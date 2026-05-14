@@ -12,7 +12,7 @@
     "build": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "node scripts/lint.mjs",
-    "validate": "node scripts/validate-trending.mjs && node scripts/validate-models.mjs",
+    "validate": "node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-model-workbench.mjs",
     "test": "npm run validate",
     "preview": "vite preview --host 127.0.0.1",
     "ingest": "node --no-warnings scripts/ingest.mjs",

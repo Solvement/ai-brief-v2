@@ -134,6 +134,25 @@ function ModelsIndex({ data }: { data: ModelsData }) {
 }
 
 function CompanyPage({ company, generatedAt }: { company: ModelCompany; generatedAt: string }) {
+  const [view, setView] = useState<"models" | "learning" | "updates">("models");
+  const [activeSeriesId, setActiveSeriesId] = useState(company.series[0]?.id || "");
+  const activeSeries = useMemo(
+    () => company.series.find((series) => series.id === activeSeriesId) || company.series[0],
+    [activeSeriesId, company.series],
+  );
+  const [activeReleaseId, setActiveReleaseId] = useState(activeSeries?.releases[0]?.id || "");
+
+  useEffect(() => {
+    if (!activeSeries) return;
+    const hasRelease = activeSeries.releases.some((release) => release.id === activeReleaseId);
+    if (!hasRelease) setActiveReleaseId(activeSeries.releases[0]?.id || "");
+  }, [activeReleaseId, activeSeries]);
+
+  const activeRelease = useMemo(() => {
+    if (!activeSeries) return null;
+    return activeSeries.releases.find((release) => release.id === activeReleaseId) || activeSeries.releases[0] || null;
+  }, [activeReleaseId, activeSeries]);
+
   return (
     <>
       <SiteHeader active="models" meta={`Models 更新于 ${formatDate(generatedAt)}`} />
@@ -160,125 +179,168 @@ function CompanyPage({ company, generatedAt }: { company: ModelCompany; generate
           </aside>
         </section>
 
-        <div className="detail-grid">
-          <div className="main-col">
-            <section className="section">
-              <h3>学习路线</h3>
-              <div className="learning-list">
-                {company.learningPath.map((item, index) => (
-                  <div className="learning-item" key={item.title}>
-                    <span className="learning-num">{index + 1}</span>
-                    <div>
-                      <h4>{item.title}</h4>
-                      <p>{item.body}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {company.series.map((series) => <SeriesSection key={series.id} series={series} />)}
-
-            <section className="section">
-              <h3>大更新与产品能力</h3>
-              <div className="update-list">
-                {company.updates.map((update) => (
-                  <article className="update-item" key={update.id}>
-                    <div className="update-meta">{formatDate(update.publishedAt)} · {update.kind}</div>
-                    <h4>{update.title}</h4>
-                    <p>{update.summary}</p>
-                    <p><b>为什么重要：</b>{update.whyItMatters}</p>
-                    <p><b>学生要学：</b>{update.studentTakeaway}</p>
-                    <SourceLinks sources={update.sources} />
-                  </article>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          <aside className="aside-col">
-            <div className="aside">
-              <h4 className="aside-title"><span className="ico">i</span>Key facts</h4>
-              <InfoRow label="Company" value={company.shortName} />
-              <InfoRow label="Audience" value={company.targetAudience.join(" / ")} />
-              <InfoRow label="Difficulty" value={company.difficulty} />
-              <InfoRow label="Action" value={company.recommendedAction} />
-              <InfoRow label="Published" value={formatDate(company.publishedAt)} />
-            </div>
-
-            <div className="aside">
-              <h4 className="aside-title"><span className="ico">→</span>Checklist</h4>
-              {company.nextSteps.map((step) => <div className="next-step" key={step}>{step}</div>)}
-            </div>
-
-            <div className="aside">
-              <h4 className="aside-title"><span className="ico">↗</span>Sources</h4>
-              <SourceLinks sources={company.sources} />
-            </div>
-          </aside>
+        <div className="workspace-tabs" role="tablist" aria-label="DeepSeek learning modes">
+          <button className={view === "models" ? "active" : ""} onClick={() => setView("models")}>模型工作台</button>
+          <button className={view === "learning" ? "active" : ""} onClick={() => setView("learning")}>学习路线</button>
+          <button className={view === "updates" ? "active" : ""} onClick={() => setView("updates")}>大更新</button>
         </div>
+
+        {view === "models" && activeSeries && activeRelease && (
+          <ModelWorkbench
+            company={company}
+            activeSeries={activeSeries}
+            activeRelease={activeRelease}
+            activeSeriesId={activeSeriesId}
+            activeReleaseId={activeReleaseId}
+            onSeriesChange={(seriesId) => {
+              setActiveSeriesId(seriesId);
+              const nextSeries = company.series.find((series) => series.id === seriesId);
+              setActiveReleaseId(nextSeries?.releases[0]?.id || "");
+            }}
+            onReleaseChange={setActiveReleaseId}
+          />
+        )}
+
+        {view === "learning" && <LearningBoard company={company} />}
+        {view === "updates" && <UpdatesBoard company={company} />}
       </main>
     </>
   );
 }
 
-function SeriesSection({ series }: { series: ModelSeries }) {
-  const releaseNames = new Map(series.releases.map((release) => [release.id, release.name]));
+function ModelWorkbench({
+  company,
+  activeSeries,
+  activeRelease,
+  activeSeriesId,
+  activeReleaseId,
+  onSeriesChange,
+  onReleaseChange,
+}: {
+  company: ModelCompany;
+  activeSeries: ModelSeries;
+  activeRelease: ModelRelease;
+  activeSeriesId: string;
+  activeReleaseId: string;
+  onSeriesChange: (seriesId: string) => void;
+  onReleaseChange: (releaseId: string) => void;
+}) {
   return (
-    <section className="section model-series-section">
-      <div className="section-kicker">Model Series</div>
-      <h3>{series.title}</h3>
-      <p className="section-lead">{series.summary}</p>
-      <div className="teacher-note">{series.teacherNote}</div>
-      <div className="release-timeline">
-        {series.releases.map((release) => (
-          <ReleaseCard key={release.id} release={release} nextName={release.nextRelation ? releaseNames.get(release.nextRelation.toReleaseId) : undefined} />
+    <section className="model-workbench">
+      <aside className="series-rail" aria-label="Model series">
+        <div className="rail-label">Series</div>
+        {company.series.map((series) => (
+          <button
+            key={series.id}
+            className={`series-pill${activeSeriesId === series.id ? " active" : ""}`}
+            onClick={() => onSeriesChange(series.id)}
+          >
+            <span>{series.title.replace(/：.+$/, "")}</span>
+            <small>{series.releases.length} releases</small>
+          </button>
         ))}
+        <div className="series-note">{activeSeries.teacherNote}</div>
+      </aside>
+
+      <div className="workbench-main">
+        <ModelMap company={company} activeReleaseId={activeReleaseId} onSeriesChange={onSeriesChange} onReleaseChange={onReleaseChange} />
+        <ReleaseSwitcher series={activeSeries} activeReleaseId={activeReleaseId} onReleaseChange={onReleaseChange} />
+        <ModelFocusPanel release={activeRelease} series={activeSeries} />
       </div>
     </section>
   );
 }
 
-function ReleaseCard({ release, nextName }: { release: ModelRelease; nextName?: string }) {
+function ModelMap({
+  company,
+  activeReleaseId,
+  onSeriesChange,
+  onReleaseChange,
+}: {
+  company: ModelCompany;
+  activeReleaseId: string;
+  onSeriesChange: (seriesId: string) => void;
+  onReleaseChange: (releaseId: string) => void;
+}) {
+  const allReleases = company.series.flatMap((series) => series.releases.map((release) => ({ release, seriesId: series.id })));
   return (
-    <article className="release-card">
-      <div className="release-date">{formatDate(release.publishedAt)}</div>
-      <div className="release-body">
-        <div className="release-head">
+    <div className="capability-map">
+      <div>
+        <div className="section-kicker">Capability Map</div>
+        <h3>从推理、效率到 Agent 基座</h3>
+      </div>
+      <div className="map-canvas">
+        {allReleases.map(({ release, seriesId }, index) => (
+          <button
+            key={release.id}
+            className={`map-node map-node-${index + 1}${release.id === activeReleaseId ? " active" : ""}`}
+            onClick={() => {
+              onSeriesChange(seriesId);
+              onReleaseChange(release.id);
+            }}
+          >
+            <span>{release.name.replace("DeepSeek-", "")}</span>
+            <small>{release.kind}</small>
+          </button>
+        ))}
+        <div className="map-line line-a" />
+        <div className="map-line line-b" />
+        <div className="map-line line-c" />
+        <div className="map-line line-d" />
+        <div className="map-line line-e" />
+      </div>
+      <div className="map-legend">
+        <span>R 系列：推理能力独立化</span>
+        <span>V 系列：通用模型吸收推理、工具和长上下文</span>
+      </div>
+    </div>
+  );
+}
+
+function ReleaseSwitcher({ series, activeReleaseId, onReleaseChange }: { series: ModelSeries; activeReleaseId: string; onReleaseChange: (releaseId: string) => void }) {
+  return (
+    <div className="release-switcher" aria-label={`${series.title} releases`}>
+      {series.releases.map((release) => (
+        <button
+          key={release.id}
+          className={`release-tab${activeReleaseId === release.id ? " active" : ""}`}
+          onClick={() => onReleaseChange(release.id)}
+        >
+          <span>{release.name.replace("DeepSeek-", "")}</span>
+          <small>{formatDate(release.publishedAt)}</small>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ModelFocusPanel({ release, series }: { release: ModelRelease; series: ModelSeries }) {
+  return (
+    <div className="model-focus-grid">
+      <article className="model-profile-panel">
+        <div className="model-profile-head">
           <div>
-            <h4>{release.name}</h4>
+            <div className="section-kicker">{series.title}</div>
+            <h2>{release.name}</h2>
             <p>{release.oneSentenceTakeaway}</p>
           </div>
-          <span className="content-pill">{release.kind}</span>
+          <span className="content-pill">{formatDate(release.publishedAt)}</span>
         </div>
 
-        <div className="release-block">
-          <h5>这一代是什么</h5>
-          <p>{release.positioning}</p>
+        <div className="model-profile-grid">
+          <AnalysisTile title="这一代是什么" body={release.positioning} tone="green" />
+          <AnalysisTile title="它自己解决的问题" body={release.problemSolved} tone="blue" />
+          <AnalysisTile title="为什么要这样设计" body={release.whyChanged} tone="amber" />
+          <AnalysisTile title="技术上怎么解决" body={release.howSolved} tone="slate" />
         </div>
-        <div className="release-block">
-          <h5>上一阶段的问题</h5>
-          <p>{release.problemSolved}</p>
-        </div>
-        <div className="release-columns">
-          <ListBlock title="核心改动" items={release.keyChanges} />
-          <div className="release-block">
-            <h5>为什么这么改</h5>
-            <p>{release.whyChanged}</p>
-          </div>
-          <div className="release-block">
-            <h5>怎么解决</h5>
-            <p>{release.howSolved}</p>
-          </div>
-        </div>
-        <div className="release-columns">
-          <ListBlock title="取舍" items={release.tradeoffs} />
-          <ListBlock title="学生要学" items={release.studentTakeaways} />
-          <ListBlock title="可做实验" items={release.experiments} />
+
+        <div className="model-lens-row">
+          <ListBlock title="模型本体：关键能力" items={release.keyChanges} />
+          <ListBlock title="适合重点学习" items={release.studentTakeaways} />
         </div>
 
         {release.api && (
-          <div className="api-strip">
+          <div className="api-strip compact">
             <InfoRow label="Model" value={release.api.modelNames.join(" / ")} />
             <InfoRow label="Context" value={release.api.contextWindow} />
             <InfoRow label="Max output" value={release.api.maxOutput} />
@@ -288,22 +350,92 @@ function ReleaseCard({ release, nextName }: { release: ModelRelease; nextName?: 
 
         <div className="teacher-note">{release.teacherNote}</div>
         <SourceLinks sources={release.sources} />
+      </article>
 
-        {release.nextRelation && (
-          <div className="relation-block">
-            <div className="relation-title">和后一代的关系：{release.name} -&gt; {nextName || release.nextRelation.toReleaseId}</div>
-            <p>{release.nextRelation.summary}</p>
-            <div className="relation-grid">
-              <InfoRow label="继承" value={release.nextRelation.inherits} />
-              <InfoRow label="改变" value={release.nextRelation.changes} />
-              <InfoRow label="原因" value={release.nextRelation.why} />
-              <InfoRow label="解法" value={release.nextRelation.solvedBy} />
-            </div>
-            <div className="teacher-note">{release.nextRelation.teacherNote}</div>
-          </div>
-        )}
+      <aside className="model-side-stack">
+        <ListBlock title="取舍与限制" items={release.tradeoffs} />
+        <ListBlock title="可以马上做的实验" items={release.experiments} />
+        {release.nextRelation ? <VisualRelationPanel release={release} relation={release.nextRelation} /> : <EndOfLinePanel release={release} />}
+      </aside>
+    </div>
+  );
+}
+
+function AnalysisTile({ title, body, tone }: { title: string; body: string; tone: "green" | "blue" | "amber" | "slate" }) {
+  return (
+    <div className={`analysis-tile ${tone}`}>
+      <h4>{title}</h4>
+      <p>{body}</p>
+    </div>
+  );
+}
+
+function VisualRelationPanel({ release, relation }: { release: ModelRelease; relation: NonNullable<ModelRelease["nextRelation"]> }) {
+  return (
+    <div className="relation-visual">
+      <div className="relation-visual-title">到后一代：{release.name} -&gt; {relation.toReleaseId.replace("deepseek-", "").toUpperCase()}</div>
+      <p>{relation.summary}</p>
+      <div className="relation-flow">
+        <div><span>继承</span><b>{relation.inherits}</b></div>
+        <div><span>改变</span><b>{relation.changes}</b></div>
+        <div><span>原因</span><b>{relation.why}</b></div>
+        <div><span>解法</span><b>{relation.solvedBy}</b></div>
       </div>
-    </article>
+      <div className="teacher-note">{relation.teacherNote}</div>
+    </div>
+  );
+}
+
+function EndOfLinePanel({ release }: { release: ModelRelease }) {
+  return (
+    <div className="relation-visual quiet">
+      <div className="relation-visual-title">{release.name} 是当前这条线的最新节点</div>
+      <p>这一版先把当前官方资料讲清。后续如果出现新一代模型，再在这里补上“它为什么走向下一代”。</p>
+    </div>
+  );
+}
+
+function LearningBoard({ company }: { company: ModelCompany }) {
+  return (
+    <section className="section learning-board">
+      <div className="section-kicker">Learning Path</div>
+      <h3>老师建议的阅读顺序</h3>
+      <div className="learning-list visual">
+        {company.learningPath.map((item, index) => (
+          <div className="learning-item" key={item.title}>
+            <span className="learning-num">{index + 1}</span>
+            <div>
+              <h4>{item.title}</h4>
+              <p>{item.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="next-step-grid">
+        {company.nextSteps.map((step) => <div className="next-step" key={step}>{step}</div>)}
+      </div>
+    </section>
+  );
+}
+
+function UpdatesBoard({ company }: { company: ModelCompany }) {
+  return (
+    <section className="section updates-board">
+      <div className="section-kicker">Product & API Updates</div>
+      <h3>模型之外的大更新</h3>
+      <div className="update-list visual">
+        {company.updates.map((update) => (
+          <article className="update-item" key={update.id}>
+            <div className="update-meta">{formatDate(update.publishedAt)} · {update.kind}</div>
+            <h4>{update.title}</h4>
+            <p>{update.summary}</p>
+            <p><b>为什么重要：</b>{update.whyItMatters}</p>
+            <p><b>学生要学：</b>{update.studentTakeaway}</p>
+            <SourceLinks sources={update.sources} />
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
