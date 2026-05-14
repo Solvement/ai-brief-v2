@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { AnalyzedRepo, ScoreBreakdown, TrendingData, TrendingWindow, LimitationItem, TryStep } from "../types";
 import { loadTrending } from "../lib/data";
 import { Markdown } from "../components/Markdown";
+import { SiteHeader } from "../components/SiteHeader";
 
 interface Props { owner: string; name: string }
 
@@ -185,16 +186,7 @@ export function Detail({ owner, name }: Props) {
 }
 
 function Header() {
-  return (
-    <header className="site-top">
-      <div className="site-top-inner">
-        <a href="#/" className="brand" style={{ color: "inherit" }}>
-          <span className="brand-mark">GH</span>
-          <span className="brand-text">Trending · Deep Dive<span className="muted">日 / 周 / 月榜 · AI 研究生导读</span></span>
-        </a>
-      </div>
-    </header>
-  );
+  return <SiteHeader active="home" />;
 }
 
 function Hero({ repo, win, deep }: { repo: AnalyzedRepo; win: TrendingWindow; deep: AnalyzedRepo["deep"] | null }) {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Board, TrendingData, TrendingWindow } from "../types";
 import { loadTrending } from "../lib/data";
 import { RepoCard } from "../components/RepoCard";
+import { SiteHeader } from "../components/SiteHeader";
 
 const TITLES: Record<TrendingWindow, string> = { daily: "今日榜", weekly: "本周榜", monthly: "本月榜" };
 const ICONS: Record<TrendingWindow, string> = { daily: "日", weekly: "周", monthly: "月" };
@@ -83,25 +84,17 @@ export function Home() {
 
   return (
     <>
-      <header className="site-top">
-        <div className="site-top-inner">
-          <div className="brand">
-            <span className="brand-mark">GH</span>
-            <span className="brand-text">
-              Trending · Deep Dive
-              <span className="muted">日 / 周 / 月榜 · AI 研究生导读</span>
-            </span>
-          </div>
-          {data && (
-            <div className="site-meta">
-              数据更新于 {relativeTime(data.generatedAt)}{" "}
-              <button className="refresh-btn" onClick={() => refreshData(false)} disabled={ingest === "running"}>
-                {ingest === "running" ? "更新中…" : "🔄 立即更新"}
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
+      <SiteHeader
+        active="home"
+        meta={data && (
+          <>
+            数据更新于 {relativeTime(data.generatedAt)}{" "}
+            <button className="refresh-btn" onClick={() => refreshData(false)} disabled={ingest === "running"}>
+              {ingest === "running" ? "更新中..." : "立即更新"}
+            </button>
+          </>
+        )}
+      />
 
       <main className="page">
         <div className="page-intro">
@@ -110,6 +103,9 @@ export function Home() {
           <div style={{ marginTop: 10, color: "var(--ink-3)", fontSize: 13 }}>
             <b>分析视角</b>：给有 AI 基础但不熟此项目术语的研究生看。
             深度解读包含 Quick read · Key Concepts · How it works · Novelty · Ecosystem · Limitations · Try it 七个板块。
+          </div>
+          <div style={{ marginTop: 10, color: "var(--ink-3)", fontSize: 13 }}>
+            <b>新增栏目</b>：<a href="#/models">Models</a> 先用 DeepSeek 做公司级模型演进样板。
           </div>
         </div>
 

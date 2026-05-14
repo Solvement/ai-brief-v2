@@ -1,17 +1,31 @@
 import { useEffect, useState } from "react";
 import { Home } from "./pages/Home";
 import { Detail } from "./pages/Detail";
+import { Models } from "./pages/Models";
+import { SiteHeader, type NavKey } from "./components/SiteHeader";
 
 /**
  * Tiny hash-based router. No external dependency.
  * Routes:
  *   #/                       -> Home (3 boards)
+ *   #/models                 -> Models index
+ *   #/models/<companyId>     -> Model company detail
  *   #/repo/<owner>/<name>    -> Detail (deep dive)
  */
-function parseHash(): { route: "home" | "detail"; owner?: string; name?: string } {
+type RouteState =
+  | { route: "home" }
+  | { route: "detail"; owner: string; name: string }
+  | { route: "models"; companyId?: string }
+  | { route: "section"; section: Exclude<NavKey, "home" | "models"> };
+
+function parseHash(): RouteState {
   const raw = window.location.hash.replace(/^#/, "") || "/";
   const m = raw.match(/^\/repo\/([^/]+)\/([^/]+)\/?$/);
   if (m) return { route: "detail", owner: decodeURIComponent(m[1]), name: decodeURIComponent(m[2]) };
+  const models = raw.match(/^\/models(?:\/([^/]+))?\/?$/);
+  if (models) return { route: "models", companyId: models[1] ? decodeURIComponent(models[1]) : undefined };
+  const section = raw.match(/^\/(news|projects|skills|articles|courses)\/?$/);
+  if (section) return { route: "section", section: section[1] as Exclude<NavKey, "home" | "models"> };
   return { route: "home" };
 }
 
@@ -30,5 +44,24 @@ export function App() {
   if (state.route === "detail" && state.owner && state.name) {
     return <Detail owner={state.owner} name={state.name} />;
   }
+  if (state.route === "models") {
+    return <Models companyId={state.companyId} />;
+  }
+  if (state.route === "section") {
+    return <ComingSoon section={state.section} />;
+  }
   return <Home />;
+}
+
+function ComingSoon({ section }: { section: Exclude<NavKey, "home" | "models"> }) {
+  return (
+    <>
+      <SiteHeader active={section} />
+      <main className="page">
+        <div className="notice">
+          {section} 栏目还没有接入数据。当前可用栏目是 Home 和 Models。
+        </div>
+      </main>
+    </>
+  );
 }

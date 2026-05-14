@@ -1,18 +1,27 @@
-# GH Trending Deep Dive
+# AI Brief
 
-Chinese-first briefings for GitHub Trending repositories. The app fetches daily, weekly, and monthly GitHub Trending boards, asks DeepSeek to evaluate each repository, and turns selected repositories into structured deep dives.
+Chinese-first AI intelligence briefings for learning, judgment, and action.
 
-This is the cleaned foundation for the next AI-brief iteration.
+The current app has two working surfaces:
+
+- `Home`: GitHub Trending daily / weekly / monthly repository briefings.
+- `Models`: curated company-level model and product-capability evolution archives.
 
 ## What It Does
 
 - Shows three boards: daily, weekly, monthly.
 - Scores every fetched repository with `worthDeepDive`.
 - Generates deep dives for the highest-value repositories above the threshold.
+- Adds a `Models` column with the first company page: DeepSeek.
+- Explains each model generation and its relationship to the next generation.
+- Tracks selected major model/product/API updates.
 - Uses a tiny hash router:
   - `#/`
+  - `#/models`
+  - `#/models/:companyId`
   - `#/repo/:owner/:name`
 - Reads static data from `public/data/trending.json`.
+- Reads curated model data from `public/data/models.json`.
 - In dev, the home page can trigger `/__ingest`, which streams `scripts/ingest.mjs` output and reloads after success.
 
 ## Quick Start
@@ -42,6 +51,8 @@ npm run ingest:dry
 
 `npm run build` writes to `dist/`, which is ignored.
 
+`npm run validate` checks both `public/data/trending.json` and `public/data/models.json`.
+
 ## Ingestion
 
 `scripts/ingest.mjs`:
@@ -51,6 +62,8 @@ npm run ingest:dry
 - asks DeepSeek for a light analysis of every fetched repository;
 - selects deep-dive candidates by `worthDeepDive >= 60`, capped by `--cap`;
 - writes `public/data/trending.json`.
+
+The `Models` column is intentionally not part of ingestion. It is manually curated from official sources so each company page can focus on learning value and model-generation reasoning instead of daily churn.
 
 Defaults:
 
@@ -85,11 +98,14 @@ INGEST_INTERVAL_HOURS=18
 ├── index.html
 ├── package.json
 ├── public/
-│   └── data/trending.json
+│   └── data/
+│       ├── models.json
+│       └── trending.json
 ├── scripts/
 │   ├── ingest.mjs
 │   ├── lint.mjs
 │   ├── maybe-ingest.mjs
+│   ├── validate-models.mjs
 │   └── validate-trending.mjs
 └── src/
     ├── App.tsx
@@ -98,14 +114,18 @@ INGEST_INTERVAL_HOURS=18
     ├── types.ts
     ├── components/
     │   ├── Markdown.tsx
-    │   └── RepoCard.tsx
+    │   ├── RepoCard.tsx
+    │   └── SiteHeader.tsx
     ├── lib/
     │   └── data.ts
     └── pages/
         ├── Detail.tsx
-        └── Home.tsx
+        ├── Home.tsx
+        └── Models.tsx
 ```
 
 ## Current Scope
 
-The legacy AI-brief v2 multi-column implementation was removed from this workspace. Do not depend on old `docs/`, `tests/`, `src/lib/content`, `src/lib/ai`, `src/pages/DirectoryPages`, or old admin pages; they are intentionally gone.
+The legacy AI-brief v2 multi-column implementation was removed from this workspace. Do not depend on old `src/lib/content`, `src/lib/ai`, `src/pages/DirectoryPages`, or old admin pages; they are intentionally gone.
+
+`Models` currently includes DeepSeek only. Add future companies by extending `public/data/models.json` and keeping `scripts/validate-models.mjs` green.

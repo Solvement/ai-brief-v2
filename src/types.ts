@@ -62,3 +62,103 @@ export interface TrendingData {
   weekly: Board;
   monthly: Board;
 }
+
+export interface ModelSource {
+  name: string;
+  url: string;
+}
+
+export interface ModelApiInfo {
+  modelNames: string[];
+  contextWindow: string;
+  maxOutput: string;
+  modes: string[];
+}
+
+export interface ModelNextRelation {
+  toReleaseId: string;
+  summary: string;
+  inherits: string;
+  changes: string;
+  why: string;
+  solvedBy: string;
+  teacherNote: string;
+}
+
+export interface ModelRelease {
+  id: string;
+  name: string;
+  kind: string;
+  publishedAt: string;
+  positioning: string;
+  oneSentenceTakeaway: string;
+  problemSolved: string;
+  keyChanges: string[];
+  whyChanged: string;
+  howSolved: string;
+  tradeoffs: string[];
+  studentTakeaways: string[];
+  experiments: string[];
+  api?: ModelApiInfo;
+  teacherNote: string;
+  sources: ModelSource[];
+  nextRelation?: ModelNextRelation;
+}
+
+export interface ModelSeries {
+  id: string;
+  title: string;
+  summary: string;
+  teacherNote: string;
+  releases: ModelRelease[];
+}
+
+export interface ModelLearningItem {
+  title: string;
+  body: string;
+}
+
+export interface ModelUpdate {
+  id: string;
+  title: string;
+  kind: string;
+  publishedAt: string;
+  summary: string;
+  whyItMatters: string;
+  studentTakeaway: string;
+  sources: ModelSource[];
+}
+
+export interface ModelCompany {
+  id: string;
+  name: string;
+  shortName: string;
+  country: string;
+  updatedAt: string;
+  publishedAt: string;
+  oneSentenceTakeaway: string;
+  whyItMatters: string;
+  contentType: "model";
+  targetAudience: string[];
+  readingTime: string;
+  actionLabel: string;
+  impactScore: number;
+  readabilityScore: number;
+  actionabilityScore: number;
+  confidenceScore: number;
+  difficulty: string;
+  recommendedAction: string;
+  sourceName: string;
+  sourceUrl: string;
+  tags: string[];
+  nextSteps: string[];
+  sources: ModelSource[];
+  learningPath: ModelLearningItem[];
+  series: ModelSeries[];
+  updates: ModelUpdate[];
+}
+
+export interface ModelsData {
+  generatedAt: string;
+  companies: ModelCompany[];
+}

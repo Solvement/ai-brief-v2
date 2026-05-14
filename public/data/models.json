@@ -1,0 +1,482 @@
+{
+  "generatedAt": "2026-05-14T18:30:00.000Z",
+  "companies": [
+    {
+      "id": "deepseek",
+      "name": "DeepSeek",
+      "shortName": "DeepSeek",
+      "country": "China",
+      "updatedAt": "2026-04-24",
+      "publishedAt": "2026-04-24",
+      "oneSentenceTakeaway": "DeepSeek 的主线不是单纯堆参数，而是在开源、低成本、推理、长上下文和 agent 工具使用之间连续优化。",
+      "whyItMatters": "它给学生提供了一个很适合学习的样本：同一家公司如何把基础模型、推理模型、API 成本、上下文工程和 agent 能力逐步串成一条产品路线。",
+      "contentType": "model",
+      "targetAudience": ["AI 学生", "模型应用开发者", "Agent 工程学习者", "开源模型观察者"],
+      "readingTime": "15 min",
+      "actionLabel": "学习 DeepSeek 路线",
+      "impactScore": 92,
+      "readabilityScore": 86,
+      "actionabilityScore": 84,
+      "confidenceScore": 91,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "sourceName": "DeepSeek API Docs",
+      "sourceUrl": "https://api-docs.deepseek.com/",
+      "tags": ["China", "Open Source", "Agent", "AI Coding", "Local AI", "Research"],
+      "nextSteps": [
+        "先看 R 系列，理解为什么 DeepSeek 要把强化学习推理单独做成一条线。",
+        "再看 V 系列，理解通用模型如何逐步吸收推理、长上下文和工具调用能力。",
+        "最后看更新节点，把模型能力和 API 成本、App 入口、开发者接口联系起来。"
+      ],
+      "sources": [
+        {
+          "name": "DeepSeek V4 Preview Release",
+          "url": "https://api-docs.deepseek.com/news/news260424"
+        },
+        {
+          "name": "DeepSeek Models & Pricing",
+          "url": "https://api-docs.deepseek.com/quick_start/pricing"
+        },
+        {
+          "name": "DeepSeek News Archive",
+          "url": "https://api-docs.deepseek.com/news/news250120"
+        }
+      ],
+      "learningPath": [
+        {
+          "title": "先学 R1：推理能力为什么可以靠后训练放大",
+          "body": "R1 的重点是大规模强化学习后训练、开源权重和蒸馏模型。学生应该关注它如何把数学、代码和长链推理从普通对话能力里分离出来，变成一个可以单独优化的能力。"
+        },
+        {
+          "title": "再学 V3.1：为什么一个模型要有 Think / Non-Think 两种模式",
+          "body": "V3.1 把思考和不思考放进同一个模型接口，是从模型能力走向产品体验的关键一步。它让用户可以在速度和深度之间切换，而不是被迫使用两个割裂的模型。"
+        },
+        {
+          "title": "接着学 V3.2：agent 不是会调用工具就够了",
+          "body": "V3.2 的重点是 Thinking in Tool-Use。学生应该理解，真实 agent 需要在规划、调用工具、读取返回、继续推理之间保持状态，而不是只输出一次函数调用 JSON。"
+        },
+        {
+          "title": "最后学 V4：长上下文、成本和产品分层一起发生",
+          "body": "V4 把 1M context、Pro/Flash 分层、DSA 和 agent coding 优化放在同一代里。这里要学的是模型公司如何同时处理能力、延迟、价格和用户场景。"
+        }
+      ],
+      "series": [
+        {
+          "id": "r-series",
+          "title": "R 系列：推理模型路线",
+          "summary": "R 系列回答的问题是：如何把复杂推理从普通聊天模型里拆出来，做成可评测、可蒸馏、可开源的能力。",
+          "teacherNote": "这条线最适合学习后训练、强化学习、蒸馏和推理链成本。不要只记 benchmark，重点看 DeepSeek 为什么要让推理成为一个独立产品形态。",
+          "releases": [
+            {
+              "id": "deepseek-r1",
+              "name": "DeepSeek-R1",
+              "kind": "model",
+              "publishedAt": "2025-01-20",
+              "positioning": "开源推理模型，用强化学习后训练把数学、代码和复杂推理能力推到接近当时顶级闭源推理模型的水平。",
+              "oneSentenceTakeaway": "R1 证明了推理能力可以通过大规模 RL 后训练和开源蒸馏路线快速扩散。",
+              "problemSolved": "普通聊天模型在需要多步推理、数学证明、代码推导时不稳定，而且闭源推理模型难以复现和学习。",
+              "keyChanges": [
+                "强化大规模 RL 后训练，把推理能力作为核心目标优化。",
+                "发布开源模型、技术报告和多个蒸馏小模型。",
+                "API 侧通过 `deepseek-reasoner` 暴露推理模型。"
+              ],
+              "whyChanged": "推理能力已经成为模型差异化的关键，但如果只依赖闭源产品，研究者和学生很难理解能力是怎样被训练、蒸馏和部署出来的。",
+              "howSolved": "DeepSeek 把推理能力放到后训练阶段集中优化，并把 R1 与蒸馏版本开源，让社区可以研究推理轨迹、训练策略和小模型继承能力。",
+              "tradeoffs": [
+                "推理会消耗更多输出 token，延迟和成本都更高。",
+                "强推理模型不一定适合所有日常聊天任务。",
+                "推理痕迹越长，越需要产品层控制可读性和预算。"
+              ],
+              "studentTakeaways": [
+                "区分预训练能力和后训练推理能力。",
+                "理解为什么蒸馏可以把大模型推理风格迁移到小模型。",
+                "用同一题目比较普通聊天模型和推理模型的 token 使用、正确率和解释质量。"
+              ],
+              "experiments": [
+                "选 10 道数学或代码题，比较 non-reasoning 模型与 `deepseek-reasoner` 的正确率。",
+                "记录每道题的输出长度，观察推理能力与 token 成本之间的关系。",
+                "拿 R1 蒸馏模型和 R1 原模型做同题对比，分析哪些推理习惯被保留下来。"
+              ],
+              "api": {
+                "modelNames": ["deepseek-reasoner"],
+                "contextWindow": "官方发布时以 thinking mode API 暴露，后续由新模型兼容路由承接。",
+                "maxOutput": "发布页给出推理 API 价格，具体上下文与输出上限以后续 pricing 页面为准。",
+                "modes": ["Thinking"]
+              },
+              "teacherNote": "R1 的学习价值不在于记住它打败谁，而在于看懂推理模型为什么会成为和聊天模型不同的产品类别。",
+              "sources": [
+                {
+                  "name": "DeepSeek-R1 Release",
+                  "url": "https://api-docs.deepseek.com/news/news250120"
+                },
+                {
+                  "name": "DeepSeek-R1 Technical Report",
+                  "url": "https://github.com/deepseek-ai/DeepSeek-R1/blob/main/DeepSeek_R1.pdf"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "deepseek-r1-0528",
+                "summary": "R1-0528 不是换路线，而是在 R1 的推理路线继续补稳定性、前端能力、幻觉控制和工具接口。",
+                "inherits": "继承 R1 的推理模型定位、开源权重路线和 API 使用方式。",
+                "changes": "增强 benchmark 表现、前端能力，降低幻觉，并补上 JSON output 与 function calling 支持。",
+                "why": "R1 首发证明了推理能力，但要进入更多真实应用，就必须让输出更可控、工具调用更稳定、误答更少。",
+                "solvedBy": "通过模型更新和接口能力补齐，让推理模型更容易接入工程系统，而不只是做问答评测。",
+                "teacherNote": "这一步说明模型发布后的第一轮迭代，常常不是架构革命，而是把研究能力修成产品能力。"
+              }
+            },
+            {
+              "id": "deepseek-r1-0528",
+              "name": "DeepSeek-R1-0528",
+              "kind": "model",
+              "publishedAt": "2025-05-28",
+              "positioning": "R1 的稳定性和工程可用性更新，强调更好 benchmark、前端能力、低幻觉，以及 JSON/function calling。",
+              "oneSentenceTakeaway": "R1-0528 把 R1 从强推理样板继续往可集成、可控输出方向推进。",
+              "problemSolved": "R1 虽然推理强，但真实应用还需要更少幻觉、更强结构化输出和函数调用能力。",
+              "keyChanges": [
+                "提升 benchmark 表现和前端相关能力。",
+                "降低幻觉。",
+                "支持 JSON output 与 function calling。"
+              ],
+              "whyChanged": "开发者不会只看模型能不能答对难题，还会看它能不能稳定进入现有 UI、工具链和自动化流程。",
+              "howSolved": "在不改变 API 使用方式的前提下更新模型能力，并提供开源权重，降低迁移成本。",
+              "tradeoffs": [
+                "仍然继承推理模型 token 使用较高的问题。",
+                "结构化输出能力增强，不代表复杂工具链一定可靠。",
+                "如果任务不需要深推理，使用推理模型可能浪费成本。"
+              ],
+              "studentTakeaways": [
+                "学习模型迭代如何从 benchmark 转向工程可用性。",
+                "观察 function calling 与推理模型结合时的失败模式。",
+                "把幻觉控制作为模型评测的一部分，而不是只看准确率。"
+              ],
+              "experiments": [
+                "设计一个需要 JSON 输出的推理题，检查输出是否稳定可解析。",
+                "让模型先推理再调用一个 mock tool，记录错误调用比例。",
+                "对比 R1 和 R1-0528 在同一前端代码任务上的可用性。"
+              ],
+              "api": {
+                "modelNames": ["deepseek-reasoner"],
+                "contextWindow": "官方说明 API 用法不变。",
+                "maxOutput": "以后续 pricing 页面为准。",
+                "modes": ["Thinking"]
+              },
+              "teacherNote": "R1-0528 是一次很典型的模型产品化更新：不是换名字，而是把研究模型接进工程接口。",
+              "sources": [
+                {
+                  "name": "DeepSeek-R1-0528 Release",
+                  "url": "https://api-docs.deepseek.com/news/news250528"
+                },
+                {
+                  "name": "DeepSeek-R1-0528 Weights",
+                  "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "v-series",
+          "title": "V 系列：通用模型到 agent 基座",
+          "summary": "V 系列回答的问题是：通用聊天模型如何吸收推理、长上下文、低成本和工具使用，逐渐成为 agent 应用的基础模型。",
+          "teacherNote": "这条线要从产品系统角度看：同一个模型家族一边追能力，一边追价格、上下文、API 兼容和 agent 场景。",
+          "releases": [
+            {
+              "id": "deepseek-v3-1",
+              "name": "DeepSeek-V3.1",
+              "kind": "model",
+              "publishedAt": "2025-08-21",
+              "positioning": "DeepSeek 走向 agent 时代的第一步，把 Think / Non-Think 两种模式放进同一代模型。",
+              "oneSentenceTakeaway": "V3.1 把 R 系列的推理思路和通用聊天模型合流，让用户按任务切换思考深度。",
+              "problemSolved": "R1 强在推理但日常任务偏重，普通聊天模型快但复杂任务不够稳，用户需要在同一个产品里切换两种工作方式。",
+              "keyChanges": [
+                "一个模型支持 Think 与 Non-Think 两种模式。",
+                "thinking 模式相对 R1-0528 更快达到答案。",
+                "通过后训练增强工具使用和多步 agent 任务。",
+                "API 中 `deepseek-chat` 对应 non-thinking，`deepseek-reasoner` 对应 thinking。"
+              ],
+              "whyChanged": "用户不想每次先判断该选聊天模型还是推理模型，产品需要把速度和深度做成可切换模式，而不是割裂模型入口。",
+              "howSolved": "在 V3 基础上继续预训练并更新 tokenizer/chat template，同时用后训练增强 agent 和 tool-use 相关能力。",
+              "tradeoffs": [
+                "混合模式降低了选择成本，但也要求用户理解什么时候该打开 thinking。",
+                "128K 上下文提升了任务空间，也提高了上下文管理难度。",
+                "API 兼容多格式会增加文档和行为边界复杂度。"
+              ],
+              "studentTakeaways": [
+                "理解模型能力和产品模式之间的关系。",
+                "学习为什么 agent 需要强推理和工具调用共同优化。",
+                "比较同一任务在 Think / Non-Think 下的延迟、成本和质量差异。"
+              ],
+              "experiments": [
+                "把同一搜索规划任务分别用 Think 和 Non-Think 跑一遍，比较步骤质量。",
+                "让模型完成一个多工具任务，观察错误发生在规划、调用还是结果整合阶段。",
+                "用 128K 级长文档做问答，记录上下文越长时答案是否更可靠。"
+              ],
+              "api": {
+                "modelNames": ["deepseek-chat", "deepseek-reasoner"],
+                "contextWindow": "128K",
+                "maxOutput": "以后续 pricing 页面为准。",
+                "modes": ["Non-Thinking", "Thinking"]
+              },
+              "teacherNote": "V3.1 是从模型到产品的关键节点：能力不是越强越好，而是要能被用户按场景控制。",
+              "sources": [
+                {
+                  "name": "DeepSeek-V3.1 Release",
+                  "url": "https://api-docs.deepseek.com/news/news250821"
+                },
+                {
+                  "name": "DeepSeek Anthropic API Guide",
+                  "url": "https://api-docs.deepseek.com/guides/anthropic_api"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "deepseek-v3-2-exp",
+                "summary": "V3.2-Exp 接着 V3.1 的 agent/长上下文方向，先把效率问题作为实验重点。",
+                "inherits": "继承 V3.1 的混合模式、agent 方向和长上下文需求。",
+                "changes": "引入 DeepSeek Sparse Attention，用更低计算和内存成本服务长上下文。",
+                "why": "当上下文和 agent 任务变长，注意力成本会成为价格、延迟和吞吐的核心瓶颈。",
+                "solvedBy": "用细粒度稀疏注意力尽量保持输出质量，同时降低长上下文训练和推理成本。",
+                "teacherNote": "从 V3.1 到 V3.2-Exp，要看懂为什么“更长上下文”最终会变成“注意力效率”问题。"
+              }
+            },
+            {
+              "id": "deepseek-v3-2-exp",
+              "name": "DeepSeek-V3.2-Exp",
+              "kind": "model",
+              "publishedAt": "2025-09-29",
+              "positioning": "实验模型，核心是用 DeepSeek Sparse Attention 改善长上下文训练和推理效率。",
+              "oneSentenceTakeaway": "V3.2-Exp 把 DeepSeek 的下一步问题聚焦到长上下文成本：不是只做更长，而是让更长变便宜。",
+              "problemSolved": "长上下文越长，注意力计算和 KV 相关成本越高，模型即使能读也未必能以合理价格大规模服务。",
+              "keyChanges": [
+                "在 V3.1-Terminus 基础上引入 DeepSeek Sparse Attention。",
+                "长上下文训练和推理更快、更省。",
+                "API 价格下调 50% 以上。",
+                "发布开源模型、技术报告和关键 GPU kernel。"
+              ],
+              "whyChanged": "如果 agent 要处理仓库、PDF、日志和多轮工具轨迹，长上下文会成为默认需求；成本如果不降，产品就很难普及。",
+              "howSolved": "通过细粒度稀疏注意力减少不必要的全量注意力计算，并把对输出质量的影响控制在可接受范围内。",
+              "tradeoffs": [
+                "实验模型适合验证方向，但稳定性和最终产品形态仍需后续版本确认。",
+                "稀疏注意力降低成本，也可能带来极端长文档召回边界。",
+                "性能接近 V3.1-Terminus，不代表所有任务都全面提升。"
+              ],
+              "studentTakeaways": [
+                "把长上下文看成系统成本问题，而不只是模型参数问题。",
+                "学习 sparse attention 为什么能影响 API 价格。",
+                "关注实验版模型如何为正式版铺路。"
+              ],
+              "experiments": [
+                "构造一个 100K token 文档问答任务，比较短提示和长提示的答案稳定性。",
+                "用重复长前缀测试缓存和长上下文成本之间的关系。",
+                "阅读技术报告，画出 DSA 想减少哪些注意力计算。"
+              ],
+              "api": {
+                "modelNames": ["deepseek-chat", "deepseek-reasoner"],
+                "contextWindow": "延续长上下文方向，具体以发布和 pricing 页面为准。",
+                "maxOutput": "以后续 pricing 页面为准。",
+                "modes": ["Non-Thinking", "Thinking"]
+              },
+              "teacherNote": "V3.2-Exp 是理解 DeepSeek 工程取向的关键：它把模型能力、GPU kernel、API 价格放在同一个问题里解决。",
+              "sources": [
+                {
+                  "name": "DeepSeek-V3.2-Exp Release",
+                  "url": "https://api-docs.deepseek.com/news/news250929"
+                },
+                {
+                  "name": "DeepSeek-V3.2-Exp Technical Report",
+                  "url": "https://github.com/deepseek-ai/DeepSeek-V3.2-Exp/blob/main/DeepSeek_V3_2.pdf"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "deepseek-v3-2",
+                "summary": "V3.2 把 V3.2-Exp 的效率路线正式化，同时把重点推到 reasoning-first agent。",
+                "inherits": "继承 DSA 和长上下文效率方向，也继承 V3.1 的 Think / Non-Think 与工具使用方向。",
+                "changes": "正式引入 Thinking in Tool-Use，并用大量 agent 环境和复杂指令合成数据训练。",
+                "why": "agent 的难点不是单次回答，而是边思考边调用工具、读取结果、继续修正计划。",
+                "solvedBy": "用覆盖 1,800+ 环境和 85k+ 复杂指令的大规模 agent 训练数据，训练模型在工具使用过程中保持推理。",
+                "teacherNote": "这里能看到实验版到正式版的转换：效率底座稳定后，产品目标转向真实 agent 任务。"
+              }
+            },
+            {
+              "id": "deepseek-v3-2",
+              "name": "DeepSeek-V3.2",
+              "kind": "model",
+              "publishedAt": "2025-12-01",
+              "positioning": "reasoning-first agent 模型，强调 Thinking in Tool-Use 和 V3.2-Speciale 的高强度推理。",
+              "oneSentenceTakeaway": "V3.2 的关键不是更会聊天，而是在工具使用过程中继续思考。",
+              "problemSolved": "早期 tool calling 往往只是生成函数参数，模型在调用前后缺少连续推理，复杂 agent 很容易在中途偏航。",
+              "keyChanges": [
+                "V3.2 成为 V3.2-Exp 的正式后继。",
+                "引入 Thinking in Tool-Use。",
+                "支持 thinking 与 non-thinking 两种模式下的工具使用。",
+                "V3.2-Speciale 提供更高强度推理，但 API-only 且暂不支持 tool-use。"
+              ],
+              "whyChanged": "当 AI 从聊天助手转向 agent，模型必须能在工具调用前后保持计划和判断，否则工具越多，错误传播越快。",
+              "howSolved": "DeepSeek 构建大规模 agent 训练数据，覆盖 1,800+ 环境与 85k+ 复杂指令，让模型学习在工具循环里推理。",
+              "tradeoffs": [
+                "更强 reasoning 通常意味着更长输出和更高 token 使用。",
+                "V3.2-Speciale 适合研究评测，但缺少 tool calls 限制了产品集成。",
+                "Thinking in Tool-Use 提升上限，也需要更严格的工具安全和状态管理。"
+              ],
+              "studentTakeaways": [
+                "理解 tool calling、tool use 和 agent reasoning 的区别。",
+                "学习为什么训练数据环境数量会影响 agent 泛化。",
+                "观察强推理模型和可工具调用模型之间的产品分工。"
+              ],
+              "experiments": [
+                "设计一个需要搜索、计算、再总结的三步任务，记录模型是否会根据工具返回修正计划。",
+                "比较 thinking 和 non-thinking 模式下的工具调用次数、错误率和最终答案。",
+                "让模型在工具结果冲突时做判断，观察它是否盲信工具输出。"
+              ],
+              "api": {
+                "modelNames": ["deepseek-chat", "deepseek-reasoner", "DeepSeek-V3.2-Speciale temporary endpoint"],
+                "contextWindow": "沿用 V3.2-Exp 使用方式，具体以官方 API 文档为准。",
+                "maxOutput": "以后续 pricing 页面为准。",
+                "modes": ["Non-Thinking", "Thinking", "Speciale API-only"]
+              },
+              "teacherNote": "V3.2 是学生理解 agent 模型的好入口：真正的 agent 能力是在工具循环中保持推理，而不是会输出一个函数名。",
+              "sources": [
+                {
+                  "name": "DeepSeek-V3.2 Release",
+                  "url": "https://api-docs.deepseek.com/news/news251201"
+                },
+                {
+                  "name": "DeepSeek Thinking Mode Guide",
+                  "url": "https://api-docs.deepseek.com/guides/thinking_mode"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "deepseek-v4-preview",
+                "summary": "V4 Preview 把 V3.2 的 agent 和 DSA 方向扩展成 1M context 标准服务，并做 Pro/Flash 产品分层。",
+                "inherits": "继承 DSA、Thinking in Tool-Use、双模式和 agent coding 方向。",
+                "changes": "升级到 V4-Pro / V4-Flash 两档模型，默认 1M context，支持 OpenAI ChatCompletions 与 Anthropic API。",
+                "why": "agent 场景需要同时处理更大上下文、更低价格、更快响应和不同用户预算。",
+                "solvedBy": "用 Pro/Flash 分层覆盖高能力和高性价比场景，用 token-wise compression + DSA 降低超长上下文成本。",
+                "teacherNote": "V3.2 到 V4 是从“会在工具中思考”走向“把长上下文 agent 变成默认产品”。"
+              }
+            },
+            {
+              "id": "deepseek-v4-preview",
+              "name": "DeepSeek-V4 Preview",
+              "kind": "model",
+              "publishedAt": "2026-04-24",
+              "positioning": "V4 预览版，主打 1M context、Pro/Flash 分层、开源权重、agent coding 和高性价比服务。",
+              "oneSentenceTakeaway": "V4 把 DeepSeek 的下一阶段定为 1M context + agent + 成本分层的综合产品线。",
+              "problemSolved": "V3.2 已经有 agent 推理，但大规模用户还需要更长上下文、更明确的速度/能力档位和更低长上下文成本。",
+              "keyChanges": [
+                "发布 DeepSeek-V4-Pro 与 DeepSeek-V4-Flash。",
+                "官方服务默认 1M context。",
+                "同时支持 Thinking / Non-Thinking。",
+                "支持 OpenAI ChatCompletions 和 Anthropic API。",
+                "`deepseek-chat` 与 `deepseek-reasoner` 将在 2026-07-24 15:59 UTC 后退役。"
+              ],
+              "whyChanged": "模型公司需要把高能力模型和高吞吐低成本模型拆开服务，让用户按任务复杂度选择，而不是用一个模型解决所有预算场景。",
+              "howSolved": "V4 使用 token-wise compression + DSA 改善超长上下文效率，并用 Pro/Flash 两档模型把能力、速度和价格拆成明确选择。",
+              "tradeoffs": [
+                "Preview 阶段意味着行为和价格仍可能调整。",
+                "1M context 容易诱导用户塞入过多无关信息，需要更好的上下文筛选。",
+                "旧模型名兼容路由会降低迁移成本，但也要求开发者在退役日期前完成显式迁移。"
+              ],
+              "studentTakeaways": [
+                "学习模型产品分层：Pro 解决高难任务，Flash 解决速度和成本。",
+                "理解 1M context 不是万能，仍要做检索、压缩和上下文预算。",
+                "关注 API 兼容和模型退役对真实应用维护的影响。"
+              ],
+              "experiments": [
+                "把同一 agent coding 任务分别交给 Pro 和 Flash，比较速度、工具调用质量和最终可运行率。",
+                "用一个长 PDF 或代码仓库做 1M context 实验，检查模型是否能引用正确位置。",
+                "把旧 `deepseek-chat` / `deepseek-reasoner` 调用迁移到 `deepseek-v4-flash` / `deepseek-v4-pro`，记录行为差异。"
+              ],
+              "api": {
+                "modelNames": ["deepseek-v4-pro", "deepseek-v4-flash"],
+                "contextWindow": "1M",
+                "maxOutput": "384K",
+                "modes": ["Non-Thinking", "Thinking"]
+              },
+              "teacherNote": "V4 最值得学的是产品工程：同一代模型同时处理参数规模、活跃参数、上下文、价格、API 兼容和 agent 场景。",
+              "sources": [
+                {
+                  "name": "DeepSeek V4 Preview Release",
+                  "url": "https://api-docs.deepseek.com/news/news260424"
+                },
+                {
+                  "name": "DeepSeek Models & Pricing",
+                  "url": "https://api-docs.deepseek.com/quick_start/pricing"
+                },
+                {
+                  "name": "DeepSeek-V4 Pro Technical Report",
+                  "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/blob/main/DeepSeek_V4.pdf"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updates": [
+        {
+          "id": "deepseek-api-upgrade-2024-07-25",
+          "title": "DeepSeek API Upgrade: JSON、Function Calling、FIM",
+          "kind": "api",
+          "publishedAt": "2024-07-25",
+          "summary": "DeepSeek 在 API 中加入 JSON Output、Function Calling、Chat Prefix Completion、8K max_tokens beta 和 FIM Completion。",
+          "whyItMatters": "这是从模型能力到开发者工具能力的第一层补齐。没有结构化输出和函数调用，模型很难进入自动化工作流。",
+          "studentTakeaway": "把这类更新看成 agent 基础设施，而不是简单 API 小功能。",
+          "sources": [
+            {
+              "name": "DeepSeek API Upgrade",
+              "url": "https://api-docs.deepseek.com/news/news0725"
+            }
+          ]
+        },
+        {
+          "id": "deepseek-context-caching-2024-08-02",
+          "title": "Context Caching: 用缓存把长输入成本打下来",
+          "kind": "api",
+          "publishedAt": "2024-08-02",
+          "summary": "DeepSeek 引入磁盘 Context Caching，重复前缀可以命中缓存，降低延迟和输入 token 成本。",
+          "whyItMatters": "长上下文应用不只是模型问题，也是账单和延迟问题。缓存让多轮对话、代码分析、文档分析更接近可规模化。",
+          "studentTakeaway": "学习长上下文时，要同时看模型窗口、KV/cache、重复前缀和 API 计费。",
+          "sources": [
+            {
+              "name": "Context Caching is Available",
+              "url": "https://api-docs.deepseek.com/news/news0802"
+            }
+          ]
+        },
+        {
+          "id": "deepseek-app-2025-01-15",
+          "title": "DeepSeek App: 把模型变成大众入口",
+          "kind": "product",
+          "publishedAt": "2025-01-15",
+          "summary": "DeepSeek App 上线，提供聊天历史同步、Web search、Deep-Think、文件上传和文本提取。",
+          "whyItMatters": "App 说明模型公司不只服务 API 开发者，也要把搜索、推理和文件能力包装成普通用户能理解的入口。",
+          "studentTakeaway": "观察同一模型能力如何在 API、Web 和 App 中被不同方式包装。",
+          "sources": [
+            {
+              "name": "Introducing DeepSeek App",
+              "url": "https://api-docs.deepseek.com/news/news250115"
+            }
+          ]
+        },
+        {
+          "id": "deepseek-v4-api-migration-2026-04-24",
+          "title": "V4 API 迁移：从旧模型名过渡到 Pro / Flash",
+          "kind": "api",
+          "publishedAt": "2026-04-24",
+          "summary": "V4 发布后，官方建议直接使用 `deepseek-v4-pro` 或 `deepseek-v4-flash`；旧的 `deepseek-chat` 和 `deepseek-reasoner` 将在 2026-07-24 后退役。",
+          "whyItMatters": "这类模型退役和路由兼容会直接影响线上应用维护，是模型开发者必须关注的产品工程问题。",
+          "studentTakeaway": "不要只学 prompt，也要学模型版本迁移、兼容路由和退役时间表。",
+          "sources": [
+            {
+              "name": "DeepSeek V4 Preview Release",
+              "url": "https://api-docs.deepseek.com/news/news260424"
+            },
+            {
+              "name": "DeepSeek Models & Pricing",
+              "url": "https://api-docs.deepseek.com/quick_start/pricing"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
