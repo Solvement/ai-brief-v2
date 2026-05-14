@@ -1,58 +1,64 @@
-import type { ActionLabel, AnyContentItem, ContentTag, ContentType, Audience, NavigationItem } from "./lib/content/types";
+export type TrendingWindow = "daily" | "weekly" | "monthly";
 
-export type { ActionLabel, AnyContentItem, ContentTag, ContentType, Audience, NavigationItem };
-
-export interface EvaluatedContentCard {
-  id: string;
-  title: string;
-  one_sentence_takeaway: string;
-  why_it_matters: string;
-  content_type: ContentType;
-  target_audience: Audience[];
-  reading_time: string;
-  action_label: string;
-  impact_score: number;
-  readability_score: number;
-  actionability_score: number;
-  confidence_score: number;
-  source_name: string;
-  source_url: string;
-  published_at: string;
-  tags: ContentTag[];
-  difficulty: "beginner" | "intermediate" | "advanced";
-  recommended_action: ActionLabel;
-  risks: string[];
-  next_steps: string[];
-}
-
-export interface DecisionBrief {
-  label: string;
-  card: EvaluatedContentCard;
-}
-
-export interface ModelRadarRow {
-  scenario: string;
-  primaryMetric: string;
-  costLevel: "低" | "中" | "高";
-  valueLevel: "中" | "中高" | "高";
-  nextStep: string;
-}
-
-export interface ToolAssessment {
+export interface RepoSummary {
+  fullName: string;
+  owner: string;
   name: string;
-  label: ContentTag;
-  maturity: "实验" | "可用" | "生产可用";
-  cost: string;
-  risk: string;
+  url: string;
+  ownerAvatarUrl: string;
+  description: string | null;
+  language: string | null;
+  languageColor: string | null;
+  stars: number;
+  forks: number;
+  starsGained: number;
 }
 
-export interface PlaybookItem {
-  title: string;
-  time: string;
-  output: string;
+export interface ScoreBreakdown {
+  novelty: number;
+  engineering: number;
+  reproducibility: number;
+  timeToValue: number;
 }
 
-export interface LearnPath {
-  title: string;
-  text: string;
+export interface WhyMatters { title: string; body: string }
+export interface KeyConcept { term: string; explain: string }
+export interface LimitationItem { title: string; body: string }
+export interface TryStep { step: string; cmd?: string; note?: string }
+
+export interface DeepDive {
+  atGlance: string;
+  whyItMatters: WhyMatters[];
+  keyConcepts: KeyConcept[];
+  /** Markdown-ish: supports ## subheading, **bold**, `code` */
+  howItWorks: string;
+  novelty: string;
+  ecosystem: string;
+  /** Structured array OR legacy string (for backward compatibility) */
+  limitations: LimitationItem[] | string;
+  /** Structured array OR legacy string */
+  tryIt: TryStep[] | string;
+  score: ScoreBreakdown;
+}
+
+export interface AnalyzedRepo extends RepoSummary {
+  rank: number;
+  tldr: string;
+  tags: string[];
+  light: string;
+  worthDeepDive: number;
+  deep?: DeepDive;
+}
+
+export interface Board {
+  window: TrendingWindow;
+  generatedAt: string;
+  repos: AnalyzedRepo[];
+}
+
+export interface TrendingData {
+  generatedAt: string;
+  daily: Board;
+  weekly: Board;
+  monthly: Board;
 }

@@ -1,39 +1,33 @@
 {
-  "name": "ai-brief",
+  "name": "gh-trending-deepdive",
   "private": true,
-  "version": "0.1.0",
-  "description": "AI-brief: a Chinese-first AI intelligence product turning AI news, models, tools, projects, papers, and guides into a daily decision workflow.",
+  "version": "0.3.0",
+  "description": "GitHub Trending (daily/weekly/monthly) curated for AI grad students. Auto re-ingests via DeepSeek; AI scores each repo and decides which get deep-dive analysis.",
   "license": "MIT",
-  "engines": {
-    "node": ">=24"
-  },
+  "type": "module",
+  "engines": { "node": ">=20" },
   "scripts": {
+    "predev": "node --no-warnings scripts/maybe-ingest.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "node scripts/lint.mjs",
-    "test": "tsc -p tsconfig.test.json && node scripts/run-tests.mjs",
-    "validate": "node scripts/validate-content.mjs",
-    "validate:content": "node scripts/validate-content.mjs",
-    "validate:evaluation": "npm test",
-    "validate:playbook": "npm test",
+    "validate": "node scripts/validate-trending.mjs",
+    "test": "npm run validate",
     "preview": "vite preview --host 127.0.0.1",
-    "ingest:live": "node --no-warnings scripts/live-ingest.mjs",
-    "db:init": "node --no-warnings scripts/db-init.mjs",
-    "db:reset": "node --no-warnings scripts/db-reset.mjs"
+    "ingest": "node --no-warnings scripts/ingest.mjs",
+    "ingest:force": "node --no-warnings scripts/ingest.mjs --no-cache",
+    "ingest:dry": "node --no-warnings scripts/ingest.mjs --dry-run"
   },
   "dependencies": {
-    "@phosphor-icons/react": "^2.1.10",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^25.6.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "tailwindcss": "^4.0.0",
     "typescript": "^5.9.3",
     "vite": "^7.2.7"
   }

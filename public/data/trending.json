@@ -1,0 +1,3030 @@
+{
+  "generatedAt": "2026-05-14T13:16:23.440Z",
+  "daily": {
+    "window": "daily",
+    "generatedAt": "2026-05-14T13:15:49.358Z",
+    "repos": [
+      {
+        "fullName": "ruvnet/RuView",
+        "owner": "ruvnet",
+        "name": "RuView",
+        "url": "https://github.com/ruvnet/RuView",
+        "ownerAvatarUrl": "https://github.com/ruvnet.png?size=80",
+        "description": "π RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign monitoring, and presence detection — all without a single pixel of video.",
+        "language": "Rust",
+        "languageColor": "#dea584",
+        "stars": 55135,
+        "forks": 7329,
+        "starsGained": 1757,
+        "rank": 1,
+        "tldr": "这是一个基于WiFi信道状态信息（CSI）的感知平台，利用ESP32低成本硬件实现穿墙人体姿态估计、生命体征监测和空间智能，无需摄像头或可穿戴设备。",
+        "tags": [
+          "WiFi感知",
+          "CSI",
+          "边缘AI",
+          "ESP32",
+          "穿墙检测"
+        ],
+        "light": "该项目近期在GitHub trending上受到关注，主要因为其将前沿的WiFi感知研究（如CMU的DensePose From WiFi）转化为可运行的边缘硬件方案，使用Rust实现高性能信号处理，并提供了完整的Docker演示和ESP32固件。其独特的无摄像头训练方法和多节点融合架构吸引了AI和物联网社区的广泛兴趣。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "RuView 将普通 WiFi 信号转化为实时空间智能、生命体征监测和存在检测，无需任何摄像头。它利用 ESP32 传感器捕获的信道状态信息（CSI），通过边缘 AI 实现穿墙感知、呼吸心率监测和姿态估计，完全本地运行，保护隐私。",
+          "whyItMatters": [
+            {
+              "title": "无摄像头隐私",
+              "body": "完全基于 WiFi 射频信号，无需摄像头，规避 GDPR/HIPAA 等视频隐私法规，适合医疗、零售等敏感场景。"
+            },
+            {
+              "title": "低成本边缘部署",
+              "body": "每个节点仅需 9 美元的 ESP32-S3，搭配 140 美元的 Cognitum Seed 即可实现完整功能，无需云服务或互联网。"
+            },
+            {
+              "title": "穿墙与黑暗环境",
+              "body": "信号可穿透墙壁和障碍物，在完全黑暗下工作，覆盖摄像头盲区，实现全天候监测。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "CSI (Channel State Information)",
+              "explain": "WiFi 信道状态信息，描述射频信号在传播路径上的幅度和相位变化。RuView 利用 ESP32 捕获 CSI，从中提取人体运动、呼吸等细微扰动，是感知的原始数据基础。"
+            },
+            {
+              "term": "RuVector",
+              "explain": "RuView 的 AI 后端，提供注意力机制、图算法、压缩和场模型等处理模块。它将 CSI 特征转化为 17 个 COCO 关键点或生命体征，支持边缘实时推理。"
+            },
+            {
+              "term": "Cognitum Seed",
+              "explain": "一个 140 美元的边缘硬件，提供持久化向量存储、kNN 搜索、密码学见证链和 MCP 代理。与 ESP32 配合，实现本地记忆和 AI 集成，无需云服务。"
+            },
+            {
+              "term": "WiFlow 架构",
+              "explain": "RuView 的姿态估计架构，仅用 10 个传感器信号即可训练出 17 个关键点，无需摄像头标注。源自卡内基梅隆大学的 DensePose From WiFi 研究。"
+            },
+            {
+              "term": "多频段融合",
+              "explain": "RuView 在 6 个 WiFi 信道上跳频，利用邻居路由器作为免费雷达发射器，将感知带宽提升 3 倍，增强空间分辨率和鲁棒性。"
+            }
+          ],
+          "howItWorks": "## 组件\nRuView 系统由多个硬件和软件组件协同工作。核心硬件是 ESP32-S3 传感器节点（9 美元），负责捕获 WiFi 信道状态信息（CSI）。可选配 Cognitum Seed（140 美元）提供持久化向量存储、kNN 搜索和密码学见证链。软件层面，RuVector 是 AI 后端，包含注意力机制、图算法和场模型；边缘模块（Edge Modules）是运行在 ESP32 上的小程序，实现特定功能如跌倒检测、呼吸监测。此外，多频段网格扫描组件利用 6 个 WiFi 信道和邻居路由器作为照明源，增强感知带宽。整个系统通过信号线协议（CRV）的六阶段流水线（格式塔、感知、拓扑、相干、搜索、模型）组织数据流。\n\n## 数据流\n数据从 WiFi 路由器发射的射频信号开始，穿过空间并被人体散射。ESP32 网格（4-6 个节点）通过 TDM 协议在信道 1/6/11 上捕获 CSI。多频段融合将 3 个信道 × 56 个子载波组合成 168 个虚拟子载波。接着，多站融合通过 N×(N-1) 条链路和注意力加权跨视角嵌入，增强空间感知。相干门（Coherence Gate）筛选稳定测量值，确保数天无需重新校准。信号处理模块（Hampel 滤波器、SpotFi、Fresnel 模型、BVP 提取、频谱图）将原始 CSI 转化为干净特征。RuVector 进一步处理，最终输出 17 个身体关键点、呼吸/心率、房间指纹和漂移警报。\n\n## 关键算法/配置\n关键算法包括：带通滤波器（呼吸 0.1-0.5 Hz，心率 0.8-2.0 Hz）结合过零检测计算 BPM；Fresnel 区几何模型实现穿墙感知（最深 5 米）；对比学习 CSI 嵌入模型（ADR-024）实现无监督自举训练；MERIDIAN 域泛化（ADR-027）确保模型在不同房间工作。配置方面，ESP32 固件需设置 WiFi SSID/密码和目标 IP；多节点部署需配置 TDM 同步；Cognitum Seed 需初始化向量存储和见证链。Docker 镜像提供模拟数据模式，无需硬件即可评估信号处理流水线。",
+          "novelty": "RuView 在 WiFi 感知领域具有显著创新，但并非完全独创。与现有方案相比：\n\n1. **与学术研究对比**：卡内基梅隆大学的 DensePose From WiFi 是基础，但 RuView 将其工程化，支持实时边缘部署，并增加了生命体征监测和穿墙感知。MIT 的 Wi-Fi 感知研究多依赖昂贵 USRP 设备，RuView 使用 9 美元 ESP32 大幅降低成本。\n\n2. **与商业方案对比**：Origin Wireless 等公司提供 WiFi 感知方案，但闭源且依赖云服务。RuView 完全开源、本地运行，且支持多模态融合（摄像头+雷达），这是独特优势。\n\n3. **与 LangChain/AutoGen 对比**：这些是通用 AI 代理框架，而 RuView 专注于射频信号处理，其 RuVector 后端针对 CSI 数据优化，包含专用信号处理流水线，非通用 LLM 应用。\n\n4. **与 Llama 等模型对比**：RuView 不使用大语言模型，而是轻量级脉冲神经网络（SNN）和传统信号处理，适合边缘设备。其无摄像头训练方法（10 个传感器信号）是新颖的，但精度仍有限（PCK@20 约 2.5%），目标 35%+ 尚未完全验证。\n\n总体而言，RuView 的创新在于将学术 WiFi 感知技术工程化为低成本、开源、边缘可部署的系统，并整合了多模态融合和密码学见证链，但核心算法并非突破性。",
+          "ecosystem": "RuView 依赖以下生态：\n- **硬件**：ESP32-S3（乐鑫科技）、Cognitum Seed（定制硬件）、Intel 5300/Atheros AR9580 研究网卡。\n- **软件**：Rust 语言（1.85+）、RuVector 库、Docker 多架构镜像、esptool 烧录工具。\n- **协议**：WiFi 802.11n/ac、CSI 捕获、TDM 同步、MCP 代理。\n\n它替代了传统摄像头监控、PIR 传感器和可穿戴设备，在隐私敏感场景（医疗、零售）有优势。竞争方案包括 Origin Wireless（商业闭源）、Cognitive Systems（WiFi 感知芯片）、以及学术项目如 Wi-Fi CSI 研究。RuView 通过开源、低成本（9 美元节点）和边缘 AI 定位差异化。它可与 Home Assistant 等智能家居平台集成，也可作为独立系统运行。未来可能依赖更广泛的 ESP32 社区和边缘 AI 框架。",
+          "limitations": [
+            {
+              "title": "姿态精度有限",
+              "body": "无摄像头训练下 PCK@20 仅约 2.5%，远低于视觉方案。摄像头监督训练目标 35%+ 尚未完成评估，实际精度待验证。"
+            },
+            {
+              "title": "硬件兼容性窄",
+              "body": "仅支持 ESP32-S3 等双核芯片，ESP32-C3 和原始 ESP32 因单核性能不足无法运行 CSI DSP，限制了硬件选择。"
+            },
+            {
+              "title": "多节点部署复杂",
+              "body": "单节点空间分辨率有限，推荐 2+ 节点或 Cognitum Seed。多节点需 TDM 同步和网络配置，对非技术用户门槛较高。"
+            },
+            {
+              "title": "穿墙距离有限",
+              "body": "通过 Fresnel 模型可实现最深 5 米穿墙，但实际效果受墙体材料（混凝土、金属）影响，复杂环境可能衰减严重。"
+            },
+            {
+              "title": "人员容量受限",
+              "body": "每个 AP 通常区分 3-5 人（56 子载波），多 AP 线性扩展，但密集人群（>20 人）下区分精度下降，不适合大型活动。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "拉取 Docker 镜像并运行模拟数据（无需硬件）",
+              "cmd": "docker pull ruvnet/wifi-densepose:latest && docker run -p 3000:3000 ruvnet/wifi-densepose:latest",
+              "note": "打开 http://localhost:3000 查看实时姿态和生命体征模拟。"
+            },
+            {
+              "step": "烧录 ESP32-S3 固件（需硬件）",
+              "cmd": "python -m esptool --chip esp32s3 --port COM9 --baud 460800 write_flash 0x0 bootloader.bin 0x8000 partition-table.bin 0xf000 ota_data_initial.bin 0x20000 esp32-csi-node.bin",
+              "note": "根据实际端口修改 COM9，确保 ESP32-S3 已连接。"
+            },
+            {
+              "step": "配置 WiFi 并启动 CSI 流",
+              "cmd": "python firmware/esp32-csi-node/provision.py --port COM9 --ssid \"YourWiFi\" --password \"secret\" --target-ip 192.168.1.20",
+              "note": "替换 WiFi 凭据和目标 IP，ESP32 将开始发送 CSI 数据。"
+            },
+            {
+              "step": "运行 RF 房间扫描（需 Cognitum Seed）",
+              "cmd": "node scripts/rf-scan.js --port 5006",
+              "note": "扫描环境射频指纹，用于房间识别和家具检测。"
+            },
+            {
+              "step": "启动 SNN 实时学习处理器",
+              "cmd": "node scripts/snn-csi-processor.js --port 5006",
+              "note": "脉冲神经网络在 30 秒内适应环境，无需预训练。"
+            },
+            {
+              "step": "运行人员计数模块",
+              "cmd": "node scripts/mincut-person-counter.js --port 5006",
+              "note": "基于最小割算法，校正多节点下的人员计数。"
+            },
+            {
+              "step": "打开实时姿态融合演示（浏览器）",
+              "cmd": "open https://ruvnet.github.io/RuView/pose-fusion.html",
+              "note": "需先运行 sensing server，演示结合 webcam 和 WiFi CSI 的双模态姿态估计。"
+            },
+            {
+              "step": "验证信号处理流水线（无硬件）",
+              "cmd": "python archive/v1/data/proof/verify.py",
+              "note": "使用确定性参考信号验证算法正确性，无需硬件。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 22,
+            "reproducibility": 20,
+            "timeToValue": 15
+          }
+        }
+      },
+      {
+        "fullName": "tinyhumansai/openhuman",
+        "owner": "tinyhumansai",
+        "name": "openhuman",
+        "url": "https://github.com/tinyhumansai/openhuman",
+        "ownerAvatarUrl": "https://github.com/tinyhumansai.png?size=80",
+        "description": "Your Personal AI super intelligence. Private, Simple and extremely powerful.",
+        "language": "Rust",
+        "languageColor": "#dea584",
+        "stars": 7206,
+        "forks": 573,
+        "starsGained": 3476,
+        "rank": 2,
+        "tldr": "这是一个开源的个人AI助手，通过自动抓取集成数据并构建本地记忆树，实现快速上下文理解，特别强调隐私和易用性。",
+        "tags": [
+          "AI助手",
+          "开源",
+          "记忆树",
+          "Rust",
+          "集成"
+        ],
+        "light": "该项目近期在GitHub trending上受到关注，主要因为其创新的记忆树和自动数据抓取功能，能够快速整合用户的多平台数据（如Gmail、Notion、GitHub等），提供个性化AI体验。此外，其简洁的UI和丰富的内置工具（如代码、搜索、语音）降低了使用门槛，吸引了大量开发者试用。",
+        "worthDeepDive": 75
+      },
+      {
+        "fullName": "rohitg00/agentmemory",
+        "owner": "rohitg00",
+        "name": "agentmemory",
+        "url": "https://github.com/rohitg00/agentmemory",
+        "ownerAvatarUrl": "https://github.com/rohitg00.png?size=80",
+        "description": "#1 Persistent memory for AI coding agents based on real-world benchmarks",
+        "language": "TypeScript",
+        "languageColor": "#3178c6",
+        "stars": 8627,
+        "forks": 714,
+        "starsGained": 1978,
+        "rank": 3,
+        "tldr": "这是一个持久化记忆引擎，用于为AI编码代理提供跨会话的上下文记忆，特别在零外部数据库、95%检索准确率和多代理共享记忆方面突出。",
+        "tags": [
+          "记忆引擎",
+          "MCP服务器",
+          "编码代理",
+          "持久化",
+          "TypeScript"
+        ],
+        "light": "本周/月 trending 原因：AI编码代理（如Claude Code、Cursor）的普及使得跨会话记忆成为刚需，而agentmemory提供了零配置、高精度（95.2% R@5）的解决方案，且无需外部数据库，直接集成MCP协议，支持多种代理。其基准测试和对比表格直观展示了优于mem0、Letta等竞品的性能，吸引了大量开发者关注。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "agentmemory 为 AI 编码代理提供持久化记忆，基于真实基准测试实现 95.2% 的检索召回率，同时减少 92% 的 token 消耗。它通过 MCP 服务器和自动钩子无缝集成到现有工作流中，无需手动管理记忆。",
+          "whyItMatters": [
+            {
+              "title": "消除重复解释",
+              "body": "代理自动记住项目上下文、偏好和决策，无需在每次会话中重新解释，显著提升开发效率。"
+            },
+            {
+              "title": "跨代理共享记忆",
+              "body": "通过 MCP 和 REST API，多个代理（如 Claude Code、Cursor、Gemini CLI）可共享同一记忆服务器，实现协作。"
+            },
+            {
+              "title": "零外部依赖",
+              "body": "基于 SQLite 和 iii 引擎，无需数据库或向量存储，部署简单且完全自托管。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "记忆生命周期",
+              "explain": "四层记忆整合策略：短期记忆自动合并到长期记忆，通过置信度评分和衰减机制管理遗忘，确保最相关的记忆优先保留。"
+            },
+            {
+              "term": "混合搜索 (RRF 融合)",
+              "explain": "结合 BM25 关键词搜索、向量语义搜索和知识图谱关系搜索，通过倒数排名融合 (RRF) 排序结果，实现 95.2% 的检索召回率。"
+            },
+            {
+              "term": "自动钩子 (Auto Hooks)",
+              "explain": "12 个预定义钩子自动捕获代理行为（如文件修改、命令执行、错误），无需手动调用 API，实现零配置记忆记录。"
+            },
+            {
+              "term": "MCP 服务器",
+              "explain": "基于 Model Context Protocol 的服务器，提供标准化的记忆读写接口，任何支持 MCP 的客户端（如 Claude Desktop、Cursor）均可直接使用。"
+            },
+            {
+              "term": "iii 引擎",
+              "explain": "agentmemory 底层依赖的轻量级引擎，提供嵌入、搜索、存储等核心能力，支持本地 all-MiniLM-L6-v2 模型，无需外部 API。"
+            }
+          ],
+          "howItWorks": "## 组件\nagentmemory 由三个核心组件构成：**记忆服务器**、**自动钩子系统**和 **MCP 接口**。记忆服务器基于 iii 引擎，使用 SQLite 作为持久化存储，内置 BM25 索引、向量嵌入（默认 all-MiniLM-L6-v2）和知识图谱。自动钩子系统提供 12 个预定义钩子，覆盖文件变更、命令执行、错误捕获等场景，无需手动调用 API。MCP 接口遵循 Model Context Protocol，允许任何支持 MCP 的客户端（如 Claude Code、Cursor、Gemini CLI）通过标准协议读写记忆。此外，还包含实时查看器（端口 3113）和 REST API（104 个端点），支持跨代理共享。\n\n## 数据流\n数据流分为捕获、存储和检索三个阶段。捕获阶段：自动钩子监听代理行为（如文件保存、命令输出），将事件转化为结构化记忆条目，包含文本、元数据和时间戳。存储阶段：条目经过嵌入模型生成向量，同时提取关键词构建 BM25 索引，并更新知识图谱中的实体关系。检索阶段：当代理发起查询时，系统并行执行 BM25 搜索、向量搜索和图谱搜索，通过倒数排名融合 (RRF) 合并结果，按置信度排序后注入代理上下文。整个流程异步执行，对代理无感知。\n\n## 关键算法/配置\n关键算法包括：**混合搜索**使用 RRF 融合 BM25、向量和图谱结果，权重可配置（默认 BM25:0.3, 向量:0.5, 图谱:0.2）。**记忆生命周期**采用四层整合：短期记忆（<1 小时）自动合并到长期记忆，基于置信度评分（0-1）和衰减因子（默认 0.9/天）管理遗忘，低置信度条目自动归档。**配置项**包括嵌入模型（默认本地 all-MiniLM-L6-v2，可选 OpenAI/text-embedding-3-small）、存储路径、端口号（默认 3113）、钩子启用列表等，通过 `agentmemory.json` 或环境变量设置。",
+          "novelty": "agentmemory 在持久化记忆领域并非完全创新，但与同类方案相比有显著差异。与 **mem0**（53K ⭐）相比，agentmemory 提供自动捕获（12 个钩子 vs 手动 add() 调用）和更高的检索精度（95.2% R@5 vs 68.5%），且无需外部向量数据库（mem0 依赖 Qdrant/pgvector）。与 **Letta/MemGPT**（22K ⭐）相比，agentmemory 是轻量级记忆引擎而非完整代理运行时，无框架锁定，任何 MCP 客户端均可使用。与 **claude-mem** 或内置 CLAUDE.md 相比，agentmemory 提供混合搜索、记忆生命周期和实时查看器，token 效率更高（~1,900 tokens/会话 vs 22K+）。\n\n其核心创新在于将记忆生命周期管理、混合搜索和自动捕获集成到一个零外部依赖的包中，并通过 MCP 标准化接口实现跨代理兼容。不过，记忆整合算法和 RRF 融合并非全新概念，但工程实现（如 827 个测试、基准验证）使其在可靠性和易用性上领先。",
+          "ecosystem": "agentmemory 依赖 **iii 引擎**（`iii-sdk` ^0.11.0）提供嵌入和搜索能力，默认使用本地 `all-MiniLM-L6-v2` 模型（通过 `@xenova/transformers`），无需外部 API。存储依赖 SQLite（通过 `better-sqlite3`），无其他外部数据库。它通过 MCP 协议与主流代理集成：Claude Code、Cursor、Gemini CLI、Codex CLI、OpenClaw、Hermes、Cline、Goose 等，也提供 REST API 供自定义集成。\n\n在竞争方面，agentmemory 直接与 mem0、Letta、Khoj、Hippo 等记忆方案竞争，但通过零依赖、自动捕获和跨代理兼容性差异化。它不替代代理本身，而是作为记忆层增强现有工具。与 LangChain 的记忆模块相比，agentmemory 更轻量且独立，不绑定特定框架。",
+          "limitations": [
+            {
+              "title": "记忆容量有限",
+              "body": "虽然使用 SQLite 持久化，但长期使用后数据库可能增长到数百 MB，影响检索速度。目前无内置数据压缩或自动归档策略。"
+            },
+            {
+              "title": "嵌入模型局限",
+              "body": "默认使用本地 all-MiniLM-L6-v2 模型，对专业领域术语（如医学、法律）的语义理解可能不足，需切换为 OpenAI 等外部模型，但会增加成本和延迟。"
+            },
+            {
+              "title": "多代理协调简单",
+              "body": "通过 MCP 和 REST 实现基本共享，但缺乏高级协调机制（如分布式锁、冲突解决），多个代理同时写入可能导致数据不一致。"
+            },
+            {
+              "title": "依赖 iii 引擎稳定性",
+              "body": "底层 iii 引擎仍在快速迭代中（当前 v0.11.x），API 可能变化，升级需谨慎。README 明确要求锁定版本，但长期兼容性未保证。"
+            },
+            {
+              "title": "实时性不足",
+              "body": "记忆捕获和检索存在异步延迟（通常数秒），对于需要即时上下文的高频交互场景（如实时调试），可能不够及时。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "启动记忆服务器（默认端口 3113）",
+              "cmd": "npx @agentmemory/agentmemory",
+              "note": "确保 Node.js >= 18，首次运行会自动安装依赖。"
+            },
+            {
+              "step": "在浏览器中打开实时记忆查看器",
+              "cmd": "open http://localhost:3113",
+              "note": "查看器显示记忆图谱和检索统计。"
+            },
+            {
+              "step": "运行演示模式，种子示例数据",
+              "cmd": "npx @agentmemory/agentmemory demo",
+              "note": "会创建 3 个模拟会话（如 JWT 认证配置），展示自动捕获效果。"
+            },
+            {
+              "step": "通过 MCP 连接 Claude Code（需配置 MCP 客户端）",
+              "note": "在 Claude Code 的 MCP 配置中添加 agentmemory 服务器地址。"
+            },
+            {
+              "step": "手动添加一条记忆",
+              "cmd": "curl -X POST http://localhost:3113/memory -H \"Content-Type: application/json\" -d '{\"text\":\"项目使用 jose 中间件处理 JWT\"}'",
+              "note": "记忆会自动索引并关联到当前项目。"
+            },
+            {
+              "step": "搜索记忆",
+              "cmd": "curl \"http://localhost:3113/search?q=JWT%20middleware\"",
+              "note": "返回混合搜索结果，包含置信度评分。"
+            },
+            {
+              "step": "配置自动钩子（以文件变更钩子为例）",
+              "note": "在 agentmemory.json 中启用 fs-watcher 钩子，自动记录文件修改。"
+            },
+            {
+              "step": "停止服务器",
+              "cmd": "Ctrl+C",
+              "note": "记忆数据保存在本地 SQLite 文件中，重启后自动加载。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 24,
+            "reproducibility": 23,
+            "timeToValue": 22
+          }
+        }
+      },
+      {
+        "fullName": "obra/superpowers",
+        "owner": "obra",
+        "name": "superpowers",
+        "url": "https://github.com/obra/superpowers",
+        "ownerAvatarUrl": "https://github.com/obra.png?size=80",
+        "description": "An agentic skills framework & software development methodology that works.",
+        "language": "Shell",
+        "languageColor": "#89e051",
+        "stars": 190646,
+        "forks": 16950,
+        "starsGained": 1801,
+        "rank": 4,
+        "tldr": "这是一个为编码代理设计的技能框架和软件开发方法论，通过可组合的技能和初始指令引导代理遵循TDD、YAGNI等原则，实现自主开发。",
+        "tags": [
+          "AI编码代理",
+          "软件开发方法论",
+          "TDD",
+          "技能框架",
+          "代理工作流"
+        ],
+        "light": "该项目近期在trending上因其创新的代理驱动开发方法论而受到关注。它提供了一套完整的技能库，使AI编码代理能够像资深开发者一样工作：先设计再编码，强调测试驱动开发，并通过子代理协作实现长时间自主工作。随着Claude Code、Codex CLI等工具的普及，开发者对提升AI编码效率的需求激增，Superpowers恰好填补了这一空白，成为提升代理开发质量的热门选择。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Superpowers 不是又一个 agent 框架，而是一套**强制性的开发方法论**，让你的 coding agent 从'乱写代码'变成'先设计、再规划、再分步执行'。它通过可组合的 skills 和自动触发的子代理驱动开发，让 Claude 等 agent 能自主工作数小时而不跑偏。",
+          "whyItMatters": [
+            {
+              "title": "从'写代码'到'做工程'",
+              "body": "强制 agent 先 brainstorm、写 spec、做计划，再 TDD 实现，避免盲目生成垃圾代码。"
+            },
+            {
+              "title": "子代理驱动开发",
+              "body": "每个任务派发独立子代理，两阶段审查（spec 合规 + 代码质量），实现长时间自主工作。"
+            },
+            {
+              "title": "跨平台统一体验",
+              "body": "支持 Claude Code、Codex CLI、Cursor、Gemini CLI 等 8 种 harness，技能和流程完全一致。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Skills",
+              "explain": "可组合的原子能力模块，如 brainstorming、test-driven-development、subagent-driven-development。每个 skill 包含触发条件、步骤和输出。agent 在任务前自动检查并应用相关 skill。"
+            },
+            {
+              "term": "Subagent-Driven Development",
+              "explain": "核心执行模式：主 agent 将计划拆成 2-5 分钟的任务，每个任务派发一个**全新子代理**执行，完成后进行两阶段审查（spec 合规 + 代码质量），通过后才继续。"
+            },
+            {
+              "term": "Git Worktrees",
+              "explain": "利用 git worktree 为每个开发分支创建隔离工作目录，避免切换分支时的上下文丢失，支持并行开发多个特性。"
+            },
+            {
+              "term": "RED-GREEN-REFACTOR",
+              "explain": "TDD 的强制循环：先写失败测试（RED），写最少代码通过（GREEN），重构优化（REFACTOR）。agent 若在测试前写代码会被删除。"
+            },
+            {
+              "term": "Harness",
+              "explain": "指承载 Superpowers 的 coding agent 环境，如 Claude Code、Codex CLI、Cursor 等。每个 harness 有独立的安装方式，但技能库和行为一致。"
+            }
+          ],
+          "howItWorks": "## 组件\nSuperpowers 的核心是**技能库（Skills Library）**，包含约 15 个预定义 skill，分为测试、调试、协作、元四类。每个 skill 是一个 markdown 文件，定义了触发条件、步骤和输出格式。例如 `test-driven-development` 强制 RED-GREEN-REFACTOR 循环，`brainstorming` 在写代码前引导用户细化需求。此外还有**指令系统**，在 agent 启动时加载，确保 agent 在每次任务前检查相关 skill。所有技能通过 `skills/` 目录组织，agent 通过文件系统或插件机制加载。\n\n## 数据流\n工作流从用户启动 agent 开始：1) **brainstorming** 技能自动触发，引导用户写出设计文档。2) 设计批准后，`using-git-worktrees` 创建隔离分支并运行测试基线。3) `writing-plans` 将设计拆成 2-5 分钟的任务，每个任务包含文件路径、完整代码和验证步骤。4) 用户确认后，`subagent-driven-development` 或 `executing-plans` 派发子代理逐任务执行，每完成一个任务触发 `requesting-code-review` 审查。5) 所有任务完成后，`finishing-a-development-branch` 验证测试、提供合并/PR/丢弃选项。数据流是**线性但带循环**的：审查失败会退回修改。\n\n## 关键算法/配置\n核心算法是**子代理调度与两阶段审查**：主 agent 维护一个任务队列，每次从队列取出一个任务，创建一个全新的子代理（无历史上下文）执行。子代理完成后，主 agent 先检查是否满足 spec（第一阶段），再检查代码质量（第二阶段），任一阶段失败则标记任务为失败并记录原因。配置方面，每个 skill 通过 markdown 中的 `## Triggers` 和 `## Steps` 定义行为，用户可通过环境变量或 harness 特定配置调整，例如 `SUPERPOWERS_DEBUG` 开启调试日志。此外，`writing-skills` 技能提供了创建新技能的模板和测试方法论，但核心技能不接受外部修改。",
+          "novelty": "Superpowers 的独特之处在于它**不是框架，而是方法论**。与 LangChain 或 AutoGen 等 agent 框架相比，它不提供 LLM 调用抽象或工具注册机制，而是直接规定 agent 的行为流程。类似地，与 LlamaIndex 的 agent 模式相比，Superpowers 更强调**工程纪律**而非智能路由。它的子代理驱动开发类似于微软的 TaskWeaver，但 Superpowers 的子代理是**无状态、一次性**的，且强制两阶段审查，这降低了累积错误的风险。\n\n另一个对比是 Anthropic 的 Claude Code 原生功能，Superpowers 相当于在其上叠加了一层**强制工作流**，使得 agent 不会跳过设计或测试。这种'元方法论'在开源领域尚属首创，虽然概念上类似软件工程中的'开发流程自动化'，但直接作用于 coding agent 并跨平台实现，是其主要创新。",
+          "ecosystem": "Superpowers 依赖**多种 coding agent harness**（Claude Code、Codex CLI、Cursor 等）作为执行环境，本身不依赖任何特定 LLM 或框架。它通过插件市场分发，与各 harness 的插件系统深度集成。在竞争方面，它与 Cursor 的 Agent 模式、GitHub Copilot 的 Agent 模式形成互补——Superpowers 提供流程，而它们提供执行。替代方案包括手动使用 Prompt 模板或使用 Devin 等全托管服务，但 Superpowers 是**开源且可自托管**的。它还与 git worktree 等标准工具配合，不引入新依赖。社区通过 Discord 和 GitHub Issues 交流，赞助模式支持持续开发。",
+          "limitations": [
+            {
+              "title": "学习曲线陡峭",
+              "body": "用户和 agent 都需要适应强制流程，初期可能觉得繁琐。对于简单任务，brainstorming 和写计划的开销可能超过直接编码。"
+            },
+            {
+              "title": "仅支持特定 harness",
+              "body": "目前只支持 8 种 coding agent，如 Claude Code、Codex CLI 等。若使用其他 agent（如 Continue.dev），需要等待适配。"
+            },
+            {
+              "title": "技能不可自定义核心",
+              "body": "官方不接受新技能贡献，核心技能修改需跨所有 harness 验证，限制了社区创新。用户只能通过 writing-skills 创建私有技能。"
+            },
+            {
+              "title": "子代理上下文丢失",
+              "body": "每个子代理是全新实例，无历史上下文，可能导致重复工作或遗漏全局信息。主 agent 需手动传递关键上下文。"
+            },
+            {
+              "title": "依赖 harness 稳定性",
+              "body": "Superpowers 的自动触发依赖 harness 的插件机制，若 harness 更新导致 API 变化，技能可能失效，需等待适配。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "在 Claude Code 中安装 Superpowers 插件（官方市场）",
+              "cmd": "/plugin install superpowers@claude-plugins-official",
+              "note": "确保 Claude Code 已安装且登录。"
+            },
+            {
+              "step": "启动一个简单项目，例如 '创建一个计算器 CLI'",
+              "cmd": "claude \"创建一个计算器 CLI\"",
+              "note": "观察 agent 是否先进入 brainstorming 阶段。"
+            },
+            {
+              "step": "在 brainstorming 中回答 agent 的问题，完善设计",
+              "note": "设计文档会保存到项目目录。"
+            },
+            {
+              "step": "批准设计后，查看 agent 生成的实施计划",
+              "note": "计划会拆成 2-5 分钟的任务。"
+            },
+            {
+              "step": "输入 'go' 让 agent 开始执行计划",
+              "cmd": "go",
+              "note": "agent 会派发子代理逐个任务执行。"
+            },
+            {
+              "step": "观察子代理执行和两阶段审查过程",
+              "note": "审查失败会退回修改。"
+            },
+            {
+              "step": "所有任务完成后，选择合并或丢弃分支",
+              "note": "agent 会提供选项。"
+            }
+          ],
+          "score": {
+            "novelty": 22,
+            "engineering": 24,
+            "reproducibility": 25,
+            "timeToValue": 18
+          }
+        }
+      },
+      {
+        "fullName": "K-Dense-AI/scientific-agent-skills",
+        "owner": "K-Dense-AI",
+        "name": "scientific-agent-skills",
+        "url": "https://github.com/K-Dense-AI/scientific-agent-skills",
+        "ownerAvatarUrl": "https://github.com/K-Dense-AI.png?size=80",
+        "description": "A set of ready to use Agent Skills for research, science, engineering, analysis, finance and writing.",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 21519,
+        "forks": 2357,
+        "starsGained": 637,
+        "rank": 5,
+        "tldr": "这是一个包含135个预定义技能的开源工具包，用于将AI编码助手转化为跨学科科研助手，特别在统一访问100+科学数据库和70+优化包方面。",
+        "tags": [
+          "AI科研助手",
+          "Agent Skills",
+          "科学数据库",
+          "多学科",
+          "开源"
+        ],
+        "light": "该项目近期在trending上因其将AI编码代理（如Cursor、Claude Code）转化为全能科研助手的能力而受到关注。它提供了135个即用型技能，覆盖从基因组学到材料科学的广泛领域，并统一了100多个科学数据库的访问。随着AI代理在科研中的应用日益普及，这个项目降低了科学家使用AI进行复杂工作流的门槛，且完全开源，吸引了大量关注。",
+        "worthDeepDive": 75
+      },
+      {
+        "fullName": "shiyu-coder/Kronos",
+        "owner": "shiyu-coder",
+        "name": "Kronos",
+        "url": "https://github.com/shiyu-coder/Kronos",
+        "ownerAvatarUrl": "https://github.com/shiyu-coder.png?size=80",
+        "description": "Kronos: A Foundation Model for the Language of Financial Markets",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 24606,
+        "forks": 4313,
+        "starsGained": 359,
+        "rank": 6,
+        "tldr": "这是一个金融K线基础模型，用分层离散标记化处理OHLCV数据，特别在跨45+交易所预训练且支持微调。",
+        "tags": [
+          "金融基础模型",
+          "K线序列",
+          "分层标记化",
+          "量化交易",
+          "开源"
+        ],
+        "light": "Kronos近期因被AAAI 2026接收而受关注，作为首个开源金融K线基础模型，它通过分层标记化将连续OHLCV数据转化为离散token，并基于自回归Transformer预训练。项目提供从预训练到微调、批预测的完整工具链，且支持多交易所数据，吸引了量化交易和AI交叉领域的研究者。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Kronos 是首个面向金融 K 线序列的开源基础模型，通过分层离散标记化将 OHLCV 数据转化为类似语言的 token，再用自回归 Transformer 预训练，统一支持预测、分类等量化任务。30 分钟即可上手预测，适合金融 AI 研究者与量化开发者。",
+          "whyItMatters": [
+            {
+              "title": "首个金融 K 线基础模型",
+              "body": "不同于通用时间序列模型，Kronos 专为金融数据的高噪声、多维度特性设计，填补了开源金融基础模型的空白。"
+            },
+            {
+              "title": "两阶段框架创新",
+              "body": "分层 tokenizer 将连续 K 线量化为离散 token，再训练 Transformer，既保留细粒度信息又支持自回归生成，可统一多种任务。"
+            },
+            {
+              "title": "覆盖全球 45+ 交易所",
+              "body": "预训练数据来自全球 45 家交易所，模型具备跨市场泛化能力，可直接用于不同资产和市场的预测。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "分层离散标记化",
+              "explain": "将连续 OHLCV 数据通过多级量化（如粗粒度趋势 + 细粒度波动）转化为离散 token 序列，类似 NLP 中的分词，使 Transformer 能高效建模金融序列的层次结构。"
+            },
+            {
+              "term": "KronosPredictor",
+              "explain": "封装了数据预处理、归一化、预测、反归一化的高级 API，用户只需传入 DataFrame 和时间戳即可获得预测结果，支持单条和批量预测。"
+            },
+            {
+              "term": "两阶段预训练",
+              "explain": "第一阶段训练 tokenizer 学习离散表示，第二阶段冻结 tokenizer 训练自回归 Transformer 预测下一个 token，类似 GPT 的 next-token prediction，但输入输出均为金融 token。"
+            },
+            {
+              "term": "模型家族 (mini/small/base/large)",
+              "explain": "提供 4 种规模（4.1M~499.2M 参数），对应不同上下文长度（2048/512），用户可根据算力和任务需求选择，所有模型（除 large）开源。"
+            }
+          ],
+          "howItWorks": "## 组件\nKronos 的核心组件包括分层 Tokenizer 和自回归 Transformer 模型。Tokenizer 采用多级残差量化（RQ-VAE）架构，将每个时间步的 OHLCV 向量（5-6 维）编码为多个离散 token，例如第一级捕获整体趋势，第二级捕获局部波动。Tokenizer 在金融数据上独立预训练，输出固定长度的 token 序列。Transformer 模型为标准的 decoder-only 架构，包含多层因果自注意力与前馈网络，输入为 token 序列，输出为下一个 token 的概率分布。模型家族提供 mini（4.1M）、small（24.7M）、base（102.3M）和 large（499.2M）四种规模，其中 mini 使用 2k 词汇表，其余使用 base 词汇表。所有组件均通过 Hugging Face Hub 发布，支持 `from_pretrained` 加载。\n\n## 数据流\n用户输入历史 K 线 DataFrame（必须含 open/high/low/close，可选 volume/amount）及对应时间戳。KronosPredictor 首先对每个特征进行独立归一化（z-score），然后调用 Tokenizer 将归一化后的连续数据编码为离散 token 序列。该序列作为 Transformer 的输入，模型自回归生成未来 token（数量由 pred_len 决定）。生成时支持温度采样（T）和 top-p 核采样，可生成多条路径并平均。生成的 token 序列再经 Tokenizer 解码为连续值，并反归一化得到最终预测 DataFrame。批量预测时，多个序列并行处理，要求 lookback 和 pred_len 一致，GPU 自动并行。\n\n## 关键算法/配置\n关键算法包括：1）**分层残差量化**：使用 RQ-VAE 将连续向量映射为多层离散码本，每层码本大小 512，共 2 层（mini）或 4 层（base），总词汇表 2k 或 512。2）**自回归预训练**：采用 next-token prediction 损失，训练数据来自全球 45+ 交易所的分钟/日线数据，覆盖股票、加密货币、外汇等。3）**采样策略**：支持温度 T（控制随机性）和 top_p（核采样），sample_count 控制生成路径数并取平均。配置项包括 max_context（默认 512，mini 为 2048）、lookback（建议 ≤ max_context）、pred_len（预测步数）。微调时需调整 config.py 中的路径、epochs、batch_size 等，支持 Comet.ml 实验跟踪。",
+          "novelty": "Kronos 的创新性在于将 NLP 中的离散 token 化思想系统性地应用于金融 K 线序列，并构建了首个开源金融基础模型。与通用时间序列基础模型（如 TimesFM、Lag-Llama）相比，Kronos 专门针对金融数据的高噪声、非平稳特性设计，通过分层量化保留多尺度信息，而非直接建模连续值。与金融领域的专用模型（如 FinBERT、StockGPT）相比，Kronos 不依赖文本，而是直接建模价格行为本身，且预训练数据覆盖全球交易所，具备更强的跨市场泛化能力。\n\n然而，其核心架构（RQ-VAE + Transformer）并非全新，类似方法在图像（VQ-VAE）和音频（EnCodec）中已有应用。Kronos 的主要贡献在于将这一范式适配到金融领域，并提供了完整的开源工具链（模型、tokenizer、预测器、微调脚本）。与同样使用离散 token 的金融模型（如 Discrete Time Series Transformer）相比，Kronos 的模型规模和预训练数据量更大，且提供了实时 demo 和回测示例，降低了使用门槛。总体而言，Kronos 在金融 AI 领域具有开创性，但技术原创性中等。",
+          "ecosystem": "Kronos 依赖 PyTorch、Hugging Face Transformers、pandas、numpy 等标准库，微调管线集成 Qlib（微软开源量化平台）用于数据获取和回测。模型托管在 Hugging Face Hub，可通过 `from_pretrained` 直接加载。Kronos 与通用时间序列模型（如 TimesFM、PatchTST）形成竞争，但更聚焦金融场景；与金融 NLP 模型（如 FinBERT）互补，可结合文本与价格信号。其开源策略对标商业金融 AI 平台（如 BloombergGPT），但规模较小。Kronos 的 tokenizer 和模型可单独使用，也可作为下游任务（如分类、异常检测）的特征提取器。社区可通过 GitHub 提交 issue 或贡献代码，但目前贡献者较少，生态尚在早期。",
+          "limitations": [
+            {
+              "title": "上下文长度有限",
+              "body": "small/base 模型最大上下文仅 512 步，对于长周期策略（如月线）或高频数据（如 tick 级）可能不足，需截断或降频。"
+            },
+            {
+              "title": "仅支持 OHLCV 输入",
+              "body": "模型仅接受价格与成交量数据，无法直接融入新闻、财报、宏观指标等文本或结构化信息，限制了多模态应用。"
+            },
+            {
+              "title": "预测不确定性未量化",
+              "body": "虽然支持采样，但未提供置信区间或概率校准，用户难以评估预测的可靠性，对风险敏感场景不够友好。"
+            },
+            {
+              "title": "微调计算成本高",
+              "body": "微调需要多 GPU 环境（torchrun），且 tokenizer 和 predictor 需分步训练，对个人研究者硬件门槛较高。"
+            },
+            {
+              "title": "回测示例过于简化",
+              "body": "提供的 A 股回测仅作演示，未包含风险中性化、组合优化等实战要素，直接用于实盘交易风险较大。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "安装依赖：Python 3.10+ 并执行 pip install -r requirements.txt",
+              "cmd": "pip install -r requirements.txt",
+              "note": "确保已安装 PyTorch 和 Hugging Face 库。"
+            },
+            {
+              "step": "从 Hugging Face 加载 Kronos-small 模型和 tokenizer",
+              "cmd": "python -c \"from model import Kronos, KronosTokenizer; tokenizer = KronosTokenizer.from_pretrained('NeoQuasar/Kronos-Tokenizer-base'); model = Kronos.from_pretrained('NeoQuasar/Kronos-small')\"",
+              "note": "首次运行会自动下载模型（约 100MB）。"
+            },
+            {
+              "step": "准备示例数据：运行 examples/prediction_example.py 查看预测效果",
+              "cmd": "python examples/prediction_example.py",
+              "note": "脚本会自动下载示例 CSV 并生成预测对比图。"
+            },
+            {
+              "step": "修改预测参数：在脚本中调整 lookback、pred_len、T、top_p 等",
+              "note": "lookback 建议 ≤ 512，pred_len 可设为 120（对应 10 小时 5 分钟线）。"
+            },
+            {
+              "step": "尝试批量预测：使用 predict_batch 方法同时预测多个股票",
+              "note": "确保所有序列的 lookback 和 pred_len 相同。"
+            },
+            {
+              "step": "微调 tokenizer：运行 finetune/train_tokenizer.py（需多 GPU）",
+              "cmd": "torchrun --standalone --nproc_per_node=2 finetune/train_tokenizer.py",
+              "note": "先修改 finetune/config.py 中的路径和参数。"
+            },
+            {
+              "step": "微调 predictor：运行 finetune/train_predictor.py",
+              "cmd": "torchrun --standalone --nproc_per_node=2 finetune/train_predictor.py",
+              "note": "确保已准备好 tokenizer 检查点。"
+            },
+            {
+              "step": "回测评估：运行 finetune/backtest.py 查看策略表现",
+              "cmd": "python finetune/backtest.py",
+              "note": "回测结果保存在 backtest_result_path 目录。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 22,
+            "reproducibility": 24,
+            "timeToValue": 20
+          }
+        }
+      },
+      {
+        "fullName": "roboflow/supervision",
+        "owner": "roboflow",
+        "name": "supervision",
+        "url": "https://github.com/roboflow/supervision",
+        "ownerAvatarUrl": "https://github.com/roboflow.png?size=80",
+        "description": "We write your reusable computer vision tools. 💜",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 38729,
+        "forks": 3475,
+        "starsGained": 59,
+        "rank": 7,
+        "tldr": "这是一个计算机视觉工具库，用来简化模型推理、标注、数据集处理等流程，特别在提供模型无关的通用接口和丰富的可视化标注器。",
+        "tags": [
+          "计算机视觉",
+          "工具库",
+          "模型无关",
+          "标注",
+          "数据集处理"
+        ],
+        "light": "Supervision 近期在 GitHub Trending 上热度高，主要因为计算机视觉应用需求持续增长，而它提供了从模型推理到结果可视化的完整工具链，极大降低了开发门槛。特别是其模型无关的设计，支持 Ultralytics、Transformers 等多种主流库，加上丰富的标注器和数据集处理功能，让开发者能快速构建应用。Roboflow 公司的持续维护和社区贡献也推动了其流行。",
+        "worthDeepDive": 70
+      },
+      {
+        "fullName": "influxdata/telegraf",
+        "owner": "influxdata",
+        "name": "telegraf",
+        "url": "https://github.com/influxdata/telegraf",
+        "ownerAvatarUrl": "https://github.com/influxdata.png?size=80",
+        "description": "Agent for collecting, processing, aggregating, and writing metrics, logs, and other arbitrary data.",
+        "language": "Go",
+        "languageColor": "#00ADD8",
+        "stars": 17112,
+        "forks": 5789,
+        "starsGained": 211,
+        "rank": 8,
+        "tldr": "这是一个数据采集代理，用于收集、处理、聚合和写入指标、日志等数据，特别在拥有超过300个插件和零外部依赖的静态二进制文件。",
+        "tags": [
+          "数据采集",
+          "监控",
+          "Go",
+          "插件化",
+          "InfluxDB"
+        ],
+        "light": "Telegraf 作为 InfluxData 生态的核心组件，近期因可观测性领域对灵活数据采集的需求增长而持续热门。其插件架构覆盖从系统指标到云服务的广泛场景，且编译为无依赖的静态二进制，部署极简。对于需要统一数据管道的团队，它是首选工具。",
+        "worthDeepDive": 60
+      },
+      {
+        "fullName": "supertone-inc/supertonic",
+        "owner": "supertone-inc",
+        "name": "supertonic",
+        "url": "https://github.com/supertone-inc/supertonic",
+        "ownerAvatarUrl": "https://github.com/supertone-inc.png?size=80",
+        "description": "Lightning-Fast, On-Device, Multilingual TTS — running natively via ONNX.",
+        "language": "Swift",
+        "languageColor": "#F05138",
+        "stars": 4988,
+        "forks": 485,
+        "starsGained": 1163,
+        "rank": 9,
+        "tldr": "这是一个轻量级多语言TTS引擎，专为设备端推理设计，通过ONNX Runtime实现低延迟、隐私安全的语音合成，特别在31种语言的自然文本处理上表现突出。",
+        "tags": [
+          "TTS",
+          "ONNX",
+          "多语言",
+          "设备端",
+          "轻量级"
+        ],
+        "light": "Supertonic 3近期发布，支持31种语言，在自然文本处理（如金融数字、电话号码）上超越ElevenLabs、OpenAI等主流方案，且模型仅99M参数，可在树莓派等边缘设备实时运行。其开源多语言示例和跨平台支持吸引了大量开发者关注。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Supertonic 是一个极速、设备端运行的多语言 TTS 系统，基于 ONNX Runtime 实现本地推理，无需网络。它提供 31 种语言支持，模型仅 99M 参数，在 CPU 上即可达到低延迟，适合边缘部署。",
+          "whyItMatters": [
+            {
+              "title": "完全本地运行",
+              "body": "所有推理在设备端完成，无云端依赖，保护隐私且零网络延迟。"
+            },
+            {
+              "title": "多语言覆盖广",
+              "body": "支持 31 种语言，包括英语、韩语、日语、阿拉伯语等，适合全球化应用。"
+            },
+            {
+              "title": "模型轻量高效",
+              "body": "仅 99M 参数，远小于同类 0.7B-2B 模型，下载快、启动快，适合资源受限设备。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "ONNX Runtime",
+              "explain": "跨平台推理引擎，Supertonic 利用它在 CPU/GPU 上高效运行 TTS 模型，支持浏览器 WebGPU/WASM 和移动端。"
+            },
+            {
+              "term": "Voice Style",
+              "explain": "预定义的语音风格（如 M1, F3），包含音色和韵律参数，通过 `get_voice_style()` 获取，用于合成时控制输出。"
+            },
+            {
+              "term": "Expression Tags",
+              "explain": "支持 `<laugh>`, `<breath>`, `<sigh>` 等标签，在文本中插入可生成带情感或副语言效果的语音。"
+            },
+            {
+              "term": "WER/CER 指标",
+              "explain": "词错误率/字符错误率，用于衡量 TTS 的阅读准确性。Supertonic 3 在多数语言上保持与更大模型（如 VoxCPM2）竞争的水平。"
+            }
+          ],
+          "howItWorks": "## 组件\nSupertonic 的核心组件包括：**ONNX 模型文件**（约 99M 参数，包含编码器、解码器和声码器），**语音风格预设**（如 M1, F3 等，存储在 Hugging Face 仓库），以及 **ONNX Runtime** 推理引擎。Python SDK 封装了模型下载、语音风格加载和合成流程。此外，各语言示例（如 Node.js、浏览器、iOS）使用对应平台的 ONNX Runtime 绑定，实现跨平台推理。浏览器版本利用 `onnxruntime-web` 通过 WebGPU 或 WASM 运行。\n\n## 数据流\n用户输入文本和语音风格，SDK 首先检查本地是否已有模型文件，若无则从 Hugging Face 自动下载。然后，文本经过前端文本规范化（处理数字、缩写、货币等），转换为音素序列。音素序列和语音风格向量输入 ONNX 模型，生成梅尔频谱，再通过声码器转换为 16-bit WAV 音频。整个过程在设备端完成，无网络请求。合成时间取决于文本长度和模型大小，CPU 上通常可实时或更快。\n\n## 关键算法/配置\n关键算法包括：**文本规范化**（处理金融表达式、电话号码、技术单位等，对比 ElevenLabs 等竞品表现更优），**多语言音素转换**（支持 31 种语言的音素映射），以及 **ONNX 模型优化**（使用 OnnxSlim 工具进行图优化和量化，减小模型体积并加速推理）。配置方面，用户可通过 `TTS(auto_download=True)` 控制自动下载，通过 `get_voice_style(voice_name=\"M1\")` 选择语音风格，并支持 `lang` 参数指定语言。批量推理可通过调整输入批次大小实现。",
+          "novelty": "Supertonic 的主要创新在于将高性能 TTS 压缩到 99M 参数并实现设备端实时推理，同时保持 31 种语言的高准确率。与 OpenAI TTS、ElevenLabs 等云端方案相比，它完全本地运行，隐私性更强且零延迟。与 Meta 的 Voicebox 或微软的 VALL-E 等大型生成式 TTS 相比，Supertonic 模型小得多（99M vs 0.7B+），但通过精心设计的文本规范化和多语言支持，在常见场景下准确率甚至更高。与开源 TTS 如 Coqui TTS 或 Piper 相比，Supertonic 提供了更完善的跨平台 SDK 和开箱即用的多语言支持，且推理速度更快。不过，其语音自然度和表现力可能不如更大规模的模型，且不支持零样本语音克隆（但提供了 Voice Builder 服务）。",
+          "ecosystem": "Supertonic 依赖 ONNX Runtime 作为推理后端，模型托管在 Hugging Face，使用 Git LFS 管理大文件。它提供了 Python、Node.js、浏览器、iOS、Rust 等 11 种运行时的示例，覆盖主流开发平台。与云端 TTS 服务（如 ElevenLabs、OpenAI TTS）竞争，但定位为本地优先、隐私优先的替代方案。与开源 TTS 项目（如 Coqui TTS、Piper）相比，Supertonic 在模型大小、多语言支持和跨平台集成方面有优势。此外，Supertone 还提供 Voice Builder 服务，允许用户创建自定义语音并部署到边缘设备，形成从模型到应用的完整生态。",
+          "limitations": [
+            {
+              "title": "语音表现力有限",
+              "body": "虽然支持表达标签，但整体语音自然度和情感丰富度不如大型云端 TTS 模型，可能不适合需要高度表现力的场景。"
+            },
+            {
+              "title": "不支持零样本克隆",
+              "body": "当前版本不提供零样本语音克隆功能，用户需使用预设语音或通过 Voice Builder 服务创建自定义语音。"
+            },
+            {
+              "title": "语言覆盖仍有限",
+              "body": "虽然支持 31 种语言，但相比一些覆盖 100+ 语言的系统，仍显不足，且部分语言（如阿拉伯语）的准确率可能较低。"
+            },
+            {
+              "title": "依赖 ONNX Runtime",
+              "body": "不同平台需要安装对应版本的 ONNX Runtime 库，可能增加部署复杂性，尤其是在嵌入式或老旧设备上。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "安装 Python SDK",
+              "cmd": "pip install supertonic",
+              "note": "确保 Python 3.8+ 环境"
+            },
+            {
+              "step": "运行 Python 示例生成语音",
+              "cmd": "python -c \"from supertonic import TTS; tts = TTS(auto_download=True); style = tts.get_voice_style('M1'); wav, dur = tts.synthesize('Hello world', style, 'en'); tts.save_audio(wav, 'hello.wav')\"",
+              "note": "首次运行会自动下载模型（约 200MB）"
+            },
+            {
+              "step": "克隆仓库并下载模型",
+              "cmd": "git clone https://github.com/supertone-inc/supertonic.git && cd supertonic && git lfs install && git clone https://huggingface.co/Supertone/supertonic-3 assets",
+              "note": "需要先安装 Git LFS"
+            },
+            {
+              "step": "运行 Python 示例脚本",
+              "cmd": "cd py && uv sync && uv run example_onnx.py",
+              "note": "输出在 outputs/output.wav"
+            },
+            {
+              "step": "运行 Node.js 示例",
+              "cmd": "cd nodejs && npm install && npm start",
+              "note": "需要 Node.js 18+"
+            },
+            {
+              "step": "在浏览器中运行 Web 示例",
+              "cmd": "cd web && npm install && npm run dev",
+              "note": "打开 http://localhost:5173"
+            },
+            {
+              "step": "体验在线 Demo",
+              "cmd": "open https://huggingface.co/spaces/Supertone/supertonic-3",
+              "note": "可直接在浏览器中测试语音合成"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 23,
+            "reproducibility": 22,
+            "timeToValue": 20
+          }
+        }
+      },
+      {
+        "fullName": "Genymobile/scrcpy",
+        "owner": "Genymobile",
+        "name": "scrcpy",
+        "url": "https://github.com/Genymobile/scrcpy",
+        "ownerAvatarUrl": "https://github.com/Genymobile.png?size=80",
+        "description": "Display and control your Android device",
+        "language": "C",
+        "languageColor": "#555555",
+        "stars": 141044,
+        "forks": 13034,
+        "starsGained": 589,
+        "rank": 10,
+        "tldr": "这是一个Android设备投屏与控制工具，通过USB或TCP/IP实现低延迟、高质量的音视频镜像，并支持键盘鼠标反向控制，无需root。",
+        "tags": [
+          "Android投屏",
+          "低延迟",
+          "反向控制",
+          "开源工具",
+          "跨平台"
+        ],
+        "light": "scrcpy近期发布v4.0版本，新增了虚拟显示、摄像头镜像、HID键盘鼠标模拟等重磅功能，同时持续优化性能和延迟。作为Android开发与调试的必备工具，它在开发者社区中一直保持高热度，新版本进一步扩展了使用场景，如远程控制、游戏手柄支持等，因此本周/月再次登上趋势榜。",
+        "worthDeepDive": 30
+      },
+      {
+        "fullName": "NVIDIA-AI-Blueprints/video-search-and-summarization",
+        "owner": "NVIDIA-AI-Blueprints",
+        "name": "video-search-and-summarization",
+        "url": "https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization",
+        "ownerAvatarUrl": "https://github.com/NVIDIA-AI-Blueprints.png?size=80",
+        "description": "Suite of reference architectures for building GPU-accelerated vision agents and AI-powered video analytics applications.",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 703,
+        "forks": 239,
+        "starsGained": 28,
+        "rank": 11,
+        "tldr": "这是一个NVIDIA官方的视频搜索与摘要AI蓝图，提供GPU加速的视觉Agent参考架构，特别在集成实时视频智能、下游分析和MCP协议驱动的Agent工作流。",
+        "tags": [
+          "NVIDIA",
+          "视频分析",
+          "视觉Agent",
+          "MCP协议",
+          "GPU加速"
+        ],
+        "light": "本周在trending上是因为NVIDIA在GTC 2025前后大力推广AI Blueprints系列，VSS作为其中主打视频理解的参考架构，结合了Cosmos-Reason2-8B等最新模型和MCP协议，吸引了大量开发者尝试部署。同时，它提供了从实时处理到离线摘要的完整工作流，适合企业级视频分析场景，因此获得关注。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "NVIDIA 官方出品的视频搜索与摘要蓝图，整合了实时视频分析、下游事件处理和基于 MCP 的 Agent 工作流，让你能在 GPU 上快速搭建视觉 AI 应用。30 分钟就能跑通 Q&A 和报告生成，省去从零搭建的麻烦。",
+          "whyItMatters": [
+            {
+              "title": "GPU 加速",
+              "body": "利用 NVIDIA NIM 微服务和 GPU 加速，处理视频流和 VLM 推理比纯 CPU 方案快 5-10 倍。"
+            },
+            {
+              "title": "端到端蓝图",
+              "body": "从视频采集、特征提取到 Agent 搜索/摘要，提供完整参考架构和 Docker Compose 一键部署。"
+            },
+            {
+              "title": "MCP 集成",
+              "body": "通过 Model Context Protocol 统一工具接口，Agent 可灵活调用 VLM、搜索、摘要等能力。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "NIM 微服务",
+              "explain": "NVIDIA 推理微服务，封装了 Cosmos-Reason2-8B 等 VLM/LLM，提供标准 API，支持 GPU 加速推理。"
+            },
+            {
+              "term": "实时视频智能层",
+              "explain": "负责实时提取视频特征、嵌入和语义理解，结果发布到消息代理，供下游分析和 Agent 使用。"
+            },
+            {
+              "term": "下游分析层",
+              "explain": "处理实时视频智能层产生的元数据流，将原始检测转化为轨迹、事件和验证告警。"
+            },
+            {
+              "term": "Agent 与离线处理层",
+              "explain": "顶层 Agent 通过 MCP 访问视频分析数据，提供搜索、Q&A、摘要、片段检索等工具。"
+            },
+            {
+              "term": "Agent 工作流",
+              "explain": "预定义的 Agent 执行流程，如 Q&A 报告生成、告警验证、长视频摘要，可组合复用。"
+            }
+          ],
+          "howItWorks": "## 组件\nVSS 架构分为三层。底层是**实时视频智能层**，包含三个核心微服务：特征提取、嵌入生成和流理解，它们从视频流中提取视觉特征、语义嵌入和上下文信息，并将结果发布到消息代理（如 Kafka）。中间是**下游分析层**，消费元数据流，进行轨迹生成、事件检测和告警验证，减少误报。顶层是**Agent 与离线处理层**，通过 Model Context Protocol (MCP) 统一工具接口，集成 VLM 视频理解、语义搜索、长视频摘要和片段检索等能力。此外，NVIDIA NIM 微服务提供 Cosmos-Reason2-8B 等 VLM/LLM 的 GPU 加速推理。UI 层基于 Next.js 构建，提供可视化交互。\n\n## 数据流\n视频流首先进入实时视频智能层，微服务提取特征并生成嵌入，结果以消息形式发布到消息代理。下游分析层消费这些消息，进行目标跟踪、行为分析和告警生成，并将结构化事件存入数据库。当用户通过 Agent 发起查询（如自然语言搜索或 Q&A）时，Agent 通过 MCP 调用相应工具：搜索工具查询嵌入数据库，VLM 工具分析视频片段，摘要工具处理长视频。最终结果经过 LLM 汇总后返回给用户。整个流程支持实时流处理和离线批量处理两种模式。\n\n## 关键算法/配置\n关键算法包括：**视频特征提取**（使用预训练 CNN/ViT 模型）、**语义嵌入**（将视频片段映射到向量空间）、**VLM 推理**（Cosmos-Reason2-8B 等模型进行视觉问答）、**长视频摘要**（通过分块和密集字幕聚合实现）。配置方面，通过 `deployments/` 下的 Docker Compose 文件定义各服务参数，如 NIM 模型版本、GPU 资源限制、消息代理地址等。Agent 工作流在 `agent/` 目录下以 Python 代码定义，可通过修改 `SKILL.md` 文件自定义技能。硬件要求严格，需特定 NVIDIA 驱动和 Container Toolkit 版本。",
+          "novelty": "与 LangChain 等通用 Agent 框架相比，VSS 的独特之处在于它专门针对视频分析场景，提供了从视频采集到 Agent 交互的完整 GPU 加速流水线。LangChain 虽然也能集成 VLM，但缺乏对实时视频流、嵌入数据库和下游事件处理的原生支持。AutoGen 更侧重于多 Agent 对话，而 VSS 聚焦于单 Agent 与视频数据的交互。Meta 的 Llama 系列主要提供 LLM 模型，不包含视频处理组件。\n\nVSS 的创新在于将 NVIDIA 的硬件加速（NIM、GPU）与 MCP 协议结合，实现了低延迟的视频分析 Agent。不过，其核心组件（VLM、嵌入、消息队列）都是成熟技术，创新更多体现在集成和优化层面。对于已有视频分析系统的团队，VSS 提供了一套可复用的参考实现，但若仅需简单视频搜索，可能过于重量级。",
+          "ecosystem": "VSS 深度依赖 NVIDIA 生态：需要 NVIDIA GPU、驱动、Container Toolkit 和 NGC API 密钥。核心模型通过 NIM 微服务提供，包括 Cosmos-Reason2-8B 和 Nemotron-Nano-9B-v2。消息代理可选 Kafka 或 Redis，数据库使用 PostgreSQL 和向量数据库（如 Milvus）。前端基于 Next.js，后端 Agent 使用 Python 和 LangChain 风格的 MCP 工具。\n\n与 VSS 竞争或互补的方案包括：Google Video AI（云端，非开源）、Twelve Labs（商业视频搜索 API）、以及开源项目如 VideoDB（视频数据库）。VSS 的优势在于本地 GPU 部署和数据隐私，但需要较高的硬件投入。它适合需要实时视频分析的企业场景，如智慧城市、仓储自动化。",
+          "limitations": [
+            {
+              "title": "硬件要求高",
+              "body": "需要特定 NVIDIA GPU（如 RTX PRO 6000）、特定驱动版本和 Container Toolkit，普通开发者难以在个人机器上运行。"
+            },
+            {
+              "title": "部署复杂",
+              "body": "涉及多个 Docker 容器、NIM 模型下载和 NGC 密钥配置，快速启动依赖 Brev Launchable 云服务，本地部署步骤较多。"
+            },
+            {
+              "title": "模型选择有限",
+              "body": "目前仅内置 Cosmos-Reason2-8B 和 Nemotron-Nano-9B-v2 两个模型，替换其他 VLM/LLM 需要额外配置。"
+            },
+            {
+              "title": "实时性依赖网络",
+              "body": "实时视频智能层依赖消息代理，网络延迟可能影响端到端响应时间，不适合超低延迟场景。"
+            },
+            {
+              "title": "文档分散",
+              "body": "核心文档在外部官网，仓库内 README 仅提供概览，深入使用需频繁跳转，增加学习成本。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "获取 NGC API 密钥并设置环境变量",
+              "cmd": "export NGC_API_KEY=<your_key>",
+              "note": "密钥需从 NVIDIA NGC 生成"
+            },
+            {
+              "step": "克隆仓库并进入根目录",
+              "cmd": "git clone https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization.git && cd video-search-and-summarization"
+            },
+            {
+              "step": "使用 Docker Compose 部署 Q&A 工作流",
+              "cmd": "cd deployments/developer-workflow/dev-profile-base && docker compose up -d",
+              "note": "确保已安装 Docker 和 NVIDIA Container Toolkit"
+            },
+            {
+              "step": "上传测试视频到指定目录",
+              "cmd": "cp /path/to/video.mp4 data/videos/",
+              "note": "视频格式需为 MP4，时长建议 <5 分钟"
+            },
+            {
+              "step": "通过 UI 进行自然语言搜索",
+              "cmd": "open http://localhost:3000",
+              "note": "默认端口 3000，需等待服务就绪"
+            },
+            {
+              "step": "运行 Agent 脚本进行摘要",
+              "cmd": "python agent/src/vss_agents/main.py --workflow summarization --video data/videos/video.mp4",
+              "note": "需先安装 Python 依赖"
+            },
+            {
+              "step": "查看生成的报告和片段",
+              "cmd": "cat output/report.md",
+              "note": "输出目录可在配置中修改"
+            },
+            {
+              "step": "清理部署",
+              "cmd": "docker compose down -v",
+              "note": "会删除所有容器和数据卷"
+            }
+          ],
+          "score": {
+            "novelty": 15,
+            "engineering": 22,
+            "reproducibility": 12,
+            "timeToValue": 10
+          }
+        }
+      },
+      {
+        "fullName": "CloakHQ/CloakBrowser",
+        "owner": "CloakHQ",
+        "name": "CloakBrowser",
+        "url": "https://github.com/CloakHQ/CloakBrowser",
+        "ownerAvatarUrl": "https://github.com/CloakHQ.png?size=80",
+        "description": "Stealth Chromium that passes every bot detection test. Drop-in Playwright replacement with source-level fingerprint patches. 30/30 tests passed.",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 10303,
+        "forks": 773,
+        "starsGained": 1369,
+        "rank": 12,
+        "tldr": "这是一个基于C++源码级修改的Chromium浏览器，用于绕过各类机器人检测，特别在reCAPTCHA v3和Cloudflare Turnstile上表现优异。",
+        "tags": [
+          "反检测浏览器",
+          "Playwright替代",
+          "源码级补丁",
+          "自动化爬虫",
+          "指纹伪装"
+        ],
+        "light": "本周/月登上趋势榜，主要因为其独特的源码级补丁方案（49个C++补丁）在反检测领域实现了突破性效果：reCAPTCHA v3得分0.9，Cloudflare Turnstile自动通过，且提供与Playwright完全兼容的API。相比现有的JS注入或配置级方案，这种底层修改更稳定、更难被检测，吸引了大量需要自动化采集但受困于反爬的开发者。",
+        "worthDeepDive": 75
+      },
+      {
+        "fullName": "mattpocock/skills",
+        "owner": "mattpocock",
+        "name": "skills",
+        "url": "https://github.com/mattpocock/skills",
+        "ownerAvatarUrl": "https://github.com/mattpocock.png?size=80",
+        "description": "Skills for Real Engineers. Straight from my .claude directory.",
+        "language": "Shell",
+        "languageColor": "#89e051",
+        "stars": 80922,
+        "forks": 6986,
+        "starsGained": 2971,
+        "rank": 13,
+        "tldr": "这是一个AI编码代理的技能集合，用来提升代码质量与工程实践，特别在将传统软件工程原则（如TDD、领域驱动设计）转化为可复用的代理指令。",
+        "tags": [
+          "AI编码代理",
+          "软件工程",
+          "Claude Code",
+          "TDD",
+          "领域驱动设计"
+        ],
+        "light": "本周/月 trending 的原因：作者 Matt Pocock 是 TypeScript 社区知名人物，其技能集针对当前 AI 编码代理（如 Claude Code）的常见痛点（沟通偏差、冗长、代码质量差、架构混乱）提供了实用解决方案。项目包含 grill-me、tdd、diagnose 等即用技能，强调工程纪律而非“vibe coding”，契合开发者对 AI 辅助编程中可控性和质量的需求，因此迅速获得关注。",
+        "worthDeepDive": 85
+      },
+      {
+        "fullName": "github/spec-kit",
+        "owner": "github",
+        "name": "spec-kit",
+        "url": "https://github.com/github/spec-kit",
+        "ownerAvatarUrl": "https://github.com/github.png?size=80",
+        "description": "💫 Toolkit to help you get started with Spec-Driven Development",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 99037,
+        "forks": 8622,
+        "starsGained": 1240,
+        "rank": 14,
+        "tldr": "这是一个开源工具包，用于实现规范驱动开发（SDD），通过将规范转化为可执行代码来加速高质量软件开发，特别强调与AI编码代理的集成。",
+        "tags": [
+          "规范驱动开发",
+          "AI编码代理",
+          "Python工具",
+          "GitHub官方"
+        ],
+        "light": "作为GitHub官方推出的项目，Spec Kit在近期受到关注，因为它提供了一种新的开发范式：规范驱动开发（SDD），旨在解决AI辅助编码中常见的“vibe coding”问题。它通过CLI工具和与Copilot等AI代理的集成，让开发者从规范直接生成实现，提高了开发效率和代码质量。社区扩展生态的快速成长也推动了其热度。",
+        "worthDeepDive": 75
+      },
+      {
+        "fullName": "garrytan/gstack",
+        "owner": "garrytan",
+        "name": "gstack",
+        "url": "https://github.com/garrytan/gstack",
+        "ownerAvatarUrl": "https://github.com/garrytan.png?size=80",
+        "description": "Use Garry Tan's exact Claude Code setup: 23 opinionated tools that serve as CEO, Designer, Eng Manager, Release Manager, Doc Engineer, and QA",
+        "language": "TypeScript",
+        "languageColor": "#3178c6",
+        "stars": 96245,
+        "forks": 14315,
+        "starsGained": 1083,
+        "rank": 15,
+        "tldr": "这是一个AI辅助开发工具集，将Claude Code转化为23个专业角色（CEO/设计师/QA等），实现单人团队级开发效率。",
+        "tags": [
+          "AI开发工具",
+          "Claude Code",
+          "单人团队",
+          "开发工作流",
+          "开源"
+        ],
+        "light": "YC CEO Garry Tan的个人开发工具开源后迅速走红，因其展示了AI辅助下单人实现810倍效率提升的惊人数据。项目将AI代理角色化、流程化，从产品构思到部署形成完整闭环，契合当前AI编程工具热潮。",
+        "worthDeepDive": 75
+      }
+    ]
+  },
+  "weekly": {
+    "window": "weekly",
+    "generatedAt": "2026-05-14T13:16:18.622Z",
+    "repos": [
+      {
+        "fullName": "anthropics/financial-services",
+        "owner": "anthropics",
+        "name": "financial-services",
+        "url": "https://github.com/anthropics/financial-services",
+        "ownerAvatarUrl": "https://github.com/anthropics.png?size=80",
+        "description": null,
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 22605,
+        "forks": 3082,
+        "starsGained": 13555,
+        "rank": 1,
+        "tldr": "这是一个Claude AI的金融行业参考代理集合，用于投资银行、股权研究等场景，特别在提供Cowork插件和Managed Agent API两种部署方式。",
+        "tags": [
+          "金融AI",
+          "Claude代理",
+          "MCP集成",
+          "工作流自动化",
+          "投资银行"
+        ],
+        "light": "Anthropic官方发布的金融行业AI代理套件，近期因Claude在企业级应用的推广而受关注。它提供了从投行到基金管理的完整工作流代理，并集成了多家金融数据提供商的MCP连接器，降低了AI在金融领域落地的门槛。",
+        "worthDeepDive": 70
+      },
+      {
+        "fullName": "CloakHQ/CloakBrowser",
+        "owner": "CloakHQ",
+        "name": "CloakBrowser",
+        "url": "https://github.com/CloakHQ/CloakBrowser",
+        "ownerAvatarUrl": "https://github.com/CloakHQ.png?size=80",
+        "description": "Stealth Chromium that passes every bot detection test. Drop-in Playwright replacement with source-level fingerprint patches. 30/30 tests passed.",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 10303,
+        "forks": 773,
+        "starsGained": 8328,
+        "rank": 2,
+        "tldr": "这是一个基于C++源码级修改的Chromium浏览器，用于绕过各类机器人检测，特别在reCAPTCHA v3和Cloudflare Turnstile上表现优异。",
+        "tags": [
+          "反检测浏览器",
+          "Playwright替代",
+          "源码级补丁",
+          "自动化爬虫",
+          "指纹伪装"
+        ],
+        "light": "本周/月登上趋势榜，主要因为其独特的源码级补丁方案（49个C++补丁）在反检测领域实现了突破性效果：reCAPTCHA v3得分0.9，Cloudflare Turnstile自动通过，且提供与Playwright完全兼容的API。相比现有的JS注入或配置级方案，这种底层修改更稳定、更难被检测，吸引了大量需要自动化采集但受困于反爬的开发者。",
+        "worthDeepDive": 75
+      },
+      {
+        "fullName": "bytedance/UI-TARS-desktop",
+        "owner": "bytedance",
+        "name": "UI-TARS-desktop",
+        "url": "https://github.com/bytedance/UI-TARS-desktop",
+        "ownerAvatarUrl": "https://github.com/bytedance.png?size=80",
+        "description": "The Open-Source Multimodal AI Agent Stack: Connecting Cutting-Edge AI Models and Agent Infra",
+        "language": "TypeScript",
+        "languageColor": "#3178c6",
+        "stars": 33858,
+        "forks": 3362,
+        "starsGained": 4096,
+        "rank": 3,
+        "tldr": "这是一个多模态AI Agent开源栈，包含Agent TARS（通用GUI Agent）和UI-TARS Desktop（桌面原生GUI Agent），特别在通过MCP协议集成真实世界工具和混合浏览器控制。",
+        "tags": [
+          "多模态AI Agent",
+          "GUI自动化",
+          "MCP协议",
+          "桌面应用",
+          "字节跳动"
+        ],
+        "light": "该项目由字节跳动开源，近期因Agent TARS CLI v0.3.0发布和UI-TARS Desktop v0.2.0引入远程操作功能而受到关注。它结合了最新的UI-TARS模型和MCP工具集成，提供了从命令行到桌面应用的完整Agent栈，适合构建自动化工作流。社区活跃，更新频繁，在Trending上热度高。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "字节跳动开源的多模态 AI Agent 栈，包含通用 Agent TARS（CLI/Web UI）和桌面原生 GUI Agent UI-TARS Desktop。它通过 MCP 协议集成真实世界工具，支持混合浏览器控制、事件流驱动，旨在提供类人任务完成体验。30 分钟可上手 CLI 或桌面应用，体验 GUI Agent 能力。",
+          "whyItMatters": [
+            {
+              "title": "多模态 Agent 栈",
+              "body": "同时提供通用 Agent 和桌面 GUI Agent，覆盖终端、浏览器、桌面等多种场景，降低开发门槛。"
+            },
+            {
+              "title": "MCP 协议集成",
+              "body": "基于 MCP 协议连接真实世界工具，可扩展性强，支持自定义 MCP Server 接入任意服务。"
+            },
+            {
+              "title": "混合浏览器控制",
+              "body": "支持 GUI Agent、DOM 或混合策略控制浏览器，适应不同网页自动化需求。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Agent TARS",
+              "explain": "通用多模态 AI Agent，提供 CLI 和 Web UI，通过多模态 LLM 和 MCP 工具完成类人任务。可类比为'带视觉能力的 LangChain Agent'。"
+            },
+            {
+              "term": "UI-TARS Desktop",
+              "explain": "基于 UI-TARS 模型的桌面原生 GUI Agent，可本地或远程控制计算机和浏览器，实现桌面自动化。"
+            },
+            {
+              "term": "MCP (Model Context Protocol)",
+              "explain": "模型上下文协议，Agent TARS 内核基于此协议，支持挂载 MCP Server 连接真实世界工具，如文件系统、浏览器等。"
+            },
+            {
+              "term": "Event Stream",
+              "explain": "协议驱动的事件流，驱动上下文工程和 Agent UI，支持流式输出和调试，是 Agent TARS 的核心通信机制。"
+            },
+            {
+              "term": "Hybrid Browser Agent",
+              "explain": "混合浏览器代理，结合 GUI Agent（视觉定位）和 DOM 解析，灵活控制浏览器执行任务。"
+            }
+          ],
+          "howItWorks": "## 组件\nAgent TARS 的核心组件包括 CLI、Web UI、Server 和 MCP 集成层。CLI 提供一键式命令行工具，支持 headful 和 headless 模式；Web UI 提供图形化界面。MCP 集成层是内核基础，允许挂载各种 MCP Server 来连接真实工具（如文件系统、浏览器、数据库）。UI-TARS Desktop 则是独立的桌面应用，基于 UI-TARS 模型，提供本地和远程计算机/浏览器操作能力。两者共享底层多模态 LLM 调用和事件流架构。\n\n## 数据流\n用户通过 CLI 或 Web UI 输入自然语言指令，Agent TARS 将指令解析为多步计划。每一步通过 MCP 协议调用对应工具（如浏览器控制、文件操作），工具执行结果以事件流形式返回。事件流包含思考过程、工具调用、中间结果等，驱动上下文工程和 Agent UI 更新。对于浏览器任务，支持 GUI Agent（视觉定位）和 DOM 解析两种模式，可混合使用。最终结果汇总后返回给用户。\n\n## 关键算法/配置\n关键算法包括多模态 LLM 的视觉理解与推理、GUI Agent 的屏幕元素定位（基于 UI-TARS 模型）、混合浏览器策略（视觉+DOM）。配置方面，支持多种模型提供商（如 Volcengine、Anthropic），通过 `--provider` 和 `--model` 参数指定。MCP Server 配置通过 JSON 文件定义，可自定义工具集。事件流协议定义了标准消息格式，用于流式传输和调试。",
+          "novelty": "与 LangChain 相比，Agent TARS 更专注于多模态和 GUI Agent 场景，内置了视觉理解和浏览器控制能力，而非通用 Agent 框架。与 AutoGen 相比，Agent TARS 提供了开箱即用的桌面应用和 CLI，降低了多 Agent 系统的使用门槛。与 Llama 生态相比，Agent TARS 更强调与真实世界工具的集成（通过 MCP），而非纯模型推理。其混合浏览器 Agent（视觉+DOM）和事件流驱动架构是独特亮点。不过，整体思路仍属于 Agent 框架范畴，创新性主要体现在工程整合和易用性上。",
+          "ecosystem": "依赖 Node.js >= 22，通过 npm 分发。核心依赖包括多模态 LLM（如 Doubao、Claude）、MCP 协议库、Electron（桌面应用）。可搭配任意 MCP Server 扩展能力，如文件系统、浏览器、数据库等。与 Midscene（浏览器自动化）有合作。竞争方案包括 LangChain、AutoGen、Playwright 等，但 TARS 更侧重多模态和 GUI 场景。",
+          "limitations": [
+            {
+              "title": "Node.js 版本限制",
+              "body": "要求 Node.js >= 22，较新版本可能不兼容旧环境，增加部署成本。"
+            },
+            {
+              "title": "模型依赖强",
+              "body": "效果高度依赖底层多模态 LLM（如 Doubao、Claude），模型能力瓶颈直接影响 Agent 表现。"
+            },
+            {
+              "title": "桌面应用平台有限",
+              "body": "UI-TARS Desktop 目前仅支持桌面端，移动端或 Web 端未覆盖。"
+            },
+            {
+              "title": "MCP 生态成熟度",
+              "body": "MCP 协议相对较新，可用工具数量和质量有限，部分场景需自建 MCP Server。"
+            },
+            {
+              "title": "复杂任务稳定性",
+              "body": "长流程任务（如多步网页操作）可能因模型幻觉或环境变化失败，需人工干预。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "确保 Node.js >= 22，安装 Agent TARS CLI",
+              "cmd": "npm install @agent-tars/cli@latest -g",
+              "note": "全局安装后可直接使用 agent-tars 命令"
+            },
+            {
+              "step": "运行 CLI 并指定模型（例如使用 Anthropic Claude）",
+              "cmd": "agent-tars --provider anthropic --model claude-3-7-sonnet-latest --apiKey your-api-key",
+              "note": "首次运行会下载依赖并启动 Web UI"
+            },
+            {
+              "step": "在 Web UI 中输入自然语言指令，如“帮我预订从圣何塞到纽约的最早航班”",
+              "note": "Agent 会自动打开浏览器执行操作"
+            },
+            {
+              "step": "观察事件流输出，查看 Agent 的思考过程和工具调用",
+              "note": "事件流在终端和 Web UI 中实时显示"
+            },
+            {
+              "step": "尝试使用 MCP Server 扩展功能，例如添加文件系统 MCP",
+              "cmd": "agent-tars --mcp-config ./mcp-config.json",
+              "note": "MCP 配置文件定义额外工具"
+            },
+            {
+              "step": "下载 UI-TARS Desktop 桌面应用（可选）",
+              "note": "访问 GitHub Releases 页面下载对应平台安装包"
+            },
+            {
+              "step": "启动 UI-TARS Desktop，选择本地或远程操作模式",
+              "note": "远程模式需在目标机器安装代理"
+            },
+            {
+              "step": "在桌面应用中输入指令，如“打开计算器并计算 123+456”",
+              "note": "Agent 会模拟鼠标键盘操作"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 22,
+            "reproducibility": 20,
+            "timeToValue": 22
+          }
+        }
+      },
+      {
+        "fullName": "Hmbown/DeepSeek-TUI",
+        "owner": "Hmbown",
+        "name": "DeepSeek-TUI",
+        "url": "https://github.com/Hmbown/DeepSeek-TUI",
+        "ownerAvatarUrl": "https://github.com/Hmbown.png?size=80",
+        "description": "Coding agent for DeepSeek models that runs in your terminal",
+        "language": "Rust",
+        "languageColor": "#dea584",
+        "stars": 28703,
+        "forks": 2384,
+        "starsGained": 15975,
+        "rank": 4,
+        "tldr": "这是一个终端编码代理，用于DeepSeek V4模型，特别在自动模式、子代理并行执行和持久化RLM会话方面有独特设计。",
+        "tags": [
+          "Rust",
+          "终端UI",
+          "编码代理",
+          "DeepSeek",
+          "子代理"
+        ],
+        "light": "该项目近期因DeepSeek V4模型发布和v0.8.33版本更新而受到关注，新增了持久化RLM会话、子代理会话和handle_read工具，提升了复杂任务的并行处理能力。其自动模式可根据上下文动态选择模型和推理强度，吸引了追求高效编码的开发者。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "DeepSeek TUI 是一个终端原生的编码代理，专为 DeepSeek V4 模型设计。它提供 1M token 上下文、流式推理、自动模式选择模型和思考层级，以及丰富的工具集（文件、shell、git、Web、子代理、MCP）。30 分钟即可上手，显著提升终端内的 AI 辅助编码效率。",
+          "whyItMatters": [
+            {
+              "title": "终端原生体验",
+              "body": "无需离开终端即可获得完整的 AI 编码助手，支持键盘驱动的 TUI 界面，适合开发者工作流。"
+            },
+            {
+              "title": "自动模式智能",
+              "body": "`--model auto` 根据任务复杂度自动选择模型和思考层级，平衡性能与成本，无需手动切换。"
+            },
+            {
+              "title": "1M 上下文窗口",
+              "body": "支持 DeepSeek V4 的百万 token 上下文，配合上下文压缩和前缀缓存，处理大型代码库更高效。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Auto Mode",
+              "explain": "自动模式，通过一次轻量路由调用（`deepseek-v4-flash`，无思考）判断当前任务复杂度，自动选择 `deepseek-v4-pro` 或 `flash` 以及思考层级（off/high/max）。子代理继承此模式。"
+            },
+            {
+              "term": "Sub-agents",
+              "explain": "子代理系统，支持并发执行多个独立任务（默认最多 10 个，可配置至 20）。通过 `agent_open` 启动，返回 `var_handle` 引用，父代理可异步获取结果，实现并行工作流。"
+            },
+            {
+              "term": "RLM (Reasoning Language Model)",
+              "explain": "持久化 REPL 会话，用于批量分析。通过 `rlm_open`/`rlm_eval`/`rlm_close` 管理，内置 `peek`、`search`、`chunk`、`sub_query_batch` 等辅助工具，适合数据探索。"
+            },
+            {
+              "term": "MCP Protocol",
+              "explain": "Model Context Protocol 支持，可连接外部 MCP 服务器扩展工具集，如数据库查询、API 调用等，增强代理能力。"
+            },
+            {
+              "term": "Workspace Rollback",
+              "explain": "工作区回滚机制，通过 side-git 在每次操作前后创建快照，支持 `/restore` 和 `revert_turn` 命令，不影响项目主仓库的 git 历史。"
+            }
+          ],
+          "howItWorks": "## 组件\nDeepSeek TUI 由两个 Rust 二进制文件组成：`deepseek`（调度器 CLI）和 `deepseek-tui`（TUI 运行时）。调度器负责解析命令行参数、管理 API 密钥和配置，然后启动 TUI 运行时。TUI 运行时基于 ratatui 库构建，提供键盘驱动的终端界面。核心引擎是一个异步事件循环，连接 OpenAI 兼容的流式客户端与 DeepSeek V4 API。工具调用通过类型化的注册表路由，包括 shell 执行、文件操作、git 管理、Web 搜索、子代理、MCP 服务器和 RLM 会话。引擎还管理会话状态、操作历史、持久化任务队列和 LSP 子系统，后者在每次编辑后自动运行语言服务器（如 rust-analyzer、pyright）并将诊断信息注入模型上下文。\n\n## 数据流\n用户输入（自然语言或命令）通过 TUI 界面发送到引擎。引擎首先检查是否启用自动模式：如果是，则先进行一次轻量路由调用（`deepseek-v4-flash`，无思考）来决定本次使用的模型和思考层级。然后，引擎将用户输入、系统提示（包含用户记忆、技能包、上下文摘要等）以及工具调用结果组装成请求，发送到 DeepSeek V4 API。API 返回流式响应，包含推理块（thinking blocks）和最终回复。引擎实时解析流，在 TUI 中显示推理过程和最终输出。如果模型请求调用工具，引擎暂停输出，执行工具（如读取文件、运行 shell 命令），将结果作为新的消息追加到上下文，并继续请求模型生成下一步。整个过程循环，直到用户终止或任务完成。会话状态（包括上下文、操作历史、任务队列）可保存到磁盘，支持恢复。\n\n## 关键算法/配置\n自动模式的核心算法是一个基于规则的决策器：路由调用分析用户请求的复杂度（如长度、关键词、历史上下文），然后映射到模型和思考层级组合。如果路由失败，回退到本地启发式规则（例如，包含“debug”或“security”的请求自动使用 Pro + 高思考）。子代理调度使用一个线程池，默认容量 10，可配置为 20，通过 `agent_open` 启动后立即返回，子代理在后台独立运行，完成后通过事件通知父代理。RLM 会话使用持久化 REPL，通过工具调用驱动，而非循环阻塞。上下文管理支持手动或自动压缩，利用前缀缓存（prefix-cache）减少重复计算。配置存储在 `~/.deepseek/config.toml`，支持多 API 提供商（DeepSeek、NVIDIA NIM、Fireworks、OpenAI 兼容、SGLang、vLLM、Ollama）。技能系统通过 GitHub 仓库安装指令包，无需后端服务。",
+          "novelty": "DeepSeek TUI 在终端编码代理领域具有显著创新。与 LangChain 和 AutoGen 等通用框架相比，它专为 DeepSeek V4 模型深度优化，充分利用了 1M token 上下文和流式推理等特性。其自动模式（Auto Mode）通过一次轻量路由调用动态选择模型和思考层级，这在同类工具中较为罕见，能有效平衡性能与成本。子代理系统支持并发执行和异步结果检索，通过 `var_handle` 引用实现高效数据传递，避免了上下文膨胀。RLM 持久化 REPL 会话为批量数据分析提供了专用工具集，如 `peek`、`search`、`chunk`，这在其他编码代理中不常见。\n\n与 GitHub Copilot 或 Cursor 等商业产品相比，DeepSeek TUI 完全开源，支持本地部署和多 API 提供商，包括自托管模型（如 Ollama、vLLM）。其 MCP 协议支持允许用户扩展工具集，而技能系统则实现了社区驱动的指令包共享。然而，其核心创新更多体现在工程整合而非算法突破：将 DeepSeek V4 的独特能力（如推理流、前缀缓存）与终端 TUI 深度结合，并提供了丰富的工具和配置选项。对于追求终端原生体验和高度可定制性的开发者来说，这是一个有价值的工具。",
+          "ecosystem": "DeepSeek TUI 深度依赖 DeepSeek V4 模型（`deepseek-v4-pro` 和 `deepseek-v4-flash`），但也支持其他 OpenAI 兼容的 API 提供商，如 NVIDIA NIM、Fireworks、SGLang、vLLM 和 Ollama。它使用 Rust 生态中的 ratatui 库构建 TUI 界面，通过 tokio 实现异步运行时。与 LangChain 和 AutoGen 等框架相比，DeepSeek TUI 更专注于终端场景，提供了开箱即用的工具集和会话管理。它不直接与这些框架竞争，而是可以作为它们的终端前端或替代方案。在终端编码代理领域，它直接与 `aider`、`codex` 等工具竞争，但凭借 DeepSeek V4 的独特能力和自动模式，在特定场景下具有优势。此外，其 MCP 协议支持使其能够融入更广泛的 AI 工具生态，技能系统则鼓励社区贡献。",
+          "limitations": [
+            {
+              "title": "依赖 DeepSeek V4",
+              "body": "核心功能针对 DeepSeek V4 优化，使用其他模型时可能无法获得最佳体验，如自动模式、推理流等特性可能受限。"
+            },
+            {
+              "title": "终端界面限制",
+              "body": "TUI 界面在复杂布局或小屏幕终端上可能显示不佳，且无法像 GUI 应用那样支持富文本、图片等多媒体内容。"
+            },
+            {
+              "title": "学习曲线",
+              "body": "丰富的命令和快捷键（如 `/model auto`、`Shift+Tab` 切换思考层级）需要一定时间熟悉，新手可能感到困惑。"
+            },
+            {
+              "title": "子代理资源消耗",
+              "body": "并发子代理（默认最多 10 个）可能消耗大量系统资源，尤其是在执行 shell 命令或网络请求时，影响其他进程。"
+            },
+            {
+              "title": "上下文管理复杂",
+              "body": "虽然支持 1M token 上下文，但手动或自动压缩策略需要用户理解，不当配置可能导致信息丢失或性能下降。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "安装 DeepSeek TUI（使用 npm）",
+              "cmd": "npm install -g deepseek-tui",
+              "note": "确保 Node.js 已安装，npm 版本较新。"
+            },
+            {
+              "step": "设置 API 密钥",
+              "cmd": "deepseek auth set --provider deepseek --api-key \"YOUR_KEY\"",
+              "note": "密钥保存在 ~/.deepseek/config.toml，也可通过 DEEPSEEK_API_KEY 环境变量设置。"
+            },
+            {
+              "step": "启动自动模式",
+              "cmd": "deepseek --model auto",
+              "note": "首次启动会提示输入 API 密钥，自动模式会根据任务选择模型和思考层级。"
+            },
+            {
+              "step": "尝试一个简单任务",
+              "note": "在 TUI 中输入 \"Write a Python function to reverse a string\"，观察模型回复和工具调用。"
+            },
+            {
+              "step": "切换思考层级",
+              "note": "按 Shift+Tab 循环切换思考层级（off → high → max），观察推理块的变化。"
+            },
+            {
+              "step": "使用子代理",
+              "note": "输入 \"Use a sub-agent to search the web for latest Rust news\"，观察子代理并发执行。"
+            },
+            {
+              "step": "查看会话历史",
+              "cmd": "Ctrl+R",
+              "note": "按 Ctrl+R 打开会话历史选择器，可恢复之前的会话。"
+            },
+            {
+              "step": "检查配置和诊断",
+              "cmd": "deepseek doctor",
+              "note": "运行 deepseek doctor 验证安装和配置是否正确。"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 24,
+            "reproducibility": 23,
+            "timeToValue": 22
+          }
+        }
+      },
+      {
+        "fullName": "rohitg00/agentmemory",
+        "owner": "rohitg00",
+        "name": "agentmemory",
+        "url": "https://github.com/rohitg00/agentmemory",
+        "ownerAvatarUrl": "https://github.com/rohitg00.png?size=80",
+        "description": "#1 Persistent memory for AI coding agents based on real-world benchmarks",
+        "language": "TypeScript",
+        "languageColor": "#3178c6",
+        "stars": 8628,
+        "forks": 714,
+        "starsGained": 4450,
+        "rank": 5,
+        "tldr": "这是一个持久化记忆引擎，用于为AI编码代理提供跨会话的上下文记忆，特别在零外部数据库、95%检索准确率和多代理共享记忆方面突出。",
+        "tags": [
+          "记忆引擎",
+          "MCP服务器",
+          "编码代理",
+          "持久化",
+          "TypeScript"
+        ],
+        "light": "本周/月 trending 原因：AI编码代理（如Claude Code、Cursor）的普及使得跨会话记忆成为刚需，而agentmemory提供了零配置、高精度（95.2% R@5）的解决方案，且无需外部数据库，直接集成MCP协议，支持多种代理。其基准测试和对比表格直观展示了优于mem0、Letta等竞品的性能，吸引了大量开发者关注。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "agentmemory 为 AI 编码代理提供持久化记忆，基于真实基准测试实现 95.2% 的检索召回率，同时减少 92% 的 token 消耗。它通过 MCP 服务器和自动钩子无缝集成到现有工作流中，无需手动管理记忆。",
+          "whyItMatters": [
+            {
+              "title": "消除重复解释",
+              "body": "代理自动记住项目上下文、偏好和决策，无需在每次会话中重新解释，显著提升开发效率。"
+            },
+            {
+              "title": "跨代理共享记忆",
+              "body": "通过 MCP 和 REST API，多个代理（如 Claude Code、Cursor、Gemini CLI）可共享同一记忆服务器，实现协作。"
+            },
+            {
+              "title": "零外部依赖",
+              "body": "基于 SQLite 和 iii 引擎，无需数据库或向量存储，部署简单且完全自托管。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "记忆生命周期",
+              "explain": "四层记忆整合策略：短期记忆自动合并到长期记忆，通过置信度评分和衰减机制管理遗忘，确保最相关的记忆优先保留。"
+            },
+            {
+              "term": "混合搜索 (RRF 融合)",
+              "explain": "结合 BM25 关键词搜索、向量语义搜索和知识图谱关系搜索，通过倒数排名融合 (RRF) 排序结果，实现 95.2% 的检索召回率。"
+            },
+            {
+              "term": "自动钩子 (Auto Hooks)",
+              "explain": "12 个预定义钩子自动捕获代理行为（如文件修改、命令执行、错误），无需手动调用 API，实现零配置记忆记录。"
+            },
+            {
+              "term": "MCP 服务器",
+              "explain": "基于 Model Context Protocol 的服务器，提供标准化的记忆读写接口，任何支持 MCP 的客户端（如 Claude Desktop、Cursor）均可直接使用。"
+            },
+            {
+              "term": "iii 引擎",
+              "explain": "agentmemory 底层依赖的轻量级引擎，提供嵌入、搜索、存储等核心能力，支持本地 all-MiniLM-L6-v2 模型，无需外部 API。"
+            }
+          ],
+          "howItWorks": "## 组件\nagentmemory 由三个核心组件构成：**记忆服务器**、**自动钩子系统**和 **MCP 接口**。记忆服务器基于 iii 引擎，使用 SQLite 作为持久化存储，内置 BM25 索引、向量嵌入（默认 all-MiniLM-L6-v2）和知识图谱。自动钩子系统提供 12 个预定义钩子，覆盖文件变更、命令执行、错误捕获等场景，无需手动调用 API。MCP 接口遵循 Model Context Protocol，允许任何支持 MCP 的客户端（如 Claude Code、Cursor、Gemini CLI）通过标准协议读写记忆。此外，还包含实时查看器（端口 3113）和 REST API（104 个端点），支持跨代理共享。\n\n## 数据流\n数据流分为捕获、存储和检索三个阶段。捕获阶段：自动钩子监听代理行为（如文件保存、命令输出），将事件转化为结构化记忆条目，包含文本、元数据和时间戳。存储阶段：条目经过嵌入模型生成向量，同时提取关键词构建 BM25 索引，并更新知识图谱中的实体关系。检索阶段：当代理发起查询时，系统并行执行 BM25 搜索、向量搜索和图谱搜索，通过倒数排名融合 (RRF) 合并结果，按置信度排序后注入代理上下文。整个流程异步执行，对代理无感知。\n\n## 关键算法/配置\n关键算法包括：**混合搜索**使用 RRF 融合 BM25、向量和图谱结果，权重可配置（默认 BM25:0.3, 向量:0.5, 图谱:0.2）。**记忆生命周期**采用四层整合：短期记忆（<1 小时）自动合并到长期记忆，基于置信度评分（0-1）和衰减因子（默认 0.9/天）管理遗忘，低置信度条目自动归档。**配置项**包括嵌入模型（默认本地 all-MiniLM-L6-v2，可选 OpenAI/text-embedding-3-small）、存储路径、端口号（默认 3113）、钩子启用列表等，通过 `agentmemory.json` 或环境变量设置。",
+          "novelty": "agentmemory 在持久化记忆领域并非完全创新，但与同类方案相比有显著差异。与 **mem0**（53K ⭐）相比，agentmemory 提供自动捕获（12 个钩子 vs 手动 add() 调用）和更高的检索精度（95.2% R@5 vs 68.5%），且无需外部向量数据库（mem0 依赖 Qdrant/pgvector）。与 **Letta/MemGPT**（22K ⭐）相比，agentmemory 是轻量级记忆引擎而非完整代理运行时，无框架锁定，任何 MCP 客户端均可使用。与 **claude-mem** 或内置 CLAUDE.md 相比，agentmemory 提供混合搜索、记忆生命周期和实时查看器，token 效率更高（~1,900 tokens/会话 vs 22K+）。\n\n其核心创新在于将记忆生命周期管理、混合搜索和自动捕获集成到一个零外部依赖的包中，并通过 MCP 标准化接口实现跨代理兼容。不过，记忆整合算法和 RRF 融合并非全新概念，但工程实现（如 827 个测试、基准验证）使其在可靠性和易用性上领先。",
+          "ecosystem": "agentmemory 依赖 **iii 引擎**（`iii-sdk` ^0.11.0）提供嵌入和搜索能力，默认使用本地 `all-MiniLM-L6-v2` 模型（通过 `@xenova/transformers`），无需外部 API。存储依赖 SQLite（通过 `better-sqlite3`），无其他外部数据库。它通过 MCP 协议与主流代理集成：Claude Code、Cursor、Gemini CLI、Codex CLI、OpenClaw、Hermes、Cline、Goose 等，也提供 REST API 供自定义集成。\n\n在竞争方面，agentmemory 直接与 mem0、Letta、Khoj、Hippo 等记忆方案竞争，但通过零依赖、自动捕获和跨代理兼容性差异化。它不替代代理本身，而是作为记忆层增强现有工具。与 LangChain 的记忆模块相比，agentmemory 更轻量且独立，不绑定特定框架。",
+          "limitations": [
+            {
+              "title": "记忆容量有限",
+              "body": "虽然使用 SQLite 持久化，但长期使用后数据库可能增长到数百 MB，影响检索速度。目前无内置数据压缩或自动归档策略。"
+            },
+            {
+              "title": "嵌入模型局限",
+              "body": "默认使用本地 all-MiniLM-L6-v2 模型，对专业领域术语（如医学、法律）的语义理解可能不足，需切换为 OpenAI 等外部模型，但会增加成本和延迟。"
+            },
+            {
+              "title": "多代理协调简单",
+              "body": "通过 MCP 和 REST 实现基本共享，但缺乏高级协调机制（如分布式锁、冲突解决），多个代理同时写入可能导致数据不一致。"
+            },
+            {
+              "title": "依赖 iii 引擎稳定性",
+              "body": "底层 iii 引擎仍在快速迭代中（当前 v0.11.x），API 可能变化，升级需谨慎。README 明确要求锁定版本，但长期兼容性未保证。"
+            },
+            {
+              "title": "实时性不足",
+              "body": "记忆捕获和检索存在异步延迟（通常数秒），对于需要即时上下文的高频交互场景（如实时调试），可能不够及时。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "启动记忆服务器（默认端口 3113）",
+              "cmd": "npx @agentmemory/agentmemory",
+              "note": "确保 Node.js >= 18，首次运行会自动安装依赖。"
+            },
+            {
+              "step": "在浏览器中打开实时记忆查看器",
+              "cmd": "open http://localhost:3113",
+              "note": "查看器显示记忆图谱和检索统计。"
+            },
+            {
+              "step": "运行演示模式，种子示例数据",
+              "cmd": "npx @agentmemory/agentmemory demo",
+              "note": "会创建 3 个模拟会话（如 JWT 认证配置），展示自动捕获效果。"
+            },
+            {
+              "step": "通过 MCP 连接 Claude Code（需配置 MCP 客户端）",
+              "note": "在 Claude Code 的 MCP 配置中添加 agentmemory 服务器地址。"
+            },
+            {
+              "step": "手动添加一条记忆",
+              "cmd": "curl -X POST http://localhost:3113/memory -H \"Content-Type: application/json\" -d '{\"text\":\"项目使用 jose 中间件处理 JWT\"}'",
+              "note": "记忆会自动索引并关联到当前项目。"
+            },
+            {
+              "step": "搜索记忆",
+              "cmd": "curl \"http://localhost:3113/search?q=JWT%20middleware\"",
+              "note": "返回混合搜索结果，包含置信度评分。"
+            },
+            {
+              "step": "配置自动钩子（以文件变更钩子为例）",
+              "note": "在 agentmemory.json 中启用 fs-watcher 钩子，自动记录文件修改。"
+            },
+            {
+              "step": "停止服务器",
+              "cmd": "Ctrl+C",
+              "note": "记忆数据保存在本地 SQLite 文件中，重启后自动加载。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 24,
+            "reproducibility": 23,
+            "timeToValue": 22
+          }
+        }
+      },
+      {
+        "fullName": "yikart/AiToEarn",
+        "owner": "yikart",
+        "name": "AiToEarn",
+        "url": "https://github.com/yikart/AiToEarn",
+        "ownerAvatarUrl": "https://github.com/yikart.png?size=80",
+        "description": "Let's use AI to Earn!",
+        "language": "TypeScript",
+        "languageColor": "#3178c6",
+        "stars": 13596,
+        "forks": 2308,
+        "starsGained": 3302,
+        "rank": 6,
+        "tldr": "这是一个AI内容营销智能体平台，用于帮助一人公司/创作者自动化内容生成、分发和变现，特别在支持多平台发布和多种结算模式。",
+        "tags": [
+          "AI Agent",
+          "内容营销",
+          "多平台发布",
+          "变现",
+          "OPC"
+        ],
+        "light": "该项目近期因推出内容交易市场、MCP协议支持以及集成OpenClaw（龙虾）等新功能而受到关注，同时其‘一人公司’定位和AI自动化变现概念在创作者经济热潮中颇具吸引力，持续获得star增长。",
+        "worthDeepDive": 45
+      },
+      {
+        "fullName": "decolua/9router",
+        "owner": "decolua",
+        "name": "9router",
+        "url": "https://github.com/decolua/9router",
+        "ownerAvatarUrl": "https://github.com/decolua.png?size=80",
+        "description": "Unlimited FREE AI coding. Connect Claude Code, Codex, Cursor, Cline, Copilot, Antigravity to FREE Claude/GPT/Gemini via 40+ providers. Auto-fallback, RTK -40% tokens, never hit limits.",
+        "language": "JavaScript",
+        "languageColor": "#f1e05a",
+        "stars": 10144,
+        "forks": 1562,
+        "starsGained": 5796,
+        "rank": 7,
+        "tldr": "这是一个AI路由工具，用于将多种AI编码工具连接到免费或廉价的AI模型，特色是RTK令牌节省和自动故障转移。",
+        "tags": [
+          "AI路由",
+          "令牌节省",
+          "免费AI",
+          "自动故障转移",
+          "编码工具集成"
+        ],
+        "light": "本周/月9Router在trending上是因为它提供了一个实用的解决方案，让开发者可以免费或低成本使用Claude、GPT等高级AI模型进行编码。随着AI编码工具（如Claude Code、Cursor）的流行，用户对降低成本和避免速率限制的需求激增。9Router通过RTK技术节省20-40%的令牌，并自动在订阅、廉价和免费提供商之间切换，确保不间断服务。其简单的安装和广泛的提供商支持（40+）使其成为开发者的热门选择。",
+        "worthDeepDive": 40
+      },
+      {
+        "fullName": "HKUDS/AI-Trader",
+        "owner": "HKUDS",
+        "name": "AI-Trader",
+        "url": "https://github.com/HKUDS/AI-Trader",
+        "ownerAvatarUrl": "https://github.com/HKUDS.png?size=80",
+        "description": "\"AI-Trader: 100% Fully-Automated Agent-Native Trading\"",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 17140,
+        "forks": 2656,
+        "starsGained": 2962,
+        "rank": 8,
+        "tldr": "这是一个Agent原生交易平台，让AI代理像人类一样参与金融交易，支持即时集成、集体智能和跨平台信号同步。",
+        "tags": [
+          "AI Agent",
+          "交易平台",
+          "金融",
+          "自动化",
+          "开源"
+        ],
+        "light": "该项目近期因AI Agent热潮和金融交易自动化需求激增而登上trending。它提供了一个让AI代理自主注册、发布信号、复制交易的平台，结合了集体智能和实时市场数据，吸引了大量开发者和交易者关注。2026年4月的稳定性增强和代码精简进一步提升了其可靠性，使其成为AI与金融交叉领域的明星项目。",
+        "worthDeepDive": 70
+      },
+      {
+        "fullName": "Imbad0202/academic-research-skills",
+        "owner": "Imbad0202",
+        "name": "academic-research-skills",
+        "url": "https://github.com/Imbad0202/academic-research-skills",
+        "ownerAvatarUrl": "https://github.com/Imbad0202.png?size=80",
+        "description": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 7068,
+        "forks": 808,
+        "starsGained": 1968,
+        "rank": 9,
+        "tldr": "这是一个Claude Code插件套件，用于辅助学术研究的全流程（研究→写作→审稿→修改→定稿），特别强调人机协作而非完全自动化，内置完整性检查和多智能体协作。",
+        "tags": [
+          "学术写作",
+          "AI辅助研究",
+          "Claude Code插件",
+          "人机协作",
+          "多智能体"
+        ],
+        "light": "该项目近期在GitHub trending上受到关注，主要因为其完整覆盖了学术研究从文献调研、论文写作、同行评审到最终定稿的全流程，且强调人机协作而非完全自动化，契合当前学术界对AI辅助工具的需求。v3.7.0版本引入了插件市场安装方式，降低了使用门槛，同时提供了丰富的文档和真实案例，吸引了大量研究者尝试。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "ARS 将 Claude Code 武装成你的学术研究副驾驶，覆盖从文献调研到终稿发布的完整流程。它不替你思考，而是用 13+12+7 个智能体处理引用、格式、逻辑校验等苦活，让你专注在论证本身。30 分钟安装，即可获得一个永不疲倦的研究助理。",
+          "whyItMatters": [
+            {
+              "title": "人机协作而非替代",
+              "body": "与全自动 AI 科学家不同，ARS 坚持人类在环，通过分阶段质量门禁避免幻觉、方法捏造等失败模式，真正提升论文质量。"
+            },
+            {
+              "title": "端到端管道覆盖",
+              "body": "从研究规划、文献综述、写作、评审到修改，10 阶段管道 + 自适应检查点，一站式完成学术出版全流程。"
+            },
+            {
+              "title": "风格校准与质量检查",
+              "body": "通过学习用户过往作品校准写作风格，并检测机器生成文本的典型模式，让输出更自然、更可信。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "13-Agent Research Team",
+              "explain": "Deep Research 阶段由 13 个专用智能体组成，分别负责文献检索、质量评估、事实核查等任务，协同完成深度调研。可类比为'学术版的 **AutoGen** 多智能体系统'。"
+            },
+            {
+              "term": "Style Calibration",
+              "explain": "Academic Paper 阶段的一项功能，通过分析用户过往论文的用词、句式、引用习惯，自动调整输出风格，使 AI 生成内容与作者个人风格一致。"
+            },
+            {
+              "term": "Integrity Gate (Stage 2.5/4.5)",
+              "explain": "管道中的关键质量门禁，运行 7 模式阻塞检查清单，包括引用验证、统计错误检测、逻辑一致性检查，防止幻觉和错误进入下一阶段。"
+            },
+            {
+              "term": "Material Passport",
+              "explain": "每个阶段输出的元数据清单，记录数据来源、处理步骤、版本信息，支持可选的 `repro_lock` 配置锁，为论文提供可追溯性。"
+            },
+            {
+              "term": "Socratic Guided Mode",
+              "explain": "Deep Research 和 Academic Paper 中的引导模式，通过苏格拉底式对话逐步引导用户明确研究问题、方法论和论文结构，而非直接生成内容。"
+            }
+          ],
+          "howItWorks": "## 组件\n\nARS 的核心由四大模块组成：**Deep Research**（13 智能体）、**Academic Paper**（12 智能体）、**Academic Paper Reviewer**（7 智能体）和 **Academic Pipeline**（10 阶段编排器）。每个模块内部采用多智能体协作架构，智能体之间通过共享上下文和阶段性产物（如 Material Passport）进行通信。Deep Research 模块包含文献检索、质量评估、事实核查等专用智能体；Academic Paper 模块包含写作、格式转换、引用检查、可视化等智能体；Reviewer 模块模拟 EIC + 3 位动态评审人 + 魔鬼代言人的多视角评审。Pipeline 编排器负责调度各阶段，并在 Stage 2.5 和 4.5 插入完整性门禁，运行 7 模式阻塞检查清单。所有模块均声明 `data_access_level`（raw/redacted/verified_only）和 `task_type`（open-ended），确保数据访问合规。\n\n## 数据流\n\n用户输入（如“写一篇关于 AI 教育影响的论文”）首先进入 Pipeline 编排器，编排器根据输入类型和阶段状态决定入口点（Stage 1 或 mid-entry）。Stage 1 启动 Deep Research 模块，13 个智能体并行或顺序执行：文献检索智能体调用 Semantic Scholar API 获取相关论文，质量评估智能体对每篇论文打分，事实核查智能体验证关键声明。结果汇总为 Research Brief 和 Methodology Blueprint。随后进入 Stage 2，Academic Paper 模块根据蓝图生成论文草稿，期间 Style Calibration 从用户历史作品中学习写作风格，Writing Quality Check 检测机器化模式。草稿经过 Stage 2.5 完整性门禁（引用验证、统计错误检测等）后进入 Stage 3 评审。Reviewer 模块生成多视角评审报告，用户修改后进入 Stage 4 修订，再次通过 Stage 4.5 门禁确认零回归。最终 Stage 5 输出最终格式（MD/DOCX/LaTeX PDF），Stage 6 生成过程摘要。整个流程中，Material Passport 记录每个产物的来源和版本，支持可选的 `repro_lock` 配置锁。\n\n## 关键算法/配置\n\nARS 的关键算法体现在几个方面：**Style Calibration** 通过分析用户过往论文的 n-gram 分布、句式长度、引用密度等特征，构建风格向量，在生成时通过 prompt 注入和 logit 偏置调整输出。**Writing Quality Check** 使用预定义的机器生成文本模式库（如过度使用“furthermore”、“notably”等过渡词，缺乏具体引用等），对每个段落进行评分。**完整性门禁** 的 7 模式检查包括：引用存在性验证（通过 Semantic Scholar API）、统计一致性检查（如 p 值与置信区间是否匹配）、逻辑矛盾检测（如前提与结论是否一致）、方法捏造检测（如声称使用了不存在的算法）、框架锁定检测（如是否过度依赖单一理论）、幻觉检测（如虚构的文献或数据）、以及跨模型一致性验证（可选，通过 `ARS_CROSS_MODEL` 启用）。配置方面，用户可通过环境变量调整：`ARS_CROSS_MODEL` 启用跨模型验证，`ANTHROPIC_API_KEY` 设置 API 密钥，以及可选的 Pandoc/tectonic 路径用于 DOCX/PDF 输出。Pipeline 支持自适应检查点，根据论文长度和复杂度动态调整 token 预算（完整 15k 词论文约 $4-6）。",
+          "novelty": "ARS 的独特之处在于它并非又一个全自动论文生成器，而是**人机协作的学术工作流框架**。与 **The AI Scientist**（Lu et al., 2026）追求完全自主不同，ARS 明确将人类置于环中，通过分阶段质量门禁（Stage 2.5/4.5）和 Socratic 引导模式，避免全自动系统常见的幻觉、方法捏造、框架锁定等失败模式。与 **PaperOrchestra**（Song et al., 2026）相比，ARS 不仅借鉴了其 Semantic Scholar 验证和反泄漏协议，还扩展了多智能体评审（7 视角）、风格校准、以及完整的 10 阶段管道编排。\n\n与 **LangChain** 或 **AutoGen** 等通用多智能体框架相比，ARS 是**领域特化的**——它内置了学术写作的领域知识（如 IMRaD 结构、APA 格式、PRISMA 系统综述流程），而非仅提供通用编排能力。此外，ARS 的 Material Passport 和可选的 `repro_lock` 配置锁提供了可追溯性，这在现有学术 AI 工具中较为罕见。不过，ARS 的创新更多体现在**工程整合**而非算法突破——它巧妙地将现有技术（多智能体、RAG、风格迁移）组合成针对学术场景的连贯工作流，并强调诚实使用 AI（而非隐藏 AI 痕迹），这在伦理上值得肯定。",
+          "ecosystem": "ARS 深度依赖 **Claude Code** 作为执行环境，所有技能以 Claude Code 插件形式运行，因此与 Anthropic 生态紧密绑定。它可选依赖 **Pandoc**（DOCX 输出）和 **tectonic** + Source Han Serif TC（APA 7.0 PDF），但 Markdown 输出无需额外工具。文献检索依赖 **Semantic Scholar API**，引用验证也通过该 API 实现。\n\nARS 与 **experiment-agent**（同一作者）形成互补：前者负责研究写作全流程，后者负责实验执行与结果验证，两者通过 Material Passport 衔接。此外，ARS 有专门的 **Codex CLI 发行版**（`Imbad0202/academic-research-skills-codex`），适配 Codex 生态。\n\n在竞争方面，ARS 与 **The AI Scientist**、**PaperOrchestra** 等全自动系统形成对比，强调人机协作；与 **Writefull**、**Paperpal** 等学术写作辅助工具相比，ARS 覆盖更广（从研究到评审）。但 ARS 不直接与 **Overleaf** 或 **Zotero** 竞争，而是作为它们的上游——生成内容后用户可导入这些工具进一步编辑。",
+          "limitations": [
+            {
+              "title": "依赖 Claude Code",
+              "body": "ARS 作为 Claude Code 插件运行，无法独立使用。用户必须安装 Claude Code 并配置 API 密钥，限制了在非 Anthropic 生态中的可用性。"
+            },
+            {
+              "title": "非全自动，需用户投入",
+              "body": "ARS 坚持人类在环，用户需积极参与 Socratic 对话、评审修改等环节。对于期望一键生成论文的用户，ARS 的学习曲线和交互成本较高。"
+            },
+            {
+              "title": "引用验证依赖 API",
+              "body": "引用验证通过 Semantic Scholar API 进行，若 API 不可用或返回不完整数据，验证可能失效。此外，API 调用可能产生额外延迟和费用。"
+            },
+            {
+              "title": "输出格式依赖外部工具",
+              "body": "DOCX 和 LaTeX PDF 输出需要安装 Pandoc 和 tectonic，增加了环境配置复杂度。若缺少这些工具，只能得到 Markdown 格式。"
+            },
+            {
+              "title": "语言支持有限",
+              "body": "虽然 Socratic 模式理论上支持任何语言，但触发关键词和默认输出仅覆盖英文和繁体中文。其他语言用户需手动修改 SKILL.md 文件。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "安装 Claude Code 并配置 API 密钥",
+              "cmd": "claude",
+              "note": "确保 `ANTHROPIC_API_KEY` 环境变量已设置，或首次运行时按提示输入。"
+            },
+            {
+              "step": "通过插件市场安装 ARS",
+              "cmd": "/plugin marketplace add Imbad0202/academic-research-skills\n/plugin install academic-research-skills",
+              "note": "需 Claude Code v3.7.0+，插件安装后即可使用 `ars-*` 命令。"
+            },
+            {
+              "step": "启动 Socratic 引导式论文规划",
+              "cmd": "/ars-plan",
+              "note": "描述你正在写的论文，ARS 会通过对话帮你梳理章节结构。"
+            },
+            {
+              "step": "快速文献综述测试",
+              "cmd": "/ars-lit-review \"AI in higher education\"",
+              "note": "单次测试，无需完整管道。结果会列出相关文献和摘要。"
+            },
+            {
+              "step": "运行完整研究管道",
+              "cmd": "I want to write a complete research paper on [your topic]",
+              "note": "直接以自然语言描述，ARS 会从 Stage 1 开始执行。全程约 $4-6。"
+            },
+            {
+              "step": "评审已有论文",
+              "cmd": "Review this paper",
+              "note": "粘贴论文内容或提供文件路径，ARS 会生成多视角评审报告。"
+            },
+            {
+              "step": "查看管道状态",
+              "cmd": "status",
+              "note": "在管道运行中可随时检查当前阶段和进度。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 23,
+            "reproducibility": 20,
+            "timeToValue": 22
+          }
+        }
+      },
+      {
+        "fullName": "addyosmani/agent-skills",
+        "owner": "addyosmani",
+        "name": "agent-skills",
+        "url": "https://github.com/addyosmani/agent-skills",
+        "ownerAvatarUrl": "https://github.com/addyosmani.png?size=80",
+        "description": "Production-grade engineering skills for AI coding agents.",
+        "language": "Shell",
+        "languageColor": "#89e051",
+        "stars": 41397,
+        "forks": 4550,
+        "starsGained": 11732,
+        "rank": 10,
+        "tldr": "这是一个AI编码代理的技能包，用于将资深工程师的工作流、质量门和最佳实践编码为可重复执行的步骤，特别在提供反合理化表和验证门以确保代理不跳过关键步骤。",
+        "tags": [
+          "AI代理",
+          "工程最佳实践",
+          "工作流自动化",
+          "代码质量",
+          "开发生命周期"
+        ],
+        "light": "本周/月在trending上是因为AI编码代理（如Claude Code、Cursor）的普及使得开发者急需一种系统化的方法来确保代理输出高质量代码。该项目由Google Chrome团队成员addyosmani创建，提供了22个即插即用的技能，覆盖从需求定义到部署的完整生命周期，并支持多个主流代理平台。其独特之处在于内置反合理化机制，防止代理偷工减料，这正好解决了当前AI编码中常见的'看起来对但实际有隐患'的问题。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Agent Skills 将资深工程师的工程实践编码为结构化工作流，让 AI 编码代理在开发全生命周期中自动遵循规范、质量门禁和最佳实践，避免随意输出。",
+          "whyItMatters": [
+            {
+              "title": "工程经验可复用",
+              "body": "将资深工程师的 22 项技能打包为 Markdown 文件，AI 代理可直接加载，无需重复灌输。"
+            },
+            {
+              "title": "覆盖全生命周期",
+              "body": "从需求定义到生产发布，每个阶段都有对应技能，确保流程完整且一致。"
+            },
+            {
+              "title": "反合理化机制",
+              "body": "每个技能内置常见借口与反驳表，防止 AI 跳过关键步骤，提升输出质量。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Skill",
+              "explain": "一个结构化的 Markdown 文件，包含概述、触发条件、分步流程、反合理化表、红旗标志和验证要求。AI 代理按此执行，确保工程规范。"
+            },
+            {
+              "term": "Slash Command",
+              "explain": "7 个映射到开发阶段的斜杠命令（如 `/spec`、`/build`），自动激活对应技能，简化交互。"
+            },
+            {
+              "term": "Anti-rationalization Table",
+              "explain": "每个技能中的表格，列出 AI 可能用来跳过步骤的借口（如“稍后加测试”）及其反驳，强制遵守流程。"
+            },
+            {
+              "term": "Verification Gate",
+              "explain": "每个技能末尾的验证要求，如测试通过、构建输出、运行时数据，确保“看似正确”不被接受。"
+            }
+          ],
+          "howItWorks": "## 组件\n\nAgent Skills 的核心组件是 22 个独立的 `SKILL.md` 文件，每个文件遵循统一模板：frontmatter（名称、描述）、概述、使用时机、分步流程、反合理化表、红旗标志和验证要求。这些技能按开发阶段组织在 `skills/` 目录下，分为 Define、Plan、Build、Verify、Review、Ship 六个阶段。此外，`agents/` 目录提供预配置的专家角色（如代码审查员、安全审计员），`references/` 目录包含测试模式、安全清单等参考材料。元技能 `using-agent-skills` 负责将用户请求映射到最合适的技能。\n\n## 数据流\n\n用户通过斜杠命令（如 `/build`）或自然语言触发技能。元技能解析输入，匹配对应 `SKILL.md`，然后 AI 代理按流程逐步执行：读取步骤、执行操作、检查反合理化表、通过验证门禁。过程中，技能可能引用 `references/` 中的清单或调用外部工具（如 MCP 连接器）。每个步骤的输出需满足验证要求，否则代理会回退或提示用户。最终结果通过后，进入下一阶段。\n\n## 关键算法/配置\n\n核心算法是“流程驱动执行”：AI 代理严格遵循技能中的步骤顺序，每一步都有明确的输入、操作和验证标准。反合理化表通过模式匹配阻止常见捷径。技能通过 `frontmatter` 中的 `use when` 条件自动触发，或通过斜杠命令手动激活。配置方面，用户可通过 `claude --plugin-dir`、`.cursor/rules/` 或 `gemini skills install` 等方式将技能注入 AI 工具。技能本身是纯 Markdown，无运行时依赖，但依赖 AI 代理的指令遵循能力。",
+          "novelty": "Agent Skills 的独特之处在于将工程最佳实践编码为 AI 代理可执行的“技能”，而非传统提示词或规则文件。与 LangChain 的 Agent 框架相比，LangChain 侧重于工具调用和链式推理，而 Agent Skills 聚焦于开发流程的规范化和质量门禁。AutoGen 提供多代理对话，但缺乏预定义的工程工作流。LlamaIndex 的 Agent 更关注数据索引和检索。Agent Skills 的创新在于：1）反合理化表，主动防止 AI 跳过关键步骤；2）渐进式披露，技能入口文件轻量，引用按需加载；3）多平台兼容，同一套技能可在 Claude、Cursor、Gemini CLI 等工具中使用。不过，其核心思想（结构化提示）并非全新，类似 GitHub Copilot 的指令文件或 Cursor 的规则，但 Agent Skills 的完整性和工程深度使其在同类中脱颖而出。",
+          "ecosystem": "Agent Skills 依赖 AI 编码代理（如 Claude Code、Cursor、Gemini CLI）作为执行引擎，自身为纯 Markdown 文件，无运行时依赖。它与这些工具互补：Claude Code 提供插件市场，Cursor 使用 `.cursor/rules`，Gemini CLI 支持 `skills install`。替代方案包括手动编写提示词或使用其他规则集（如 GitHub Copilot 的 `.github/copilot-instructions.md`），但 Agent Skills 提供更完整的生命周期覆盖。竞争项目有 `sweepai/sweep`（自动 PR）和 `plandex-ai/plandex`（任务规划），但 Agent Skills 更侧重于流程规范而非自动化。它可与 MCP 服务器（如 FactSet、S&P Global）集成，增强数据获取能力。",
+          "limitations": [
+            {
+              "title": "依赖代理遵循能力",
+              "body": "技能的有效性完全取决于 AI 代理是否严格遵循 Markdown 指令，若代理忽略步骤或反合理化表，则技能失效。"
+            },
+            {
+              "title": "无内置执行引擎",
+              "body": "Agent Skills 本身不执行代码或测试，仅提供指导，需要外部工具（如测试框架、CI 系统）配合。"
+            },
+            {
+              "title": "技能覆盖有限",
+              "body": "22 个技能虽覆盖常见场景，但特定领域（如机器学习、嵌入式开发）可能缺少专用技能，需用户自行扩展。"
+            },
+            {
+              "title": "反合理化表可能不全面",
+              "body": "AI 可能找到表中未列出的新借口，导致跳过步骤，需要社区持续更新。"
+            },
+            {
+              "title": "多平台一致性难保证",
+              "body": "不同 AI 工具对 Markdown 指令的解析和执行方式有差异，同一技能在不同平台上的表现可能不一致。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "克隆仓库到本地",
+              "cmd": "git clone https://github.com/addyosmani/agent-skills.git",
+              "note": "确保已安装 Git。"
+            },
+            {
+              "step": "在 Claude Code 中安装插件（推荐）",
+              "cmd": "/plugin marketplace add addyosmani/agent-skills\n/plugin install agent-skills@addy-agent-skills",
+              "note": "若 SSH 报错，改用 HTTPS URL。"
+            },
+            {
+              "step": "在 Claude Code 中启动会话并运行 /spec 命令",
+              "cmd": "/spec",
+              "note": "描述你的项目想法，AI 将按技能生成 PRD。"
+            },
+            {
+              "step": "在 Cursor 中配置技能",
+              "cmd": "cp -r skills/*/.cursor/rules/",
+              "note": "或参考 docs/cursor-setup.md 进行配置。"
+            },
+            {
+              "step": "在 Gemini CLI 中安装技能",
+              "cmd": "gemini skills install https://github.com/addyosmani/agent-skills.git --path skills",
+              "note": "确保已安装 Gemini CLI。"
+            },
+            {
+              "step": "查看某个技能的 Markdown 内容",
+              "cmd": "cat skills/spec-driven-development/SKILL.md",
+              "note": "了解其结构和反合理化表。"
+            },
+            {
+              "step": "使用代码审查员角色审查代码",
+              "cmd": "cat agents/code-reviewer.md",
+              "note": "将内容作为系统提示注入 AI 代理。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 22,
+            "reproducibility": 25,
+            "timeToValue": 20
+          }
+        }
+      },
+      {
+        "fullName": "playcanvas/supersplat",
+        "owner": "playcanvas",
+        "name": "supersplat",
+        "url": "https://github.com/playcanvas/supersplat",
+        "ownerAvatarUrl": "https://github.com/playcanvas.png?size=80",
+        "description": "3D Gaussian Splat Editor",
+        "language": "TypeScript",
+        "languageColor": "#3178c6",
+        "stars": 7910,
+        "forks": 857,
+        "starsGained": 2745,
+        "rank": 11,
+        "tldr": "这是一个3D高斯泼溅编辑器，用于在浏览器中查看、编辑、优化和发布高斯泼溅场景，特别在无需安装、全Web端运行。",
+        "tags": [
+          "3D高斯泼溅",
+          "Web编辑器",
+          "PlayCanvas",
+          "开源工具",
+          "实时渲染"
+        ],
+        "light": "近期3D高斯泼溅技术（3DGS）在NeRF和3D重建领域持续火热，但缺乏易用的编辑工具。SuperSplat填补了这一空白，提供免费的浏览器内编辑器，支持裁剪、优化、导出等操作，降低了3DGS的编辑门槛。PlayCanvas作为知名Web引擎，其开源发布吸引了大量3D视觉和Web开发者关注，加之社区活跃，近期在GitHub trending上热度较高。",
+        "worthDeepDive": 75
+      },
+      {
+        "fullName": "mattpocock/skills",
+        "owner": "mattpocock",
+        "name": "skills",
+        "url": "https://github.com/mattpocock/skills",
+        "ownerAvatarUrl": "https://github.com/mattpocock.png?size=80",
+        "description": "Skills for Real Engineers. Straight from my .claude directory.",
+        "language": "Shell",
+        "languageColor": "#89e051",
+        "stars": 80927,
+        "forks": 6986,
+        "starsGained": 15813,
+        "rank": 12,
+        "tldr": "这是一个AI编码代理的技能集合，用来提升代码质量与工程实践，特别在将传统软件工程原则（如TDD、领域驱动设计）转化为可复用的代理指令。",
+        "tags": [
+          "AI编码代理",
+          "软件工程",
+          "Claude Code",
+          "TDD",
+          "领域驱动设计"
+        ],
+        "light": "本周/月 trending 的原因：作者 Matt Pocock 是 TypeScript 社区知名人物，其技能集针对当前 AI 编码代理（如 Claude Code）的常见痛点（沟通偏差、冗长、代码质量差、架构混乱）提供了实用解决方案。项目包含 grill-me、tdd、diagnose 等即用技能，强调工程纪律而非“vibe coding”，契合开发者对 AI 辅助编程中可控性和质量的需求，因此迅速获得关注。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Matt Pocock 将数十年软件工程经验提炼为可复用的 AI agent 技能集，解决 agent 常见失败模式：沟通错位、冗长、代码不可靠、架构腐化。每个技能独立、可组合，30 秒即可集成到 Claude Code 等 agent 中，让你用工程思维而非 vibe coding 构建真实应用。",
+          "whyItMatters": [
+            {
+              "title": "工程化 AI 开发",
+              "body": "将 TDD、领域驱动设计、持续重构等经典实践封装为 agent 可执行的技能，让 AI 遵循工程纪律而非随机生成。"
+            },
+            {
+              "title": "即插即用",
+              "body": "通过 `npx skills@latest add` 一键安装，无需复杂配置，即可获得 grilling、诊断、架构改进等实用能力。"
+            },
+            {
+              "title": "可组合与可定制",
+              "body": "每个技能是独立的 markdown 文件，易于修改和组合，适应不同项目和工作流，避免被框架锁定。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Skill",
+              "explain": "一个 markdown 文件，定义 agent 可执行的特定任务（如 `/grill-me`），包含指令、参数和示例。可类比为 agent 的“函数”，通过自然语言调用。"
+            },
+            {
+              "term": "Grilling Session",
+              "explain": "一种结构化对话模式，agent 通过一系列问题深入挖掘需求、假设和边界条件，确保人与 agent 对齐。类似敏捷中的用户故事细化。"
+            },
+            {
+              "term": "Shared Language (CONTEXT.md)",
+              "explain": "项目专用的领域术语表，帮助 agent 使用简洁、一致的词汇描述业务逻辑，减少歧义和 token 消耗。类似 DDD 中的通用语言。"
+            },
+            {
+              "term": "Vertical Slice",
+              "explain": "将需求拆分为端到端可独立交付的功能切片，每个切片包含 UI、业务逻辑、数据访问等完整层。用于 `to-issues` 和 `tdd` 技能。"
+            },
+            {
+              "term": "Red-Green-Refactor",
+              "explain": "TDD 循环：先写失败测试（红），再写最少代码通过测试（绿），最后重构代码。`/tdd` 技能强制 agent 遵循此循环。"
+            }
+          ],
+          "howItWorks": "## 组件\n\n仓库核心是 `skills/` 目录下的 markdown 文件，每个文件定义一个可复用的 agent 技能。技能分为三类：**Engineering**（代码工作，如 `/diagnose`、`/tdd`、`/improve-codebase-architecture`）、**Productivity**（通用工作流，如 `/grill-me`、`/caveman`、`/handoff`）和 **Misc**（偶尔使用的工具）。每个技能文件包含元数据、详细指令、参数说明和示例。安装时，`skills.sh` 工具（通过 `npx skills@latest add` 调用）将选中的技能注入到目标 agent（如 Claude Code、Codex）的配置中，使其可通过 `/skill-name` 命令触发。此外，`/setup-matt-pocock-skills` 技能负责初始化每个仓库的配置：选择 issue 跟踪器（GitHub/Linear/本地文件）、定义 triage 标签词汇表、设置文档存储路径，并生成 `CONTEXT.md` 和 `docs/adr/` 目录结构。\n\n## 数据流\n\n典型工作流从 `/grill-with-docs` 开始：用户描述需求，agent 通过一系列问题（grilling session）挖掘细节，同时更新 `CONTEXT.md`（共享语言）和 ADR（架构决策记录）。对齐后，用户可调用 `/to-prd` 将对话内容自动生成为 PRD 并提交为 GitHub issue。接着，`/to-issues` 将 PRD 拆分为多个垂直切片（vertical slices），每个切片对应一个独立可交付的 issue。开发时，agent 使用 `/tdd` 技能按红-绿-重构循环逐个实现切片，`/diagnose` 技能处理调试。代码合并前，`/improve-codebase-architecture` 定期扫描代码库，基于 `CONTEXT.md` 和 ADR 提出架构改进建议。整个流程中，`/caveman` 可压缩 agent 输出减少 token 消耗，`/handoff` 在切换 agent 时传递上下文。\n\n## 关键算法/配置\n\n核心算法体现在每个技能的指令逻辑中。例如，`/tdd` 技能强制 agent 遵循“先写测试，再写代码，最后重构”的循环，并内置了测试质量检查清单（如避免测试实现细节、使用领域语言命名等）。`/diagnose` 技能实现了一个调试循环：复现 → 最小化 → 假设 → 检测 → 修复 → 回归测试，每一步都有具体提示。`/improve-codebase-architecture` 技能使用启发式规则扫描代码库，寻找“深化机会”（deepening opportunities），例如模块耦合、命名不一致、缺失抽象等，并参考 `CONTEXT.md` 中的领域语言给出重构建议。配置方面，`/setup-matt-pocock-skills` 在仓库根目录生成 `.skills/` 文件夹，包含 `config.json`（存储 issue 跟踪器类型、标签映射）、`CONTEXT.md`（共享语言文档）和 `docs/adr/`（架构决策记录）。这些配置被其他技能通过文件系统读取，实现跨会话的持久化状态。",
+          "novelty": "与 LangChain、AutoGen、Llama 等框架相比，Matt Pocock 的技能集并非提供通用的 agent 编排或模型抽象，而是聚焦于**软件工程最佳实践的封装**。LangChain 和 AutoGen 更关注 agent 间的通信、工具调用和任务分解，但很少涉及代码质量、测试纪律或架构演进。Llama 作为模型，本身不提供工程化工作流。\n\n该仓库的新意在于：1) **将 TDD、领域驱动设计、持续重构等经典实践转化为 agent 可执行的原子技能**，每个技能独立、可组合，且带有详细的指令和示例。2) **强调“共享语言”（CONTEXT.md）**，这是 DDD 的核心概念，但在 AI agent 开发中很少被系统化应用。3) **提供完整的端到端工作流**，从需求对齐（grilling）到任务分解（to-issues）到实现（tdd）到架构改进（improve-codebase-architecture），覆盖软件开发生命周期。4) **轻量级、无锁定**：技能是纯文本 markdown，不依赖特定框架或模型，可移植到任何支持自定义命令的 agent（Claude Code、Codex 等）。相比之下，LangChain 和 AutoGen 的应用往往与框架深度绑定。",
+          "ecosystem": "该仓库依赖 `skills.sh` 工具（通过 `npx skills@latest add` 调用）进行安装和配置，本身不依赖其他运行时。技能文件是纯 markdown，可在任何支持自定义 slash 命令的 agent 中使用，如 **Claude Code**、**Codex**（GitHub Copilot）、**Cursor** 等。它与 **GSD**、**BMAD**、**Spec-Kit** 等同类项目形成竞争关系——这些项目也试图定义 AI 开发流程，但 Matt 批评它们“剥夺控制权且难以调试”。该仓库的优势在于技能的小型化、可组合性和易修改性。此外，它可与 **GitHub Issues**、**Linear** 等 issue 跟踪器集成，以及 **Prettier**、**Husky**、**lint-staged** 等工具链配合（通过 `/setup-pre-commit` 技能）。社区方面，Matt Pocock 是 TypeScript 领域知名人物，拥有约 6 万订阅者的 newsletter，这为仓库提供了持续的用户反馈和迭代动力。",
+          "limitations": [
+            {
+              "title": "仅支持特定 agent",
+              "body": "技能设计主要针对 Claude Code 和 Codex，其他 agent 可能需要手动适配 markdown 指令格式，无法保证开箱即用。"
+            },
+            {
+              "title": "无图形界面",
+              "body": "所有技能通过命令行或聊天界面触发，缺乏可视化配置或进度追踪，对非技术用户不够友好。"
+            },
+            {
+              "title": "依赖用户纪律",
+              "body": "技能的有效性高度依赖用户是否主动调用（如每次变更前使用 `/grill-me`），缺乏自动化强制机制，容易跳过关键步骤。"
+            },
+            {
+              "title": "共享语言维护成本",
+              "body": "`CONTEXT.md` 需要持续更新以反映领域变化，若团队不维护，技能效果会随时间衰减，甚至产生误导。"
+            },
+            {
+              "title": "无多 agent 协作",
+              "body": "技能集面向单 agent 场景，未提供多 agent 分工、通信或冲突解决机制，不适合大型团队并行开发。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "在项目目录中运行安装命令，选择所需技能",
+              "cmd": "npx skills@latest add mattpocock/skills",
+              "note": "确保已安装 Node.js 18+，选择 `/setup-matt-pocock-skills` 以完成初始化。"
+            },
+            {
+              "step": "在 agent 中运行 `/setup-matt-pocock-skills` 配置仓库",
+              "cmd": "/setup-matt-pocock-skills",
+              "note": "按提示选择 issue 跟踪器、triage 标签和文档存储路径。"
+            },
+            {
+              "step": "描述一个需求，然后调用 `/grill-with-docs` 进行需求对齐",
+              "cmd": "/grill-with-docs",
+              "note": "认真回答 agent 的问题，它会自动更新 CONTEXT.md 和 ADR。"
+            },
+            {
+              "step": "使用 `/to-prd` 将对话内容生成为 PRD 并提交 issue",
+              "cmd": "/to-prd",
+              "note": "确保已配置 GitHub 或 Linear 集成，否则 PRD 仅保存在本地。"
+            },
+            {
+              "step": "用 `/to-issues` 将 PRD 拆分为多个可独立实现的 issue",
+              "cmd": "/to-issues",
+              "note": "每个 issue 对应一个垂直切片，包含完整实现所需信息。"
+            },
+            {
+              "step": "实现一个 issue 时，使用 `/tdd` 按红-绿-重构循环开发",
+              "cmd": "/tdd",
+              "note": "agent 会先写测试，再写代码，最后重构，确保代码质量。"
+            },
+            {
+              "step": "遇到 bug 时，调用 `/diagnose` 进行结构化调试",
+              "cmd": "/diagnose",
+              "note": "遵循复现→最小化→假设→检测→修复→回归测试的循环。"
+            },
+            {
+              "step": "定期运行 `/improve-codebase-architecture` 改善架构",
+              "cmd": "/improve-codebase-architecture",
+              "note": "建议每几天运行一次，它会基于 CONTEXT.md 和 ADR 提出重构建议。"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 22,
+            "reproducibility": 24,
+            "timeToValue": 23
+          }
+        }
+      },
+      {
+        "fullName": "ruvnet/ruflo",
+        "owner": "ruvnet",
+        "name": "ruflo",
+        "url": "https://github.com/ruvnet/ruflo",
+        "ownerAvatarUrl": "https://github.com/ruvnet.png?size=80",
+        "description": "🌊 The leading agent orchestration platform for Claude. Deploy intelligent multi-agent swarms, coordinate autonomous workflows, and build conversational AI systems. Features enterprise-grade architecture, self-learning swarm intelligence, RAG integration, and native Claude Code / Codex Integration",
+        "language": "TypeScript",
+        "languageColor": "#3178c6",
+        "stars": 50745,
+        "forks": 5670,
+        "starsGained": 5510,
+        "rank": 13,
+        "tldr": "这是一个多智能体编排平台，用于Claude Code，通过自学习记忆、联邦通信和100+专业智能体实现企业级多机协作。",
+        "tags": [
+          "多智能体编排",
+          "Claude Code",
+          "自学习",
+          "联邦通信",
+          "TypeScript"
+        ],
+        "light": "Ruflo近期在GitHub trending上活跃，因其为Claude Code提供了完整的智能体神经系统，支持100+智能体、自学习记忆和跨机器联邦协作。项目包含32个原生插件和Web UI，降低了多智能体系统的使用门槛。其独特的'自学习循环'和'零信任联邦'架构吸引了开发者关注，尤其是需要企业级AI协作解决方案的团队。",
+        "worthDeepDive": 85
+      },
+      {
+        "fullName": "apernet/hysteria",
+        "owner": "apernet",
+        "name": "hysteria",
+        "url": "https://github.com/apernet/hysteria",
+        "ownerAvatarUrl": "https://github.com/apernet.png?size=80",
+        "description": "Hysteria is a powerful, lightning fast and censorship resistant proxy.",
+        "language": "Go",
+        "languageColor": "#00ADD8",
+        "stars": 20732,
+        "forks": 2143,
+        "starsGained": 692,
+        "rank": 14,
+        "tldr": "这是一个基于定制QUIC协议的网络代理工具，用于突破网络审查并提供高速传输，特别在抗干扰和伪装性方面表现突出。",
+        "tags": [
+          "网络代理",
+          "QUIC协议",
+          "抗审查",
+          "高性能"
+        ],
+        "light": "近期因网络审查加剧和QUIC协议在抗干扰方面的优势，Hysteria在开发者社区中热度上升。其定制QUIC协议能有效应对丢包网络，伪装成HTTP/3流量躲避检测，且支持多平台和多种代理模式，成为翻墙和网络优化的热门选择。",
+        "worthDeepDive": 60
+      },
+      {
+        "fullName": "datawhalechina/easy-vibe",
+        "owner": "datawhalechina",
+        "name": "easy-vibe",
+        "url": "https://github.com/datawhalechina/easy-vibe",
+        "ownerAvatarUrl": "https://github.com/datawhalechina.png?size=80",
+        "description": "💻 vibe coding 2026 | Your first modern Coding course for beginners to master step by step.",
+        "language": "JavaScript",
+        "languageColor": "#f1e05a",
+        "stars": 10759,
+        "forks": 1008,
+        "starsGained": 2869,
+        "rank": 15,
+        "tldr": "这是一个面向初学者的AI编程教程项目，通过自然语言描述即可构建应用，特别强调从零到一的完整学习路径和可视化交互式教学。",
+        "tags": [
+          "AI编程",
+          "入门教程",
+          "vibe coding",
+          "全栈开发",
+          "交互式学习"
+        ],
+        "light": "该项目近期在GitHub Trending上热度高，主要因为其紧跟'vibe coding'趋势，提供从零开始的AI编程学习路径，包含交互式教程、可视化AI原理和RAG游戏化学习。2026年3月频繁更新，新增真实用户故事、SaaS全栈项目、Stripe支付集成等实用内容，吸引了大量初学者和开发者关注。",
+        "worthDeepDive": 45
+      }
+    ]
+  },
+  "monthly": {
+    "window": "monthly",
+    "generatedAt": "2026-05-14T13:16:23.425Z",
+    "repos": [
+      {
+        "fullName": "multica-ai/andrej-karpathy-skills",
+        "owner": "multica-ai",
+        "name": "andrej-karpathy-skills",
+        "url": "https://github.com/multica-ai/andrej-karpathy-skills",
+        "ownerAvatarUrl": "https://github.com/multica-ai.png?size=80",
+        "description": "A single CLAUDE.md file to improve Claude Code behavior, derived from Andrej Karpathy's observations on LLM coding pitfalls.",
+        "language": null,
+        "languageColor": null,
+        "stars": 129266,
+        "forks": 13110,
+        "starsGained": 108189,
+        "rank": 1,
+        "tldr": "这是一个CLAUDE.md配置文件，用于改善Claude Code的编码行为，特别针对LLM常见的过度复杂化、盲目假设和无关修改等问题。",
+        "tags": [
+          "Claude Code",
+          "编码规范",
+          "LLM提示工程",
+          "代码质量"
+        ],
+        "light": "本周在trending上是因为Andrej Karpathy关于LLM编码陷阱的推文引发广泛讨论，该项目将他的观察转化为可直接使用的CLAUDE.md文件，解决了开发者使用AI编码工具时的痛点。随着Claude Code等AI编码助手普及，这类实用指南需求激增，且项目提供插件安装方式，降低了使用门槛。",
+        "worthDeepDive": 65
+      },
+      {
+        "fullName": "mattpocock/skills",
+        "owner": "mattpocock",
+        "name": "skills",
+        "url": "https://github.com/mattpocock/skills",
+        "ownerAvatarUrl": "https://github.com/mattpocock.png?size=80",
+        "description": "Skills for Real Engineers. Straight from my .claude directory.",
+        "language": "Shell",
+        "languageColor": "#89e051",
+        "stars": 80927,
+        "forks": 6987,
+        "starsGained": 63639,
+        "rank": 2,
+        "tldr": "这是一个AI编码代理的技能集合，用来提升代码质量与工程实践，特别在将传统软件工程原则（如TDD、领域驱动设计）转化为可复用的代理指令。",
+        "tags": [
+          "AI编码代理",
+          "软件工程",
+          "Claude Code",
+          "TDD",
+          "领域驱动设计"
+        ],
+        "light": "本周/月 trending 的原因：作者 Matt Pocock 是 TypeScript 社区知名人物，其技能集针对当前 AI 编码代理（如 Claude Code）的常见痛点（沟通偏差、冗长、代码质量差、架构混乱）提供了实用解决方案。项目包含 grill-me、tdd、diagnose 等即用技能，强调工程纪律而非“vibe coding”，契合开发者对 AI 辅助编程中可控性和质量的需求，因此迅速获得关注。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Matt Pocock 将数十年软件工程经验提炼为可复用的 AI agent 技能集，解决 agent 常见失败模式：沟通错位、冗长、代码不可靠、架构腐化。每个技能独立、可组合，30 秒即可集成到 Claude Code 等 agent 中，让你用工程思维而非 vibe coding 构建真实应用。",
+          "whyItMatters": [
+            {
+              "title": "工程化 AI 开发",
+              "body": "将 TDD、领域驱动设计、持续重构等经典实践封装为 agent 可执行的技能，让 AI 遵循工程纪律而非随机生成。"
+            },
+            {
+              "title": "即插即用",
+              "body": "通过 `npx skills@latest add` 一键安装，无需复杂配置，即可获得 grilling、诊断、架构改进等实用能力。"
+            },
+            {
+              "title": "可组合与可定制",
+              "body": "每个技能是独立的 markdown 文件，易于修改和组合，适应不同项目和工作流，避免被框架锁定。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Skill",
+              "explain": "一个 markdown 文件，定义 agent 可执行的特定任务（如 `/grill-me`），包含指令、参数和示例。可类比为 agent 的“函数”，通过自然语言调用。"
+            },
+            {
+              "term": "Grilling Session",
+              "explain": "一种结构化对话模式，agent 通过一系列问题深入挖掘需求、假设和边界条件，确保人与 agent 对齐。类似敏捷中的用户故事细化。"
+            },
+            {
+              "term": "Shared Language (CONTEXT.md)",
+              "explain": "项目专用的领域术语表，帮助 agent 使用简洁、一致的词汇描述业务逻辑，减少歧义和 token 消耗。类似 DDD 中的通用语言。"
+            },
+            {
+              "term": "Vertical Slice",
+              "explain": "将需求拆分为端到端可独立交付的功能切片，每个切片包含 UI、业务逻辑、数据访问等完整层。用于 `to-issues` 和 `tdd` 技能。"
+            },
+            {
+              "term": "Red-Green-Refactor",
+              "explain": "TDD 循环：先写失败测试（红），再写最少代码通过测试（绿），最后重构代码。`/tdd` 技能强制 agent 遵循此循环。"
+            }
+          ],
+          "howItWorks": "## 组件\n\n仓库核心是 `skills/` 目录下的 markdown 文件，每个文件定义一个可复用的 agent 技能。技能分为三类：**Engineering**（代码工作，如 `/diagnose`、`/tdd`、`/improve-codebase-architecture`）、**Productivity**（通用工作流，如 `/grill-me`、`/caveman`、`/handoff`）和 **Misc**（偶尔使用的工具）。每个技能文件包含元数据、详细指令、参数说明和示例。安装时，`skills.sh` 工具（通过 `npx skills@latest add` 调用）将选中的技能注入到目标 agent（如 Claude Code、Codex）的配置中，使其可通过 `/skill-name` 命令触发。此外，`/setup-matt-pocock-skills` 技能负责初始化每个仓库的配置：选择 issue 跟踪器（GitHub/Linear/本地文件）、定义 triage 标签词汇表、设置文档存储路径，并生成 `CONTEXT.md` 和 `docs/adr/` 目录结构。\n\n## 数据流\n\n典型工作流从 `/grill-with-docs` 开始：用户描述需求，agent 通过一系列问题（grilling session）挖掘细节，同时更新 `CONTEXT.md`（共享语言）和 ADR（架构决策记录）。对齐后，用户可调用 `/to-prd` 将对话内容自动生成为 PRD 并提交为 GitHub issue。接着，`/to-issues` 将 PRD 拆分为多个垂直切片（vertical slices），每个切片对应一个独立可交付的 issue。开发时，agent 使用 `/tdd` 技能按红-绿-重构循环逐个实现切片，`/diagnose` 技能处理调试。代码合并前，`/improve-codebase-architecture` 定期扫描代码库，基于 `CONTEXT.md` 和 ADR 提出架构改进建议。整个流程中，`/caveman` 可压缩 agent 输出减少 token 消耗，`/handoff` 在切换 agent 时传递上下文。\n\n## 关键算法/配置\n\n核心算法体现在每个技能的指令逻辑中。例如，`/tdd` 技能强制 agent 遵循“先写测试，再写代码，最后重构”的循环，并内置了测试质量检查清单（如避免测试实现细节、使用领域语言命名等）。`/diagnose` 技能实现了一个调试循环：复现 → 最小化 → 假设 → 检测 → 修复 → 回归测试，每一步都有具体提示。`/improve-codebase-architecture` 技能使用启发式规则扫描代码库，寻找“深化机会”（deepening opportunities），例如模块耦合、命名不一致、缺失抽象等，并参考 `CONTEXT.md` 中的领域语言给出重构建议。配置方面，`/setup-matt-pocock-skills` 在仓库根目录生成 `.skills/` 文件夹，包含 `config.json`（存储 issue 跟踪器类型、标签映射）、`CONTEXT.md`（共享语言文档）和 `docs/adr/`（架构决策记录）。这些配置被其他技能通过文件系统读取，实现跨会话的持久化状态。",
+          "novelty": "与 LangChain、AutoGen、Llama 等框架相比，Matt Pocock 的技能集并非提供通用的 agent 编排或模型抽象，而是聚焦于**软件工程最佳实践的封装**。LangChain 和 AutoGen 更关注 agent 间的通信、工具调用和任务分解，但很少涉及代码质量、测试纪律或架构演进。Llama 作为模型，本身不提供工程化工作流。\n\n该仓库的新意在于：1) **将 TDD、领域驱动设计、持续重构等经典实践转化为 agent 可执行的原子技能**，每个技能独立、可组合，且带有详细的指令和示例。2) **强调“共享语言”（CONTEXT.md）**，这是 DDD 的核心概念，但在 AI agent 开发中很少被系统化应用。3) **提供完整的端到端工作流**，从需求对齐（grilling）到任务分解（to-issues）到实现（tdd）到架构改进（improve-codebase-architecture），覆盖软件开发生命周期。4) **轻量级、无锁定**：技能是纯文本 markdown，不依赖特定框架或模型，可移植到任何支持自定义命令的 agent（Claude Code、Codex 等）。相比之下，LangChain 和 AutoGen 的应用往往与框架深度绑定。",
+          "ecosystem": "该仓库依赖 `skills.sh` 工具（通过 `npx skills@latest add` 调用）进行安装和配置，本身不依赖其他运行时。技能文件是纯 markdown，可在任何支持自定义 slash 命令的 agent 中使用，如 **Claude Code**、**Codex**（GitHub Copilot）、**Cursor** 等。它与 **GSD**、**BMAD**、**Spec-Kit** 等同类项目形成竞争关系——这些项目也试图定义 AI 开发流程，但 Matt 批评它们“剥夺控制权且难以调试”。该仓库的优势在于技能的小型化、可组合性和易修改性。此外，它可与 **GitHub Issues**、**Linear** 等 issue 跟踪器集成，以及 **Prettier**、**Husky**、**lint-staged** 等工具链配合（通过 `/setup-pre-commit` 技能）。社区方面，Matt Pocock 是 TypeScript 领域知名人物，拥有约 6 万订阅者的 newsletter，这为仓库提供了持续的用户反馈和迭代动力。",
+          "limitations": [
+            {
+              "title": "仅支持特定 agent",
+              "body": "技能设计主要针对 Claude Code 和 Codex，其他 agent 可能需要手动适配 markdown 指令格式，无法保证开箱即用。"
+            },
+            {
+              "title": "无图形界面",
+              "body": "所有技能通过命令行或聊天界面触发，缺乏可视化配置或进度追踪，对非技术用户不够友好。"
+            },
+            {
+              "title": "依赖用户纪律",
+              "body": "技能的有效性高度依赖用户是否主动调用（如每次变更前使用 `/grill-me`），缺乏自动化强制机制，容易跳过关键步骤。"
+            },
+            {
+              "title": "共享语言维护成本",
+              "body": "`CONTEXT.md` 需要持续更新以反映领域变化，若团队不维护，技能效果会随时间衰减，甚至产生误导。"
+            },
+            {
+              "title": "无多 agent 协作",
+              "body": "技能集面向单 agent 场景，未提供多 agent 分工、通信或冲突解决机制，不适合大型团队并行开发。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "在项目目录中运行安装命令，选择所需技能",
+              "cmd": "npx skills@latest add mattpocock/skills",
+              "note": "确保已安装 Node.js 18+，选择 `/setup-matt-pocock-skills` 以完成初始化。"
+            },
+            {
+              "step": "在 agent 中运行 `/setup-matt-pocock-skills` 配置仓库",
+              "cmd": "/setup-matt-pocock-skills",
+              "note": "按提示选择 issue 跟踪器、triage 标签和文档存储路径。"
+            },
+            {
+              "step": "描述一个需求，然后调用 `/grill-with-docs` 进行需求对齐",
+              "cmd": "/grill-with-docs",
+              "note": "认真回答 agent 的问题，它会自动更新 CONTEXT.md 和 ADR。"
+            },
+            {
+              "step": "使用 `/to-prd` 将对话内容生成为 PRD 并提交 issue",
+              "cmd": "/to-prd",
+              "note": "确保已配置 GitHub 或 Linear 集成，否则 PRD 仅保存在本地。"
+            },
+            {
+              "step": "用 `/to-issues` 将 PRD 拆分为多个可独立实现的 issue",
+              "cmd": "/to-issues",
+              "note": "每个 issue 对应一个垂直切片，包含完整实现所需信息。"
+            },
+            {
+              "step": "实现一个 issue 时，使用 `/tdd` 按红-绿-重构循环开发",
+              "cmd": "/tdd",
+              "note": "agent 会先写测试，再写代码，最后重构，确保代码质量。"
+            },
+            {
+              "step": "遇到 bug 时，调用 `/diagnose` 进行结构化调试",
+              "cmd": "/diagnose",
+              "note": "遵循复现→最小化→假设→检测→修复→回归测试的循环。"
+            },
+            {
+              "step": "定期运行 `/improve-codebase-architecture` 改善架构",
+              "cmd": "/improve-codebase-architecture",
+              "note": "建议每几天运行一次，它会基于 CONTEXT.md 和 ADR 提出重构建议。"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 22,
+            "reproducibility": 24,
+            "timeToValue": 23
+          }
+        }
+      },
+      {
+        "fullName": "Alishahryar1/free-claude-code",
+        "owner": "Alishahryar1",
+        "name": "free-claude-code",
+        "url": "https://github.com/Alishahryar1/free-claude-code",
+        "ownerAvatarUrl": "https://github.com/Alishahryar1.png?size=80",
+        "description": "Use claude-code for free in the terminal, VSCode extension or discord like OpenClaw (voice supported)",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 24508,
+        "forks": 3646,
+        "starsGained": 22569,
+        "rank": 3,
+        "tldr": "这是一个代理工具，用来将Claude Code的API请求路由到免费或本地模型后端，特别在支持多提供商混合路由和模型分层配置。",
+        "tags": [
+          "Claude Code代理",
+          "免费模型路由",
+          "多后端支持",
+          "本地部署",
+          "开发工具"
+        ],
+        "light": "本周/月登上trending是因为Claude Code官方收费且限制严格，而此项目提供了一种零成本替代方案，支持NVIDIA NIM、Kimi、OpenRouter等十余种免费或本地模型后端，并允许按模型层级（Opus/Sonnet/Haiku）分别路由。对于希望使用Claude Code界面但不想付费的开发者极具吸引力，且项目活跃维护，文档详尽。",
+        "worthDeepDive": 60
+      },
+      {
+        "fullName": "AIDC-AI/Pixelle-Video",
+        "owner": "AIDC-AI",
+        "name": "Pixelle-Video",
+        "url": "https://github.com/AIDC-AI/Pixelle-Video",
+        "ownerAvatarUrl": "https://github.com/AIDC-AI.png?size=80",
+        "description": "🚀 AI 全自动短视频引擎 | AI Fully Automated Short Video Engine",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 16537,
+        "forks": 2382,
+        "starsGained": 12334,
+        "rank": 4,
+        "tldr": "这是一个AI全自动短视频生成引擎，输入主题即可自动完成文案、配图、配音、合成，特别在基于ComfyUI工作流实现原子能力灵活组合。",
+        "tags": [
+          "AI视频生成",
+          "ComfyUI",
+          "全自动",
+          "多模态",
+          "开源工具"
+        ],
+        "light": "该项目近期因集成数字人口播、动作迁移等新功能，以及提供Windows一键整合包降低使用门槛，在AI视频生成领域受到关注。其基于ComfyUI的模块化设计允许用户灵活替换模型和组件，同时支持本地和云端部署，满足了从个人创作者到开发者的多样化需求。",
+        "worthDeepDive": 60
+      },
+      {
+        "fullName": "lsdefine/GenericAgent",
+        "owner": "lsdefine",
+        "name": "GenericAgent",
+        "url": "https://github.com/lsdefine/GenericAgent",
+        "ownerAvatarUrl": "https://github.com/lsdefine.png?size=80",
+        "description": "Self-evolving agent: grows skill tree from 3.3K-line seed, achieving full system control with 6x less token consumption",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 11338,
+        "forks": 1291,
+        "starsGained": 10322,
+        "rank": 5,
+        "tldr": "这是一个自进化智能体框架，通过9个原子工具和~100行Agent循环实现系统级控制，核心代码仅3K行，能在任务执行中自动结晶技能形成技能树，且token消耗比同类低6倍。",
+        "tags": [
+          "自进化",
+          "极简架构",
+          "token高效",
+          "系统控制",
+          "技能树"
+        ],
+        "light": "本周/月登上trending主要因为其极简自进化设计引发关注：仅3K行代码实现完整系统控制，且通过自动结晶技能大幅降低token消耗（<30K上下文窗口）。arXiv技术报告提供了详尽的五维评估，对比Claude Code、OpenAI CodeX等基线，在任务完成、工具效率、记忆系统等维度表现突出。此外，项目活跃更新（L4记忆、调度器集成）和社区生态（教程、多前端支持）也推动了热度。",
+        "worthDeepDive": 95,
+        "deep": {
+          "atGlance": "GenericAgent 用仅 3K 行种子代码实现自我进化：每次任务自动结晶为技能，形成专属技能树。相比 Claude Code 等方案，token 消耗降低 6 倍，上下文窗口小于 30K，适合长期自主运行。",
+          "whyItMatters": [
+            {
+              "title": "极简自进化",
+              "body": "核心仅 3K 行代码，9 个原子工具 + 100 行 Agent Loop，却能通过任务结晶自动增长技能树，无需预装海量依赖。"
+            },
+            {
+              "title": "6 倍 Token 节省",
+              "body": "分层记忆系统将上下文窗口控制在 30K 以内，远低于其他方案的 200K-1M，显著降低推理成本与幻觉风险。"
+            },
+            {
+              "title": "真实系统控制",
+              "body": "直接注入真实浏览器（保留登录态），支持鼠标键盘、ADB 移动设备控制，而非沙盒或模拟环境。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Self-Evolution",
+              "explain": "核心机制：每次任务完成后，自动将执行路径结晶为可复用的技能（Skill），写入记忆层。下次类似任务直接调用，形成持续增长的技能树。"
+            },
+            {
+              "term": "Layered Memory",
+              "explain": "五层记忆系统：L0 元规则、L1 洞察索引、L2 全局事实、L3 任务技能/SOP、L4 会话归档。确保关键知识始终在上下文中，减少噪声。"
+            },
+            {
+              "term": "9 Atomic Tools",
+              "explain": "最小工具集：code_run、file_read、file_write、file_patch、web_scan、web_execute_js、ask_user 等，外加 2 个记忆管理工具。通过 code_run 可动态创建新工具。"
+            },
+            {
+              "term": "Agent Loop",
+              "explain": "约 100 行代码的核心循环：感知环境状态 → 任务推理 → 执行工具 → 写入经验 → 循环。极简设计保证了低开销和高可维护性。"
+            }
+          ],
+          "howItWorks": "## 组件\nGenericAgent 的核心组件包括：**Agent Loop**（约 100 行）、**9 个原子工具**、**五层记忆系统**以及**技能结晶引擎**。Agent Loop 是执行中枢，循环执行“感知-推理-行动-记忆”流程。9 个原子工具涵盖代码执行、文件操作、浏览器控制、用户交互等基础能力，其中 `code_run` 可动态安装包、编写脚本，实现工具扩展。五层记忆系统（L0-L4）从元规则到会话归档，逐层压缩信息密度，确保上下文窗口始终小于 30K。技能结晶引擎在每次任务成功后，将执行路径提炼为可复用的技能（Skill），存入 L3 层，供后续直接调用。整个框架无复杂依赖，核心代码仅约 3K 行，部署只需 `pip install` 和 API Key。\n\n## 数据流\n用户输入任务后，Agent Loop 首先从记忆系统中检索相关技能和事实（L1-L3），形成初始上下文。然后循环执行：通过 `web_scan` 或 `code_run` 感知环境状态，LLM 推理后调用原子工具（如 `file_write`、`web_execute_js`）执行动作，执行结果反馈回 Loop。任务完成后，技能结晶引擎将执行路径压缩为技能，写入 L3 记忆；同时 L4 会话归档存储完整记录。下次遇到相似任务时，直接调用已有技能，避免重复探索。整个数据流以**信息密度最大化**为原则，只保留最相关的知识在上下文中，从而降低 token 消耗和幻觉风险。\n\n## 关键算法/配置\n核心算法是**上下文信息密度最大化**（Contextual Information Density Maximization），通过分层记忆系统实现：每层只存储必要信息，L0 固定规则，L1 快速路由索引，L2 长期事实，L3 可复用技能，L4 归档。技能结晶算法将执行路径中的关键步骤（命令、代码、参数）提取为结构化技能，支持条件分支和参数化。配置方面，`mykey.py` 管理 API Key 和模型选择，支持 Claude、Gemini、Kimi 等。`agent_loop.py` 中的 `MAX_CONTEXT_TOKENS` 默认 30K，可调整。工具集通过 `tools/` 目录下的 Python 文件注册，用户可自定义新工具。记忆持久化使用本地文件系统，无需外部数据库。",
+          "novelty": "GenericAgent 的核心创新在于**自我进化**与**极简架构**的结合。与 LangChain 相比，LangChain 提供丰富的工具链和链式调用，但缺乏自主技能积累，每次任务需重新规划；GenericAgent 通过技能结晶实现“一次探索，永久复用”。与 AutoGen 相比，AutoGen 强调多智能体对话，但系统复杂、部署成本高；GenericAgent 单智能体 + 最小工具集即可完成复杂任务，token 消耗降低 6 倍。与 Claude Code 相比，Claude Code 是强大的 CLI 工具，但无状态，每次会话需重新加载上下文；GenericAgent 的分层记忆让长期运行更高效。\n\n不过，GenericAgent 的新意并非颠覆性：其原子工具集和 Agent Loop 设计在已有框架中均有类似实现（如 OpenClaw 的模块化工具）。真正的差异化在于**技能自动结晶**机制，将执行经验转化为可复用资产，这在开源代理框架中较为罕见。此外，其 3K 行核心代码的极简性降低了理解和修改门槛，但代价是功能深度不如 LangChain 等成熟框架。总体而言，GenericAgent 在“轻量自进化”方向上提供了有价值的参考实现。",
+          "ecosystem": "GenericAgent 依赖 Python 生态，核心依赖仅 `requests`、`streamlit`、`pywebview` 等少数包，无外部数据库或消息队列。它可与主流 LLM API（Claude、Gemini、Kimi、MiniMax）配合使用，不绑定特定模型。前端支持 Terminal UI（Textual）、Streamlit、Qt 等，还可通过 Telegram、QQ、飞书等 IM 作为 Bot 交互。与 Codeg 项目集成后，可作为 ACP 代理与其他代理（Claude Code、Gemini）协同工作。\n\n在竞争方面，GenericAgent 与 OpenClaw（53 万行代码）、Claude Code、AutoGen 等形成差异化：更轻量、更自主。它不直接替代这些工具，而是提供一种“从零生长”的替代范式。其技能库可共享（已发布百万级技能库），但缺乏标准化的技能市场或插件系统。未来可能面临来自更成熟的框架（如 LangGraph）的竞争，但当前在 token 效率和自进化方面具有独特优势。",
+          "limitations": [
+            {
+              "title": "技能泛化有限",
+              "body": "技能结晶基于具体执行路径，跨领域泛化能力弱。复杂任务可能产生碎片化技能，需人工整理或增加元学习机制。"
+            },
+            {
+              "title": "无多智能体协作",
+              "body": "当前仅支持单智能体运行，无法像 AutoGen 那样多代理分工。对于需要并行探索或角色分工的任务，效率较低。"
+            },
+            {
+              "title": "记忆持久化简单",
+              "body": "记忆存储依赖本地文件系统，无分布式或容错机制。长期运行后文件可能膨胀，且多实例间无法共享记忆。"
+            },
+            {
+              "title": "工具集固定",
+              "body": "9 个原子工具虽可动态扩展，但缺乏标准化工具注册和版本管理。用户自定义工具需修改代码，不够灵活。"
+            },
+            {
+              "title": "安全风险",
+              "body": "直接控制真实浏览器和系统，存在误操作或恶意指令风险。虽然有人机确认工具，但默认无沙箱隔离。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "克隆仓库并安装依赖",
+              "cmd": "git clone https://github.com/lsdefine/GenericAgent.git && cd GenericAgent && pip install requests streamlit pywebview",
+              "note": "确保 Python 3.10+ 已安装"
+            },
+            {
+              "step": "配置 API Key",
+              "cmd": "cp mykey_template.py mykey.py && nano mykey.py",
+              "note": "填入你的 LLM API Key，支持 Claude/Gemini 等"
+            },
+            {
+              "step": "启动桌面 GUI",
+              "cmd": "python launch.pyw",
+              "note": "默认启动 Streamlit 界面，浏览器访问 http://localhost:8501"
+            },
+            {
+              "step": "尝试第一个任务",
+              "cmd": "在输入框输入：'帮我创建一个 Python 脚本，打印当前时间'",
+              "note": "观察 Agent 自动执行并结晶技能"
+            },
+            {
+              "step": "查看已积累的技能",
+              "cmd": "ls skills/",
+              "note": "每次任务完成后，技能文件会保存在 skills 目录"
+            },
+            {
+              "step": "启动终端 UI",
+              "cmd": "python frontends/tuiapp.py",
+              "note": "轻量级键盘驱动界面，适合 SSH 环境"
+            },
+            {
+              "step": "运行 Telegram Bot",
+              "cmd": "python frontends/tgapp.py",
+              "note": "需先在 mykey.py 中配置 tg_bot_token 和 tg_allowed_users"
+            },
+            {
+              "step": "恢复历史会话",
+              "cmd": "在聊天界面输入 /continue 1",
+              "note": "支持多会话快照恢复，/new 开始新会话"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 22,
+            "reproducibility": 24,
+            "timeToValue": 23
+          }
+        }
+      },
+      {
+        "fullName": "ComposioHQ/awesome-codex-skills",
+        "owner": "ComposioHQ",
+        "name": "awesome-codex-skills",
+        "url": "https://github.com/ComposioHQ/awesome-codex-skills",
+        "ownerAvatarUrl": "https://github.com/ComposioHQ.png?size=80",
+        "description": "A curated list of practical Codex skills for automating workflows across the Codex CLI and API.",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 9455,
+        "forks": 869,
+        "starsGained": 8290,
+        "rank": 6,
+        "tldr": "这是一个精选的Codex技能列表，用于通过CLI和API自动化工作流，特别强调将AI与1000+应用集成实现实际操作。",
+        "tags": [
+          "Codex技能",
+          "工作流自动化",
+          "AI集成",
+          "实用工具",
+          "社区驱动"
+        ],
+        "light": "本周/月 trending 的原因：随着Codex CLI和API的普及，开发者急需可复用的技能模块来扩展AI能力。该项目提供了大量即装即用的技能（如发送邮件、创建Issue、分析Sentry错误等），降低了AI自动化门槛。同时，其社区贡献模式（PRs welcome）和与Composio平台的深度集成（连接1000+应用）使其成为当前AI工作流自动化的热门资源。",
+        "worthDeepDive": 60
+      },
+      {
+        "fullName": "NousResearch/hermes-agent",
+        "owner": "NousResearch",
+        "name": "hermes-agent",
+        "url": "https://github.com/NousResearch/hermes-agent",
+        "ownerAvatarUrl": "https://github.com/NousResearch.png?size=80",
+        "description": "The agent that grows with you",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 149713,
+        "forks": 23643,
+        "starsGained": 74950,
+        "rank": 7,
+        "tldr": "这是一个自改进AI代理框架，通过内置学习循环从经验中创建技能、跨会话记忆用户模型，并支持多种部署方式。",
+        "tags": [
+          "AI Agent",
+          "自改进",
+          "多平台",
+          "Nous Research",
+          "开源"
+        ],
+        "light": "本周/月 trending 原因：Nous Research 推出的自改进 AI 代理，强调持续学习和跨平台集成，吸引了关注自主 AI 系统的开发者。其独特的学习循环和技能创建机制，以及支持多种 LLM 提供商和部署选项，使其在 AI 代理领域脱颖而出。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Hermes Agent 是 Nous Research 打造的自改进 AI 代理，核心亮点在于内置学习循环：它能从经验中自主创建技能、在使用中自我优化，并跨会话构建用户模型。支持 200+ 模型、多平台部署（Telegram/Discord/CLI），且可运行在低至 $5 VPS 或 serverless 基础设施上，成本极低。",
+          "whyItMatters": [
+            {
+              "title": "自改进闭环",
+              "body": "代理能自主创建并优化技能，通过记忆和用户建模实现持续学习，无需人工干预。"
+            },
+            {
+              "title": "多平台无缝集成",
+              "body": "单一网关同时支持 Telegram、Discord、Slack 等 6 个平台，对话可跨平台连续。"
+            },
+            {
+              "title": "模型无锁定",
+              "body": "支持 OpenAI、OpenRouter、Hugging Face 等 200+ 模型，一条命令切换，零代码改动。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "技能系统 (Skills)",
+              "explain": "代理从复杂任务中自主创建的可复用程序，存储在 `~/.hermes/skills/`，支持自改进和社区共享（agentskills.io）。类似 LangChain 的工具，但能自动生成和迭代。"
+            },
+            {
+              "term": "记忆与用户建模",
+              "explain": "基于 Honcho 的辩证用户建模，结合 FTS5 会话搜索和 LLM 摘要，实现跨会话持久记忆。代理会定期自我提示以巩固知识。"
+            },
+            {
+              "term": "网关 (Gateway)",
+              "explain": "统一消息入口，同时连接 Telegram、Discord、Slack、WhatsApp、Signal 和 CLI，支持语音转录和跨平台对话连续性。"
+            },
+            {
+              "term": "终端后端 (Terminal Backends)",
+              "explain": "支持本地、Docker、SSH、Singularity、Modal、Daytona、Vercel Sandbox 七种运行环境，实现代码执行和工具调用的隔离与远程化。"
+            }
+          ],
+          "howItWorks": "## 组件\nHermes Agent 由多个核心组件构成：**代理循环**（Agent Loop）是大脑，负责接收输入、调用工具、生成回复；**技能系统**管理自主创建和社区共享的技能，支持自改进；**记忆系统**基于 Honcho 实现用户建模，使用 SQLite 和 FTS5 进行持久化存储和检索；**网关**统一处理多平台消息，支持 Telegram、Discord、Slack 等；**终端后端**抽象了代码执行环境，支持本地、Docker、SSH 等七种后端；**调度器**内置 cron，可定时执行任务并投递到任意平台。此外还有工具系统（40+ 内置工具）、MCP 集成、上下文文件等模块。\n\n## 数据流\n用户通过 CLI 或消息平台发送输入 → 网关将消息标准化为内部格式 → 代理循环接收输入，结合当前会话上下文和记忆系统检索的相关历史 → 代理决定是否调用工具（如执行 Python 脚本、搜索网络）→ 工具通过终端后端在指定环境执行 → 结果返回代理循环 → 代理生成最终回复 → 回复经网关投递回用户。同时，代理会在后台异步更新记忆、创建或优化技能、触发调度任务。整个流程支持中断和重定向，用户可随时发送新消息打断当前处理。\n\n## 关键算法/配置\n核心算法是**自改进学习循环**：代理在完成复杂任务后，会评估是否值得创建新技能，若创建则自动生成代码并测试；技能在使用中会记录成功/失败案例，定期自我优化。记忆系统使用 **FTS5 全文搜索** + **LLM 摘要**实现高效跨会话检索，Honcho 算法通过辩证对话构建用户模型。配置方面，核心文件 `~/.hermes/config.yaml` 管理模型提供商、工具启用、终端后端等；模型切换通过 `hermes model` 命令动态修改，支持 200+ 模型。调度器使用标准 cron 表达式，任务定义在 `~/.hermes/cron/` 下。",
+          "novelty": "Hermes Agent 的核心创新在于**自改进闭环**，这在现有 AI 代理框架中较为罕见。与 LangChain 相比，LangChain 提供工具调用和链式编排，但缺乏自主技能创建和记忆优化；AutoGen 强调多代理对话，但用户建模和跨会话记忆较弱；LlamaIndex 侧重数据索引，而非代理自主进化。Hermes 的独特之处在于：代理能自主创建技能（类似 AutoGPT 的自主性，但更结构化）、通过 Honcho 进行用户建模（类似 ChatGPT 的记忆功能，但更深入）、以及跨平台网关设计。然而，其底层仍依赖 LLM 的推理能力，技能创建质量受限于模型性能。整体而言，Hermes 在工程整合上表现出色，但核心算法创新有限，更多是现有技术的巧妙组合。",
+          "ecosystem": "Hermes Agent 依赖丰富的开源生态：使用 `uv` 管理 Python 环境，`ripgrep` 和 `ffmpeg` 提供搜索和媒体处理，`Node.js` 用于部分工具。它兼容 MCP（Model Context Protocol）标准，可连接任意 MCP 服务器扩展能力。技能系统与 `agentskills.io` 社区标准兼容，支持技能共享。在竞争方面，Hermes 与 OpenClaw 有直接继承关系（提供迁移工具），与 AutoGen、LangChain 等框架在代理构建领域竞争，但 Hermes 更侧重终端用户直接使用的成品代理，而非开发库。它也可替代 ChatGPT 等闭源服务，提供自托管、模型自由的替代方案。",
+          "limitations": [
+            {
+              "title": "技能质量依赖模型",
+              "body": "自主创建的技能质量受限于底层 LLM 的推理和代码生成能力，弱模型可能导致技能不稳定或无效。"
+            },
+            {
+              "title": "Windows 支持不完善",
+              "body": "原生 Windows 为早期 Beta，存在粗糙边缘；WSL2 是推荐路径，但增加了使用门槛。"
+            },
+            {
+              "title": "记忆规模性能瓶颈",
+              "body": "长期使用后 SQLite 数据库可能增长至数百 MB，FTS5 检索速度可能下降，需手动维护。"
+            },
+            {
+              "title": "多平台配置复杂",
+              "body": "配置 Telegram、Discord 等平台需分别申请 API Token 和设置，对非技术用户不够友好。"
+            },
+            {
+              "title": "学习曲线较陡",
+              "body": "丰富的功能和配置项（技能、记忆、终端后端等）需要一定学习成本，新手可能感到困惑。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "一键安装 Hermes Agent（Linux/macOS/WSL2）",
+              "cmd": "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash",
+              "note": "安装后执行 `source ~/.bashrc` 刷新环境"
+            },
+            {
+              "step": "启动交互式 CLI 开始对话",
+              "cmd": "hermes",
+              "note": "首次运行会自动进入设置向导"
+            },
+            {
+              "step": "切换模型提供商（例如使用 OpenRouter）",
+              "cmd": "hermes model",
+              "note": "按提示选择 provider 和 model，支持 200+ 模型"
+            },
+            {
+              "step": "查看可用工具列表",
+              "cmd": "hermes tools",
+              "note": "可启用/禁用特定工具"
+            },
+            {
+              "step": "启动消息网关以连接 Telegram",
+              "cmd": "hermes gateway setup",
+              "note": "需先配置 Telegram Bot Token"
+            },
+            {
+              "step": "创建并测试一个自定义技能",
+              "cmd": "/create-skill my_skill",
+              "note": "在对话中输入该命令，代理会引导创建"
+            },
+            {
+              "step": "设置定时任务（每日报告）",
+              "cmd": "/cron add \"0 9 * * *\" \"发送今日摘要\"",
+              "note": "cron 表达式后跟任务描述"
+            },
+            {
+              "step": "诊断安装问题",
+              "cmd": "hermes doctor",
+              "note": "会检查依赖和配置完整性"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 24,
+            "reproducibility": 22,
+            "timeToValue": 20
+          }
+        }
+      },
+      {
+        "fullName": "addyosmani/agent-skills",
+        "owner": "addyosmani",
+        "name": "agent-skills",
+        "url": "https://github.com/addyosmani/agent-skills",
+        "ownerAvatarUrl": "https://github.com/addyosmani.png?size=80",
+        "description": "Production-grade engineering skills for AI coding agents.",
+        "language": "Shell",
+        "languageColor": "#89e051",
+        "stars": 41397,
+        "forks": 4550,
+        "starsGained": 26582,
+        "rank": 8,
+        "tldr": "这是一个AI编码代理的技能包，用于将资深工程师的工作流、质量门和最佳实践编码为可重复执行的步骤，特别在提供反合理化表和验证门以确保代理不跳过关键步骤。",
+        "tags": [
+          "AI代理",
+          "工程最佳实践",
+          "工作流自动化",
+          "代码质量",
+          "开发生命周期"
+        ],
+        "light": "本周/月在trending上是因为AI编码代理（如Claude Code、Cursor）的普及使得开发者急需一种系统化的方法来确保代理输出高质量代码。该项目由Google Chrome团队成员addyosmani创建，提供了22个即插即用的技能，覆盖从需求定义到部署的完整生命周期，并支持多个主流代理平台。其独特之处在于内置反合理化机制，防止代理偷工减料，这正好解决了当前AI编码中常见的'看起来对但实际有隐患'的问题。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "Agent Skills 将资深工程师的工程实践编码为结构化工作流，让 AI 编码代理在开发全生命周期中自动遵循规范、质量门禁和最佳实践，避免随意输出。",
+          "whyItMatters": [
+            {
+              "title": "工程经验可复用",
+              "body": "将资深工程师的 22 项技能打包为 Markdown 文件，AI 代理可直接加载，无需重复灌输。"
+            },
+            {
+              "title": "覆盖全生命周期",
+              "body": "从需求定义到生产发布，每个阶段都有对应技能，确保流程完整且一致。"
+            },
+            {
+              "title": "反合理化机制",
+              "body": "每个技能内置常见借口与反驳表，防止 AI 跳过关键步骤，提升输出质量。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Skill",
+              "explain": "一个结构化的 Markdown 文件，包含概述、触发条件、分步流程、反合理化表、红旗标志和验证要求。AI 代理按此执行，确保工程规范。"
+            },
+            {
+              "term": "Slash Command",
+              "explain": "7 个映射到开发阶段的斜杠命令（如 `/spec`、`/build`），自动激活对应技能，简化交互。"
+            },
+            {
+              "term": "Anti-rationalization Table",
+              "explain": "每个技能中的表格，列出 AI 可能用来跳过步骤的借口（如“稍后加测试”）及其反驳，强制遵守流程。"
+            },
+            {
+              "term": "Verification Gate",
+              "explain": "每个技能末尾的验证要求，如测试通过、构建输出、运行时数据，确保“看似正确”不被接受。"
+            }
+          ],
+          "howItWorks": "## 组件\n\nAgent Skills 的核心组件是 22 个独立的 `SKILL.md` 文件，每个文件遵循统一模板：frontmatter（名称、描述）、概述、使用时机、分步流程、反合理化表、红旗标志和验证要求。这些技能按开发阶段组织在 `skills/` 目录下，分为 Define、Plan、Build、Verify、Review、Ship 六个阶段。此外，`agents/` 目录提供预配置的专家角色（如代码审查员、安全审计员），`references/` 目录包含测试模式、安全清单等参考材料。元技能 `using-agent-skills` 负责将用户请求映射到最合适的技能。\n\n## 数据流\n\n用户通过斜杠命令（如 `/build`）或自然语言触发技能。元技能解析输入，匹配对应 `SKILL.md`，然后 AI 代理按流程逐步执行：读取步骤、执行操作、检查反合理化表、通过验证门禁。过程中，技能可能引用 `references/` 中的清单或调用外部工具（如 MCP 连接器）。每个步骤的输出需满足验证要求，否则代理会回退或提示用户。最终结果通过后，进入下一阶段。\n\n## 关键算法/配置\n\n核心算法是“流程驱动执行”：AI 代理严格遵循技能中的步骤顺序，每一步都有明确的输入、操作和验证标准。反合理化表通过模式匹配阻止常见捷径。技能通过 `frontmatter` 中的 `use when` 条件自动触发，或通过斜杠命令手动激活。配置方面，用户可通过 `claude --plugin-dir`、`.cursor/rules/` 或 `gemini skills install` 等方式将技能注入 AI 工具。技能本身是纯 Markdown，无运行时依赖，但依赖 AI 代理的指令遵循能力。",
+          "novelty": "Agent Skills 的独特之处在于将工程最佳实践编码为 AI 代理可执行的“技能”，而非传统提示词或规则文件。与 LangChain 的 Agent 框架相比，LangChain 侧重于工具调用和链式推理，而 Agent Skills 聚焦于开发流程的规范化和质量门禁。AutoGen 提供多代理对话，但缺乏预定义的工程工作流。LlamaIndex 的 Agent 更关注数据索引和检索。Agent Skills 的创新在于：1）反合理化表，主动防止 AI 跳过关键步骤；2）渐进式披露，技能入口文件轻量，引用按需加载；3）多平台兼容，同一套技能可在 Claude、Cursor、Gemini CLI 等工具中使用。不过，其核心思想（结构化提示）并非全新，类似 GitHub Copilot 的指令文件或 Cursor 的规则，但 Agent Skills 的完整性和工程深度使其在同类中脱颖而出。",
+          "ecosystem": "Agent Skills 依赖 AI 编码代理（如 Claude Code、Cursor、Gemini CLI）作为执行引擎，自身为纯 Markdown 文件，无运行时依赖。它与这些工具互补：Claude Code 提供插件市场，Cursor 使用 `.cursor/rules`，Gemini CLI 支持 `skills install`。替代方案包括手动编写提示词或使用其他规则集（如 GitHub Copilot 的 `.github/copilot-instructions.md`），但 Agent Skills 提供更完整的生命周期覆盖。竞争项目有 `sweepai/sweep`（自动 PR）和 `plandex-ai/plandex`（任务规划），但 Agent Skills 更侧重于流程规范而非自动化。它可与 MCP 服务器（如 FactSet、S&P Global）集成，增强数据获取能力。",
+          "limitations": [
+            {
+              "title": "依赖代理遵循能力",
+              "body": "技能的有效性完全取决于 AI 代理是否严格遵循 Markdown 指令，若代理忽略步骤或反合理化表，则技能失效。"
+            },
+            {
+              "title": "无内置执行引擎",
+              "body": "Agent Skills 本身不执行代码或测试，仅提供指导，需要外部工具（如测试框架、CI 系统）配合。"
+            },
+            {
+              "title": "技能覆盖有限",
+              "body": "22 个技能虽覆盖常见场景，但特定领域（如机器学习、嵌入式开发）可能缺少专用技能，需用户自行扩展。"
+            },
+            {
+              "title": "反合理化表可能不全面",
+              "body": "AI 可能找到表中未列出的新借口，导致跳过步骤，需要社区持续更新。"
+            },
+            {
+              "title": "多平台一致性难保证",
+              "body": "不同 AI 工具对 Markdown 指令的解析和执行方式有差异，同一技能在不同平台上的表现可能不一致。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "克隆仓库到本地",
+              "cmd": "git clone https://github.com/addyosmani/agent-skills.git",
+              "note": "确保已安装 Git。"
+            },
+            {
+              "step": "在 Claude Code 中安装插件（推荐）",
+              "cmd": "/plugin marketplace add addyosmani/agent-skills\n/plugin install agent-skills@addy-agent-skills",
+              "note": "若 SSH 报错，改用 HTTPS URL。"
+            },
+            {
+              "step": "在 Claude Code 中启动会话并运行 /spec 命令",
+              "cmd": "/spec",
+              "note": "描述你的项目想法，AI 将按技能生成 PRD。"
+            },
+            {
+              "step": "在 Cursor 中配置技能",
+              "cmd": "cp -r skills/*/.cursor/rules/",
+              "note": "或参考 docs/cursor-setup.md 进行配置。"
+            },
+            {
+              "step": "在 Gemini CLI 中安装技能",
+              "cmd": "gemini skills install https://github.com/addyosmani/agent-skills.git --path skills",
+              "note": "确保已安装 Gemini CLI。"
+            },
+            {
+              "step": "查看某个技能的 Markdown 内容",
+              "cmd": "cat skills/spec-driven-development/SKILL.md",
+              "note": "了解其结构和反合理化表。"
+            },
+            {
+              "step": "使用代码审查员角色审查代码",
+              "cmd": "cat agents/code-reviewer.md",
+              "note": "将内容作为系统提示注入 AI 代理。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 22,
+            "reproducibility": 25,
+            "timeToValue": 20
+          }
+        }
+      },
+      {
+        "fullName": "Z4nzu/hackingtool",
+        "owner": "Z4nzu",
+        "name": "hackingtool",
+        "url": "https://github.com/Z4nzu/hackingtool",
+        "ownerAvatarUrl": "https://github.com/Z4nzu.png?size=80",
+        "description": "ALL IN ONE Hacking Tool For Hackers",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 74332,
+        "forks": 8385,
+        "starsGained": 16288,
+        "rank": 9,
+        "tldr": "这是一个黑客工具合集，用来整合185+安全工具到统一菜单界面，特别在提供搜索、标签过滤和智能推荐功能。",
+        "tags": [
+          "黑客工具",
+          "渗透测试",
+          "工具合集",
+          "安全研究",
+          "Python"
+        ],
+        "light": "该项目在GitHub上持续获得高星，近期v2.0.0大更新增加了搜索、标签过滤、推荐等交互功能，并新增Active Directory、Cloud Security等类别，覆盖更全面的安全测试场景，吸引了大量安全爱好者和渗透测试人员关注。",
+        "worthDeepDive": 30
+      },
+      {
+        "fullName": "anthropics/financial-services",
+        "owner": "anthropics",
+        "name": "financial-services",
+        "url": "https://github.com/anthropics/financial-services",
+        "ownerAvatarUrl": "https://github.com/anthropics.png?size=80",
+        "description": null,
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 22605,
+        "forks": 3082,
+        "starsGained": 14661,
+        "rank": 10,
+        "tldr": "这是一个Claude AI的金融行业参考代理集合，用于投资银行、股权研究等场景，特别在提供Cowork插件和Managed Agent API两种部署方式。",
+        "tags": [
+          "金融AI",
+          "Claude代理",
+          "MCP集成",
+          "工作流自动化",
+          "投资银行"
+        ],
+        "light": "Anthropic官方发布的金融行业AI代理套件，近期因Claude在企业级应用的推广而受关注。它提供了从投行到基金管理的完整工作流代理，并集成了多家金融数据提供商的MCP连接器，降低了AI在金融领域落地的门槛。",
+        "worthDeepDive": 70
+      },
+      {
+        "fullName": "soxoj/maigret",
+        "owner": "soxoj",
+        "name": "maigret",
+        "url": "https://github.com/soxoj/maigret",
+        "ownerAvatarUrl": "https://github.com/soxoj.png?size=80",
+        "description": "🕵️‍♂️ Collect a dossier on a person by username from 3000+ sites",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 28553,
+        "forks": 2050,
+        "starsGained": 8986,
+        "rank": 11,
+        "tldr": "这是一个OSINT用户名搜索工具，用来从3000+网站收集用户公开信息，特别在支持AI摘要和递归搜索。",
+        "tags": [
+          "OSINT",
+          "用户名搜索",
+          "Python",
+          "信息收集",
+          "开源情报"
+        ],
+        "light": "近期因AI分析功能（--ai）和持续更新的3000+站点数据库受到关注，适合安全研究和社交工程场景。",
+        "worthDeepDive": 75
+      },
+      {
+        "fullName": "Tracer-Cloud/opensre",
+        "owner": "Tracer-Cloud",
+        "name": "opensre",
+        "url": "https://github.com/Tracer-Cloud/opensre",
+        "ownerAvatarUrl": "https://github.com/Tracer-Cloud.png?size=80",
+        "description": "Build your own AI SRE agents. The open source toolkit for the AI era.",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 5040,
+        "forks": 636,
+        "starsGained": 4449,
+        "rank": 12,
+        "tldr": "这是一个开源AI SRE框架，用于构建和训练生产环境故障排查代理，特别在提供强化学习环境和合成故障场景评测。",
+        "tags": [
+          "AI SRE",
+          "故障排查",
+          "强化学习",
+          "开源框架",
+          "可观测性"
+        ],
+        "light": "本周/月趋势上升，因为AI运维（AIOps）热度持续，而OpenSRE提供了首个开源的生产级AI SRE代理框架，集成了60+工具，并包含合成故障场景和端到端测试，填补了AI在基础设施故障响应领域的空白。其公开Alpha版本和活跃的社区（Discord、Trendshift）也吸引了关注。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "OpenSRE 是专为 AI SRE 代理打造的开源框架，提供训练和评估环境。它连接 60+ 工具，自动进行根因分析，并生成结构化报告。30 分钟即可上手，快速构建自己的 AI 运维代理。",
+          "whyItMatters": [
+            {
+              "title": "填补 AI SRE 空白",
+              "body": "SWE-bench 推动了编码代理，但生产事故响应缺乏类似基准。OpenSRE 构建了缺失的强化学习环境。"
+            },
+            {
+              "title": "开源可自托管",
+              "body": "代码和数据完全可控，可部署在自己的基础设施上，避免第三方依赖。"
+            },
+            {
+              "title": "60+ 集成开箱即用",
+              "body": "覆盖 LLM、可观测性、云基础设施、数据库等，快速接入现有工具链。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "AI SRE Agent",
+              "explain": "OpenSRE 的核心代理，负责接收告警、关联日志/指标/链路、推理根因并生成报告。可类比为'专攻运维的 **LangChain agent**'。"
+            },
+            {
+              "term": "Synthetic RCA Suite",
+              "explain": "合成根因分析测试套件，包含预定义的故障场景和红鲱鱼干扰项，用于评估代理的根因定位准确性和证据完整性。"
+            },
+            {
+              "term": "Runbook-aware Reasoning",
+              "explain": "代理能自动读取并应用运维手册中的步骤，将组织知识融入推理过程，减少人工干预。"
+            },
+            {
+              "term": "Evidence-backed Root Cause",
+              "explain": "每个根因结论都关联具体数据源（日志、指标等），确保可追溯、可验证。"
+            }
+          ],
+          "howItWorks": "## 组件\nOpenSRE 由多个核心组件构成：**Agent 运行时**（基于 Python/FastAPI）负责接收告警并编排推理流程；**集成层**通过 60+ 连接器与 LLM、可观测性平台、云服务等交互；**测试套件**包括合成 RCA 场景和端到端测试，用于评估代理性能；**CLI 工具**提供交互式 shell 和一次性调查命令。此外，还包含数据库（PostgreSQL/Redis）用于持久化会话和配置。\n\n## 数据流\n当告警触发时，OpenSRE 首先**获取**告警上下文及相关日志、指标和链路数据；然后**推理**跨系统的异常模式，识别根因；接着**生成**结构化调查报告，包含根因、证据和下一步建议；最后**发布**摘要到 Slack/PagerDuty。整个过程支持流式输出，用户可通过 CLI 实时查看进展。\n\n## 关键算法/配置\n核心算法基于 LLM 的推理链，支持多种提供商（Anthropic、OpenAI、Ollama 等），通过 `/effort` 命令调节推理深度（low/max）。配置通过环境变量管理，如 `LLM_PROVIDER`、`DATABASE_URI`、`REDIS_URI`。测试套件使用语义命名区分合成与端到端场景，并包含红鲱鱼干扰项以评估鲁棒性。",
+          "novelty": "OpenSRE 在 AI 运维领域具有显著创新性。与 LangChain 等通用代理框架相比，OpenSRE 专为 SRE 场景设计，内置了告警关联、根因分析、运行手册集成等运维专用能力，而非通用工具链。与 AutoGen 的多代理协作不同，OpenSRE 聚焦单一代理的端到端事故响应，并提供了合成测试环境来评估代理性能。与 Llama 等基础模型相比，OpenSRE 是上层框架，不依赖特定模型。\n\n其最大新意在于构建了**开源的强化学习环境**，包含合成 RCA 套件和端到端测试，这类似于 SWE-bench 对编码代理的推动作用。目前同类项目（如 Rookout、Causely）多为商业产品，OpenSRE 的开源策略和可自托管特性使其在社区中独树一帜。",
+          "ecosystem": "OpenSRE 依赖 Python 生态，核心依赖包括 FastAPI、LLM 客户端库（如 anthropic、openai）、以及各类云 SDK（boto3、google-cloud 等）。它可与主流可观测性平台（Grafana、Datadog、CloudWatch）和告警系统（PagerDuty、Slack）集成。在竞争方面，商业产品如 Rookout、Causely 提供类似 AI 根因分析，但闭源且成本高。开源替代品较少，OpenSRE 有望成为该领域的标杆。此外，它可与 MCP 协议兼容的工具配合使用，扩展能力。",
+          "limitations": [
+            {
+              "title": "仍处于 Alpha 阶段",
+              "body": "核心工作流可用但未完全稳定，API 和集成可能演进，不适合生产关键环境。"
+            },
+            {
+              "title": "依赖外部 LLM",
+              "body": "推理质量高度依赖所选 LLM 的能力，且使用商业模型可能产生 API 费用。"
+            },
+            {
+              "title": "测试场景有限",
+              "body": "目前合成场景和端到端测试数量有限，覆盖的故障模式不够全面。"
+            },
+            {
+              "title": "部署复杂度较高",
+              "body": "需要配置数据库、Redis 和多个 API 密钥，对运维经验有一定要求。"
+            },
+            {
+              "title": "无内置多代理协作",
+              "body": "当前架构为单代理设计，不支持多代理分工处理复杂事故。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "安装 OpenSRE（最新稳定版）",
+              "cmd": "curl -fsSL https://install.opensre.com | bash",
+              "note": "自动检测操作系统，支持 Unix 和 PowerShell。"
+            },
+            {
+              "step": "运行 onboard 配置向导",
+              "cmd": "opensre onboard",
+              "note": "设置 LLM 提供商和 API 密钥。"
+            },
+            {
+              "step": "启动交互式 shell 进行事故调查",
+              "cmd": "opensre",
+              "note": "输入自然语言描述事故，使用 /help 查看命令。"
+            },
+            {
+              "step": "使用一次性调查命令分析告警文件",
+              "cmd": "opensre investigate -i tests/e2e/kubernetes/fixtures/datadog_k8s_alert.json",
+              "note": "替换为实际告警文件路径。"
+            },
+            {
+              "step": "设置推理深度（可选）",
+              "cmd": "/effort high",
+              "note": "在交互式 shell 中执行，仅对 OpenAI/Codex 有效。"
+            },
+            {
+              "step": "更新到最新版本",
+              "cmd": "opensre update",
+              "note": "保持与 main 分支同步。"
+            },
+            {
+              "step": "卸载 OpenSRE 并清除数据",
+              "cmd": "opensre uninstall",
+              "note": "彻底移除所有本地数据。"
+            }
+          ],
+          "score": {
+            "novelty": 22,
+            "engineering": 20,
+            "reproducibility": 18,
+            "timeToValue": 19
+          }
+        }
+      },
+      {
+        "fullName": "TauricResearch/TradingAgents",
+        "owner": "TauricResearch",
+        "name": "TradingAgents",
+        "url": "https://github.com/TauricResearch/TradingAgents",
+        "ownerAvatarUrl": "https://github.com/TauricResearch.png?size=80",
+        "description": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 75279,
+        "forks": 14666,
+        "starsGained": 25162,
+        "rank": 13,
+        "tldr": "这是一个多智能体金融交易框架，通过模拟真实交易公司的分析师、研究员、交易员和风控团队协作，利用LLM进行市场分析并生成交易决策。",
+        "tags": [
+          "多智能体",
+          "金融交易",
+          "LLM",
+          "LangGraph",
+          "开源框架"
+        ],
+        "light": "该项目近期频繁更新（v0.2.0至v0.2.5），支持GPT-5.4、Gemini 3.1、Claude 4.6等最新模型，并新增结构化输出、检查点恢复、多语言支持等功能。其多智能体协作架构和持续迭代的工程优化吸引了大量关注，在AI+金融领域具有创新性。",
+        "worthDeepDive": 85,
+        "deep": {
+          "atGlance": "TradingAgents 是一个多智能体金融交易框架，通过模拟真实交易公司的分析师、研究员、交易员和风控团队，利用 LLM 协作决策。它提供可配置的 CLI 和 Python API，支持多种 LLM 提供商，并内置持久化与恢复机制，适合研究和实验。",
+          "whyItMatters": [
+            {
+              "title": "多智能体协作",
+              "body": "模拟真实交易团队分工，分析师、研究员、交易员和风控经理协同工作，提升决策的全面性和稳健性。"
+            },
+            {
+              "title": "LLM 灵活集成",
+              "body": "支持 OpenAI、Google、Anthropic、xAI、DeepSeek、Qwen、GLM、MiniMax 等主流 LLM，以及本地 Ollama 模型，适应不同场景。"
+            },
+            {
+              "title": "持久化与恢复",
+              "body": "自动记录决策日志并支持检查点恢复，中断后可继续执行，避免重复计算，提升实验效率。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Analyst Team",
+              "explain": "由基本面分析师、情绪分析师、新闻分析师和技术分析师组成，分别从财务、市场情绪、宏观事件和技术指标角度评估资产，为后续研究提供多维度输入。"
+            },
+            {
+              "term": "Researcher Team",
+              "explain": "包括看涨和看空研究员，通过结构化辩论批判分析师报告，平衡潜在收益与风险，生成更稳健的研究结论。"
+            },
+            {
+              "term": "Trader Agent",
+              "explain": "综合分析师和研究员报告，决定交易时机和规模，输出具体交易指令，是决策链中的执行环节。"
+            },
+            {
+              "term": "Risk Management & Portfolio Manager",
+              "explain": "风控团队评估市场波动性、流动性等风险因素，调整策略；投资组合经理最终批准或拒绝交易提案，确保风险可控。"
+            },
+            {
+              "term": "LangGraph",
+              "explain": "框架基于 LangGraph 构建，提供灵活的状态图和节点管理，支持多智能体流程编排、检查点恢复和模块化扩展。"
+            }
+          ],
+          "howItWorks": "## 组件\nTradingAgents 的核心组件包括四大团队：**Analyst Team**（基本面分析师、情绪分析师、新闻分析师、技术分析师）负责从不同维度分析市场数据；**Researcher Team**（看涨和看空研究员）通过结构化辩论评估分析师报告；**Trader Agent** 综合所有报告生成交易决策；**Risk Management & Portfolio Manager** 评估风险并最终批准交易。这些组件通过 LangGraph 编排，每个智能体由 LLM 驱动，支持多种模型提供商（如 GPT、Gemini、Claude）。配置通过 `DEFAULT_CONFIG` 字典管理，可调整 LLM 提供商、辩论轮数等参数。\n\n## 数据流\n数据流从用户输入（如股票代码和日期）开始，首先由 Analyst Team 并行获取并分析数据：基本面分析师调用财务数据 API，情绪分析师抓取新闻和社交媒体，新闻分析师解析宏观事件，技术分析师计算技术指标。分析结果传递给 Researcher Team，研究员进行辩论并生成综合报告。Trader Agent 接收报告后输出交易指令（如买入/卖出/持有及数量）。最后，Risk Management 评估风险，Portfolio Manager 批准或拒绝，决策记录到 `~/.tradingagents/memory/trading_memory.md`。整个过程支持检查点恢复，中断后可从最后成功节点继续。\n\n## 关键算法/配置\n关键算法包括：**结构化辩论**——看涨和看空研究员基于分析师报告进行多轮辩论，平衡观点；**技术指标计算**——如 MACD、RSI 等，用于技术分析；**风险评分**——风控团队根据波动性、流动性等计算风险等级。配置项集中在 `DEFAULT_CONFIG`：`llm_provider` 选择模型提供商，`deep_think_llm` 和 `quick_think_llm` 分别用于复杂推理和快速任务，`max_debate_rounds` 控制辩论轮数。持久化机制包括决策日志（追加到 Markdown 文件）和可选的 SQLite 检查点（`checkpoint_enabled`），路径可通过环境变量 `TRADINGAGENTS_MEMORY_LOG_PATH` 和 `TRADINGAGENTS_CACHE_DIR` 覆盖。",
+          "novelty": "TradingAgents 与现有框架如 LangChain、AutoGen 和 LlamaIndex 相比，其核心创新在于**模拟真实交易公司的组织架构**，将交易任务分解为分析师、研究员、交易员和风控等专业化角色，并通过结构化辩论和风险控制流程实现协作决策。LangChain 和 AutoGen 提供通用的多智能体编排能力，但缺乏针对金融交易领域的预定义角色和流程；LlamaIndex 侧重数据索引和检索，不涉及交易决策。TradingAgents 则内置了金融领域特定的分析模块（如基本面、情绪、技术分析）和风险评分机制，使其开箱即用。此外，框架支持多种 LLM 提供商和本地模型，并提供了持久化决策日志和检查点恢复功能，增强了实验的可靠性。然而，其新颖性主要体现在**领域特定设计**而非底层技术突破，核心算法（如辩论、风险评分）相对常规。",
+          "ecosystem": "TradingAgents 依赖 Python 3.13+ 和 LangGraph 作为底层编排框架，LLM 调用通过各提供商 API（OpenAI、Google、Anthropic 等）实现，数据源包括 Alpha Vantage（财务数据）和可能的新闻/社交媒体 API。它可与 Docker 配合使用，支持 Ollama 本地模型。在竞争方面，TradingAgents 与 FinGPT、FinRL 等金融 AI 框架形成对比：FinGPT 侧重情感分析，FinRL 侧重强化学习交易，而 TradingAgents 强调多智能体协作。它也可被视为 AutoGen 在金融领域的特化版本。社区方面，项目有 Discord、WeChat 和 X 社群，并引用 arXiv 论文，学术背景较强。",
+          "limitations": [
+            {
+              "title": "非投资建议",
+              "body": "框架明确声明仅供研究，交易表现受 LLM 模型、温度、数据质量等影响，不可作为实际投资依据。"
+            },
+            {
+              "title": "依赖外部 API",
+              "body": "需要配置多个 LLM 和数据 API 密钥（如 Alpha Vantage），部分服务可能收费或有限额，增加使用门槛。"
+            },
+            {
+              "title": "性能不确定性",
+              "body": "多智能体协作和 LLM 调用可能导致延迟和成本较高，尤其在复杂分析或高频交易场景下不适用。"
+            },
+            {
+              "title": "数据质量风险",
+              "body": "情绪分析依赖新闻和社交媒体数据，可能存在噪音或偏见，影响决策准确性。"
+            },
+            {
+              "title": "回测局限性",
+              "body": "虽然支持回测，但历史表现不代表未来结果，且框架未提供全面的回测评估工具。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "克隆仓库并安装依赖",
+              "cmd": "git clone https://github.com/TauricResearch/TradingAgents.git && cd TradingAgents && pip install .",
+              "note": "确保 Python 3.13+ 和 conda 环境。"
+            },
+            {
+              "step": "设置 LLM API 密钥",
+              "cmd": "export OPENAI_API_KEY=your_key_here",
+              "note": "至少设置一个 LLM 提供商密钥，如 OpenAI、Google 或 Anthropic。"
+            },
+            {
+              "step": "运行 CLI 交互界面",
+              "cmd": "tradingagents",
+              "note": "首次运行会显示配置界面，选择股票代码、日期和 LLM 提供商。"
+            },
+            {
+              "step": "选择股票和日期",
+              "note": "在 CLI 中输入股票代码（如 NVDA）和分析日期（如 2026-01-15）。"
+            },
+            {
+              "step": "等待分析完成",
+              "note": "观察各智能体进度条，最终显示交易决策（买入/卖出/持有）和理由。"
+            },
+            {
+              "step": "查看决策日志",
+              "cmd": "cat ~/.tradingagents/memory/trading_memory.md",
+              "note": "每次运行后决策会追加到此文件，包含历史表现反思。"
+            },
+            {
+              "step": "使用 Python API 编程调用",
+              "cmd": "python -c \"from tradingagents.graph.trading_graph import TradingAgentsGraph; ta = TradingAgentsGraph(); _, decision = ta.propagate('NVDA', '2026-01-15'); print(decision)\"",
+              "note": "确保在仓库根目录运行，或安装为包。"
+            },
+            {
+              "step": "启用检查点恢复",
+              "cmd": "tradingagents analyze --checkpoint",
+              "note": "中断后重新运行相同命令，将从上次步骤继续。"
+            }
+          ],
+          "score": {
+            "novelty": 18,
+            "engineering": 22,
+            "reproducibility": 20,
+            "timeToValue": 17
+          }
+        }
+      },
+      {
+        "fullName": "Anil-matcha/Open-Generative-AI",
+        "owner": "Anil-matcha",
+        "name": "Open-Generative-AI",
+        "url": "https://github.com/Anil-matcha/Open-Generative-AI",
+        "ownerAvatarUrl": "https://github.com/Anil-matcha.png?size=80",
+        "description": "Open-source alternative to AI video platforms — Free AI image & video generation studio with 200+ models (Flux, Midjourney, Kling, Sora, Veo). No content filters. Self-hosted, MIT licensed.",
+        "language": "JavaScript",
+        "languageColor": "#f1e05a",
+        "stars": 13453,
+        "forks": 2357,
+        "starsGained": 8573,
+        "rank": 14,
+        "tldr": "这是一个开源AI媒体生成工作室，聚合200+模型（Flux、Midjourney等），支持图像/视频/唇形同步生成，无内容过滤，可自托管。",
+        "tags": [
+          "AI视频生成",
+          "自托管",
+          "无过滤",
+          "多模型聚合",
+          "桌面应用"
+        ],
+        "light": "本周/月趋势源于AI视频平台收费和审查加剧，用户寻求开源替代。该项目提供免费、无过滤的生成体验，集成200+模型，支持本地推理和桌面应用，满足创作者对自由度和控制权的需求。",
+        "worthDeepDive": 65
+      },
+      {
+        "fullName": "hugohe3/ppt-master",
+        "owner": "hugohe3",
+        "name": "ppt-master",
+        "url": "https://github.com/hugohe3/ppt-master",
+        "ownerAvatarUrl": "https://github.com/hugohe3.png?size=80",
+        "description": "AI generates natively editable PPTX from any document — real PowerPoint shapes with native animations, not images · by Hugo He",
+        "language": "Python",
+        "languageColor": "#3572A5",
+        "stars": 16281,
+        "forks": 1585,
+        "starsGained": 10925,
+        "rank": 15,
+        "tldr": "这是一个AI驱动的PPT生成工具，能从任意文档生成原生可编辑的PPTX文件，特别在于输出的是真实形状和动画而非图片。",
+        "tags": [
+          "AI PPT生成",
+          "原生可编辑",
+          "开源工具",
+          "多模型支持"
+        ],
+        "light": "该项目近期在GitHub trending上受到关注，主要因为其解决了AI生成PPT的核心痛点：输出原生可编辑的PPTX文件，而非图片。随着AI办公工具需求增长，用户对高质量、可编辑的演示文稿生成需求迫切。项目支持多种AI模型（Claude、GPT、Gemini等），并提供实时预览、模板复制、动画和语音旁白等高级功能，吸引了大量用户。此外，项目持续更新，版本已达v2.7.0，社区活跃。",
+        "worthDeepDive": 85
+      }
+    ]
+  }
+}

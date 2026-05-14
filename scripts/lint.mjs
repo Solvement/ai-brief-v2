@@ -21,7 +21,7 @@ async function walk(dir) {
       violations.push(`${path}: console.log is not allowed in source files`);
     }
     if (path.includes(`${join("src", "components")}`) && text.includes("const mock")) {
-      violations.push(`${path}: mock data belongs in src/lib/content/seed.ts or views.ts`);
+      violations.push(`${path}: mock data belongs in fixtures or generated data files, not UI components`);
     }
   }
 }
