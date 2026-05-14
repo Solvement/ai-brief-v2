@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { ModelAnalysisSection, ModelCompany, ModelRelease, ModelSeries, ModelsData } from "../types";
+import type { ModelAnalysisSection, ModelBenchmarkChart, ModelCompany, ModelRelease, ModelSeries, ModelsData } from "../types";
 import { loadModels } from "../lib/data";
 import { SiteHeader } from "../components/SiteHeader";
 
@@ -477,7 +477,10 @@ function BenchmarkLens({ release }: { release: ModelRelease }) {
         <span className="lens-badge">发布时第一眼</span>
       </div>
       <p className="professor-note">{benchmark.professorNote}</p>
-      <div className="benchmark-grid">
+      <div className="benchmark-chart-grid">
+        {benchmark.charts.map((chartItem) => <BenchmarkChart key={chartItem.title} chart={chartItem} />)}
+      </div>
+      <div className="benchmark-grid benchmark-notes-grid">
         {benchmark.items.map((item) => (
           <div className="benchmark-card" key={item.label + "-" + item.score}>
             <div className="benchmark-card-top">
@@ -494,6 +497,38 @@ function BenchmarkLens({ release }: { release: ModelRelease }) {
         {benchmark.caveats.map((caveat) => <span key={caveat}>{caveat}</span>)}
       </div>
     </section>
+  );
+}
+
+function BenchmarkChart({ chart }: { chart: ModelBenchmarkChart }) {
+  const maxValue = chart.maxValue || Math.max(...chart.bars.map((barItem) => barItem.value), 1);
+  return (
+    <div className="benchmark-chart-card">
+      <div className="benchmark-chart-head">
+        <div>
+          <span>{chart.title}</span>
+          <small>{chart.metric}</small>
+        </div>
+        <b>{sourceTypeLabel(chart.sourceType)}</b>
+      </div>
+      <div className="chart-bars">
+        {chart.bars.map((barItem) => {
+          const width = Math.max(4, Math.min(100, (barItem.value / maxValue) * 100));
+          return (
+            <div className={`chart-row${barItem.highlight ? " highlight" : ""}`} key={`${chart.title}-${barItem.label}`}>
+              <div className="chart-row-meta">
+                <span>{barItem.label}</span>
+                <b>{barItem.display}</b>
+              </div>
+              <div className="chart-track" aria-label={`${barItem.label}: ${barItem.display}`}>
+                <div className="chart-fill" style={{ width: `${width}%` }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="chart-foot">{chart.higherIsBetter ? "数值越高越好" : "数值越低越好"} · {chart.unit}</div>
+    </div>
   );
 }
 

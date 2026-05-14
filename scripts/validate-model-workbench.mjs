@@ -8,6 +8,7 @@ const checks = [
   ["ModelMap component", /function ModelMap\(/],
   ["ModelFocusPanel component", /function ModelFocusPanel\(/],
   ["BenchmarkLens component", /function BenchmarkLens\(/],
+  ["BenchmarkChart component", /function BenchmarkChart\(/],
   ["Lens tabs component", /function LensTabs\(/],
   ["ReleaseSwitcher component", /function ReleaseSwitcher\(/],
   ["Visual relation panel", /function VisualRelationPanel\(/],
@@ -17,6 +18,7 @@ const checks = [
   ["Capability map styles", /\.capability-map/],
   ["Model profile grid styles", /\.model-profile-grid/],
   ["Lens tab styles", /\.lens-tabs/],
+  ["Benchmark chart styles", /\.benchmark-chart-grid/],
   ["Benchmark card styles", /\.benchmark-card/],
   ["Relation visual styles", /\.relation-visual/],
 ];

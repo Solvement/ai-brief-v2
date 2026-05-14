@@ -176,6 +176,192 @@
                       "interpretation": "说明 R1 有代码修复能力，但真实工程还受工具链、上下文、脚手架影响。",
                       "sourceType": "official"
                     }
+                  ],
+                  "charts": [
+                    {
+                      "title": "AIME 2024",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-4o",
+                          "value": 9.3,
+                          "display": "9.3%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Claude 3.5 Sonnet",
+                          "value": 16,
+                          "display": "16.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3",
+                          "value": 39.2,
+                          "display": "39.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "OpenAI o1-mini",
+                          "value": 63.6,
+                          "display": "63.6%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "OpenAI o1-1217",
+                          "value": 79.2,
+                          "display": "79.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 79.8,
+                          "display": "79.8%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "MATH-500",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-4o",
+                          "value": 74.6,
+                          "display": "74.6%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Claude 3.5 Sonnet",
+                          "value": 78.3,
+                          "display": "78.3%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "OpenAI o1-mini",
+                          "value": 90,
+                          "display": "90.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3",
+                          "value": 90.2,
+                          "display": "90.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "OpenAI o1-1217",
+                          "value": 96.4,
+                          "display": "96.4%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 97.3,
+                          "display": "97.3%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Codeforces",
+                      "metric": "Rating",
+                      "unit": "rating",
+                      "higherIsBetter": true,
+                      "maxValue": 2200,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Claude 3.5 Sonnet",
+                          "value": 717,
+                          "display": "717",
+                          "highlight": false
+                        },
+                        {
+                          "label": "GPT-4o",
+                          "value": 759,
+                          "display": "759",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3",
+                          "value": 1134,
+                          "display": "1134",
+                          "highlight": false
+                        },
+                        {
+                          "label": "OpenAI o1-mini",
+                          "value": 1820,
+                          "display": "1820",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 2029,
+                          "display": "2029",
+                          "highlight": true
+                        },
+                        {
+                          "label": "OpenAI o1-1217",
+                          "value": 2061,
+                          "display": "2061",
+                          "highlight": false
+                        }
+                      ]
+                    },
+                    {
+                      "title": "SWE-bench Verified",
+                      "metric": "Resolved",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 60,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-4o",
+                          "value": 38.8,
+                          "display": "38.8%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "OpenAI o1-mini",
+                          "value": 41.6,
+                          "display": "41.6%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3",
+                          "value": 42,
+                          "display": "42.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "OpenAI o1-1217",
+                          "value": 48.9,
+                          "display": "48.9%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 49.2,
+                          "display": "49.2%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "Claude 3.5 Sonnet",
+                          "value": 50.8,
+                          "display": "50.8%",
+                          "highlight": false
+                        }
+                      ]
+                    }
                   ]
                 },
                 "architecture": {
@@ -321,6 +507,96 @@
                       "comparator": "R1 首发时更偏推理研究模型",
                       "interpretation": "结构化输出让模型更容易接进工作流、工具和应用后端。",
                       "sourceType": "official"
+                    }
+                  ],
+                  "charts": [
+                    {
+                      "title": "AIME 2025",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 70,
+                          "display": "70.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1-0528",
+                          "value": 87.5,
+                          "display": "87.5%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "AIME 2024",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 79.8,
+                          "display": "79.8%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1-0528",
+                          "value": 91.4,
+                          "display": "91.4%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "GPQA-Diamond",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 71.5,
+                          "display": "71.5%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1-0528",
+                          "value": 81,
+                          "display": "81.0%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "SWE-bench Verified",
+                      "metric": "Resolved",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 70,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "DeepSeek R1",
+                          "value": 49.2,
+                          "display": "49.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek R1-0528",
+                          "value": 57.6,
+                          "display": "57.6%",
+                          "highlight": true
+                        }
+                      ]
                     }
                   ]
                 },
@@ -481,6 +757,132 @@
                       "interpretation": "DeepSeek 开始把评估重心从单题推理转向多步工具环境。",
                       "sourceType": "official"
                     }
+                  ],
+                  "charts": [
+                    {
+                      "title": "GPQA-Diamond",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "DeepSeek V3 0324",
+                          "value": 68.4,
+                          "display": "68.4%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.1 Non-Think",
+                          "value": 74.9,
+                          "display": "74.9%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.1 Think",
+                          "value": 80.1,
+                          "display": "80.1%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "R1-0528",
+                          "value": 81,
+                          "display": "81.0%",
+                          "highlight": false
+                        }
+                      ]
+                    },
+                    {
+                      "title": "LiveCodeBench",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 90,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "DeepSeek V3 0324",
+                          "value": 43,
+                          "display": "43.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.1 Non-Think",
+                          "value": 56.4,
+                          "display": "56.4%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "R1-0528",
+                          "value": 73.3,
+                          "display": "73.3%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.1 Think",
+                          "value": 74.8,
+                          "display": "74.8%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "SWE Verified Agent",
+                      "metric": "Resolved",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 80,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "DeepSeek V3 0324",
+                          "value": 45.4,
+                          "display": "45.4%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.1 Non-Think",
+                          "value": 66,
+                          "display": "66.0%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "AIME 2025",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "V3.1 Non-Think",
+                          "value": 49.8,
+                          "display": "49.8%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3 0324",
+                          "value": 51.3,
+                          "display": "51.3%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "R1-0528",
+                          "value": 87.5,
+                          "display": "87.5%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.1 Think",
+                          "value": 88.4,
+                          "display": "88.4%",
+                          "highlight": true
+                        }
+                      ]
+                    }
                   ]
                 },
                 "architecture": {
@@ -631,6 +1033,96 @@
                       "comparator": "标准稠密注意力路线",
                       "interpretation": "这里看的是单位 token 成本和长上下文可扩展性，不只是准确率。",
                       "sourceType": "official"
+                    }
+                  ],
+                  "charts": [
+                    {
+                      "title": "MMLU-Pro",
+                      "metric": "Score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "V3.1-Terminus",
+                          "value": 85,
+                          "display": "85.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.2-Exp",
+                          "value": 85,
+                          "display": "85.0%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Codeforces",
+                      "metric": "Rating",
+                      "unit": "rating",
+                      "higherIsBetter": true,
+                      "maxValue": 2300,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "V3.1-Terminus",
+                          "value": 2046,
+                          "display": "2046",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.2-Exp",
+                          "value": 2121,
+                          "display": "2121",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Terminal-bench",
+                      "metric": "Score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 50,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "V3.1-Terminus",
+                          "value": 36.7,
+                          "display": "36.7",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.2-Exp",
+                          "value": 37.7,
+                          "display": "37.7",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "BrowseComp-zh",
+                      "metric": "Score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 60,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "V3.1-Terminus",
+                          "value": 45,
+                          "display": "45.0",
+                          "highlight": false
+                        },
+                        {
+                          "label": "V3.2-Exp",
+                          "value": 47.9,
+                          "display": "47.9",
+                          "highlight": true
+                        }
+                      ]
                     }
                   ]
                 },
@@ -792,6 +1284,104 @@
                       "interpretation": "数学推理继续强，但这一版更重要的是把 reasoning 接到工具使用。",
                       "sourceType": "third-party"
                     }
+                  ],
+                  "charts": [
+                    {
+                      "title": "MMLU-Pro",
+                      "metric": "Score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "third-party",
+                      "bars": [
+                        {
+                          "label": "V3.1 Think",
+                          "value": 84.8,
+                          "display": "84.8%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "R1-0528",
+                          "value": 85,
+                          "display": "85.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3.2",
+                          "value": 85,
+                          "display": "85.0%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "V4-Pro Max",
+                          "value": 87.5,
+                          "display": "87.5%",
+                          "highlight": false
+                        }
+                      ]
+                    },
+                    {
+                      "title": "GPQA-Diamond",
+                      "metric": "Score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "third-party",
+                      "bars": [
+                        {
+                          "label": "V3.1 Think",
+                          "value": 80.1,
+                          "display": "80.1%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "R1-0528",
+                          "value": 81,
+                          "display": "81.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3.2",
+                          "value": 82.4,
+                          "display": "82.4%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "V4-Pro Max",
+                          "value": 90.1,
+                          "display": "90.1%",
+                          "highlight": false
+                        }
+                      ]
+                    },
+                    {
+                      "title": "SWE-bench Verified",
+                      "metric": "Resolved",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 90,
+                      "sourceType": "third-party",
+                      "bars": [
+                        {
+                          "label": "V3.1 Agent",
+                          "value": 66,
+                          "display": "66.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V3.2",
+                          "value": 70,
+                          "display": "70.0%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "V4-Pro Max",
+                          "value": 80.6,
+                          "display": "80.6%",
+                          "highlight": false
+                        }
+                      ]
+                    }
                   ]
                 },
                 "architecture": {
@@ -952,6 +1542,168 @@
                       "comparator": "GPT-5.4 mini as reference in CAISI report",
                       "interpretation": "V4 的竞争力不只是能力，还包括单位任务成本。",
                       "sourceType": "third-party"
+                    }
+                  ],
+                  "charts": [
+                    {
+                      "title": "GPQA Diamond",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GLM-5.1 Thinking",
+                          "value": 86.2,
+                          "display": "86.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V4-Pro Max",
+                          "value": 90.1,
+                          "display": "90.1%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "K2.6 Thinking",
+                          "value": 90.5,
+                          "display": "90.5%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Opus-4.6 Max",
+                          "value": 91.3,
+                          "display": "91.3%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "GPT-5.4 xHigh",
+                          "value": 93,
+                          "display": "93.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Gemini-3.1-Pro High",
+                          "value": 94.3,
+                          "display": "94.3%",
+                          "highlight": false
+                        }
+                      ]
+                    },
+                    {
+                      "title": "SWE Verified",
+                      "metric": "Resolved",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 90,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "K2.6 Thinking",
+                          "value": 80.2,
+                          "display": "80.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V4-Pro Max",
+                          "value": 80.6,
+                          "display": "80.6%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "Gemini-3.1-Pro High",
+                          "value": 80.6,
+                          "display": "80.6%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Opus-4.6 Max",
+                          "value": 80.8,
+                          "display": "80.8%",
+                          "highlight": false
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Terminal Bench 2.0",
+                      "metric": "Accuracy",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 80,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GLM-5.1 Thinking",
+                          "value": 63.5,
+                          "display": "63.5%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Opus-4.6 Max",
+                          "value": 65.4,
+                          "display": "65.4%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "K2.6 Thinking",
+                          "value": 66.7,
+                          "display": "66.7%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V4-Pro Max",
+                          "value": 67.9,
+                          "display": "67.9%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "Gemini-3.1-Pro High",
+                          "value": 68.5,
+                          "display": "68.5%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "GPT-5.4 xHigh",
+                          "value": 75.1,
+                          "display": "75.1%",
+                          "highlight": false
+                        }
+                      ]
+                    },
+                    {
+                      "title": "LiveCodeBench",
+                      "metric": "Pass@1",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Opus-4.6 Max",
+                          "value": 88.8,
+                          "display": "88.8%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "K2.6 Thinking",
+                          "value": 89.6,
+                          "display": "89.6%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Gemini-3.1-Pro High",
+                          "value": 91.7,
+                          "display": "91.7%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "DeepSeek V4-Pro Max",
+                          "value": 93.5,
+                          "display": "93.5%",
+                          "highlight": true
+                        }
+                      ]
                     }
                   ]
                 },

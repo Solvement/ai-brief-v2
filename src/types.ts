@@ -87,6 +87,23 @@ export interface ModelNextRelation {
 
 export type ModelBenchmarkSourceType = "official" | "third-party" | "derived";
 
+export interface ModelBenchmarkChartBar {
+  label: string;
+  value: number;
+  display: string;
+  highlight?: boolean;
+}
+
+export interface ModelBenchmarkChart {
+  title: string;
+  metric: string;
+  unit: string;
+  higherIsBetter: boolean;
+  maxValue?: number;
+  sourceType: ModelBenchmarkSourceType;
+  bars: ModelBenchmarkChartBar[];
+}
+
 export interface ModelBenchmarkItem {
   label: string;
   score: string;
@@ -99,6 +116,7 @@ export interface ModelBenchmarkLens {
   headline: string;
   professorNote: string;
   caveats: string[];
+  charts: ModelBenchmarkChart[];
   items: ModelBenchmarkItem[];
 }
 

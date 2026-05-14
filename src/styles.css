@@ -930,8 +930,105 @@ button { font-family: inherit; cursor: pointer; }
   gap: 10px;
   margin-top: 14px;
 }
+.benchmark-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.benchmark-chart-card {
+  min-height: 268px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+.benchmark-chart-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.benchmark-chart-head span {
+  display: block;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+.benchmark-chart-head small {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 750;
+}
+.benchmark-chart-head b {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 10.5px;
+}
+.chart-bars {
+  display: grid;
+  gap: 9px;
+}
+.chart-row {
+  display: grid;
+  gap: 5px;
+}
+.chart-row-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+.chart-row-meta span {
+  overflow: hidden;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chart-row-meta b {
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 900;
+}
+.chart-track {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+.chart-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #94a3b8;
+}
+.chart-row.highlight .chart-row-meta span,
+.chart-row.highlight .chart-row-meta b {
+  color: #0f766e;
+}
+.chart-row.highlight .chart-fill {
+  background: linear-gradient(90deg, #0f766e, #14b8a6);
+}
+.chart-foot {
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 750;
+}
+.benchmark-notes-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .benchmark-card {
-  min-height: 174px;
+  min-height: 142px;
   padding: 13px;
   border-radius: 8px;
   background: #ffffff;
@@ -1175,7 +1272,7 @@ button { font-family: inherit; cursor: pointer; }
   .capability-map { grid-template-columns: 1fr; }
 }
 @media (max-width: 980px) {
-  .model-focus-grid, .model-profile-grid, .model-lens-row, .benchmark-grid, .lens-section-grid, .professor-action-grid, .learning-list.visual, .update-list.visual, .next-step-grid {
+  .model-focus-grid, .model-profile-grid, .model-lens-row, .benchmark-grid, .benchmark-chart-grid, .lens-section-grid, .professor-action-grid, .learning-list.visual, .update-list.visual, .next-step-grid {
     grid-template-columns: 1fr;
   }
   .lens-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }

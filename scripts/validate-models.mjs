@@ -58,6 +58,36 @@ function validateBenchmarkItem(item, path) {
   }
 }
 
+function validateBenchmarkChart(chart, path) {
+  for (const key of ["title", "metric", "unit"]) {
+    validateString(chart?.[key], `${path}.${key}`);
+  }
+  if (typeof chart?.higherIsBetter !== "boolean") {
+    fail(`${path}.higherIsBetter`, "must be a boolean");
+  }
+  if (!["official", "third-party", "derived"].includes(chart?.sourceType)) {
+    fail(`${path}.sourceType`, "must be official, third-party, or derived");
+  }
+  if (chart?.maxValue !== undefined && (!Number.isFinite(chart.maxValue) || chart.maxValue <= 0)) {
+    fail(`${path}.maxValue`, "must be a positive number when present");
+  }
+  if (!Array.isArray(chart?.bars) || chart.bars.length < 2) {
+    fail(`${path}.bars`, "must have at least 2 item(s)");
+    return;
+  }
+  chart.bars.forEach((bar, index) => {
+    const barPath = `${path}.bars[${index}]`;
+    validateString(bar?.label, `${barPath}.label`);
+    validateString(bar?.display, `${barPath}.display`);
+    if (!Number.isFinite(bar?.value) || bar.value < 0) {
+      fail(`${barPath}.value`, "must be a non-negative number");
+    }
+    if (bar?.highlight !== undefined && typeof bar.highlight !== "boolean") {
+      fail(`${barPath}.highlight`, "must be a boolean when present");
+    }
+  });
+}
+
 function validateAnalysisSection(section, path, minBullets = 2) {
   validateString(section?.headline, `${path}.headline`);
   validateString(section?.professorNote, `${path}.professorNote`);
@@ -73,6 +103,13 @@ function validateModelAnalysis(analysis, path) {
   validateString(analysis.benchmark?.headline, `${path}.benchmark.headline`);
   validateString(analysis.benchmark?.professorNote, `${path}.benchmark.professorNote`);
   validateStringArray(analysis.benchmark?.caveats, `${path}.benchmark.caveats`, 1);
+  if (!Array.isArray(analysis.benchmark?.charts) || analysis.benchmark.charts.length < 1) {
+    fail(`${path}.benchmark.charts`, "must have at least 1 item(s)");
+  } else {
+    analysis.benchmark.charts.forEach((chart, index) => {
+      validateBenchmarkChart(chart, `${path}.benchmark.charts[${index}]`);
+    });
+  }
   if (!Array.isArray(analysis.benchmark?.items) || analysis.benchmark.items.length < 2) {
     fail(`${path}.benchmark.items`, "must have at least 2 item(s)");
   } else {
