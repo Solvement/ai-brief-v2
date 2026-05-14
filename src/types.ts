@@ -85,6 +85,39 @@ export interface ModelNextRelation {
   teacherNote: string;
 }
 
+export type ModelBenchmarkSourceType = "official" | "third-party" | "derived";
+
+export interface ModelBenchmarkItem {
+  label: string;
+  score: string;
+  comparator: string;
+  interpretation: string;
+  sourceType: ModelBenchmarkSourceType;
+}
+
+export interface ModelBenchmarkLens {
+  headline: string;
+  professorNote: string;
+  caveats: string[];
+  items: ModelBenchmarkItem[];
+}
+
+export interface ModelAnalysisSection {
+  headline: string;
+  professorNote: string;
+  bullets: string[];
+}
+
+export interface ModelAnalysis {
+  benchmark: ModelBenchmarkLens;
+  architecture: ModelAnalysisSection;
+  designLineage: ModelAnalysisSection;
+  trainingData: ModelAnalysisSection;
+  innovation: ModelAnalysisSection;
+  limitations: ModelAnalysisSection;
+  professorLens: ModelAnalysisSection;
+}
+
 export interface ModelRelease {
   id: string;
   name: string;
@@ -100,6 +133,7 @@ export interface ModelRelease {
   studentTakeaways: string[];
   experiments: string[];
   api?: ModelApiInfo;
+  modelAnalysis: ModelAnalysis;
   teacherNote: string;
   sources: ModelSource[];
   nextRelation?: ModelNextRelation;

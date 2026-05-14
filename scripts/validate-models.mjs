@@ -49,6 +49,50 @@ function validateSources(sources, path) {
   });
 }
 
+function validateBenchmarkItem(item, path) {
+  for (const key of ["label", "score", "comparator", "interpretation"]) {
+    validateString(item?.[key], `${path}.${key}`);
+  }
+  if (!["official", "third-party", "derived"].includes(item?.sourceType)) {
+    fail(`${path}.sourceType`, "must be official, third-party, or derived");
+  }
+}
+
+function validateAnalysisSection(section, path, minBullets = 2) {
+  validateString(section?.headline, `${path}.headline`);
+  validateString(section?.professorNote, `${path}.professorNote`);
+  validateStringArray(section?.bullets, `${path}.bullets`, minBullets);
+}
+
+function validateModelAnalysis(analysis, path) {
+  if (!analysis || typeof analysis !== "object") {
+    fail(path, "must be an object");
+    return;
+  }
+
+  validateString(analysis.benchmark?.headline, `${path}.benchmark.headline`);
+  validateString(analysis.benchmark?.professorNote, `${path}.benchmark.professorNote`);
+  validateStringArray(analysis.benchmark?.caveats, `${path}.benchmark.caveats`, 1);
+  if (!Array.isArray(analysis.benchmark?.items) || analysis.benchmark.items.length < 2) {
+    fail(`${path}.benchmark.items`, "must have at least 2 item(s)");
+  } else {
+    analysis.benchmark.items.forEach((item, index) => {
+      validateBenchmarkItem(item, `${path}.benchmark.items[${index}]`);
+    });
+  }
+
+  for (const key of [
+    "architecture",
+    "designLineage",
+    "trainingData",
+    "innovation",
+    "limitations",
+    "professorLens",
+  ]) {
+    validateAnalysisSection(analysis[key], `${path}.${key}`);
+  }
+}
+
 function validateRelease(release, path, releaseIds) {
   for (const key of [
     "id",
@@ -69,6 +113,7 @@ function validateRelease(release, path, releaseIds) {
   validateStringArray(release?.studentTakeaways, `${path}.studentTakeaways`, 1);
   validateStringArray(release?.experiments, `${path}.experiments`, 1);
   validateSources(release?.sources, `${path}.sources`);
+  validateModelAnalysis(release?.modelAnalysis, `${path}.modelAnalysis`);
 
   if (release?.api) {
     validateStringArray(release.api.modelNames, `${path}.api.modelNames`, 1);

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { ModelCompany, ModelRelease, ModelSeries, ModelsData } from "../types";
+import type { ModelAnalysisSection, ModelCompany, ModelRelease, ModelSeries, ModelsData } from "../types";
 import { loadModels } from "../lib/data";
 import { SiteHeader } from "../components/SiteHeader";
 
@@ -314,7 +314,23 @@ function ReleaseSwitcher({ series, activeReleaseId, onReleaseChange }: { series:
   );
 }
 
+type LensKey = "benchmark" | "architecture" | "training" | "innovation" | "professor";
+
+const LENS_OPTIONS: { key: LensKey; label: string; helper: string }[] = [
+  { key: "benchmark", label: "Benchmark", helper: "先看和谁比、测什么" },
+  { key: "architecture", label: "架构", helper: "模型怎样被设计" },
+  { key: "training", label: "训练/数据", helper: "能力怎样被塑造" },
+  { key: "innovation", label: "创新/局限", helper: "贡献和边界" },
+  { key: "professor", label: "教授视角", helper: "学生该怎么学" },
+];
+
 function ModelFocusPanel({ release, series }: { release: ModelRelease; series: ModelSeries }) {
+  const [activeLens, setActiveLens] = useState<LensKey>("benchmark");
+
+  useEffect(() => {
+    setActiveLens("benchmark");
+  }, [release.id]);
+
   return (
     <div className="model-focus-grid">
       <article className="model-profile-panel">
@@ -328,16 +344,14 @@ function ModelFocusPanel({ release, series }: { release: ModelRelease; series: M
         </div>
 
         <div className="model-profile-grid">
-          <AnalysisTile title="这一代是什么" body={release.positioning} tone="green" />
-          <AnalysisTile title="它自己解决的问题" body={release.problemSolved} tone="blue" />
-          <AnalysisTile title="为什么要这样设计" body={release.whyChanged} tone="amber" />
-          <AnalysisTile title="技术上怎么解决" body={release.howSolved} tone="slate" />
+          <ModelSnapshotTile label="定位" value={release.positioning} tone="green" />
+          <ModelSnapshotTile label="解决的问题" value={release.problemSolved} tone="blue" />
+          <ModelSnapshotTile label="设计动机" value={release.whyChanged} tone="amber" />
+          <ModelSnapshotTile label="技术解法" value={release.howSolved} tone="slate" />
         </div>
 
-        <div className="model-lens-row">
-          <ListBlock title="模型本体：关键能力" items={release.keyChanges} />
-          <ListBlock title="适合重点学习" items={release.studentTakeaways} />
-        </div>
+        <LensTabs activeLens={activeLens} onChange={setActiveLens} />
+        <LensView release={release} activeLens={activeLens} />
 
         {release.api && (
           <div className="api-strip compact">
@@ -361,13 +375,155 @@ function ModelFocusPanel({ release, series }: { release: ModelRelease; series: M
   );
 }
 
-function AnalysisTile({ title, body, tone }: { title: string; body: string; tone: "green" | "blue" | "amber" | "slate" }) {
+function ModelSnapshotTile({ label, value, tone }: { label: string; value: string; tone: "green" | "blue" | "amber" | "slate" }) {
   return (
-    <div className={`analysis-tile ${tone}`}>
-      <h4>{title}</h4>
-      <p>{body}</p>
+    <div className={"analysis-tile " + tone}>
+      <h4>{label}</h4>
+      <p>{value}</p>
     </div>
   );
+}
+
+function LensTabs({ activeLens, onChange }: { activeLens: LensKey; onChange: (lens: LensKey) => void }) {
+  return (
+    <div className="lens-tabs" role="tablist" aria-label="Model analysis lenses">
+      {LENS_OPTIONS.map((option) => (
+        <button
+          key={option.key}
+          className={"lens-tab" + (activeLens === option.key ? " active" : "")}
+          onClick={() => onChange(option.key)}
+          role="tab"
+          aria-selected={activeLens === option.key}
+        >
+          <span>{option.label}</span>
+          <small>{option.helper}</small>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function LensView({ release, activeLens }: { release: ModelRelease; activeLens: LensKey }) {
+  const analysis = release.modelAnalysis;
+
+  if (activeLens === "benchmark") return <BenchmarkLens release={release} />;
+  if (activeLens === "architecture") {
+    return (
+      <CompoundLens
+        kicker="Architecture Lens"
+        sections={[
+          { title: "架构设计", section: analysis.architecture },
+          { title: "思路来源", section: analysis.designLineage },
+        ]}
+      />
+    );
+  }
+  if (activeLens === "training") {
+    return (
+      <CompoundLens
+        kicker="Training Lens"
+        sections={[
+          { title: "训练方式 / 数据结果", section: analysis.trainingData },
+          {
+            title: "关键能力变化",
+            section: {
+              headline: "这一版公开可观察到的能力变化",
+              professorNote: "把官方发布点拆成可测试任务，才不会只停在宣传语。",
+              bullets: release.keyChanges,
+            },
+          },
+        ]}
+      />
+    );
+  }
+  if (activeLens === "innovation") {
+    return (
+      <CompoundLens
+        kicker="Innovation Lens"
+        sections={[
+          { title: "创新点", section: analysis.innovation },
+          { title: "局限性", section: analysis.limitations },
+        ]}
+      />
+    );
+  }
+  return <ProfessorLens release={release} />;
+}
+
+function BenchmarkLens({ release }: { release: ModelRelease }) {
+  const benchmark = release.modelAnalysis.benchmark;
+  return (
+    <section className="analysis-lens benchmark-lens">
+      <div className="lens-head">
+        <div>
+          <div className="section-kicker">Benchmark Lens</div>
+          <h3>{benchmark.headline}</h3>
+        </div>
+        <span className="lens-badge">发布时第一眼</span>
+      </div>
+      <p className="professor-note">{benchmark.professorNote}</p>
+      <div className="benchmark-grid">
+        {benchmark.items.map((item) => (
+          <div className="benchmark-card" key={item.label + "-" + item.score}>
+            <div className="benchmark-card-top">
+              <span>{item.label}</span>
+              <b>{sourceTypeLabel(item.sourceType)}</b>
+            </div>
+            <strong>{item.score}</strong>
+            <p>{item.comparator}</p>
+            <small>{item.interpretation}</small>
+          </div>
+        ))}
+      </div>
+      <div className="benchmark-caveats">
+        {benchmark.caveats.map((caveat) => <span key={caveat}>{caveat}</span>)}
+      </div>
+    </section>
+  );
+}
+
+function CompoundLens({ kicker, sections }: { kicker: string; sections: { title: string; section: ModelAnalysisSection }[] }) {
+  return (
+    <section className="analysis-lens">
+      <div className="section-kicker">{kicker}</div>
+      <div className="lens-section-grid">
+        {sections.map(({ title, section }) => (
+          <AnalysisSection key={title} title={title} section={section} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ProfessorLens({ release }: { release: ModelRelease }) {
+  return (
+    <section className="analysis-lens professor-lens">
+      <AnalysisSection title="教授视角" section={release.modelAnalysis.professorLens} />
+      <div className="professor-action-grid">
+        <ListBlock title="适合重点学习" items={release.studentTakeaways} />
+        <ListBlock title="可以马上做的实验" items={release.experiments} />
+      </div>
+    </section>
+  );
+}
+
+function AnalysisSection({ title, section }: { title: string; section: ModelAnalysisSection }) {
+  return (
+    <div className="lens-section">
+      <span>{title}</span>
+      <h4>{section.headline}</h4>
+      <p>{section.professorNote}</p>
+      <ul>
+        {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+function sourceTypeLabel(sourceType: string): string {
+  if (sourceType === "third-party") return "第三方";
+  if (sourceType === "derived") return "推导";
+  return "官方";
 }
 
 function VisualRelationPanel({ release, relation }: { release: ModelRelease; relation: NonNullable<ModelRelease["nextRelation"]> }) {

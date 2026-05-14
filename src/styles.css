@@ -840,6 +840,209 @@ button { font-family: inherit; cursor: pointer; }
 .analysis-tile.blue { background: #f0f9ff; border-color: #bae6fd; }
 .analysis-tile.amber { background: #fffbeb; border-color: #fde68a; }
 .analysis-tile.slate { background: #f8fafc; border-color: #e2e8f0; }
+.lens-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 16px;
+  padding: 6px;
+  border-radius: 10px;
+  background: #eef2f7;
+  border: 1px solid #dbe4ee;
+}
+.lens-tab {
+  display: grid;
+  gap: 3px;
+  min-height: 58px;
+  padding: 9px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+.lens-tab:hover {
+  background: rgba(255,255,255,0.72);
+  color: #12352c;
+}
+.lens-tab:active { transform: translateY(1px); }
+.lens-tab.active {
+  background: #ffffff;
+  border-color: #b6c7d8;
+  color: #0f172a;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+.lens-tab span {
+  font-size: 12.5px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+.lens-tab small {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.25;
+}
+.analysis-lens {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #dbe4ee;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+.lens-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+.lens-head h3 {
+  margin: 5px 0 0;
+  color: #16211d;
+  font-size: 18px;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+.lens-badge {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #ecfeff;
+  border: 1px solid #a5f3fc;
+  color: #155e75;
+  font-size: 11px;
+  font-weight: 900;
+}
+.professor-note {
+  margin: 12px 0 0;
+  padding: 12px;
+  border-left: 3px solid #0f766e;
+  border-radius: 8px;
+  background: #f0fdfa;
+  color: #31554d;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+.benchmark-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.benchmark-card {
+  min-height: 174px;
+  padding: 13px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+}
+.benchmark-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 9px;
+}
+.benchmark-card-top span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+.benchmark-card-top b {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 10.5px;
+}
+.benchmark-card strong {
+  display: block;
+  color: #0f172a;
+  font-size: 19px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.benchmark-card p {
+  margin: 8px 0 6px;
+  color: #475569;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.benchmark-card small {
+  display: block;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.benchmark-caveats {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.benchmark-caveats span {
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #7c2d12;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.lens-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.lens-section {
+  padding: 14px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+}
+.lens-section span {
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.lens-section h4 {
+  margin: 7px 0 8px;
+  color: #16211d;
+  font-size: 16px;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+.lens-section p {
+  margin: 0 0 10px;
+  color: #405149;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.lens-section ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #334155;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+.lens-section li { margin-bottom: 5px; }
+.professor-lens .lens-section { background: #f7fee7; border-color: #d9f99d; }
+.professor-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.professor-action-grid .release-block {
+  padding: 13px;
+  border-top: none;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+}
 .model-lens-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -955,12 +1158,15 @@ button { font-family: inherit; cursor: pointer; }
   .capability-map { grid-template-columns: 1fr; }
 }
 @media (max-width: 980px) {
-  .model-focus-grid, .model-profile-grid, .model-lens-row, .learning-list.visual, .update-list.visual, .next-step-grid {
+  .model-focus-grid, .model-profile-grid, .model-lens-row, .benchmark-grid, .lens-section-grid, .professor-action-grid, .learning-list.visual, .update-list.visual, .next-step-grid {
     grid-template-columns: 1fr;
   }
+  .lens-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 680px) {
   .workspace-tabs { display: grid; grid-template-columns: 1fr; width: 100%; }
+  .lens-tabs { grid-template-columns: 1fr; }
+  .lens-head { flex-direction: column; }
   .series-rail { grid-template-columns: 1fr; }
   .model-profile-head { flex-direction: column; }
   .model-profile-head h2 { font-size: 24px; }

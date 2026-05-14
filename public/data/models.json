@@ -11,7 +11,12 @@
       "oneSentenceTakeaway": "DeepSeek 的主线不是单纯堆参数，而是在开源、低成本、推理、长上下文和 agent 工具使用之间连续优化。",
       "whyItMatters": "它给学生提供了一个很适合学习的样本：同一家公司如何把基础模型、推理模型、API 成本、上下文工程和 agent 能力逐步串成一条产品路线。",
       "contentType": "model",
-      "targetAudience": ["AI 学生", "模型应用开发者", "Agent 工程学习者", "开源模型观察者"],
+      "targetAudience": [
+        "AI 学生",
+        "模型应用开发者",
+        "Agent 工程学习者",
+        "开源模型观察者"
+      ],
       "readingTime": "15 min",
       "actionLabel": "学习 DeepSeek 路线",
       "impactScore": 92,
@@ -22,7 +27,14 @@
       "recommendedAction": "read",
       "sourceName": "DeepSeek API Docs",
       "sourceUrl": "https://api-docs.deepseek.com/",
-      "tags": ["China", "Open Source", "Agent", "AI Coding", "Local AI", "Research"],
+      "tags": [
+        "China",
+        "Open Source",
+        "Agent",
+        "AI Coding",
+        "Local AI",
+        "Research"
+      ],
       "nextSteps": [
         "先看 R 系列，理解为什么 DeepSeek 要把强化学习推理单独做成一条线。",
         "再看 V 系列，理解通用模型如何逐步吸收推理、长上下文和工具调用能力。",
@@ -98,10 +110,14 @@
                 "拿 R1 蒸馏模型和 R1 原模型做同题对比，分析哪些推理习惯被保留下来。"
               ],
               "api": {
-                "modelNames": ["deepseek-reasoner"],
+                "modelNames": [
+                  "deepseek-reasoner"
+                ],
                 "contextWindow": "官方发布时以 thinking mode API 暴露，后续由新模型兼容路由承接。",
                 "maxOutput": "发布页给出推理 API 价格，具体上下文与输出上限以后续 pricing 页面为准。",
-                "modes": ["Thinking"]
+                "modes": [
+                  "Thinking"
+                ]
               },
               "teacherNote": "R1 的学习价值不在于记住它打败谁，而在于看懂推理模型为什么会成为和聊天模型不同的产品类别。",
               "sources": [
@@ -122,6 +138,100 @@
                 "why": "R1 首发证明了推理能力，但要进入更多真实应用，就必须让输出更可控、工具调用更稳定、误答更少。",
                 "solvedBy": "通过模型更新和接口能力补齐，让推理模型更容易接入工程系统，而不只是做问答评测。",
                 "teacherNote": "这一步说明模型发布后的第一轮迭代，常常不是架构革命，而是把研究能力修成产品能力。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "R1 发布时最重要的信号不是单项第一，而是开源推理模型第一次在数学、代码、复杂推理上接近 OpenAI o1。",
+                  "professorNote": "看 R1 的 benchmark，先看任务类型：AIME/MATH 测数学推理，Codeforces/SWE-bench 测代码和工程，GPQA/MMLU-Pro 测知识型复杂推理。它的历史意义来自“开放权重 + 推理能力接近闭源前沿”的组合。",
+                  "caveats": [
+                    "官方表格使用固定采样设置，不等于你本地一次调用的稳定体验。",
+                    "R1 的强项集中在可验证推理，日常问答、工具调用、多轮产品体验需要另看。"
+                  ],
+                  "items": [
+                    {
+                      "label": "AIME 2024",
+                      "score": "79.8% Pass@1",
+                      "comparator": "官方表格显示略高于 OpenAI o1-1217 的 79.2%",
+                      "interpretation": "数学竞赛题是 R1 最能体现 test-time reasoning 的场景，说明它会用更长推理链换正确率。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "MATH-500",
+                      "score": "97.3% Pass@1",
+                      "comparator": "官方表格显示高于 OpenAI o1-1217 的 96.4%",
+                      "interpretation": "这类题有明确答案，特别适合强化学习用 reward 推动模型形成自检和反思。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Codeforces",
+                      "score": "2029 rating / 96.3 percentile",
+                      "comparator": "接近 OpenAI o1-1217 的 2061 rating / 96.6 percentile",
+                      "interpretation": "R1 已经进入强算法竞赛模型区间，但仍不是完整软件工程 agent。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "SWE-bench Verified",
+                      "score": "49.2% resolved",
+                      "comparator": "官方表格显示与 Claude 3.5 Sonnet、OpenAI o1 同一梯队",
+                      "interpretation": "说明 R1 有代码修复能力，但真实工程还受工具链、上下文、脚手架影响。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "R1 不是从零发明一个新 Transformer，而是在 DeepSeek-V3-Base 的 MoE 底座上做推理后训练。",
+                  "professorNote": "把它想成两层：底座负责语言和知识，后训练负责“遇到难题时先思考、检查、再回答”的行为。R1-Zero 证明 RL 可以直接诱发推理，R1 再加入 cold-start 数据让推理更可读、更稳定。",
+                  "bullets": [
+                    "底座沿用 DeepSeek-V3-Base，官方给出的 R1/R1-Zero 为 671B total、37B activated、128K context。",
+                    "R1-Zero 先做大规模 RL，不依赖 SFT 作为预备步骤，观察到自我验证、反思、长 CoT 等行为。",
+                    "正式 R1 在 RL 前加入 cold-start 数据，并用多阶段 SFT/RL 改善可读性、语言混杂和偏好对齐。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "它的思路来源是 o1 式 test-time compute，但 DeepSeek 把问题改写成开放权重和可复现实验。",
+                  "professorNote": "闭源模型只告诉你“推理很强”，R1 更适合学生学习，因为你能看到训练路线：从 base model、RL、cold-start、distillation 到小模型。",
+                  "bullets": [
+                    "核心问题是：推理能力能不能不是靠人工写满 CoT，而是靠可验证 reward 学出来。",
+                    "R1 把“推理模型”从闭源体验变成可研究对象，让学生能比较 RL、SFT、蒸馏各自的作用。",
+                    "R1 到 R1-0528 的关系不是换代架构，而是把初代研究模型往更可用的产品模型打磨。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "R1 的训练方式重点在后训练 pipeline，而不是公开一个完整预训练数据配方。",
+                  "professorNote": "学生要抓住“可验证任务”的价值：数学和代码能自动判对错，所以 reward 比主观问答更可靠。",
+                  "bullets": [
+                    "R1-Zero：直接在 base model 上做 RL，先验证纯 RL 能否诱发推理。",
+                    "R1：加入 cold-start 数据，再经过推理 RL、拒绝采样/SFT、偏好对齐等阶段。",
+                    "蒸馏路线：用 R1 生成推理数据，微调 Qwen/Llama 系列小模型，证明大模型推理模式可以迁移。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "R1 的创新点是把推理行为、开放权重和蒸馏路线同时推到前台。",
+                  "professorNote": "如果只看分数，你会错过它真正改变行业的地方：以后大家不只问“模型多大”，还会问“训练时怎样激发推理，推理时愿意花多少 token”。",
+                  "bullets": [
+                    "首次开放展示纯 RL 可激发推理行为的研究路线。",
+                    "把 reasoning model 从闭源体验变成可下载、可蒸馏、可复现的研究材料。",
+                    "让小模型通过蒸馏获得强推理能力，降低学习和部署门槛。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "R1 的局限来自推理模型本身：慢、长、成本高，而且不等于 agent。",
+                  "professorNote": "要训练判断力：R1 很强，但不要把“数学 benchmark 强”自动翻译成“任何任务都强”。不同任务的 reward、上下文、工具链完全不同。",
+                  "bullets": [
+                    "R1-Zero 暴露过 endless repetition、readability 差、语言混杂等问题，R1 缓解但不代表完全消失。",
+                    "长 CoT 会增加 token 成本和延迟，用户体验不一定优于更短的通用模型。",
+                    "工具调用、多步 agent、前端交互不是 R1 首发时的主要优化目标。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "学 R1，要把它当作“强化学习如何塑造模型行为”的案例。",
+                  "professorNote": "我会让学生做三件事：复盘官方 benchmark，读训练 pipeline，然后自己设计小实验比较普通提示词、强制思考、蒸馏模型的差异。",
+                  "bullets": [
+                    "问：为什么数学和代码适合做推理 RL？因为答案更容易被程序或规则验证。",
+                    "问：为什么要 cold-start？因为纯 RL 可能学会解决题，但表达和对齐不稳定。",
+                    "问：为什么蒸馏重要？因为它把昂贵大模型的推理轨迹变成小模型可学习的数据。"
+                  ]
+                }
               }
             },
             {
@@ -155,10 +265,14 @@
                 "对比 R1 和 R1-0528 在同一前端代码任务上的可用性。"
               ],
               "api": {
-                "modelNames": ["deepseek-reasoner"],
+                "modelNames": [
+                  "deepseek-reasoner"
+                ],
                 "contextWindow": "官方说明 API 用法不变。",
                 "maxOutput": "以后续 pricing 页面为准。",
-                "modes": ["Thinking"]
+                "modes": [
+                  "Thinking"
+                ]
               },
               "teacherNote": "R1-0528 是一次很典型的模型产品化更新：不是换名字，而是把研究模型接进工程接口。",
               "sources": [
@@ -170,7 +284,101 @@
                   "name": "DeepSeek-R1-0528 Weights",
                   "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528"
                 }
-              ]
+              ],
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "R1-0528 是一次推理模型产品化更新：官方强调 benchmark 提升、前端能力、幻觉降低，以及 JSON/function calling 支持。",
+                  "professorNote": "这类版本不要只问“架构换了吗”，要问“官方承诺改善了哪些失败模式，证据是什么，用户会在哪些任务上感觉到”。",
+                  "caveats": [
+                    "发布页给出方向性描述和图表，但没有像 R1 README 那样在正文列完整可复制表格。",
+                    "function calling/JSON 支持提升的是可集成性，不等同于模型在所有 agent 环境中都可靠。"
+                  ],
+                  "items": [
+                    {
+                      "label": "Benchmark refresh",
+                      "score": "官方称 improved benchmark performance",
+                      "comparator": "相对 DeepSeek-R1",
+                      "interpretation": "这说明 DeepSeek 把 R1 的研究能力继续向稳定能力打磨，但要结合图表和实际任务验证。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Front-end capability",
+                      "score": "官方称 enhanced front-end capabilities",
+                      "comparator": "相对 DeepSeek-R1",
+                      "interpretation": "前端能力是从“会写代码”走向“会产出可运行界面”的重要应用信号。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Hallucination",
+                      "score": "官方称 reduced hallucinations",
+                      "comparator": "相对 DeepSeek-R1",
+                      "interpretation": "推理模型如果更会解释但事实不稳，产品价值会下降；降低幻觉是走向日常使用的必要改进。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Structured output",
+                      "score": "JSON output & function calling",
+                      "comparator": "R1 首发时更偏推理研究模型",
+                      "interpretation": "结构化输出让模型更容易接进工作流、工具和应用后端。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "R1-0528 没有公开成一个全新架构世代，更像是在 R1 路线上做能力和接口加固。",
+                  "professorNote": "很多模型版本不是“重新发明模型”，而是通过数据、后训练、解码策略、服务接口把失败率压低。学生要学会区分架构创新和产品硬化。",
+                  "bullets": [
+                    "延续 R1 推理模型路线，官方没有宣布全新的底层架构。",
+                    "重点变化落在 benchmark、前端生成、幻觉控制、JSON/function calling 等使用层能力。",
+                    "API 使用方式保持不变，说明它更像一次兼容升级。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "它承接 R1 的推理优势，把“强但研究味重”的模型往真实应用里推。",
+                  "professorNote": "R1-0528 的设计动机可以用一句话理解：用户不只需要会想，还需要输出稳定、能被程序消费、能减少事实错误。",
+                  "bullets": [
+                    "R1 证明推理能力，R1-0528 解决推理模型接入应用时的稳定性问题。",
+                    "function calling 和 JSON 输出让模型从聊天窗口进入软件系统。",
+                    "前端能力增强说明 DeepSeek 开始重视代码产物的可视化和可运行结果。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "官方没有公开完整训练数据细节，但变化大概率来自后训练数据和偏好优化。",
+                  "professorNote": "在缺少论文级细节时不要硬猜。我们可以判断“它优化了什么行为”，但要明确哪些是官方事实，哪些是合理推断。",
+                  "bullets": [
+                    "官方事实：benchmark、前端、幻觉、结构化输出能力被点名改善。",
+                    "合理推断：需要更多前端任务、结构化输出任务和事实性偏好数据来支撑这些变化。",
+                    "学生应该记录：哪些能力有数字表格，哪些只有发布页陈述。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "R1-0528 的创新不在“新理论”，而在把 reasoning model 变成更能接入产品的模型。",
+                  "professorNote": "产品化更新同样值得学：真正有用的模型不是只赢 benchmark，还要减少集成成本、降低失败率。",
+                  "bullets": [
+                    "把 JSON/function calling 放进 R 系列推理模型能力范围。",
+                    "强调前端能力，说明代码生成正在从算法题走向应用界面。",
+                    "降低幻觉是从“会解释”走向“可依赖”的关键。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "R1-0528 仍然继承 R 系列的成本和任务边界。",
+                  "professorNote": "版本更新不等于所有问题消失。学生做评估时要复测自己的任务：前端、JSON、事实问答、工具调用都要单独验。",
+                  "bullets": [
+                    "发布页没有完整披露训练配方和所有 benchmark 数字，外部复验很重要。",
+                    "结构化输出支持不代表复杂工具链规划就可靠。",
+                    "推理模式仍可能带来更高 token 成本和延迟。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "学 R1-0528，要学习“模型迭代如何从研究指标走向产品失败模式”。",
+                  "professorNote": "我会让你列一张表：R1 的典型失败、R1-0528 官方说解决了什么、你准备用什么测试复验。",
+                  "bullets": [
+                    "把 benchmark 提升和真实任务体验分开评估。",
+                    "用同一组前端 prompt 比较 R1 与 R1-0528 的可运行率。",
+                    "测试 JSON schema、function calling 参数稳定性和失败恢复。"
+                  ]
+                }
+              }
             }
           ]
         },
@@ -212,10 +420,16 @@
                 "用 128K 级长文档做问答，记录上下文越长时答案是否更可靠。"
               ],
               "api": {
-                "modelNames": ["deepseek-chat", "deepseek-reasoner"],
+                "modelNames": [
+                  "deepseek-chat",
+                  "deepseek-reasoner"
+                ],
                 "contextWindow": "128K",
                 "maxOutput": "以后续 pricing 页面为准。",
-                "modes": ["Non-Thinking", "Thinking"]
+                "modes": [
+                  "Non-Thinking",
+                  "Thinking"
+                ]
               },
               "teacherNote": "V3.1 是从模型到产品的关键节点：能力不是越强越好，而是要能被用户按场景控制。",
               "sources": [
@@ -236,6 +450,93 @@
                 "why": "当上下文和 agent 任务变长，注意力成本会成为价格、延迟和吞吐的核心瓶颈。",
                 "solvedBy": "用细粒度稀疏注意力尽量保持输出质量，同时降低长上下文训练和推理成本。",
                 "teacherNote": "从 V3.1 到 V3.2-Exp，要看懂为什么“更长上下文”最终会变成“注意力效率”问题。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "V3.1 的 benchmark 重点是 agent 方向：更快 thinking、更强工具使用、多步任务表现，而不是单纯再刷数学题。",
+                  "professorNote": "V3.1 是 DeepSeek 把 R 系列推理能力吸收到通用模型里的关键节点。读它要关注“同一个模型如何在 Think/Non-Think 两种模式间切换”。",
+                  "caveats": [
+                    "发布页正文更多是能力方向和图表，没有给出完整可复制 benchmark 表。",
+                    "SWE/Terminal-Bench 类任务强依赖执行环境和 scaffolding，不能只看模型裸能力。"
+                  ],
+                  "items": [
+                    {
+                      "label": "Hybrid inference",
+                      "score": "Think / Non-Think 双模式",
+                      "comparator": "R1 系列需要更明确地作为 reasoning model 使用",
+                      "interpretation": "用户可以按任务成本选择是否启用深度推理，这是通用模型产品化的关键。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Thinking efficiency",
+                      "score": "官方称 V3.1-Think 比 R1-0528 更快到达答案",
+                      "comparator": "DeepSeek-R1-0528",
+                      "interpretation": "不是所有推理都要更长，好的推理模型应该学会把 token 花在必要地方。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Agent tasks",
+                      "score": "官方称 SWE / Terminal-Bench 更强",
+                      "comparator": "V3 及 R1 路线的早期形态",
+                      "interpretation": "DeepSeek 开始把评估重心从单题推理转向多步工具环境。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "V3.1 的关键设计是一个通用模型同时支持 Think 和 Non-Think。",
+                  "professorNote": "把 V3.1 想成“通用底座 + 可切换推理模式”。这比把 chat model 和 reasoner 完全分开更符合产品使用：简单问题别浪费推理，复杂任务再打开。",
+                  "bullets": [
+                    "官方 API 将 deepseek-chat 映射到 non-thinking mode，将 deepseek-reasoner 映射到 thinking mode。",
+                    "两种模式都支持 128K context，降低从聊天到推理的迁移成本。",
+                    "V3.1 Base 在 V3 上做 840B tokens continued pretraining，用于长上下文扩展。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "V3.1 是 R 系列和 V 系列开始合流的版本。",
+                  "professorNote": "这里的设计来源很清楚：R 系列证明 reasoning 有价值，V 系列要把它变成通用模型的一个可调能力。",
+                  "bullets": [
+                    "从 R1 学到：复杂任务需要显式推理。",
+                    "从 V 系列学到：日常应用需要低延迟、长上下文和兼容 API。",
+                    "V3.1 把两者结合成“一个模型，两种推理预算”。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "V3.1 公开强调 continued pretraining 与 agent/tool-use post-training。",
+                  "professorNote": "预训练解决“看过更多、上下文更长”，后训练解决“怎么用工具、怎么分步骤做任务”。这两个层次要分清。",
+                  "bullets": [
+                    "官方说明 V3.1 Base 在 V3 上继续预训练 840B tokens，用于长上下文扩展。",
+                    "post-training 提升工具使用和多步 agent 任务。",
+                    "tokenizer 和 chat template 更新，说明接口格式本身也是模型行为的一部分。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "V3.1 的创新是把推理预算产品化。",
+                  "professorNote": "模型产品不只是参数和分数，还包括用户如何控制成本、速度和准确率。Think/Non-Think 就是一个很好的控制旋钮。",
+                  "bullets": [
+                    "同一模型支持双模式，减少模型选择复杂度。",
+                    "把 Anthropic API、strict function calling 等集成能力纳入发布重点。",
+                    "将 DeepSeek 的路线从“模型能力”推进到“agent 基础设施”。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "V3.1 的复杂性来自模式选择和 agent 评估。",
+                  "professorNote": "如果用户不会判断何时 Think，双模式会变成新负担。所以产品层需要默认策略、成本提示和失败回退。",
+                  "bullets": [
+                    "Think 模式更贵更慢，Non-Think 在复杂任务上可能不够。",
+                    "128K context 只是容量，不保证模型能正确检索和使用全部信息。",
+                    "工具调用能力需要真实执行环境测试，单纯聊天结果不够。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "学 V3.1，要学“推理预算控制”。",
+                  "professorNote": "我会让学生同一任务跑三遍：不开 Think、开 Think、拆成工具任务。比较答案质量、token、延迟和失败模式。",
+                  "bullets": [
+                    "理解 Think/Non-Think 是模型使用策略，不只是 UI 按钮。",
+                    "学会把 agent benchmark 和真实工具链区别开。",
+                    "观察长上下文是否真的被利用，而不是只塞进去。"
+                  ]
+                }
               }
             },
             {
@@ -270,10 +571,16 @@
                 "阅读技术报告，画出 DSA 想减少哪些注意力计算。"
               ],
               "api": {
-                "modelNames": ["deepseek-chat", "deepseek-reasoner"],
+                "modelNames": [
+                  "deepseek-chat",
+                  "deepseek-reasoner"
+                ],
                 "contextWindow": "延续长上下文方向，具体以发布和 pricing 页面为准。",
                 "maxOutput": "以后续 pricing 页面为准。",
-                "modes": ["Non-Thinking", "Thinking"]
+                "modes": [
+                  "Non-Thinking",
+                  "Thinking"
+                ]
               },
               "teacherNote": "V3.2-Exp 是理解 DeepSeek 工程取向的关键：它把模型能力、GPU kernel、API 价格放在同一个问题里解决。",
               "sources": [
@@ -294,6 +601,93 @@
                 "why": "agent 的难点不是单次回答，而是边思考边调用工具、读取结果、继续修正计划。",
                 "solvedBy": "用覆盖 1,800+ 环境和 85k+ 复杂指令的大规模 agent 训练数据，训练模型在工具使用过程中保持推理。",
                 "teacherNote": "这里能看到实验版到正式版的转换：效率底座稳定后，产品目标转向真实 agent 任务。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "V3.2-Exp 的核心 benchmark 不是“更聪明多少”，而是“长上下文效率提升且质量基本持平”。",
+                  "professorNote": "这是学习模型工程很重要的一课：当模型已经很强，下一代优化常常是成本、速度、上下文，而不是每个能力分数都暴涨。",
+                  "caveats": [
+                    "这是 experimental release，官方自己也把它定位为实验模型。",
+                    "稀疏注意力的真实收益要在长上下文、长输出和生产负载里验证。"
+                  ],
+                  "items": [
+                    {
+                      "label": "Quality retention",
+                      "score": "官方称 benchmarks on par with V3.1-Terminus",
+                      "comparator": "DeepSeek-V3.1-Terminus",
+                      "interpretation": "如果质量近似不掉，注意力效率优化就有实际价值。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "API cost",
+                      "score": "API prices cut by 50%+",
+                      "comparator": "此前 API 价格",
+                      "interpretation": "成本下降会改变可用场景：长上下文 agent、批量分析、低价应用都更现实。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Long-context efficiency",
+                      "score": "DSA reduces compute cost with minimal quality impact",
+                      "comparator": "标准稠密注意力路线",
+                      "interpretation": "这里看的是单位 token 成本和长上下文可扩展性，不只是准确率。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "V3.2-Exp 引入 DeepSeek Sparse Attention，把长上下文的注意力计算变稀疏。",
+                  "professorNote": "普通注意力的问题是上下文越长，计算和显存压力急剧上升。DSA 的直觉是：不是每个 token 都需要和所有 token 同等交互。",
+                  "bullets": [
+                    "官方称 DSA 实现 fine-grained sparse attention，重点优化长上下文训练和推理效率。",
+                    "模型基于 V3.1-Terminus，引入结构性效率实验。",
+                    "DeepSeek 同步开源模型和 TileLang/CUDA GPU kernels，方便社区研究实现细节。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "V3.2-Exp 是从 V3.1 的 agent/长上下文需求自然长出来的效率版本。",
+                  "professorNote": "agent 会吃大量上下文：代码库、网页、日志、工具返回。没有注意力效率，agent 越强越贵。",
+                  "bullets": [
+                    "V3.1 把模型推向 agent era，V3.2-Exp 解决 agent 时代的长上下文成本。",
+                    "它把优化目标从单点能力转向 cost-performance。",
+                    "这也为 V3.2 和 V4 的更长上下文路线铺路。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "V3.2-Exp 的公开重点在结构和效率，训练数据细节不是发布页主角。",
+                  "professorNote": "当官方重点讲 attention 和 kernel，就说明这一版最值得学习的是系统/架构，而不是数据配方。",
+                  "bullets": [
+                    "基于 V3.1-Terminus 的能力延续，目标是少损质量换效率。",
+                    "需要长上下文任务来验证 DSA 是否真的保持关键信息检索。",
+                    "实验版适合做 A/B：同 prompt、同上下文长度，对比质量、延迟和成本。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "V3.2-Exp 的创新是把稀疏注意力作为面向生产成本的模型能力。",
+                  "professorNote": "很多学生只关注“模型会不会”，但工程上同样重要的是“会不会便宜地、稳定地、长时间地做”。",
+                  "bullets": [
+                    "DSA 让长上下文从高成本能力变成可规模化能力。",
+                    "开源 kernels 提高了研究透明度，也帮助开发者理解性能来自哪里。",
+                    "配合 50%+ API 降价，模型更新直接影响产品可行性。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "稀疏注意力的风险是边缘信息可能被低估，实验模型也需要生产复验。",
+                  "professorNote": "你要问：它省掉的注意力有没有刚好省掉任务需要的证据？这就是长上下文评估的核心。",
+                  "bullets": [
+                    "质量“基本持平”不代表所有长上下文检索场景都稳定。",
+                    "实验模型可能存在格式、兼容性或极端上下文失败。",
+                    "成本下降也可能诱导用户塞入过多无关上下文，反而降低答案质量。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "学 V3.2-Exp，要从 benchmark 转向 cost-quality curve。",
+                  "professorNote": "我会让学生做一个实验：固定答案质量阈值，看 V3.2-Exp 相对 V3.1-Terminus 能省多少成本和延迟。",
+                  "bullets": [
+                    "理解 attention 复杂度为什么是长上下文瓶颈。",
+                    "用长文档问答和代码库检索测试“省计算后有没有丢证据”。",
+                    "把价格变化纳入模型评估，而不是只看排行榜。"
+                  ]
+                }
               }
             },
             {
@@ -328,10 +722,18 @@
                 "让模型在工具结果冲突时做判断，观察它是否盲信工具输出。"
               ],
               "api": {
-                "modelNames": ["deepseek-chat", "deepseek-reasoner", "DeepSeek-V3.2-Speciale temporary endpoint"],
+                "modelNames": [
+                  "deepseek-chat",
+                  "deepseek-reasoner",
+                  "DeepSeek-V3.2-Speciale temporary endpoint"
+                ],
                 "contextWindow": "沿用 V3.2-Exp 使用方式，具体以官方 API 文档为准。",
                 "maxOutput": "以后续 pricing 页面为准。",
-                "modes": ["Non-Thinking", "Thinking", "Speciale API-only"]
+                "modes": [
+                  "Non-Thinking",
+                  "Thinking",
+                  "Speciale API-only"
+                ]
               },
               "teacherNote": "V3.2 是学生理解 agent 模型的好入口：真正的 agent 能力是在工具循环中保持推理，而不是会输出一个函数名。",
               "sources": [
@@ -352,6 +754,100 @@
                 "why": "agent 场景需要同时处理更大上下文、更低价格、更快响应和不同用户预算。",
                 "solvedBy": "用 Pro/Flash 分层覆盖高能力和高性价比场景，用 token-wise compression + DSA 降低超长上下文成本。",
                 "teacherNote": "V3.2 到 V4 是从“会在工具中思考”走向“把长上下文 agent 变成默认产品”。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "V3.2 的 benchmark 信号是“GPT-5 级日常主力 + agent/tool-use 训练 + Speciale 冲高推理”。",
+                  "professorNote": "V3.2 要分开看：普通 V3.2 是日常 driver，Speciale 是高 token、高推理的研究/竞赛版本。不要把两者混成一个产品体验。",
+                  "caveats": [
+                    "V3.2-Speciale 官方说明更强但 token 使用更高，且当时 API-only、无 tool-use。",
+                    "Hugging Face evaluation results 可能来自平台评测，不完全等同官方发布图表。"
+                  ],
+                  "items": [
+                    {
+                      "label": "SWE-bench Verified",
+                      "score": "70.0 resolved",
+                      "comparator": "Hugging Face evaluation results for DeepSeek-V3.2",
+                      "interpretation": "这是从代码生成走向真实 issue 修复的重要指标，说明 V3.2 已进入强 coding agent 底座范围。",
+                      "sourceType": "third-party"
+                    },
+                    {
+                      "label": "GPQA Diamond",
+                      "score": "82.4",
+                      "comparator": "Hugging Face evaluation results for DeepSeek-V3.2",
+                      "interpretation": "GPQA 更偏研究生级科学问答，能补充数学/代码以外的复杂知识推理视角。",
+                      "sourceType": "third-party"
+                    },
+                    {
+                      "label": "MMLU-Pro",
+                      "score": "85.0",
+                      "comparator": "Hugging Face evaluation results for DeepSeek-V3.2",
+                      "interpretation": "这显示通用复杂知识能力继续保持高位，是“日常主力模型”的基础。",
+                      "sourceType": "third-party"
+                    },
+                    {
+                      "label": "MathArena AIME 2026",
+                      "score": "94.17",
+                      "comparator": "Hugging Face evaluation results for DeepSeek-V3.2",
+                      "interpretation": "数学推理继续强，但这一版更重要的是把 reasoning 接到工具使用。",
+                      "sourceType": "third-party"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "V3.2 延续 V3.2-Exp 的结构，并把“thinking in tool-use”变成核心能力。",
+                  "professorNote": "很多模型能先想再答，也能调用工具；V3.2 的关键是让模型在工具使用过程中也保持推理状态。",
+                  "bullets": [
+                    "官方称 V3.2 是 V3.2-Exp 的正式继任者，模型结构与 V3.2-Exp / Speciale 保持一致。",
+                    "V3.2 同时支持 thinking 和 non-thinking 两种模式下的 tool-use。",
+                    "Speciale 面向最高推理能力，但官方说明不支持 tool calling。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "V3.2 把 V3.1 的双模式和 V3.2-Exp 的效率路线合并到 agent 模型上。",
+                  "professorNote": "它不是单纯“V3.1 分数更高版”。它回答的问题是：模型能不能一边思考，一边使用外部工具完成复杂任务？",
+                  "bullets": [
+                    "从 V3.1 继承 Think/Non-Think 产品模式。",
+                    "从 V3.2-Exp 继承 DSA 与长上下文效率思路。",
+                    "新增大规模 agentic task synthesis，把推理训练推进到交互环境。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "V3.2 公开强调大规模 agent 任务合成数据：1,800+ 环境与 85k+ 复杂指令。",
+                  "professorNote": "这是 agent 时代的数据观：不是只喂文本答案，而是构造环境、工具、状态和目标，让模型练习完整任务过程。",
+                  "bullets": [
+                    "官方称使用覆盖 1,800+ environments 与 85k+ complex instructions 的 agent training data synthesis method。",
+                    "目标是把 reasoning 集成进 tool-use，而不是只在最后输出答案。",
+                    "post-training 重点从单题推理扩展到合规、泛化和复杂交互。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "V3.2 的创新是“推理 + 工具使用”的耦合。",
+                  "professorNote": "Agent 的难点不只是会调用函数，而是知道什么时候查、怎么查、查完如何更新计划。V3.2 正是在这个层面前进。",
+                  "bullets": [
+                    "thinking in tool-use 将 reasoning 融入工具调用流程。",
+                    "Speciale 让 DeepSeek 同时保留“日常 agent 模型”和“高推理研究模型”。",
+                    "用合成环境规模化 agent 后训练，解决真实环境数据昂贵的问题。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "V3.2 的限制在于工具链可靠性、Speciale 的使用边界和高 token 成本。",
+                  "professorNote": "模型会调用工具不代表 agent 系统安全可靠。工具权限、状态管理、错误恢复、审计日志仍然是工程问题。",
+                  "bullets": [
+                    "Speciale 推理强但 token 使用更高，并且不支持 tool-use。",
+                    "工具使用能力依赖外部执行环境，benchmark 与你的应用环境可能差异很大。",
+                    "合成 agent 数据能扩大覆盖，但仍需要真实任务复验。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "学 V3.2，要从“模型答题”升级到“模型完成任务”。",
+                  "professorNote": "我会让学生做一个小 agent：读文件、调用搜索、写结果。然后比较普通 V3.2、thinking mode、Speciale 的成本和成功率。",
+                  "bullets": [
+                    "学会评估 tool-use：成功率、步骤数、错误恢复，而不是只看最终文本。",
+                    "区分 daily driver 与 high-compute reasoning model 的定位。",
+                    "理解合成环境为什么能训练 agent，但也为什么需要真实世界回归测试。"
+                  ]
+                }
               }
             },
             {
@@ -387,10 +883,16 @@
                 "把旧 `deepseek-chat` / `deepseek-reasoner` 调用迁移到 `deepseek-v4-flash` / `deepseek-v4-pro`，记录行为差异。"
               ],
               "api": {
-                "modelNames": ["deepseek-v4-pro", "deepseek-v4-flash"],
+                "modelNames": [
+                  "deepseek-v4-pro",
+                  "deepseek-v4-flash"
+                ],
                 "contextWindow": "1M",
                 "maxOutput": "384K",
-                "modes": ["Non-Thinking", "Thinking"]
+                "modes": [
+                  "Non-Thinking",
+                  "Thinking"
+                ]
               },
               "teacherNote": "V4 最值得学的是产品工程：同一代模型同时处理参数规模、活跃参数、上下文、价格、API 兼容和 agent 场景。",
               "sources": [
@@ -406,7 +908,108 @@
                   "name": "DeepSeek-V4 Pro Technical Report",
                   "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/blob/main/DeepSeek_V4.pdf"
                 }
-              ]
+              ],
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "V4 Preview 的 benchmark 第一眼要同时看两组：DeepSeek 官方自评和 CAISI/NIST 第三方评估。",
+                  "professorNote": "最新大模型发布时，网上先传的一定是横向对比图。但作为学生，你必须问：谁测的、测什么、有没有私有 benchmark、推理档位和成本怎么算。",
+                  "caveats": [
+                    "DeepSeek 官方称 V4-Pro 接近顶级闭源模型；CAISI/NIST 认为它在非公开评测上约落后美国前沿 8 个月。两者并不矛盾，因为 benchmark 集合不同。",
+                    "V4 仍是 Preview，服务映射、旧模型退休时间和真实产品稳定性需要持续观察。"
+                  ],
+                  "items": [
+                    {
+                      "label": "SWE Verified",
+                      "score": "80.6 resolved",
+                      "comparator": "DeepSeek V4-Pro Max 官方模型卡 / HF evaluation results",
+                      "interpretation": "这是非常强的软件工程信号，说明 V4-Pro 已经瞄准 coding agent 前沿。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "GPQA Diamond",
+                      "score": "90.1 Pass@1",
+                      "comparator": "V4-Pro Max 官方模型卡表格",
+                      "interpretation": "科学复杂推理进入闭源前沿附近，但要和独立评测一起看。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Terminal Bench 2.0",
+                      "score": "67.9 accuracy",
+                      "comparator": "V4-Pro Max 官方模型卡表格",
+                      "interpretation": "Terminal Bench 更贴近 agent 在命令行环境里完成任务的能力。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "CAISI aggregate finding",
+                      "score": "约落后美国前沿 8 个月",
+                      "comparator": "NIST/CAISI 对 GPT-5.5、GPT-5.4 mini、Opus 4.6、DeepSeek V4 Pro 的评估",
+                      "interpretation": "第三方私有/半私有评测提醒我们：官方榜单强，不等于所有未见任务都同样强。",
+                      "sourceType": "third-party"
+                    },
+                    {
+                      "label": "Cost efficiency",
+                      "score": "CAISI: 7 个 benchmark 中 5 个比最具成本竞争力的美国参考模型更省",
+                      "comparator": "GPT-5.4 mini as reference in CAISI report",
+                      "interpretation": "V4 的竞争力不只是能力，还包括单位任务成本。",
+                      "sourceType": "third-party"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "V4 Preview 把 DeepSeek 路线推到 1M context、Pro/Flash 双模型和 token-wise compression + DSA。",
+                  "professorNote": "它不是单个“大模型”故事，而是一个模型产品矩阵：Pro 追能力，Flash 追速度和成本，两者都服务 1M 上下文。",
+                  "bullets": [
+                    "官方发布页写明 V4-Pro 为 1.6T total / 49B active params，V4-Flash 为 284B total / 13B active params。",
+                    "结构创新包括 token-wise compression + DSA，用来降低超长上下文计算和显存成本。",
+                    "官方服务默认 1M context，并支持 Thinking / Non-Thinking 双模式。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "V4 是 V3.2 agent 路线的放大版：更长上下文、更强 agent、更明确的产品分层。",
+                  "professorNote": "你可以把 V4 看成三个前序问题的合并答案：R1 解决推理，V3.2 解决工具使用，V3.2-Exp 解决长上下文效率，V4 把它们堆到 1M context 产品里。",
+                  "bullets": [
+                    "继承 R 系列的 reasoning 和 V3.1/V3.2 的双模式。",
+                    "继承 V3.2-Exp 的 DSA 长上下文效率路线，并加入 token-wise compression。",
+                    "把 agentic coding、Claude Code/OpenCode 等集成场景写进发布重点。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "V4 公开重点在技术报告、agent 优化和超长上下文能力，但完整训练数据配方仍需读报告和后续复验。",
+                  "professorNote": "越新的前沿模型，越要把官方 marketing、技术报告、第三方评估分层阅读。不要把一张发布图当成完整事实。",
+                  "bullets": [
+                    "官方强调 dedicated optimizations for agent capabilities，并称已用于 DeepSeek 内部 agentic coding。",
+                    "1M context 需要训练和后训练都覆盖长依赖、检索、压缩和多步任务。",
+                    "CAISI 的私有/半私有 benchmark 为官方自报之外提供了泛化能力校验。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "V4 的创新是把前沿开源权重、1M 上下文和高性价比 agent 能力同时产品化。",
+                  "professorNote": "从行业角度看，V4 最值得学的是“能力-成本-上下文”的三角平衡。单纯更强不够，还要让用户能负担得起。",
+                  "bullets": [
+                    "Pro/Flash 分层让同一代模型覆盖高能力和高效率两个市场。",
+                    "1M context 从特色功能变成官方服务默认能力。",
+                    "OpenAI ChatCompletions 与 Anthropic API 兼容降低迁移成本。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "V4 的风险是 Preview 状态、官方/第三方评测差距，以及超长上下文的真实可靠性。",
+                  "professorNote": "1M context 不是魔法。上下文越长，越要测试模型是否找得到关键证据、是否被无关内容干扰、是否能引用准确位置。",
+                  "bullets": [
+                    "CAISI/NIST 显示 V4 在 DeepSeek 自报评测上强于其非公开评测表现。",
+                    "旧 deepseek-chat / deepseek-reasoner 将在 2026-07-24 15:59 UTC 后退休，需要关注迁移。",
+                    "长上下文成本降低不等于可无限塞材料，检索、压缩、引用校验仍然必要。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "学 V4，要学会同时读官方 benchmark 和独立 benchmark。",
+                  "professorNote": "我会让学生做一个发布评测表：官方最佳分数、第三方分数、成本、上下文、API 迁移风险、你自己的任务复验结果。",
+                  "bullets": [
+                    "先看 benchmark，但不要只看最高分；看评测方、任务类型、推理档位、成本。",
+                    "用 1M context 做 retrieval stress test，检查关键证据是否被准确使用。",
+                    "把 Pro/Flash 当成产品分层案例：同一公司如何同时服务前沿能力和低成本场景。"
+                  ]
+                }
+              }
             }
           ]
         }

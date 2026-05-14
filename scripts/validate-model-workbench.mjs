@@ -7,12 +7,17 @@ const checks = [
   ["ModelWorkbench component", /function ModelWorkbench\(/],
   ["ModelMap component", /function ModelMap\(/],
   ["ModelFocusPanel component", /function ModelFocusPanel\(/],
+  ["BenchmarkLens component", /function BenchmarkLens\(/],
+  ["Lens tabs component", /function LensTabs\(/],
   ["ReleaseSwitcher component", /function ReleaseSwitcher\(/],
   ["Visual relation panel", /function VisualRelationPanel\(/],
   ["Workbench shell class", /className="model-workbench"/],
   ["Release tab buttons", /className=\{`release-tab/],
+  ["Benchmark lens class", /className="analysis-lens benchmark-lens"/],
   ["Capability map styles", /\.capability-map/],
   ["Model profile grid styles", /\.model-profile-grid/],
+  ["Lens tab styles", /\.lens-tabs/],
+  ["Benchmark card styles", /\.benchmark-card/],
   ["Relation visual styles", /\.relation-visual/],
 ];
 
