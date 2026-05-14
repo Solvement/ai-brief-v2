@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-14T18:30:00.000Z",
+  "generatedAt": "2026-05-14T21:30:00.000Z",
   "companies": [
     {
       "id": "deepseek",
@@ -1828,6 +1828,2465 @@
             {
               "name": "DeepSeek Models & Pricing",
               "url": "https://api-docs.deepseek.com/quick_start/pricing"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "shortName": "OpenAI",
+      "country": "United States",
+      "updatedAt": "2025-12-11",
+      "publishedAt": "2025-04-14",
+      "oneSentenceTakeaway": "OpenAI 的主线是把通用 GPT、推理 o 系列和 Codex 工程能力逐步收敛成一个可路由的智能工作系统。",
+      "whyItMatters": "它最适合作为学生理解闭源前沿模型工业化的样本：同一家公司如何同时推进长上下文、推理、工具调用、代码 agent、产品路由和 API 分层。",
+      "contentType": "model",
+      "targetAudience": [
+        "AI 学生",
+        "模型应用开发者",
+        "AI Coding 学习者",
+        "产品/研究观察者"
+      ],
+      "readingTime": "18 min",
+      "actionLabel": "学习 OpenAI 路线",
+      "impactScore": 96,
+      "readabilityScore": 84,
+      "actionabilityScore": 88,
+      "confidenceScore": 90,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "sourceName": "OpenAI Model Releases",
+      "sourceUrl": "https://openai.com/index/",
+      "tags": [
+        "Agent",
+        "AI Coding",
+        "Multimodal",
+        "Workflow",
+        "Business",
+        "Research"
+      ],
+      "nextSteps": [
+        "先看 GPT-4.1，理解为什么长上下文和指令跟随会变成应用开发的基础能力。",
+        "再看 o3/o4-mini，理解推理模型为什么开始和工具使用合并。",
+        "最后看 GPT-5 到 GPT-5.2，理解前沿模型从单点能力走向编码、长任务和路由系统。"
+      ],
+      "sources": [
+        {
+          "name": "GPT-4.1 Release",
+          "url": "https://openai.com/index/gpt-4-1/"
+        },
+        {
+          "name": "Introducing o3 and o4-mini",
+          "url": "https://openai.com/index/introducing-o3-and-o4-mini/"
+        },
+        {
+          "name": "Introducing GPT-5",
+          "url": "https://openai.com/index/introducing-gpt-5/"
+        },
+        {
+          "name": "Introducing GPT-5.2",
+          "url": "https://openai.com/index/introducing-gpt-5-2/"
+        }
+      ],
+      "learningPath": [
+        {
+          "title": "GPT-4.1：先学上下文工程，不要只学提示词",
+          "body": "GPT-4.1 的 1M context 和 SWE-bench 提升说明，真实应用不是只靠更聪明的回答，而是靠模型能稳定吸收大量代码、文档和历史状态。"
+        },
+        {
+          "title": "o 系列：推理不是慢一点的聊天，而是可调预算的搜索过程",
+          "body": "o3/o4-mini 让学生看到 test-time compute、工具调用和多步检查如何合并。重点不是背分数，而是理解模型为什么需要在作答时继续计算。"
+        },
+        {
+          "title": "GPT-5/5.2：前沿模型开始变成可路由系统",
+          "body": "GPT-5 之后，模型产品更像一个系统：快速模型、深度推理、代码 agent、多模态和 API 约束被统一到同一套入口里。"
+        }
+      ],
+      "series": [
+        {
+          "id": "gpt-series",
+          "title": "GPT 主线：通用智能与开发者基座",
+          "summary": "从长上下文、代码理解到前沿 agentic coding，回答的是通用模型如何成为应用平台底座。",
+          "teacherNote": "学习 GPT 主线时，不要只看最大模型。要看上下文长度、指令遵循、工具调用和代码 benchmark 如何一起影响产品可用性。",
+          "releases": [
+            {
+              "id": "openai-gpt-4-1",
+              "name": "OpenAI GPT-4.1",
+              "kind": "model",
+              "publishedAt": "2025-04-14",
+              "positioning": "面向开发者的 GPT-4 系列升级，强调 1M context、代码能力和指令遵循。",
+              "oneSentenceTakeaway": "GPT-4.1 把“更会写代码”和“能读更长工程上下文”绑定在一起，是从聊天模型走向软件协作模型的一步。",
+              "problemSolved": "GPT-4o 虽然强，但在大型仓库、长文档和严格指令任务中仍容易漏上下文或偏离格式。",
+              "keyChanges": [
+                "上下文窗口扩展到 1M tokens。",
+                "SWE-bench Verified 从 GPT-4o 的 33.2% 提到 54.6%。",
+                "更强调指令遵循和前端/代码编辑任务。"
+              ],
+              "whyChanged": "开发者场景需要模型读完整仓库、issue、日志和规范，而不是只在短上下文里生成片段。",
+              "howSolved": "通过长上下文训练、代码任务强化和指令遵循优化，让模型更像能读项目资料的协作者。",
+              "tradeoffs": [
+                "长上下文会提高输入成本和检索噪声。",
+                "不是推理模型，复杂数学/规划仍要看 o 系列或后续 GPT-5。"
+              ],
+              "studentTakeaways": [
+                "学习上下文压缩和信息选择。",
+                "用同一代码任务比较短上下文和长上下文模型。"
+              ],
+              "experiments": [
+                "把一个中型 repo 的 README、issue 和相关文件一次性喂给模型，让它定位 bug。",
+                "比较只给错误日志 vs 给完整上下文时的修复质量。"
+              ],
+              "api": {
+                "modelNames": [
+                  "gpt-4.1",
+                  "gpt-4.1-mini",
+                  "gpt-4.1-nano"
+                ],
+                "contextWindow": "1M tokens",
+                "maxOutput": "以 API 文档为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Coding"
+                ]
+              },
+              "teacherNote": "GPT-4.1 值得学的不是 1M 这个数字，而是它迫使你学习上下文工程：什么该放进去，什么该总结，什么该检索。",
+              "sources": [
+                {
+                  "name": "GPT-4.1 Release",
+                  "url": "https://openai.com/index/gpt-4-1/"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "openai-gpt-5",
+                "summary": "GPT-5 继承 GPT-4.1 的开发者基础能力，并把推理、编码和多模态统一成更强的前沿模型。",
+                "inherits": "长上下文、代码理解、指令遵循和 API 开发者定位。",
+                "changes": "从单次代码编辑提升到更强的 agentic coding 和复杂推理。",
+                "why": "真实开发任务需要跨文件规划、执行、验证，而不只是生成局部代码。",
+                "solvedBy": "通过更强的推理和编码训练，把上下文理解变成可执行的工程行动。",
+                "teacherNote": "这条关系说明：长上下文只是材料，GPT-5 试图补的是如何基于材料持续行动。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "GPT-4.1 的关键 benchmark 信号是 SWE-bench Verified 54.6%，说明它在真实代码修复上明显超过 GPT-4o。",
+                  "professorNote": "看 GPT-4.1，不要只看通用知识题。代码修复和长上下文任务更能说明它为什么对开发者重要。",
+                  "caveats": [
+                    "SWE-bench 是工程修复代理能力的代理指标，不等于所有 repo 都能自动修。",
+                    "1M context 不代表可以无脑塞入所有资料，噪声会降低判断。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "SWE-bench Verified",
+                      "metric": "Resolved tasks",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-4o",
+                          "value": 33.2,
+                          "display": "33.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "GPT-4.1",
+                          "value": 54.6,
+                          "display": "54.6%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "SWE-bench Verified",
+                      "score": "54.6%",
+                      "comparator": "官方发布中高于 GPT-4o 的 33.2%",
+                      "interpretation": "说明模型更适合真实代码库修复。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Context window",
+                      "score": "1M tokens",
+                      "comparator": "远超 GPT-4o 早期常用上下文",
+                      "interpretation": "让模型可以把仓库、规范和历史记录放入同一问题。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "长上下文代码模型",
+                  "professorNote": "从学生视角看，它的架构重点不是公开参数，而是输入长度、检索压力和代码位置感。",
+                  "bullets": [
+                    "长上下文让模型能读取更多文件。",
+                    "代码优化让它更适合 diff、测试和错误定位。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 GPT-4o 到开发者专项优化",
+                  "professorNote": "GPT-4.1 不是单纯替代 GPT-4o，而是面向 API 和工程任务的分支。",
+                  "bullets": [
+                    "延续 GPT-4o 的多模态和通用能力。",
+                    "把产品重心转向代码、指令和上下文。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "训练重点转向工程任务",
+                  "professorNote": "你应该把它理解成数据分布变化：更多仓库、补丁、指令遵循和长上下文样本。",
+                  "bullets": [
+                    "强化真实代码修改任务。",
+                    "优化长文档内信息检索。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "把上下文长度变成工程能力",
+                  "professorNote": "创新不一定是新架构，也可能是把系统约束推到可用水平。",
+                  "bullets": [
+                    "1M context 降低外部检索拼接压力。",
+                    "SWE-bench 提升让它更像开发工具。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "长上下文不是免费午餐",
+                  "professorNote": "学生最容易误解的是：上下文越长越好。实际需要选择、排序和摘要。",
+                  "bullets": [
+                    "输入成本更高。",
+                    "上下文噪声会让模型抓错重点。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "应该怎么学 GPT-4.1",
+                  "professorNote": "把它当作上下文工程课，而不是只当作新模型新闻。",
+                  "bullets": [
+                    "练习把 repo 信息切成必要上下文。",
+                    "记录同一任务在不同上下文规模下的结果。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "openai-gpt-5",
+              "name": "OpenAI GPT-5",
+              "kind": "model",
+              "publishedAt": "2025-08-07",
+              "positioning": "前沿通用模型，强调代码、推理、多模态和开发者体验的统一。",
+              "oneSentenceTakeaway": "GPT-5 的意义在于把 GPT 主线和推理/代码能力进一步合并，开始像一个统一智能层。",
+              "problemSolved": "模型用户不想在聊天、代码、推理、图像理解之间手动选择太多模型。",
+              "keyChanges": [
+                "官方强调 agentic coding、推理和前端生成。",
+                "SWE-bench Verified 达到 74.9%。",
+                "Aider polyglot 达到 88%。"
+              ],
+              "whyChanged": "前沿模型的竞争从单点问答转向长任务执行，开发者需要模型能规划、修改、验证。",
+              "howSolved": "通过更强的推理训练、代码任务训练和产品路由能力，让模型在复杂任务中更少中断。",
+              "tradeoffs": [
+                "更强模型通常成本更高。",
+                "复杂任务仍需要工具、测试和权限边界。"
+              ],
+              "studentTakeaways": [
+                "把模型当作执行系统看，而不是答案生成器。",
+                "学习如何设计验证闭环。"
+              ],
+              "experiments": [
+                "让模型实现一个小功能并写测试，记录它是否主动验证。",
+                "比较 GPT-4.1 与 GPT-5 在多文件修改任务上的差异。"
+              ],
+              "api": {
+                "modelNames": [
+                  "gpt-5",
+                  "gpt-5-mini",
+                  "gpt-5-nano"
+                ],
+                "contextWindow": "以 OpenAI API 文档为准",
+                "maxOutput": "以 OpenAI API 文档为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Coding",
+                  "Reasoning"
+                ]
+              },
+              "teacherNote": "GPT-5 的学习重点是系统化：模型、工具、测试和产品入口如何组合成一个能完成任务的回路。",
+              "sources": [
+                {
+                  "name": "Introducing GPT-5",
+                  "url": "https://openai.com/index/introducing-gpt-5/"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "openai-gpt-5-2",
+                "summary": "GPT-5.2 不是换范式，而是在 GPT-5 的基础上继续加强长程 agent、复杂推理和编码稳定性。",
+                "inherits": "继承 GPT-5 的统一前沿模型定位和 agentic coding 路线。",
+                "changes": "更强调 professional knowledge work、长程任务和更高推理 benchmark。",
+                "why": "用户开始把模型用于真实工作流，失败点从“不会答”转为“长任务中途偏航”。",
+                "solvedBy": "提高复杂任务 benchmark、工具使用可靠性和长期上下文内的目标保持能力。",
+                "teacherNote": "这是从“会做”到“更稳定地做完”的迭代。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "GPT-5 发布时最醒目的信号是代码和长任务能力：SWE-bench Verified 74.9%，Aider polyglot 88%。",
+                  "professorNote": "GPT-5 的 benchmark 应该按任务类型读：SWE-bench 看修 bug，Aider 看跨语言编辑，推理题看是否能保持多步检查。",
+                  "caveats": [
+                    "官方 benchmark 不等于你的 IDE 代理会自动成功。",
+                    "真实工程还取决于上下文、工具、权限和测试质量。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Agentic coding",
+                      "metric": "Benchmark score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-4.1 SWE",
+                          "value": 54.6,
+                          "display": "54.6%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "GPT-5 SWE",
+                          "value": 74.9,
+                          "display": "74.9%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "GPT-5 Aider",
+                          "value": 88,
+                          "display": "88.0%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "SWE-bench Verified",
+                      "score": "74.9%",
+                      "comparator": "高于 GPT-4.1 的 54.6%",
+                      "interpretation": "表明跨文件 bug 修复能力显著提升。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Aider polyglot",
+                      "score": "88%",
+                      "comparator": "官方开发者发布强调的代码编辑指标",
+                      "interpretation": "说明它更适合多语言真实项目编辑。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "统一前沿模型",
+                  "professorNote": "GPT-5 的公开信息更强调系统能力，而不是公开底层结构。",
+                  "bullets": [
+                    "统一处理代码、文本、视觉和推理。",
+                    "通过产品层路由不同任务预算。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 GPT-4.1 到更强 agentic coding",
+                  "professorNote": "GPT-5 把长上下文材料转化成更强执行能力。",
+                  "bullets": [
+                    "继承长上下文工程能力。",
+                    "补上更强推理和任务执行。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "强化代码、推理和工具任务",
+                  "professorNote": "可观察结果说明训练目标更靠近真实开发流程。",
+                  "bullets": [
+                    "代码修复和编辑任务占比更重要。",
+                    "多步推理任务帮助模型保持计划。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "前沿模型系统化",
+                  "professorNote": "创新点在于把模型做成可完成工作流的核心，而不是只给答案。",
+                  "bullets": [
+                    "更强 coding benchmark。",
+                    "更适合工具辅助任务。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "仍要外部验证",
+                  "professorNote": "越强的模型越容易让用户忽略测试，这反而是风险。",
+                  "bullets": [
+                    "可能生成貌似合理但未验证的修改。",
+                    "长任务需要人为设定检查点。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 GPT-5",
+                  "professorNote": "把每次调用拆成目标、上下文、行动、验证四步。",
+                  "bullets": [
+                    "写 prompt 时明确验收标准。",
+                    "保留测试日志来判断模型是否真完成。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "openai-gpt-5-2",
+              "name": "OpenAI GPT-5.2",
+              "kind": "model",
+              "publishedAt": "2025-12-11",
+              "positioning": "面向专业知识工作和长程 agent 任务的 GPT-5 系列升级。",
+              "oneSentenceTakeaway": "GPT-5.2 代表前沿模型开始优化“长任务稳定完成”，而不只是提高单题得分。",
+              "problemSolved": "复杂研究、代码和办公任务需要模型长时间保持目标、引用材料、使用工具并自检。",
+              "keyChanges": [
+                "官方强调 professional knowledge work 和 long-horizon tasks。",
+                "SWE-bench Verified 提升到 80%。",
+                "GPQA Diamond 达到 92.4%，AIME 2025 达到 100%。"
+              ],
+              "whyChanged": "模型被用于真实工作后，用户更关心长程可靠性、事实质量和可交付结果。",
+              "howSolved": "通过更强推理、工具使用和长任务训练，让模型在多步骤任务里更少偏离。",
+              "tradeoffs": [
+                "更深推理会增加延迟和成本。",
+                "专业任务仍需要来源核验。"
+              ],
+              "studentTakeaways": [
+                "学习长程任务拆解。",
+                "把 benchmark 与真实工作流验证结合。"
+              ],
+              "experiments": [
+                "让模型做一个 30 分钟研究任务，要求列来源和不确定性。",
+                "比较 GPT-5 与 GPT-5.2 在同一复杂 refactor 上的完成度。"
+              ],
+              "api": {
+                "modelNames": [
+                  "gpt-5.2",
+                  "gpt-5.2-chat-latest"
+                ],
+                "contextWindow": "以 OpenAI API 文档为准",
+                "maxOutput": "以 OpenAI API 文档为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Coding",
+                  "Reasoning",
+                  "Tool use"
+                ]
+              },
+              "teacherNote": "学 GPT-5.2 时重点看 long-horizon：模型是否能持续围绕目标行动，而不是第一步答得漂亮。",
+              "sources": [
+                {
+                  "name": "Introducing GPT-5.2",
+                  "url": "https://openai.com/index/introducing-gpt-5-2/"
+                }
+              ],
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "GPT-5.2 的官方 benchmark 信号集中在复杂推理和工程任务：SWE-bench 80%、GPQA 92.4%、AIME 100%。",
+                  "professorNote": "这些指标说明它更适合高难度问题，但学生仍要问：这些指标能否映射到我的任务验收标准？",
+                  "caveats": [
+                    "高分不等于零幻觉。",
+                    "官方发布指标通常是最佳配置或特定评测协议下的结果。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "GPT-5.2 headline metrics",
+                      "metric": "Score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-5.1 SWE",
+                          "value": 76.3,
+                          "display": "76.3%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "GPT-5.2 SWE",
+                          "value": 80,
+                          "display": "80.0%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "GPT-5.2 GPQA",
+                          "value": 92.4,
+                          "display": "92.4%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "GPT-5.2 AIME",
+                          "value": 100,
+                          "display": "100%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "SWE-bench Verified",
+                      "score": "80.0%",
+                      "comparator": "官方称高于 GPT-5.1 的 76.3%",
+                      "interpretation": "说明代码修复继续提升。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "GPQA Diamond",
+                      "score": "92.4%",
+                      "comparator": "官方发布的高难科学问答指标",
+                      "interpretation": "说明复杂知识推理更强。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "长程工作模型",
+                  "professorNote": "公开材料强调能力层，适合从系统角度理解。",
+                  "bullets": [
+                    "更强工具和任务保持。",
+                    "更适合专业知识工作。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "GPT-5 的稳定性迭代",
+                  "professorNote": "这是对 GPT-5 路线的能力补强。",
+                  "bullets": [
+                    "继承统一模型入口。",
+                    "加强长期任务可靠性。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "面向专业工作流的后训练",
+                  "professorNote": "可观察结果显示训练目标更靠近研究、编码和知识工作。",
+                  "bullets": [
+                    "复杂推理样本增强。",
+                    "长程工具使用任务增强。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "从高分到高完成度",
+                  "professorNote": "真正值得学的是模型厂商如何把 benchmark 推向可交付任务。",
+                  "bullets": [
+                    "强调 long-horizon。",
+                    "强调专业知识工作。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "高能力带来高信任风险",
+                  "professorNote": "模型越强，越需要用户建立核验流程。",
+                  "bullets": [
+                    "来源仍需核验。",
+                    "长任务中错误可能累积。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 GPT-5.2",
+                  "professorNote": "用真实项目任务测试，而不是只看榜单。",
+                  "bullets": [
+                    "定义完成标准。",
+                    "要求模型输出证据、测试和下一步。"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "reasoning-series",
+          "title": "o 系列：推理与工具使用",
+          "summary": "把 test-time reasoning、视觉理解和工具调用结合，回答模型如何在作答时继续计算。",
+          "teacherNote": "o 系列适合学习推理预算、工具调用和多模态问题求解。",
+          "releases": [
+            {
+              "id": "openai-o3-o4-mini",
+              "name": "OpenAI o3 / o4-mini",
+              "kind": "model",
+              "publishedAt": "2025-04-16",
+              "positioning": "面向复杂推理、视觉推理和工具使用的推理模型组合。",
+              "oneSentenceTakeaway": "o3/o4-mini 把推理模型从“只会想”推进到“会看图、会用工具、会验证”。",
+              "problemSolved": "复杂问题常需要模型在回答过程中搜索、计算、看图、执行代码，而不是直接吐答案。",
+              "keyChanges": [
+                "o3 面向最强推理表现。",
+                "o4-mini 面向更高性价比推理。",
+                "官方强调与工具、图像输入结合。"
+              ],
+              "whyChanged": "推理模型如果不能调用工具，就很难处理真实数据、图片和工程环境。",
+              "howSolved": "把多步推理、视觉输入和工具调用训练到同一执行流程里。",
+              "tradeoffs": [
+                "推理模型延迟更高。",
+                "工具调用越强，越需要权限和安全边界。"
+              ],
+              "studentTakeaways": [
+                "理解 test-time compute。",
+                "比较不用工具和用工具时的解题路径。"
+              ],
+              "experiments": [
+                "给同一道几何题分别用普通模型和 o 系列，观察是否会借助视觉推理。",
+                "让模型调用代码验证数学答案。"
+              ],
+              "api": {
+                "modelNames": [
+                  "o3",
+                  "o4-mini"
+                ],
+                "contextWindow": "以 OpenAI API 文档为准",
+                "maxOutput": "以 OpenAI API 文档为准",
+                "modes": [
+                  "Reasoning",
+                  "Vision",
+                  "Tool use"
+                ]
+              },
+              "teacherNote": "o 系列最适合学习：模型为什么需要在推理中使用外部工具，而不是把所有知识压在参数里。",
+              "sources": [
+                {
+                  "name": "Introducing o3 and o4-mini",
+                  "url": "https://openai.com/index/introducing-o3-and-o4-mini/"
+                }
+              ],
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "o3/o4-mini 的核心信号是强推理和工具结合，o4-mini 在 AIME 2025 with Python 上达到 99.5%。",
+                  "professorNote": "这个 benchmark 要和工具条件一起读：with Python 说明模型不是纯脑算，而是在使用计算工具完成推理。",
+                  "caveats": [
+                    "带工具分数不能直接和不带工具模型横比。",
+                    "真实环境中工具权限、数据质量和执行错误会影响结果。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "AIME 2025 with Python",
+                      "metric": "Accuracy",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "o3",
+                          "value": 98.4,
+                          "display": "98.4%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "o4-mini",
+                          "value": 99.5,
+                          "display": "99.5%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "AIME 2025 with Python",
+                      "score": "99.5%",
+                      "comparator": "o4-mini 官方指标",
+                      "interpretation": "展示推理模型和代码工具结合后的数学能力。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Tool use",
+                      "score": "多工具组合",
+                      "comparator": "官方发布强调 agentic tool use",
+                      "interpretation": "说明模型正在从答案生成走向行动执行。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "推理时计算模型",
+                  "professorNote": "重点是作答时继续分解、计算和验证。",
+                  "bullets": [
+                    "test-time compute 更重要。",
+                    "工具调用成为推理链的一部分。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 o1 到工具化推理",
+                  "professorNote": "o3/o4-mini 延续推理路线，但更接近 agent。",
+                  "bullets": [
+                    "继承慢思考能力。",
+                    "加入更强视觉和工具能力。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "可验证任务与工具轨迹",
+                  "professorNote": "推理模型需要大量可检查答案和工具使用轨迹。",
+                  "bullets": [
+                    "数学和代码任务提供可验证 reward。",
+                    "工具调用训练让模型学会何时外包计算。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "推理和工具合流",
+                  "professorNote": "创新点在于推理不再只发生在文本里。",
+                  "bullets": [
+                    "可用 Python 验证。",
+                    "可结合图像输入。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "工具依赖带来新风险",
+                  "professorNote": "会用工具不等于会安全地用工具。",
+                  "bullets": [
+                    "可能调用错误工具。",
+                    "可能过度计算简单问题。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 o 系列",
+                  "professorNote": "把每个答案拆成想、查、算、验四个环节。",
+                  "bullets": [
+                    "记录模型何时调用工具。",
+                    "比较工具结果和最终答案是否一致。"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "updates": [
+        {
+          "id": "openai-codex",
+          "title": "Codex 与 ChatGPT/IDE/终端工作流合并",
+          "kind": "AI Coding",
+          "publishedAt": "2025-10-01",
+          "summary": "OpenAI 把 Codex 从模型能力扩展成开发者工作流入口，包括代码代理、终端、IDE 和浏览器辅助能力。",
+          "whyItMatters": "模型能力只有接入真实 repo、测试和 review 才能转化成生产力。",
+          "studentTakeaway": "学 AI Coding 时要同时学习模型、工具权限、测试和代码审查。",
+          "sources": [
+            {
+              "name": "OpenAI Codex",
+              "url": "https://openai.com/codex/"
+            }
+          ]
+        },
+        {
+          "id": "openai-gpt-5-1-developers",
+          "title": "GPT-5.1 for developers",
+          "kind": "API",
+          "publishedAt": "2025-11-12",
+          "summary": "OpenAI 继续把 GPT-5 系列拆成面向不同延迟、成本和开发任务的 API 选择。",
+          "whyItMatters": "模型产品的竞争不只是最强模型，而是不同任务如何自动选型。",
+          "studentTakeaway": "比较模型时要加入延迟、成本、上下文和工具支持，而不是只看最高分。",
+          "sources": [
+            {
+              "name": "GPT-5.1 for Developers",
+              "url": "https://openai.com/index/gpt-5-1-for-developers/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "shortName": "Anthropic",
+      "country": "United States",
+      "updatedAt": "2026-02-17",
+      "publishedAt": "2024-06-20",
+      "oneSentenceTakeaway": "Anthropic 的 Claude 主线最值得学习的是“可靠可控的长程协作”：代码、电脑使用、长上下文和安全边界一起演进。",
+      "whyItMatters": "Claude 是理解 AI 助手如何从聊天产品变成工作伙伴的好样本，尤其适合观察 coding agent、computer use、文件/表格工作流和安全设计。",
+      "contentType": "model",
+      "targetAudience": [
+        "AI 学生",
+        "模型应用开发者",
+        "AI Coding 学习者",
+        "产品/研究观察者"
+      ],
+      "readingTime": "16 min",
+      "actionLabel": "学习 Claude 路线",
+      "impactScore": 94,
+      "readabilityScore": 88,
+      "actionabilityScore": 86,
+      "confidenceScore": 89,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "sourceName": "Anthropic News",
+      "sourceUrl": "https://www.anthropic.com/news",
+      "tags": [
+        "Agent",
+        "AI Coding",
+        "Workflow",
+        "Safety",
+        "Business",
+        "Research"
+      ],
+      "nextSteps": [
+        "先看 Claude 3.5 Sonnet，理解为什么它成为早期 coding assistant 的标杆。",
+        "再看 Sonnet 4.5，学习长程 agent 和 computer use 的产品化。",
+        "最后看 Sonnet 4.6，观察模型如何继续优化 coding、文件处理和 1M context。"
+      ],
+      "sources": [
+        {
+          "name": "Claude 3.5 Sonnet",
+          "url": "https://www.anthropic.com/news/claude-3-5-sonnet"
+        },
+        {
+          "name": "Claude Sonnet 4.5",
+          "url": "https://www.anthropic.com/news/claude-sonnet-4-5"
+        },
+        {
+          "name": "Claude Sonnet 4.6",
+          "url": "https://www.anthropic.com/news/claude-sonnet-4-6"
+        }
+      ],
+      "learningPath": [
+        {
+          "title": "Claude 3.5 Sonnet：学会把模型当作工程同事",
+          "body": "它的重点不是只有文采，而是在代码修改、理解需求和保持语气上的平衡。"
+        },
+        {
+          "title": "Sonnet 4.5：学长程 agent 的边界",
+          "body": "长程 agent 需要计划、执行、电脑使用和安全约束同时存在，不能只看模型聪明程度。"
+        },
+        {
+          "title": "Sonnet 4.6：学上下文和工具产品化",
+          "body": "1M context、Excel、Chrome、Claude Code 等入口说明模型公司开始围绕工作流组织能力。"
+        }
+      ],
+      "series": [
+        {
+          "id": "sonnet-series",
+          "title": "Sonnet 系列：可靠编码与长程协作",
+          "summary": "从代码助手到长程 agent，回答 Claude 如何在高可靠工作任务里保持可控。",
+          "teacherNote": "学 Sonnet 系列时，把注意力放在可靠性、工具边界和长任务完成度，而不是只比较聊天风格。",
+          "releases": [
+            {
+              "id": "claude-3-5-sonnet",
+              "name": "Claude 3.5 Sonnet",
+              "kind": "model",
+              "publishedAt": "2024-06-20",
+              "positioning": "Claude 3 系列中的高性能工作模型，强调代码、视觉和速度/成本平衡。",
+              "oneSentenceTakeaway": "Claude 3.5 Sonnet 让很多开发者第一次把 Claude 当作稳定代码伙伴，而不只是写作助手。",
+              "problemSolved": "早期助手要么强但慢贵，要么快但不够可靠，难以长期进入日常开发流。",
+              "keyChanges": [
+                "显著提升代码和视觉理解。",
+                "速度与成本优于更大模型。",
+                "成为 Claude Artifacts 等交互式产物的基础。"
+              ],
+              "whyChanged": "用户需要能快速迭代的工作模型，而不是每次都调用最重模型。",
+              "howSolved": "通过更强代码/视觉能力和产品层 artifact 交互，把模型输出变成可编辑成果。",
+              "tradeoffs": [
+                "复杂长程 agent 能力仍有限。",
+                "上下文和工具能力还未形成完整工作站。"
+              ],
+              "studentTakeaways": [
+                "理解中型前沿模型的产品价值。",
+                "比较代码解释和代码修改质量。"
+              ],
+              "experiments": [
+                "让它重构一个 React 组件并解释设计取舍。",
+                "让它从截图推断 UI bug。"
+              ],
+              "api": {
+                "modelNames": [
+                  "claude-3-5-sonnet"
+                ],
+                "contextWindow": "以 Anthropic docs 为准",
+                "maxOutput": "以 Anthropic docs 为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Coding"
+                ]
+              },
+              "teacherNote": "这版适合学习“好用”如何压过“最大”：速度、成本、代码能力和交互体验组合在一起才形成产品优势。",
+              "sources": [
+                {
+                  "name": "Claude 3.5 Sonnet",
+                  "url": "https://www.anthropic.com/news/claude-3-5-sonnet"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "claude-sonnet-4-5",
+                "summary": "Sonnet 4.5 把 3.5 的 coding assistant 方向继续推到长程 agent 和电脑使用。",
+                "inherits": "继承代码、视觉、写作和工作助手定位。",
+                "changes": "更强调长任务、computer use、Claude Code 和企业工作流。",
+                "why": "用户开始让模型处理完整任务，而不是只要求一段代码或一段文字。",
+                "solvedBy": "通过更强的 agent benchmark、工具使用和产品入口，把助手升级成工作流执行者。",
+                "teacherNote": "这是从“帮我写”到“帮我做一段工作”的转变。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Claude 3.5 Sonnet 的信号是 coding assistant 体验跃迁，后续升级版在 SWE-bench Verified 达到 40.6%。",
+                  "professorNote": "它的 benchmark 不能只看单点分数，要结合开发者体感：解释、修改、保持上下文和减少多余输出。",
+                  "caveats": [
+                    "不同批次 Sonnet 3.5 有升级版本。",
+                    "早期 coding benchmark 还不能完全代表 agent 工作流。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Coding trajectory",
+                      "metric": "SWE-bench style signal",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "derived",
+                      "bars": [
+                        {
+                          "label": "GPT-4o",
+                          "value": 33.2,
+                          "display": "33.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Claude 3.5 Sonnet",
+                          "value": 40.6,
+                          "display": "40.6%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "SWE-bench Verified",
+                      "score": "40.6%",
+                      "comparator": "Anthropic 在升级发布中披露",
+                      "interpretation": "说明其代码修复能力进入主流前沿区间。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Artifacts",
+                      "score": "产品能力",
+                      "comparator": "把模型输出变成可编辑作品",
+                      "interpretation": "这让学生看到模型能力如何通过 UI 放大。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "平衡型工作模型",
+                  "professorNote": "公开资料不暴露架构细节，学习重点是能力组合。",
+                  "bullets": [
+                    "代码、视觉和语言都强。",
+                    "速度/成本适合高频使用。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 Claude 3 到工作助手",
+                  "professorNote": "Sonnet 成为 Anthropic 的主力工作模型线。",
+                  "bullets": [
+                    "继承 Claude 的安全和对话风格。",
+                    "更靠近开发与企业任务。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "代码和视觉任务增强",
+                  "professorNote": "模型表现说明训练分布覆盖更多真实工作输入。",
+                  "bullets": [
+                    "代码理解更强。",
+                    "视觉截图和图表理解更好。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "Artifacts 让输出可操作",
+                  "professorNote": "产品创新和模型能力一起形成学习价值。",
+                  "bullets": [
+                    "可生成交互式成果。",
+                    "适合快速修改。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "长程执行还不够",
+                  "professorNote": "3.5 更像强助手，而不是完整 agent。",
+                  "bullets": [
+                    "需要用户分步推动。",
+                    "复杂工具链依赖外部产品。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Claude 3.5",
+                  "professorNote": "用它练习需求解释和代码 review。",
+                  "bullets": [
+                    "比较它和 GPT 系列的代码风格。",
+                    "观察它如何处理模糊需求。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "claude-sonnet-4-5",
+              "name": "Claude Sonnet 4.5",
+              "kind": "model",
+              "publishedAt": "2025-09-29",
+              "positioning": "Anthropic 面向 coding、agent 和 computer use 的主力前沿模型。",
+              "oneSentenceTakeaway": "Sonnet 4.5 把 Claude 的主战场从代码补全推进到长程任务和电脑操作。",
+              "problemSolved": "真实工作需要模型连续操作浏览器、文件、代码和表格，单轮聊天能力不够。",
+              "keyChanges": [
+                "官方称其为最强 coding model。",
+                "OSWorld 电脑使用分数从 Sonnet 4 的 42.2% 提升到 61.4%。",
+                "更强调 Claude Code、agent 和企业工作流。"
+              ],
+              "whyChanged": "AI 助手的竞争点变成能否在工具环境里完成任务。",
+              "howSolved": "通过 computer use、coding 和长程任务训练，让模型能持续操作外部环境。",
+              "tradeoffs": [
+                "越会操作电脑，越需要权限和确认机制。",
+                "长任务失败更难排查。"
+              ],
+              "studentTakeaways": [
+                "学习 agent 的状态管理。",
+                "理解 computer use benchmark 的意义。"
+              ],
+              "experiments": [
+                "让模型按步骤操作一个网页表单并记录每步状态。",
+                "让 Claude Code 修复一个测试失败。"
+              ],
+              "api": {
+                "modelNames": [
+                  "claude-sonnet-4-5"
+                ],
+                "contextWindow": "以 Anthropic docs 为准",
+                "maxOutput": "以 Anthropic docs 为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Coding",
+                  "Computer use"
+                ]
+              },
+              "teacherNote": "Sonnet 4.5 是学习 agent 产品化的好样本：能力、工具、权限、安全提示必须一起设计。",
+              "sources": [
+                {
+                  "name": "Claude Sonnet 4.5",
+                  "url": "https://www.anthropic.com/news/claude-sonnet-4-5"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "claude-sonnet-4-6",
+                "summary": "Sonnet 4.6 继续增强 Sonnet 4.5 的 coding、文件工作流和长上下文。",
+                "inherits": "继承 Sonnet 4.5 的 agent、coding 和 computer use 路线。",
+                "changes": "更强代码偏好、更长上下文窗口、更深企业文件场景。",
+                "why": "长程任务瓶颈从“会不会操作”变成“能否持续理解大量资料并稳定产出”。",
+                "solvedBy": "扩展上下文和工作流入口，强化 coding 与办公文件处理。",
+                "teacherNote": "这是从 agent 能力到工作台能力的延伸。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Sonnet 4.5 的清晰信号是 OSWorld 61.4%，说明电脑使用能力进入实用区间。",
+                  "professorNote": "OSWorld 测的是模型在真实电脑环境中完成任务，不是单纯写代码。它更接近 agent 产品问题。",
+                  "caveats": [
+                    "电脑使用 benchmark 对环境设置敏感。",
+                    "真实使用还需要安全确认和权限控制。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "OSWorld",
+                      "metric": "Computer-use task success",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Claude Sonnet 4",
+                          "value": 42.2,
+                          "display": "42.2%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Claude Sonnet 4.5",
+                          "value": 61.4,
+                          "display": "61.4%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "OSWorld",
+                      "score": "61.4%",
+                      "comparator": "官方发布中高于 Sonnet 4 的 42.2%",
+                      "interpretation": "显示模型更会操作真实软件环境。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Coding model",
+                      "score": "官方定位最强",
+                      "comparator": "Anthropic 发布重点强调 coding",
+                      "interpretation": "说明 Claude 主线开始与开发工具强绑定。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "Agent 工作模型",
+                  "professorNote": "不是公开架构学习，而是 agent 环境适配学习。",
+                  "bullets": [
+                    "更强工具操作。",
+                    "更适合长任务。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从代码助手到 computer use",
+                  "professorNote": "继承 Sonnet 3.5 的代码优势，扩展到外部环境。",
+                  "bullets": [
+                    "保留高可读输出。",
+                    "增强电脑控制。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "长程任务和工具轨迹",
+                  "professorNote": "agent 需要学习连续步骤，而不是孤立答案。",
+                  "bullets": [
+                    "电脑操作轨迹训练。",
+                    "代码修复和测试循环训练。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "把模型放进工作环境",
+                  "professorNote": "关键创新是模型-工具-权限的产品结合。",
+                  "bullets": [
+                    "OSWorld 提升明显。",
+                    "Claude Code 成为重要入口。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "安全边界更重要",
+                  "professorNote": "越能操作，越不能放任自动执行。",
+                  "bullets": [
+                    "错误点击可能造成真实影响。",
+                    "需要审批和回滚。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Sonnet 4.5",
+                  "professorNote": "用 agent 四要素学习：目标、状态、动作、反馈。",
+                  "bullets": [
+                    "记录每一步工具调用。",
+                    "为任务设计中止条件。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "claude-sonnet-4-6",
+              "name": "Claude Sonnet 4.6",
+              "kind": "model",
+              "publishedAt": "2026-02-17",
+              "positioning": "Sonnet 4 系列的工作流升级，强调 coding、1M context、文件/表格和浏览器协作。",
+              "oneSentenceTakeaway": "Sonnet 4.6 的价值在于把 Claude 从模型能力推进到更完整的办公与开发工作台。",
+              "problemSolved": "开发者和企业用户需要模型同时处理大上下文、代码库、表格、浏览器和文件。",
+              "keyChanges": [
+                "官方强调更强 coding 和 agentic tasks。",
+                "API 支持 1M context beta。",
+                "围绕 Claude Code、Chrome、Excel 等工作流继续扩展。"
+              ],
+              "whyChanged": "模型已经进入真实工作流，瓶颈变成材料太多、工具太多、任务太长。",
+              "howSolved": "扩展上下文和产品集成，让模型围绕用户工作环境持续协作。",
+              "tradeoffs": [
+                "1M context 仍需要上下文整理。",
+                "企业文件场景对权限和隐私要求更高。"
+              ],
+              "studentTakeaways": [
+                "学习上下文窗口和工作流入口的关系。",
+                "理解模型能力如何被 IDE/浏览器/表格放大。"
+              ],
+              "experiments": [
+                "给模型一个长文档和表格，让它提取决策依据。",
+                "在 Claude Code 中比较 4.5 和 4.6 的修复偏好。"
+              ],
+              "api": {
+                "modelNames": [
+                  "claude-sonnet-4-6"
+                ],
+                "contextWindow": "1M context beta",
+                "maxOutput": "以 Anthropic docs 为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Coding",
+                  "Files",
+                  "Computer use"
+                ]
+              },
+              "teacherNote": "Sonnet 4.6 适合学习模型平台化：模型本体、上下文、文件、浏览器和代码工具如何组合。",
+              "sources": [
+                {
+                  "name": "Claude Sonnet 4.6",
+                  "url": "https://www.anthropic.com/news/claude-sonnet-4-6"
+                }
+              ],
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Sonnet 4.6 的公开信号不是单一榜单，而是 1M context、coding 偏好和工作流入口的组合。",
+                  "professorNote": "这类版本要看产品指标：开发者是否更愿意用、长上下文是否能承载文件任务、工具链是否更稳定。",
+                  "caveats": [
+                    "偏好评测不是绝对 benchmark。",
+                    "1M context beta 需要 API 条件和成本约束。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Claude Code preference",
+                      "metric": "Reported preference",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Sonnet 4.5",
+                          "value": 30,
+                          "display": "30%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Sonnet 4.6",
+                          "value": 70,
+                          "display": "70%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "Claude Code preference",
+                      "score": "70%",
+                      "comparator": "官方发布提到开发者偏好 Sonnet 4.6",
+                      "interpretation": "说明它在真实 coding 体验上有体感提升。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Context",
+                      "score": "1M beta",
+                      "comparator": "API 支持长上下文 beta",
+                      "interpretation": "说明文件和代码库任务空间扩大。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "工作流模型",
+                  "professorNote": "重点是模型如何接入工作环境，而不是只看参数。",
+                  "bullets": [
+                    "1M context。",
+                    "代码和文件入口增强。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "Sonnet 4.5 的工作台化",
+                  "professorNote": "从 agent 能力继续走向企业工作流。",
+                  "bullets": [
+                    "继承 computer use。",
+                    "补强长上下文和文件处理。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "办公与代码任务增强",
+                  "professorNote": "可观察重点是文件、表格和 coding 反馈。",
+                  "bullets": [
+                    "更多工作流轨迹。",
+                    "更多开发者偏好优化。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "上下文与工具整合",
+                  "professorNote": "创新点在组合：长上下文 + Claude Code + Chrome + Office 文件。",
+                  "bullets": [
+                    "降低跨工具切换。",
+                    "提升长材料处理。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "材料越多越需要治理",
+                  "professorNote": "长上下文不是知识库替代品。",
+                  "bullets": [
+                    "容易引入无关材料。",
+                    "隐私和权限更敏感。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Sonnet 4.6",
+                  "professorNote": "把它当作 AI 工作台案例。",
+                  "bullets": [
+                    "设计一个跨文件任务。",
+                    "要求模型输出引用和检查清单。"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "updates": [
+        {
+          "id": "anthropic-claude-code",
+          "title": "Claude Code 成为 Sonnet 路线的重要产品入口",
+          "kind": "AI Coding",
+          "publishedAt": "2025-09-29",
+          "summary": "Anthropic 把 Claude 的 coding 能力放进更完整的开发者工作流，包括命令行、IDE 和代码库任务。",
+          "whyItMatters": "模型能力需要和 repo、测试、权限、版本管理结合，才会变成真实生产力。",
+          "studentTakeaway": "学习 coding agent 时必须同时看模型、环境和验证。",
+          "sources": [
+            {
+              "name": "Claude Sonnet 4.5",
+              "url": "https://www.anthropic.com/news/claude-sonnet-4-5"
+            }
+          ]
+        },
+        {
+          "id": "anthropic-computer-use",
+          "title": "Computer use 与浏览器/桌面操作",
+          "kind": "Workflow",
+          "publishedAt": "2025-09-29",
+          "summary": "Claude 路线持续强调让模型操作真实软件环境。",
+          "whyItMatters": "这把 agent 从 API 调用推进到人类工作界面，但也带来安全和权限问题。",
+          "studentTakeaway": "任何自动操作都要设计确认、回滚和日志。",
+          "sources": [
+            {
+              "name": "Claude Sonnet 4.5",
+              "url": "https://www.anthropic.com/news/claude-sonnet-4-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "google-deepmind",
+      "name": "Google DeepMind",
+      "shortName": "Gemini",
+      "country": "United States / United Kingdom",
+      "updatedAt": "2026-02-19",
+      "publishedAt": "2025-03-25",
+      "oneSentenceTakeaway": "Gemini 路线最值得学习的是原生多模态、长上下文和搜索/工作区生态如何结合。",
+      "whyItMatters": "Google 的优势不是只有模型本身，而是搜索、YouTube、Android、Workspace、TPU 和 DeepMind 研究能力能一起影响模型产品。",
+      "contentType": "model",
+      "targetAudience": [
+        "AI 学生",
+        "模型应用开发者",
+        "AI Coding 学习者",
+        "产品/研究观察者"
+      ],
+      "readingTime": "17 min",
+      "actionLabel": "学习 Gemini 路线",
+      "impactScore": 95,
+      "readabilityScore": 85,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "sourceName": "Google Blog",
+      "sourceUrl": "https://blog.google/products/gemini/",
+      "tags": [
+        "Multimodal",
+        "Agent",
+        "Research",
+        "Workflow",
+        "Business",
+        "AI Coding"
+      ],
+      "nextSteps": [
+        "先看 Gemini 2.5 Pro，理解 thinking model 和长上下文如何结合。",
+        "再看 Gemini 3 Pro，学习多模态 benchmark 和产品集成。",
+        "最后看 Gemini 3.1 Pro，观察 Google 如何把推理和 agent 平台继续推高。"
+      ],
+      "sources": [
+        {
+          "name": "Gemini 2.5 Pro Preview",
+          "url": "https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/"
+        },
+        {
+          "name": "Introducing Gemini 3",
+          "url": "https://blog.google/products/gemini/gemini-3/"
+        },
+        {
+          "name": "Gemini 3.1 Pro",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
+        }
+      ],
+      "learningPath": [
+        {
+          "title": "Gemini 2.5 Pro：学 thinking + long context",
+          "body": "Gemini 2.5 Pro 的学习价值在于它把长上下文、多模态和推理模型结合，适合做资料密集任务。"
+        },
+        {
+          "title": "Gemini 3：学多模态评测",
+          "body": "Gemini 3 的 HLE、GPQA、MMMU-Pro、Video-MMMU 等指标让学生看到不同能力如何被拆开评估。"
+        },
+        {
+          "title": "Gemini 3.1：学前沿模型如何进入 agent 平台",
+          "body": "Antigravity、Deep Think 和 ARC-AGI-2 等信号说明 Google 正把模型推向更复杂的 agent 和抽象推理任务。"
+        }
+      ],
+      "series": [
+        {
+          "id": "gemini-pro-series",
+          "title": "Gemini Pro 系列：原生多模态与长上下文",
+          "summary": "从 thinking model 到 multimodal agent，回答 Google 如何把模型与搜索、工作区和开发工具结合。",
+          "teacherNote": "学习 Gemini 时要看生态：同样的模型能力放进搜索、视频、文档和 IDE，会产生不同价值。",
+          "releases": [
+            {
+              "id": "gemini-2-5-pro",
+              "name": "Gemini 2.5 Pro",
+              "kind": "model",
+              "publishedAt": "2025-03-25",
+              "positioning": "Google 的 thinking model，强调推理、长上下文和多模态理解。",
+              "oneSentenceTakeaway": "Gemini 2.5 Pro 把长上下文和推理显著结合，适合资料密集的复杂任务。",
+              "problemSolved": "多模态和长文档任务需要模型既能读大量材料，又能做多步推理。",
+              "keyChanges": [
+                "官方强调 thinking model。",
+                "LMArena 达到 1470。",
+                "WebDev Arena 达到 1443。"
+              ],
+              "whyChanged": "用户任务越来越多来自视频、网页、文档和代码混合输入。",
+              "howSolved": "用原生多模态和长上下文训练，把更多输入形态纳入同一模型。",
+              "tradeoffs": [
+                "长上下文成本和延迟高。",
+                "多模态任务评测更复杂。"
+              ],
+              "studentTakeaways": [
+                "学习多模态输入设计。",
+                "理解 thinking model 的应用边界。"
+              ],
+              "experiments": [
+                "给模型一段视频摘要、一份文档和一个问题，观察它如何引用材料。",
+                "比较短 prompt 和长上下文任务结果。"
+              ],
+              "api": {
+                "modelNames": [
+                  "gemini-2.5-pro"
+                ],
+                "contextWindow": "以 Google AI docs 为准",
+                "maxOutput": "以 Google AI docs 为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Audio",
+                  "Video",
+                  "Code"
+                ]
+              },
+              "teacherNote": "Gemini 2.5 Pro 适合学习资料密集推理：模型不只是会想，还要会从多源材料里找证据。",
+              "sources": [
+                {
+                  "name": "Gemini 2.5 Pro Preview",
+                  "url": "https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "gemini-3-pro",
+                "summary": "Gemini 3 Pro 在 2.5 Pro 的 thinking + multimodal 基础上继续提高前沿推理、多模态和产品集成。",
+                "inherits": "继承长上下文、多模态和 thinking model 定位。",
+                "changes": "更强的前沿 benchmark，更深产品集成和 agent 开发入口。",
+                "why": "Google 需要把研究能力转化为面向搜索、工作区和开发者的统一模型体验。",
+                "solvedBy": "通过 Gemini 3 Pro 和 Antigravity 等入口，把模型能力连接到具体工作流。",
+                "teacherNote": "这说明模型升级和生态集成是一件事。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Gemini 2.5 Pro 的官方信号是 LMArena 1470 和 WebDev Arena 1443，强调 thinking 与开发任务。",
+                  "professorNote": "LMArena 是偏人类偏好和综合能力的指标，WebDev Arena 更靠近前端生成体验。",
+                  "caveats": [
+                    "Arena 分数会随时间和参赛模型变化。",
+                    "WebDev 表现不等于完整软件工程能力。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Arena signals",
+                      "metric": "Score",
+                      "unit": "points",
+                      "higherIsBetter": true,
+                      "maxValue": 1600,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "LMArena",
+                          "value": 1470,
+                          "display": "1470",
+                          "highlight": true
+                        },
+                        {
+                          "label": "WebDev Arena",
+                          "value": 1443,
+                          "display": "1443",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "LMArena",
+                      "score": "1470",
+                      "comparator": "官方发布强调的综合竞技场分数",
+                      "interpretation": "说明用户偏好和综合能力处于前沿。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "WebDev Arena",
+                      "score": "1443",
+                      "comparator": "官方发布强调的网页开发指标",
+                      "interpretation": "说明模型在前端生成场景较强。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "原生多模态 thinking model",
+                  "professorNote": "Gemini 的学习重点是多输入模态和推理结合。",
+                  "bullets": [
+                    "文本、图像、音频、视频统一输入。",
+                    "thinking 提高复杂任务表现。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 Gemini 1.x 到 thinking model",
+                  "professorNote": "2.5 Pro 把 Gemini 的多模态底座推向推理任务。",
+                  "bullets": [
+                    "继承长上下文优势。",
+                    "加强推理和开发能力。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "多模态与长上下文训练",
+                  "professorNote": "训练目标覆盖网页、视频、代码和文档。",
+                  "bullets": [
+                    "多源材料理解。",
+                    "复杂任务推理。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "多模态和推理合流",
+                  "professorNote": "创新点在于不是先转文本再推理，而是统一处理多模态材料。",
+                  "bullets": [
+                    "适合视频/文档混合任务。",
+                    "适合资料问答。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "Arena 不能替代任务验收",
+                  "professorNote": "学生要自己设计多模态验证集。",
+                  "bullets": [
+                    "可能引用错误片段。",
+                    "视频长输入成本高。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Gemini 2.5",
+                  "professorNote": "用多模态资料包训练自己设计评测。",
+                  "bullets": [
+                    "准备文本+图像+视频任务。",
+                    "要求模型输出证据位置。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "gemini-3-pro",
+              "name": "Gemini 3 Pro",
+              "kind": "model",
+              "publishedAt": "2025-11-18",
+              "positioning": "Google 的前沿多模态模型，强调推理、多模态、coding 和产品集成。",
+              "oneSentenceTakeaway": "Gemini 3 Pro 展示了 Google 把模型能力推向搜索、开发者工具和多模态任务的合力。",
+              "problemSolved": "前沿模型需要同时处理科学推理、视频理解、网页开发和复杂知识问答。",
+              "keyChanges": [
+                "LMArena 达到 1501。",
+                "Humanity's Last Exam 达到 37.5%。",
+                "GPQA Diamond 达到 91.9%，MMMU-Pro 达到 81%。"
+              ],
+              "whyChanged": "用户输入形态越来越复杂，单纯文本模型无法覆盖 Google 生态中的任务。",
+              "howSolved": "继续强化原生多模态、推理和产品集成。",
+              "tradeoffs": [
+                "高端模型成本和延迟更高。",
+                "多模态 benchmark 难以完全复现。"
+              ],
+              "studentTakeaways": [
+                "区分不同多模态 benchmark。",
+                "观察模型如何进入产品入口。"
+              ],
+              "experiments": [
+                "让模型分析一段视频并生成行动计划。",
+                "比较 Gemini 2.5 和 3 在同一 HLE 风格题上的推理过程。"
+              ],
+              "api": {
+                "modelNames": [
+                  "gemini-3-pro"
+                ],
+                "contextWindow": "以 Google AI docs 为准",
+                "maxOutput": "以 Google AI docs 为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Audio",
+                  "Video",
+                  "Code",
+                  "Reasoning"
+                ]
+              },
+              "teacherNote": "Gemini 3 Pro 是学习多模态 benchmark 的好入口：每个分数对应的能力都不一样。",
+              "sources": [
+                {
+                  "name": "Introducing Gemini 3",
+                  "url": "https://blog.google/products/gemini/gemini-3/"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "gemini-3-1-pro",
+                "summary": "Gemini 3.1 Pro 在 Gemini 3 Pro 基础上继续加强抽象推理和 agent 平台能力。",
+                "inherits": "继承 Gemini 3 的多模态和前沿推理定位。",
+                "changes": "更强调 ARC-AGI-2、Deep Think 和 agent 开发体验。",
+                "why": "前沿模型竞争从通用能力转向复杂抽象推理和可操作 agent。",
+                "solvedBy": "通过更高难评测和开发工具平台化，连接模型能力与任务执行。",
+                "teacherNote": "这是从多模态强模型到 agent 平台的过渡。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Gemini 3 Pro 的 benchmark 覆盖很广：LMArena 1501、GPQA 91.9%、MMMU-Pro 81%、Video-MMMU 87.6%。",
+                  "professorNote": "读 Gemini 3 的 benchmark 时要按能力拆：知识推理、视觉问答、视频理解和用户偏好不是同一种能力。",
+                  "caveats": [
+                    "不同 benchmark 不能简单相加。",
+                    "多模态 benchmark 对提示和输入预处理敏感。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Gemini 3 Pro headline metrics",
+                      "metric": "Score",
+                      "unit": "% / points",
+                      "higherIsBetter": true,
+                      "maxValue": 1600,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "LMArena",
+                          "value": 1501,
+                          "display": "1501",
+                          "highlight": true
+                        },
+                        {
+                          "label": "GPQA",
+                          "value": 91.9,
+                          "display": "91.9%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "MMMU-Pro",
+                          "value": 81,
+                          "display": "81.0%",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Video-MMMU",
+                          "value": 87.6,
+                          "display": "87.6%",
+                          "highlight": false
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "Humanity's Last Exam",
+                      "score": "37.5%",
+                      "comparator": "官方发布中的高难综合指标",
+                      "interpretation": "展示复杂知识和推理能力。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "SimpleQA Verified",
+                      "score": "72.1%",
+                      "comparator": "官方发布中的事实问答指标",
+                      "interpretation": "显示事实性仍是重点能力。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "前沿原生多模态模型",
+                  "professorNote": "架构细节不公开，学习重点是多模态能力组合。",
+                  "bullets": [
+                    "统一处理视频、图像、文本。",
+                    "更强 reasoning。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 2.5 thinking 到 3 Pro",
+                  "professorNote": "延续 thinking 路线并拓展产品化。",
+                  "bullets": [
+                    "保留长上下文。",
+                    "强化高难推理和多模态。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "高难题与多模态数据",
+                  "professorNote": "可观察指标说明训练覆盖更多科学、视频和网页任务。",
+                  "bullets": [
+                    "高难问答。",
+                    "视频和 UI 任务。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "多能力同时提高",
+                  "professorNote": "Gemini 3 的亮点是能力覆盖面，而不是单一榜单。",
+                  "bullets": [
+                    "多模态强。",
+                    "产品集成深。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "生态依赖强",
+                  "professorNote": "离开 Google 生态时，一些优势可能变弱。",
+                  "bullets": [
+                    "API 环境和产品环境不同。",
+                    "评测复现成本高。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Gemini 3",
+                  "professorNote": "把 benchmark 按输入模态分类。",
+                  "bullets": [
+                    "列出每个 benchmark 的输入和输出。",
+                    "用自己的任务映射对应指标。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "gemini-3-1-pro",
+              "name": "Gemini 3.1 Pro",
+              "kind": "model",
+              "publishedAt": "2026-02-19",
+              "positioning": "Gemini 3 系列升级，强调 Deep Think、复杂推理和 agent 开发。",
+              "oneSentenceTakeaway": "Gemini 3.1 Pro 的重点是把多模态前沿能力继续推向抽象推理和 agent 平台。",
+              "problemSolved": "复杂 agent 任务需要模型具备更强抽象推理、计划和工具环境适配。",
+              "keyChanges": [
+                "官方强调 Gemini 3.1 Pro 和 Deep Think。",
+                "ARC-AGI-2 达到 77.1%。",
+                "继续与 Antigravity 等开发者入口结合。"
+              ],
+              "whyChanged": "模型能力从解决具体题转向更一般的抽象任务和环境适配。",
+              "howSolved": "通过更强推理模型和 agent 平台支持，提高复杂任务完成度。",
+              "tradeoffs": [
+                "高难推理模型通常更慢。",
+                "ARC 类评测不等同日常产品体验。"
+              ],
+              "studentTakeaways": [
+                "学习抽象推理 benchmark。",
+                "观察 agent 开发平台如何包装模型能力。"
+              ],
+              "experiments": [
+                "设计一个需要规则归纳的小任务，比较 Gemini 3 与 3.1。",
+                "用 Antigravity 风格工作流拆解一个 coding agent 任务。"
+              ],
+              "api": {
+                "modelNames": [
+                  "gemini-3.1-pro"
+                ],
+                "contextWindow": "以 Google AI docs 为准",
+                "maxOutput": "以 Google AI docs 为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Video",
+                  "Code",
+                  "Reasoning",
+                  "Agent"
+                ]
+              },
+              "teacherNote": "Gemini 3.1 Pro 适合学习高难抽象 benchmark 和实际 agent 工具之间的差距。",
+              "sources": [
+                {
+                  "name": "Gemini 3.1 Pro",
+                  "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-1-pro/"
+                }
+              ],
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Gemini 3.1 Pro 的核心公开信号是 ARC-AGI-2 77.1%，强调更强抽象推理。",
+                  "professorNote": "ARC-AGI-2 不是普通知识题，它更关注从少量例子归纳规则。学生应把它和 GPQA、MMLU 区分开。",
+                  "caveats": [
+                    "ARC 分数不能直接代表写代码或聊天体验。",
+                    "Deep Think 模式通常意味着更高计算预算。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "ARC-AGI-2",
+                      "metric": "Score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Gemini 3 Pro",
+                          "value": 45,
+                          "display": "baseline",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Gemini 3.1 Pro",
+                          "value": 77.1,
+                          "display": "77.1%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "ARC-AGI-2",
+                      "score": "77.1%",
+                      "comparator": "官方发布强调的抽象推理指标",
+                      "interpretation": "说明模型在规则归纳类任务上继续提升。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Deep Think",
+                      "score": "模式升级",
+                      "comparator": "官方强调更深推理",
+                      "interpretation": "说明推理预算成为产品可选择能力。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "高预算推理模型",
+                  "professorNote": "学习重点是 Deep Think 这类推理预算产品化。",
+                  "bullets": [
+                    "更长推理过程。",
+                    "更适合抽象任务。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "Gemini 3 的推理升级",
+                  "professorNote": "在多模态基础上强化抽象思维。",
+                  "bullets": [
+                    "继承 Gemini 3 Pro。",
+                    "增强复杂规则归纳。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "抽象推理任务增强",
+                  "professorNote": "ARC 信号说明训练和评测关注更一般的问题求解。",
+                  "bullets": [
+                    "规则归纳。",
+                    "复杂规划。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "抽象 benchmark 产品化",
+                  "professorNote": "Google 把研究型能力通过 Deep Think 暴露给用户。",
+                  "bullets": [
+                    "高难题表现提升。",
+                    "agent 平台集成。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "高难题和真实任务有距离",
+                  "professorNote": "学生要避免把 ARC 分数泛化到所有任务。",
+                  "bullets": [
+                    "普通办公任务可能不需要 Deep Think。",
+                    "成本/延迟更高。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Gemini 3.1",
+                  "professorNote": "用小型归纳任务理解抽象推理。",
+                  "bullets": [
+                    "写规则推断题。",
+                    "比较普通模式和 Deep Think。"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "updates": [
+        {
+          "id": "google-antigravity",
+          "title": "Google Antigravity 作为 agent 开发入口",
+          "kind": "AI Coding",
+          "publishedAt": "2025-11-18",
+          "summary": "Google 将 Gemini 3 能力放入面向开发者的 agent 工作环境。",
+          "whyItMatters": "模型能力通过 IDE/agent 平台才能进入真实开发流程。",
+          "studentTakeaway": "研究模型时同步看开发者工具，理解能力如何被产品包装。",
+          "sources": [
+            {
+              "name": "Introducing Gemini 3",
+              "url": "https://blog.google/products/gemini/gemini-3/"
+            }
+          ]
+        },
+        {
+          "id": "google-deep-research",
+          "title": "Gemini Deep Research 与搜索生态",
+          "kind": "Workflow",
+          "publishedAt": "2025-11-18",
+          "summary": "Gemini 系列持续与搜索、研究和 Workspace 场景结合。",
+          "whyItMatters": "Google 的模型优势经常来自模型和信息生态一起工作。",
+          "studentTakeaway": "做研究助手时要区分模型推理和搜索/引用系统的贡献。",
+          "sources": [
+            {
+              "name": "Introducing Gemini 3",
+              "url": "https://blog.google/products/gemini/gemini-3/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "meta",
+      "name": "Meta",
+      "shortName": "Llama",
+      "country": "United States",
+      "updatedAt": "2025-04-05",
+      "publishedAt": "2024-07-23",
+      "oneSentenceTakeaway": "Meta 的 Llama 路线最值得学习的是开放权重生态如何追赶前沿闭源模型，并通过 MoE、多模态和长上下文扩展边界。",
+      "whyItMatters": "Llama 是学生学习本地 AI、开源生态、蒸馏、微调和企业私有部署的重要路线。",
+      "contentType": "model",
+      "targetAudience": [
+        "AI 学生",
+        "Local AI 学习者",
+        "开源模型开发者",
+        "企业私有化开发者"
+      ],
+      "readingTime": "15 min",
+      "actionLabel": "学习 Llama 路线",
+      "impactScore": 93,
+      "readabilityScore": 87,
+      "actionabilityScore": 90,
+      "confidenceScore": 87,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "sourceName": "Meta AI Blog",
+      "sourceUrl": "https://ai.meta.com/blog/",
+      "tags": [
+        "Open Source",
+        "Local AI",
+        "Multimodal",
+        "Research",
+        "Business",
+        "Safety"
+      ],
+      "nextSteps": [
+        "先看 Llama 3.1 405B，理解开放权重前沿模型为什么重要。",
+        "再看 Llama 4 Scout，学习长上下文和单 GPU 可部署的取舍。",
+        "最后看 Llama 4 Maverick，理解 MoE 如何在质量和成本之间折中。"
+      ],
+      "sources": [
+        {
+          "name": "Introducing Llama 3.1",
+          "url": "https://ai.meta.com/blog/meta-llama-3-1/"
+        },
+        {
+          "name": "Llama 4 multimodal intelligence",
+          "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/"
+        }
+      ],
+      "learningPath": [
+        {
+          "title": "Llama 3.1：学开放权重生态",
+          "body": "405B 模型和 128K context 让社区可以研究、微调和部署接近前沿的开放模型。"
+        },
+        {
+          "title": "Llama 4 Scout：学长上下文本地化",
+          "body": "Scout 的 10M context 和较低活跃参数说明，长上下文可以和部署效率一起设计。"
+        },
+        {
+          "title": "Llama 4 Maverick：学 MoE 质量/成本折中",
+          "body": "Maverick 的 MoE 设计展示了如何用专家路由提升能力，同时控制每次推理的活跃参数。"
+        }
+      ],
+      "series": [
+        {
+          "id": "llama-series",
+          "title": "Llama 系列：开放权重与 MoE 多模态",
+          "summary": "从 405B dense 到 Llama 4 MoE，回答开放模型如何在部署、生态和前沿能力之间平衡。",
+          "teacherNote": "学 Llama 时要特别关注许可、部署成本、微调生态和安全工具，而不是只看参数规模。",
+          "releases": [
+            {
+              "id": "llama-3-1-405b",
+              "name": "Llama 3.1 405B",
+              "kind": "model",
+              "publishedAt": "2024-07-23",
+              "positioning": "Meta 的开放权重前沿 dense 模型，强调 405B 参数、128K context 和生态可微调。",
+              "oneSentenceTakeaway": "Llama 3.1 405B 让开放权重模型第一次真正进入与闭源前沿模型对话的区间。",
+              "problemSolved": "闭源模型强但不可控，企业和研究者需要能本地部署、微调和审计的大模型。",
+              "keyChanges": [
+                "发布 405B 开放权重模型。",
+                "上下文扩展到 128K。",
+                "提供 8B/70B/405B 多尺寸生态。"
+              ],
+              "whyChanged": "开放生态需要一个足够强的教师模型，支持蒸馏、合成数据和企业私有化。",
+              "howSolved": "Meta 发布开放权重和配套工具，让社区能微调、蒸馏、部署和研究。",
+              "tradeoffs": [
+                "405B 部署成本非常高。",
+                "开放权重带来安全滥用风险。"
+              ],
+              "studentTakeaways": [
+                "理解开放权重和开源的区别。",
+                "学习模型尺寸、上下文和部署成本的关系。"
+              ],
+              "experiments": [
+                "用小尺寸 Llama 做 LoRA 微调。",
+                "比较本地模型和 API 模型在隐私任务上的取舍。"
+              ],
+              "api": {
+                "modelNames": [
+                  "Llama 3.1 405B",
+                  "Llama 3.1 70B",
+                  "Llama 3.1 8B"
+                ],
+                "contextWindow": "128K tokens",
+                "maxOutput": "依赖部署框架",
+                "modes": [
+                  "Text",
+                  "Code",
+                  "Local AI"
+                ]
+              },
+              "teacherNote": "Llama 3.1 的学习价值在生态：一个强开放模型如何让微调、蒸馏和本地部署成为可能。",
+              "sources": [
+                {
+                  "name": "Introducing Llama 3.1",
+                  "url": "https://ai.meta.com/blog/meta-llama-3-1/"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "llama-4-scout",
+                "summary": "Llama 4 Scout 把开放权重路线从 dense 文本模型推进到 MoE、多模态和超长上下文。",
+                "inherits": "继承开放权重、社区部署和多尺寸生态。",
+                "changes": "转向 MoE 架构、原生多模态和 10M context。",
+                "why": "开放模型需要在能力继续提升的同时降低推理活跃成本。",
+                "solvedBy": "通过专家路由让总参数更大但每次推理只激活一部分参数。",
+                "teacherNote": "这是从参数规模竞争转向计算路径设计。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Llama 3.1 405B 的核心信号不是单一分数，而是 405B 开放权重 + 128K context 的组合。",
+                  "professorNote": "对学生来说，Llama 3.1 最重要的是生态指标：能否本地部署、能否微调、能否作为教师模型。",
+                  "caveats": [
+                    "开放权重不等于完全开源。",
+                    "405B 对个人硬件不友好。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Open model scale",
+                      "metric": "Context window",
+                      "unit": "K tokens",
+                      "higherIsBetter": true,
+                      "maxValue": 128,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Llama 3",
+                          "value": 8,
+                          "display": "8K",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Llama 3.1 405B",
+                          "value": 128,
+                          "display": "128K",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "Parameters",
+                      "score": "405B",
+                      "comparator": "Meta 发布的最大 Llama 3.1 模型",
+                      "interpretation": "提供开放生态的强教师模型。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Context",
+                      "score": "128K",
+                      "comparator": "相比 Llama 3 明显扩展",
+                      "interpretation": "让开放模型进入长文档任务。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "Dense 开放权重模型",
+                  "professorNote": "学习重点是大 dense 模型如何服务开放生态。",
+                  "bullets": [
+                    "405B 参数。",
+                    "多尺寸模型族。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 Llama 2/3 到前沿开放模型",
+                  "professorNote": "Meta 继续用开放权重扩大生态影响力。",
+                  "bullets": [
+                    "继承开放模型路线。",
+                    "扩大上下文和规模。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "大规模预训练与指令微调",
+                  "professorNote": "公开信息强调训练规模和多语言/代码能力。",
+                  "bullets": [
+                    "更大训练数据。",
+                    "后训练提高指令遵循。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "开放前沿教师模型",
+                  "professorNote": "创新点是把强模型能力开放给社区改造。",
+                  "bullets": [
+                    "支持蒸馏。",
+                    "支持企业私有化。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "部署门槛高",
+                  "professorNote": "强开放模型仍需工程能力才能落地。",
+                  "bullets": [
+                    "显存成本高。",
+                    "安全治理责任转移给部署方。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Llama 3.1",
+                  "professorNote": "用小模型练生态，用 405B 理解教师模型意义。",
+                  "bullets": [
+                    "跑 8B/70B。",
+                    "研究许可和安全工具。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "llama-4-scout",
+              "name": "Llama 4 Scout",
+              "kind": "model",
+              "publishedAt": "2025-04-05",
+              "positioning": "Llama 4 系列中的长上下文 MoE 模型，17B active parameters、16 experts、10M context。",
+              "oneSentenceTakeaway": "Scout 的重点是长上下文和部署效率：它让开放模型探索超长材料任务。",
+              "problemSolved": "长文档、代码库和多模态资料需要超长上下文，但全量大模型推理成本过高。",
+              "keyChanges": [
+                "MoE 架构，17B active parameters。",
+                "16 experts。",
+                "官方称支持 10M context。"
+              ],
+              "whyChanged": "开放模型要覆盖更长任务，同时还要能被更多硬件部署。",
+              "howSolved": "通过 MoE 只激活部分专家，并把上下文窗口大幅扩展。",
+              "tradeoffs": [
+                "超长上下文会引入噪声。",
+                "MoE 路由复杂度更高。"
+              ],
+              "studentTakeaways": [
+                "理解 active parameters 和 total parameters 的区别。",
+                "学习长上下文评测。"
+              ],
+              "experiments": [
+                "把一本长文档切入上下文，让模型找跨章节线索。",
+                "比较 RAG 与超长上下文直接输入。"
+              ],
+              "api": {
+                "modelNames": [
+                  "Llama 4 Scout"
+                ],
+                "contextWindow": "10M tokens",
+                "maxOutput": "依赖部署框架",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Local AI",
+                  "Long context"
+                ]
+              },
+              "teacherNote": "Scout 适合学习一个问题：当上下文足够长，RAG 还是否必要？答案通常是仍然必要，但设计会变化。",
+              "sources": [
+                {
+                  "name": "Llama 4 multimodal intelligence",
+                  "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/"
+                }
+              ],
+              "nextRelation": {
+                "toReleaseId": "llama-4-maverick",
+                "summary": "Maverick 不是 Scout 的简单后继，而是同代里更偏质量和通用助手的 MoE 分支。",
+                "inherits": "继承 Llama 4 的 MoE、多模态和开放权重路线。",
+                "changes": "专家数量从 16 扩到 128，更强调通用质量和竞技场表现。",
+                "why": "Scout 偏长上下文，Maverick 需要覆盖更广泛的日常和开发者任务。",
+                "solvedBy": "通过更多专家和更强模型容量，提升通用能力。",
+                "teacherNote": "同一代模型也会分工：不是所有新模型都服务同一个目标。"
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Llama 4 Scout 的 benchmark 信号更像系统指标：10M context 和 17B active parameters。",
+                  "professorNote": "Scout 要从架构指标读，不要只问它聊天分数多少。它回答的是开放模型如何处理超长上下文。",
+                  "caveats": [
+                    "10M context 不等于 10M 信息都被同等使用。",
+                    "部署效果依赖推理框架。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Context expansion",
+                      "metric": "Context window",
+                      "unit": "K tokens",
+                      "higherIsBetter": true,
+                      "maxValue": 10000,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Llama 3.1",
+                          "value": 128,
+                          "display": "128K",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Llama 4 Scout",
+                          "value": 10000,
+                          "display": "10M",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "Active parameters",
+                      "score": "17B",
+                      "comparator": "官方架构指标",
+                      "interpretation": "说明每次推理只激活一部分模型。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Experts",
+                      "score": "16",
+                      "comparator": "官方架构指标",
+                      "interpretation": "展示 MoE 路由设计。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "MoE 长上下文模型",
+                  "professorNote": "重点理解专家路由和 active parameters。",
+                  "bullets": [
+                    "16 experts。",
+                    "17B active parameters。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 dense 到 MoE",
+                  "professorNote": "Llama 4 开始把开放模型推向 MoE。",
+                  "bullets": [
+                    "继承开放权重。",
+                    "转向专家路由。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "多模态和长上下文训练",
+                  "professorNote": "Scout 需要学习在极长输入中保持相关性。",
+                  "bullets": [
+                    "长上下文样本。",
+                    "图文任务。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "10M context 开放模型",
+                  "professorNote": "长上下文是它的最大差异点。",
+                  "bullets": [
+                    "适合长文档实验。",
+                    "适合 RAG 对比。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "长上下文使用难",
+                  "professorNote": "输入越长越需要检索和摘要策略。",
+                  "bullets": [
+                    "容易被无关材料干扰。",
+                    "推理成本仍高。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Scout",
+                  "professorNote": "用它比较 RAG 和直接长上下文。",
+                  "bullets": [
+                    "设计跨章节问题。",
+                    "记录引用是否准确。"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "llama-4-maverick",
+              "name": "Llama 4 Maverick",
+              "kind": "model",
+              "publishedAt": "2025-04-05",
+              "positioning": "Llama 4 系列中的高质量通用 MoE 模型，17B active parameters、128 experts。",
+              "oneSentenceTakeaway": "Maverick 展示了开放 MoE 模型如何用更多专家提升通用质量，同时控制活跃计算。",
+              "problemSolved": "开放模型既要高质量，又要比 dense 巨型模型更可部署。",
+              "keyChanges": [
+                "17B active parameters。",
+                "128 experts。",
+                "官方披露 LMArena ELO 1417。"
+              ],
+              "whyChanged": "通用助手任务需要更高模型容量和更丰富专家分工。",
+              "howSolved": "用更多专家提高总容量，但每次推理保持较低活跃参数。",
+              "tradeoffs": [
+                "MoE 部署和量化更复杂。",
+                "开放模型质量仍依赖生态微调。"
+              ],
+              "studentTakeaways": [
+                "理解 MoE 的质量/成本折中。",
+                "区分总参数和活跃参数。"
+              ],
+              "experiments": [
+                "比较 Maverick 与同尺寸 dense 模型在中文、代码和视觉任务上的表现。",
+                "观察不同推理框架对 MoE 延迟的影响。"
+              ],
+              "api": {
+                "modelNames": [
+                  "Llama 4 Maverick"
+                ],
+                "contextWindow": "以 Meta 发布和部署框架为准",
+                "maxOutput": "依赖部署框架",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Local AI",
+                  "MoE"
+                ]
+              },
+              "teacherNote": "Maverick 是学习 MoE 的好案例：强模型不一定每次都激活全部参数。",
+              "sources": [
+                {
+                  "name": "Llama 4 multimodal intelligence",
+                  "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/"
+                }
+              ],
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "Llama 4 Maverick 的公开信号是 128 experts、17B active parameters 和 LMArena ELO 1417。",
+                  "professorNote": "这里要把架构指标和用户偏好指标一起读：专家更多代表容量，ELO 代表综合体验。",
+                  "caveats": [
+                    "Arena 分数会随榜单变化。",
+                    "MoE 部署效果依赖框架和硬件。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Llama 4 MoE experts",
+                      "metric": "Number of experts",
+                      "unit": "experts",
+                      "higherIsBetter": true,
+                      "maxValue": 128,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "Scout",
+                          "value": 16,
+                          "display": "16",
+                          "highlight": false
+                        },
+                        {
+                          "label": "Maverick",
+                          "value": 128,
+                          "display": "128",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "LMArena ELO",
+                      "score": "1417",
+                      "comparator": "Meta 官方发布披露",
+                      "interpretation": "说明 Maverick 在用户偏好类评测中有竞争力。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "Active parameters",
+                      "score": "17B",
+                      "comparator": "和 Scout 一样的活跃参数量",
+                      "interpretation": "说明容量增加不一定等于每次推理成本线性增加。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "大专家池 MoE",
+                  "professorNote": "Maverick 的核心是更多专家带来的容量提升。",
+                  "bullets": [
+                    "128 experts。",
+                    "17B active parameters。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "Llama 4 的质量分支",
+                  "professorNote": "与 Scout 同代但目标不同。",
+                  "bullets": [
+                    "继承多模态 MoE。",
+                    "更偏通用助手质量。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "多任务专家分工",
+                  "professorNote": "专家越多，越需要路由学会把任务分配给合适子网络。",
+                  "bullets": [
+                    "多任务训练。",
+                    "多模态训练。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "开放 MoE 的工程样本",
+                  "professorNote": "学生可以学习 MoE 如何进入开放生态。",
+                  "bullets": [
+                    "专家路由。",
+                    "开放部署挑战。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "部署更复杂",
+                  "professorNote": "MoE 对推理系统提出更高要求。",
+                  "bullets": [
+                    "路由和缓存复杂。",
+                    "量化支持不一。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 Maverick",
+                  "professorNote": "用它理解模型容量和推理成本分离。",
+                  "bullets": [
+                    "画出总参数/活跃参数关系。",
+                    "测试不同硬件上的延迟。"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "updates": [
+        {
+          "id": "meta-llama-stack",
+          "title": "Llama Stack 与开放模型应用生态",
+          "kind": "Open Source",
+          "publishedAt": "2024-07-23",
+          "summary": "Meta 围绕 Llama 建设工具链，让开发者更容易部署、微调和构建应用。",
+          "whyItMatters": "开放模型的真正价值来自生态工具，而不是单个权重文件。",
+          "studentTakeaway": "学本地 AI 时要同时学推理框架、微调、评测和安全工具。",
+          "sources": [
+            {
+              "name": "Introducing Llama 3.1",
+              "url": "https://ai.meta.com/blog/meta-llama-3-1/"
+            }
+          ]
+        },
+        {
+          "id": "meta-llama-guard",
+          "title": "Llama Guard / Prompt Guard 安全工具",
+          "kind": "Safety",
+          "publishedAt": "2024-07-23",
+          "summary": "Meta 将安全模型和开放权重主线配套发布。",
+          "whyItMatters": "开放模型越强，部署方越需要自己的安全和内容治理能力。",
+          "studentTakeaway": "评估开放模型时不要只看能力，也要看安全栈。",
+          "sources": [
+            {
+              "name": "Introducing Llama 3.1",
+              "url": "https://ai.meta.com/blog/meta-llama-3-1/"
             }
           ]
         }

@@ -267,7 +267,7 @@ function ModelMap({
     <div className="capability-map">
       <div>
         <div className="section-kicker">Capability Map</div>
-        <h3>从推理、效率到 Agent 基座</h3>
+        <h3>{company.shortName} 模型路线图</h3>
       </div>
       <div className="map-canvas">
         {allReleases.map(({ release, seriesId }, index) => (
@@ -279,7 +279,7 @@ function ModelMap({
               onReleaseChange(release.id);
             }}
           >
-            <span>{release.name.replace("DeepSeek-", "")}</span>
+            <span>{shortModelName(release.name, company.shortName)}</span>
             <small>{release.kind}</small>
           </button>
         ))}
@@ -290,8 +290,9 @@ function ModelMap({
         <div className="map-line line-e" />
       </div>
       <div className="map-legend">
-        <span>R 系列：推理能力独立化</span>
-        <span>V 系列：通用模型吸收推理、工具和长上下文</span>
+        {company.series.map((series) => (
+          <span key={series.id}>{series.title}：{series.summary}</span>
+        ))}
       </div>
     </div>
   );
@@ -306,12 +307,21 @@ function ReleaseSwitcher({ series, activeReleaseId, onReleaseChange }: { series:
           className={`release-tab${activeReleaseId === release.id ? " active" : ""}`}
           onClick={() => onReleaseChange(release.id)}
         >
-          <span>{release.name.replace("DeepSeek-", "")}</span>
+          <span>{shortModelName(release.name)}</span>
           <small>{formatDate(release.publishedAt)}</small>
         </button>
       ))}
     </div>
   );
+}
+
+function shortModelName(name: string, companyName = ""): string {
+  return name
+    .replace(/^DeepSeek-/, "")
+    .replace(new RegExp(`^${companyName}\\s+`, "i"), "")
+    .replace(/^OpenAI\s+/, "")
+    .replace(/^Claude\s+/, "")
+    .trim();
 }
 
 type LensKey = "benchmark" | "architecture" | "training" | "innovation" | "professor";
