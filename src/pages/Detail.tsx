@@ -50,7 +50,7 @@ export function Detail({ owner, name }: Props) {
       <>
         <Header />
         <div className="detail">
-          <div className="breadcrumb"><a href="#/">← 返回榜单</a></div>
+          <div className="breadcrumb"><a href="#/projects">← 返回项目榜单</a></div>
           <div className="notice">没找到 <b>{owner}/{name}</b>。可能不在当前的日 / 周 / 月榜上。</div>
         </div>
       </>
@@ -65,8 +65,8 @@ export function Detail({ owner, name }: Props) {
       <Header />
       <div className="detail">
         <div className="breadcrumb">
-          <a href="#/">榜单</a><span className="sep">/</span>
-          <a href="#/">{BOARD_LABEL[win]}</a><span className="sep">/</span>
+          <a href="#/projects">Projects</a><span className="sep">/</span>
+          <a href="#/projects">{BOARD_LABEL[win]}</a><span className="sep">/</span>
           <span>{repo.fullName}</span>
         </div>
 
@@ -186,7 +186,7 @@ export function Detail({ owner, name }: Props) {
 }
 
 function Header() {
-  return <SiteHeader active="home" />;
+  return <SiteHeader active="projects" />;
 }
 
 function Hero({ repo, win, deep }: { repo: AnalyzedRepo; win: TrendingWindow; deep: AnalyzedRepo["deep"] | null }) {

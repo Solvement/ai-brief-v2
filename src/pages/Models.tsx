@@ -466,7 +466,16 @@ function MissingAnalysisFallback({ release }: { release: ModelRelease }) {
 }
 
 function BenchmarkLens({ release }: { release: ModelRelease }) {
-  const benchmark = release.modelAnalysis.benchmark;
+  const benchmark = release.modelAnalysis?.benchmark;
+  if (
+    !benchmark ||
+    !Array.isArray(benchmark.charts) ||
+    !Array.isArray(benchmark.items) ||
+    !Array.isArray(benchmark.caveats)
+  ) {
+    return <MissingAnalysisFallback release={release} />;
+  }
+
   return (
     <section className="analysis-lens benchmark-lens">
       <div className="lens-head">
@@ -501,7 +510,8 @@ function BenchmarkLens({ release }: { release: ModelRelease }) {
 }
 
 function BenchmarkChart({ chart }: { chart: ModelBenchmarkChart }) {
-  const maxValue = chart.maxValue || Math.max(...chart.bars.map((barItem) => barItem.value), 1);
+  const bars = Array.isArray(chart.bars) ? chart.bars : [];
+  const maxValue = chart.maxValue || Math.max(...bars.map((barItem) => barItem.value), 1);
   return (
     <div className="benchmark-chart-card">
       <div className="benchmark-chart-head">
@@ -512,7 +522,7 @@ function BenchmarkChart({ chart }: { chart: ModelBenchmarkChart }) {
         <b>{sourceTypeLabel(chart.sourceType)}</b>
       </div>
       <div className="chart-bars">
-        {chart.bars.map((barItem) => {
+        {bars.map((barItem) => {
           const width = Math.max(4, Math.min(100, (barItem.value / maxValue) * 100));
           return (
             <div className={`chart-row${barItem.highlight ? " highlight" : ""}`} key={`${chart.title}-${barItem.label}`}>
@@ -532,7 +542,7 @@ function BenchmarkChart({ chart }: { chart: ModelBenchmarkChart }) {
   );
 }
 
-function CompoundLens({ kicker, sections }: { kicker: string; sections: { title: string; section: ModelAnalysisSection }[] }) {
+function CompoundLens({ kicker, sections }: { kicker: string; sections: { title: string; section?: ModelAnalysisSection }[] }) {
   return (
     <section className="analysis-lens">
       <div className="section-kicker">{kicker}</div>
@@ -557,14 +567,15 @@ function ProfessorLens({ release }: { release: ModelRelease }) {
   );
 }
 
-function AnalysisSection({ title, section }: { title: string; section: ModelAnalysisSection }) {
+function AnalysisSection({ title, section }: { title: string; section?: ModelAnalysisSection }) {
+  const bullets = Array.isArray(section?.bullets) ? section.bullets : [];
   return (
     <div className="lens-section">
       <span>{title}</span>
-      <h4>{section.headline}</h4>
-      <p>{section.professorNote}</p>
+      <h4>{section?.headline || "分析数据未就绪"}</h4>
+      <p>{section?.professorNote || "当前数据缺少这个分析维度，先用基础信息继续阅读，避免页面白屏。"}</p>
       <ul>
-        {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+        {bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
       </ul>
     </div>
   );
