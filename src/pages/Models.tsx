@@ -406,6 +406,7 @@ function LensTabs({ activeLens, onChange }: { activeLens: LensKey; onChange: (le
 function LensView({ release, activeLens }: { release: ModelRelease; activeLens: LensKey }) {
   const analysis = release.modelAnalysis;
 
+  if (!analysis) return <MissingAnalysisFallback release={release} />;
   if (activeLens === "benchmark") return <BenchmarkLens release={release} />;
   if (activeLens === "architecture") {
     return (
@@ -448,6 +449,20 @@ function LensView({ release, activeLens }: { release: ModelRelease; activeLens: 
     );
   }
   return <ProfessorLens release={release} />;
+}
+
+function MissingAnalysisFallback({ release }: { release: ModelRelease }) {
+  return (
+    <section className="analysis-lens stale-analysis-fallback">
+      <div className="section-kicker">Data Refresh Needed</div>
+      <h3>这个模型版本还没有加载到新的分析结构</h3>
+      <p>如果你刚刚更新过项目，刷新页面即可拿到 Benchmark、架构、训练、创新和教授视角。当前先显示基础摘要，避免旧缓存导致页面白屏。</p>
+      <div className="model-lens-row">
+        <ListBlock title="关键能力" items={release.keyChanges} />
+        <ListBlock title="适合重点学习" items={release.studentTakeaways} />
+      </div>
+    </section>
+  );
 }
 
 function BenchmarkLens({ release }: { release: ModelRelease }) {
