@@ -1,0 +1,351 @@
+{
+  "generatedAt": "2026-05-14T22:20:00.000Z",
+  "papers": [
+    {
+      "id": "attention-is-all-you-need",
+      "title": "Attention Is All You Need",
+      "shortTitle": "Transformer",
+      "authors": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin",
+      "venue": "NeurIPS 2017 / arXiv:1706.03762",
+      "arxivId": "1706.03762",
+      "contentType": "paper",
+      "publishedAt": "2017-06-12",
+      "updatedAt": "2023-08-02",
+      "oneSentenceTakeaway": "Transformer 的真正版本价值不只是提出 self-attention，而是把序列建模从循环/卷积训练瓶颈里解放出来。",
+      "whyItMatters": "几乎所有现代 LLM、扩散模型文本编码器、多模态模型和 agent 语言骨架都继承了这篇论文的核心抽象。",
+      "targetAudience": ["AI 学生", "LLM 学习者", "模型架构学习者", "论文精读者"],
+      "readingTime": "22 min",
+      "actionLabel": "精读 Transformer 版本线",
+      "impactScore": 100,
+      "readabilityScore": 78,
+      "actionabilityScore": 86,
+      "confidenceScore": 95,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "tags": ["Research", "Multimodal", "RAG", "AI Coding"],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/1706.03762",
+      "sources": [
+        { "name": "arXiv:1706.03762", "url": "https://arxiv.org/abs/1706.03762" },
+        { "name": "NeurIPS Proceedings", "url": "https://papers.nips.cc/paper/7181-attention-is-all-you-need" }
+      ],
+      "versionQuestion": "为什么 v1 的研究突破，在 v7 之后仍然值得回头读？",
+      "versions": [
+        {
+          "id": "transformer-v1",
+          "label": "v1 初稿",
+          "submittedAt": "2017-06-12",
+          "versionType": "Research Breakthrough",
+          "changeSummary": "首次提出完全基于 attention 的 encoder-decoder 架构，去掉 RNN/CNN 序列路径。",
+          "whyChanged": "当时机器翻译主流仍依赖循环或卷积结构，训练并行度和长距离依赖都是核心瓶颈。",
+          "readerQuestion": "如果不用循环，模型如何知道词序和远距离依赖？",
+          "evidence": "arXiv 显示 v1 提交于 2017-06-12；摘要给出 WMT14 En-De 28.4 BLEU、En-Fr 41.8 BLEU。",
+          "impactScore": 100
+        },
+        {
+          "id": "transformer-v5",
+          "label": "v5 会议稳定版",
+          "submittedAt": "2017-12-06",
+          "versionType": "Conference Stabilization",
+          "changeSummary": "研究主张已经稳定，读者应重点看 architecture、attention、positional encoding 和 BLEU 实验如何互相支撑。",
+          "whyChanged": "会议版通常会把论证、实验表述和相关工作打磨成可引用形态。",
+          "readerQuestion": "哪些设计是后来 LLM 继承的核心，哪些只是机器翻译时代的配置？",
+          "evidence": "arXiv submission history 显示 v5 为 2017-12-06；NeurIPS 2017 收录版本成为主流引用基础。",
+          "impactScore": 96
+        },
+        {
+          "id": "transformer-v7",
+          "label": "v7 长期维护版",
+          "submittedAt": "2023-08-02",
+          "versionType": "Long-tail Maintenance",
+          "changeSummary": "多年后仍有版本维护，说明这类基础论文不只是历史材料，也需要在引用、元数据或排版层面保持可用。",
+          "whyChanged": "高影响论文会被教材、课程和复现工程长期使用，后续版本常服务于可引用性和长期维护。",
+          "readerQuestion": "当一篇论文已经成为基础设施，读论文时应该读原始创新还是读后续生态？",
+          "evidence": "arXiv 显示最后修订为 2023-08-02 v7。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "v1 是范式突破，v5 是会议稳定表达，v7 是长期维护信号。学习时应该先读 v1 的问题意识，再用最终版确认公式、实验和引用。",
+      "conceptMap": ["Self-attention", "Multi-head attention", "Positional encoding", "Encoder-decoder", "Parallel training"],
+      "charts": [
+        {
+          "title": "WMT14 headline results",
+          "metric": "BLEU reported in abstract",
+          "unit": "BLEU",
+          "maxValue": 50,
+          "bars": [
+            { "label": "En-De", "value": 28.4, "display": "28.4", "highlight": true },
+            { "label": "En-Fr", "value": 41.8, "display": "41.8", "highlight": true }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "把序列建模的核心计算从逐步递归改成可并行 attention，让模型同时获得长距离依赖和训练效率。",
+        "background": "RNN/CNN 在序列任务中要么难以并行，要么需要堆很多层才能覆盖长距离关系。",
+        "method": "用 scaled dot-product attention、multi-head attention、position-wise feed-forward 和 positional encoding 组成 encoder-decoder。",
+        "experiments": "机器翻译实验显示质量和训练效率同时提升，并在 English-to-German、English-to-French 上给出强结果。",
+        "limitations": "原论文阶段还没有解决超长上下文、检索增强、稀疏 attention 和大规模预训练问题。",
+        "professorLens": "教授会让学生先画出一层 Transformer 的数据流，再解释为什么 attention 的矩阵乘法比 RNN 时间步更适合 GPU。",
+        "verificationChecklist": ["能手写 Q/K/V 计算流程", "能解释 positional encoding 为什么必要", "能区分 encoder-decoder Transformer 和 decoder-only LLM", "能说明 BLEU 指标和今天 LLM 评测的差异"]
+      },
+      "nextSteps": ["读第 3 节模型架构并画图。", "用小矩阵手算一次 attention。", "再读 BERT/GPT，观察 Transformer 如何分化成 encoder-only 与 decoder-only。"]
+    },
+    {
+      "id": "retrieval-augmented-generation",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "shortTitle": "RAG",
+      "authors": "Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela",
+      "venue": "NeurIPS 2020 / arXiv:2005.11401",
+      "arxivId": "2005.11401",
+      "contentType": "paper",
+      "publishedAt": "2020-05-22",
+      "updatedAt": "2021-04-12",
+      "oneSentenceTakeaway": "RAG 的核心不是“先搜再答”这么简单，而是把参数记忆和非参数记忆接成可训练的生成系统。",
+      "whyItMatters": "今天几乎所有企业知识库、AI 搜索、文档问答和 agent 记忆系统都在使用 RAG 思想的工程化变体。",
+      "targetAudience": ["AI 学生", "RAG 工程师", "Agent 学习者", "企业知识库开发者"],
+      "readingTime": "18 min",
+      "actionLabel": "精读 RAG 版本线",
+      "impactScore": 96,
+      "readabilityScore": 82,
+      "actionabilityScore": 94,
+      "confidenceScore": 93,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "tags": ["RAG", "Workflow", "Agent", "Research", "Business"],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/2005.11401",
+      "sources": [
+        { "name": "arXiv:2005.11401", "url": "https://arxiv.org/abs/2005.11401" },
+        { "name": "NeurIPS 2020", "url": "https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html" }
+      ],
+      "versionQuestion": "RAG 从初稿到 NeurIPS 接收版，读者应该关注哪些论证被稳定下来？",
+      "versions": [
+        {
+          "id": "rag-v1",
+          "label": "v1 初稿",
+          "submittedAt": "2020-05-22",
+          "versionType": "Initial Method",
+          "changeSummary": "提出把预训练 seq2seq 模型和 dense vector index 的 Wikipedia 记忆结合。",
+          "whyChanged": "纯参数模型更新知识困难，且难以给出来源；检索模块可以补足外部知识。",
+          "readerQuestion": "知识应该存在模型参数里，还是存在可更新的外部索引里？",
+          "evidence": "arXiv 显示 v1 提交于 2020-05-22；摘要说明 parametric memory + non-parametric memory。",
+          "impactScore": 96
+        },
+        {
+          "id": "rag-v2",
+          "label": "v2 接收前修订",
+          "submittedAt": "2020-12-07",
+          "versionType": "Conference Revision",
+          "changeSummary": "版本进入会议期修订，读者应重点确认实验范围、任务设置和 RAG-Sequence / RAG-Token 的比较。",
+          "whyChanged": "从方法初稿到会议论文，需要让实验、baseline 和表述更可审查。",
+          "readerQuestion": "两种 RAG formulation 分别适合什么生成场景？",
+          "evidence": "arXiv history 显示 v2 为 2020-12-07；comments 标注 accepted at NeurIPS 2020。",
+          "impactScore": 90
+        },
+        {
+          "id": "rag-v4",
+          "label": "v4 最终 arXiv 版",
+          "submittedAt": "2021-04-12",
+          "versionType": "Finalized Reference",
+          "changeSummary": "最终版本成为后续 RAG 工程和研究引用的稳定入口。",
+          "whyChanged": "高影响方法需要稳定的 citation、排版和最终实验说明，便于后续研究复用。",
+          "readerQuestion": "今天的向量数据库 RAG 和原论文的 end-to-end RAG 有何差异？",
+          "evidence": "arXiv 显示最后修订为 2021-04-12 v4。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "v1 负责提出 parametric/non-parametric memory 组合，v2/v4 负责把方法论证稳定成可引用版本。今天读 RAG，要同时读论文方法和现代工程变体的差异。",
+      "conceptMap": ["Parametric memory", "Non-parametric memory", "Dense retrieval", "RAG-Sequence", "RAG-Token", "Provenance"],
+      "charts": [
+        {
+          "title": "RAG design split",
+          "metric": "Core formulation count",
+          "unit": "count",
+          "maxValue": 4,
+          "bars": [
+            { "label": "Memory types", "value": 2, "display": "2" },
+            { "label": "RAG formulations", "value": 2, "display": "2", "highlight": true },
+            { "label": "arXiv versions", "value": 4, "display": "v1-v4" }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "模型不应该只依赖参数记忆；可更新、可追溯的外部记忆能让生成更适合知识密集任务。",
+        "background": "纯语言模型在事实更新、来源追踪和长尾知识上受限，传统检索系统又缺少生成能力。",
+        "method": "用 dense retriever 找 Wikipedia passage，再由 seq2seq generator 基于检索结果生成答案；论文比较 RAG-Sequence 和 RAG-Token。",
+        "experiments": "在开放域问答和生成任务上比较 parametric-only 与 retrieval-augmented 模型，强调事实性、具体性和多样性。",
+        "limitations": "原始 RAG 不是今天企业 RAG 的完整答案，现代系统还要处理 chunking、rerank、权限、缓存、引用和评测。",
+        "professorLens": "教授会要求学生区分研究 RAG 和工程 RAG：前者关注可训练 formulation，后者关注数据治理和检索质量。",
+        "verificationChecklist": ["能解释 parametric vs non-parametric memory", "能画出 retriever-generator 数据流", "能区分 RAG-Sequence 和 RAG-Token", "能设计一个引用正确率评测"]
+      },
+      "nextSteps": ["读摘要和方法图。", "用 5 篇文档手写一个最小 RAG。", "比较不检索、只检索、检索+生成三种输出。"]
+    },
+    {
+      "id": "lora",
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "shortTitle": "LoRA",
+      "authors": "Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen",
+      "venue": "ICLR 2022 / arXiv:2106.09685",
+      "arxivId": "2106.09685",
+      "contentType": "paper",
+      "publishedAt": "2021-06-17",
+      "updatedAt": "2021-10-16",
+      "oneSentenceTakeaway": "LoRA 的版本分析重点是：一个简单低秩假设如何通过更强 baseline 和延迟实验变成可信工程方法。",
+      "whyItMatters": "LoRA 是今天大模型微调、adapter 生态、QLoRA、PEFT 和本地模型训练的基础方法之一。",
+      "targetAudience": ["AI 学生", "微调学习者", "Local AI 开发者", "模型工程师"],
+      "readingTime": "16 min",
+      "actionLabel": "精读 LoRA 版本线",
+      "impactScore": 95,
+      "readabilityScore": 86,
+      "actionabilityScore": 95,
+      "confidenceScore": 94,
+      "difficulty": "intermediate",
+      "recommendedAction": "try",
+      "tags": ["Local AI", "Open Source", "AI Coding", "Research"],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/2106.09685",
+      "sources": [
+        { "name": "arXiv:2106.09685", "url": "https://arxiv.org/abs/2106.09685" },
+        { "name": "LoRA GitHub", "url": "https://github.com/microsoft/LoRA" }
+      ],
+      "versionQuestion": "为什么 LoRA v2 的 baseline 和 latency 补强，比单纯提出方法更重要？",
+      "versions": [
+        {
+          "id": "lora-v1",
+          "label": "v1 方法初稿",
+          "submittedAt": "2021-06-17",
+          "versionType": "Initial Method",
+          "changeSummary": "提出冻结预训练权重，只训练低秩分解矩阵来完成下游适配。",
+          "whyChanged": "全量微调 175B 级模型成本过高，部署多个 full fine-tuned checkpoint 不现实。",
+          "readerQuestion": "为什么权重更新可以用低秩矩阵近似？",
+          "evidence": "arXiv 显示 v1 提交于 2021-06-17；摘要称 trainable parameters 可减少 10,000 倍，GPU memory 需求减少 3 倍。",
+          "impactScore": 95
+        },
+        {
+          "id": "lora-v2",
+          "label": "v2 实验补强",
+          "submittedAt": "2021-10-16",
+          "versionType": "Baselines & Latency",
+          "changeSummary": "作者在 comments 中说明 v2 加入 better baselines、GLUE 实验和更多 adapter latency 分析。",
+          "whyChanged": "参数高效方法最容易被质疑 baseline 不公平或推理延迟隐藏成本，v2 正是在补这些可信度缺口。",
+          "readerQuestion": "LoRA 的优势来自低秩方法本身，还是来自比较对象设置？",
+          "evidence": "arXiv comments: Draft V2 includes better baselines, experiments on GLUE, and more on adapter latency。",
+          "impactScore": 92
+        }
+      ],
+      "versionRelation": "v1 给出核心低秩思想，v2 补上 baseline、公平比较和 latency 论证。学生读 LoRA 时，必须把方法简洁性和实验可信度一起看。",
+      "conceptMap": ["Low-rank adaptation", "Frozen pretrained weights", "Trainable rank matrices", "Adapter latency", "PEFT"],
+      "charts": [
+        {
+          "title": "Efficiency claims",
+          "metric": "Reduction factor reported in abstract",
+          "unit": "x",
+          "maxValue": 10000,
+          "bars": [
+            { "label": "Trainable params", "value": 10000, "display": "10,000x", "highlight": true },
+            { "label": "GPU memory", "value": 3, "display": "3x" }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "下游微调不一定需要更新全部参数；许多任务的有效权重更新可以落在低秩子空间里。",
+        "background": "模型越大，全量微调越贵，保存和部署多个任务版本也越困难。",
+        "method": "冻结原模型，在 Transformer 层里注入可训练的低秩矩阵 A/B，只训练这些小矩阵。",
+        "experiments": "比较 RoBERTa、DeBERTa、GPT-2、GPT-3 上的质量、吞吐、参数量和 adapter latency。",
+        "limitations": "LoRA 的 rank、插入层位置、目标模块选择会影响效果；它也不能替代数据质量和评测。",
+        "professorLens": "教授会要求学生自己算一次参数量：为什么 d x r + r x k 比 d x k 小得多。",
+        "verificationChecklist": ["能写出 W + BA 的形式", "能解释 rank r 的作用", "能说明为什么 LoRA 没有额外推理层延迟", "能用 PEFT 跑一个小模型微调"]
+      },
+      "nextSteps": ["用一个小模型跑 LoRA 微调。", "比较 r=4、r=8、r=16 的效果和显存。", "读 QLoRA，理解量化和 LoRA 如何组合。"]
+    },
+    {
+      "id": "dpo",
+      "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+      "shortTitle": "DPO",
+      "authors": "Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D. Manning, Chelsea Finn",
+      "venue": "NeurIPS 2023 / arXiv:2305.18290",
+      "arxivId": "2305.18290",
+      "contentType": "paper",
+      "publishedAt": "2023-05-29",
+      "updatedAt": "2024-07-29",
+      "oneSentenceTakeaway": "DPO 的版本价值在于把复杂 RLHF 管线重写成一个简单分类损失，并在后续版本中稳定成偏好优化基础读物。",
+      "whyItMatters": "今天大量开源对齐、偏好优化、RLHF 替代方法和指令模型训练都会拿 DPO 做基线。",
+      "targetAudience": ["AI 学生", "对齐学习者", "开源模型训练者", "LLM 研究者"],
+      "readingTime": "20 min",
+      "actionLabel": "精读 DPO 版本线",
+      "impactScore": 94,
+      "readabilityScore": 80,
+      "actionabilityScore": 90,
+      "confidenceScore": 92,
+      "difficulty": "advanced",
+      "recommendedAction": "read",
+      "tags": ["Research", "Safety", "Open Source", "Prompt"],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/2305.18290",
+      "sources": [
+        { "name": "arXiv:2305.18290", "url": "https://arxiv.org/abs/2305.18290" },
+        { "name": "DPO project", "url": "https://github.com/eric-mitchell/direct-preference-optimization" }
+      ],
+      "versionQuestion": "DPO 为什么能把 RLHF 从 reward model + RL 变成 supervised-style preference loss？",
+      "versions": [
+        {
+          "id": "dpo-v1",
+          "label": "v1 方法初稿",
+          "submittedAt": "2023-05-29",
+          "versionType": "Initial Method",
+          "changeSummary": "提出一种 reward model 参数化，使最优 policy 可以闭式表达，从而用简单分类损失优化偏好。",
+          "whyChanged": "PPO 式 RLHF 复杂、不稳定、需要 reward model 和采样，开源训练者很难复现。",
+          "readerQuestion": "DPO 是不是去掉了 reward model，还是把 reward model 隐式写进了 policy？",
+          "evidence": "arXiv 显示 v1 提交于 2023-05-29；摘要说明 DPO eliminates sampling during fine-tuning and significant hyperparameter tuning。",
+          "impactScore": 94
+        },
+        {
+          "id": "dpo-v2",
+          "label": "v2 会议期修订",
+          "submittedAt": "2023-12-13",
+          "versionType": "Review Revision",
+          "changeSummary": "进入会议后修订阶段，读者应重点检查推导、实验设置和与 PPO/RLHF baseline 的比较。",
+          "whyChanged": "偏好优化论文最核心的质疑通常来自推导假设和 baseline 公平性。",
+          "readerQuestion": "DPO 的稳定性来自目标函数，还是来自实现细节更少？",
+          "evidence": "arXiv history 显示 v2 为 2023-12-13。",
+          "impactScore": 88
+        },
+        {
+          "id": "dpo-v3",
+          "label": "v3 最终维护版",
+          "submittedAt": "2024-07-29",
+          "versionType": "Stable Reference",
+          "changeSummary": "最终版本成为后续 IPO、KTO、ORPO、SimPO 等偏好优化方法比较的基础参照。",
+          "whyChanged": "当一个方法成为基线，版本稳定性会影响后续论文如何引用、复现和对比。",
+          "readerQuestion": "后续 DPO 变体到底是在改目标函数，还是在改数据和正则？",
+          "evidence": "arXiv 显示最后修订为 2024-07-29 v3。",
+          "impactScore": 86
+        }
+      ],
+      "versionRelation": "v1 提出从 RLHF 到分类损失的核心变换；v2/v3 让推导和实验成为稳定引用。学生应从 DPO 再往后读偏好优化家族。",
+      "conceptMap": ["Preference pairs", "Implicit reward", "KL constraint", "Classification loss", "RLHF without PPO"],
+      "charts": [
+        {
+          "title": "Pipeline simplification",
+          "metric": "Training components",
+          "unit": "steps",
+          "maxValue": 4,
+          "bars": [
+            { "label": "PPO-style RLHF", "value": 3, "display": "reward + RL + tuning" },
+            { "label": "DPO", "value": 1, "display": "classification loss", "highlight": true }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "标准 RLHF 的最优解可以改写成一个只依赖偏好对的 supervised-style 目标，降低训练复杂度。",
+        "background": "RLHF 通常需要训练 reward model，再用 PPO 优化 policy，工程不稳定且超参数敏感。",
+        "method": "通过 reward-policy 对偶关系，把偏好概率写成 chosen/rejected response 的 log-prob 差，形成 DPO loss。",
+        "experiments": "论文比较情感控制、摘要和单轮对话质量，强调 DPO 能匹配或超过 PPO-based RLHF。",
+        "limitations": "DPO 仍依赖偏好数据质量；它简化训练管线，但不会自动解决 reward hacking、数据偏见和多轮偏好问题。",
+        "professorLens": "教授会要求学生推一遍 DPO loss：不是背公式，而是理解 reference model、KL 和 preference pair 的角色。",
+        "verificationChecklist": ["能解释 chosen/rejected pair", "能说明 reference model 为什么存在", "能推导 log-ratio 在 loss 中的作用", "能比较 DPO、PPO、KTO/ORPO 的差异"]
+      },
+      "nextSteps": ["先复习 RLHF/PPO 管线。", "手推 DPO loss。", "用一个小偏好数据集训练 DPO，观察 beta 对输出的影响。"]
+    }
+  ]
+}

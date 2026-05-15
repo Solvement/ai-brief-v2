@@ -1,9 +1,11 @@
-import type { ModelsData, TrendingData } from "../types";
+import type { ArticlesData, ModelsData, TrendingData } from "../types";
 
 let cached: TrendingData | null = null;
 let inflight: Promise<TrendingData> | null = null;
 let cachedModels: ModelsData | null = null;
 let inflightModels: Promise<ModelsData> | null = null;
+let cachedArticles: ArticlesData | null = null;
+let inflightArticles: Promise<ArticlesData> | null = null;
 
 /**
  * Load the static trending.json produced by `npm run ingest`.
@@ -39,4 +41,20 @@ export function loadModels(): Promise<ModelsData> {
       inflightModels = null;
     });
   return inflightModels;
+}
+
+export function loadArticles(): Promise<ArticlesData> {
+  if (cachedArticles) return Promise.resolve(cachedArticles);
+  if (inflightArticles) return inflightArticles;
+  inflightArticles = fetch("./data/articles.json", { cache: "no-cache" })
+    .then(async (res) => {
+      if (!res.ok) throw new Error(`加载 articles.json 失败：HTTP ${res.status}`);
+      const data = (await res.json()) as ArticlesData;
+      cachedArticles = data;
+      return data;
+    })
+    .finally(() => {
+      inflightArticles = null;
+    });
+  return inflightArticles;
 }

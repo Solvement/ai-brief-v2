@@ -32,9 +32,9 @@ const HOME_SECTIONS = [
   {
     title: "Articles",
     href: "#/articles",
-    label: "文章解读",
-    body: "把长文、观点和技术分析压缩成判断和行动清单。",
-    state: "规划中",
+    label: "学术文章版本分析",
+    body: "按 arXiv 版本线拆论文：初稿、实验补强、会议稳定版、长期维护版分别改了什么、为什么改、怎么验证读懂。",
+    state: "已接入",
   },
   {
     title: "Courses",

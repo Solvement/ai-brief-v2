@@ -214,3 +214,84 @@ export interface ModelsData {
   generatedAt: string;
   companies: ModelCompany[];
 }
+
+export interface ArticleSource {
+  name: string;
+  url: string;
+}
+
+export interface ArticleVersion {
+  id: string;
+  label: string;
+  submittedAt: string;
+  versionType: string;
+  changeSummary: string;
+  whyChanged: string;
+  readerQuestion: string;
+  evidence: string;
+  impactScore: number;
+}
+
+export interface ArticleChartBar {
+  label: string;
+  value: number;
+  display: string;
+  highlight?: boolean;
+}
+
+export interface ArticleChart {
+  title: string;
+  metric: string;
+  unit: string;
+  maxValue?: number;
+  bars: ArticleChartBar[];
+}
+
+export interface ArticleAnalysis {
+  thesis: string;
+  background: string;
+  method: string;
+  experiments: string;
+  limitations: string;
+  professorLens: string;
+  verificationChecklist: string[];
+}
+
+export interface AcademicArticle {
+  id: string;
+  title: string;
+  shortTitle: string;
+  authors: string;
+  venue: string;
+  arxivId: string;
+  contentType: "paper";
+  publishedAt: string;
+  updatedAt: string;
+  oneSentenceTakeaway: string;
+  whyItMatters: string;
+  targetAudience: string[];
+  readingTime: string;
+  actionLabel: string;
+  impactScore: number;
+  readabilityScore: number;
+  actionabilityScore: number;
+  confidenceScore: number;
+  difficulty: string;
+  recommendedAction: string;
+  tags: string[];
+  sourceName: string;
+  sourceUrl: string;
+  sources: ArticleSource[];
+  versionQuestion: string;
+  versions: ArticleVersion[];
+  versionRelation: string;
+  conceptMap: string[];
+  charts: ArticleChart[];
+  analysis: ArticleAnalysis;
+  nextSteps: string[];
+}
+
+export interface ArticlesData {
+  generatedAt: string;
+  papers: AcademicArticle[];
+}
