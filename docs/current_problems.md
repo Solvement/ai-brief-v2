@@ -133,7 +133,7 @@ What future agents should do:
 - Add cross-content related item generation:
   - model -> paper;
   - paper -> project;
-  - project -> skill/course.
+  - project -> skill.
 
 ### 6. Curated Data Can Become Stale
 

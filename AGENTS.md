@@ -2,7 +2,7 @@
 
 ## Product
 
-This repository is for AI-brief, a Chinese-first AI intelligence product that turns AI news, model updates, tools, projects, papers, articles, guides, and courses into readable, actionable briefings.
+This repository is for AI-brief, a Chinese-first AI intelligence product that turns AI news, model updates, tools, projects, papers, articles, and guides into readable, actionable briefings.
 
 The product principle is:
 
@@ -36,9 +36,8 @@ Use this navigation structure:
 - Projects
 - Skills
 - Articles
-- Courses
 
-Home, Projects, Models, and Articles are implemented right now. News, Skills, and Courses are placeholders. Future sections should be added incrementally without reviving removed legacy code.
+Home, Projects, Models, and Articles are implemented right now. News and Skills are placeholders. Courses has been removed from product scope. Future sections should be added incrementally without reviving removed legacy code.
 
 ## Long-Term Maintenance Docs
 
@@ -81,7 +80,6 @@ Supported content types:
 - article
 - paper
 - guide
-- course
 
 ## Card Philosophy
 
@@ -132,7 +130,7 @@ Every imported item should be evaluated by AI using:
 - risks
 - next_steps
 
-Use different evaluation rubrics for news, models, tools, integrations, articles, papers, guides, and courses.
+Use different evaluation rubrics for news, models, tools, integrations, articles, papers, and guides.
 
 ## Data Contracts
 

@@ -34,7 +34,7 @@ function parseHash(): RouteState {
   const articles = raw.match(/^\/articles(?:\/([^/]+))?\/?$/);
   if (articles) return { route: "articles", paperId: articles[1] ? decodeURIComponent(articles[1]) : undefined };
   if (/^\/projects\/?$/.test(raw)) return { route: "projects" };
-  const section = raw.match(/^\/(news|skills|courses)\/?$/);
+  const section = raw.match(/^\/(news|skills)\/?$/);
   if (section) return { route: "section", section: section[1] as Exclude<NavKey, "home" | "models" | "projects" | "articles"> };
   return { route: "home" };
 }

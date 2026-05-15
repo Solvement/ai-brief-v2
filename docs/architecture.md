@@ -46,7 +46,7 @@ Ingestion
 
 `#/`
 
-Home is a navigation hub only. It should not hold full product content. It links to News, Models, Projects, Skills, Articles, and Courses.
+Home is a navigation hub only. It should not hold full product content. It links to News, Models, Projects, Skills, and Articles.
 
 ### Projects
 
@@ -101,7 +101,7 @@ Each paper should explain:
 
 ### Placeholder Sections
 
-News, Skills, and Courses are still placeholders. Do not pretend they are implemented.
+News and Skills are still placeholders. Courses has been removed from product scope. Do not pretend removed or placeholder sections are implemented.
 
 ## Agent Flow
 

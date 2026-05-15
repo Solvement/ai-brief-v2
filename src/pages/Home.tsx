@@ -36,13 +36,6 @@ const HOME_SECTIONS = [
     body: "按 arXiv 版本线拆论文：初稿、实验补强、会议稳定版、长期维护版分别改了什么、为什么改、怎么验证读懂。",
     state: "已接入",
   },
-  {
-    title: "Courses",
-    href: "#/courses",
-    label: "课程资源",
-    body: "筛选值得系统学习的课程，并标记难度、收益和验证方式。",
-    state: "规划中",
-  },
 ];
 
 export function Home() {
@@ -55,7 +48,7 @@ export function Home() {
             <div className="eyebrow">AI Brief</div>
             <h1>Information -&gt; Judgment -&gt; Action</h1>
             <p>
-              中文优先的 AI 情报工作台。Home 只保留栏目入口，具体内容分别进入 News、Models、Projects、Skills、Articles、Courses。
+              中文优先的 AI 情报工作台。Home 只保留栏目入口，具体内容分别进入 News、Models、Projects、Skills、Articles。
             </p>
           </div>
           <div className="home-principle-grid">

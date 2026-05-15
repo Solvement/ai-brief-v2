@@ -50,7 +50,6 @@ Tiny hash router. Current routes:
 #/articles/:paperId        academic article version detail
 #/news                     placeholder
 #/skills                   placeholder
-#/courses                  placeholder
 ```
 
 ### `src/main.tsx`
@@ -279,7 +278,7 @@ Future direction:
 
 - split crawler from analysis;
 - add duplicate detection;
-- add source adapters for papers, news, model release pages, and courses.
+- add source adapters for papers, news, and model release pages.
 
 ### frontend/
 

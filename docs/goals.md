@@ -30,7 +30,7 @@ AI Brief should become:
 - an AI PM portfolio project;
 - a scalable AI brief system;
 - a multi-agent news and research analysis system;
-- a learning workbench for models, papers, tools, projects, skills, articles, and courses.
+- a learning workbench for models, papers, tools, projects, skills, and articles.
 
 ## Target User
 
@@ -138,13 +138,6 @@ Future direction:
   - agents / tool use;
   - diffusion / multimodal;
   - efficient fine-tuning.
-
-### Courses
-
-Goal:
-
-- curated course and learning resource briefings;
-- explain prerequisite, time cost, outcome, practice project, and proof of learning.
 
 ## System Goals
 
