@@ -19,8 +19,10 @@ Every major feature should help users answer:
 
 ## Current Working Surface
 
-- `Home`: GitHub Trending daily / weekly / monthly repository briefings.
-- `Models`: company-level model and product-capability evolution archives. The first implemented company is DeepSeek.
+- `Home`: navigation hub for the main product sections.
+- `Projects`: GitHub Trending daily / weekly / monthly repository briefings.
+- `Models`: company-level model and product-capability evolution archives.
+- `Articles`: academic paper and long-form article version analysis.
 - `Repo detail`: README quick read, key concepts, architecture flow, novelty, ecosystem, limitations, try-it steps, and scoring.
 - `Ingest`: GitHub Trending HTML + GitHub README + DeepSeek analysis into `public/data/trending.json`.
 
@@ -36,7 +38,18 @@ Use this navigation structure:
 - Articles
 - Courses
 
-Only Home and Models are implemented right now. Future sections should be added incrementally without reviving removed legacy code.
+Home, Projects, Models, and Articles are implemented right now. News, Skills, and Courses are placeholders. Future sections should be added incrementally without reviving removed legacy code.
+
+## Long-Term Maintenance Docs
+
+Keep these documents current when the project changes:
+
+- `docs/architecture.md`: system structure, agent flow, and pipeline.
+- `docs/repo_map.md`: repository map and module responsibilities.
+- `docs/current_problems.md`: current blockers, weaknesses, and known risks.
+- `docs/goals.md`: product direction and long-term target state.
+
+When changing routes, directories, data contracts, ingestion, ranking, crawler behavior, or product goals, update the relevant document in the same task.
 
 ## Content Tags
 
@@ -125,6 +138,7 @@ Use different evaluation rubrics for news, models, tools, integrations, articles
 
 - GitHub Trending data lives at `public/data/trending.json`.
 - Curated model archive data lives at `public/data/models.json`.
+- Curated academic article version data lives at `public/data/articles.json`.
 - Keep all public data objects explicitly typed in `src/types.ts`.
 - Keep validation scripts green for any changed data contract.
 
