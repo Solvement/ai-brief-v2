@@ -112,6 +112,15 @@ function ModelsIndex({ data }: { data: ModelsData }) {
               </div>
               <p className="company-takeaway">{company.oneSentenceTakeaway}</p>
               <p className="company-why">{company.whyItMatters}</p>
+              <div className="company-route-strip">
+                {company.series.flatMap((series) => series.releases.slice(0, 2)).slice(0, 4).map((release) => (
+                  <span key={release.id}>{shortModelName(release.name, company.shortName)}</span>
+                ))}
+              </div>
+              <div className="company-start-hint">
+                <b>推荐起点</b>
+                <span>{company.series[0]?.releases[0]?.name || company.shortName}：先读代表模型，再看后续分支。</span>
+              </div>
               <div className="tag-row">
                 {company.tags.slice(0, 6).map((tag) => <span className="tag" key={tag}>{tag}</span>)}
               </div>
@@ -245,10 +254,20 @@ function ModelWorkbench({
       <div className="workbench-main">
         <ModelMap company={company} activeReleaseId={activeReleaseId} onSeriesChange={onSeriesChange} onReleaseChange={onReleaseChange} />
         <ReleaseSwitcher series={activeSeries} activeReleaseId={activeReleaseId} onReleaseChange={onReleaseChange} />
-        <ModelFocusPanel release={activeRelease} series={activeSeries} />
+        <ModelFocusPanel
+          release={activeRelease}
+          series={activeSeries}
+          previousRelease={previousRelease(activeSeries, activeRelease.id)}
+        />
       </div>
     </section>
   );
+}
+
+function previousRelease(series: ModelSeries, releaseId: string): ModelRelease | null {
+  const index = series.releases.findIndex((release) => release.id === releaseId);
+  if (index <= 0) return null;
+  return series.releases[index - 1];
 }
 
 function ModelMap({
@@ -334,7 +353,7 @@ const LENS_OPTIONS: { key: LensKey; label: string; helper: string }[] = [
   { key: "professor", label: "教授视角", helper: "学生该怎么学" },
 ];
 
-function ModelFocusPanel({ release, series }: { release: ModelRelease; series: ModelSeries }) {
+function ModelFocusPanel({ release, series, previousRelease }: { release: ModelRelease; series: ModelSeries; previousRelease: ModelRelease | null }) {
   const [activeLens, setActiveLens] = useState<LensKey>("benchmark");
 
   useEffect(() => {
@@ -377,8 +396,10 @@ function ModelFocusPanel({ release, series }: { release: ModelRelease; series: M
       </article>
 
       <aside className="model-side-stack">
+        <ModelDeltaPanel release={release} previousRelease={previousRelease} />
         <ListBlock title="取舍与限制" items={release.tradeoffs} />
         <ListBlock title="可以马上做的实验" items={release.experiments} />
+        <ModelVerificationPanel release={release} />
         {release.nextRelation ? <VisualRelationPanel release={release} relation={release.nextRelation} /> : <EndOfLinePanel release={release} />}
       </aside>
     </div>
@@ -531,6 +552,7 @@ function BenchmarkChart({ chart }: { chart: ModelBenchmarkChart }) {
         </div>
         <b>{sourceTypeLabel(chart.sourceType)}</b>
       </div>
+      <p className="benchmark-plain-note">{benchmarkPlainNote(chart)}</p>
       <div className="chart-bars">
         {bars.map((barItem) => {
           const width = Math.max(4, Math.min(100, (barItem.value / maxValue) * 100));
@@ -550,6 +572,17 @@ function BenchmarkChart({ chart }: { chart: ModelBenchmarkChart }) {
       <div className="chart-foot">{chart.higherIsBetter ? "数值越高越好" : "数值越低越好"} · {chart.unit}</div>
     </div>
   );
+}
+
+function benchmarkPlainNote(chart: ModelBenchmarkChart): string {
+  const title = chart.title.toLowerCase();
+  const metric = chart.metric.toLowerCase();
+  if (title.includes("aime") || title.includes("math")) return "这类图主要看数学推理和可验证解题能力，不等于日常聊天体验。";
+  if (title.includes("codeforces")) return "这在看算法竞赛能力，能反映代码推理，但不等于完整软件工程 agent。";
+  if (title.includes("swe")) return "这在看真实仓库修 bug 能力，通常比单题代码 benchmark 更接近工程实践。";
+  if (title.includes("gpqa") || title.includes("mmlu")) return "这在看高难知识和复杂问答能力，适合判断模型知识推理上限。";
+  if (metric.includes("context") || metric.includes("parameter") || metric.includes("expert")) return "这是系统/架构指标，不是能力分数；要和 benchmark 分开读。";
+  return "先看它测什么任务，再看高低；不要把单项分数外推成整体智能。";
 }
 
 function CompoundLens({ kicker, sections }: { kicker: string; sections: { title: string; section?: ModelAnalysisSection }[] }) {
@@ -600,7 +633,7 @@ function sourceTypeLabel(sourceType: string): string {
 function VisualRelationPanel({ release, relation }: { release: ModelRelease; relation: NonNullable<ModelRelease["nextRelation"]> }) {
   return (
     <div className="relation-visual">
-      <div className="relation-visual-title">到后一代：{release.name} -&gt; {relation.toReleaseId.replace("deepseek-", "").toUpperCase()}</div>
+      <div className="relation-visual-title">{relationTitle(release, relation)}</div>
       <p>{relation.summary}</p>
       <div className="relation-flow">
         <div><span>继承</span><b>{relation.inherits}</b></div>
@@ -609,6 +642,54 @@ function VisualRelationPanel({ release, relation }: { release: ModelRelease; rel
         <div><span>解法</span><b>{relation.solvedBy}</b></div>
       </div>
       <div className="teacher-note">{relation.teacherNote}</div>
+    </div>
+  );
+}
+
+function relationTitle(release: ModelRelease, relation: NonNullable<ModelRelease["nextRelation"]>): string {
+  const text = `${relation.summary} ${relation.changes} ${relation.why}`;
+  const target = relation.toReleaseId.replace("deepseek-", "").toUpperCase();
+  if (/分支|并行|不是.+后继|同代/.test(text)) return `同代/分支关系：${release.name} ↔ ${target}`;
+  if (/合并|merge|融合/i.test(text)) return `能力合流：${release.name} -> ${target}`;
+  if (/产品|API|split|拆分/i.test(text)) return `产品路线关系：${release.name} -> ${target}`;
+  return `演进关系：${release.name} -> ${target}`;
+}
+
+function ModelDeltaPanel({ release, previousRelease }: { release: ModelRelease; previousRelease: ModelRelease | null }) {
+  return (
+    <div className="relation-visual quiet model-delta-panel">
+      <div className="relation-visual-title">
+        {previousRelease ? `相对上一版：${shortModelName(previousRelease.name)} -> ${shortModelName(release.name)}` : "这一条线的起点"}
+      </div>
+      <div className="delta-grid">
+        <InfoRow label="目标任务" value={release.positioning} />
+        <InfoRow label="解决问题" value={release.problemSolved} />
+        <InfoRow label="架构/方法" value={release.howSolved} />
+        <InfoRow label="代价边界" value={release.tradeoffs[0] || "暂无结构化限制"} />
+      </div>
+    </div>
+  );
+}
+
+function ModelVerificationPanel({ release }: { release: ModelRelease }) {
+  const firstExperiment = release.experiments[0] || "选一个和该模型定位匹配的小任务，比较它和上一代的输出差异。";
+  return (
+    <div className="release-block model-verification-panel">
+      <h5>怎么证明自己读懂了</h5>
+      <div className="model-verification-grid">
+        <div>
+          <span>复述题</span>
+          <p>用两句话说清 {release.name} 解决了什么问题，以及它付出了什么代价。</p>
+        </div>
+        <div>
+          <span>实验题</span>
+          <p>{firstExperiment}</p>
+        </div>
+        <div>
+          <span>通过标准</span>
+          <p>能把 benchmark、架构设计和局限连成一个因果解释，而不是只背分数。</p>
+        </div>
+      </div>
     </div>
   );
 }

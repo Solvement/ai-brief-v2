@@ -7,12 +7,27 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  buildAgentFlow,
+  createQualityGate,
+  gateCheck,
+  gateWarning,
+  rememberPipelineRun,
+  summarizeSelection,
+} from "./lib/agentic-pipeline.mjs";
+import { fetchGitHubReadme, scrapeTrendingBoard } from "./lib/github-trending.mjs";
+import {
+  PROJECT_FOCUS_GUIDANCE,
+  adjustWorthForAiEngineerFocus,
+  selectDeepDiveIndices,
+} from "./lib/project-ranking.mjs";
+import { DEEP_SYS, LIGHT_SYS, deepUser, lightUser } from "./lib/project-prompts.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const CACHE_DIR = path.join(ROOT, ".cache");
 const CACHE_FILE = path.join(CACHE_DIR, "analyses.json");
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 const CACHE_TTL_DAYS = 7;
 const STARS_DRIFT_THRESHOLD = 0.30;
 
@@ -37,69 +52,37 @@ function numFlag(n, d) { const a = argv.find((x) => x.startsWith(`--${n}=`)); if
 const LIMIT = numFlag("limit", 15);
 const CAP = numFlag("cap", 6);
 const WORTH_THRESHOLD = numFlag("worth", 60);
-const UA = "Mozilla/5.0 gh-trending-deepdive/0.5";
+const API_TIMEOUT_MS = numFlag("api-timeout-ms", Number(process.env.DEEPSEEK_TIMEOUT_MS) || 180000);
+const LIGHT_MAX_TOKENS = numFlag("light-max-tokens", Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200);
+const DEEP_MAX_TOKENS = numFlag("deep-max-tokens", Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 8000);
 
-async function fetchHtml(url) { const r = await fetch(url, { headers: { "user-agent": UA, accept: "text/html" } }); if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`); return r.text(); }
-function decodeEntities(s) { return s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " "); }
-const stripTags = (s) => decodeEntities(s.replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
-
-function parseTrendingHtml(html) {
-  const repos = [];
-  const re = /<article\b[^>]*class="[^"]*Box-row[^"]*"[^>]*>([\s\S]*?)<\/article>/g;
-  let m;
-  while ((m = re.exec(html))) {
-    const b = m[1];
-    const hr = b.match(/<h2[^>]*class="[^"]*lh-condensed[^"]*"[^>]*>[\s\S]*?<a[^>]*href="\/([^"/]+)\/([^"/?#]+)"/);
-    if (!hr) continue;
-    const owner = decodeEntities(hr[1]); const name = decodeEntities(hr[2]);
-    if (!owner || !name) continue;
-    let description = null; const dm = b.match(/<p\b[^>]*class="[^"]*col-9[^"]*"[^>]*>([\s\S]*?)<\/p>/);
-    if (dm) description = stripTags(dm[1]) || null;
-    let language = null; const lm = b.match(/<span\b[^>]*itemprop="programmingLanguage"[^>]*>\s*([^<]+)<\/span>/);
-    if (lm) language = decodeEntities(lm[1].trim()) || null;
-    let languageColor = null; const cm = b.match(/<span\b[^>]*class="[^"]*repo-language-color[^"]*"[^>]*style="background-color:\s*([^"]+)"/);
-    if (cm) languageColor = cm[1].trim();
-    let stars = 0, forks = 0;
-    for (const t of b.matchAll(/<a\b[^>]*href="\/[^"/]+\/[^"/?#]+\/(stargazers|forks)"[^>]*>([\s\S]*?)<\/a>/g)) {
-      const n = parseInt(stripTags(t[2]).replace(/[,\s]/g, ""), 10);
-      if (Number.isFinite(n)) { if (t[1] === "stargazers") stars = n; if (t[1] === "forks") forks = n; }
-    }
-    let starsGained = 0;
-    const gm = b.match(/<span\b[^>]*?class="[^"]*float-sm-right[^"]*"[^>]*>([\s\S]*?)<\/span>/);
-    if (gm) { const txt = stripTags(gm[1]); const nm = txt.match(/([\d,]+)\s+stars?\s+(?:today|this\s+week|this\s+month)/i); if (nm) starsGained = parseInt(nm[1].replace(/,/g, ""), 10) || 0; }
-    repos.push({
-      fullName: `${owner}/${name}`, owner, name,
-      url: `https://github.com/${owner}/${name}`,
-      ownerAvatarUrl: `https://github.com/${owner}.png?size=80`,
-      description, language, languageColor, stars, forks, starsGained,
-    });
-  }
-  return repos;
-}
-async function scrapeBoard(window) { return parseTrendingHtml(await fetchHtml(`https://github.com/trending?since=${window}`)).slice(0, LIMIT); }
-async function fetchReadme(owner, name) {
-  const h = { accept: "application/vnd.github.raw", "user-agent": UA };
-  if (process.env.GITHUB_TOKEN) h.authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  const r = await fetch(`https://api.github.com/repos/${owner}/${name}/readme`, { headers: h });
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`README ${owner}/${name} -> ${r.status}`);
-  return (await r.text()).slice(0, 14000);
+function deepseekBaseUrl() {
+  return process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
 }
 
-const DEEPSEEK_BASE = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
-const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
+function projectLightModel() {
+  return process.env.PROJECT_LIGHT_MODEL || process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
+}
 
-async function chat({ system, user, jsonMode = false, retries = 2, maxTokens = 800 }) {
+function projectDeepModel() {
+  return process.env.PROJECT_DEEP_MODEL || process.env.DEEPSEEK_PRO_MODEL || process.env.DEEPSEEK_MODEL || "deepseek-v4-pro";
+}
+
+async function chat({ system, user, model, jsonMode = false, retries = 2, maxTokens = 800 }) {
   if (!process.env.DEEPSEEK_API_KEY) throw new Error("缺少 DEEPSEEK_API_KEY");
-  const body = { model: DEEPSEEK_MODEL, messages: [{ role: "system", content: system }, { role: "user", content: user }], temperature: jsonMode ? 0.3 : 0.5, max_tokens: maxTokens };
+  const selectedModel = model || process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
+  const body = { model: selectedModel, messages: [{ role: "system", content: system }, { role: "user", content: user }], temperature: jsonMode ? 0.3 : 0.5, max_tokens: maxTokens };
   if (jsonMode) body.response_format = { type: "json_object" };
   let lastErr;
   for (let i = 0; i <= retries; i++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
     try {
-      const r = await fetch(`${DEEPSEEK_BASE}/chat/completions`, {
+      const r = await fetch(`${deepseekBaseUrl()}/chat/completions`, {
         method: "POST",
         headers: { "content-type": "application/json", authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}` },
         body: JSON.stringify(body),
+        signal: controller.signal,
       });
       if (!r.ok) { const e = await r.text().catch(() => ""); throw new Error(`DeepSeek ${r.status}: ${e.slice(0, 200)}`); }
       const d = await r.json(); const c = d?.choices?.[0]?.message?.content;
@@ -108,72 +91,34 @@ async function chat({ system, user, jsonMode = false, retries = 2, maxTokens = 8
     } catch (e) {
       lastErr = e;
       if (i < retries) { await new Promise((rr) => setTimeout(rr, 1500 * (i + 1))); console.warn(`  retry: ${e.message}`); }
+    } finally {
+      clearTimeout(timer);
     }
   }
   throw lastErr;
 }
 
-const LIGHT_SYS = `你给"AI 研究生（有 ML/LLM/agent 基础但不熟此项目）"做 GitHub 项目导读。
-
-返回严格 JSON: { tldr, tags, light, worthDeepDive }
-- tldr: 30-50 字。"这是一个【类型】，用来【做什么】，特别在【独特点】"。不要复述 description。
-- tags: 3-5 个短标签。反映项目本质。
-- light: 80-150 字。讲清"为什么这周/月在 trending 上"。不要复述 tldr。一段连贯中文。
-- worthDeepDive: 0-100 整数。"对 AI 研究生学习的价值"。
-    100=必读 / 80-99=强烈推荐 / 60-79=值得深读 / 40-59=一般 / 0-39=营销/跟风/低质量
-  评分依据：技术新意+工程质量+概念价值+是否值得 30 分钟。营销文案/AI 赚钱/官方示例分数应偏低。`;
-
-const DEEP_SYS = `你给"AI 研究生"做深度技术解读。每段必须基于 README，不知道就说"README 没写"。
-
-**关键格式要求 — 必须严格遵守，否则整次输出作废：**
-- howItWorks 字段必须用 \`## 组件\` \`## 数据流\` \`## 关键算法/配置\` 这样的二级 markdown 标题分成至少 2 段，每段 200-300 字。
-- limitations 字段必须是数组 \`[{title, body}]\`，3-5 条，每条 title ≤ 10 字，body 60-120 字。
-- tryIt 字段必须是数组 \`[{step, cmd?, note?}]\`，5-8 步骤。step = 这一步要做什么（30-80 字），cmd（可选）= 真实命令字符串，note（可选）= 一句提醒。
-- 文本里需要时可用 \`**加粗**\` 高亮关键术语 / 数字，可用 \`\\\`code\\\`\` 标记代码 / 路径。
-
-返回严格 JSON：
-{
-  "atGlance": "60-100 字。'为什么要花 30 分钟看这个项目'。不要复述 description。",
-  "whyItMatters": [
-    {"title": "短标题 ≤ 10 字", "body": "40-70 字"},
-    {"title": "...", "body": "..."},
-    {"title": "...", "body": "..."}
-  ],
-  "keyConcepts": [
-    {"term": "Pitch Agent", "explain": "本仓库特有的投行专用代理，封装了从客户简报到生成 PPT 草稿的完整流程，自动调用 \\\`FactSet\\\` / \\\`S&P Global\\\` 等 MCP 连接器抓取数据。可类比为'套着金融模板的 **LangChain agent**'。"}
-    // 3-5 条。term AND explain 都必填，explain 不能空。
-  ],
-  "howItWorks": "## 组件\\n第一段 200-300 字讲组件...\\n\\n## 数据流\\n第二段 200-300 字讲数据流...\\n\\n## 关键算法 / 配置\\n第三段 200-300 字讲关键算法和配置项。",
-  "novelty": "300-500 字。对比 2-4 个同领域知名方案（点名 LangChain / AutoGen / Llama 等）。新意不大就诚实说。可用空行分 2 段。",
-  "ecosystem": "200-350 字。依赖什么 / 搭配什么 / 替代什么 / 跟谁竞争。可用空行分段。",
-  "limitations": [
-    {"title": "记忆容量有限", "body": "虽然有生命周期管理，但长期使用后 SQLite 数据库可能增长到 **数百 MB**，影响检索速度。"},
-    {"title": "嵌入模型局限", "body": "..."}
-    // 3-5 条
-  ],
-  "tryIt": [
-    {"step": "安装并启动记忆服务器", "cmd": "npx @agentmemory/agentmemory", "note": "默认占用端口 3113"},
-    {"step": "在浏览器看实时记忆图", "cmd": "open http://localhost:3113"},
-    {"step": "..." }
-    // 5-8 步
-  ],
-  "score": { "novelty": 0-25, "engineering": 0-25, "reproducibility": 0-25, "timeToValue": 0-25 }
-}
-
-不要 markdown 包裹，直接返回 JSON 对象。`;
-
-function lightUser(r, md) {
-  const d = r.description ? `\n描述：${r.description}` : "";
-  const l = r.language ? `\n主语言：${r.language}` : "";
-  return `仓库：${r.fullName}${d}${l}\n\nREADME:\n"""\n${md || "(没拿到 README)"}\n"""`;
-}
-function deepUser(r, md) {
-  const d = r.description ? `\n描述：${r.description}` : "";
-  const l = r.language ? `\n主语言：${r.language}` : "";
-  const s = `\nstars: ${r.stars}，本榜窗口新增 ${r.starsGained}`;
-  return `仓库：${r.fullName}${d}${l}${s}\n\nREADME:\n"""\n${md || "(没拿到 README)"}\n"""\n\n严格按 JSON schema 返回。limitations 和 tryIt 必须是数组（不要粘成一段字符串）。howItWorks 必须用 ## 分段。`;
-}
 function parseJson(raw) { let s = raw.trim(); if (s.startsWith("```")) s = s.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim(); return JSON.parse(s); }
+
+async function chatJson({ system, user, model, maxTokens }) {
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const strictSystem = attempt === 0
+      ? system
+      : `${system}\n\n上一轮输出不是合法 JSON。现在只重新输出一个完整 JSON object：不要 markdown，不要注释，不要尾随逗号，字符串内部的英文双引号必须转义。`;
+    const strictUser = attempt === 0
+      ? user
+      : `${user}\n\n上一次 JSON 解析错误：${lastError?.message || "unknown"}。请重新生成完整、可被 JSON.parse 直接解析的 JSON。`;
+    const raw = await chat({ system: strictSystem, user: strictUser, model, jsonMode: true, maxTokens });
+    try {
+      return parseJson(raw);
+    } catch (error) {
+      lastError = error;
+      console.warn(`  JSON parse retry ${attempt + 1}/2: ${error.message}`);
+    }
+  }
+  throw lastError;
+}
 
 function offlineLight(r) {
   const k = r.language ? `一个 ${r.language} 项目` : "一个开源项目";
@@ -286,30 +231,28 @@ async function processBoard(window, all, cache) {
   const readmes = NO_README ? all.map(() => null) : await pMap(all, 5, async (r) => {
     const e = cache[r.fullName];
     if (e?.readmeCached && cacheHit(e, r)) return e.readmeCached;
-    try { return await fetchReadme(r.owner, r.name); }
+    try { return await fetchGitHubReadme(r.owner, r.name); }
     catch (err) { console.warn(`  README failed ${r.fullName}: ${err.message}`); return null; }
   });
 
   console.log("→ light…");
   const lights = await pMap(all, 3, async (r, i) => {
     const e = cache[r.fullName];
-    if (e?.light && cacheHit(e, r)) { console.log(`  ⟲ cache HIT light ${r.fullName}`); return e.light; }
-    if (NO_LLM) return offlineLight(r);
+    if (e?.light && cacheHit(e, r)) { console.log(`  ⟲ cache HIT light ${r.fullName}`); return adjustWorthForAiEngineerFocus(r, readmes[i], e.light); }
+    if (NO_LLM) return adjustWorthForAiEngineerFocus(r, readmes[i], offlineLight(r));
     try {
-      const raw = await chat({ system: LIGHT_SYS, user: lightUser(r, readmes[i]), jsonMode: true, maxTokens: 700 });
-      const p = parseJson(raw);
-      return {
+      const p = await chatJson({ system: `${LIGHT_SYS}\n\n${PROJECT_FOCUS_GUIDANCE}`, user: lightUser(r, readmes[i]), model: projectLightModel(), maxTokens: LIGHT_MAX_TOKENS });
+      const parsedLight = {
         tldr: String(p.tldr || "").trim() || offlineLight(r).tldr,
         tags: Array.isArray(p.tags) ? p.tags.map((t) => String(t).trim()).filter(Boolean).slice(0, 5) : offlineLight(r).tags,
         light: String(p.light || "").trim(),
         worthDeepDive: Math.max(0, Math.min(100, Math.round(Number(p.worthDeepDive) || 50))),
       };
-    } catch (e2) { console.warn(`  light failed ${r.fullName}: ${e2.message}`); return offlineLight(r); }
+      return adjustWorthForAiEngineerFocus(r, readmes[i], parsedLight);
+    } catch (e2) { console.warn(`  light failed ${r.fullName}: ${e2.message}`); return adjustWorthForAiEngineerFocus(r, readmes[i], offlineLight(r)); }
   });
 
-  const rankedByWorth = all.map((r, i) => ({ r, i, w: lights[i]?.worthDeepDive ?? 50 })).sort((a, b) => b.w - a.w);
-  const deepIdxSet = new Set();
-  for (const x of rankedByWorth) { if (deepIdxSet.size >= CAP) break; if (x.w >= WORTH_THRESHOLD) deepIdxSet.add(x.i); }
+  const deepIdxSet = selectDeepDiveIndices(all, lights, { cap: CAP, worthThreshold: WORTH_THRESHOLD });
   console.log(`→ deep dive: ${deepIdxSet.size} repos (worth >= ${WORTH_THRESHOLD}, cap ${CAP})`);
 
   const deeps = new Array(all.length).fill(null);
@@ -320,8 +263,7 @@ async function processBoard(window, all, cache) {
     if (e?.deep && cacheHit(e, r)) { console.log(`    ⟲ cache HIT deep`); deeps[idx] = e.deep; continue; }
     if (NO_LLM) { deeps[idx] = offlineDeep(r); continue; }
     try {
-      const raw = await chat({ system: DEEP_SYS, user: deepUser(r, readmes[idx]), jsonMode: true, maxTokens: 4500 });
-      const p = parseJson(raw);
+      const p = await chatJson({ system: DEEP_SYS, user: deepUser(r, readmes[idx]), model: projectDeepModel(), maxTokens: DEEP_MAX_TOKENS });
       const safe = (a) => Array.isArray(a) ? a : [];
       const sc = p.score || {};
       deeps[idx] = {
@@ -370,6 +312,7 @@ async function main() {
   await loadEnv();
   console.log("Mode:", NO_LLM ? "OFFLINE" : "DeepSeek", "/ cache:", NO_CACHE ? "OFF" : "ON",
     "/ limit:", LIMIT, "/ cap:", CAP, "/ worth>=", WORTH_THRESHOLD);
+  console.log("Models:", `project light=${projectLightModel()}`, `/ project deep=${projectDeepModel()}`);
   const cache = await loadCache();
   const before = Object.keys(cache).length;
   console.log(`cache: ${before} entries loaded`);
@@ -377,11 +320,82 @@ async function main() {
   const boards = {};
   for (const w of windows) {
     console.log(`抓榜：${w}…`);
-    boards[w] = await processBoard(w, await scrapeBoard(w), cache);
+    boards[w] = await processBoard(w, await scrapeTrendingBoard(w, { limit: LIMIT }), cache);
   }
   await saveCache(cache);
   console.log(`cache: ${Object.keys(cache).length} entries saved (was ${before})`);
-  const out = { generatedAt: new Date().toISOString(), daily: boards.daily, weekly: boards.weekly, monthly: boards.monthly };
+  const allRepos = windows.flatMap((w) => boards[w].repos);
+  const deepRepos = allRepos.filter((repo) => repo.deep);
+  const deepRepoIds = new Set(deepRepos.map((repo) => repo.fullName));
+  const agentFlow = buildAgentFlow("projects", {
+    discover: `${allRepos.length} repos from GitHub Trending daily/weekly/monthly`,
+    evidence: `${allRepos.length} README fetch attempts, cache entries ${Object.keys(cache).length}`,
+    rank: `worthDeepDive threshold ${WORTH_THRESHOLD}, cap ${CAP}`,
+    review: `${deepRepos.length} project deep dives, ${allRepos.length - deepRepos.length} light reads`,
+    verify: "validate-trending + text encoding gate",
+    publish: "public/data/trending.json",
+    archive: ".cache/analyses.json + data/agent-memory/projects.json",
+  });
+  const qualityGate = createQualityGate({
+    surface: "projects",
+    checks: [
+      gateCheck("boards-present", "daily / weekly / monthly boards exist", windows.every((w) => boards[w]?.repos?.length > 0), `windows=${windows.join(",")}`),
+      gateCheck("cards-have-tldr", "every project card has a TL;DR", allRepos.every((repo) => repo.tldr && repo.light), `${allRepos.length} repos checked`),
+      gateCheck("worth-scores", "every project has a numeric worthDeepDive score", allRepos.every((repo) => Number.isFinite(repo.worthDeepDive)), `${allRepos.length} repos checked`),
+      gateWarning("deep-dive-coverage", "at least one high-value project gets a deep dive", deepRepos.length > 0, `${deepRepos.length} deep dives selected`),
+    ],
+  });
+  const pipelineMemory = await rememberPipelineRun({
+    surface: "projects",
+    date: new Date().toISOString().slice(0, 10),
+    sourceFiles: {
+      public: "public/data/trending.json",
+      cache: ".cache/analyses.json",
+    },
+    agentFlow,
+    qualityGate,
+    selectedItems: summarizeSelection(deepRepos, (repo) => ({
+      id: repo.fullName,
+      title: repo.fullName,
+      score: repo.worthDeepDive,
+      reason: repo.tldr,
+    })),
+    archivedItems: summarizeSelection(allRepos.filter((repo) => !repo.deep && !deepRepoIds.has(repo.fullName)).slice(0, 12), (repo) => ({
+      id: repo.fullName,
+      title: repo.fullName,
+      score: repo.worthDeepDive,
+      reason: "light read or below deep-dive threshold",
+    })),
+    highlights: [
+      `Projects refreshed ${allRepos.length} repos from GitHub Trending.`,
+      `${deepRepos.length} repos passed the deep-dive threshold.`,
+    ],
+    nextActions: [
+      "Open Projects page and verify cards are not blank.",
+      "Run npm run validate before treating the refresh as published.",
+    ],
+    reusablePatterns: deepRepos.slice(0, 5).map((repo) => ({
+      text: `${repo.fullName}: ${repo.tldr}`,
+      source: "projects",
+    })),
+  });
+  const out = {
+    generatedAt: new Date().toISOString(),
+    analysisModels: {
+      projectLight: projectLightModel(),
+      projectDeep: projectDeepModel(),
+    },
+    pipelineRun: {
+      id: pipelineMemory.run.id,
+      memoryFile: "data/agent-memory/projects.json",
+      statusFile: "public/data/pipeline-status.json",
+    },
+    agentFlow,
+    qualityGate,
+    daily: boards.daily,
+    weekly: boards.weekly,
+    monthly: boards.monthly,
+  };
   await mkdir(path.join(ROOT, "public", "data"), { recursive: true });
   const p = path.join(ROOT, "public", "data", "trending.json");
   await writeFile(p, JSON.stringify(out, null, 2), "utf8");

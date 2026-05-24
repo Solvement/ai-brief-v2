@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-14T21:30:00.000Z",
+  "generatedAt": "2026-05-15T16:00:00.000Z",
   "companies": [
     {
       "id": "deepseek",
@@ -1838,10 +1838,10 @@
       "name": "OpenAI",
       "shortName": "OpenAI",
       "country": "United States",
-      "updatedAt": "2025-12-11",
+      "updatedAt": "2026-04-24",
       "publishedAt": "2025-04-14",
-      "oneSentenceTakeaway": "OpenAI 的主线是把通用 GPT、推理 o 系列和 Codex 工程能力逐步收敛成一个可路由的智能工作系统。",
-      "whyItMatters": "它最适合作为学生理解闭源前沿模型工业化的样本：同一家公司如何同时推进长上下文、推理、工具调用、代码 agent、产品路由和 API 分层。",
+      "oneSentenceTakeaway": "OpenAI 的主线已经从通用问答推进到 agentic coding、电脑使用、知识工作和早期科研协作：GPT-5.5 是这条线目前的最新公开节点。",
+      "whyItMatters": "对学习者来说，GPT 系列不只是模型代号变化，而是观察前沿实验室如何把推理、工具、上下文、验证和安全策略组合成可工作的智能系统。",
       "contentType": "model",
       "targetAudience": [
         "AI 学生",
@@ -1870,7 +1870,7 @@
       "nextSteps": [
         "先看 GPT-4.1，理解为什么长上下文和指令跟随会变成应用开发的基础能力。",
         "再看 o3/o4-mini，理解推理模型为什么开始和工具使用合并。",
-        "最后看 GPT-5 到 GPT-5.2，理解前沿模型从单点能力走向编码、长任务和路由系统。"
+        "最后看 GPT-5 到 GPT-5.5，理解前沿模型从单点能力走向长任务、电脑使用、科研工作流和更严格安全边界。"
       ],
       "sources": [
         {
@@ -1888,6 +1888,14 @@
         {
           "name": "Introducing GPT-5.2",
           "url": "https://openai.com/index/introducing-gpt-5-2/"
+        },
+        {
+          "name": "Introducing GPT-5.5",
+          "url": "https://openai.com/index/introducing-gpt-5-5/"
+        },
+        {
+          "name": "GPT-5.5 System Card",
+          "url": "https://openai.com/index/gpt-5-5-system-card/"
         }
       ],
       "learningPath": [
@@ -1900,8 +1908,8 @@
           "body": "o3/o4-mini 让学生看到 test-time compute、工具调用和多步检查如何合并。重点不是背分数，而是理解模型为什么需要在作答时继续计算。"
         },
         {
-          "title": "GPT-5/5.2：前沿模型开始变成可路由系统",
-          "body": "GPT-5 之后，模型产品更像一个系统：快速模型、深度推理、代码 agent、多模态和 API 约束被统一到同一套入口里。"
+          "title": "GPT-5/5.5：前沿模型开始变成可路由的工作系统",
+          "body": "GPT-5 之后，模型产品更像一个系统：快速模型、深度推理、代码 agent、多模态、电脑使用和 API 约束被统一到同一套入口里。GPT-5.5 的重点不是换一个名字，而是让模型更能自己规划、使用工具、检查结果并持续完成任务。"
         }
       ],
       "series": [
@@ -2388,7 +2396,235 @@
                     "要求模型输出证据、测试和下一步。"
                   ]
                 }
+              },
+              "nextRelation": {
+                "toReleaseId": "openai-gpt-5-5",
+                "summary": "GPT-5.5 是 GPT-5 系列后续前沿节点；本档案跳过中间 5.3/5.4 条目，官方对比主要使用 GPT-5.4。",
+                "inherits": "继承 GPT-5.2 的长程任务、专业知识工作、编码和工具使用方向。",
+                "changes": "进一步强调 agentic coding、computer use、科研工作流、token efficiency 和更强安全 safeguards。",
+                "why": "真实用户开始把模型交给多步骤工作，核心挑战从“会不会”变成“能不能持续做完并自我检查”。",
+                "solvedBy": "通过更强长程执行评测、更高工具使用可靠性、更高效推理服务和更严格风险控制推进。",
+                "teacherNote": "这条关系要提醒学生：闭源模型档案不是参数年表，而是产品能力和系统能力的演化图。"
               }
+            },
+            {
+              "id": "openai-gpt-5-5",
+              "name": "OpenAI GPT-5.5",
+              "kind": "model",
+              "publishedAt": "2026-04-23",
+              "positioning": "面向真实电脑工作、agentic coding、知识工作和早期科研协作的 GPT-5 系列前沿升级；GPT-5.5 Pro 使用更多并行 test-time compute。",
+              "oneSentenceTakeaway": "GPT-5.5 的核心不是“答题更聪明”这么简单，而是更早理解任务意图、更会用工具、更能检查自己，并在长任务里持续往前推进。",
+              "problemSolved": "GPT-5.2 已经强调长任务稳定性，但真实工作里还会遇到系统级问题：跨工具执行、代码库理解、电脑界面操作、研究资料整合、安全边界和成本效率需要一起提高。",
+              "keyChanges": [
+                "OpenAI 官方称 GPT-5.5 是当时最智能、最直觉可用的模型，并重点提升 agentic coding、computer use、knowledge work 和 early scientific research。",
+                "官方更新显示 2026-04-24 GPT-5.5 与 GPT-5.5 Pro 已可用于 API；Codex 中 GPT-5.5 提供 400K context window，API 说明为 1M context window。",
+                "Terminal-Bench 2.0 达到 82.7%，SWE-Bench Pro 达到 58.6%，GDPval 达到 84.9%，OSWorld-Verified 达到 78.7%。"
+              ],
+              "whyChanged": "用户把模型交给真实任务后，失败点从“不会回答”变成“会中途偏航、不会查证、不会跨工具协调、不能把工作做完”。GPT-5.5 的发布重点正是把模型从回答器推进到工作执行者。",
+              "howSolved": "公开材料没有披露底层架构细节，但可以看到产品和训练目标的组合：更强的长程编码评测、更可靠工具使用、更高效推理服务、更严格的生物/网络安全 safeguards，以及面向 Codex 和 ChatGPT 的工作流集成。",
+              "tradeoffs": [
+                "能力更强也更贵，GPT-5.5 API 标准价格高于 GPT-5.4，虽然官方强调 token efficiency 更好。",
+                "官方 benchmark 仍需要结合真实项目复验，尤其是 SWE-Bench Pro 这类公开集存在记忆化争议。",
+                "更强 computer use 和 cyber 能力会带来更严格安全限制，合法防御场景可能需要额外 trust signals。"
+              ],
+              "studentTakeaways": [
+                "把 GPT-5.5 当作 agent 系统案例学习：目标理解、计划、工具、执行、检查、安全策略是一个闭环。",
+                "读 benchmark 时按任务拆开：Terminal-Bench 看命令行长程工作，SWE-Bench Pro 看真实 issue，GDPval 看知识工作，OSWorld 看电脑操作。",
+                "不要把未公开架构脑补成事实；对闭源模型要区分官方披露、可观察能力和合理推断。"
+              ],
+              "experiments": [
+                "设计一个 45 分钟 coding agent 任务：给模型一个真实 repo bug、验收测试和约束，记录它是否能定位、修改、运行测试并解释风险。",
+                "设计一个知识工作任务：让模型阅读 3 份资料、生成表格和一页 memo，再用人工 checklist 检查事实、引用和遗漏。",
+                "比较 GPT-5.2 与 GPT-5.5 在同一任务上的重试次数、工具调用质量、测试通过率、最终可交付度。"
+              ],
+              "api": {
+                "modelNames": [
+                  "gpt-5.5",
+                  "gpt-5.5-pro"
+                ],
+                "contextWindow": "API: 1M tokens；Codex: 400K context window",
+                "maxOutput": "以 OpenAI API 文档为准",
+                "modes": [
+                  "Text",
+                  "Vision",
+                  "Coding",
+                  "Reasoning",
+                  "Tool use",
+                  "Computer use",
+                  "Research"
+                ]
+              },
+              "modelAnalysis": {
+                "benchmark": {
+                  "headline": "GPT-5.5 的官方 benchmark 信号集中在长程执行：Terminal-Bench 2.0 82.7%、SWE-Bench Pro 58.6%、GDPval 84.9%、OSWorld-Verified 78.7%。",
+                  "professorNote": "这些分数不能混成一个“总智商”。Terminal-Bench 测命令行计划和工具协调，SWE-Bench Pro 测真实 GitHub issue，GDPval 测知识工作交付，OSWorld 测电脑环境操作。不同指标对应不同产品能力。",
+                  "caveats": [
+                    "SWE-Bench Pro 是公开 benchmark，官方页面也提示相关实验室已指出记忆化风险，所以要看但不能迷信。",
+                    "GDPval、OSWorld、Tau2 等指标更接近工作流，但你的真实任务还取决于权限、上下文、工具稳定性和验收标准。"
+                  ],
+                  "charts": [
+                    {
+                      "title": "Coding and terminal work",
+                      "metric": "Official score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-5.4 Terminal",
+                          "value": 75.1,
+                          "display": "75.1%"
+                        },
+                        {
+                          "label": "GPT-5.5 Terminal",
+                          "value": 82.7,
+                          "display": "82.7%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "GPT-5.4 SWE Pro",
+                          "value": 57.7,
+                          "display": "57.7%"
+                        },
+                        {
+                          "label": "GPT-5.5 SWE Pro",
+                          "value": 58.6,
+                          "display": "58.6%",
+                          "highlight": true
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Knowledge work and computer use",
+                      "metric": "Official score",
+                      "unit": "%",
+                      "higherIsBetter": true,
+                      "maxValue": 100,
+                      "sourceType": "official",
+                      "bars": [
+                        {
+                          "label": "GPT-5.4 GDPval",
+                          "value": 83,
+                          "display": "83.0%"
+                        },
+                        {
+                          "label": "GPT-5.5 GDPval",
+                          "value": 84.9,
+                          "display": "84.9%",
+                          "highlight": true
+                        },
+                        {
+                          "label": "GPT-5.4 OSWorld",
+                          "value": 75,
+                          "display": "75.0%"
+                        },
+                        {
+                          "label": "GPT-5.5 OSWorld",
+                          "value": 78.7,
+                          "display": "78.7%",
+                          "highlight": true
+                        }
+                      ]
+                    }
+                  ],
+                  "items": [
+                    {
+                      "label": "Terminal-Bench 2.0",
+                      "score": "82.7%",
+                      "comparator": "高于 GPT-5.4 的 75.1%",
+                      "interpretation": "说明它在复杂命令行工作流、计划、迭代和工具协调上提升明显。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "SWE-Bench Pro",
+                      "score": "58.6%",
+                      "comparator": "略高于 GPT-5.4 的 57.7%，低于官方列出的 Claude Opus 4.7 64.3%",
+                      "interpretation": "说明真实 issue 解决能力继续提升，但不能只凭这一项判断所有编码任务。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "GDPval",
+                      "score": "84.9%",
+                      "comparator": "高于 GPT-5.4 的 83.0%",
+                      "interpretation": "更能交付结构化知识工作成果，而不只是答题。",
+                      "sourceType": "official"
+                    },
+                    {
+                      "label": "OSWorld-Verified",
+                      "score": "78.7%",
+                      "comparator": "高于 GPT-5.4 的 75.0%",
+                      "interpretation": "电脑环境操作能力提升，适合观察 computer use 方向。",
+                      "sourceType": "official"
+                    }
+                  ]
+                },
+                "architecture": {
+                  "headline": "闭源前沿模型 + 工具/电脑使用系统",
+                  "professorNote": "公开信息没有给出 Transformer 层数、参数量或 MoE 结构，因此不能把架构说成已知事实。可学习的是系统结构：模型、Codex、浏览/电脑使用、推理预算、安全分类器和推理服务共同组成产品能力。",
+                  "bullets": [
+                    "底层网络结构未公开，适合以黑盒系统方式分析。",
+                    "公开重点在长程任务、工具使用、电脑操作和推理服务效率。",
+                    "GPT-5.5 Pro 可以理解为同一底层模型使用更多并行 test-time compute 的高精度形态。"
+                  ]
+                },
+                "designLineage": {
+                  "headline": "从 GPT-5.2 的长任务稳定性推进到 GPT-5.5 的执行型工作系统",
+                  "professorNote": "本档案没有逐条收录 5.3/5.4，所以 GPT-5.2 到 GPT-5.5 是跨版本观察。官方对比主要使用 GPT-5.4，说明 5.5 是在上一代前沿工作模型基础上的执行效率和能力升级。",
+                  "bullets": [
+                    "继承 GPT-5 系列的代码、推理和知识工作方向。",
+                    "更强调 fewer tokens、fewer retries 和更自然的任务理解。",
+                    "把科研、办公、代码、电脑使用统一到“能做完工作”的叙事。"
+                  ]
+                },
+                "trainingData": {
+                  "headline": "训练数据未披露，后训练目标可以从能力信号反推",
+                  "professorNote": "对闭源模型要保守：不能声称看到了训练数据。我们只能从评测和产品描述推断训练/后训练更关注真实工作流、代码库、工具使用和安全边界。",
+                  "bullets": [
+                    "更强 agentic coding 和 Terminal-Bench 表明长程工程轨迹很重要。",
+                    "知识工作和 office/document/spreadsheet 能力表明结构化工作交付被强化。",
+                    "生物、网络安全 safeguards 表明安全分类和政策训练也在产品化链路里。"
+                  ]
+                },
+                "innovation": {
+                  "headline": "创新点在“持续完成任务”的系统能力",
+                  "professorNote": "前沿闭源模型的创新不一定都表现为新论文里的新模块。GPT-5.5 值得学的是能力组合：模型更强、推理更省、工具更稳、安全更细，最后体现为能把真实任务推进到底。",
+                  "bullets": [
+                    "Terminal-Bench 和 OSWorld 指向工具协调和电脑使用。",
+                    "Codex 中更少 token 完成任务指向执行效率。",
+                    "科研案例说明模型开始参与分析、实验、证明和工具搭建。"
+                  ]
+                },
+                "limitations": {
+                  "headline": "闭源、官方评测和权限边界仍然是限制",
+                  "professorNote": "越强的模型越需要更严格的验证。学生最容易犯的错是看到 GPT-5.5 分数高，就把测试、引用、权限和安全审查全部省掉。",
+                  "bullets": [
+                    "不可复现底层训练和架构。",
+                    "公开 benchmark 不能覆盖你的真实任务。",
+                    "高风险网络/生物能力会触发更严格安全策略。"
+                  ]
+                },
+                "professorLens": {
+                  "headline": "怎么学习 GPT-5.5",
+                  "professorNote": "把它放进“agent 课程”而不是“模型新闻”：拆成 intent understanding、planning、tool use、execution、verification、safety 六个环节，每个环节都设计一个小实验。",
+                  "bullets": [
+                    "用同一任务对比 GPT-5.2、GPT-5.5 和一个开源模型。",
+                    "记录失败原因：看错上下文、工具调用错、没有验证、越权、输出不可交付。",
+                    "用 benchmark 图学习任务类型，而不是只背排名。"
+                  ]
+                }
+              },
+              "teacherNote": "我会让学生把 GPT-5.5 当成“agentic work model”来学：不要先问参数多少，而是问它怎样理解任务、怎样调用工具、怎样保持目标、怎样验证输出、怎样在安全边界内工作。",
+              "sources": [
+                {
+                  "name": "Introducing GPT-5.5",
+                  "url": "https://openai.com/index/introducing-gpt-5-5/"
+                },
+                {
+                  "name": "GPT-5.5 System Card",
+                  "url": "https://openai.com/index/gpt-5-5-system-card/"
+                }
+              ]
             }
           ]
         },
@@ -2548,6 +2784,25 @@
         }
       ],
       "updates": [
+        {
+          "id": "openai-gpt-5-5-api",
+          "title": "GPT-5.5 与 GPT-5.5 Pro API 可用",
+          "kind": "model availability",
+          "publishedAt": "2026-04-24",
+          "summary": "OpenAI 在 GPT-5.5 发布页更新说明 GPT-5.5 与 GPT-5.5 Pro 已可用于 API，同时系统卡加入 API 部署 safeguards。",
+          "whyItMatters": "这意味着 GPT-5.5 不只是 ChatGPT/Codex 产品入口，也进入开发者可集成的模型层。",
+          "studentTakeaway": "学习新模型时要区分“产品发布日”和“API 可用日”，并同时查看 system card 的安全约束。",
+          "sources": [
+            {
+              "name": "Introducing GPT-5.5",
+              "url": "https://openai.com/index/introducing-gpt-5-5/"
+            },
+            {
+              "name": "GPT-5.5 System Card",
+              "url": "https://openai.com/index/gpt-5-5-system-card/"
+            }
+          ]
+        },
         {
           "id": "openai-codex",
           "title": "Codex 与 ChatGPT/IDE/终端工作流合并",

@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { SiteHeader } from "../components/SiteHeader";
+import { loadPipelineStatus } from "../lib/data";
+import type { PipelineStatusData } from "../types";
 
 const HOME_SECTIONS = [
   {
@@ -32,13 +35,19 @@ const HOME_SECTIONS = [
   {
     title: "Articles",
     href: "#/articles",
-    label: "学术文章版本分析",
-    body: "按 arXiv 版本线拆论文：初稿、实验补强、会议稳定版、长期维护版分别改了什么、为什么改、怎么验证读懂。",
+    label: "学术文章深读",
+    body: "用小白能懂的语言拆论文问题、思路、架构、方法流程、实验证据、局限和教授视角；版本线作为补充线索。",
     state: "已接入",
   },
 ];
 
 export function Home() {
+  const [pipelineStatus, setPipelineStatus] = useState<PipelineStatusData | null>(null);
+
+  useEffect(() => {
+    loadPipelineStatus().then(setPipelineStatus).catch(() => setPipelineStatus(null));
+  }, []);
+
   return (
     <>
       <SiteHeader active="home" />
@@ -46,7 +55,10 @@ export function Home() {
         <section className="home-hero-panel">
           <div>
             <div className="eyebrow">AI Brief</div>
-            <h1>Information -&gt; Judgment -&gt; Action</h1>
+            <h1>
+              <span>Information -&gt;</span>{" "}
+              <span>Judgment -&gt; Action</span>
+            </h1>
             <p>
               中文优先的 AI 情报工作台。Home 只保留栏目入口，具体内容分别进入 News、Models、Projects、Skills、Articles。
             </p>
@@ -72,7 +84,57 @@ export function Home() {
             </a>
           ))}
         </section>
+
+        <PipelineStatusPanel data={pipelineStatus} />
       </main>
     </>
   );
+}
+
+function PipelineStatusPanel({ data }: { data: PipelineStatusData | null }) {
+  if (!data) {
+    return (
+      <section className="home-pipeline-panel">
+        <div className="section-kicker">Agentic Pipeline</div>
+        <h2>还没有公开的流水线状态</h2>
+        <p>运行 Projects、Articles 或 Paper Radar 的刷新后，这里会显示 Orchestrator、质量门槛和长期记忆的最新状态。</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="home-pipeline-panel">
+      <div className="home-pipeline-head">
+        <div>
+          <div className="section-kicker">Agentic Pipeline</div>
+          <h2>从图片路线落地出来的系统骨架</h2>
+          <p>{data.principle}</p>
+        </div>
+        <span>{new Date(data.generatedAt).toLocaleString()}</span>
+      </div>
+      <div className="home-pipeline-grid">
+        {data.surfaces.map((surface) => (
+          <article key={surface.surface}>
+            <div className="pipeline-surface-head">
+              <b>{surfaceLabel(surface.surface)}</b>
+              <span className={`pipeline-status ${surface.latestRun?.qualityStatus || "unknown"}`}>
+                {surface.latestRun?.qualityStatus || "unknown"}
+              </span>
+            </div>
+            <p>{surface.latestRun?.highlights?.[0] || "等待下一次刷新。"}</p>
+            <small>
+              selected {surface.latestRun?.selectedCount || 0} / archived {surface.latestRun?.archivedCount || 0} · memory runs {surface.runCount}
+            </small>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function surfaceLabel(surface: string): string {
+  if (surface === "paper_radar") return "Paper Radar";
+  if (surface === "articles") return "Articles";
+  if (surface === "projects") return "Projects";
+  return surface;
 }

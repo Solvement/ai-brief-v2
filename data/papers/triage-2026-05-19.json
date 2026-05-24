@@ -1,0 +1,707 @@
+{
+  "date": "2026-05-19",
+  "generatedAt": "2026-05-19T19:33:28.319Z",
+  "inputFile": "data\\papers\\candidates-2026-05-19.json",
+  "modelUsed": "deepseek-chat",
+  "decisions": [
+    "ignore",
+    "skim",
+    "read",
+    "review",
+    "deep_dive",
+    "implement"
+  ],
+  "top": [
+    {
+      "id": "arxiv-2504-19413",
+      "key": "arxiv:2504.19413",
+      "title": "Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory",
+      "authors": [
+        "Prateek Chhikara",
+        "Dev Khant",
+        "Saket Aryan",
+        "Taranjeet Singh",
+        "Deshraj Yadav"
+      ],
+      "abstract": "Large Language Models (LLMs) have demonstrated remarkable prowess in generating contextually coherent responses, yet their fixed context windows pose fundamental challenges for maintaining consistency over prolonged multi-session dialogues. We introduce Mem0, a scalable memory-centric architecture that addresses this issue by dynamically extracting, consolidating, and retrieving salient information from ongoing conversations. Building on this foundation, we further propose an enhanced variant that leverages graph-based memory representations to capture complex relational structures among conversational elements. Through comprehensive evaluations on LOCOMO benchmark, we systematically compare our approaches against six baseline categories: (i) established memory-augmented systems, (ii) retrieval-augmented generation (RAG) with varying chunk sizes and k-values, (iii) a full-context approach that processes the entire conversation history, (iv) an open-source memory solution, (v) a proprietary model system, and (vi) a dedicated memory management platform. Empirical results show that our methods consistently outperform all existing memory systems across four question categories: single-hop, temporal, multi-hop, and open-domain. Notably, Mem0 achieves 26% relative improvements in the LLM-as-a-Judge metric over OpenAI, while Mem0 with graph memory achieves around 2% higher overall score than the base configuration. Beyond accuracy gains, we also markedly reduce computational overhead compared to full-context method. In particular, Mem0 attains a 91% lower p95 latency and saves more than 90% token cost, offering a compelling balance between advanced reasoning capabilities and practical deployment constraints. Our findings highlight critical role of structured, persistent memory mechanisms for long-term conversational coherence, paving the way for more reliable and efficient LLM-driven AI agents.",
+      "source": "papers_with_code_trending",
+      "sourceName": "Papers with Code trending",
+      "sourceUrl": "https://paperswithcode.com/papers/2504.19413",
+      "paperUrl": "https://arxiv.org/abs/2504.19413",
+      "pdfUrl": "",
+      "arxivId": "2504.19413",
+      "venue": "",
+      "publishedAt": "2025-04-28T01:46:35Z",
+      "updatedAt": "2025-04-28T01:46:35Z",
+      "discoveredAt": "2026-05-19T19:33:18.536Z",
+      "version": "2504.19413",
+      "codeUrl": "",
+      "tags": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "sourceSignals": [
+        "Papers with Code trending",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "RAG / Knowledge Systems",
+        "Evaluation / Benchmarks"
+      ],
+      "triage": {
+        "role_relevance": 99,
+        "architecture_value": 100,
+        "practicality": 54,
+        "novelty": 35,
+        "evaluation_quality": 69,
+        "interview_value": 85,
+        "build_potential": 92,
+        "total_score": 79,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks"
+        ],
+        "source_quality": 35,
+        "deterministic_reason": "AI Agents, RAG / Knowledge Systems, Evaluation / Benchmarks; total 79; strongest signals: role_relevance, architecture_value, interview_value.",
+        "model_adjustment": 0,
+        "model_reason": "Strong architecture and interview value for memory-augmented agents."
+      }
+    },
+    {
+      "id": "arxiv-2605-18747",
+      "key": "arxiv:2605.18747",
+      "title": "Code as Agent Harness",
+      "authors": [
+        "Xuying Ning",
+        "Katherine Tieu",
+        "Dongqi Fu",
+        "Tianxin Wei",
+        "Zihao Li",
+        "Yuanchen Bei",
+        "Jiaru Zou",
+        "Mengting Ai",
+        "Zhining Liu",
+        "Ting-Wei Li",
+        "Lingjie Chen",
+        "Yanjun Zhao",
+        "Ke Yang",
+        "Bingxuan Li",
+        "Cheng Qian",
+        "Gaotang Li",
+        "Xiao Lin",
+        "Zhichen Zeng",
+        "Ruizhong Qiu",
+        "Sirui Chen",
+        "Yifan Sun",
+        "Xiyuan Yang",
+        "Ruida Wang",
+        "Rui Pan",
+        "Chenyuan Yang",
+        "Dylan Zhang",
+        "Liri Fang",
+        "Zikun Cui",
+        "Yang Cao",
+        "Pan Chen",
+        "Dorothy Sun",
+        "Ren Chen",
+        "Mahesh Srinivasan",
+        "Nipun Mathur",
+        "Yinglong Xia",
+        "Hong Li",
+        "Hong Yan",
+        "Pan Lu",
+        "Lingming Zhang",
+        "Tong Zhang",
+        "Hanghang Tong",
+        "Jingrui He"
+      ],
+      "abstract": "Recent large language models (LLMs) have demonstrated strong capabilities in understanding and generating code, from competitive programming to repository-level software engineering. In emerging agentic systems, code is no longer only a target output. It increasingly serves as an operational substrate for agent reasoning, acting, environment modeling, and execution-based verification. We frame this shift through the lens of agent harnesses and introduce code as agent harness: a unified view that centers code as the basis for agent infrastructure. To systematically study this perspective, we organize the survey around three connected layers. First, we study the harness interface, where code connects agents to reasoning, action, and environment modeling. Second, we examine harness mechanisms: planning, memory, and tool use for long-horizon execution, together with feedback-driven control and optimization that make harness reliable and adaptive. Third, we discuss scaling the harness from single-agent systems to multi-agent settings, where shared code artifacts support multi-agent coordination, review, and verification. Across these layers, we summarize representative methods and practical applications of code as agent harness, spanning coding assistants, GUI/OS automation, embodied agents, scientific discovery, personalization and recommendation, DevOps, and enterprise workflows. We further outline open challenges for harness engineering, including evaluation beyond final task success, verification under incomplete feedback, regression-free harness improvement, consistent shared state across multiple agents, human oversight for safety-critical actions, and extensions to multimodal environments. By centering code as the harness of agentic AI, this survey provides a unified roadmap toward executable, verifiable, and stateful AI agent systems.",
+      "source": "huggingface_daily",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.18747",
+      "paperUrl": "https://arxiv.org/abs/2605.18747",
+      "pdfUrl": "",
+      "arxivId": "2605.18747",
+      "venue": "",
+      "publishedAt": "2026-05-18T17:59:03Z",
+      "updatedAt": "2026-05-18T17:59:03Z",
+      "discoveredAt": "2026-05-19T19:33:15.492Z",
+      "version": "2026-05-18T17:59:03Z",
+      "codeUrl": "",
+      "tags": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "sourceSignals": [
+        "Hugging Face Daily Papers",
+        "arXiv filtered search"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "Tool Use",
+        "AI Coding / SWE Agents",
+        "RAG / Knowledge Systems",
+        "Multimodal UI",
+        "Evaluation / Benchmarks",
+        "LLM Security / Reliability"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 98,
+        "practicality": 72,
+        "novelty": 43,
+        "evaluation_quality": 43,
+        "interview_value": 81,
+        "build_potential": 99,
+        "total_score": 79,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "Tool Use",
+          "AI Coding / SWE Agents",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability"
+        ],
+        "source_quality": 20,
+        "deterministic_reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 79; strongest signals: role_relevance, architecture_value, practicality.",
+        "model_adjustment": 0,
+        "model_reason": "Unified view of code as agent harness; high build potential."
+      }
+    },
+    {
+      "id": "arxiv-2512-16676",
+      "key": "arxiv:2512.16676",
+      "title": "DataFlow: An LLM-Driven Framework for Unified Data Preparation and Workflow Automation in the Era of Data-Centric AI",
+      "authors": [
+        "Hao Liang",
+        "Xiaochen Ma",
+        "Zhou Liu",
+        "Zhen Hao Wong",
+        "Zhengyang Zhao",
+        "Zimo Meng",
+        "Runming He",
+        "Chengyu Shen",
+        "Qifeng Cai",
+        "Zhaoyang Han",
+        "Meiyi Qiang",
+        "Yalin Feng",
+        "Tianyi Bai",
+        "Zewei Pan",
+        "Ziyi Guo",
+        "Yizhen Jiang",
+        "Jingwen Deng",
+        "Qijie You",
+        "Peichao Lai",
+        "Tianyu Guo",
+        "Chi Hsu Tsai",
+        "Hengyi Feng",
+        "Rui Hu",
+        "Wenkai Yu",
+        "Junbo Niu",
+        "Bohan Zeng",
+        "Ruichuan An",
+        "Lu Ma",
+        "Jihao Huang",
+        "Yaowei Zheng",
+        "Conghui He",
+        "Linpeng Tang",
+        "Bin Cui",
+        "Weinan E",
+        "Wentao Zhang"
+      ],
+      "abstract": "The rapidly growing demand for high-quality data in Large Language Models (LLMs) has intensified the need for scalable, reliable, and semantically rich data preparation pipelines. However, current practices remain dominated by ad-hoc scripts and loosely specified workflows, which lack principled abstractions, hinder reproducibility, and offer limited support for model-in-the-loop data generation. To address these challenges, we present DataFlow, a unified and extensible LLM-driven data preparation framework. DataFlow is designed with system-level abstractions that enable modular, reusable, and composable data transformations, and provides a PyTorch-style pipeline construction API for building debuggable and optimizable dataflows. The framework consists of nearly 200 reusable operators and six domain-general pipelines spanning text, mathematical reasoning, code, Text-to-SQL, agentic RAG, and large-scale knowledge extraction. To further improve usability, we introduce DataFlow-Agent, which automatically translates natural-language specifications into executable pipelines via operator synthesis, pipeline planning, and iterative verification. Across six representative use cases, DataFlow consistently improves downstream LLM performance. Our math, code, and text pipelines outperform curated human datasets and specialized synthetic baselines, achieving up to +3\\% execution accuracy in Text-to-SQL over SynSQL, +7\\% average improvements on code benchmarks, and 1--3 point gains on MATH, GSM8K, and AIME. Moreover, a unified 10K-sample dataset produced by DataFlow enables base models to surpass counterparts trained on 1M Infinity-Instruct data. These results demonstrate that DataFlow provides a practical and high-performance substrate for reliable, reproducible, and scalable LLM data preparation, and establishes a system-level foundation for future data-centric AI development.",
+      "source": "papers_with_code_trending",
+      "sourceName": "Papers with Code trending",
+      "sourceUrl": "https://paperswithcode.com/papers/2512.16676",
+      "paperUrl": "https://arxiv.org/abs/2512.16676",
+      "pdfUrl": "",
+      "arxivId": "2512.16676",
+      "venue": "",
+      "publishedAt": "2025-12-18T15:46:15Z",
+      "updatedAt": "2025-12-18T15:46:15Z",
+      "discoveredAt": "2026-05-19T19:33:18.537Z",
+      "version": "2512.16676",
+      "codeUrl": "",
+      "tags": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "sourceSignals": [
+        "Papers with Code trending",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "Tool Use",
+        "AI Coding / SWE Agents",
+        "RAG / Knowledge Systems",
+        "Evaluation / Benchmarks"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 100,
+        "practicality": 57,
+        "novelty": 39,
+        "evaluation_quality": 47,
+        "interview_value": 83,
+        "build_potential": 95,
+        "total_score": 78,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "Tool Use",
+          "AI Coding / SWE Agents",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks"
+        ],
+        "source_quality": 35,
+        "deterministic_reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 78; strongest signals: role_relevance, architecture_value, interview_value.",
+        "model_adjustment": 0,
+        "model_reason": "LLM-driven data prep framework with high architecture and interview value."
+      }
+    },
+    {
+      "id": "arxiv-2605-17242",
+      "key": "arxiv:2605.17242",
+      "title": "From Runnable to Shippable: Multi-Agent Test-Driven Development for Generating Full-Stack Web Applications from Requirements",
+      "authors": [
+        "Yuxuan Wan",
+        "Tingshuo Liang",
+        "Jiakai Xu",
+        "Jingyu Xiao",
+        "Yintong Huo",
+        "Michael R Lyu"
+      ],
+      "abstract": "Coding agents can generate web applications from natural-language descriptions, yet a recent benchmark study shows that generated applications fail to meet functional requirements in over 70% of cases. The core difficulty is that web correctness cannot be assessed from source files or terminal output: the application must be deployed, exercised through simulated browser interactions, and failures must be translated into actionable repair signals -- steps that current agents cannot perform without human mediation. We present TDDev, a framework that automates this closed loop through three stages: (1) converting high-level requirements into structured acceptance tests before any code is written, (2) deploying the application and validating it through browser-based interaction simulation, and (3) translating browser-observed failures into structured repair reports for the coding agent. Enabled by TDDev, we conduct the first controlled empirical study of Test-driven development (TDD) strategies for web application generation, comparing four development protocols across two coding agents, two backbone models, and two benchmarks. TDD infrastructure consistently improves generation quality by 34--48 percentage points over a no-TDD baseline. The central finding is that the optimal protocol depends on the model's generation style: models that build applications holistically benefit most from agentic enforcement, while models that extend code conservatively benefit from incremental enforcement. Mismatching protocol to generation style eliminates the TDD benefit entirely while multiplying token cost up to 25-fold. A user study confirms that TDDev reduces manual developer intervention to zero, shifting the workload from continuous prompt engineering to autonomous, feedback-driven refinement.",
+      "source": "huggingface_daily",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.17242",
+      "paperUrl": "https://arxiv.org/abs/2605.17242",
+      "pdfUrl": "",
+      "arxivId": "2605.17242",
+      "venue": "",
+      "publishedAt": "2026-05-17T03:48:41Z",
+      "updatedAt": "2026-05-17T03:48:41Z",
+      "discoveredAt": "2026-05-19T19:33:15.491Z",
+      "version": "2026-05-17T03:48:41Z",
+      "codeUrl": "",
+      "tags": [
+        "cs.SE"
+      ],
+      "sourceSignals": [
+        "Hugging Face Daily Papers",
+        "arXiv filtered search"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "AI Coding / SWE Agents",
+        "Evaluation / Benchmarks",
+        "Human-AI Interaction"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 90,
+        "practicality": 63,
+        "novelty": 59,
+        "evaluation_quality": 43,
+        "interview_value": 83,
+        "build_potential": 87,
+        "total_score": 78,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "AI Coding / SWE Agents",
+          "Evaluation / Benchmarks",
+          "Human-AI Interaction"
+        ],
+        "source_quality": 20,
+        "deterministic_reason": "AI Agents, AI Coding / SWE Agents, Evaluation / Benchmarks; total 78; strongest signals: role_relevance, architecture_value, interview_value.",
+        "model_adjustment": 0,
+        "model_reason": "Multi-agent test-driven dev for web apps; practical and interview-relevant."
+      }
+    },
+    {
+      "id": "arxiv-2403-08299",
+      "key": "arxiv:2403.08299",
+      "title": "AutoDev: Automated AI-Driven Development",
+      "authors": [
+        "Michele Tufano",
+        "Anisha Agarwal",
+        "Jinu Jang",
+        "Roshanak Zilouchian Moghaddam",
+        "Neel Sundaresan"
+      ],
+      "abstract": "The landscape of software development has witnessed a paradigm shift with the advent of AI-powered assistants, exemplified by GitHub Copilot. However, existing solutions are not leveraging all the potential capabilities available in an IDE such as building, testing, executing code, git operations, etc. Therefore, they are constrained by their limited capabilities, primarily focusing on suggesting code snippets and file manipulation within a chat-based interface. To fill this gap, we present AutoDev, a fully automated AI-driven software development framework, designed for autonomous planning and execution of intricate software engineering tasks. AutoDev enables users to define complex software engineering objectives, which are assigned to AutoDev's autonomous AI Agents to achieve. These AI agents can perform diverse operations on a codebase, including file editing, retrieval, build processes, execution, testing, and git operations. They also have access to files, compiler output, build and testing logs, static analysis tools, and more. This enables the AI Agents to execute tasks in a fully automated manner with a comprehensive understanding of the contextual information required. Furthermore, AutoDev establishes a secure development environment by confining all operations within Docker containers. This framework incorporates guardrails to ensure user privacy and file security, allowing users to define specific permitted or restricted commands and operations within AutoDev. In our evaluation, we tested AutoDev on the HumanEval dataset, obtaining promising results with 91.5% and 87.8% of Pass@1 for code generation and test generation respectively, demonstrating its effectiveness in automating software engineering tasks while maintaining a secure and user-controlled development environment.",
+      "source": "papers_with_code_trending",
+      "sourceName": "Papers with Code trending",
+      "sourceUrl": "https://paperswithcode.com/papers/2403.08299",
+      "paperUrl": "https://arxiv.org/abs/2403.08299",
+      "pdfUrl": "",
+      "arxivId": "2403.08299",
+      "venue": "",
+      "publishedAt": "2024-03-13T07:12:03Z",
+      "updatedAt": "2024-03-13T07:12:03Z",
+      "discoveredAt": "2026-05-19T19:33:18.537Z",
+      "version": "2403.08299",
+      "codeUrl": "",
+      "tags": [
+        "cs.SE",
+        "cs.AI"
+      ],
+      "sourceSignals": [
+        "Papers with Code trending",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "Tool Use",
+        "AI Coding / SWE Agents",
+        "RAG / Knowledge Systems",
+        "Evaluation / Benchmarks",
+        "LLM Security / Reliability"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 73,
+        "practicality": 79,
+        "novelty": 35,
+        "evaluation_quality": 59,
+        "interview_value": 87,
+        "build_potential": 96,
+        "total_score": 77,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "Tool Use",
+          "AI Coding / SWE Agents",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability"
+        ],
+        "source_quality": 35,
+        "deterministic_reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 77; strongest signals: role_relevance, architecture_value, practicality.",
+        "model_adjustment": 0,
+        "model_reason": "Automated AI-driven development; high build potential and interview value."
+      }
+    },
+    {
+      "id": "arxiv-2605-17946",
+      "key": "arxiv:2605.17946",
+      "title": "SVFSearch: A Multimodal Knowledge-Intensive Benchmark for Short-Video Frame Search in the Gaming Vertical Domain",
+      "authors": [
+        "Lingtao Mao",
+        "Huangyu Dai",
+        "Xinyu Sun",
+        "Zihan Liang",
+        "Ben Chen",
+        "Chenyi Lei",
+        "Wenwu Ou"
+      ],
+      "abstract": "Multimodal large language models are increasingly used as agent backbones that understand multimodal inputs, plan retrieval actions, invoke external tools, and reason over retrieved information. Yet existing benchmarks rarely evaluate this ability in short-video applications, where a paused frame is often visually ambiguous and answering requires vertical, long-tail, and fast-evolving domain knowledge. We introduce SVFSearch, the first open benchmark for short-video frame search in the Chinese gaming domain. SVFSearch contains 5,000 four-choice test examples and 4,198 auxiliary training examples, each centered on a paused game scene from a real short-video clip. To support fair and reproducible evaluation, SVFSearch provides a frozen offline retrieval environment with a game-domain text corpus, a topic-linked image gallery, and text, image, and multimodal retrieval interfaces, avoiding reliance on uncontrolled web search APIs. We evaluate representative paradigms ranging from direct QA and RAG workflow to Plan-Act-Replan agents and learned search models. Results reveal a large gap between model-only answering, practical agentic search, and oracle knowledge: the best open-source direct-QA model reaches 66.4%, the best practical agent achieves 79.1%, and oracle knowledge reaches 95.4%. Further analysis exposes bottlenecks in visual grounding, retrieval quality, evidence-grounded reasoning, and tool-use behavior, including over-search, answer-only shortcuts, and retrieval-induced misleading.",
+      "source": "arxiv_filtered",
+      "sourceName": "arXiv filtered search",
+      "sourceUrl": "https://arxiv.org/abs/2605.17946",
+      "paperUrl": "https://arxiv.org/abs/2605.17946",
+      "pdfUrl": "",
+      "arxivId": "2605.17946v1",
+      "venue": "",
+      "publishedAt": "2026-05-18T07:03:48Z",
+      "updatedAt": "2026-05-18T07:03:48Z",
+      "discoveredAt": "2026-05-19T19:33:18.538Z",
+      "version": "2605.17946v1",
+      "codeUrl": "",
+      "tags": [
+        "cs.AI",
+        "cs.CV",
+        "cs.LG"
+      ],
+      "sourceSignals": [
+        "arXiv filtered search",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "Tool Use",
+        "RAG / Knowledge Systems",
+        "Multimodal UI",
+        "Evaluation / Benchmarks"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 89,
+        "practicality": 57,
+        "novelty": 50,
+        "evaluation_quality": 68,
+        "interview_value": 76,
+        "build_potential": 78,
+        "total_score": 77,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "Tool Use",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks"
+        ],
+        "source_quality": 30,
+        "deterministic_reason": "AI Agents, Tool Use, RAG / Knowledge Systems; total 77; strongest signals: role_relevance, architecture_value, interview_value.",
+        "model_adjustment": 0,
+        "model_reason": "Multimodal benchmark for short-video frame search; good for eval and RAG."
+      }
+    },
+    {
+      "id": "arxiv-2605-16909",
+      "key": "arxiv:2605.16909",
+      "title": "TOBench: A Task-Oriented Omni-Modal Benchmark for Real-World Tool-Using Agents",
+      "authors": [
+        "Zhiqiang Liu",
+        "Wenhui Dong",
+        "Yilang Tan",
+        "Yuwen Qu",
+        "Haochen Yin",
+        "Chenyang Si"
+      ],
+      "abstract": "Tool-using agents are increasingly expected to operate across realistic professional workflows, where they must interpret multimodal inputs, coordinate external tools, inspect intermediate artifacts, and revise their actions before producing a final result. Existing benchmarks, however, often evaluate tool use, computer use, and multimodal reasoning in isolation, leaving a gap between benchmark settings and end-to-end omni-modal tool use in the real world. To address this gap, we introduce MM-ToolBench, a benchmark and evaluation harness for task-oriented omni-modal tool use. MM-ToolBench contains 100 executable tasks from two macro task families, Customer Service and Intelligent Creation, covering 20 subcategory slices and supported by 27 MCP servers with 324 tools. The central design of MM-ToolBench is closed-loop multimodal verification: agents must execute tools, inspect rendered or transformed artifacts, and self-correct when outputs fail task-specific requirements. To make such evaluation scalable and verifiable, MM-ToolBench couples MCP-based execution with task-specific grounded evaluators and a semi-automated construction pipeline for scenario discovery, task instantiation, evaluator synthesis, and human audit. Experiments on 15 contemporary agentic models show that MM-ToolBench remains highly challenging: Claude Opus 4.6, commonly regarded as one of the strongest coding-agent models, achieves only 32.0% task success, far below the 94.0% human benchmark. We envision MM-ToolBench as a practical foundation for evaluating and advancing next-generation omni-modal tool-using agents through closed-loop multimodal verification.",
+      "source": "huggingface_daily",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.16909",
+      "paperUrl": "https://arxiv.org/abs/2605.16909",
+      "pdfUrl": "",
+      "arxivId": "2605.16909",
+      "venue": "",
+      "publishedAt": "2026-05-16T09:49:25Z",
+      "updatedAt": "2026-05-16T09:49:25Z",
+      "discoveredAt": "2026-05-19T19:33:18.536Z",
+      "version": "2026-05-16T09:49:25Z",
+      "codeUrl": "",
+      "tags": [
+        "cs.AI"
+      ],
+      "sourceSignals": [
+        "Hugging Face Daily Papers",
+        "arXiv filtered search",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "Tool Use",
+        "Multimodal UI",
+        "Evaluation / Benchmarks"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 85,
+        "practicality": 49,
+        "novelty": 47,
+        "evaluation_quality": 69,
+        "interview_value": 77,
+        "build_potential": 64,
+        "total_score": 74,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "Tool Use",
+          "Multimodal UI",
+          "Evaluation / Benchmarks"
+        ],
+        "source_quality": 35,
+        "deterministic_reason": "AI Agents, Tool Use, Multimodal UI; total 74; strongest signals: role_relevance, architecture_value, interview_value.",
+        "model_adjustment": 0,
+        "model_reason": "Omni-modal tool-use benchmark; strong on agents and tool use."
+      }
+    },
+    {
+      "id": "arxiv-2605-14271",
+      "key": "arxiv:2605.14271",
+      "title": "Auditing Agent Harness Safety",
+      "authors": [
+        "Chengzhi Liu",
+        "Yichen Guo",
+        "Yepeng Liu",
+        "Yuzhe Yang",
+        "Qianqi Yan",
+        "Xuandong Zhao",
+        "Wenyue Hua",
+        "Sheng Liu",
+        "Sharon Li",
+        "Yuheng Bu",
+        "Xin Eric Wang"
+      ],
+      "abstract": "LLM agents increasingly run inside execution harnesses that dispatch tools, allocate resources, and route messages between specialized components. However, a harness can return a correct, benign answer over a trajectory that accesses unauthorized resources or leaks context to the wrong agent. Output-level evaluation cannot see these failures, yet most safety benchmarks score only final outputs or terminal states, even though many violations occur mid-trajectory rather than at termination. The central question is whether the harness respects user intent, permission boundaries, and information-flow constraints throughout execution. To address this gap, we propose HarnessAudit, a framework that audits full execution trajectories across boundary compliance, execution fidelity, and system stability, with a focus on multi-agent harnesses where these risks are most pronounced. We further introduce HarnessAudit-Bench, a benchmark of 210 tasks across eight real-world domains, instantiated in both single-agent and multi-agent configurations with embedded safety constraints. Evaluating ten harness configurations across frontier models and three multi-agent frameworks, we find that: (i) task completion is misaligned with safe execution, and violations accumulate with trajectory length; (ii) safety risks vary across domains, task types, and agent roles; (iii) most violations concentrate in resource access and inter-agent information transfer; and (iv) multi-agent collaboration expands the safety risk surface, while harness design sets the upper bound of safe deployment.",
+      "source": "papers_with_code_trending",
+      "sourceName": "Papers with Code trending",
+      "sourceUrl": "https://paperswithcode.com/papers/2605.14271",
+      "paperUrl": "https://arxiv.org/abs/2605.14271",
+      "pdfUrl": "",
+      "arxivId": "2605.14271",
+      "venue": "",
+      "publishedAt": "2026-05-14T02:14:28Z",
+      "updatedAt": "2026-05-16T00:50:55Z",
+      "discoveredAt": "2026-05-19T19:33:18.536Z",
+      "version": "2605.14271",
+      "codeUrl": "",
+      "tags": [
+        "cs.CL",
+        "cs.CY"
+      ],
+      "sourceSignals": [
+        "Papers with Code trending",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "AI Agents",
+        "Tool Use",
+        "Evaluation / Benchmarks",
+        "LLM Security / Reliability",
+        "Human-AI Interaction"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 77,
+        "practicality": 57,
+        "novelty": 55,
+        "evaluation_quality": 69,
+        "interview_value": 69,
+        "build_potential": 65,
+        "total_score": 74,
+        "decision": "review",
+        "matched_topics": [
+          "AI Agents",
+          "Tool Use",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability",
+          "Human-AI Interaction"
+        ],
+        "source_quality": 35,
+        "deterministic_reason": "AI Agents, Tool Use, Evaluation / Benchmarks; total 74; strongest signals: role_relevance, architecture_value.",
+        "model_adjustment": 0,
+        "model_reason": "Auditing agent harness safety; relevant for security and eval."
+      }
+    },
+    {
+      "id": "arxiv-2605-18733",
+      "key": "arxiv:2605.18733",
+      "title": "Advancing Narrative Long Video Generation via Training-Free Identity-Aware Memory",
+      "authors": [
+        "Jinzhuo Liu",
+        "Jiangning Zhang",
+        "Wencan Jiang",
+        "Yabiao Wang",
+        "Dingkang Liang",
+        "Zhucun Xue",
+        "Ran Yi",
+        "Yong Liu"
+      ],
+      "abstract": "Autoregressive video generation has improved rapidly in visual fidelity and interactivity, but it still suffers from long-term inconsistency and memory degradation. Most existing solutions either compress historical frames using predefined strategies or retrieve keyframes based on coarse implicit attention signals, both of which fail to handle evolving prompts with shifting entity references, leading to identity drift, character duplication, and attribute loss. To address this, we propose IAMFlow, a training-free identity-aware memory framework that explicitly models and tracks persistent entity identities, enabling consistent generation across prompt transitions. Specifically, an LLM extracts entities with visual attributes from each prompt and assigns unique global IDs for identity-aware memory, while a VLM asynchronously verifies and refines attributes from rendered frames, enabling explicit entity tracking in place of implicit similarity-based matching. To keep the proposed framework computationally practical, we design a systematic inference acceleration pipeline, including asynchronous visual verification, adaptive prompt transition, and model quantization, which achieves faster generation than existing baselines. Furthermore, we introduce NarraStream-Bench, a benchmark for narrative streaming video generation that features 324 multi-prompt scripts spanning six dimensions and a three-dimensional evaluation protocol that integrates both traditional metrics and multimodal large language model-based assessments. Extensive experiments show that IAMFlow, despite being training-free, achieves the best overall performance on NarraStream-Bench, outperforming the strongest baseline by 2.56 points, while achieving a 1.39$\\times$ speedup over the most efficient baseline in the 60-second multi-prompt setting.",
+      "source": "arxiv_filtered",
+      "sourceName": "arXiv filtered search",
+      "sourceUrl": "https://arxiv.org/abs/2605.18733",
+      "paperUrl": "https://arxiv.org/abs/2605.18733",
+      "pdfUrl": "",
+      "arxivId": "2605.18733v1",
+      "venue": "",
+      "publishedAt": "2026-05-18T17:54:34Z",
+      "updatedAt": "2026-05-18T17:54:34Z",
+      "discoveredAt": "2026-05-19T19:33:18.538Z",
+      "version": "2026-05-18T17:54:34Z",
+      "codeUrl": "",
+      "tags": [
+        "cs.CV"
+      ],
+      "sourceSignals": [
+        "arXiv filtered search",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "RAG / Knowledge Systems",
+        "AIGC Image/Video/Product Workflows",
+        "Multimodal UI",
+        "Evaluation / Benchmarks"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 88,
+        "practicality": 40,
+        "novelty": 54,
+        "evaluation_quality": 68,
+        "interview_value": 70,
+        "build_potential": 56,
+        "total_score": 72,
+        "decision": "read",
+        "matched_topics": [
+          "RAG / Knowledge Systems",
+          "AIGC Image/Video/Product Workflows",
+          "Multimodal UI",
+          "Evaluation / Benchmarks"
+        ],
+        "source_quality": 30,
+        "deterministic_reason": "RAG / Knowledge Systems, AIGC Image/Video/Product Workflows, Multimodal UI; total 72; strongest signals: role_relevance, architecture_value, interview_value.",
+        "model_adjustment": 0,
+        "model_reason": "Training-free memory for video generation; niche but interesting."
+      }
+    },
+    {
+      "id": "arxiv-2605-16893",
+      "key": "arxiv:2605.16893",
+      "title": "NGM: A Plug-and-Play Training-Free Memory Module for LLMs",
+      "authors": [
+        "Yuwen Qu",
+        "Wenhui Dong",
+        "Chenyang Si",
+        "Caifeng Shan"
+      ],
+      "abstract": "Recent studies introduce conditional memory modules that decouple knowledge storage from neural computation, enabling more direct knowledge access. Compared to MoE, which relies on dynamic computation paths, explicit lookup provides a more efficient knowledge retrieval mechanism. However, these approaches still depend on learned memory embeddings, requiring additional training and limiting flexibility. To address this, we propose N-gram Memory (NGM), a training-free, plug-and-play module composed of a Causal N-Gram Encoder and a Cosine-Gated Memory Injector. The Causal N-Gram Encoder directly averages the pretrained token embeddings of the backbone model to construct N-gram representations, thereby eliminating the need to train separate N-gram embeddings from scratch. This design requires neither an additional memory table nor a retrieval pipeline. The Cosine-Gated Memory Injector then uses a non-parametric cosine gate with ReLU to modulate the retrieved embeddings into the contextual representations. We evaluate NGM on the Qwen3 series from 0.6B to 14B across eight benchmarks. NGM improves average performance by 0.5 to 1.2 points, with particularly clear gains on code generation and knowledge-intensive tasks (e.g., +3.0 on LiveCodeBench and +3.03 on GPQA for Qwen3-14B). Moreover, NGM also improves performance in multimodal benchmarks (e.g., MMStar +1.53 on Qwen3-VL-2B).",
+      "source": "huggingface_daily",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.16893",
+      "paperUrl": "https://arxiv.org/abs/2605.16893",
+      "pdfUrl": "",
+      "arxivId": "2605.16893",
+      "venue": "",
+      "publishedAt": "2026-05-16T09:12:52Z",
+      "updatedAt": "2026-05-16T09:12:52Z",
+      "discoveredAt": "2026-05-19T19:33:18.536Z",
+      "version": "2605.16893",
+      "codeUrl": "",
+      "tags": [
+        "cs.AI"
+      ],
+      "sourceSignals": [
+        "Hugging Face Daily Papers",
+        "arXiv metadata"
+      ],
+      "focusTopics": [
+        "AI Coding / SWE Agents",
+        "RAG / Knowledge Systems",
+        "Multimodal UI",
+        "Evaluation / Benchmarks"
+      ],
+      "triage": {
+        "role_relevance": 100,
+        "architecture_value": 79,
+        "practicality": 56,
+        "novelty": 39,
+        "evaluation_quality": 45,
+        "interview_value": 81,
+        "build_potential": 66,
+        "total_score": 71,
+        "decision": "read",
+        "matched_topics": [
+          "AI Coding / SWE Agents",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks"
+        ],
+        "source_quality": 35,
+        "deterministic_reason": "AI Coding / SWE Agents, RAG / Knowledge Systems, Multimodal UI; total 71; strongest signals: role_relevance, architecture_value, interview_value.",
+        "model_adjustment": 0,
+        "model_reason": "Plug-and-play memory module; good for RAG and coding agents."
+      }
+    }
+  ]
+}

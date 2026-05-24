@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 3,
+  "date": "2026-05-20",
+  "generatedAt": "2026-05-21T01:19:09.950Z",
+  "one_must_read_paper": {
+    "id": "arxiv-2605-14271",
+    "title": "Auditing Agent Harness Safety",
+    "daily_action": "must_read",
+    "triage_decision": "deep_dive",
+    "total_score": 97,
+    "sourceName": "Papers with Code trending",
+    "sourceUrl": "https://paperswithcode.com/papers/2605.14271",
+    "matched_topics": [
+      "AI Agents",
+      "Tool Use",
+      "Agent Harness / Observability",
+      "Evaluation / Benchmarks",
+      "LLM Security / Reliability",
+      "Human-AI Interaction"
+    ],
+    "freshness_signal": "new",
+    "hotness_signal": "high_signal_source",
+    "reason": "AI Agents, Tool Use, Agent Harness / Observability; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness, trajectory."
+  },
+  "three_skim_papers": [
+    {
+      "id": "arxiv-2605-18747",
+      "title": "Code as Agent Harness",
+      "daily_action": "skim",
+      "triage_decision": "deep_dive",
+      "total_score": 93,
+      "sourceName": "Papers with Code trending",
+      "sourceUrl": "https://paperswithcode.com/papers/2605.18747",
+      "matched_topics": [
+        "AI Agents",
+        "Tool Use",
+        "AI Coding / SWE Agents",
+        "Agent Harness / Observability",
+        "RAG / Knowledge Systems",
+        "Multimodal UI",
+        "Evaluation / Benchmarks",
+        "LLM Security / Reliability"
+      ],
+      "freshness_signal": "new",
+      "hotness_signal": "high_signal_source",
+      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, rollback."
+    },
+    {
+      "id": "arxiv-2604-17288",
+      "title": "Clover: A Neural-Symbolic Agentic Harness with Stochastic Tree-of-Thoughts for Verified RTL Repair",
+      "daily_action": "skim",
+      "triage_decision": "deep_dive",
+      "total_score": 93,
+      "sourceName": "AHE rescue cache",
+      "sourceUrl": "https://arxiv.org/abs/2604.17288",
+      "matched_topics": [
+        "AI Agents",
+        "AI Coding / SWE Agents",
+        "Agent Harness / Observability",
+        "Evaluation / Benchmarks"
+      ],
+      "freshness_signal": "new",
+      "hotness_signal": "high_signal_source",
+      "reason": "AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness."
+    },
+    {
+      "id": "arxiv-2605-18859",
+      "title": "TwinRouterBench: Fast Static and Live Dynamic Evaluation for Realistic Agentic LLM Routing",
+      "daily_action": "skim",
+      "triage_decision": "deep_dive",
+      "total_score": 93,
+      "sourceName": "arXiv coding agents and SWE evals",
+      "sourceUrl": "https://arxiv.org/abs/2605.18859",
+      "matched_topics": [
+        "AI Agents",
+        "Tool Use",
+        "AI Coding / SWE Agents",
+        "Agent Harness / Observability",
+        "Evaluation / Benchmarks"
+      ],
+      "freshness_signal": "new",
+      "hotness_signal": "standard_source",
+      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: trajectory."
+    }
+  ],
+  "one_professor_lesson": "从教授视角看，这篇文章教学生如何为特定垂直领域（如工程设计）设计严谨的多智能体基准，尤其要注意分离检索贡献和测试条件分支。工程实践中，学生应学习如何将仿真工具、知识库和作业调度集成进智能体系统，并理解端到端测评比单一指标更有说服力。文中监督式架构是务实起点，但注意其局限（如单点故障），未来可探索更去中心化的设计。",
+  "one_good_idea_to_steal": "三维基准分别考察工具使用、知识检索和长时间任务执行，维度互补",
+  "one_bad_idea_or_risk": "仅用两个领域问题，基准泛化能力不足，难以直接迁移至其他工程细分",
+  "one_transferable_pattern": "构建多维度基准的模块化设计：将任务分解为不同认知维度，独立评测",
+  "one_future_work_application": "在开发AI工程助手时，可借鉴其三维测评思路，从工具调用、知识检索、长任务执行三方面制定验收标准",
+  "one_architecture_takeaway": "多智能体系统采用监督式架构，基于状态图（LangGraph）编排工具调用、检索和仿真节点；评测设计将任务按认知需求分类，并引入门控评分隔离组件贡献，此模式可直接应用于企业级AI工程平台设计。",
+  "one_interview_talking_point": "在面试中可举例说明多智能体系统如何协调工程仿真、检索和作业调度，展示端到端交付能力",
+  "one_project_idea": "基于LangGraph构建一个简化的工程设计智能体，集成一个开源仿真工具（如FreeFEM）和文档检索，复现基础流程",
+  "agent_flow": [
+    {
+      "role": "Discoverer",
+      "responsibility": "从 HF Daily、Papers with Code、arXiv、OpenReview、ACL、CVF 和公司研究页发现候选论文。",
+      "signal": "160 candidates entered triage"
+    },
+    {
+      "role": "Evidence Collector",
+      "responsibility": "保留 sourceUrl、paperUrl、abstract、sourceSignals、focusTopics 和版本号，避免只看标题判断。",
+      "signal": "Papers with Code trending"
+    },
+    {
+      "role": "Ranker",
+      "responsibility": "按岗位相关性、架构价值、实用性、新颖性、评估质量、面试表达和可构建性打分。",
+      "signal": "cutoff 75, selected 10"
+    },
+    {
+      "role": "Teacher Reviewer",
+      "responsibility": "只对 1-2 篇高价值论文做教授式深读，讲清好设计、坏设计和可迁移模式。",
+      "signal": "review cache is version-aware"
+    },
+    {
+      "role": "Verifier",
+      "responsibility": "用 validate 脚本检查 trace、daily 输出、review 字段和中文编码。",
+      "signal": "npm run validate is the quality gate"
+    },
+    {
+      "role": "Publisher",
+      "responsibility": "把 daily radar 摘要发布到 public/data/paper-radar.json，供前端展示。",
+      "signal": "public radar data ready"
+    },
+    {
+      "role": "Archivist",
+      "responsibility": "保存 candidates、triage、reviewed 和 daily 文件，后续复用思路架构。",
+      "signal": "data/papers/*-2026-05-20.json"
+    }
+  ],
+  "quality_gate": {
+    "schemaVersion": 1,
+    "surface": "paper_radar",
+    "status": "pass",
+    "checkedAt": "2026-05-21T01:19:09.950Z",
+    "checks": [
+      {
+        "id": "must-read",
+        "label": "daily output has one must-read paper",
+        "status": "pass",
+        "details": "Auditing Agent Harness Safety"
+      },
+      {
+        "id": "skim-count",
+        "label": "daily output keeps at most three skim papers",
+        "status": "pass",
+        "details": "3 skim papers"
+      },
+      {
+        "id": "triage-top",
+        "label": "triage top list stays small and present",
+        "status": "pass",
+        "details": "10 top papers"
+      },
+      {
+        "id": "professor-fields",
+        "label": "daily output includes professor learning fields",
+        "status": "pass",
+        "details": "professor/good/risk/pattern fallbacks available"
+      },
+      {
+        "id": "review-cache",
+        "label": "at least one Pro review is attached or cached",
+        "status": "pass",
+        "details": "2 review files linked"
+      },
+      {
+        "id": "review-depth",
+        "label": "attached review reaches teaching-depth bar",
+        "status": "pass",
+        "details": "average review depth 95"
+      }
+    ]
+  },
+  "run_trace": {
+    "summary": {
+      "candidateCount": 160,
+      "selectedCount": 4,
+      "reviewedCount": 2,
+      "sourceFailureCount": 0,
+      "modelCalls": 0,
+      "totalTokens": 0
+    },
+    "stages": [
+      {
+        "stage": "daily",
+        "startedAt": "2026-05-21T01:19:09.944Z",
+        "inputFile": "data\\papers\\triage-2026-05-20.json",
+        "reviewFileCount": 2,
+        "mustReadId": "arxiv-2605-14271",
+        "skimCount": 3,
+        "averageReviewDepth": 95,
+        "finishedAt": "2026-05-21T01:19:09.950Z",
+        "durationMs": 6,
+        "modelUsage": {
+          "calls": 0,
+          "promptTokens": 0,
+          "completionTokens": 0,
+          "totalTokens": 0,
+          "models": {}
+        }
+      }
+    ],
+    "modelUsage": {
+      "calls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "models": {}
+    },
+    "sourceFailures": []
+  },
+  "reflection": {
+    "schemaVersion": 1,
+    "summary": "Reflection found 1 watch item(s); keep the feed small and evidence-led.",
+    "averageReviewDepth": 95,
+    "whatWorked": [
+      "Must-read selected with score 97: Auditing Agent Harness Safety",
+      "4 selected paper(s) carried agent harness / observability signals.",
+      "2 reviewed paper file(s) are available for teaching-oriented reuse."
+    ],
+    "whatToWatch": [
+      "114 papers were below top cutoff; inspect if emerging concepts are being crowded out."
+    ],
+    "selfCorrections": [
+      "Do not treat fresh or hot as sufficient quality evidence; freshness only earns attention, not promotion.",
+      "Benchmark and evaluation papers must be read through claims, controlled variables, metrics, and failure modes.",
+      "A paper is only Articles-worthy when it teaches a reusable AI engineer pattern, not merely because it is about AI."
+    ],
+    "nextRunAdjustments": [
+      "Keep AHE rescue enabled, but prefer papers with concrete harness/eval evidence.",
+      "Use reviewed papers as candidates for full Articles deep dive only after manual read.",
+      "If a review lacks good/bad/transferable patterns, rerun review with stricter professor prompt instead of publishing a shallow analysis."
+    ]
+  },
+  "reviewedFiles": [
+    {
+      "id": "arxiv-2605-19743",
+      "title": "EngiAI: A Multi-Agent Framework and Benchmark Suite for LLM-Driven Engineering Design",
+      "file": "data\\papers\\reviewed\\arxiv-2605-19743-2026-05-20.json"
+    },
+    {
+      "id": "arxiv-2605-17242",
+      "title": "From Runnable to Shippable: Multi-Agent Test-Driven Development for Generating Full-Stack Web Applications from Requirements",
+      "file": "data\\papers\\reviewed\\arxiv-2605-17242-2026-05-20.json"
+    }
+  ],
+  "pipelineRun": {
+    "id": "paper_radar-2026-05-20-1779326349951",
+    "memoryFile": "data/agent-memory/paper_radar.json",
+    "statusFile": "public/data/pipeline-status.json"
+  }
+}

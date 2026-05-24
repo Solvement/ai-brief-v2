@@ -1,351 +1,1801 @@
 {
-  "generatedAt": "2026-05-14T22:20:00.000Z",
+  "generatedAt": "2026-05-21T00:50:00.749Z",
   "papers": [
     {
-      "id": "attention-is-all-you-need",
-      "title": "Attention Is All You Need",
-      "shortTitle": "Transformer",
-      "authors": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin",
-      "venue": "NeurIPS 2017 / arXiv:1706.03762",
-      "arxivId": "1706.03762",
+      "id": "longmemeval-v2-agent-memory",
+      "title": "LongMemEval-V2: Evaluating Long-Term Agent Memory Toward Experienced Colleagues",
+      "shortTitle": "LongMemEval-V2",
+      "authors": "Di Wu, Zixiang Ji, Asmi Kawatkar, Bryan Kwan, Jia-Chen Gu, Nanyun Peng, Kai-Wei Chang",
+      "venue": "arXiv 2026 / UCLA + collaborators",
+      "arxivId": "2605.12493",
       "contentType": "paper",
-      "publishedAt": "2017-06-12",
-      "updatedAt": "2023-08-02",
-      "oneSentenceTakeaway": "Transformer 的真正版本价值不只是提出 self-attention，而是把序列建模从循环/卷积训练瓶颈里解放出来。",
-      "whyItMatters": "几乎所有现代 LLM、扩散模型文本编码器、多模态模型和 agent 语言骨架都继承了这篇论文的核心抽象。",
-      "targetAudience": ["AI 学生", "LLM 学习者", "模型架构学习者", "论文精读者"],
-      "readingTime": "22 min",
-      "actionLabel": "精读 Transformer 版本线",
-      "impactScore": 100,
-      "readabilityScore": 78,
-      "actionabilityScore": 86,
-      "confidenceScore": 95,
-      "difficulty": "intermediate",
-      "recommendedAction": "read",
-      "tags": ["Research", "Multimodal", "RAG", "AI Coding"],
-      "sourceName": "arXiv",
-      "sourceUrl": "https://arxiv.org/abs/1706.03762",
-      "sources": [
-        { "name": "arXiv:1706.03762", "url": "https://arxiv.org/abs/1706.03762" },
-        { "name": "NeurIPS Proceedings", "url": "https://papers.nips.cc/paper/7181-attention-is-all-you-need" }
+      "paperType": "system_method",
+      "publishedAt": "2026-05-12",
+      "updatedAt": "2026-05-12",
+      "oneSentenceTakeaway": "它把 agent memory 从聊天记录回忆，推进到能不能像老同事一样记住一个环境怎么工作。",
+      "whyItMatters": "AI engineer 做 agent 时最容易误判 memory：不是存越多越好，而是能否把历史轨迹压成下次执行真正有用的环境经验。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
       ],
-      "versionQuestion": "为什么 v1 的研究突破，在 v7 之后仍然值得回头读？",
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "Agent",
+        "Memory",
+        "RAG",
+        "Benchmark",
+        "AI Coding"
+      ],
+      "sourceName": "arXiv:2605.12493",
+      "sourceUrl": "https://arxiv.org/abs/2605.12493",
+      "sources": [
+        {
+          "name": "arXiv:2605.12493",
+          "url": "https://arxiv.org/abs/2605.12493"
+        }
+      ],
+      "versionQuestion": "长期记忆系统到底应该记用户偏好，还是应该记环境经验和失败教训？",
       "versions": [
         {
-          "id": "transformer-v1",
-          "label": "v1 初稿",
-          "submittedAt": "2017-06-12",
-          "versionType": "Research Breakthrough",
-          "changeSummary": "首次提出完全基于 attention 的 encoder-decoder 架构，去掉 RNN/CNN 序列路径。",
-          "whyChanged": "当时机器翻译主流仍依赖循环或卷积结构，训练并行度和长距离依赖都是核心瓶颈。",
-          "readerQuestion": "如果不用循环，模型如何知道词序和远距离依赖？",
-          "evidence": "arXiv 显示 v1 提交于 2017-06-12；摘要给出 WMT14 En-De 28.4 BLEU、En-Fr 41.8 BLEU。",
-          "impactScore": 100
+          "id": "longmemeval-v2-agent-memory-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2026-05-12",
+          "changeSummary": "提出面向 web agent 的环境经验记忆评测。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "为什么传统长上下文/对话记忆 benchmark 不够？",
+          "evidence": "论文提交于 2026-05-12，覆盖 451 个手工问题和最多 115M tokens 的历史轨迹。",
+          "impactScore": 82
         },
         {
-          "id": "transformer-v5",
-          "label": "v5 会议稳定版",
-          "submittedAt": "2017-12-06",
-          "versionType": "Conference Stabilization",
-          "changeSummary": "研究主张已经稳定，读者应重点看 architecture、attention、positional encoding 和 BLEU 实验如何互相支撑。",
-          "whyChanged": "会议版通常会把论证、实验表述和相关工作打磨成可引用形态。",
-          "readerQuestion": "哪些设计是后来 LLM 继承的核心，哪些只是机器翻译时代的配置？",
-          "evidence": "arXiv submission history 显示 v5 为 2017-12-06；NeurIPS 2017 收录版本成为主流引用基础。",
-          "impactScore": 96
-        },
-        {
-          "id": "transformer-v7",
-          "label": "v7 长期维护版",
-          "submittedAt": "2023-08-02",
-          "versionType": "Long-tail Maintenance",
-          "changeSummary": "多年后仍有版本维护，说明这类基础论文不只是历史材料，也需要在引用、元数据或排版层面保持可用。",
-          "whyChanged": "高影响论文会被教材、课程和复现工程长期使用，后续版本常服务于可引用性和长期维护。",
-          "readerQuestion": "当一篇论文已经成为基础设施，读论文时应该读原始创新还是读后续生态？",
-          "evidence": "arXiv 显示最后修订为 2023-08-02 v7。",
+          "id": "longmemeval-v2-agent-memory-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2026-05-12",
+          "changeSummary": "当前版本给出 AgentRunbook-R/C 两类记忆方法和准确率对比。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "什么时候 RAG memory 不够，需要 coding-agent 风格的证据收集？",
+          "evidence": "摘要报告 AgentRunbook-C 72.5% average accuracy，强 RAG baseline 48.5%。",
           "impactScore": 88
         }
       ],
-      "versionRelation": "v1 是范式突破，v5 是会议稳定表达，v7 是长期维护信号。学习时应该先读 v1 的问题意识，再用最终版确认公式、实验和引用。",
-      "conceptMap": ["Self-attention", "Multi-head attention", "Positional encoding", "Encoder-decoder", "Parallel training"],
+      "versionRelation": "这篇不是又一个记忆库，而是把记忆定义成环境经验压缩问题；它适合作为 AI Brief 后续 agent memory 项目的评测模板。",
+      "showVersionLens": false,
+      "plainLanguage": {
+        "beginnerSummary": "想象你去一个新公司工作，第一天什么都不懂，三个月后你知道系统坑在哪里。LongMemEval-V2 测的就是 AI 能不能从历史操作里变成这样的熟手。",
+        "mentalModel": "memory 不是仓库，是 runbook：它要把过去的轨迹整理成下一次行动前能直接看的操作手册。",
+        "whyItWorks": "它不只问过去发生了什么，还问这个环境的按钮、状态变化、工作流和坑点是否被学会。",
+        "oneThingToRemember": "好的 agent memory 应该让 agent 更像熟悉项目的同事，而不是只会搜索聊天记录。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Environment experience",
+          "plainMeaning": "环境经验，指 agent 在某个网站或工具里反复操作后积累的规则和坑点。",
+          "whyItMatters": "真实工作里的 agent 会长期面对同一个代码库或产品环境。"
+        },
+        {
+          "term": "Context gathering",
+          "plainMeaning": "先从历史里找证据，再回答当前问题。",
+          "whyItMatters": "它把 memory 评测变成可执行的检索任务。"
+        },
+        {
+          "term": "Runbook",
+          "plainMeaning": "把经验写成操作手册或策略笔记。",
+          "whyItMatters": "这是把记忆落地到工程系统的最直接形态。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "一个 agent 能不能从很多历史轨迹里学到环境经验，并在新任务里正确调用这些经验？",
+        "coreMove": "把 memory 拆成状态回忆、动态状态追踪、工作流知识、环境坑点和前提意识五类问题。",
+        "designChoices": [
+          {
+            "title": "问环境经验",
+            "choice": "不用普通聊天问答，而是问界面、状态、流程、坑点。",
+            "why": "这样更接近 coding agent 或 web agent 的真实长期使用场景。",
+            "tradeoff": "构造成本高，不能完全自动生成。"
+          },
+          {
+            "title": "把证据收集单独建模",
+            "choice": "让 memory 系统先返回 compact evidence，再给下游模型回答。",
+            "why": "这能区分存储质量和最终回答模型能力。",
+            "tradeoff": "延迟和成本会比单次 RAG 高。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "收集轨迹",
+            "body": "系统先给 memory 方法大量历史轨迹，里面包含操作、观察和失败。"
+          },
+          {
+            "label": "Step 2",
+            "title": "提取证据",
+            "body": "memory 方法把历史压缩成状态、事件、策略笔记或文件化轨迹。"
+          },
+          {
+            "label": "Step 3",
+            "title": "回答问题",
+            "body": "下游模型基于证据回答环境相关问题，并用准确率评价。"
+          }
+        ],
+        "optimizationLogic": "目标不是把所有 token 塞进上下文，而是在准确率、延迟和证据可解释性之间找 Pareto 平衡。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "论文评测的是长期环境经验记忆，不等同于所有人格化 memory 或用户画像 memory。",
+        "modernExtensionBoundary": "可以扩展到 AI coding agent：让 agent 记住代码库约定、测试命令、历史 bug 和常见失败恢复路径。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "History trajectories",
+            "role": "提供原始经验",
+            "beginnerExplanation": "就是 agent 过去在环境里走过的路。",
+            "connectsTo": "Memory store"
+          },
+          {
+            "label": "Block 2",
+            "title": "Memory store",
+            "role": "压缩和组织经验",
+            "beginnerExplanation": "可以是 RAG 池、策略笔记或文件化轨迹。",
+            "connectsTo": "Evidence gathering"
+          },
+          {
+            "label": "Block 3",
+            "title": "Evidence gathering",
+            "role": "找出回答需要的证据",
+            "beginnerExplanation": "像同事翻项目 runbook。",
+            "connectsTo": "Question answering"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "AgentRunbook-C 准确率更高，但代价是 latency；说明 memory 不是免费能力，必须工程化权衡。",
+        "whatWasCompared": "AgentRunbook-R、AgentRunbook-C、强 RAG baseline 和 coding-agent baseline。",
+        "whatToTrust": "可信的是问题类别、准确率差距和 memory 设计思路。",
+        "whatNotToOverclaim": "不要把它理解成已经解决长期记忆；论文也标为 Work in Progress。"
+      },
+      "experimentReadings": [
+        {
+          "question": "memory 系统是否能从历史轨迹中恢复环境经验？",
+          "setup": "451 个手工问题，历史轨迹最多 500 条、115M tokens。",
+          "metric": "Average accuracy",
+          "result": "AgentRunbook-C 72.5%，强 RAG baseline 48.5%，coding-agent baseline 69.3%。",
+          "conclusion": "文件化轨迹加 coding-agent 式证据收集在准确率上更强。",
+          "limitation": "高延迟和高成本意味着它还不是默认生产方案。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "从老师角度，这篇最值得学的是问题定义。不要急着问用什么向量库，先问 memory 到底服务哪种任务：回忆事实、跟踪状态、积累流程，还是避免重复踩坑。",
+        "beginnerPath": [
+          "先读 abstract，圈出五类 memory ability。",
+          "再看 AgentRunbook-R/C 的差别。",
+          "最后把它映射到你自己的 AI Brief crawler 或 coding agent。"
+        ],
+        "commonMisreadings": [
+          "误以为长上下文等于长期记忆。",
+          "误以为准确率最高的方法就是生产最优方案，忽略 latency。"
+        ],
+        "practicePrompt": "把 AI Brief 项目里的一个重复开发问题写成 memory benchmark：历史轨迹是什么，问题是什么，答案证据在哪里？"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 LongMemEval-V2 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "历史轨迹 -> memory store/runbook -> evidence gathering -> QA accuracy。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "RAG 可能搜到相似历史但漏掉环境坑点；指标可以看 evidence 是否包含正确 gotcha。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "用本项目 git log 或 docs 写 5 条历史经验，做 5 个问题测试 AI 是否能找对证据。",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "README 里写清楚问题、历史材料、评分规则和失败案例。"
+        }
+      ],
+      "conceptMap": [
+        "长期记忆 -> 环境经验 -> runbook",
+        "RAG memory -> 证据召回 -> 延迟权衡"
+      ],
       "charts": [
         {
-          "title": "WMT14 headline results",
-          "metric": "BLEU reported in abstract",
-          "unit": "BLEU",
-          "maxValue": 50,
+          "title": "Memory 方法准确率",
+          "metric": "average accuracy",
+          "unit": "%",
+          "maxValue": 100,
           "bars": [
-            { "label": "En-De", "value": 28.4, "display": "28.4", "highlight": true },
-            { "label": "En-Fr", "value": 41.8, "display": "41.8", "highlight": true }
+            {
+              "label": "RAG baseline",
+              "value": 48.5,
+              "display": "48.5%"
+            },
+            {
+              "label": "Coding agent baseline",
+              "value": 69.3,
+              "display": "69.3%"
+            },
+            {
+              "label": "AgentRunbook-C",
+              "value": 72.5,
+              "display": "72.5%"
+            }
           ]
         }
       ],
       "analysis": {
-        "thesis": "把序列建模的核心计算从逐步递归改成可并行 attention，让模型同时获得长距离依赖和训练效率。",
-        "background": "RNN/CNN 在序列任务中要么难以并行，要么需要堆很多层才能覆盖长距离关系。",
-        "method": "用 scaled dot-product attention、multi-head attention、position-wise feed-forward 和 positional encoding 组成 encoder-decoder。",
-        "experiments": "机器翻译实验显示质量和训练效率同时提升，并在 English-to-German、English-to-French 上给出强结果。",
-        "limitations": "原论文阶段还没有解决超长上下文、检索增强、稀疏 attention 和大规模预训练问题。",
-        "professorLens": "教授会让学生先画出一层 Transformer 的数据流，再解释为什么 attention 的矩阵乘法比 RNN 时间步更适合 GPU。",
-        "verificationChecklist": ["能手写 Q/K/V 计算流程", "能解释 positional encoding 为什么必要", "能区分 encoder-decoder Transformer 和 decoder-only LLM", "能说明 BLEU 指标和今天 LLM 评测的差异"]
+        "thesis": "长期 memory 的关键问题不是存储容量，而是能否把多次会话里的环境经验变成可查询、可验证、可行动的证据。",
+        "background": "早期 memory benchmark 常测回忆能力；真实 agent 更需要知道某个环境的隐性规则。",
+        "method": "论文用人工问题和长历史轨迹构造 context gathering 任务，比较不同记忆组织方式。",
+        "experiments": "核心结果显示 AgentRunbook-C 最强，但延迟成本明显，RAG 仍有准确率上限。",
+        "limitations": "Work in Progress；评测集中在定制 web 环境，迁移到代码库和企业内部系统还需要适配。",
+        "professorLens": "你要学习的是 memory 的产品定义：从聊天历史，转成工作环境经验管理。",
+        "verificationChecklist": [
+          "能解释五类 memory ability",
+          "能说明 RAG baseline 为什么不够",
+          "能设计一个代码库 memory 小评测"
+        ]
       },
-      "nextSteps": ["读第 3 节模型架构并画图。", "用小矩阵手算一次 attention。", "再读 BERT/GPT，观察 Transformer 如何分化成 encoder-only 与 decoder-only。"]
+      "nextSteps": [
+        "给 AI Brief 增加 current_problems 到 agent memory 的映射。",
+        "把 crawler 重复抓取问题写成一个 MemoryArena 风格任务。"
+      ],
+      "templateDecision": {
+        "suggestedPaperType": "benchmark_evaluation",
+        "activePaperType": "system_method",
+        "confidence": "medium",
+        "reason": "这篇文章题材更像专用模板，但当前深度模块还不完整，先用通用系统论文模板保证不瞎编。",
+        "requiredModules": [
+          "paperQuestion",
+          "termPrimer",
+          "claimMap",
+          "experimentMatrix",
+          "resultsAnalysis",
+          "criticalReview",
+          "applicationDeploymentTranslation",
+          "interviewCard"
+        ],
+        "fallbackReason": "benchmark_evaluation 模板缺少完整结构化模块；生成器需要补齐后才能切换。"
+      },
+      "qualityDecision": {
+        "qualityScore": 100,
+        "tier": "must_read",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。",
+          "时间足够新，适合每日更新栏目。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入今日 active feed，值得 deep dive。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": true
+      }
     },
     {
-      "id": "retrieval-augmented-generation",
-      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
-      "shortTitle": "RAG",
-      "authors": "Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela",
-      "venue": "NeurIPS 2020 / arXiv:2005.11401",
-      "arxivId": "2005.11401",
+      "id": "debug2fix-coding-agent-debugger",
+      "title": "Debug2Fix: Can Interactive Debugging Help Coding Agents Fix More Bugs?",
+      "shortTitle": "Debug2Fix",
+      "authors": "Spandan Garg, Yufan Huang",
+      "venue": "arXiv 2026 / software engineering agents",
+      "arxivId": "2602.18571",
       "contentType": "paper",
-      "publishedAt": "2020-05-22",
-      "updatedAt": "2021-04-12",
-      "oneSentenceTakeaway": "RAG 的核心不是“先搜再答”这么简单，而是把参数记忆和非参数记忆接成可训练的生成系统。",
-      "whyItMatters": "今天几乎所有企业知识库、AI 搜索、文档问答和 agent 记忆系统都在使用 RAG 思想的工程化变体。",
-      "targetAudience": ["AI 学生", "RAG 工程师", "Agent 学习者", "企业知识库开发者"],
-      "readingTime": "18 min",
-      "actionLabel": "精读 RAG 版本线",
-      "impactScore": 96,
-      "readabilityScore": 82,
-      "actionabilityScore": 94,
-      "confidenceScore": 93,
-      "difficulty": "intermediate",
-      "recommendedAction": "read",
-      "tags": ["RAG", "Workflow", "Agent", "Research", "Business"],
-      "sourceName": "arXiv",
-      "sourceUrl": "https://arxiv.org/abs/2005.11401",
-      "sources": [
-        { "name": "arXiv:2005.11401", "url": "https://arxiv.org/abs/2005.11401" },
-        { "name": "NeurIPS 2020", "url": "https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html" }
+      "paperType": "agent_architecture",
+      "publishedAt": "2026-02-20",
+      "updatedAt": "2026-04-21",
+      "oneSentenceTakeaway": "它指出 coding agent 不该只靠读代码和反复跑测试，还应该像工程师一样使用 debugger 看运行时状态。",
+      "whyItMatters": "你明年投 AI engineer，coding agent 是核心方向；这篇能训练你从工具设计而不是模型崇拜来分析能力提升。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
       ],
-      "versionQuestion": "RAG 从初稿到 NeurIPS 接收版，读者应该关注哪些论证被稳定下来？",
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "AI Coding",
+        "Agent",
+        "Workflow",
+        "Benchmark",
+        "Tool Use"
+      ],
+      "sourceName": "arXiv:2602.18571",
+      "sourceUrl": "https://arxiv.org/abs/2602.18571",
+      "sources": [
+        {
+          "name": "arXiv:2602.18571",
+          "url": "https://arxiv.org/abs/2602.18571"
+        }
+      ],
+      "versionQuestion": "为什么给 agent 增加 debugger，可能比换更强模型更有价值？",
       "versions": [
         {
-          "id": "rag-v1",
-          "label": "v1 初稿",
-          "submittedAt": "2020-05-22",
-          "versionType": "Initial Method",
-          "changeSummary": "提出把预训练 seq2seq 模型和 dense vector index 的 Wikipedia 记忆结合。",
-          "whyChanged": "纯参数模型更新知识困难，且难以给出来源；检索模块可以补足外部知识。",
-          "readerQuestion": "知识应该存在模型参数里，还是存在可更新的外部索引里？",
-          "evidence": "arXiv 显示 v1 提交于 2020-05-22；摘要说明 parametric memory + non-parametric memory。",
-          "impactScore": 96
+          "id": "debug2fix-coding-agent-debugger-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2026-02-20",
+          "changeSummary": "提出把交互式调试接入 coding agent 的框架。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "agent 修 bug 为什么不能只靠静态读代码？",
+          "evidence": "v1 提交于 2026-02-20。",
+          "impactScore": 82
         },
         {
-          "id": "rag-v2",
-          "label": "v2 接收前修订",
-          "submittedAt": "2020-12-07",
-          "versionType": "Conference Revision",
-          "changeSummary": "版本进入会议期修订，读者应重点确认实验范围、任务设置和 RAG-Sequence / RAG-Token 的比较。",
-          "whyChanged": "从方法初稿到会议论文，需要让实验、baseline 和表述更可审查。",
-          "readerQuestion": "两种 RAG formulation 分别适合什么生成场景？",
-          "evidence": "arXiv history 显示 v2 为 2020-12-07；comments 标注 accepted at NeurIPS 2020。",
-          "impactScore": 90
-        },
-        {
-          "id": "rag-v4",
-          "label": "v4 最终 arXiv 版",
-          "submittedAt": "2021-04-12",
-          "versionType": "Finalized Reference",
-          "changeSummary": "最终版本成为后续 RAG 工程和研究引用的稳定入口。",
-          "whyChanged": "高影响方法需要稳定的 citation、排版和最终实验说明，便于后续研究复用。",
-          "readerQuestion": "今天的向量数据库 RAG 和原论文的 end-to-end RAG 有何差异？",
-          "evidence": "arXiv 显示最后修订为 2021-04-12 v4。",
+          "id": "debug2fix-coding-agent-debugger-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2026-04-21",
+          "changeSummary": "v2 更新到 2026-04-21，强调 Java/Python debugger 和 subagent 架构。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "debugger 子代理在什么场景补足主 agent？",
+          "evidence": "摘要报告在 GitBug-Java 与 SWE-Bench-Live 上部分模型提升超过 20%。",
           "impactScore": 88
         }
       ],
-      "versionRelation": "v1 负责提出 parametric/non-parametric memory 组合，v2/v4 负责把方法论证稳定成可引用版本。今天读 RAG，要同时读论文方法和现代工程变体的差异。",
-      "conceptMap": ["Parametric memory", "Non-parametric memory", "Dense retrieval", "RAG-Sequence", "RAG-Token", "Provenance"],
+      "versionRelation": "Debug2Fix 把 coding agent 的能力边界从 prompt/模型移到工具接口设计，这正是工程岗位要能讲清楚的地方。",
+      "showVersionLens": false,
+      "plainLanguage": {
+        "beginnerSummary": "人类修 bug 时会下断点，看变量值。很多 coding agent 只会读文件和跑测试。Debug2Fix 的意思是：把断点和运行时观察也交给 agent。",
+        "mentalModel": "主 agent 像开发者，debug subagent 像专门拿着调试器查运行时证据的助手。",
+        "whyItWorks": "因为很多 bug 的关键证据不在静态代码里，而在执行到某一行时变量到底是什么。",
+        "oneThingToRemember": "agent 工具设计可以改变能力上限。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Interactive debugging",
+          "plainMeaning": "运行程序时暂停、检查变量和调用栈。",
+          "whyItMatters": "这是人类开发者排查复杂 bug 的核心动作。"
+        },
+        {
+          "term": "Subagent architecture",
+          "plainMeaning": "把一个专门任务交给子 agent。",
+          "whyItMatters": "可以把调试证据收集和主修复逻辑分开。"
+        },
+        {
+          "term": "SWE-Bench-Live",
+          "plainMeaning": "更接近实时软件工程任务的评测。",
+          "whyItMatters": "能减少老 benchmark 被记忆污染的风险。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "coding agent 是否能通过访问 debugger 获得更强 bug fixing 能力？",
+        "coreMove": "把调试器包装成 agent 工具，并用子 agent 负责运行时调查。",
+        "designChoices": [
+          {
+            "title": "引入调试器工具",
+            "choice": "让 agent 能看变量、堆栈和执行路径。",
+            "why": "补足只读代码无法获得的动态证据。",
+            "tradeoff": "实现复杂，需要语言和 IDE/CLI 适配。"
+          },
+          {
+            "title": "用子 agent 隔离调试",
+            "choice": "主 agent 负责修复，debug subagent 负责查证据。",
+            "why": "避免主上下文被低层调试细节淹没。",
+            "tradeoff": "多 agent 协调失败会增加成本。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "定位失败",
+            "body": "主 agent 读 issue 和测试失败，提出需要调查的假设。"
+          },
+          {
+            "label": "Step 2",
+            "title": "调试执行",
+            "body": "debug subagent 运行程序、下断点、读取变量或栈信息。"
+          },
+          {
+            "label": "Step 3",
+            "title": "合成修复",
+            "body": "主 agent 用调试证据修改代码并重新验证。"
+          }
+        ],
+        "optimizationLogic": "用更丰富的 runtime observation 换取更少盲目试错。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "论文聚焦 bug fixing，不等于所有软件开发任务。",
+        "modernExtensionBoundary": "可以扩展到 Codex/Claude Code：把 debugger、日志、trace viewer 都产品化成 agent tools。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "Main agent",
+            "role": "规划和修改代码",
+            "beginnerExplanation": "像负责修 bug 的工程师。",
+            "connectsTo": "Debug subagent"
+          },
+          {
+            "label": "Block 2",
+            "title": "Debug subagent",
+            "role": "收集运行时证据",
+            "beginnerExplanation": "像专门帮你看断点的人。",
+            "connectsTo": "Debugger tools"
+          },
+          {
+            "label": "Block 3",
+            "title": "Debugger tools",
+            "role": "提供变量和调用栈",
+            "beginnerExplanation": "把隐藏在执行过程里的事实暴露出来。",
+            "connectsTo": "Patch validation"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "部分模型提升超过 20%，并且较弱模型可接近更强模型表现，说明工具接口很关键。",
+        "whatWasCompared": "普通 coding agent baseline 与接入 debugger/subagent 的 Debug2Fix。",
+        "whatToTrust": "可信的是工具设计带来的方向性收益和消融结论。",
+        "whatNotToOverclaim": "论文仍在 review，不应说 debugger 已成为所有 coding agent 标配。"
+      },
+      "experimentReadings": [
+        {
+          "question": "交互式调试是否提升 bug fixing 成功率？",
+          "setup": "Java/Python debugger 接入 agent，在 GitBug-Java 与 SWE-Bench-Live 上比较。",
+          "metric": "Bug fixing success rate",
+          "result": "摘要报告某些模型超过 20% performance improvement。",
+          "conclusion": "运行时调试证据能显著减少盲目 test-fix 循环。",
+          "limitation": "语言支持、调试器可靠性和多 agent 成本仍是落地难点。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "从教学角度，这篇是 coding agent 工具设计课。你要把 debugger 看成 observation channel，而不是附属功能。",
+        "beginnerPath": [
+          "先理解人类调试流程。",
+          "再看论文如何把调试流程拆给子 agent。",
+          "最后思考 Codex 类工具如何保存调试轨迹。"
+        ],
+        "commonMisreadings": [
+          "以为提升来自更强模型。",
+          "以为 debugger 只是多一个命令，而不是新的 observation layer。"
+        ],
+        "practicePrompt": "给一个失败单测，设计 agent 可以调用的 debug 工具 schema：输入、输出、失败处理是什么？"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 Debug2Fix 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "issue/test failure -> main agent hypothesis -> debug subagent -> debugger observations -> patch -> tests。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "如果 debugger 输出过长，主 agent 会丢失关键变量；指标可以看关键变量是否进入 patch rationale。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "选一个小 Python bug，手动记录断点变量，再写成 agent trace JSON。",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "作品集重点展示 trace、错误假设、最终修复和验证命令。"
+        }
+      ],
+      "conceptMap": [
+        "coding agent -> debugger tool -> runtime evidence",
+        "subagent -> evidence collection -> patch synthesis"
+      ],
       "charts": [
         {
-          "title": "RAG design split",
-          "metric": "Core formulation count",
+          "title": "调试工具带来的相对提升",
+          "metric": "relative performance",
+          "unit": "index",
+          "maxValue": 130,
+          "bars": [
+            {
+              "label": "Baseline",
+              "value": 100,
+              "display": "100"
+            },
+            {
+              "label": "Debug2Fix",
+              "value": 120,
+              "display": ">120"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "coding agent 的下一步不是只堆模型，而是把人类开发者的调试工具变成 agent 可调用、可审计的动作空间。",
+        "background": "当前主流 agent 多依赖代码阅读和测试循环，运行时调查能力弱。",
+        "method": "框架把 Java/Python 调试器接入 agent，并通过 subagent 分担调试流程。",
+        "experiments": "在 GitBug-Java 与 SWE-Bench-Live 上比较 baseline 和 Debug2Fix，并做 subagent/debugger 消融。",
+        "limitations": "调试器集成复杂，且不同语言、测试环境和容器权限都会影响稳定性。",
+        "professorLens": "你要学会问：一个 agent 缺的是推理，还是缺观察工具？Debug2Fix 是后者的典型案例。",
+        "verificationChecklist": [
+          "能解释静态分析和运行时调试的差别",
+          "能描述 subagent 为什么有用",
+          "能提出一个可记录的 debugger trace schema"
+        ]
+      },
+      "nextSteps": [
+        "给 AI Brief 项目 detail 页补 agent trace 学习模板。",
+        "把 Debug2Fix 的思想用于 crawler bug 排查流程。"
+      ],
+      "templateDecision": {
+        "suggestedPaperType": "agent_architecture",
+        "activePaperType": "agent_architecture",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "methodFlow",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 100,
+        "tier": "must_read",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。",
+          "时间足够新，适合每日更新栏目。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入今日 active feed，值得 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": true
+      }
+    },
+    {
+      "id": "agent-lightning-rl-agents",
+      "title": "Agent Lightning: Train ANY AI Agents with Reinforcement Learning",
+      "shortTitle": "Agent Lightning",
+      "authors": "Xufang Luo, Yuge Zhang, Zhiyuan He, Zilong Wang, Siyun Zhao, Dongsheng Li, Luna K. Qiu, Yuqing Yang",
+      "venue": "Microsoft Research / arXiv 2025",
+      "arxivId": "2508.03680",
+      "contentType": "paper",
+      "paperType": "agent_architecture",
+      "publishedAt": "2025-08-05",
+      "updatedAt": "2025-08-05",
+      "oneSentenceTakeaway": "它尝试把已有 agent 的执行轨迹和 RL 训练解耦，让 LangChain、OpenAI Agents SDK、AutoGen 这类系统也能接入强化学习。",
+      "whyItMatters": "如果你做 AI engineer，只会写 agent workflow 不够；下一层是如何记录轨迹、分配 credit、把线上执行变成训练信号。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
+      ],
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "Agent",
+        "Workflow",
+        "AI Coding",
+        "Benchmark",
+        "Open Source"
+      ],
+      "sourceName": "arXiv:2508.03680",
+      "sourceUrl": "https://arxiv.org/abs/2508.03680",
+      "sources": [
+        {
+          "name": "arXiv:2508.03680",
+          "url": "https://arxiv.org/abs/2508.03680"
+        },
+        {
+          "name": "Microsoft Agent Lightning",
+          "url": "https://www.microsoft.com/en-us/research/project/agent-lightning/"
+        }
+      ],
+      "versionQuestion": "真实 agent 能否在不重写业务代码的情况下接入 RL 训练？",
+      "versions": [
+        {
+          "id": "agent-lightning-rl-agents-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2025-08-05",
+          "changeSummary": "提出 Training-Agent Disaggregation 和 LightningRL。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "为什么 agent 执行与训练要解耦？",
+          "evidence": "arXiv 2025-08-05 提交，摘要明确支持 LangChain、OpenAI Agents SDK、AutoGen 等框架。",
+          "impactScore": 82
+        },
+        {
+          "id": "agent-lightning-rl-agents-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2025-08-05",
+          "changeSummary": "Microsoft project page 强调可接入多种 agent framework。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "这是否能成为 agent observability 到 training 的桥？",
+          "evidence": "项目页列出 OpenAI Agent SDK、LangChain、AutoGen 等框架支持。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "Agent Lightning 把 agent 工程从 orchestration 推进到可训练系统，是 agent infra 的重要方向。",
+      "showVersionLens": false,
+      "plainLanguage": {
+        "beginnerSummary": "它像给已有 agent 加一个训练插座：agent 继续按原来的代码跑，系统把执行过程记录成训练能用的格式。",
+        "mentalModel": "把 agent runtime 当成游戏环境，把每次工具调用和结果当成 RL 的状态、动作、奖励。",
+        "whyItWorks": "它不要求把完整多轮对话硬拼成训练样本，而是把轨迹拆成可学习的 transition。",
+        "oneThingToRemember": "可观测轨迹是训练 agent 的前提。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Credit assignment",
+          "plainMeaning": "判断成功或失败应该归因到哪一步动作。",
+          "whyItMatters": "多步 agent 训练最大难点之一。"
+        },
+        {
+          "term": "Trajectory",
+          "plainMeaning": "agent 从开始到结束的动作和观察序列。",
+          "whyItMatters": "没有轨迹就无法复盘和训练。"
+        },
+        {
+          "term": "Training-Agent Disaggregation",
+          "plainMeaning": "训练系统与 agent 执行系统分离。",
+          "whyItMatters": "让现有 agent 少改代码就能接入训练。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "如何让任意 agent framework 产生可用于 RL 的训练信号？",
+        "coreMove": "定义统一数据接口，把 agent execution 表述成 MDP，并用 LightningRL 做层级 credit assignment。",
+        "designChoices": [
+          {
+            "title": "执行训练解耦",
+            "choice": "不把 RL 逻辑塞进业务 agent。",
+            "why": "降低迁移成本，适合真实工程系统。",
+            "tradeoff": "接口抽象如果不够细，会丢失重要上下文。"
+          },
+          {
+            "title": "统一轨迹接口",
+            "choice": "把多框架 agent 的行为转成标准 transitions。",
+            "why": "便于后续训练、调试和对比。",
+            "tradeoff": "不同框架语义可能难以完全对齐。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "运行现有 agent",
+            "body": "LangChain/Agents SDK/AutoGen agent 正常执行任务。"
+          },
+          {
+            "label": "Step 2",
+            "title": "记录轨迹",
+            "body": "observability 层捕获状态、动作、观察和结果。"
+          },
+          {
+            "label": "Step 3",
+            "title": "训练更新",
+            "body": "LightningRL 分解轨迹并做 credit assignment。"
+          }
+        ],
+        "optimizationLogic": "用标准化轨迹降低 RL 接入成本，同时保留复杂 agent workflow。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "论文强调 RL 框架，不代表自动解决奖励设计和安全问题。",
+        "modernExtensionBoundary": "可扩展到 AI Brief：把 daily refresh 的 crawler/ranker/analyzer 轨迹记录为改进数据。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "Agent runtime",
+            "role": "执行任务",
+            "beginnerExplanation": "就是你已经写好的 agent 应用。",
+            "connectsTo": "Observability"
+          },
+          {
+            "label": "Block 2",
+            "title": "Observability",
+            "role": "记录轨迹",
+            "beginnerExplanation": "把每一步变成训练数据候选。",
+            "connectsTo": "LightningRL"
+          },
+          {
+            "label": "Block 3",
+            "title": "LightningRL",
+            "role": "训练和分配 credit",
+            "beginnerExplanation": "判断哪一步动作值得强化。",
+            "connectsTo": "Updated policy"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "摘要报告在 text-to-SQL、RAG、math tool-use 上有稳定连续提升。",
+        "whatWasCompared": "接入 Agent Lightning 前后的 agent 表现，以及多任务域。",
+        "whatToTrust": "可信的是解耦架构和轨迹标准化思路。",
+        "whatNotToOverclaim": "不要以为接入框架就自动有好 reward；奖励设计仍是工程难点。"
+      },
+      "experimentReadings": [
+        {
+          "question": "解耦式 RL 是否能提升多类 agent 任务？",
+          "setup": "text-to-SQL、RAG、math tool-use 等任务。",
+          "metric": "Task performance after RL optimization",
+          "result": "摘要称稳定、连续改进。",
+          "conclusion": "agent 训练可以被抽象成可插拔基础设施。",
+          "limitation": "公开摘要未给出所有任务细节；需要读表确认提升幅度。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "如果你将来面试 AI engineer，能讲清 Agent Lightning，就说明你理解 agent 从 demo 到系统训练的关键跨越。",
+        "beginnerPath": [
+          "先看什么是 trajectory。",
+          "再看 credit assignment。",
+          "最后把自己的 agent 项目加日志。"
+        ],
+        "commonMisreadings": [
+          "以为 RL 只是模型训练问题。",
+          "忽略 observability 是训练前提。"
+        ],
+        "practicePrompt": "给 AI Brief refresh 流程设计 trajectory 字段：state/action/observation/reward 各是什么？"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 Agent Lightning 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "agent runtime -> trajectory logger -> unified transitions -> LightningRL -> improved model/policy。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "reward 太粗会把错误动作也强化；指标可以看失败任务中的 credit assignment 是否集中在错误步骤。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "为一个三步 RAG agent 记录 JSON trajectory，并手写一个 reward 规则。",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "作品集展示 trajectory、reward、错误归因和改进计划。"
+        }
+      ],
+      "conceptMap": [
+        "agent observability -> trajectory -> RL training",
+        "workflow automation -> reward design -> policy improvement"
+      ],
+      "charts": [
+        {
+          "title": "覆盖的 agent 训练场景",
+          "metric": "scenario count",
+          "unit": "count",
+          "maxValue": 3,
+          "bars": [
+            {
+              "label": "text-to-SQL",
+              "value": 1,
+              "display": "1"
+            },
+            {
+              "label": "RAG",
+              "value": 1,
+              "display": "1"
+            },
+            {
+              "label": "math tool-use",
+              "value": 1,
+              "display": "1"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "下一代 agent infra 要把运行、观测、评测和训练连成闭环。",
+        "background": "现在很多 agent 框架只负责编排，缺少把执行数据转成训练信号的统一层。",
+        "method": "Agent Lightning 定义数据接口、MDP 表述和 LightningRL 层级训练算法。",
+        "experiments": "跨 text-to-SQL、RAG、math tool-use 验证训练收益。",
+        "limitations": "reward 质量、轨迹隐私、安全边界和线上部署成本仍需解决。",
+        "professorLens": "这篇适合训练系统视角：agent 不是 prompt 应用，而是可观测、可优化的闭环系统。",
+        "verificationChecklist": [
+          "能解释执行和训练为什么要解耦",
+          "能画出 trajectory schema",
+          "能设计一个简单 reward"
+        ]
+      },
+      "nextSteps": [
+        "给 AI Brief crawler 记录结构化 execution trace。",
+        "把 ranking 是否命中你的偏好作为 reward 设计草案。"
+      ],
+      "templateDecision": {
+        "suggestedPaperType": "agent_architecture",
+        "activePaperType": "agent_architecture",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "methodFlow",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 95,
+        "tier": "must_read",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入今日 active feed，值得 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": true
+      }
+    },
+    {
+      "id": "swe-bench-illusion",
+      "title": "The SWE-Bench Illusion: When State-of-the-Art LLMs Remember Instead of Reason",
+      "shortTitle": "SWE-Bench Illusion",
+      "authors": "Shanchao Liang, Spandan Garg, Roshanak Zilouchian Moghaddam",
+      "venue": "Microsoft Research / arXiv 2025",
+      "arxivId": "2506.12286",
+      "contentType": "paper",
+      "paperType": "benchmark_evaluation",
+      "publishedAt": "2025-06-14",
+      "updatedAt": "2025-12-01",
+      "oneSentenceTakeaway": "它提醒我们：coding agent benchmark 高分可能混入记忆污染，不能直接等于真实工程能力。",
+      "whyItMatters": "你关注 benchmark 很对，但 AI engineer 需要知道 benchmark 怎么被污染、怎么设计更可靠的评测。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
+      ],
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "AI Coding",
+        "Benchmark",
+        "Safety",
+        "Research"
+      ],
+      "sourceName": "arXiv:2506.12286",
+      "sourceUrl": "https://arxiv.org/abs/2506.12286",
+      "sources": [
+        {
+          "name": "arXiv:2506.12286",
+          "url": "https://arxiv.org/abs/2506.12286"
+        },
+        {
+          "name": "Microsoft Research publication page",
+          "url": "https://www.microsoft.com/en-us/research/publication/the-swe-bench-illusion-when-state-of-the-art-llms-remember-instead-of-reason/"
+        }
+      ],
+      "versionQuestion": "SWE-Bench 分数到底测的是解题能力，还是模型记住了公开仓库线索？",
+      "versions": [
+        {
+          "id": "swe-bench-illusion-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2025-06-14",
+          "changeSummary": "提出两个诊断任务检查 benchmark 记忆污染。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "如何发现模型是不是靠 issue 描述记住了文件路径？",
+          "evidence": "v1 于 2025-06-14 提交。",
+          "impactScore": 82
+        },
+        {
+          "id": "swe-bench-illusion-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2025-12-01",
+          "changeSummary": "v4 于 2025-12-01 修订，继续强调 contamination-resistant benchmark。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "未来 coding agent leaderboard 应该怎么设计？",
+          "evidence": "arXiv submission history 显示 v4 2025-12-01。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "这篇是 benchmark 素养课：帮你避免被榜单营销带偏。",
+      "showVersionLens": false,
+      "benchmarkEvaluation": {
+        "paperQuestion": {
+          "researchQuestion": "SWE-Bench 高分是否可能来自 benchmark memorization，而不是泛化软件工程能力？",
+          "challengedConclusion": "作者质疑的是一个常见但危险的推断：如果某个 coding agent 在 SWE-Bench Verified 上得分很高，就说明它已经具备可靠的真实软件工程能力。",
+          "whyImportant": "SWE-Bench 是 coding agent 赛道最容易被引用的指标之一。假如分数里混入了训练数据记忆、公开 issue 记忆或仓库模式记忆，团队就可能把“会背题”的系统误判为“会修真实项目”的系统，进而在招聘、产品选型和 agent 评估上做出错误判断。"
+        },
+        "narrativeExplanation": "这篇论文最值得学习的不是“某个模型是不是作弊”，而是它教你如何怀疑一个看似权威的 benchmark。作者没有直接说 SWE-Bench 没价值，而是把问题拆成更可验证的小问题：如果模型没有仓库结构，只看到 issue 描述，却能猜出要改哪个文件；如果模型没有足够上下文，却能复现 ground-truth function 的连续代码片段；如果过滤掉 issue 里显式出现的路径线索后表现仍然偏高，那么高分就可能不完全来自真实推理。\n\n从教授视角看，这是一篇 evaluation literacy 论文。它提醒你：评估 AI coding agent 时，不能只看最终 resolve rate，还要问模型到底靠什么信息完成任务。真正有工程价值的 agent 应该能在新仓库、新 issue、新测试和私有 holdout 上稳定工作；如果它只在公开热门 benchmark 上表现突出，那更像是熟悉题库，而不是掌握软件工程。\n\n对你未来做 AI engineer 项目的启发是：任何 leaderboard 都要配一个反作弊诊断层。你可以把这篇论文的方法迁移到自己的 AI Brief、RAG、coding agent 或项目 ranking 系统里：先构造“缺少关键上下文”的 probe，再比较公开集、私有集、时间后移集和外部仓库集的表现差距。差距越大，越需要把分数解释为“可能被暴露数据放大”，而不是直接解释为能力提升。",
+        "termPrimer": [
+          {
+            "term": "SWE-Bench / SWE-Bench Verified",
+            "explanation": "SWE-Bench 用真实 GitHub issue 和对应修复来评估模型能不能改代码。SWE-Bench Verified 是更常被 leaderboard 使用的人工筛选子集，所以它的影响力更大，也更容易成为模型训练、调参、产品宣传反复围绕的目标。理解它时不要只把它当成分数表，而要把它看成一个会被反复研究和暴露的公开考试。"
+          },
+          {
+            "term": "Benchmark memorization",
+            "explanation": "benchmark memorization 指模型不是通过现场推理解决问题，而是记住了题目、仓库、issue、patch 或代码片段的线索。它不一定是有意作弊，公开数据长期存在于 GitHub、论文、博客、评测报告和训练语料中，本来就可能被模型吸收。危险之处在于它会把真实泛化能力伪装成高准确率。"
+          },
+          {
+            "term": "Benchmark contamination risk",
+            "explanation": "contamination 是测试数据进入训练数据或模型开发反馈循环的风险。对 coding benchmark 来说，污染不只来自完整答案泄露，也可能来自 issue 文本、文件路径、函数名、commit diff、讨论串和第三方复盘。只要模型能利用这些暴露线索，benchmark 就可能高估它在新任务上的能力。"
+          },
+          {
+            "term": "File path identification",
+            "explanation": "这是作者设计的诊断任务：只给 issue 描述，不给仓库结构和代码，让模型猜 buggy file path。正常情况下，真实修 bug 往往需要搜索仓库、读代码、跑测试；如果模型在缺少这些信息时仍然高准确，就说明它可能记住了公开任务或仓库模式。它测试的是“模型是否知道答案线索”，不是完整修复能力。"
+          },
+          {
+            "term": "Function reproduction",
+            "explanation": "function reproduction 让模型在很有限的当前文件上下文和 issue 描述下复现 ground-truth function。这个任务故意不给足够信息，因为作者想看模型是否能生成和真实补丁高度相似的代码片段。如果连续代码片段重合度异常高，更像是记忆过特定实现，而不是从需求重新推导实现。"
+          },
+          {
+            "term": "Prefix completion",
+            "explanation": "prefix completion 给模型一段代码前缀，看它能不能继续补出后面的 ground-truth 代码。这个任务更直接地测 verbatim memorization，因为它弱化了“理解 issue”的成分，观察模型是否能沿着前缀背出原始补丁。论文报告不同模型存在可观的 instance-level verbatim match，这会强化 benchmark 污染风险的判断。"
+          },
+          {
+            "term": "Filtered accuracy",
+            "explanation": "filtered accuracy 会先过滤掉 issue 描述里显式包含文件路径或 import 语句的样本，再计算 file path identification 的准确率。这样做是为了避免模型只是复制题面里的路径字符串。过滤后模式仍然存在，说明问题不只是表层字符串匹配，还可能是更深的实例或仓库记忆。"
+          },
+          {
+            "term": "Consecutive 5-gram overlap",
+            "explanation": "5-gram overlap 衡量模型生成代码里连续 5 个 token 的片段有多少和 ground-truth 代码完全重合。单个 token 或普通语法重合不稀奇，但连续 5 个 token 的比例偏高，尤其在信息不足条件下偏高，就更像 verbatim memory。它是用来捕捉“背出相同代码片段”的信号，而不是评价代码是否功能正确。"
+          },
+          {
+            "term": "Outside-repo comparison",
+            "explanation": "outside-repo comparison 把 SWE-Bench 任务和不在 SWE-Bench 里的热门仓库任务做对比。这个设计很关键，因为如果模型只是熟悉流行 Python 项目，那么外部热门仓库也应该表现接近；如果只有 SWE-Bench 生态表现明显更高，就更支持 benchmark-specific memorization 的解释。"
+          }
+        ],
+        "claimMap": [
+          {
+            "claim": "SWE-Bench Verified 高分可能部分来自记忆，而不完全是泛化软件工程能力。",
+            "evidence": "论文报告模型在没有仓库结构的 file path identification 中，SWE-Bench Verified 上可达到最高 76% accuracy，而不在 SWE-Bench 中的仓库任务最高约 53%。",
+            "possibleCounterpoint": "模型也可能学到的是常见项目结构和 issue 写法，而不是具体记住某个 benchmark 样本；高路径准确率不能单独证明完整答案泄露。",
+            "confidence": "high"
+          },
+          {
+            "claim": "file path identification 暴露了模型对公开 issue/仓库线索的异常熟悉。",
+            "evidence": "任务刻意不给 repository structure，却仍出现 SWE-Bench Verified > Full-SWE-Bench > SWE-Bench Extra / outside-repo 的层级表现。",
+            "possibleCounterpoint": "issue 描述本身可能包含强语义线索，例如模块名、错误类型或用户可见 API；这部分合理线索也会帮助定位文件。",
+            "confidence": "medium-high"
+          },
+          {
+            "claim": "filtered accuracy 说明问题不只是复制题面里的路径字符串。",
+            "evidence": "论文过滤掉显式文件路径和 import statement 后，模型在 SWE-Bench 生态上仍保持更高表现，并且外部 benchmark 的下降模式仍然存在。",
+            "possibleCounterpoint": "过滤规则是启发式的，无法保证移除所有隐含线索；同时不同 benchmark 的 issue 写法和难度仍可能不同。",
+            "confidence": "medium-high"
+          },
+          {
+            "claim": "function reproduction 和 5-gram overlap 提供了更直接的代码片段记忆信号。",
+            "evidence": "论文报告 SWE-Bench Verified 的 function reproduction 最高 34.9% consecutive 5-gram overlap，SWE Full 28.7%，SWE Extra 18.2%，outside / other benchmarks 最高约 18.1%。",
+            "possibleCounterpoint": "代码修复有时本来就会产生相似模板，尤其是常见 bug pattern；5-gram overlap 需要结合任务上下文和外部对照一起解释。",
+            "confidence": "high"
+          },
+          {
+            "claim": "prefix completion 进一步支持 instance-level verbatim memorization 风险。",
+            "evidence": "论文报告 prefix completion 中 instance-level verbatim match 在多个模型上达到 11.7% 到 31.6%，Claude 4 Opus 接近三分之一。",
+            "possibleCounterpoint": "不同模型的训练数据和去重策略不透明，prefix completion 只能说明行为上的记忆迹象，不能直接还原训练语料来源。",
+            "confidence": "medium-high"
+          }
+        ],
+        "experimentMatrix": [
+          {
+            "experimentName": "File path identification",
+            "input": "只给 GitHub issue description，不提供 repository tree、文件内容或测试结果。",
+            "hiddenInformation": "正确 buggy file path 被隐藏；仓库结构也被隐藏，模型不能正常搜索定位。",
+            "metric": "Exact path accuracy / filtered accuracy",
+            "whatItTests": "测试模型是否在缺少必要工程上下文时仍能猜中要修改的文件，并暴露它是否提前知道 benchmark 线索。",
+            "whyItMatters": "如果模型不用看仓库就能高概率猜中文件，SWE-Bench 分数里就可能包含公开 issue 或仓库模式记忆，而不是完整 agent 工作流能力。"
+          },
+          {
+            "experimentName": "Filtered file path accuracy",
+            "input": "从 file path identification 样本中移除 issue 描述显式包含路径或 import 线索的样本。",
+            "hiddenInformation": "控制变量是表层字符串线索；作者试图让模型不能靠复制题面路径获胜。",
+            "metric": "Filtered accuracy (F-Acc.)",
+            "whatItTests": "测试高路径准确率是否仍存在于更干净的样本中，从而排除简单复制题面字符串的解释。",
+            "whyItMatters": "如果过滤后层级差距仍存在，说明污染风险不只是题面泄露，而可能是实例级或仓库级记忆。"
+          },
+          {
+            "experimentName": "Function reproduction",
+            "input": "给当前文件上下文和 issue description，但不给足以严格推导 ground-truth fixed function 的完整信息。",
+            "hiddenInformation": "ground-truth function implementation 被隐藏；模型理论上缺少精确复现代码的必要条件。",
+            "metric": "Consecutive 5-gram overlap ratio",
+            "whatItTests": "测试模型生成的修复函数和真实补丁是否存在异常高的逐字片段重合。",
+            "whyItMatters": "高 5-gram overlap 在信息不足条件下更像记忆补丁文本，而不是现场理解需求后重新实现。"
+          },
+          {
+            "experimentName": "Prefix completion",
+            "input": "给 ground-truth code 的前缀或上下文，让模型继续生成后续代码。",
+            "hiddenInformation": "完整目标代码被隐藏，issue 语义和完整修复过程被弱化，模型主要面对的是续写记忆压力测试。",
+            "metric": "Instance-level verbatim match percentage",
+            "whatItTests": "测试模型是否能沿着前缀直接背出 benchmark 中的真实代码片段。",
+            "whyItMatters": "这是更直接的 memorization probe；如果模型能补出原始补丁，说明 benchmark 实例可能已被训练或反馈循环暴露。"
+          },
+          {
+            "experimentName": "5-gram overlap cross-benchmark comparison",
+            "input": "SWE-Bench Verified、Full-SWE-Bench、SWE-Bench Extra、Outside-Repo、RefactorBench、SWE-Bench C# 等集合上的 function reproduction 输出。",
+            "hiddenInformation": "控制变量是 benchmark 来源；作者观察同类任务在不同来源上的重合度差异。",
+            "metric": "5-gram overlap ratio",
+            "whatItTests": "测试 verbatim similarity 是否集中出现在 SWE-Bench 生态，而不是普遍存在于所有 coding task。",
+            "whyItMatters": "如果重合度只在被广泛使用的公开 benchmark 上更高，就更像 benchmark-specific exposure，而不是通用编码能力。"
+          },
+          {
+            "experimentName": "Outside-repo comparison",
+            "input": "来自不在 SWE-Bench 数据集中的热门开源仓库的 SWE-Bench style 任务。",
+            "hiddenInformation": "仓库同样公开且可能进入训练语料，但不属于 SWE-Bench 生态。",
+            "metric": "Path accuracy / filtered accuracy / 5-gram overlap",
+            "whatItTests": "测试模型是否只是熟悉热门仓库，还是对 SWE-Bench 特定任务表现异常好。",
+            "whyItMatters": "这是区分 repository familiarity 和 benchmark memorization 的关键对照；外部热门仓库表现明显低，才更支持 benchmark-specific risk。"
+          }
+        ],
+        "resultsAnalysis": [
+          {
+            "mainResult": "File path identification 在 SWE-Bench Verified 上最高达到 76%，outside-repo tasks 最高约 53%。",
+            "interpretation": "在没有仓库结构的条件下，模型仍能较高概率猜中 buggy file path，说明它可能掌握了公开 issue、仓库组织或 benchmark 实例的线索。",
+            "supportsClaim": "支持。这个结果直接支持“leaderboard 分数可能被记忆放大”的核心论点，但它不是最终证明，只是强行为证据。",
+            "alternativeExplanation": "issue 描述可能包含模块语义、错误类型和 API 名称，强模型可以利用这些线索做合理定位；因此需要 filtered accuracy 和外部对照进一步支撑。"
+          },
+          {
+            "mainResult": "Filtered accuracy 过滤显式路径/import 后，SWE-Bench 生态的性能优势仍然存在。",
+            "interpretation": "这说明模型不只是复制 issue 文本里的路径字符串。即使去掉表层线索，模型在 SWE-Bench 相关任务上的优势仍指向更深层的实例或仓库记忆。",
+            "supportsClaim": "支持。filtered accuracy 是论文中更有说服力的控制，因为它回应了“模型只是读到了路径”的反驳。",
+            "alternativeExplanation": "过滤规则可能漏掉隐含线索；不同集合的 issue 长度、问题类型、仓库复杂度仍可能影响准确率。"
+          },
+          {
+            "mainResult": "Function reproduction 的 5-gram overlap 呈现 SWE Verified 34.9% > SWE Full 28.7% > SWE Extra 18.2% 的下降层级，外部集合最高约 18.1%。",
+            "interpretation": "SWE-Bench Verified 和 Full 上的逐字片段重合更高，而同仓库较新的 SWE Extra 接近外部集合，说明模型可能记住的是特定历史 benchmark 实例，而不是泛化掌握这些仓库。",
+            "supportsClaim": "强支持。这个结果比文件路径更接近“代码内容记忆”，尤其是在缺少足够规格信息时仍然出现高重合。",
+            "alternativeExplanation": "某些修复模式可能天然模板化，导致不同实现也出现 5-gram 重合；因此要看跨集合差异，而不是只看单个绝对数值。"
+          },
+          {
+            "mainResult": "Prefix completion 的 instance-level verbatim match 在不同模型间约 11.7% 到 31.6%。",
+            "interpretation": "只给前缀时，部分模型能继续生成原始修复代码，这更接近直接记忆信号。模型规模、训练数据和去重策略不同，会导致不同厂商和代际出现不同程度的记忆行为。",
+            "supportsClaim": "支持。它强化了 SWE-Bench Verified 存在实例级暴露风险的判断。",
+            "alternativeExplanation": "prefix completion 本身是刻意设计的记忆压力测试，不等同于真实 agent 修复流程；它说明风险存在，但不能说明所有成功 patch 都来自背诵。"
+          },
+          {
+            "mainResult": "Outside-repo comparison 显示，同样公开、热门、可能在训练数据中的仓库任务表现低于 SWE-Bench 生态。",
+            "interpretation": "如果模型只是熟悉热门 GitHub 项目，outside-repo 任务也应接近 SWE-Bench；显著差距更符合 benchmark-specific 或 repository-bias memorization。",
+            "supportsClaim": "支持，但需要谨慎。这个对照很重要，不过外部仓库任务分布、issue 风格和评测难度仍可能不同。",
+            "alternativeExplanation": "outside-repo 任务可能本身更难、issue 描述更短或测试目标不同；论文用文件数量和 issue 长度做了一些控制，但不能完全消除分布差异。"
+          }
+        ],
+        "criticalReview": {
+          "strengths": [
+            "它没有停留在抽象批评，而是设计了 file path identification、function reproduction、prefix completion 等可执行 probe。",
+            "它把结果放进 cross-benchmark comparison，而不是只拿 SWE-Bench 单点分数做判断，这让 contamination 解释更有说服力。",
+            "它把 filtered accuracy 引入路径定位任务，主动回应了“模型可能只是复制 issue 里的显式路径”这个反方观点。"
+          ],
+          "weaknesses": [
+            "它仍然无法直接看到模型训练数据，所以所有结论本质上是行为证据，而不是训练语料审计。",
+            "不同 benchmark 的任务分布、issue 写法、仓库复杂度和语言生态不完全一致，可能影响横向比较。",
+            "论文更擅长说明“现有分数有污染风险”，但没有完整给出新 benchmark 应该如何长期运营、去重和防泄漏的工程方案。"
+          ],
+          "missingExperiments": [
+            "需要更多私有、时间后移、完全未公开仓库的 holdout，以验证这些现象是否仍然存在。",
+            "需要对同一个 agent 在公开 SWE-Bench、私有 issue、mutation issue、synthetic-but-realistic issue 上做统一评估。",
+            "需要评估带工具的完整 coding agent：search、edit、test feedback 是否能降低纯记忆带来的虚高分。"
+          ],
+          "generalizationLimits": [
+            "这篇主要讨论 SWE-Bench 相关 coding benchmark，不应直接外推到所有代码生成、所有语言或所有 agent 评测。",
+            "它揭示 contamination risk，但不能证明每个模型、每个高分样本、每次真实修复都来自记忆。",
+            "它更适合用作 benchmark 设计警示，而不是用来否定 coding agent 这个方向。"
+          ],
+          "counterArguments": [
+            "反方可以说：模型猜中文件路径并不一定是记忆，也可能是学到了项目结构、错误模式和软件工程经验。",
+            "反方也可以说：高 5-gram overlap 可能来自标准库用法、常见模板或简单修复，而不是 benchmark 泄露。",
+            "更强的反方观点是：即使 benchmark 有污染，真实产品中的 agent 仍可能通过工具调用、测试反馈和人工 review 产生价值；所以结论应该是“改进评估”，不是“否定 agent”。"
+          ]
+        },
+        "applicationDeploymentTranslation": {
+          "howToUse": "在自己的 AI 系统里，把这篇论文当成“评估可信度检查表”。不要只报告一个 accuracy、resolve rate 或 ranking score，而要同时报告公开集、私有集、时间后移集、外部来源集的表现，并对可能的题库记忆做诊断。",
+          "concreteImplementationIdea": "做一个 coding-agent-eval-sanity-checker：输入一批 issue 和 ground truth patch，自动生成四组评估：1) 正常 agent 修复；2) no-repo path guessing，只给 issue 猜文件；3) filtered no-repo path guessing，移除路径/import 线索；4) function/prefix overlap probe，计算生成代码和 ground truth 的 5-gram overlap。最后输出一张报告：如果 no-repo accuracy 或 overlap 在公开 benchmark 上显著高于私有/外部集，就标记 contamination risk。",
+          "evaluationChecklist": [
+            "每个 benchmark 样本记录来源、发布时间、是否公开、是否可能进入训练语料。",
+            "至少保留一个私有 holdout 或时间后移 holdout，不把它用于 prompt 调参和模型选择。",
+            "报告正常任务分数时，同时报告 no-context probe、filtered accuracy、5-gram overlap 和 outside-repo 对照。",
+            "如果公开集和私有集差距过大，必须在结论里降级 confidence，不允许只展示最好看的 leaderboard 分数。",
+            "对 coding agent 项目，保存 search/read/edit/test 的轨迹，区分“先定位再修复”和“直接背出路径/代码”。"
+          ],
+          "failureModes": [
+            "过滤规则过弱，issue 里仍保留模块名、路径片段或唯一错误字符串，导致 probe 低估污染。",
+            "外部仓库任务太难或分布不同，导致把真实难度差异误判成 contamination。",
+            "只看 5-gram overlap 会误伤模板化代码，需要结合上下文不足条件和跨集合差异解释。",
+            "团队为了提高分数反复在公开 benchmark 上调 prompt，等于把 eval 变成训练集。"
+          ]
+        },
+        "interviewCard": {
+          "sixtySecondExplanation": "SWE-Bench Illusion 这篇论文问的是：coding agent 在 SWE-Bench 上的高分，是否真的代表泛化软件工程能力？作者设计了几个诊断任务，比如只给 issue 描述让模型猜 buggy file path、在信息不足条件下让模型复现 ground-truth function、用 prefix completion 和 5-gram overlap 看逐字记忆。结果显示模型在 SWE-Bench Verified 上的表现明显高于外部仓库任务，例如路径识别最高 76% 对比 outside-repo 约 53%，函数复现的 5-gram overlap 也更高。我的理解是，这不是说 SWE-Bench 没用，而是说 AI coding agent 评估必须加入 anti-contamination probe、私有 holdout 和跨仓库对照，否则 leaderboard 很容易高估真实工程能力。",
+          "interviewQuestions": [
+            "如果你要评估一个 coding agent，除了 SWE-Bench resolve rate，还会加哪些 contamination-resistant checks？",
+            "file path identification 和 function reproduction 分别检测了哪种 memorization 风险？",
+            "为什么 filtered accuracy 和 outside-repo comparison 能增强这篇论文的论证？它们仍有哪些局限？"
+          ],
+          "strongPersonalOpinion": "我会把 SWE-Bench 当成必要但不充分的指标。真正严肃的 coding agent 评估应该把公开 benchmark 分数降权，把私有 holdout、时间后移任务、工具轨迹质量和测试反馈闭环放到同等重要的位置。",
+          "smallProjectIdea": "做一个 Mini Benchmark Auditor：给 20 个公开 GitHub issue 和 20 个你自己构造的私有 issue，分别跑 no-repo path guessing、filtered path guessing、5-gram overlap 和正常 agent 修复，最后生成 contamination risk report。这个项目很适合作品集，因为它展示的是 AI engineer 评估能力，而不只是调 API。"
+        },
+        "missingEvidence": [
+          "无法从公开摘要直接证明具体模型训练集中包含某个 SWE-Bench 样本；当前结论基于行为诊断和跨 benchmark 差异。",
+          "论文没有完全消除所有 benchmark 分布差异，所以 outside-repo comparison 应解释为风险信号，而不是污染的数学证明。"
+        ]
+      },
+      "plainLanguage": {
+        "beginnerSummary": "如果考试题库泄露，学生高分不一定代表会解题。SWE-Bench Illusion 就是在问：coding agent 的高分有没有类似问题？",
+        "mentalModel": "benchmark 是测量仪器；如果仪器被训练数据污染，读数就会偏高。",
+        "whyItWorks": "它设计诊断任务：只给 issue 描述，看模型是否能猜出 buggy file path 或复现函数。",
+        "oneThingToRemember": "看榜单时先问评测是否抗污染。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Data contamination",
+          "plainMeaning": "测试数据进入训练数据或被模型记住。",
+          "whyItMatters": "会让 benchmark 高估真实泛化能力。"
+        },
+        {
+          "term": "Diagnostic task",
+          "plainMeaning": "专门验证某个隐藏假设的小测试。",
+          "whyItMatters": "可以拆穿 benchmark 分数背后的原因。"
+        },
+        {
+          "term": "SWE-Bench Verified",
+          "plainMeaning": "常用软件工程 agent 评测集合。",
+          "whyItMatters": "它影响 coding agent 市场叙事。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "SWE-Bench 高分中有多少可能来自记忆，而非泛化解题？",
+        "coreMove": "设计 file path identification 和 function reproduction 两个诊断任务。",
+        "designChoices": [
+          {
+            "title": "只给 issue 描述",
+            "choice": "不给仓库结构也让模型猜文件路径。",
+            "why": "如果还能高分，说明可能记住了公开 issue。",
+            "tradeoff": "诊断不能证明全部来源，只能提示风险。"
+          },
+          {
+            "title": "比较未收录仓库",
+            "choice": "把 SWE-Bench 与未收录任务对比。",
+            "why": "看性能差距是否指向数据污染。",
+            "tradeoff": "未收录任务分布可能也不同。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "选择任务",
+            "body": "从 SWE-Bench Verified/Full 和其他仓库取样。"
+          },
+          {
+            "label": "Step 2",
+            "title": "设计诊断",
+            "body": "限制可见信息，只测是否记住线索。"
+          },
+          {
+            "label": "Step 3",
+            "title": "比较差异",
+            "body": "看模型在收录与未收录任务上的准确率和相似度。"
+          }
+        ],
+        "optimizationLogic": "通过反事实式诊断，把 benchmark 分数拆成泛化能力和记忆线索两部分。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "论文质疑评测有效性，不是否定所有 coding agent 进步。",
+        "modernExtensionBoundary": "可以扩展到 AI Brief 的 ranking：所有评分都要记录来源、时间和可能偏差。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "Benchmark tasks",
+            "role": "提供原始评测",
+            "beginnerExplanation": "SWE-Bench 是被检查对象。",
+            "connectsTo": "Diagnostic probes"
+          },
+          {
+            "label": "Block 2",
+            "title": "Diagnostic probes",
+            "role": "限制信息做小测试",
+            "beginnerExplanation": "看模型是否凭记忆回答。",
+            "connectsTo": "Comparison"
+          },
+          {
+            "label": "Block 3",
+            "title": "Comparison",
+            "role": "区分收录与未收录",
+            "beginnerExplanation": "观察高分是否只在公开集上出现。",
+            "connectsTo": "Evaluation policy"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "模型可仅凭 issue 描述达到最高 76% buggy file path identification，未收录仓库最高 53%。",
+        "whatWasCompared": "SWE-Bench Verified/Full 与其他未收录仓库上的诊断任务表现。",
+        "whatToTrust": "可信的是诊断任务暴露的污染风险。",
+        "whatNotToOverclaim": "不能简单说所有 SWE-Bench 成绩都无效；只能说需要更抗污染的评测。"
+      },
+      "experimentReadings": [
+        {
+          "question": "模型是否记住了 SWE-Bench 相关线索？",
+          "setup": "只给 issue 描述或当前文件上下文，测试文件路径识别和函数复现。",
+          "metric": "Accuracy / consecutive 5-gram similarity",
+          "result": "摘要报告文件路径识别最高 76%，未收录仓库最高 53%；函数复现相似度 SWE-Bench 最高 35%，其他任务最高 18%。",
+          "conclusion": "已有 coding benchmark 可能高估泛化能力。",
+          "limitation": "诊断任务本身也可能受任务分布影响。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "如果你只会背 leaderboard，面试会很浅；如果你能讲评测污染和诊断任务，就像真正做过 eval。",
+        "beginnerPath": [
+          "先理解题库泄露类比。",
+          "再看两个诊断任务。",
+          "最后设计自己的 anti-contamination checklist。"
+        ],
+        "commonMisreadings": [
+          "以为论文是在否定 SWE-Bench。",
+          "把 benchmark 高分等同于生产能力。"
+        ],
+        "practicePrompt": "为 AI Brief 的项目 ranking 设计一个反作弊检查：哪些信号可能只是流量，不是学习价值？"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 SWE-Bench Illusion 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "benchmark task -> restricted diagnostic input -> model answer -> compare against hidden/generalization set。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "模型可能凭 issue 标题记住文件路径；指标是无仓库结构条件下的 path accuracy。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "选 10 个 GitHub issue，设计一个小诊断：不看仓库能否猜中修改文件？",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "展示任务、限制信息、准确率和为什么这能检测记忆污染。"
+        }
+      ],
+      "conceptMap": [
+        "benchmark -> contamination -> diagnostic task",
+        "coding agent -> SWE-Bench -> evaluation validity"
+      ],
+      "charts": [
+        {
+          "title": "文件路径识别诊断",
+          "metric": "accuracy",
+          "unit": "%",
+          "maxValue": 100,
+          "bars": [
+            {
+              "label": "SWE-Bench",
+              "value": 76,
+              "display": "up to 76%"
+            },
+            {
+              "label": "未收录仓库",
+              "value": 53,
+              "display": "up to 53%"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "benchmark 不是中立事实，必须持续检查污染、饱和和分布偏差。",
+        "background": "SWE-Bench 分数成为 coding agent 市场的重要指标，但公开 benchmark 容易进入训练语料。",
+        "method": "论文构造诊断任务，检查模型是否在缺少真实上下文时仍能猜中答案。",
+        "experiments": "比较收录和未收录任务上的路径识别、函数复现和文本相似度。",
+        "limitations": "并不能量化每个模型训练数据，只能提供行为证据。",
+        "professorLens": "这篇训练你当评测工程师：先怀疑测量方式，再讨论模型排名。",
+        "verificationChecklist": [
+          "能解释 contamination 和 saturation",
+          "能描述两个诊断任务",
+          "能提出一个抗污染方案"
+        ]
+      },
+      "nextSteps": [
+        "给 AI Brief 模型 benchmark 卡片加 source/confidence 说明。",
+        "为项目 deep dive 增加 benchmark 可信度字段。"
+      ],
+      "templateDecision": {
+        "suggestedPaperType": "benchmark_evaluation",
+        "activePaperType": "benchmark_evaluation",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "paperQuestion",
+          "termPrimer",
+          "claimMap",
+          "experimentMatrix",
+          "resultsAnalysis",
+          "criticalReview",
+          "applicationDeploymentTranslation",
+          "interviewCard"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 94,
+        "tier": "must_read",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "来源或作者机构具备较高可信度/行业影响力。",
+          "时间足够新，适合每日更新栏目。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入今日 active feed，值得 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": true
+      }
+    },
+    {
+      "id": "memoryarena-agent-memory",
+      "title": "MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks",
+      "shortTitle": "MemoryArena",
+      "authors": "Zexue He, Yu Wang, Churan Zhi, Yuanzhe Hu, Tzu-Ping Chen, et al.",
+      "venue": "arXiv 2026 / UW + UCSD + MIT collaborators",
+      "arxivId": "2602.16313",
+      "contentType": "paper",
+      "paperType": "system_method",
+      "publishedAt": "2026-02-18",
+      "updatedAt": "2026-02-18",
+      "oneSentenceTakeaway": "它把 memory 和 action 绑在一起评测：agent 必须从前几次任务学到经验，再用经验完成后续任务。",
+      "whyItMatters": "这比单纯问过去聊天内容更接近真实 agent 产品，也能指导你设计 portfolio 里的多会话 agent。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
+      ],
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "Agent",
+        "Memory",
+        "Benchmark",
+        "Workflow"
+      ],
+      "sourceName": "arXiv:2602.16313",
+      "sourceUrl": "https://arxiv.org/abs/2602.16313",
+      "sources": [
+        {
+          "name": "arXiv:2602.16313",
+          "url": "https://arxiv.org/abs/2602.16313"
+        }
+      ],
+      "versionQuestion": "memory benchmark 应该只测记忆，还是测记忆如何改变行动？",
+      "versions": [
+        {
+          "id": "memoryarena-agent-memory-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2026-02-18",
+          "changeSummary": "提出 multi-session Memory-Agent-Environment loops。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "如何把记忆和后续行动耦合评测？",
+          "evidence": "arXiv 2026-02-18 提交，摘要列出 web navigation、planning、information search、formal reasoning。",
+          "impactScore": 82
+        },
+        {
+          "id": "memoryarena-agent-memory-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2026-02-18",
+          "changeSummary": "当前版本仍是 v1，但问题定义很新。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "如果 agent 只会回忆但不会用记忆行动，是否算有 memory？",
+          "evidence": "摘要指出已有 LoCoMo 等 benchmark 接近饱和的 agent 在 agentic setting 表现差。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "MemoryArena 与 LongMemEval-V2 互补：前者看记忆如何驱动行动，后者看环境经验证据收集。",
+      "showVersionLens": false,
+      "plainLanguage": {
+        "beginnerSummary": "它像连续闯关游戏：第一关学到的规则，第三关必须用上。只会背第一关发生了什么，不代表会玩这个游戏。",
+        "mentalModel": "memory 是 action policy 的一部分，不是单独的笔记本。",
+        "whyItWorks": "它让任务之间显式依赖，逼迫 agent 学习、保存并调用之前的反馈。",
+        "oneThingToRemember": "记忆的价值要通过后续行动验证。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Multi-session",
+          "plainMeaning": "跨多次会话或任务。",
+          "whyItMatters": "长期 agent 必须跨天、跨任务保持能力。"
+        },
+        {
+          "term": "Interdependent subtasks",
+          "plainMeaning": "后续子任务依赖前面学到的信息。",
+          "whyItMatters": "这能测 agent 是否真的用上 memory。"
+        },
+        {
+          "term": "Memory-Agent-Environment loop",
+          "plainMeaning": "记忆、agent 和环境反复互相影响。",
+          "whyItMatters": "这是生产 agent 的真实运行结构。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "agent 能否在多会话任务中学会经验，并把经验用于后续行动？",
+        "coreMove": "设计显式互相依赖的人工任务，让 memory 和 action 无法分开作弊。",
+        "designChoices": [
+          {
+            "title": "任务间依赖",
+            "choice": "后续任务需要用前序反馈。",
+            "why": "防止 benchmark 退化成单轮问答。",
+            "tradeoff": "任务构造更难。"
+          },
+          {
+            "title": "多领域任务",
+            "choice": "覆盖 web navigation、规划、搜索和形式推理。",
+            "why": "看 memory 是否跨任务类型有效。",
+            "tradeoff": "不同领域评分难以完全统一。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "执行早期任务",
+            "body": "agent 与环境互动并获得反馈。"
+          },
+          {
+            "label": "Step 2",
+            "title": "蒸馏记忆",
+            "body": "agent 或 memory 模块保存有用经验。"
+          },
+          {
+            "label": "Step 3",
+            "title": "解决后续任务",
+            "body": "系统检查后续行动是否正确利用早期经验。"
+          }
+        ],
+        "optimizationLogic": "把 memory 的评价目标从 recall accuracy 转为 downstream action success。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "论文评 memory benchmark，不直接提出生产记忆系统。",
+        "modernExtensionBoundary": "可以用于评估 coding agent 是否记得项目约定、测试坑和历史 review 决策。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "Environment",
+            "role": "提供任务和反馈",
+            "beginnerExplanation": "像连续任务世界。",
+            "connectsTo": "Agent"
+          },
+          {
+            "label": "Block 2",
+            "title": "Agent",
+            "role": "采取行动并学习",
+            "beginnerExplanation": "需要从反馈中总结经验。",
+            "connectsTo": "Memory"
+          },
+          {
+            "label": "Block 3",
+            "title": "Memory",
+            "role": "保存可复用经验",
+            "beginnerExplanation": "下次行动前要能被调用。",
+            "connectsTo": "Future tasks"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "传统长上下文 memory benchmark 表现好，不代表在 agentic setting 里好。",
+        "whatWasCompared": "不同 memory agent 在多会话、互相关联任务上的行动表现。",
+        "whatToTrust": "可信的是 benchmark 设计方向和失败模式。",
+        "whatNotToOverclaim": "暂时不要当成生产 memory 方案的排名榜。"
+      },
+      "experimentReadings": [
+        {
+          "question": "已有 memory 方法在交互式多会话任务里是否可靠？",
+          "setup": "人类构造互相依赖任务，覆盖四类 agentic 场景。",
+          "metric": "Task success across interdependent sessions",
+          "result": "摘要报告已有长上下文 memory benchmark 上接近饱和的 agent 在该设置表现差。",
+          "conclusion": "真实 memory 能力必须和行动闭环一起评。",
+          "limitation": "公开摘要没有给出所有系统的完整数值，需读论文表格确认。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "如果我是老师，我会让你把它和 LongMemEval-V2 放一起读：一个问经验证据，一个问经验是否改变行动。",
+        "beginnerPath": [
+          "先理解多会话任务。",
+          "再看四类场景。",
+          "最后自己设计一个两轮 agent 任务。"
+        ],
+        "commonMisreadings": [
+          "把它当成又一个聊天记忆测试。",
+          "忽略任务互相依赖是核心。"
+        ],
+        "practicePrompt": "设计一个两天的 AI Brief agent 任务：第一天学会数据 schema，第二天必须用 schema 修 bug。"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 MemoryArena 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "session 1 action/feedback -> memory distillation -> session 2 task -> memory-conditioned action -> score。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "agent 可能保存了事实但没有在后续 plan 中调用；指标可看 plan 是否引用 memory key。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "用本项目 docs 设计 3 个递进任务，要求后一个任务必须复用前一个任务的结论。",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "展示任务依赖图、memory notes 和每轮 pass/fail。"
+        }
+      ],
+      "conceptMap": [
+        "memory -> policy improvement -> downstream task success",
+        "multi-session -> feedback -> distilled experience"
+      ],
+      "charts": [
+        {
+          "title": "覆盖的 agentic 场景",
+          "metric": "task families",
           "unit": "count",
           "maxValue": 4,
           "bars": [
-            { "label": "Memory types", "value": 2, "display": "2" },
-            { "label": "RAG formulations", "value": 2, "display": "2", "highlight": true },
-            { "label": "arXiv versions", "value": 4, "display": "v1-v4" }
+            {
+              "label": "普通 recall benchmark",
+              "value": 1,
+              "display": "1 类"
+            },
+            {
+              "label": "MemoryArena",
+              "value": 4,
+              "display": "4 类"
+            }
           ]
         }
       ],
       "analysis": {
-        "thesis": "模型不应该只依赖参数记忆；可更新、可追溯的外部记忆能让生成更适合知识密集任务。",
-        "background": "纯语言模型在事实更新、来源追踪和长尾知识上受限，传统检索系统又缺少生成能力。",
-        "method": "用 dense retriever 找 Wikipedia passage，再由 seq2seq generator 基于检索结果生成答案；论文比较 RAG-Sequence 和 RAG-Token。",
-        "experiments": "在开放域问答和生成任务上比较 parametric-only 与 retrieval-augmented 模型，强调事实性、具体性和多样性。",
-        "limitations": "原始 RAG 不是今天企业 RAG 的完整答案，现代系统还要处理 chunking、rerank、权限、缓存、引用和评测。",
-        "professorLens": "教授会要求学生区分研究 RAG 和工程 RAG：前者关注可训练 formulation，后者关注数据治理和检索质量。",
-        "verificationChecklist": ["能解释 parametric vs non-parametric memory", "能画出 retriever-generator 数据流", "能区分 RAG-Sequence 和 RAG-Token", "能设计一个引用正确率评测"]
+        "thesis": "长期 agent memory 的关键不是记住，而是把记忆转化为后续行动优势。",
+        "background": "许多 benchmark 把记忆和行动拆开，导致高分系统未必能完成真实长任务。",
+        "method": "MemoryArena 用互相依赖的多会话任务测试 memory-agent-environment loop。",
+        "experiments": "主要观察已有系统在新 agentic setting 下的性能落差。",
+        "limitations": "人工任务规模、开放环境覆盖和评分自动化仍需继续扩大。",
+        "professorLens": "这篇训练你定义 evaluation target：不要测容易测的，测真正影响产品成败的。",
+        "verificationChecklist": [
+          "能解释 memory 与 action 的耦合",
+          "能给出一个互相依赖任务例子",
+          "能说明为什么 LoCoMo 不够"
+        ]
       },
-      "nextSteps": ["读摘要和方法图。", "用 5 篇文档手写一个最小 RAG。", "比较不检索、只检索、检索+生成三种输出。"]
-    },
-    {
-      "id": "lora",
-      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
-      "shortTitle": "LoRA",
-      "authors": "Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen",
-      "venue": "ICLR 2022 / arXiv:2106.09685",
-      "arxivId": "2106.09685",
-      "contentType": "paper",
-      "publishedAt": "2021-06-17",
-      "updatedAt": "2021-10-16",
-      "oneSentenceTakeaway": "LoRA 的版本分析重点是：一个简单低秩假设如何通过更强 baseline 和延迟实验变成可信工程方法。",
-      "whyItMatters": "LoRA 是今天大模型微调、adapter 生态、QLoRA、PEFT 和本地模型训练的基础方法之一。",
-      "targetAudience": ["AI 学生", "微调学习者", "Local AI 开发者", "模型工程师"],
-      "readingTime": "16 min",
-      "actionLabel": "精读 LoRA 版本线",
-      "impactScore": 95,
-      "readabilityScore": 86,
-      "actionabilityScore": 95,
-      "confidenceScore": 94,
-      "difficulty": "intermediate",
-      "recommendedAction": "try",
-      "tags": ["Local AI", "Open Source", "AI Coding", "Research"],
-      "sourceName": "arXiv",
-      "sourceUrl": "https://arxiv.org/abs/2106.09685",
-      "sources": [
-        { "name": "arXiv:2106.09685", "url": "https://arxiv.org/abs/2106.09685" },
-        { "name": "LoRA GitHub", "url": "https://github.com/microsoft/LoRA" }
+      "nextSteps": [
+        "把 AI Brief 的 current_problems 转为多轮 agent task。",
+        "给 Projects deep dive 增加失败轨迹字段。"
       ],
-      "versionQuestion": "为什么 LoRA v2 的 baseline 和 latency 补强，比单纯提出方法更重要？",
-      "versions": [
-        {
-          "id": "lora-v1",
-          "label": "v1 方法初稿",
-          "submittedAt": "2021-06-17",
-          "versionType": "Initial Method",
-          "changeSummary": "提出冻结预训练权重，只训练低秩分解矩阵来完成下游适配。",
-          "whyChanged": "全量微调 175B 级模型成本过高，部署多个 full fine-tuned checkpoint 不现实。",
-          "readerQuestion": "为什么权重更新可以用低秩矩阵近似？",
-          "evidence": "arXiv 显示 v1 提交于 2021-06-17；摘要称 trainable parameters 可减少 10,000 倍，GPU memory 需求减少 3 倍。",
-          "impactScore": 95
-        },
-        {
-          "id": "lora-v2",
-          "label": "v2 实验补强",
-          "submittedAt": "2021-10-16",
-          "versionType": "Baselines & Latency",
-          "changeSummary": "作者在 comments 中说明 v2 加入 better baselines、GLUE 实验和更多 adapter latency 分析。",
-          "whyChanged": "参数高效方法最容易被质疑 baseline 不公平或推理延迟隐藏成本，v2 正是在补这些可信度缺口。",
-          "readerQuestion": "LoRA 的优势来自低秩方法本身，还是来自比较对象设置？",
-          "evidence": "arXiv comments: Draft V2 includes better baselines, experiments on GLUE, and more on adapter latency。",
-          "impactScore": 92
-        }
-      ],
-      "versionRelation": "v1 给出核心低秩思想，v2 补上 baseline、公平比较和 latency 论证。学生读 LoRA 时，必须把方法简洁性和实验可信度一起看。",
-      "conceptMap": ["Low-rank adaptation", "Frozen pretrained weights", "Trainable rank matrices", "Adapter latency", "PEFT"],
-      "charts": [
-        {
-          "title": "Efficiency claims",
-          "metric": "Reduction factor reported in abstract",
-          "unit": "x",
-          "maxValue": 10000,
-          "bars": [
-            { "label": "Trainable params", "value": 10000, "display": "10,000x", "highlight": true },
-            { "label": "GPU memory", "value": 3, "display": "3x" }
-          ]
-        }
-      ],
-      "analysis": {
-        "thesis": "下游微调不一定需要更新全部参数；许多任务的有效权重更新可以落在低秩子空间里。",
-        "background": "模型越大，全量微调越贵，保存和部署多个任务版本也越困难。",
-        "method": "冻结原模型，在 Transformer 层里注入可训练的低秩矩阵 A/B，只训练这些小矩阵。",
-        "experiments": "比较 RoBERTa、DeBERTa、GPT-2、GPT-3 上的质量、吞吐、参数量和 adapter latency。",
-        "limitations": "LoRA 的 rank、插入层位置、目标模块选择会影响效果；它也不能替代数据质量和评测。",
-        "professorLens": "教授会要求学生自己算一次参数量：为什么 d x r + r x k 比 d x k 小得多。",
-        "verificationChecklist": ["能写出 W + BA 的形式", "能解释 rank r 的作用", "能说明为什么 LoRA 没有额外推理层延迟", "能用 PEFT 跑一个小模型微调"]
+      "templateDecision": {
+        "suggestedPaperType": "benchmark_evaluation",
+        "activePaperType": "system_method",
+        "confidence": "medium",
+        "reason": "这篇文章题材更像专用模板，但当前深度模块还不完整，先用通用系统论文模板保证不瞎编。",
+        "requiredModules": [
+          "paperQuestion",
+          "termPrimer",
+          "claimMap",
+          "experimentMatrix",
+          "resultsAnalysis",
+          "criticalReview",
+          "applicationDeploymentTranslation",
+          "interviewCard"
+        ],
+        "fallbackReason": "benchmark_evaluation 模板缺少完整结构化模块；生成器需要补齐后才能切换。"
       },
-      "nextSteps": ["用一个小模型跑 LoRA 微调。", "比较 r=4、r=8、r=16 的效果和显存。", "读 QLoRA，理解量化和 LoRA 如何组合。"]
-    },
-    {
-      "id": "dpo",
-      "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
-      "shortTitle": "DPO",
-      "authors": "Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D. Manning, Chelsea Finn",
-      "venue": "NeurIPS 2023 / arXiv:2305.18290",
-      "arxivId": "2305.18290",
-      "contentType": "paper",
-      "publishedAt": "2023-05-29",
-      "updatedAt": "2024-07-29",
-      "oneSentenceTakeaway": "DPO 的版本价值在于把复杂 RLHF 管线重写成一个简单分类损失，并在后续版本中稳定成偏好优化基础读物。",
-      "whyItMatters": "今天大量开源对齐、偏好优化、RLHF 替代方法和指令模型训练都会拿 DPO 做基线。",
-      "targetAudience": ["AI 学生", "对齐学习者", "开源模型训练者", "LLM 研究者"],
-      "readingTime": "20 min",
-      "actionLabel": "精读 DPO 版本线",
-      "impactScore": 94,
-      "readabilityScore": 80,
-      "actionabilityScore": 90,
-      "confidenceScore": 92,
-      "difficulty": "advanced",
-      "recommendedAction": "read",
-      "tags": ["Research", "Safety", "Open Source", "Prompt"],
-      "sourceName": "arXiv",
-      "sourceUrl": "https://arxiv.org/abs/2305.18290",
-      "sources": [
-        { "name": "arXiv:2305.18290", "url": "https://arxiv.org/abs/2305.18290" },
-        { "name": "DPO project", "url": "https://github.com/eric-mitchell/direct-preference-optimization" }
-      ],
-      "versionQuestion": "DPO 为什么能把 RLHF 从 reward model + RL 变成 supervised-style preference loss？",
-      "versions": [
-        {
-          "id": "dpo-v1",
-          "label": "v1 方法初稿",
-          "submittedAt": "2023-05-29",
-          "versionType": "Initial Method",
-          "changeSummary": "提出一种 reward model 参数化，使最优 policy 可以闭式表达，从而用简单分类损失优化偏好。",
-          "whyChanged": "PPO 式 RLHF 复杂、不稳定、需要 reward model 和采样，开源训练者很难复现。",
-          "readerQuestion": "DPO 是不是去掉了 reward model，还是把 reward model 隐式写进了 policy？",
-          "evidence": "arXiv 显示 v1 提交于 2023-05-29；摘要说明 DPO eliminates sampling during fine-tuning and significant hyperparameter tuning。",
-          "impactScore": 94
-        },
-        {
-          "id": "dpo-v2",
-          "label": "v2 会议期修订",
-          "submittedAt": "2023-12-13",
-          "versionType": "Review Revision",
-          "changeSummary": "进入会议后修订阶段，读者应重点检查推导、实验设置和与 PPO/RLHF baseline 的比较。",
-          "whyChanged": "偏好优化论文最核心的质疑通常来自推导假设和 baseline 公平性。",
-          "readerQuestion": "DPO 的稳定性来自目标函数，还是来自实现细节更少？",
-          "evidence": "arXiv history 显示 v2 为 2023-12-13。",
-          "impactScore": 88
-        },
-        {
-          "id": "dpo-v3",
-          "label": "v3 最终维护版",
-          "submittedAt": "2024-07-29",
-          "versionType": "Stable Reference",
-          "changeSummary": "最终版本成为后续 IPO、KTO、ORPO、SimPO 等偏好优化方法比较的基础参照。",
-          "whyChanged": "当一个方法成为基线，版本稳定性会影响后续论文如何引用、复现和对比。",
-          "readerQuestion": "后续 DPO 变体到底是在改目标函数，还是在改数据和正则？",
-          "evidence": "arXiv 显示最后修订为 2024-07-29 v3。",
-          "impactScore": 86
-        }
-      ],
-      "versionRelation": "v1 提出从 RLHF 到分类损失的核心变换；v2/v3 让推导和实验成为稳定引用。学生应从 DPO 再往后读偏好优化家族。",
-      "conceptMap": ["Preference pairs", "Implicit reward", "KL constraint", "Classification loss", "RLHF without PPO"],
-      "charts": [
-        {
-          "title": "Pipeline simplification",
-          "metric": "Training components",
-          "unit": "steps",
-          "maxValue": 4,
-          "bars": [
-            { "label": "PPO-style RLHF", "value": 3, "display": "reward + RL + tuning" },
-            { "label": "DPO", "value": 1, "display": "classification loss", "highlight": true }
-          ]
-        }
-      ],
-      "analysis": {
-        "thesis": "标准 RLHF 的最优解可以改写成一个只依赖偏好对的 supervised-style 目标，降低训练复杂度。",
-        "background": "RLHF 通常需要训练 reward model，再用 PPO 优化 policy，工程不稳定且超参数敏感。",
-        "method": "通过 reward-policy 对偶关系，把偏好概率写成 chosen/rejected response 的 log-prob 差，形成 DPO loss。",
-        "experiments": "论文比较情感控制、摘要和单轮对话质量，强调 DPO 能匹配或超过 PPO-based RLHF。",
-        "limitations": "DPO 仍依赖偏好数据质量；它简化训练管线，但不会自动解决 reward hacking、数据偏见和多轮偏好问题。",
-        "professorLens": "教授会要求学生推一遍 DPO loss：不是背公式，而是理解 reference model、KL 和 preference pair 的角色。",
-        "verificationChecklist": ["能解释 chosen/rejected pair", "能说明 reference model 为什么存在", "能推导 log-ratio 在 loss 中的作用", "能比较 DPO、PPO、KTO/ORPO 的差异"]
-      },
-      "nextSteps": ["先复习 RLHF/PPO 管线。", "手推 DPO loss。", "用一个小偏好数据集训练 DPO，观察 beta 对输出的影响。"]
+      "qualityDecision": {
+        "qualityScore": 92,
+        "tier": "must_read",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。",
+          "时间足够新，适合每日更新栏目。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入今日 active feed，值得 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": true
+      }
     }
-  ]
+  ],
+  "dailyLimit": 5,
+  "activeCount": 5,
+  "archiveCount": 12,
+  "templatePolicy": {
+    "version": "quality-first-v1",
+    "dailyLimit": 5,
+    "selectionRule": "先按质量分、AI engineer 相关性、架构价值、评测可信度、可迁移性选 top 5；再为入选文章选择解读模板。",
+    "fallbackRule": "如果文章题材适合专用模板但结构化分析未补齐，先降级到 system_method，避免浅写或瞎编。",
+    "supportedPaperTypes": [
+      "benchmark_evaluation",
+      "system_method",
+      "agent_architecture",
+      "survey",
+      "theory_algorithm",
+      "product_engineering_blog"
+    ]
+  },
+  "pipelineRun": {
+    "id": "articles-2026-05-21-1779324600752",
+    "memoryFile": "data/agent-memory/articles.json",
+    "statusFile": "public/data/pipeline-status.json"
+  },
+  "agentFlow": [
+    {
+      "stage": "discover",
+      "role": "Discoverer",
+      "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+      "signal": "8 curated article candidates, including 8 recent seed papers"
+    },
+    {
+      "stage": "evidence",
+      "role": "Evidence Collector",
+      "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+      "signal": "sources, architecture walkthroughs, experiment readings, verification tasks"
+    },
+    {
+      "stage": "rank",
+      "role": "Ranker",
+      "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+      "signal": "quality-first top 5, archive 12"
+    },
+    {
+      "stage": "review",
+      "role": "Teacher Reviewer",
+      "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+      "signal": "5 full deep-dive papers kept in active feed"
+    },
+    {
+      "stage": "verify",
+      "role": "Verifier",
+      "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+      "signal": "validate-articles + validate-text-encoding"
+    },
+    {
+      "stage": "publish",
+      "role": "Publisher",
+      "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+      "signal": "public/data/articles.json"
+    },
+    {
+      "stage": "archive",
+      "role": "Archivist",
+      "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+      "signal": "public/data/articles-archive.json + data/agent-memory/articles.json"
+    }
+  ],
+  "qualityGate": {
+    "schemaVersion": 1,
+    "surface": "articles",
+    "status": "pass",
+    "checkedAt": "2026-05-21T00:50:00.751Z",
+    "checks": [
+      {
+        "id": "active-count",
+        "label": "active feed respects the daily five-paper limit",
+        "status": "pass",
+        "details": "5/5 active papers"
+      },
+      {
+        "id": "quality-decisions",
+        "label": "every active paper has a quality decision",
+        "status": "pass",
+        "details": "5 papers checked"
+      },
+      {
+        "id": "template-decisions",
+        "label": "every active paper has a template decision",
+        "status": "pass",
+        "details": "5 papers checked"
+      },
+      {
+        "id": "deep-dive-fields",
+        "label": "every active paper has professor and verification sections",
+        "status": "pass",
+        "details": "5 papers checked"
+      },
+      {
+        "id": "benchmark-template-depth",
+        "label": "benchmark/evaluation papers include specialized analysis blocks",
+        "status": "pass",
+        "details": "1 benchmark papers checked"
+      }
+    ]
+  }
 }

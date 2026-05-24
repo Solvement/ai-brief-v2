@@ -23,6 +23,21 @@ function scoreLabel(t: number): { text: string; cls: string } {
   if (t > 0) return { text: "可选", cls: "low" };
   return { text: "未评分", cls: "low" };
 }
+function firstSentence(text: string): string {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  const match = normalized.match(/^(.+?[。！？.!?])\s*/);
+  return match ? match[1] : normalized;
+}
+function repoAudience(repo: AnalyzedRepo): string {
+  if (repo.tags.length > 0) return `你正在学习 ${repo.tags.slice(0, 3).join(" / ")} 相关项目`;
+  if (repo.language) return `你想用 ${repo.language} 读一个真实开源项目`;
+  return "你想判断这个项目是否值得继续研究";
+}
+function repoAction(repo: AnalyzedRepo): string {
+  if (repo.deep) return "先看 Overview 的新手路径，再按 Try it 做一次最小验证。";
+  if (repo.worthDeepDive >= 60) return "先读轻量摘要，确认是否和你的学习目标相关。";
+  return "了解趋势即可，暂时不建议投入大量时间。";
+}
 
 type TabKey = "overview" | "concepts" | "howItWorks" | "novelty" | "ecosystem" | "limitations" | "tryIt";
 const TAB_DEFS: { key: TabKey; label: string; icon: string }[] = [
@@ -73,14 +88,7 @@ export function Detail({ owner, name }: Props) {
         {!deep ? (
           <>
             <Hero repo={repo} win={win} deep={null} />
-            <section className="section">
-              <h3>Quick read · README 速读</h3>
-              <div className="body prose"><Markdown text={repo.light} /></div>
-            </section>
-            <div className="notice">
-              这个项目 AI 评估 <b>worthDeepDive = {repo.worthDeepDive}</b>，未达 deep dive 阈值（60）或被 cap 挤出。
-              如果你想强制深度分析它，命令行加 <code>--worth=0 --cap=10</code> 重跑 ingest。
-            </div>
+            <LiteProjectDetail repo={repo} />
           </>
         ) : (
           <div className="detail-grid">
@@ -97,10 +105,12 @@ export function Detail({ owner, name }: Props) {
 
               {tab === "overview" && (
                 <>
+                  <ProjectLearningLoop repo={repo} />
                   <section className="section">
                     <h3>📖 Quick read · README 速读</h3>
                     <div className="body prose"><Markdown text={repo.light} /></div>
                   </section>
+                  <ProjectOverviewGrid repo={repo} />
                   <section className="section">
                     <h3>✨ Why it matters</h3>
                     <div className="callouts">
@@ -115,10 +125,11 @@ export function Detail({ owner, name }: Props) {
                   <section className="section">
                     <h3>这份分析是给谁看的？</h3>
                     <div className="body prose">
-                      <p>这不是 README 翻译。目标读者是 <strong>有 ML / LLM / agent 基础但没读过这份 README 的研究生</strong>。所以会拆解项目特有的术语（<a href="#" onClick={(e) => { e.preventDefault(); setTab("concepts"); }}>Key Concepts</a>），讲清架构和数据流（<a href="#" onClick={(e) => { e.preventDefault(); setTab("howItWorks"); }}>How it works</a>），跟同类工作的位置（<a href="#" onClick={(e) => { e.preventDefault(); setTab("novelty"); }}>Novelty</a>），在生态里的搭档（<a href="#" onClick={(e) => { e.preventDefault(); setTab("ecosystem"); }}>Ecosystem</a>），已知坑（<a href="#" onClick={(e) => { e.preventDefault(); setTab("limitations"); }}>Limitations</a>），以及最短上手路径（<a href="#" onClick={(e) => { e.preventDefault(); setTab("tryIt"); }}>Try it</a>）。</p>
-                      <p>右侧总分 4 维度（新意 / 工程 / 复现 / 上手）各 0-25，总分 0-100。AI 还另给了 <strong>worthDeepDive = {repo.worthDeepDive}</strong>，超过 60 才会做这份深度解读，所以你看到这页就说明它通过了筛选。</p>
+                      <p>这不是 README 翻译。默认读者是 <strong>刚开始接触 AI 项目的学生</strong>：先讲它像什么、解决什么痛点，再拆项目特有术语（<a href="#" onClick={(e) => { e.preventDefault(); setTab("concepts"); }}>Key Concepts</a>）、架构和数据流（<a href="#" onClick={(e) => { e.preventDefault(); setTab("howItWorks"); }}>How it works</a>）、同类差异（<a href="#" onClick={(e) => { e.preventDefault(); setTab("novelty"); }}>Novelty</a>）、生态位置（<a href="#" onClick={(e) => { e.preventDefault(); setTab("ecosystem"); }}>Ecosystem</a>）、已知坑（<a href="#" onClick={(e) => { e.preventDefault(); setTab("limitations"); }}>Limitations</a>）和最短上手路径（<a href="#" onClick={(e) => { e.preventDefault(); setTab("tryIt"); }}>Try it</a>）。</p>
+                      <p>右侧总分 4 维度（新意 / 工程 / 复现 / 上手）各 0-25，总分 0-100。<strong>worthDeepDive = {repo.worthDeepDive}</strong> 是“是否值得深挖”的价值分，不等于项目质量保证。</p>
                     </div>
                   </section>
+                  <ProjectVerificationPanel repo={repo} />
                 </>
               )}
 
@@ -187,6 +198,113 @@ export function Detail({ owner, name }: Props) {
 
 function Header() {
   return <SiteHeader active="projects" />;
+}
+
+function LiteProjectDetail({ repo }: { repo: AnalyzedRepo }) {
+  return (
+    <div className="lite-project-grid">
+      <section className="section">
+        <h3>Quick read · 轻量判断</h3>
+        <div className="body prose"><Markdown text={repo.light} /></div>
+      </section>
+      <aside className="aside">
+        <h4 className="aside-title"><span className="ico">?</span>为什么没有 Deep Dive</h4>
+        <div className="project-decision-stack">
+          <div><span>价值分</span><b>{repo.worthDeepDive}/100</b></div>
+          <div><span>适合你如果</span><b>{repoAudience(repo)}</b></div>
+          <div><span>建议动作</span><b>{repoAction(repo)}</b></div>
+        </div>
+        <div className="aside-note">
+          这里不展示命令行重跑说明。对学习者来说，先判断它是否和你的目标相关；如果相关，再去 GitHub README 看官方安装方式。
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function ProjectLearningLoop({ repo }: { repo: AnalyzedRepo }) {
+  return (
+    <section className="project-learning-loop">
+      <div>
+        <div className="section-kicker">Project Deep Dive Loop</div>
+        <h3>默认按这条路径读</h3>
+      </div>
+      <div className="project-loop-steps">
+        <span>1. 它本质上像什么</span>
+        <span>2. 为什么现在值得看</span>
+        <span>3. 怎么工作</span>
+        <span>4. 怎么跑一次并验证</span>
+      </div>
+      <div className="project-loop-target">
+        <b>{repoAction(repo)}</b>
+        <p>{repo.deep?.atGlance || firstSentence(repo.light)}</p>
+      </div>
+    </section>
+  );
+}
+
+function ProjectOverviewGrid({ repo }: { repo: AnalyzedRepo }) {
+  const deep = repo.deep;
+  if (!deep) return null;
+  const firstConcept = deep.keyConcepts[0];
+  return (
+    <section className="project-overview-grid">
+      <div className="analysis-card">
+        <span>它本质上像什么</span>
+        <p>{deep.atGlance}</p>
+      </div>
+      <div className="analysis-card">
+        <span>适合谁</span>
+        <p>{repoAudience(repo)}</p>
+      </div>
+      <div className="analysis-card">
+        <span>先懂一个概念</span>
+        <p>{firstConcept ? `${firstConcept.term}：${firstSentence(firstConcept.explain)}` : "这个项目没有明显专有术语，先读 README 里的目标和 quickstart。"}</p>
+      </div>
+      <div className="analysis-card">
+        <span>怎么开始验证</span>
+        <p>{firstTryStep(deep.tryIt)}</p>
+      </div>
+    </section>
+  );
+}
+
+function ProjectVerificationPanel({ repo }: { repo: AnalyzedRepo }) {
+  const deep = repo.deep;
+  if (!deep) return null;
+  const firstTry = firstTryStep(deep.tryIt);
+  return (
+    <section className="section project-verification-panel">
+      <div className="section-kicker">Verification</div>
+      <h3>怎么证明你真的看懂/会用了</h3>
+      <div className="verification-task-grid">
+        <article className="verification-task-card">
+          <div className="verification-task-head"><span>复述题</span><h4>用一句话说清项目价值</h4></div>
+          <p>不看 README，用自己的话解释它解决什么痛点，为什么最近值得关注。</p>
+          <div className="verification-pass"><b>通过标准</b><ul><li>说出目标用户或使用场景。</li><li>说出它和普通工具/同类项目的差异。</li></ul></div>
+          <div className="verification-answer"><b>答案关键点</b><p>{repo.tldr}</p></div>
+        </article>
+        <article className="verification-task-card">
+          <div className="verification-task-head"><span>流程题</span><h4>画出最小工作流</h4></div>
+          <p>画出输入、核心处理、输出三段，并标出项目最关键的模块或命令。</p>
+          <div className="verification-pass"><b>通过标准</b><ul><li>能标出至少一个输入和一个输出。</li><li>能解释中间处理为什么有价值。</li></ul></div>
+          <div className="verification-mistake"><b>常见错法</b><p>只复制项目口号，没有画出数据或用户操作如何流动。</p></div>
+        </article>
+        <article className="verification-task-card">
+          <div className="verification-task-head"><span>实操题</span><h4>完成一次最小试用</h4></div>
+          <p>{firstTry}</p>
+          <div className="verification-pass"><b>通过标准</b><ul><li>能说出预期看到什么结果。</li><li>失败时能判断是安装、配置、依赖还是项目限制。</li></ul></div>
+          <div className="verification-answer"><b>下一步</b><p>如果跑通，再读 Limitations 判断它是否适合真实项目。</p></div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function firstTryStep(steps: TryStep[] | string): string {
+  if (Array.isArray(steps) && steps[0]) return steps[0].step;
+  if (typeof steps === "string" && steps.trim()) return firstSentence(steps);
+  return "先打开官方 README，找 install / quickstart / demo 三个入口。";
 }
 
 function Hero({ repo, win, deep }: { repo: AnalyzedRepo; win: TrendingWindow; deep: AnalyzedRepo["deep"] | null }) {

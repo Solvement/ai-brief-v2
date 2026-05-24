@@ -1,0 +1,564 @@
+{
+  "schemaVersion": 1,
+  "surface": "projects",
+  "updatedAt": "2026-05-21T00:50:54.540Z",
+  "runs": [
+    {
+      "id": "projects-2026-05-20-1779324654541",
+      "surface": "projects",
+      "date": "2026-05-20",
+      "generatedAt": "2026-05-21T00:50:54.540Z",
+      "sourceFiles": {
+        "public": "public/data/trending.json"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "24 repos already present in public trending data"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "GitHub Trending metadata, README cache, light/deep analysis"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "worthDeepDive scores from current trending data"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 deep dives, 21 light reads"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "validate-trending + validate-text-encoding"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/trending.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": ".cache/analyses.json + data/agent-memory/projects.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "projects",
+        "status": "pass",
+        "checkedAt": "2026-05-21T00:50:54.539Z",
+        "checks": [
+          {
+            "id": "boards-present",
+            "label": "daily / weekly / monthly boards exist",
+            "status": "pass",
+            "details": "24 repos present"
+          },
+          {
+            "id": "cards-have-tldr",
+            "label": "every project card has a TL;DR",
+            "status": "pass",
+            "details": "24 repos checked"
+          },
+          {
+            "id": "deep-dive-coverage",
+            "label": "at least one high-value project gets a deep dive",
+            "status": "pass",
+            "details": "3 deep dives selected"
+          }
+        ]
+      },
+      "selectedItems": [
+        {
+          "id": "colbymchenry/codegraph",
+          "title": "colbymchenry/codegraph",
+          "score": 96,
+          "reason": "这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。"
+        },
+        {
+          "id": "tinyhumansai/openhuman",
+          "title": "tinyhumansai/openhuman",
+          "score": 100,
+          "reason": "这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。"
+        },
+        {
+          "id": "rohitg00/agentmemory",
+          "title": "rohitg00/agentmemory",
+          "score": 97,
+          "reason": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。"
+        }
+      ],
+      "archivedItems": [
+        {
+          "id": "Imbad0202/academic-research-skills",
+          "title": "Imbad0202/academic-research-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "multica-ai/andrej-karpathy-skills",
+          "title": "multica-ai/andrej-karpathy-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "rohitg00/ai-engineering-from-scratch",
+          "title": "rohitg00/ai-engineering-from-scratch",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "HKUDS/CLI-Anything",
+          "title": "HKUDS/CLI-Anything",
+          "score": 96,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "can1357/oh-my-pi",
+          "title": "can1357/oh-my-pi",
+          "score": 94,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "obra/superpowers",
+          "title": "obra/superpowers",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "CloakHQ/CloakBrowser",
+          "title": "CloakHQ/CloakBrowser",
+          "score": 76,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "ruvnet/RuView",
+          "title": "ruvnet/RuView",
+          "score": 100,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "Imbad0202/academic-research-skills",
+          "title": "Imbad0202/academic-research-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "oven-sh/bun",
+          "title": "oven-sh/bun",
+          "score": 21,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "facebook/pyrefly",
+          "title": "facebook/pyrefly",
+          "score": 58,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "mattpocock/skills",
+          "title": "mattpocock/skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        }
+      ],
+      "highlights": [
+        "Projects currently expose 24 repos and 3 deep dives."
+      ],
+      "nextActions": [
+        "Use Projects refresh to update this memory from a live GitHub Trending run."
+      ]
+    },
+    {
+      "id": "projects-2026-05-20-1779324615000",
+      "surface": "projects",
+      "date": "2026-05-20",
+      "generatedAt": "2026-05-21T00:50:15.000Z",
+      "sourceFiles": {
+        "public": "public/data/trending.json"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "24 repos already present in public trending data"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "GitHub Trending metadata, README cache, light/deep analysis"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "worthDeepDive scores from current trending data"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 deep dives, 21 light reads"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "validate-trending + validate-text-encoding"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/trending.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": ".cache/analyses.json + data/agent-memory/projects.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "projects",
+        "status": "pass",
+        "checkedAt": "2026-05-21T00:50:14.999Z",
+        "checks": [
+          {
+            "id": "boards-present",
+            "label": "daily / weekly / monthly boards exist",
+            "status": "pass",
+            "details": "24 repos present"
+          },
+          {
+            "id": "cards-have-tldr",
+            "label": "every project card has a TL;DR",
+            "status": "pass",
+            "details": "24 repos checked"
+          },
+          {
+            "id": "deep-dive-coverage",
+            "label": "at least one high-value project gets a deep dive",
+            "status": "pass",
+            "details": "3 deep dives selected"
+          }
+        ]
+      },
+      "selectedItems": [
+        {
+          "id": "colbymchenry/codegraph",
+          "title": "colbymchenry/codegraph",
+          "score": 96,
+          "reason": "这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。"
+        },
+        {
+          "id": "tinyhumansai/openhuman",
+          "title": "tinyhumansai/openhuman",
+          "score": 100,
+          "reason": "这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。"
+        },
+        {
+          "id": "rohitg00/agentmemory",
+          "title": "rohitg00/agentmemory",
+          "score": 97,
+          "reason": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。"
+        }
+      ],
+      "archivedItems": [
+        {
+          "id": "Imbad0202/academic-research-skills",
+          "title": "Imbad0202/academic-research-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "tinyhumansai/openhuman",
+          "title": "tinyhumansai/openhuman",
+          "score": 96,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "multica-ai/andrej-karpathy-skills",
+          "title": "multica-ai/andrej-karpathy-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "rohitg00/ai-engineering-from-scratch",
+          "title": "rohitg00/ai-engineering-from-scratch",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "HKUDS/CLI-Anything",
+          "title": "HKUDS/CLI-Anything",
+          "score": 96,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "can1357/oh-my-pi",
+          "title": "can1357/oh-my-pi",
+          "score": 94,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "obra/superpowers",
+          "title": "obra/superpowers",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "rohitg00/agentmemory",
+          "title": "rohitg00/agentmemory",
+          "score": 91,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "colbymchenry/codegraph",
+          "title": "colbymchenry/codegraph",
+          "score": 100,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "CloakHQ/CloakBrowser",
+          "title": "CloakHQ/CloakBrowser",
+          "score": 76,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "ruvnet/RuView",
+          "title": "ruvnet/RuView",
+          "score": 100,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "Imbad0202/academic-research-skills",
+          "title": "Imbad0202/academic-research-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        }
+      ],
+      "highlights": [
+        "Projects currently expose 24 repos and 3 deep dives."
+      ],
+      "nextActions": [
+        "Use Projects refresh to update this memory from a live GitHub Trending run."
+      ]
+    },
+    {
+      "id": "projects-2026-05-20-1779324608792",
+      "surface": "projects",
+      "date": "2026-05-20",
+      "generatedAt": "2026-05-21T00:50:08.792Z",
+      "sourceFiles": {
+        "public": "public/data/trending.json"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "24 repos already present in public trending data"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "GitHub Trending metadata, README cache, light/deep analysis"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "worthDeepDive scores from current trending data"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 deep dives, 21 light reads"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "validate-trending + validate-text-encoding"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/trending.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": ".cache/analyses.json + data/agent-memory/projects.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "projects",
+        "status": "pass",
+        "checkedAt": "2026-05-21T00:50:08.791Z",
+        "checks": [
+          {
+            "id": "boards-present",
+            "label": "daily / weekly / monthly boards exist",
+            "status": "pass",
+            "details": "24 repos present"
+          },
+          {
+            "id": "cards-have-tldr",
+            "label": "every project card has a TL;DR",
+            "status": "pass",
+            "details": "24 repos checked"
+          },
+          {
+            "id": "deep-dive-coverage",
+            "label": "at least one high-value project gets a deep dive",
+            "status": "pass",
+            "details": "3 deep dives selected"
+          }
+        ]
+      },
+      "selectedItems": [
+        {
+          "id": "colbymchenry/codegraph",
+          "title": "colbymchenry/codegraph",
+          "score": 96,
+          "reason": "这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。"
+        },
+        {
+          "id": "tinyhumansai/openhuman",
+          "title": "tinyhumansai/openhuman",
+          "score": 100,
+          "reason": "这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。"
+        },
+        {
+          "id": "rohitg00/agentmemory",
+          "title": "rohitg00/agentmemory",
+          "score": 97,
+          "reason": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。"
+        }
+      ],
+      "archivedItems": [
+        {
+          "id": "Imbad0202/academic-research-skills",
+          "title": "Imbad0202/academic-research-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "tinyhumansai/openhuman",
+          "title": "tinyhumansai/openhuman",
+          "score": 96,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "multica-ai/andrej-karpathy-skills",
+          "title": "multica-ai/andrej-karpathy-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "rohitg00/ai-engineering-from-scratch",
+          "title": "rohitg00/ai-engineering-from-scratch",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "HKUDS/CLI-Anything",
+          "title": "HKUDS/CLI-Anything",
+          "score": 96,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "can1357/oh-my-pi",
+          "title": "can1357/oh-my-pi",
+          "score": 94,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "obra/superpowers",
+          "title": "obra/superpowers",
+          "score": 39,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "rohitg00/agentmemory",
+          "title": "rohitg00/agentmemory",
+          "score": 91,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "colbymchenry/codegraph",
+          "title": "colbymchenry/codegraph",
+          "score": 100,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "CloakHQ/CloakBrowser",
+          "title": "CloakHQ/CloakBrowser",
+          "score": 76,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "ruvnet/RuView",
+          "title": "ruvnet/RuView",
+          "score": 100,
+          "reason": "light read in current public data"
+        },
+        {
+          "id": "Imbad0202/academic-research-skills",
+          "title": "Imbad0202/academic-research-skills",
+          "score": 39,
+          "reason": "light read in current public data"
+        }
+      ],
+      "highlights": [
+        "Projects currently expose 24 repos and 3 deep dives."
+      ],
+      "nextActions": [
+        "Use Projects refresh to update this memory from a live GitHub Trending run."
+      ]
+    }
+  ],
+  "reusablePatterns": [
+    {
+      "text": "colbymchenry/codegraph: 这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。",
+      "source": "projects",
+      "firstSeenAt": "2026-05-21T00:50:08.792Z",
+      "lastSeenAt": "2026-05-21T00:50:54.540Z"
+    },
+    {
+      "text": "tinyhumansai/openhuman: 这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。",
+      "source": "projects",
+      "firstSeenAt": "2026-05-21T00:50:08.792Z",
+      "lastSeenAt": "2026-05-21T00:50:54.540Z"
+    },
+    {
+      "text": "rohitg00/agentmemory: 这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。",
+      "source": "projects",
+      "firstSeenAt": "2026-05-21T00:50:08.792Z",
+      "lastSeenAt": "2026-05-21T00:50:54.540Z"
+    }
+  ]
+}

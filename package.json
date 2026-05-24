@@ -12,12 +12,19 @@
     "build": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "node scripts/lint.mjs",
-    "validate": "node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-model-workbench.mjs && node scripts/validate-articles.mjs",
+    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-model-workbench.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs",
     "test": "npm run validate",
     "preview": "vite preview --host 127.0.0.1",
     "ingest": "node --no-warnings scripts/ingest.mjs",
     "ingest:force": "node --no-warnings scripts/ingest.mjs --no-cache",
-    "ingest:dry": "node --no-warnings scripts/ingest.mjs --dry-run"
+    "ingest:dry": "node --no-warnings scripts/ingest.mjs --dry-run",
+    "refresh:articles": "node --no-warnings scripts/refresh-articles.mjs",
+    "papers:discover": "node --no-warnings scripts/papers-radar.mjs discover",
+    "papers:triage": "node --no-warnings scripts/papers-radar.mjs triage",
+    "papers:review": "node --no-warnings scripts/papers-radar.mjs review",
+    "papers:daily": "node --no-warnings scripts/papers-radar.mjs daily",
+    "papers:run": "node --no-warnings scripts/papers-radar.mjs run",
+    "pipeline:sync": "node --no-warnings scripts/sync-pipeline-status.mjs"
   },
   "dependencies": {
     "react": "^19.2.3",

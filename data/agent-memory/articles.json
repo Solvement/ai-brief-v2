@@ -1,0 +1,638 @@
+{
+  "schemaVersion": 1,
+  "surface": "articles",
+  "updatedAt": "2026-05-21T00:50:54.559Z",
+  "runs": [
+    {
+      "id": "articles-2026-05-21-1779324654560",
+      "surface": "articles",
+      "date": "2026-05-21",
+      "generatedAt": "2026-05-21T00:50:54.559Z",
+      "sourceFiles": {
+        "active": "public/data/articles.json",
+        "archive": "public/data/articles-archive.json"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "8 curated article candidates, including 8 recent seed papers"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "sources, architecture walkthroughs, experiment readings, verification tasks"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "quality-first top 5, archive 12"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "5 full deep-dive papers kept in active feed"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "validate-articles + validate-text-encoding"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "public/data/articles-archive.json + data/agent-memory/articles.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "articles",
+        "status": "pass",
+        "checkedAt": "2026-05-21T00:50:00.751Z",
+        "checks": [
+          {
+            "id": "active-count",
+            "label": "active feed respects the daily five-paper limit",
+            "status": "pass",
+            "details": "5/5 active papers"
+          },
+          {
+            "id": "quality-decisions",
+            "label": "every active paper has a quality decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "template-decisions",
+            "label": "every active paper has a template decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "deep-dive-fields",
+            "label": "every active paper has professor and verification sections",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "benchmark-template-depth",
+            "label": "benchmark/evaluation papers include specialized analysis blocks",
+            "status": "pass",
+            "details": "1 benchmark papers checked"
+          }
+        ]
+      },
+      "selectedItems": [
+        {
+          "id": "longmemeval-v2-agent-memory",
+          "title": "LongMemEval-V2: Evaluating Long-Term Agent Memory Toward Experienced Colleagues",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "debug2fix-coding-agent-debugger",
+          "title": "Debug2Fix: Can Interactive Debugging Help Coding Agents Fix More Bugs?",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "agent-lightning-rl-agents",
+          "title": "Agent Lightning: Train ANY AI Agents with Reinforcement Learning",
+          "score": 95,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "swe-bench-illusion",
+          "title": "The SWE-Bench Illusion: When State-of-the-Art LLMs Remember Instead of Reason",
+          "score": 94,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "memoryarena-agent-memory",
+          "title": "MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks",
+          "score": 92,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Articles currently expose 5 full deep dives."
+      ],
+      "nextActions": [
+        "Use Articles refresh to regenerate the curated active feed."
+      ]
+    },
+    {
+      "id": "articles-2026-05-21-1779324615016",
+      "surface": "articles",
+      "date": "2026-05-21",
+      "generatedAt": "2026-05-21T00:50:15.015Z",
+      "sourceFiles": {
+        "active": "public/data/articles.json",
+        "archive": "public/data/articles-archive.json"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "8 curated article candidates, including 8 recent seed papers"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "sources, architecture walkthroughs, experiment readings, verification tasks"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "quality-first top 5, archive 12"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "5 full deep-dive papers kept in active feed"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "validate-articles + validate-text-encoding"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "public/data/articles-archive.json + data/agent-memory/articles.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "articles",
+        "status": "pass",
+        "checkedAt": "2026-05-21T00:50:00.751Z",
+        "checks": [
+          {
+            "id": "active-count",
+            "label": "active feed respects the daily five-paper limit",
+            "status": "pass",
+            "details": "5/5 active papers"
+          },
+          {
+            "id": "quality-decisions",
+            "label": "every active paper has a quality decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "template-decisions",
+            "label": "every active paper has a template decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "deep-dive-fields",
+            "label": "every active paper has professor and verification sections",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "benchmark-template-depth",
+            "label": "benchmark/evaluation papers include specialized analysis blocks",
+            "status": "pass",
+            "details": "1 benchmark papers checked"
+          }
+        ]
+      },
+      "selectedItems": [
+        {
+          "id": "longmemeval-v2-agent-memory",
+          "title": "LongMemEval-V2: Evaluating Long-Term Agent Memory Toward Experienced Colleagues",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "debug2fix-coding-agent-debugger",
+          "title": "Debug2Fix: Can Interactive Debugging Help Coding Agents Fix More Bugs?",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "agent-lightning-rl-agents",
+          "title": "Agent Lightning: Train ANY AI Agents with Reinforcement Learning",
+          "score": 95,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "swe-bench-illusion",
+          "title": "The SWE-Bench Illusion: When State-of-the-Art LLMs Remember Instead of Reason",
+          "score": 94,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "memoryarena-agent-memory",
+          "title": "MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks",
+          "score": 92,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Articles currently expose 5 full deep dives."
+      ],
+      "nextActions": [
+        "Use Articles refresh to regenerate the curated active feed."
+      ]
+    },
+    {
+      "id": "articles-2026-05-21-1779324608808",
+      "surface": "articles",
+      "date": "2026-05-21",
+      "generatedAt": "2026-05-21T00:50:08.808Z",
+      "sourceFiles": {
+        "active": "public/data/articles.json",
+        "archive": "public/data/articles-archive.json"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "8 curated article candidates, including 8 recent seed papers"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "sources, architecture walkthroughs, experiment readings, verification tasks"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "quality-first top 5, archive 12"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "5 full deep-dive papers kept in active feed"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "validate-articles + validate-text-encoding"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "public/data/articles-archive.json + data/agent-memory/articles.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "articles",
+        "status": "pass",
+        "checkedAt": "2026-05-21T00:50:00.751Z",
+        "checks": [
+          {
+            "id": "active-count",
+            "label": "active feed respects the daily five-paper limit",
+            "status": "pass",
+            "details": "5/5 active papers"
+          },
+          {
+            "id": "quality-decisions",
+            "label": "every active paper has a quality decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "template-decisions",
+            "label": "every active paper has a template decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "deep-dive-fields",
+            "label": "every active paper has professor and verification sections",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "benchmark-template-depth",
+            "label": "benchmark/evaluation papers include specialized analysis blocks",
+            "status": "pass",
+            "details": "1 benchmark papers checked"
+          }
+        ]
+      },
+      "selectedItems": [
+        {
+          "id": "longmemeval-v2-agent-memory",
+          "title": "LongMemEval-V2: Evaluating Long-Term Agent Memory Toward Experienced Colleagues",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "debug2fix-coding-agent-debugger",
+          "title": "Debug2Fix: Can Interactive Debugging Help Coding Agents Fix More Bugs?",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "agent-lightning-rl-agents",
+          "title": "Agent Lightning: Train ANY AI Agents with Reinforcement Learning",
+          "score": 95,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "swe-bench-illusion",
+          "title": "The SWE-Bench Illusion: When State-of-the-Art LLMs Remember Instead of Reason",
+          "score": 94,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "memoryarena-agent-memory",
+          "title": "MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks",
+          "score": 92,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Articles currently expose 5 full deep dives."
+      ],
+      "nextActions": [
+        "Use Articles refresh to regenerate the curated active feed."
+      ]
+    },
+    {
+      "id": "articles-2026-05-21-1779324600752",
+      "surface": "articles",
+      "date": "2026-05-21",
+      "generatedAt": "2026-05-21T00:50:00.752Z",
+      "sourceFiles": {
+        "active": "public/data/articles.json",
+        "archive": "public/data/articles-archive.json"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "8 curated article candidates, including 8 recent seed papers"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "sources, architecture walkthroughs, experiment readings, verification tasks"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "quality-first top 5, archive 12"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "5 full deep-dive papers kept in active feed"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "validate-articles + validate-text-encoding"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "public/data/articles-archive.json + data/agent-memory/articles.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "articles",
+        "status": "pass",
+        "checkedAt": "2026-05-21T00:50:00.751Z",
+        "checks": [
+          {
+            "id": "active-count",
+            "label": "active feed respects the daily five-paper limit",
+            "status": "pass",
+            "details": "5/5 active papers"
+          },
+          {
+            "id": "quality-decisions",
+            "label": "every active paper has a quality decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "template-decisions",
+            "label": "every active paper has a template decision",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "deep-dive-fields",
+            "label": "every active paper has professor and verification sections",
+            "status": "pass",
+            "details": "5 papers checked"
+          },
+          {
+            "id": "benchmark-template-depth",
+            "label": "benchmark/evaluation papers include specialized analysis blocks",
+            "status": "pass",
+            "details": "1 benchmark papers checked"
+          }
+        ]
+      },
+      "selectedItems": [
+        {
+          "id": "longmemeval-v2-agent-memory",
+          "title": "LongMemEval-V2: Evaluating Long-Term Agent Memory Toward Experienced Colleagues",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "debug2fix-coding-agent-debugger",
+          "title": "Debug2Fix: Can Interactive Debugging Help Coding Agents Fix More Bugs?",
+          "score": 100,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "agent-lightning-rl-agents",
+          "title": "Agent Lightning: Train ANY AI Agents with Reinforcement Learning",
+          "score": 95,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "swe-bench-illusion",
+          "title": "The SWE-Bench Illusion: When State-of-the-Art LLMs Remember Instead of Reason",
+          "score": 94,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        },
+        {
+          "id": "memoryarena-agent-memory",
+          "title": "MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks",
+          "score": 92,
+          "reason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。"
+        }
+      ],
+      "archivedItems": [
+        {
+          "id": "the-agent-company",
+          "title": "TheAgentCompany: Benchmarking LLM Agents on Consequential Real World Tasks",
+          "score": 91,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "swe-agent-aci",
+          "title": "SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering",
+          "score": 90,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "sciagentgym-scientific-tool-use",
+          "title": "SciAgentGym: Benchmarking Multi-Step Scientific Tool-use in LLM Agents",
+          "score": 85,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "browsecomp-browsing-agents",
+          "title": "BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agents",
+          "score": 85,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "mem0-production-agent-memory",
+          "title": "Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory",
+          "score": 76,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "react-reasoning-acting",
+          "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "score": 66,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "generative-agents",
+          "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+          "score": 63,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "dpo",
+          "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+          "score": 55,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "attention-is-all-you-need",
+          "title": "Attention Is All You Need",
+          "score": 55,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "retrieval-augmented-generation",
+          "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+          "score": 54,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "latent-diffusion-models",
+          "title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+          "score": 45,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        },
+        {
+          "id": "lora",
+          "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+          "score": 40,
+          "reason": "未进入今日 top 5，但保留作后续思路/架构资料。"
+        }
+      ],
+      "highlights": [
+        "Articles kept 5 full deep dives and archived 12 reusable papers.",
+        "Paper quality is selected before template choice."
+      ],
+      "nextActions": [
+        "Open Articles index and one benchmark paper after refresh.",
+        "Run npm run validate before treating the active feed as published."
+      ]
+    }
+  ],
+  "reusablePatterns": [
+    {
+      "text": "LongMemEval-V2: 一个 agent 能不能从很多历史轨迹里学到环境经验，并在新任务里正确调用这些经验？",
+      "source": "articles",
+      "firstSeenAt": "2026-05-21T00:50:00.752Z",
+      "lastSeenAt": "2026-05-21T00:50:54.559Z"
+    },
+    {
+      "text": "Debug2Fix: coding agent 是否能通过访问 debugger 获得更强 bug fixing 能力？",
+      "source": "articles",
+      "firstSeenAt": "2026-05-21T00:50:00.752Z",
+      "lastSeenAt": "2026-05-21T00:50:54.559Z"
+    },
+    {
+      "text": "Agent Lightning: 如何让任意 agent framework 产生可用于 RL 的训练信号？",
+      "source": "articles",
+      "firstSeenAt": "2026-05-21T00:50:00.752Z",
+      "lastSeenAt": "2026-05-21T00:50:54.559Z"
+    },
+    {
+      "text": "SWE-Bench Illusion: SWE-Bench 高分中有多少可能来自记忆，而非泛化解题？",
+      "source": "articles",
+      "firstSeenAt": "2026-05-21T00:50:00.752Z",
+      "lastSeenAt": "2026-05-21T00:50:54.559Z"
+    },
+    {
+      "text": "MemoryArena: agent 能否在多会话任务中学会经验，并把经验用于后续行动？",
+      "source": "articles",
+      "firstSeenAt": "2026-05-21T00:50:00.752Z",
+      "lastSeenAt": "2026-05-21T00:50:54.559Z"
+    }
+  ]
+}

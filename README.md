@@ -1,28 +1,60 @@
 # AI Brief
 
-Chinese-first AI intelligence briefings for learning, judgment, and action.
+AI Brief is a Chinese-first AI intelligence product for turning noisy AI information into readable, actionable briefings.
 
-The current app has two working surfaces:
+The product principle is:
 
-- `Home`: GitHub Trending daily / weekly / monthly repository briefings.
-- `Models`: curated company-level model and product-capability evolution archives.
+```text
+Information -> Judgment -> Action
+```
 
-## What It Does
+The current repository is a local-first MVP. It focuses on AI projects, model evolution, academic papers, and a small research radar for AI engineer job preparation.
 
-- Shows three boards: daily, weekly, monthly.
-- Scores every fetched repository with `worthDeepDive`.
-- Generates deep dives for the highest-value repositories above the threshold.
-- Adds a `Models` column with the first company page: DeepSeek.
-- Explains each model generation and its relationship to the next generation.
-- Tracks selected major model/product/API updates.
-- Uses a tiny hash router:
-  - `#/`
-  - `#/models`
-  - `#/models/:companyId`
-  - `#/repo/:owner/:name`
-- Reads static data from `public/data/trending.json`.
-- Reads curated model data from `public/data/models.json`.
-- In dev, the home page can trigger `/__ingest`, which streams `scripts/ingest.mjs` output and reloads after success.
+## Why This Exists
+
+Most AI feeds optimize for volume. AI Brief optimizes for judgment:
+
+- what happened;
+- why it matters;
+- who should care;
+- whether to read, try, save, ignore, or monitor;
+- what to do next;
+- how to verify understanding.
+
+The long-term goal is a daily-updated AI intelligence website that prefers a small number of high-signal items over broad coverage.
+
+## Current Surfaces
+
+- `Home`: navigation hub plus pipeline status.
+- `Projects`: GitHub Trending daily / weekly / monthly repository briefings.
+- `Models`: curated company-level model and product-capability evolution archive.
+- `Articles`: recent AI paper deep-reading workbench.
+- `AI Job Research Radar`: standalone CLI/data pipeline for paper discovery, triage, and 1-2 professor-style paper reviews.
+- `News` and `Skills`: placeholders.
+
+Routes:
+
+```text
+#/
+#/projects
+#/repo/:owner/:name
+#/models
+#/models/:companyId
+#/articles
+#/articles/:paperId
+```
+
+## What Works Today
+
+- Vite + React + TypeScript frontend.
+- Static JSON data contracts in `public/data/`.
+- GitHub Trending ingestion through `npm run ingest`.
+- One-click dev refresh from the Projects page.
+- Curated Articles refresh through `npm run refresh:articles`.
+- AI Job Research Radar through `npm run papers:run`.
+- Shared local pipeline status through `public/data/pipeline-status.json`.
+- Validation gates for JSON shape, UI contract checks, and Chinese text encoding.
+- Model routing via environment variables, for example `PROJECT_LIGHT_MODEL` and `PAPERS_REVIEW_MODEL`.
 
 ## Quick Start
 
@@ -32,9 +64,16 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open the Vite URL, currently `http://127.0.0.1:5180`.
+Open the Vite URL printed by the terminal.
 
-If `public/data/trending.json` is fresh enough, `predev` skips ingestion. If it is older than `INGEST_INTERVAL_HOURS` (default 18), dev startup runs ingestion first.
+For real AI analysis, set:
+
+```env
+DEEPSEEK_API_KEY=
+GITHUB_TOKEN=
+```
+
+`GITHUB_TOKEN` is optional but recommended for README rate limits. Do not commit `.env.local`.
 
 ## Commands
 
@@ -43,89 +82,98 @@ npm run typecheck
 npm run lint
 npm run validate
 npm run build
+```
 
+Project refresh:
+
+```bash
 npm run ingest
 npm run ingest:force
 npm run ingest:dry
 ```
 
-`npm run build` writes to `dist/`, which is ignored.
-
-`npm run validate` checks both `public/data/trending.json` and `public/data/models.json`.
-
-## Ingestion
-
-`scripts/ingest.mjs`:
-
-- scrapes GitHub Trending for `daily`, `weekly`, and `monthly`;
-- fetches each repository README through the GitHub API;
-- asks DeepSeek for a light analysis of every fetched repository;
-- selects deep-dive candidates by `worthDeepDive >= 60`, capped by `--cap`;
-- writes `public/data/trending.json`.
-
-The `Models` column is intentionally not part of ingestion. It is manually curated from official sources so each company page can focus on learning value and model-generation reasoning instead of daily churn.
-
-Defaults:
-
-- `--limit=15`
-- `--cap=6`
-- `--worth=60`
-
-Useful variants:
+Articles and paper radar:
 
 ```bash
-npm run ingest:dry
-npm run ingest -- --limit=10 --cap=4 --worth=70
-npm run ingest:force
+npm run refresh:articles
+npm run papers:discover
+npm run papers:triage
+npm run papers:review
+npm run papers:daily
+npm run papers:run
 ```
 
-## Environment
+Pipeline status rebuild:
+
+```bash
+npm run pipeline:sync
+```
+
+## Architecture
+
+Canonical content pipeline:
 
 ```text
-DEEPSEEK_API_KEY=
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-chat
-GITHUB_TOKEN=
-INGEST_INTERVAL_HOURS=18
+discover -> evidence -> rank -> review -> verify -> publish -> archive
 ```
 
-`DEEPSEEK_API_KEY` is required for real analysis. `GITHUB_TOKEN` is optional but strongly recommended for README rate limits.
+Current implementation is intentionally lightweight:
 
-## Project Structure
+- `src/`: frontend routes, components, and typed data contracts.
+- `public/data/`: active frontend JSON data.
+- `data/`: local generated research and pipeline memory.
+- `scripts/`: ingestion, paper radar, validation, and pipeline utilities.
+- `scripts/lib/agentic-pipeline.mjs`: shared local pipeline contract.
+- `scripts/lib/github-trending.mjs`: GitHub Trending source adapter.
+- `scripts/lib/project-ranking.mjs`: project deep-dive ranking rules.
+- `scripts/lib/project-prompts.mjs`: project analysis prompt contracts.
 
-```text
-.
-├── index.html
-├── package.json
-├── public/
-│   └── data/
-│       ├── models.json
-│       └── trending.json
-├── scripts/
-│   ├── ingest.mjs
-│   ├── lint.mjs
-│   ├── maybe-ingest.mjs
-│   ├── validate-models.mjs
-│   └── validate-trending.mjs
-└── src/
-    ├── App.tsx
-    ├── main.tsx
-    ├── styles.css
-    ├── types.ts
-    ├── components/
-    │   ├── Markdown.tsx
-    │   ├── RepoCard.tsx
-    │   └── SiteHeader.tsx
-    ├── lib/
-    │   └── data.ts
-    └── pages/
-        ├── Detail.tsx
-        ├── Home.tsx
-        └── Models.tsx
-```
+No database, queue, Kubernetes, Prometheus, or external orchestration runtime is required for the current MVP.
 
-## Current Scope
+## Data Contracts
 
-The legacy AI-brief v2 multi-column implementation was removed from this workspace. Do not depend on old `src/lib/content`, `src/lib/ai`, `src/pages/DirectoryPages`, or old admin pages; they are intentionally gone.
+- `public/data/trending.json`: GitHub Trending project briefings.
+- `public/data/models.json`: curated model archive.
+- `public/data/articles.json`: active top paper deep dives.
+- `public/data/articles-archive.json`: archived or non-active paper deep dives.
+- `public/data/paper-radar.json`: latest paper radar digest for frontend visibility.
+- `public/data/pipeline-status.json`: shared pipeline run status for Home.
+- `data/agent-memory/*.json`: local pipeline memory.
+- `data/papers/*.json`: AI Job Research Radar outputs.
 
-`Models` currently includes DeepSeek only. Add future companies by extending `public/data/models.json` and keeping `scripts/validate-models.mjs` green.
+All public data shapes should stay reflected in `src/types.ts` and validation scripts.
+
+## Where The Project Is Not Good Enough Yet
+
+The useful next improvements are not more UI polish. The hard parts are product judgment and source grounding:
+
+- Home should become a true daily recommended mix, not just a navigation hub.
+- News needs a real small-batch signal pipeline.
+- Models need same-day official-source verification for any "latest" claim.
+- Project ranking needs structured reasons, not only `worthDeepDive`.
+- Paper Radar and Articles need a narrow promotion step so strong radar papers can become full Articles deep dives.
+- Project, model, and article claims need better provenance display.
+- GitHub Trending HTML parsing needs snapshot tests.
+- CSS is still one large file and should be split once the product surface stabilizes.
+
+See:
+
+- `docs/architecture.md`
+- `docs/repo_map.md`
+- `docs/current_problems.md`
+- `docs/goals.md`
+
+## Open Source Status
+
+This repository is published as an experimental learning and product-architecture project.
+
+It is not a finished SaaS product. It is useful as:
+
+- an AI PM / AI engineer portfolio base;
+- a local AI intelligence workflow;
+- a reference for JSON-first agentic content pipelines;
+- a study tool for AI projects, model releases, and papers.
+
+## License
+
+MIT.

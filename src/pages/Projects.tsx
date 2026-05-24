@@ -88,7 +88,7 @@ export function Projects() {
         active="projects"
         meta={data && (
           <>
-            数据更新于 {relativeTime(data.generatedAt)}{" "}
+            <span className="meta-text">数据更新于 {relativeTime(data.generatedAt)}</span>
             <button className="refresh-btn" onClick={() => refreshData(false)} disabled={ingest === "running"}>
               {ingest === "running" ? "更新中..." : "立即更新"}
             </button>
@@ -98,11 +98,11 @@ export function Projects() {
 
       <main className="page">
         <div className="page-intro">
-          GitHub Trending 的<b>日 / 周 / 月</b>榜单。每张卡片右上角的<b> AI 评分</b>来自 DeepSeek 对该项目的全维度评估，
-          只有得分够高的项目才会进入<b> 深度解读</b>——而不是固定 top 3。
+          GitHub Trending 的<b>日 / 周 / 月</b>项目简报。每张卡片先回答：这是什么、为什么现在值得看、
+          适合谁、建议你读还是试。右上角会明确区分<b>价值分</b>和<b>总分</b>。
           <div style={{ marginTop: 10, color: "var(--ink-3)", fontSize: 13 }}>
-            <b>分析视角</b>：给有 AI 基础但不熟此项目术语的研究生看。
-            深度解读包含 Quick read · Key Concepts · How it works · Novelty · Ecosystem · Limitations · Try it 七个板块。
+            <b>分析视角</b>：默认给刚开始接触 AI 工具和项目的学生看，先用人话解释，再保留工程细节。
+            深度解读会把 Overview、How it works、Try it 和自测标准放到默认路径里。
           </div>
           <div style={{ marginTop: 10, color: "var(--ink-3)", fontSize: 13 }}>
             <b>新增栏目</b>：<a href="#/models">Models</a> 先用 DeepSeek 做公司级模型演进样板。

@@ -49,8 +49,43 @@ function validateRepo(repo, path) {
   }
 }
 
+function validateAgentFlow(flow, path) {
+  if (flow === undefined) return;
+  if (!Array.isArray(flow) || flow.length < 5) {
+    fail(path, "must contain at least five agent roles");
+    return;
+  }
+  flow.forEach((step, index) => {
+    for (const key of ["role", "responsibility", "signal"]) {
+      if (typeof step?.[key] !== "string" || step[key].trim() === "") fail(`${path}[${index}].${key}`, "must be a non-empty string");
+    }
+  });
+}
+
+function validateQualityGate(gate, path) {
+  if (gate === undefined) return;
+  if (!gate || typeof gate !== "object") {
+    fail(path, "must be an object");
+    return;
+  }
+  if (!["pass", "warning", "fail"].includes(gate.status)) fail(`${path}.status`, "must be pass, warning, or fail");
+  if (!isIso(gate.checkedAt)) fail(`${path}.checkedAt`, "must be an ISO date");
+  if (!Array.isArray(gate.checks) || gate.checks.length === 0) {
+    fail(`${path}.checks`, "must be a non-empty array");
+    return;
+  }
+  gate.checks.forEach((check, index) => {
+    if (typeof check?.id !== "string" || check.id.trim() === "") fail(`${path}.checks[${index}].id`, "must be a non-empty string");
+    if (typeof check?.label !== "string" || check.label.trim() === "") fail(`${path}.checks[${index}].label`, "must be a non-empty string");
+    if (!["pass", "warning", "fail"].includes(check?.status)) fail(`${path}.checks[${index}].status`, "must be pass, warning, or fail");
+    if (typeof check?.details !== "string") fail(`${path}.checks[${index}].details`, "must be a string");
+  });
+}
+
 if (!data || typeof data !== "object") fail("$", "must be an object");
 if (!isIso(data.generatedAt)) fail("$.generatedAt", "must be an ISO date");
+validateAgentFlow(data.agentFlow, "$.agentFlow");
+validateQualityGate(data.qualityGate, "$.qualityGate");
 
 for (const windowName of ["daily", "weekly", "monthly"]) {
   const board = data[windowName];

@@ -13,7 +13,7 @@ import { SiteHeader, type NavKey } from "./components/SiteHeader";
  *   #/projects               -> Projects (GitHub Trending boards)
  *   #/models                 -> Models index
  *   #/models/<companyId>     -> Model company detail
- *   #/articles               -> Academic article version analysis
+ *   #/articles               -> Academic paper deep-reading workbench
  *   #/articles/<paperId>     -> Article detail
  *   #/repo/<owner>/<name>    -> Project detail
  */

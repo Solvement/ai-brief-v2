@@ -58,9 +58,90 @@ export interface Board {
 
 export interface TrendingData {
   generatedAt: string;
+  analysisModels?: {
+    projectLight: string;
+    projectDeep: string;
+  };
+  pipelineRun?: AgentPipelineRunRef;
+  agentFlow?: AgentPipelineFlowStep[];
+  qualityGate?: AgentQualityGate;
   daily: Board;
   weekly: Board;
   monthly: Board;
+}
+
+export interface AgentPipelineFlowStep {
+  stage?: string;
+  role: string;
+  responsibility: string;
+  signal: string;
+}
+
+export interface AgentQualityGateCheck {
+  id: string;
+  label: string;
+  status: "pass" | "warning" | "fail";
+  details: string;
+}
+
+export interface AgentQualityGate {
+  schemaVersion: number;
+  surface: string;
+  status: "pass" | "warning" | "fail";
+  checkedAt: string;
+  checks: AgentQualityGateCheck[];
+}
+
+export interface AgentPipelineRunRef {
+  id: string;
+  memoryFile: string;
+  statusFile: string;
+}
+
+export interface AgentPipelinePublicRun {
+  id: string;
+  surface: string;
+  date: string;
+  generatedAt: string;
+  qualityStatus: "pass" | "warning" | "fail" | "unknown";
+  selectedCount: number;
+  archivedCount: number;
+  traceSummary?: AgentPipelineTraceSummary | null;
+  reflectionSummary?: string;
+  highlights: string[];
+  nextActions: string[];
+}
+
+export interface AgentPipelineTraceSummary {
+  candidateCount?: number;
+  selectedCount?: number;
+  reviewedCount?: number;
+  sourceFailureCount?: number;
+  modelCalls?: number;
+  totalTokens?: number;
+}
+
+export interface AgentMemoryPattern {
+  text: string;
+  source: string;
+  firstSeenAt: string;
+  lastSeenAt: string;
+}
+
+export interface AgentPipelineSurfaceStatus {
+  surface: string;
+  updatedAt: string;
+  latestRun: AgentPipelinePublicRun | null;
+  runCount: number;
+  reusablePatterns: AgentMemoryPattern[];
+}
+
+export interface PipelineStatusData {
+  schemaVersion: number;
+  generatedAt: string;
+  principle: string;
+  surfaces: AgentPipelineSurfaceStatus[];
+  recentRuns: AgentPipelinePublicRun[];
 }
 
 export interface ModelSource {
@@ -257,6 +338,187 @@ export interface ArticleAnalysis {
   verificationChecklist: string[];
 }
 
+export interface ArticlePlainLanguage {
+  beginnerSummary: string;
+  mentalModel: string;
+  whyItWorks: string;
+  oneThingToRemember: string;
+}
+
+export interface ArticlePrerequisiteTerm {
+  term: string;
+  plainMeaning: string;
+  whyItMatters: string;
+}
+
+export interface ArticleFlowStep {
+  label: string;
+  title: string;
+  body: string;
+}
+
+export interface ArticleDesignChoice {
+  title: string;
+  choice: string;
+  why: string;
+  tradeoff: string;
+}
+
+export interface ArticleIdeaArchitecture {
+  centralQuestion: string;
+  coreMove: string;
+  designChoices: ArticleDesignChoice[];
+  methodFlow: ArticleFlowStep[];
+  optimizationLogic: string;
+}
+
+export interface ArticleArchitectureBlock {
+  label: string;
+  title: string;
+  role: string;
+  beginnerExplanation: string;
+  connectsTo: string;
+}
+
+export interface ArticleArchitectureWalkthrough {
+  originalPaperBoundary: string;
+  modernExtensionBoundary: string;
+  blocks: ArticleArchitectureBlock[];
+}
+
+export interface ArticleEvidenceLens {
+  benchmarkTakeaway: string;
+  whatWasCompared: string;
+  whatToTrust: string;
+  whatNotToOverclaim: string;
+}
+
+export interface ArticleExperimentReading {
+  question: string;
+  setup: string;
+  metric: string;
+  result: string;
+  conclusion: string;
+  limitation: string;
+}
+
+export interface ArticleStudyLens {
+  professorExplanation: string;
+  beginnerPath: string[];
+  commonMisreadings: string[];
+  practicePrompt: string;
+}
+
+export interface ArticleVerificationTask {
+  level: string;
+  title: string;
+  task: string;
+  passCriteria: string[];
+  commonMistake: string;
+  sampleAnswer: string;
+}
+
+export type PaperType =
+  | "benchmark_evaluation"
+  | "system_method"
+  | "agent_architecture"
+  | "survey"
+  | "theory_algorithm"
+  | "product_engineering_blog";
+
+export interface BenchmarkPaperQuestion {
+  researchQuestion: string;
+  challengedConclusion: string;
+  whyImportant: string;
+}
+
+export interface BenchmarkTermPrimerItem {
+  term: string;
+  explanation: string;
+  missingEvidence?: string;
+}
+
+export interface BenchmarkClaimMapItem {
+  claim: string;
+  evidence: string;
+  possibleCounterpoint: string;
+  confidence: string;
+  missingEvidence?: string;
+}
+
+export interface BenchmarkExperimentMatrixItem {
+  experimentName: string;
+  input: string;
+  hiddenInformation: string;
+  metric: string;
+  whatItTests: string;
+  whyItMatters: string;
+  missingEvidence?: string;
+}
+
+export interface BenchmarkResultAnalysisItem {
+  mainResult: string;
+  interpretation: string;
+  supportsClaim: string;
+  alternativeExplanation: string;
+  missingEvidence?: string;
+}
+
+export interface BenchmarkCriticalReview {
+  strengths: string[];
+  weaknesses: string[];
+  missingExperiments: string[];
+  generalizationLimits: string[];
+  counterArguments: string[];
+}
+
+export interface BenchmarkApplicationTranslation {
+  howToUse: string;
+  concreteImplementationIdea: string;
+  evaluationChecklist: string[];
+  failureModes: string[];
+}
+
+export interface BenchmarkInterviewCard {
+  sixtySecondExplanation: string;
+  interviewQuestions: string[];
+  strongPersonalOpinion: string;
+  smallProjectIdea: string;
+}
+
+export interface BenchmarkEvaluationAnalysis {
+  paperQuestion: BenchmarkPaperQuestion;
+  narrativeExplanation: string;
+  termPrimer: BenchmarkTermPrimerItem[];
+  claimMap: BenchmarkClaimMapItem[];
+  experimentMatrix: BenchmarkExperimentMatrixItem[];
+  resultsAnalysis: BenchmarkResultAnalysisItem[];
+  criticalReview: BenchmarkCriticalReview;
+  applicationDeploymentTranslation: BenchmarkApplicationTranslation;
+  interviewCard: BenchmarkInterviewCard;
+  missingEvidence?: string[];
+}
+
+export interface ArticleTemplateDecision {
+  suggestedPaperType: PaperType;
+  activePaperType: PaperType;
+  confidence: string;
+  reason: string;
+  requiredModules: string[];
+  fallbackReason?: string;
+}
+
+export interface ArticleQualityDecision {
+  qualityScore: number;
+  tier: "must_read" | "strong" | "archive" | "ignore";
+  selectionReason: string;
+  qualitySignals: string[];
+  redFlags: string[];
+  recommendedUse: string;
+  archiveValue: string;
+  selectedForDaily: boolean;
+}
+
 export interface AcademicArticle {
   id: string;
   title: string;
@@ -265,6 +527,7 @@ export interface AcademicArticle {
   venue: string;
   arxivId: string;
   contentType: "paper";
+  paperType: PaperType;
   publishedAt: string;
   updatedAt: string;
   oneSentenceTakeaway: string;
@@ -288,10 +551,158 @@ export interface AcademicArticle {
   conceptMap: string[];
   charts: ArticleChart[];
   analysis: ArticleAnalysis;
+  plainLanguage: ArticlePlainLanguage;
+  prerequisiteTerms: ArticlePrerequisiteTerm[];
+  ideaArchitecture: ArticleIdeaArchitecture;
+  architectureWalkthrough: ArticleArchitectureWalkthrough;
+  evidenceLens: ArticleEvidenceLens;
+  experimentReadings: ArticleExperimentReading[];
+  studyLens: ArticleStudyLens;
+  verificationTasks: ArticleVerificationTask[];
+  benchmarkEvaluation?: BenchmarkEvaluationAnalysis;
+  templateDecision: ArticleTemplateDecision;
+  qualityDecision: ArticleQualityDecision;
+  showVersionLens?: boolean;
   nextSteps: string[];
+}
+
+export interface ArticleTemplatePolicy {
+  version: string;
+  dailyLimit: number;
+  selectionRule: string;
+  fallbackRule: string;
+  supportedPaperTypes: PaperType[];
 }
 
 export interface ArticlesData {
   generatedAt: string;
+  dailyLimit?: number;
+  activeCount?: number;
+  archiveCount?: number;
+  pipelineRun?: AgentPipelineRunRef;
+  agentFlow?: AgentPipelineFlowStep[];
+  qualityGate?: AgentQualityGate;
+  templatePolicy?: ArticleTemplatePolicy;
   papers: AcademicArticle[];
+}
+
+export interface ArticlesArchiveData {
+  generatedAt: string;
+  archiveCount: number;
+  pipelineRun?: AgentPipelineRunRef;
+  papers: (AcademicArticle & {
+    archivedAt: string;
+    archiveReason: string;
+    reusableFor: string[];
+  })[];
+}
+
+export interface PaperRadarSummaryPaper {
+  id: string;
+  title: string;
+  daily_action: string;
+  triage_decision: string;
+  total_score: number;
+  sourceName: string;
+  sourceUrl: string;
+  matched_topics: string[];
+  freshness_signal: string;
+  hotness_signal: string;
+  reason: string;
+}
+
+export interface PaperRadarAgentFlowStep {
+  stage?: string;
+  role: string;
+  responsibility: string;
+  signal: string;
+}
+
+export interface PaperRadarSelectionTraceItem {
+  id: string;
+  title: string;
+  score: number;
+  decision: string;
+  status: string;
+  reason: string;
+  aheSignals: string[];
+  freshness: string;
+  hotness: string;
+}
+
+export interface PaperRadarRunTraceStage {
+  stage: string;
+  startedAt?: string;
+  finishedAt?: string;
+  durationMs?: number;
+  modelUsage?: {
+    calls: number;
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    models: Record<string, {
+      calls: number;
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    }>;
+  };
+  [key: string]: unknown;
+}
+
+export interface PaperRadarRunTrace {
+  summary: AgentPipelineTraceSummary;
+  stages: PaperRadarRunTraceStage[];
+  modelUsage: PaperRadarRunTraceStage["modelUsage"];
+  sourceFailures: {
+    source: string;
+    queryLabel: string;
+    failureReason: string;
+  }[];
+}
+
+export interface PaperRadarReflection {
+  schemaVersion: number;
+  summary: string;
+  averageReviewDepth: number;
+  whatWorked: string[];
+  whatToWatch: string[];
+  selfCorrections: string[];
+  nextRunAdjustments: string[];
+}
+
+export interface PaperRadarPublicData {
+  schemaVersion: number;
+  date: string;
+  generatedAt: string;
+  sourceFiles: {
+    daily: string;
+    triage: string;
+  };
+  pipelineRun?: AgentPipelineRunRef | null;
+  qualityGate?: AgentQualityGate | null;
+  runTrace?: PaperRadarRunTrace | null;
+  reflection?: PaperRadarReflection | null;
+  memoryVersion?: number;
+  triageSummary: {
+    candidateCount: number;
+    scoredCount: number;
+    selectedCount: number;
+    rejectedCount: number;
+    belowTopCutoffCount: number;
+    cutoffScore: number;
+  } | null;
+  agentFlow: PaperRadarAgentFlowStep[];
+  mustRead: PaperRadarSummaryPaper | null;
+  skim: PaperRadarSummaryPaper[];
+  professorLesson: string;
+  goodIdeaToSteal: string;
+  badIdeaOrRisk: string;
+  transferablePattern: string;
+  futureWorkApplication: string;
+  architectureTakeaway: string;
+  interviewTalkingPoint: string;
+  projectIdea: string;
+  topPapers: PaperRadarSummaryPaper[];
+  selectionTrace: PaperRadarSelectionTraceItem[];
 }

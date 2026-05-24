@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-05-21T01:19:09.965Z",
+  "principle": "discover -> evidence -> rank -> review -> verify -> publish -> archive",
+  "surfaces": [
+    {
+      "surface": "articles",
+      "updatedAt": "2026-05-21T00:50:54.559Z",
+      "latestRun": {
+        "id": "articles-2026-05-21-1779324654560",
+        "surface": "articles",
+        "date": "2026-05-21",
+        "generatedAt": "2026-05-21T00:50:54.559Z",
+        "qualityStatus": "pass",
+        "selectedCount": 5,
+        "archivedCount": 0,
+        "traceSummary": null,
+        "reflectionSummary": "",
+        "highlights": [
+          "Articles currently expose 5 full deep dives."
+        ],
+        "nextActions": [
+          "Use Articles refresh to regenerate the curated active feed."
+        ]
+      },
+      "runCount": 4,
+      "reusablePatterns": [
+        {
+          "text": "LongMemEval-V2: 一个 agent 能不能从很多历史轨迹里学到环境经验，并在新任务里正确调用这些经验？",
+          "source": "articles",
+          "firstSeenAt": "2026-05-21T00:50:00.752Z",
+          "lastSeenAt": "2026-05-21T00:50:54.559Z"
+        },
+        {
+          "text": "Debug2Fix: coding agent 是否能通过访问 debugger 获得更强 bug fixing 能力？",
+          "source": "articles",
+          "firstSeenAt": "2026-05-21T00:50:00.752Z",
+          "lastSeenAt": "2026-05-21T00:50:54.559Z"
+        },
+        {
+          "text": "Agent Lightning: 如何让任意 agent framework 产生可用于 RL 的训练信号？",
+          "source": "articles",
+          "firstSeenAt": "2026-05-21T00:50:00.752Z",
+          "lastSeenAt": "2026-05-21T00:50:54.559Z"
+        },
+        {
+          "text": "SWE-Bench Illusion: SWE-Bench 高分中有多少可能来自记忆，而非泛化解题？",
+          "source": "articles",
+          "firstSeenAt": "2026-05-21T00:50:00.752Z",
+          "lastSeenAt": "2026-05-21T00:50:54.559Z"
+        },
+        {
+          "text": "MemoryArena: agent 能否在多会话任务中学会经验，并把经验用于后续行动？",
+          "source": "articles",
+          "firstSeenAt": "2026-05-21T00:50:00.752Z",
+          "lastSeenAt": "2026-05-21T00:50:54.559Z"
+        }
+      ]
+    },
+    {
+      "surface": "paper_radar",
+      "updatedAt": "2026-05-21T01:19:09.951Z",
+      "latestRun": {
+        "id": "paper_radar-2026-05-20-1779326349951",
+        "surface": "paper_radar",
+        "date": "2026-05-20",
+        "generatedAt": "2026-05-21T01:19:09.951Z",
+        "qualityStatus": "pass",
+        "selectedCount": 4,
+        "archivedCount": 6,
+        "traceSummary": {
+          "candidateCount": 160,
+          "selectedCount": 4,
+          "reviewedCount": 2,
+          "sourceFailureCount": 0,
+          "modelCalls": 0,
+          "totalTokens": 0
+        },
+        "reflectionSummary": "Reflection found 1 watch item(s); keep the feed small and evidence-led.",
+        "highlights": [
+          "Must-read paper: Auditing Agent Harness Safety",
+          "160 candidates passed through radar triage."
+        ],
+        "nextActions": [
+          "Review the must-read paper before promoting it into Articles.",
+          "Run npm run validate after publishing radar data."
+        ]
+      },
+      "runCount": 6,
+      "reusablePatterns": [
+        {
+          "text": "Auditing Agent Harness Safety: Selected as top 1 after score and diversity ranking: AI Agents, Tool Use, Agent Harness / Observability; AHE signals: agent harness, trajectory; freshness=new; hotness=high_signal_source; score=97.",
+          "source": "paper_radar",
+          "firstSeenAt": "2026-05-21T00:50:08.312Z",
+          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+        },
+        {
+          "text": "Code as Agent Harness: Selected as top 2 after score and diversity ranking: AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: harness engineering, agent harness, rollback; freshness=new; hotness=high_signal_source; score=93.",
+          "source": "paper_radar",
+          "firstSeenAt": "2026-05-21T00:50:08.312Z",
+          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+        },
+        {
+          "text": "Clover: A Neural-Symbolic Agentic Harness with Stochastic Tree-of-Thoughts for Verified RTL Repair: Selected as top 3 after score and diversity ranking: AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; AHE signals: agent harness; freshness=new; hotness=high_signal_source; score=93.",
+          "source": "paper_radar",
+          "firstSeenAt": "2026-05-21T00:50:08.312Z",
+          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+        },
+        {
+          "text": "TwinRouterBench: Fast Static and Live Dynamic Evaluation for Realistic Agentic LLM Routing: Selected as top 4 after score and diversity ranking: AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: trajectory; freshness=new; hotness=standard_source; score=93.",
+          "source": "paper_radar",
+          "firstSeenAt": "2026-05-21T00:50:08.312Z",
+          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+        },
+        {
+          "text": "Auditing Agent Harness Safety: AI Agents, Tool Use, Agent Harness / Observability; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness, trajectory.",
+          "source": "paper_radar",
+          "firstSeenAt": "2026-05-21T00:50:08.814Z",
+          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+        },
+        {
+          "text": "Code as Agent Harness: AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, rollback.",
+          "source": "paper_radar",
+          "firstSeenAt": "2026-05-21T00:50:08.814Z",
+          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+        }
+      ]
+    },
+    {
+      "surface": "projects",
+      "updatedAt": "2026-05-21T00:50:54.540Z",
+      "latestRun": {
+        "id": "projects-2026-05-20-1779324654541",
+        "surface": "projects",
+        "date": "2026-05-20",
+        "generatedAt": "2026-05-21T00:50:54.540Z",
+        "qualityStatus": "pass",
+        "selectedCount": 3,
+        "archivedCount": 12,
+        "traceSummary": null,
+        "reflectionSummary": "",
+        "highlights": [
+          "Projects currently expose 24 repos and 3 deep dives."
+        ],
+        "nextActions": [
+          "Use Projects refresh to update this memory from a live GitHub Trending run."
+        ]
+      },
+      "runCount": 3,
+      "reusablePatterns": [
+        {
+          "text": "colbymchenry/codegraph: 这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。",
+          "source": "projects",
+          "firstSeenAt": "2026-05-21T00:50:08.792Z",
+          "lastSeenAt": "2026-05-21T00:50:54.540Z"
+        },
+        {
+          "text": "tinyhumansai/openhuman: 这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。",
+          "source": "projects",
+          "firstSeenAt": "2026-05-21T00:50:08.792Z",
+          "lastSeenAt": "2026-05-21T00:50:54.540Z"
+        },
+        {
+          "text": "rohitg00/agentmemory: 这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。",
+          "source": "projects",
+          "firstSeenAt": "2026-05-21T00:50:08.792Z",
+          "lastSeenAt": "2026-05-21T00:50:54.540Z"
+        }
+      ]
+    }
+  ],
+  "recentRuns": [
+    {
+      "id": "paper_radar-2026-05-20-1779326349951",
+      "surface": "paper_radar",
+      "date": "2026-05-20",
+      "generatedAt": "2026-05-21T01:19:09.951Z",
+      "qualityStatus": "pass",
+      "selectedCount": 4,
+      "archivedCount": 6,
+      "traceSummary": {
+        "candidateCount": 160,
+        "selectedCount": 4,
+        "reviewedCount": 2,
+        "sourceFailureCount": 0,
+        "modelCalls": 0,
+        "totalTokens": 0
+      },
+      "reflectionSummary": "Reflection found 1 watch item(s); keep the feed small and evidence-led.",
+      "highlights": [
+        "Must-read paper: Auditing Agent Harness Safety",
+        "160 candidates passed through radar triage."
+      ],
+      "nextActions": [
+        "Review the must-read paper before promoting it into Articles.",
+        "Run npm run validate after publishing radar data."
+      ]
+    },
+    {
+      "id": "articles-2026-05-21-1779324654560",
+      "surface": "articles",
+      "date": "2026-05-21",
+      "generatedAt": "2026-05-21T00:50:54.559Z",
+      "qualityStatus": "pass",
+      "selectedCount": 5,
+      "archivedCount": 0,
+      "traceSummary": null,
+      "reflectionSummary": "",
+      "highlights": [
+        "Articles currently expose 5 full deep dives."
+      ],
+      "nextActions": [
+        "Use Articles refresh to regenerate the curated active feed."
+      ]
+    },
+    {
+      "id": "projects-2026-05-20-1779324654541",
+      "surface": "projects",
+      "date": "2026-05-20",
+      "generatedAt": "2026-05-21T00:50:54.540Z",
+      "qualityStatus": "pass",
+      "selectedCount": 3,
+      "archivedCount": 12,
+      "traceSummary": null,
+      "reflectionSummary": "",
+      "highlights": [
+        "Projects currently expose 24 repos and 3 deep dives."
+      ],
+      "nextActions": [
+        "Use Projects refresh to update this memory from a live GitHub Trending run."
+      ]
+    }
+  ]
+}

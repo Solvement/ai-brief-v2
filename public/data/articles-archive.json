@@ -1,0 +1,3979 @@
+{
+  "generatedAt": "2026-05-21T00:50:00.749Z",
+  "archiveCount": 12,
+  "pipelineRun": {
+    "id": "articles-2026-05-21-1779324600752",
+    "memoryFile": "data/agent-memory/articles.json",
+    "statusFile": "public/data/pipeline-status.json"
+  },
+  "papers": [
+    {
+      "id": "the-agent-company",
+      "title": "TheAgentCompany: Benchmarking LLM Agents on Consequential Real World Tasks",
+      "shortTitle": "TheAgentCompany",
+      "authors": "Frank F. Xu, Yufan Song, Boxuan Li, Yuxuan Tang, Kritanjali Jain, Mengxue Bao, Zora Z. Wang, Xuhui Zhou, Zhitong Guo, Murong Cao, Mingyang Yang, Hao Yang Lu, Amaad Martin, Zhe Su, Leander Maben, Raj Mehta, Wayne Chi, Lawrence Jang, Yiqing Xie, Shuyan Zhou, Graham Neubig",
+      "venue": "arXiv 2024-2025 / Carnegie Mellon University + Duke University",
+      "arxivId": "2412.14161",
+      "contentType": "paper",
+      "publishedAt": "2024-12-18",
+      "updatedAt": "2025-09-10",
+      "oneSentenceTakeaway": "TheAgentCompany 把 agent 放进一个模拟软件公司，测试它能否浏览网页、写代码、跑程序、和同事沟通并完成真实职场任务。",
+      "whyItMatters": "它非常适合校准你对 agent 的期待：最强基线能完整完成 24% 任务，说明 agent 已能处理一部分简单工作，但长程复杂任务还远没自动化。",
+      "targetAudience": [
+        "Agent 研究学习者",
+        "AI PM portfolio 学生",
+        "想判断 AI 自动化边界的人"
+      ],
+      "readingTime": "80 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 93,
+      "readabilityScore": 80,
+      "actionabilityScore": 94,
+      "confidenceScore": 91,
+      "difficulty": "中高：需要理解 benchmark、评估器和工作流环境",
+      "recommendedAction": "精读任务环境、checkpoint 评分和 24% 结果，不要只看排行榜",
+      "tags": [
+        "Agent",
+        "Workflow",
+        "AI Coding",
+        "Business",
+        "Research"
+      ],
+      "sourceName": "arXiv / TheAgentCompany",
+      "sourceUrl": "https://arxiv.org/abs/2412.14161",
+      "sources": [
+        {
+          "name": "arXiv: TheAgentCompany",
+          "url": "https://arxiv.org/abs/2412.14161"
+        },
+        {
+          "name": "TheAgentCompany site",
+          "url": "https://the-agent-company.com"
+        }
+      ],
+      "versionQuestion": "如何评估一个 agent 是否真的能像数字员工一样完成工作，而不是只会演示单步操作？",
+      "versions": [
+        {
+          "id": "v1",
+          "label": "arXiv v1",
+          "submittedAt": "2024-12-18",
+          "versionType": "initial preprint",
+          "changeSummary": "提出自包含软件公司环境和真实职场任务 benchmark。",
+          "whyChanged": "现有 agent benchmark 往往只测浏览、桌面或单一软件，不能回答工作自动化边界。",
+          "readerQuestion": "agent 到底能完成多少真实工作？",
+          "evidence": "论文建立 175 个任务、多个工具界面和 checkpoint evaluator。",
+          "impactScore": 90
+        },
+        {
+          "id": "v3",
+          "label": "arXiv v3",
+          "submittedAt": "2025-09-10",
+          "versionType": "revised version",
+          "changeSummary": "更新论文版本，整理任务环境、评分和实验呈现。",
+          "whyChanged": "agent 评测快速发展，需要更清楚说明可复现环境和结果边界。",
+          "readerQuestion": "24% 完成率应该让我们乐观还是谨慎？",
+          "evidence": "修订版继续强调 full completion 与 partial completion 的区别。",
+          "impactScore": 93
+        }
+      ],
+      "versionRelation": "v1 建立 benchmark；v3 是更成熟的修订版。学习重点是 benchmark 设计：环境、任务、checkpoint、partial credit、成本和步骤数共同决定结论。",
+      "plainLanguage": {
+        "beginnerSummary": "这篇论文不是问 agent 会不会点网页按钮，而是把它丢进一个模拟公司：有 GitLab、文档、项目管理、聊天工具。任务要像员工一样跨工具完成。",
+        "mentalModel": "像给 AI 做一次实习考核：不是做一道题，而是让它完成“查资料、问同事、改代码、写报告、提交结果”的完整工作。",
+        "whyItWorks": "真实工作本来就是跨工具、长步骤、有中间检查点的。TheAgentCompany 把这些因素放进一个可复现环境，并用 checkpoint 给部分进度打分。",
+        "oneThingToRemember": "Agent benchmark 越接近真实工作，结果通常越不神奇，也越有价值。24% 是能力信号，也是边界提醒。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Benchmark",
+          "plainMeaning": "用固定任务和评分标准比较模型或系统的方法。",
+          "whyItMatters": "TheAgentCompany 本质是评估框架，不是单个 agent。"
+        },
+        {
+          "term": "Checkpoint",
+          "plainMeaning": "任务中必须完成的中间里程碑。",
+          "whyItMatters": "它让评估能区分“完全失败”和“做了一部分”。"
+        },
+        {
+          "term": "Self-hosted environment",
+          "plainMeaning": "可以自己部署和重置的测试环境。",
+          "whyItMatters": "保证评测更可复现，不依赖真实第三方网站变化。"
+        },
+        {
+          "term": "Partial completion",
+          "plainMeaning": "任务没完全成功但完成了部分检查点。",
+          "whyItMatters": "真实 agent 常常不是全成或全败，部分进度也有信息量。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "如何构建一个足够真实、可复现、可量化的环境，测试 LLM agent 能否完成职场任务？",
+        "coreMove": "搭建一个模拟软件公司，提供网页、代码、文档、聊天和终端工具，并用 checkpoint evaluator 评估任务完成度。",
+        "designChoices": [
+          {
+            "title": "模拟公司环境",
+            "choice": "用 GitLab、OwnCloud、Plane、RocketChat 等自托管工具构成公司。",
+            "why": "真实工作需要跨工具，而不是只测一个网页。",
+            "tradeoff": "环境复杂，搭建和维护成本高。"
+          },
+          {
+            "title": "Checkpoint 评分",
+            "choice": "把任务拆成多个可检查里程碑。",
+            "why": "能衡量部分进度，更接近真实任务评估。",
+            "tradeoff": "checkpoint 设计会影响结论，过细或过粗都有偏差。"
+          },
+          {
+            "title": "模拟同事互动",
+            "choice": "让 agent 需要和虚拟同事沟通获取信息。",
+            "why": "真实工作常常需要问人和协调。",
+            "tradeoff": "模拟同事由 LLM 扮演，可能带来额外不确定性。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "搭建公司环境",
+            "body": "部署代码、文档、项目管理和聊天系统。"
+          },
+          {
+            "label": "02",
+            "title": "设计任务",
+            "body": "从软件公司日常工作抽取 SWE、PM、Finance、Admin 等任务。"
+          },
+          {
+            "label": "03",
+            "title": "定义 checkpoint",
+            "body": "为每个任务写出可验证的中间目标。"
+          },
+          {
+            "label": "04",
+            "title": "运行 agent",
+            "body": "agent 浏览、写代码、跑程序、发消息完成任务。"
+          },
+          {
+            "label": "05",
+            "title": "评分分析",
+            "body": "计算 full completion、partial score、步骤数和成本。"
+          }
+        ],
+        "optimizationLogic": "TheAgentCompany 优化的是评估真实性：把单步网页操作升级为多工具、多角色、长程任务，并用 partial credit 避免只看最终成败。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文关注数字工作者式 agent benchmark，环境是模拟软件公司，不代表所有职业、所有国家或所有物理工作。",
+        "modernExtensionBoundary": "后续可以扩展到更多行业、真实企业软件、长期项目和人机协作评估，但需要隐私、安全和成本控制。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Task Suite",
+            "role": "提供 175 个工作任务。",
+            "beginnerExplanation": "这是 agent 的考试题库。",
+            "connectsTo": "初始化环境和评分器。"
+          },
+          {
+            "label": "B",
+            "title": "Company Environment",
+            "role": "提供网页、代码、文档、聊天和终端。",
+            "beginnerExplanation": "像一个小型公司内网。",
+            "connectsTo": "agent 在这里行动。"
+          },
+          {
+            "label": "C",
+            "title": "Agent Harness",
+            "role": "让模型用浏览器、终端和代码工具执行任务。",
+            "beginnerExplanation": "这是 agent 的工作台。",
+            "connectsTo": "生成行动轨迹。"
+          },
+          {
+            "label": "D",
+            "title": "Evaluators",
+            "role": "检查 checkpoint 和最终产物。",
+            "beginnerExplanation": "像自动阅卷老师。",
+            "connectsTo": "输出 full 和 partial 分数。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "最强基线完整完成 24.0% 任务，partial score 为 34.4%。这说明 agent 已有实用苗头，但距离可靠数字员工还有明显距离。",
+        "whatWasCompared": "论文在同一公司环境中测试多个闭源和开源模型 backbone，并使用 OpenHands agent harness。",
+        "whatToTrust": "可信结论是：多工具长程工作比单步 benchmark 难很多，checkpoint 和 partial score 能提供更细颗粒度判断。",
+        "whatNotToOverclaim": "不要把 24% 外推成“24% 工作会被替代”。任务集合、环境、模型版本、提示和工具都影响结果。"
+      },
+      "experimentReadings": [
+        {
+          "question": "当前 LLM agent 能在模拟公司中完成多少真实工作任务？",
+          "setup": "作者构建自托管软件公司环境，设计 175 个任务，用 OpenHands harness 测试多个模型。",
+          "metric": "full completion、partial completion、步骤数、成本。",
+          "result": "最强基线完整完成 24.0% 任务，partial score 34.4%。",
+          "conclusion": "agent 能完成一部分简单任务，但长程复杂工作仍然很难。",
+          "limitation": "环境是模拟软件公司，不代表全部职业；评估器和模拟同事也会影响结果。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会把这篇作为“如何判断 agent 新闻真假”的核心阅读。看到厂商说 agent 能工作，你要问：环境真实么？任务长么？能不能复现？评分是最终成功还是部分成功？成本和步骤数是多少？",
+        "beginnerPath": [
+          "先读 abstract，记住 24% full completion。",
+          "再画环境组件：GitLab、OwnCloud、Plane、RocketChat、terminal。",
+          "最后挑一个任务，拆成 checkpoint 看为什么难。"
+        ],
+        "commonMisreadings": [
+          "把 24% 理解成工作岗位自动化比例。",
+          "只看 full completion，不看 partial score 和失败原因。",
+          "忽略自托管环境和真实企业环境的差距。"
+        ],
+        "practicePrompt": "为 AI-Brief 设计一个 TheAgentCompany 风格任务：让 agent 抓取一篇论文、写 deep dive、更新数据、跑 validation。写出 5 个 checkpoint。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释 24% 的含义",
+          "task": "说明 full completion 24% 和 partial score 34.4% 分别代表什么。",
+          "passCriteria": [
+            "说出 24% 是完整任务成功率。",
+            "说出 34.4% 包含部分进度。"
+          ],
+          "commonMistake": "把 24% 当成所有工作自动化比例。",
+          "sampleAnswer": "24% 表示最佳基线完整通过全部 checkpoint 的任务比例；34.4% 是给部分完成也加分后的分数，不等于岗位替代比例。"
+        },
+        {
+          "level": "画图题",
+          "title": "画评测环境",
+          "task": "画出任务、公司环境、agent harness、evaluator 四块。",
+          "passCriteria": [
+            "包含多工具环境。",
+            "包含 checkpoint evaluator。"
+          ],
+          "commonMistake": "只画一个网页浏览器。",
+          "sampleAnswer": "任务输入进入 agent harness，agent 在 GitLab/OwnCloud/Plane/RocketChat/terminal 中行动，evaluator 检查各 checkpoint 并打分。"
+        },
+        {
+          "level": "迁移题",
+          "title": "设计一个 AI-Brief agent benchmark",
+          "task": "为本项目设计 3 个可自动检查的 checkpoint。",
+          "passCriteria": [
+            "checkpoint 可验证。",
+            "至少一个检查输出质量。"
+          ],
+          "commonMistake": "写成主观愿望，无法评估。",
+          "sampleAnswer": "检查 articles.json 有新 paper id；运行 npm run validate 通过；deep dive 包含 verificationTasks 至少 3 个且 sourceUrl 为 arXiv。"
+        }
+      ],
+      "conceptMap": [
+        "Workplace benchmark",
+        "Self-hosted environment",
+        "Checkpoint evaluator",
+        "Partial completion",
+        "Digital worker"
+      ],
+      "charts": [
+        {
+          "title": "Best baseline performance",
+          "metric": "Completion score",
+          "unit": "%",
+          "maxValue": 100,
+          "bars": [
+            {
+              "label": "Full completion",
+              "value": 24,
+              "display": "24.0%"
+            },
+            {
+              "label": "Partial score",
+              "value": 34.4,
+              "display": "34.4%"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "评估 agent 不能只看单步演示，必须放进多工具、长程、可复现、带 checkpoint 的真实工作环境。",
+        "background": "现有 benchmark 常覆盖有限界面或短任务，难以回答 AI 是否能完成实际职场任务。",
+        "method": "构建自托管软件公司环境、设计多类别任务、使用 checkpoint evaluator 和 partial credit。",
+        "experiments": "用多个模型和 OpenHands harness 跑任务，报告 full completion、partial score、步骤数和成本。",
+        "limitations": "任务来自模拟软件公司，不能代表所有行业；模拟同事和评估器设计会影响结果。",
+        "professorLens": "教授会要求学生从 benchmark 设计读起，而不是从模型排名读起。好的评测本身就是研究贡献。",
+        "verificationChecklist": [
+          "能解释 full vs partial。",
+          "能画环境结构。",
+          "能设计可检查 checkpoint。",
+          "能说明不能外推到岗位替代率。"
+        ]
+      },
+      "nextSteps": [
+        "把 AI-Brief ingest 流程设计成小型 agent benchmark。",
+        "记录每次 agent 失败的 checkpoint。",
+        "比较不同模型在同一项目维护任务上的完成率和成本。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 91,
+        "tier": "must_read",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "有可迁移的系统架构或工程设计思路。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入每日 5 篇候选，适合 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "future architecture/reference",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "swe-agent-aci",
+      "title": "SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering",
+      "shortTitle": "SWE-agent",
+      "authors": "John Yang, Carlos E. Jimenez, Alexander Wettig, Kilian Lieret, Shunyu Yao, Karthik Narasimhan, Ofir Press",
+      "venue": "NeurIPS 2024 / Princeton NLP",
+      "arxivId": "2405.15793",
+      "contentType": "paper",
+      "publishedAt": "2024-05-06",
+      "updatedAt": "2024-11-11",
+      "oneSentenceTakeaway": "SWE-agent 的关键观点是：AI coding agent 也需要为自己设计的“IDE”，好的 Agent-Computer Interface 会显著影响修 bug 能力。",
+      "whyItMatters": "它把 AI coding 从“模型会不会写代码”推进到“模型怎样看文件、编辑、运行测试、理解反馈”。这对 Projects deep dive 和 Codex 类工具都很重要。",
+      "targetAudience": [
+        "AI Coding 学习者",
+        "Agent 工程实践者",
+        "软件工程学生"
+      ],
+      "readingTime": "70 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 94,
+      "readabilityScore": 78,
+      "actionabilityScore": 96,
+      "confidenceScore": 93,
+      "difficulty": "中高：需要理解 repo 操作、测试和 benchmark",
+      "recommendedAction": "精读 ACI 设计，并把它映射到自己的 coding agent 工作流",
+      "tags": [
+        "Agent",
+        "AI Coding",
+        "Workflow",
+        "Open Source"
+      ],
+      "sourceName": "arXiv / NeurIPS 2024",
+      "sourceUrl": "https://arxiv.org/abs/2405.15793",
+      "sources": [
+        {
+          "name": "arXiv: SWE-agent",
+          "url": "https://arxiv.org/abs/2405.15793"
+        },
+        {
+          "name": "SWE-agent project",
+          "url": "https://swe-agent.com"
+        }
+      ],
+      "versionQuestion": "为什么同一个模型，换一个电脑接口和命令协议，修 bug 能力会变强？",
+      "versions": [
+        {
+          "id": "v1",
+          "label": "arXiv v1",
+          "submittedAt": "2024-05-06",
+          "versionType": "initial preprint",
+          "changeSummary": "提出 Agent-Computer Interface 概念和 SWE-agent 系统。",
+          "whyChanged": "非交互式 LLM 直接修代码能力有限，agent 需要更适合自己的软件操作界面。",
+          "readerQuestion": "coding agent 的瓶颈是模型，还是它使用电脑的方式？",
+          "evidence": "论文报告 SWE-bench pass@1 12.5% 和 HumanEvalFix 87.7%。",
+          "impactScore": 90
+        },
+        {
+          "id": "v3",
+          "label": "arXiv v3 / NeurIPS",
+          "submittedAt": "2024-11-11",
+          "versionType": "conference revision",
+          "changeSummary": "形成 NeurIPS 2024 版本，整理实验与系统细节。",
+          "whyChanged": "SWE-agent 已成为 coding agent 研究的重要基线，需要更稳定论文记录。",
+          "readerQuestion": "哪些 ACI 设计会改变 agent 行为？",
+          "evidence": "最终版本强调文件编辑、导航、测试执行和接口设计对行为的影响。",
+          "impactScore": 94
+        }
+      ],
+      "versionRelation": "v1 建立 ACI 视角；v3 更适合作为正式论文学习。对学生最重要的是：AI coding agent 的工程界面本身就是模型能力的一部分。",
+      "plainLanguage": {
+        "beginnerSummary": "人类程序员需要 IDE、搜索、终端和测试；AI agent 也一样。SWE-agent 的重点不是发明一个更聪明的大模型，而是给模型一个更适合它操作代码库的界面。",
+        "mentalModel": "把模型想成新手程序员。你给它一堆散乱文件和模糊命令，它会迷路；你给它清楚的文件查看、编辑和测试反馈接口，它更容易完成任务。",
+        "whyItWorks": "Agent 的每一步都依赖它能否看见正确上下文、做出小而准的编辑、运行测试并理解错误。ACI 把这些操作变成模型更容易使用的动作空间。",
+        "oneThingToRemember": "AI coding 能力 = 模型能力 + 代码上下文 + 操作接口 + 测试反馈，不只是模型排行榜。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "SWE-bench",
+          "plainMeaning": "真实 GitHub issue 修复 benchmark。",
+          "whyItMatters": "它比玩具代码题更接近真实软件工程。"
+        },
+        {
+          "term": "Agent-Computer Interface",
+          "plainMeaning": "专门给 agent 使用电脑、文件和终端的接口设计。",
+          "whyItMatters": "接口会直接影响 agent 行为和成功率。"
+        },
+        {
+          "term": "Trajectory",
+          "plainMeaning": "agent 从读问题到修改、测试、提交的完整步骤记录。",
+          "whyItMatters": "调试 coding agent 时要看轨迹，不只看最终 diff。"
+        },
+        {
+          "term": "Pass@1",
+          "plainMeaning": "一次尝试就成功的比例。",
+          "whyItMatters": "衡量 agent 是否能稳定独立完成任务。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "能不能通过设计更适合 LLM agent 的电脑接口，提高它自动修复真实软件问题的能力？",
+        "coreMove": "把 repo 浏览、文件编辑、搜索、终端执行和测试反馈封装成 agent 友好的动作接口。",
+        "designChoices": [
+          {
+            "title": "专用编辑命令",
+            "choice": "让 agent 用结构化命令编辑文件，而不是自由发挥整段文件。",
+            "why": "减少误删、错位和大范围改坏。",
+            "tradeoff": "接口设计更复杂，模型需要学习命令约束。"
+          },
+          {
+            "title": "交互式测试反馈",
+            "choice": "让 agent 修改后运行测试并读取错误。",
+            "why": "真实软件工程靠反馈闭环，不靠一次生成。",
+            "tradeoff": "测试慢、环境可能不稳定，成本上升。"
+          },
+          {
+            "title": "仓库导航",
+            "choice": "提供搜索、查看文件、定位符号等能力。",
+            "why": "真实 bug 往往跨文件，必须先找到相关代码。",
+            "tradeoff": "上下文选择错会导致 agent 追错方向。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "读取 issue",
+            "body": "agent 先理解 bug、期望行为和可能相关模块。"
+          },
+          {
+            "label": "02",
+            "title": "导航仓库",
+            "body": "通过搜索和文件查看定位代码位置。"
+          },
+          {
+            "label": "03",
+            "title": "小步编辑",
+            "body": "使用 ACI 命令做局部修改。"
+          },
+          {
+            "label": "04",
+            "title": "运行测试",
+            "body": "执行测试、脚本或重现命令获取反馈。"
+          },
+          {
+            "label": "05",
+            "title": "迭代修复",
+            "body": "根据错误继续定位和修改，直到满足验收。"
+          }
+        ],
+        "optimizationLogic": "SWE-agent 的优化逻辑是缩小 agent 的动作空间并提高反馈质量。好的接口让模型少做危险大编辑，多做可检查的小步骤。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文关注 ACI 如何提升自动软件工程任务表现，主要在 SWE-bench 和 HumanEvalFix 上评估。",
+        "modernExtensionBoundary": "今天的 Codex、OpenHands、Claude Code、Cursor agent 等都在扩展这类思想，但权限管理、多人协作和生产发布安全不是 SWE-agent 原论文完整解决的问题。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Issue Input",
+            "role": "给出真实 bug 或任务描述。",
+            "beginnerExplanation": "agent 要先像程序员一样读需求。",
+            "connectsTo": "驱动仓库搜索。"
+          },
+          {
+            "label": "B",
+            "title": "ACI Commands",
+            "role": "提供查看、搜索、编辑、运行的操作集合。",
+            "beginnerExplanation": "这是 agent 的 IDE。",
+            "connectsTo": "执行代码修改。"
+          },
+          {
+            "label": "C",
+            "title": "Repository State",
+            "role": "保存文件、依赖和测试环境。",
+            "beginnerExplanation": "真实代码库会反馈修改是否正确。",
+            "connectsTo": "测试和错误日志。"
+          },
+          {
+            "label": "D",
+            "title": "Feedback Loop",
+            "role": "把测试错误和运行结果返回 agent。",
+            "beginnerExplanation": "agent 根据失败信息继续修。",
+            "connectsTo": "下一轮导航或编辑。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文报告 SWE-agent 在 SWE-bench pass@1 12.5%、HumanEvalFix 87.7%，关键证据是 ACI 设计显著改变 agent 完成真实代码任务的能力。",
+        "whatWasCompared": "比较 SWE-agent 与非交互式 LLM 或不同接口/命令设计下的表现。",
+        "whatToTrust": "可信结论是：coding agent 的界面设计和反馈闭环会显著影响结果，不能只看底层模型。",
+        "whatNotToOverclaim": "不要把 12.5% 理解成“自动程序员已成熟”。SWE-bench 真实但仍是 benchmark，生产代码还需要测试、review、安全和责任边界。"
+      },
+      "experimentReadings": [
+        {
+          "question": "更好的 agent-computer interface 是否提升自动修 bug？",
+          "setup": "在 SWE-bench 和 HumanEvalFix 上运行 SWE-agent，并分析接口设计影响。",
+          "metric": "pass@1 成功率。",
+          "result": "SWE-agent 报告 SWE-bench 12.5%、HumanEvalFix 87.7%。",
+          "conclusion": "接口和反馈循环对 coding agent 至关重要。",
+          "limitation": "SWE-bench 成功率仍有限，环境、测试和 issue 质量会影响结果。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生把这篇论文当成 AI coding 工程课：不要问“模型怎么还没全自动写软件”，先问它能不能正确看文件、做小改动、跑测试、读错误。真实工程能力就在这些细节里。",
+        "beginnerPath": [
+          "先理解 SWE-bench 是真实 issue，不是算法题。",
+          "再画 ACI 如何连接模型和 repo。",
+          "最后复盘一条失败轨迹，看它在哪一步看错或改错。"
+        ],
+        "commonMisreadings": [
+          "只把 SWE-agent 当作一个工具，而不学 ACI 思想。",
+          "只看 pass@1，不看失败轨迹。",
+          "忽略测试环境和权限边界。"
+        ],
+        "practicePrompt": "拿一个小 repo issue，规定 agent 每次只能改 20 行以内，并必须运行测试。记录它的每轮决策。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释 ACI",
+          "task": "说明 Agent-Computer Interface 和普通 prompt 有什么不同。",
+          "passCriteria": [
+            "说出 ACI 是操作接口。",
+            "说出它影响文件编辑和测试反馈。"
+          ],
+          "commonMistake": "把 ACI 说成更长的系统提示词。",
+          "sampleAnswer": "ACI 是给 agent 使用电脑的动作集合，比如查看文件、编辑、运行测试。它决定模型能怎样接触代码库。"
+        },
+        {
+          "level": "画图题",
+          "title": "画 coding agent 闭环",
+          "task": "画出 issue -> search -> edit -> test -> feedback 的流程。",
+          "passCriteria": [
+            "包含测试反馈。",
+            "包含回到下一轮编辑或搜索。"
+          ],
+          "commonMistake": "画成一次生成代码，没有反馈。",
+          "sampleAnswer": "agent 读 issue 后搜索相关文件，做局部编辑，运行测试，失败日志返回后继续定位。"
+        },
+        {
+          "level": "迁移题",
+          "title": "改进 Codex 使用方式",
+          "task": "把 SWE-agent 思想迁移到使用 Codex 的流程中。",
+          "passCriteria": [
+            "提出小步修改。",
+            "提出明确测试/验收。"
+          ],
+          "commonMistake": "让模型一次性大改全项目。",
+          "sampleAnswer": "我会先让 Codex 定位相关文件，再限制一次只改一个模块，改完必须跑对应测试并报告失败日志。"
+        }
+      ],
+      "conceptMap": [
+        "Agent-Computer Interface",
+        "SWE-bench",
+        "Repository navigation",
+        "Edit command",
+        "Test feedback"
+      ],
+      "charts": [
+        {
+          "title": "Reported benchmark scores",
+          "metric": "pass@1",
+          "unit": "%",
+          "maxValue": 100,
+          "bars": [
+            {
+              "label": "SWE-bench",
+              "value": 12.5,
+              "display": "12.5%"
+            },
+            {
+              "label": "HumanEvalFix",
+              "value": 87.7,
+              "display": "87.7%"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "自动软件工程 agent 的关键不只是更强 LLM，还包括让模型高质量使用电脑的接口。",
+        "background": "非交互式 LLM 生成补丁时常缺上下文、不能运行测试、容易大范围误改。",
+        "method": "设计 Agent-Computer Interface，把仓库导航、编辑和测试执行变成结构化动作。",
+        "experiments": "在 SWE-bench 和 HumanEvalFix 上评估，报告 pass@1 提升并分析 ACI 设计影响。",
+        "limitations": "成功率仍有限，真实生产环境还涉及安全、review、依赖和权限问题。",
+        "professorLens": "教授会要求学生看失败轨迹：agent 哪里没有看到关键文件，哪里没有跑测试，哪里误解了 issue。",
+        "verificationChecklist": [
+          "能解释 ACI。",
+          "能画出测试反馈闭环。",
+          "能分析一次失败轨迹。",
+          "能给自己的 coding agent 设计验收标准。"
+        ]
+      },
+      "nextSteps": [
+        "读一条 SWE-agent 成功轨迹。",
+        "复现一个小 bug 修复流程。",
+        "把 ACI 思想写进 Projects deep dive 的执行模板。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 90,
+        "tier": "must_read",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入每日 5 篇候选，适合 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "future architecture/reference",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "sciagentgym-scientific-tool-use",
+      "title": "SciAgentGym: Benchmarking Multi-Step Scientific Tool-use in LLM Agents",
+      "shortTitle": "SciAgentGym",
+      "authors": "Yujiong Shen, Yajie Yang, Zhiheng Xi, Binze Hu, Huayu Sha, et al.",
+      "venue": "ICML 2026 (regular) / arXiv:2602.12984",
+      "arxivId": "2602.12984",
+      "contentType": "paper",
+      "paperType": "system_method",
+      "publishedAt": "2026-02-13",
+      "updatedAt": "2026-05-01",
+      "oneSentenceTakeaway": "它把 scientific agent 的核心难点定义为长链路工具编排，而不是单步问答。",
+      "whyItMatters": "AI engineer 做 agent 时，真正值钱的是把工具、执行环境、评测和数据合成串起来；这篇刚好覆盖这些能力。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
+      ],
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "Agent",
+        "Tool Use",
+        "Benchmark",
+        "Research",
+        "Workflow"
+      ],
+      "sourceName": "arXiv:2602.12984",
+      "sourceUrl": "https://arxiv.org/abs/2602.12984",
+      "sources": [
+        {
+          "name": "arXiv:2602.12984",
+          "url": "https://arxiv.org/abs/2602.12984"
+        },
+        {
+          "name": "ICML 2026 project page",
+          "url": "https://huayusha.org/publication/SciAgentGym/"
+        }
+      ],
+      "versionQuestion": "科学研究 agent 为什么比普通 web/search agent 更难？",
+      "versions": [
+        {
+          "id": "sciagentgym-scientific-tool-use-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2026-02-13",
+          "changeSummary": "提出 SciAgentGym 环境、SciAgentBench 评测和 SciForge 数据合成方法。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "长链路工具使用失败在哪里？",
+          "evidence": "arXiv 2026-02-13 提交，摘要提到 1,780 个工具。",
+          "impactScore": 82
+        },
+        {
+          "id": "sciagentgym-scientific-tool-use-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2026-05-01",
+          "changeSummary": "项目页标记为 ICML 2026 regular accepted。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "这是否代表 agent 工具评测正在进入顶会主线？",
+          "evidence": "项目页 2026-05-01 更新，写明 ICML 2026 accepted regular。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "SciAgentGym 是从通用 agent benchmark 走向垂直科研 workflow benchmark 的代表。",
+      "showVersionLens": false,
+      "plainLanguage": {
+        "beginnerSummary": "这篇可以理解为给科学研究 agent 建了一个健身房：里面不是一道题一个答案，而是一串工具、一串步骤和一串可能失败的中间状态。",
+        "mentalModel": "把科学任务看成工具依赖图：先用哪个工具，会产出什么，再喂给哪个工具。",
+        "whyItWorks": "它用真实工具链拉长交互 horizon，让模型的规划、执行和错误恢复能力都暴露出来。",
+        "oneThingToRemember": "agent benchmark 越接近真实工作流，越能暴露短 demo 看不见的问题。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Tool orchestration",
+          "plainMeaning": "选择并安排多个工具的调用顺序。",
+          "whyItMatters": "agent 工程岗位经常要做工具路由和工作流编排。"
+        },
+        {
+          "term": "Execution infrastructure",
+          "plainMeaning": "能真实运行工具并收集结果的环境。",
+          "whyItMatters": "没有执行环境就只能评 prompt，不能评 agent。"
+        },
+        {
+          "term": "Data synthesis",
+          "plainMeaning": "自动生成训练轨迹或任务数据。",
+          "whyItMatters": "这是训练工具使用能力的重要工程手段。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "LLM agent 能不能在科研场景中稳定编排多步工具，而不是只回答知识问题？",
+        "coreMove": "构造包含 1,780 个工具的交互环境，再用 tiered benchmark 测短链和长链任务。",
+        "designChoices": [
+          {
+            "title": "真实工具环境",
+            "choice": "让 agent 直接面对可执行工具。",
+            "why": "科学 workflow 的难点在执行，不在背知识。",
+            "tradeoff": "维护成本高，工具失败会影响评测。"
+          },
+          {
+            "title": "依赖图合成轨迹",
+            "choice": "SciForge 用工具 action space 的依赖图生成训练轨迹。",
+            "why": "让训练数据更懂工具之间的逻辑关系。",
+            "tradeoff": "合成轨迹可能覆盖不到所有真实研究习惯。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "建工具库",
+            "body": "收集自然科学领域工具和执行接口。"
+          },
+          {
+            "label": "Step 2",
+            "title": "构造任务",
+            "body": "从单步到长链 workflow 分层设计问题。"
+          },
+          {
+            "label": "Step 3",
+            "title": "合成训练",
+            "body": "用依赖图生成逻辑一致的工具调用轨迹。"
+          }
+        ],
+        "optimizationLogic": "用可执行工具和分层任务把模型从会说，推向会做、会连贯地做。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "论文聚焦 scientific tool-use，不覆盖所有办公、网页或代码 agent。",
+        "modernExtensionBoundary": "可以迁移到 AI Brief：把 crawler、ranking、summarizer、validator 也看成工具链。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "Tool pool",
+            "role": "提供可执行动作",
+            "beginnerExplanation": "像给 agent 一个实验室工具箱。",
+            "connectsTo": "Task suite"
+          },
+          {
+            "label": "Block 2",
+            "title": "Task suite",
+            "role": "定义从短到长的任务",
+            "beginnerExplanation": "把难度拉成梯度。",
+            "connectsTo": "Agent execution"
+          },
+          {
+            "label": "Block 3",
+            "title": "SciForge",
+            "role": "合成训练轨迹",
+            "beginnerExplanation": "教小模型理解工具依赖。",
+            "connectsTo": "Fine-tuned agent"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "长链路任务会让成功率从 60.6% 掉到 30.9%，说明 horizon 是关键难点。",
+        "whatWasCompared": "不同 horizon 的科学工具任务、强模型和经过 SciForge 训练的模型。",
+        "whatToTrust": "可信的是工具数量、horizon 趋势和训练轨迹合成思路。",
+        "whatNotToOverclaim": "不要把科学工具成功直接外推到所有 agent 产品。"
+      },
+      "experimentReadings": [
+        {
+          "question": "模型在长工具链上是否持续稳定？",
+          "setup": "1,780 工具，四个自然科学领域，分层任务。",
+          "metric": "Success rate",
+          "result": "摘要报告 GPT-5 从 60.6% 降到 30.9%，SciAgent-8B 可超过更大模型。",
+          "conclusion": "工具依赖图训练能提高长链路工具使用能力。",
+          "limitation": "科学工具域特殊，工程产品迁移需要重建工具库和评分器。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "这篇适合作为 agent workflow 工程课。不要只看模型分数，要看它如何把工具执行变成可训练、可评测的系统。",
+        "beginnerPath": [
+          "读 abstract 看工具和 horizon。",
+          "看 SciForge 如何合成轨迹。",
+          "对照自己的项目画工具依赖图。"
+        ],
+        "commonMisreadings": [
+          "把工具数量当成唯一贡献。",
+          "忽略执行基础设施比 prompt 更重要。"
+        ],
+        "practicePrompt": "把 AI Brief 每日更新拆成 6 个工具节点，标出依赖和失败重试策略。"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 SciAgentGym 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "task -> tool dependency graph -> agent execution -> score -> SciForge trajectories。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "长链任务中早期工具输出错误会级联；指标可以记录每步 tool success 和最终 task success。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "选两个本地脚本作为 tools，设计一个 3 步 agent workflow benchmark。",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "展示 tool schema、任务、执行日志、评分和一次失败分析。"
+        }
+      ],
+      "conceptMap": [
+        "tool-use -> execution infrastructure -> long-horizon benchmark",
+        "dependency graph -> synthetic trajectories -> fine-tuning"
+      ],
+      "charts": [
+        {
+          "title": "长链路带来的成功率下降",
+          "metric": "success rate",
+          "unit": "%",
+          "maxValue": 100,
+          "bars": [
+            {
+              "label": "短 horizon",
+              "value": 60.6,
+              "display": "60.6%"
+            },
+            {
+              "label": "长 horizon",
+              "value": 30.9,
+              "display": "30.9%"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "科研 agent 的瓶颈是多步工具编排和执行可靠性，不能用单轮问答 benchmark 判断。",
+        "background": "通用 agent benchmark 常无法覆盖科研任务的工具依赖和证据要求。",
+        "method": "论文构建 SciAgentGym、SciAgentBench，并用 SciForge 生成逻辑感知的训练轨迹。",
+        "experiments": "核心实验看 horizon 变长后的成功率下降，以及合成训练是否带来迁移收益。",
+        "limitations": "工具维护、领域覆盖和评分鲁棒性都会限制 benchmark 长期生命力。",
+        "professorLens": "你要学的是 benchmark 设计：任务、工具、执行、评分、训练数据如何闭环。",
+        "verificationChecklist": [
+          "能解释为什么 1,780 工具不是噱头",
+          "能说清 horizon 为什么让 agent 失败",
+          "能把 AI Brief pipeline 画成工具依赖图"
+        ]
+      },
+      "nextSteps": [
+        "把 AI Brief refresh 流程写成工具依赖图。",
+        "为 Articles refresh 加候选来源评分器。"
+      ],
+      "templateDecision": {
+        "suggestedPaperType": "benchmark_evaluation",
+        "activePaperType": "system_method",
+        "confidence": "medium",
+        "reason": "这篇文章题材更像专用模板，但当前深度模块还不完整，先用通用系统论文模板保证不瞎编。",
+        "requiredModules": [
+          "paperQuestion",
+          "termPrimer",
+          "claimMap",
+          "experimentMatrix",
+          "resultsAnalysis",
+          "criticalReview",
+          "applicationDeploymentTranslation",
+          "interviewCard"
+        ],
+        "fallbackReason": "benchmark_evaluation 模板缺少完整结构化模块；生成器需要补齐后才能切换。"
+      },
+      "qualityDecision": {
+        "qualityScore": 85,
+        "tier": "strong",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "有可迁移的系统架构或工程设计思路。",
+          "时间足够新，适合每日更新栏目。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入每日 5 篇候选，适合 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-21T00:50:00.749Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "future architecture/reference",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "browsecomp-browsing-agents",
+      "title": "BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agents",
+      "shortTitle": "BrowseComp",
+      "authors": "Jason Wei, Zhiqing Sun, Spencer Papay, Scott McKinney, Jeffrey Han, Isa Fulford, Hyung Won Chung, Alex Tachard Passos, William Fedus, Amelia Glaese",
+      "venue": "OpenAI / arXiv 2025",
+      "arxivId": "2504.12516",
+      "contentType": "paper",
+      "paperType": "system_method",
+      "publishedAt": "2025-04-16",
+      "updatedAt": "2025-04-16",
+      "oneSentenceTakeaway": "它专门测 browsing agent 找难找信息的能力，不再让联网模型靠简单搜索题刷高分。",
+      "whyItMatters": "AI Brief 未来新闻和论文发现也需要 browsing agent；这篇能帮你理解信息搜索型 agent 怎么评。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
+      ],
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "Agent",
+        "Benchmark",
+        "Research",
+        "Workflow"
+      ],
+      "sourceName": "arXiv:2504.12516",
+      "sourceUrl": "https://arxiv.org/abs/2504.12516",
+      "sources": [
+        {
+          "name": "arXiv:2504.12516",
+          "url": "https://arxiv.org/abs/2504.12516"
+        },
+        {
+          "name": "OpenAI BrowseComp release",
+          "url": "https://openai.com/index/browsecomp/"
+        }
+      ],
+      "versionQuestion": "browsing agent 的核心能力到底是搜索速度，还是持久寻找和交叉验证？",
+      "versions": [
+        {
+          "id": "browsecomp-browsing-agents-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2025-04-16",
+          "changeSummary": "提出 1,266 个需要持续浏览的短答案问题。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "为什么 SimpleQA 类 benchmark 对联网模型太简单？",
+          "evidence": "arXiv 2025-04-16 提交。",
+          "impactScore": 82
+        },
+        {
+          "id": "browsecomp-browsing-agents-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2025-04-16",
+          "changeSummary": "OpenAI release 将其定位为 browsing agents benchmark。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "Deep Research 类 agent 为什么在这类任务上更有优势？",
+          "evidence": "OpenAI 页面说明评测了 GPT-4o、GPT-4.5、o1、带浏览模型和 Deep Research。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "BrowseComp 是从知识问答走向信息搜索 agent 的评测迁移。",
+      "showVersionLens": false,
+      "plainLanguage": {
+        "beginnerSummary": "普通搜索题像问今天北京天气；BrowseComp 像让你从几十个网页里找一个很冷门但可验证的事实。",
+        "mentalModel": "它是 browsing agent 的编程比赛：答案短，但找到答案需要耐心、跳转和证据链。",
+        "whyItWorks": "题目要求 hard-to-find、entangled information，让简单一次搜索不够。",
+        "oneThingToRemember": "browsing agent 的价值在于 persistence 和 evidence，不只是联网。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Browsing agent",
+          "plainMeaning": "能自己打开网页、搜索、阅读并综合证据的 agent。",
+          "whyItMatters": "新闻/论文自动发现都会用到。"
+        },
+        {
+          "term": "Entangled information",
+          "plainMeaning": "分散在多个来源里的交织信息。",
+          "whyItMatters": "真实 research 往往不是一个网页直接给答案。"
+        },
+        {
+          "term": "Reference answer",
+          "plainMeaning": "可自动验证的标准短答案。",
+          "whyItMatters": "让开放浏览任务也能客观评分。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "如何评估 agent 是否真的会在互联网上坚持寻找难找信息？",
+        "coreMove": "构造 1,266 个短答案但难搜索的问题，并开源到 simple-evals。",
+        "designChoices": [
+          {
+            "title": "短答案",
+            "choice": "让答案容易自动验证。",
+            "why": "避免长答案主观评分干扰。",
+            "tradeoff": "牺牲了真实用户长报告需求。"
+          },
+          {
+            "title": "难找信息",
+            "choice": "问题需要多站点浏览和 pivot。",
+            "why": "更能测 agent persistence。",
+            "tradeoff": "题目维护会受网页变化影响。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "提出问题",
+            "body": "给出一个难以直接搜索的事实问题。"
+          },
+          {
+            "label": "Step 2",
+            "title": "浏览寻找",
+            "body": "agent 多次搜索、打开网页、改变关键词。"
+          },
+          {
+            "label": "Step 3",
+            "title": "提交短答案",
+            "body": "答案与 reference answer 对比评分。"
+          }
+        ],
+        "optimizationLogic": "降低答案评分难度，把难度集中到信息寻找过程。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "它不测长文写作、用户澄清和复杂行动。",
+        "modernExtensionBoundary": "可以扩展到 AI Brief：自动发现 10 条高信号新闻时要记录搜索路径和证据。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "Question set",
+            "role": "定义难找事实",
+            "beginnerExplanation": "像一组搜索侦探题。",
+            "connectsTo": "Browsing loop"
+          },
+          {
+            "label": "Block 2",
+            "title": "Browsing loop",
+            "role": "搜索和跳转",
+            "beginnerExplanation": "agent 需要不断换策略。",
+            "connectsTo": "Evidence"
+          },
+          {
+            "label": "Block 3",
+            "title": "Reference answer",
+            "role": "自动验收",
+            "beginnerExplanation": "短答案让评分清楚。",
+            "connectsTo": "Score"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "BrowseComp 有 1,266 个问题，专测 hard-to-find online information。",
+        "whatWasCompared": "无浏览模型、带浏览模型和 Deep Research 等 browsing agent。",
+        "whatToTrust": "可信的是任务设计和 open-source benchmark 方向。",
+        "whatNotToOverclaim": "不要把它等同真实研究报告质量；它故意避开长答案和歧义处理。"
+      },
+      "experimentReadings": [
+        {
+          "question": "哪些 agent 能持续浏览并找到难找事实？",
+          "setup": "1,266 个 browsing competition 问题，答案短且可验证。",
+          "metric": "Answer accuracy",
+          "result": "OpenAI release 报告 Deep Research 类型模型在这类任务上更有效。",
+          "conclusion": "持久浏览和证据合成是独立能力。",
+          "limitation": "网页会变化，benchmark 需要维护。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "做 AI Brief 新闻源时，你需要的是 BrowseComp 思维：不是抓很多，而是找到难找但重要的信息。",
+        "beginnerPath": [
+          "先理解 1,266 题是什么。",
+          "再看为什么答案短。",
+          "最后设计 3 个 AI 行业 browsing 题。"
+        ],
+        "commonMisreadings": [
+          "以为有浏览器工具就等于 browsing agent。",
+          "忽略网页变化对 benchmark 的影响。"
+        ],
+        "practicePrompt": "设计一个 AI 新闻 browsing 任务：找某公司最新论文的官方发布时间和代码链接。"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 BrowseComp 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "question -> search/browser loop -> evidence snippets -> short answer -> reference check。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "agent 可能停在第一个相似网页；指标可以看搜索 pivot 次数和最终 evidence source。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "写 5 个 AI industry hard-to-find 问题，并保存答案来源。",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "展示问题、搜索路径、证据链接和标准答案。"
+        }
+      ],
+      "conceptMap": [
+        "browsing agent -> persistence -> reference answer",
+        "daily news discovery -> source evidence -> confidence"
+      ],
+      "charts": [
+        {
+          "title": "BrowseComp 题量",
+          "metric": "question count",
+          "unit": "items",
+          "maxValue": 1266,
+          "bars": [
+            {
+              "label": "BrowseComp",
+              "value": 1266,
+              "display": "1,266"
+            },
+            {
+              "label": "AI Brief daily target",
+              "value": 10,
+              "display": "10 条"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "联网不是 browsing agent，能坚持寻找、变换策略并给出可验证答案才是。",
+        "background": "简单事实问答已经被带浏览模型快速饱和，需要更难的信息搜索评测。",
+        "method": "构建短答案、难搜索、可验证的问题集。",
+        "experiments": "比较不同模型/agent 在 browsing 问题上的表现。",
+        "limitations": "短答案设定不覆盖复杂报告和主观分析。",
+        "professorLens": "这篇适合你学习信息获取 agent 的 evaluation design。",
+        "verificationChecklist": [
+          "能解释 BrowseComp 和 SimpleQA 差别",
+          "能设计一个 hard-to-find 问题",
+          "能说明 reference answer 为什么重要"
+        ]
+      },
+      "nextSteps": [
+        "为 News/Articles discovery 记录 search path。",
+        "把 source confidence 纳入 Home 推荐。"
+      ],
+      "templateDecision": {
+        "suggestedPaperType": "benchmark_evaluation",
+        "activePaperType": "system_method",
+        "confidence": "medium",
+        "reason": "这篇文章题材更像专用模板，但当前深度模块还不完整，先用通用系统论文模板保证不瞎编。",
+        "requiredModules": [
+          "paperQuestion",
+          "termPrimer",
+          "claimMap",
+          "experimentMatrix",
+          "resultsAnalysis",
+          "criticalReview",
+          "applicationDeploymentTranslation",
+          "interviewCard"
+        ],
+        "fallbackReason": "benchmark_evaluation 模板缺少完整结构化模块；生成器需要补齐后才能切换。"
+      },
+      "qualityDecision": {
+        "qualityScore": 85,
+        "tier": "strong",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "包含评测或 benchmark 视角，能训练判断模型结果是否可信。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入每日 5 篇候选，适合 deep dive。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-21T00:50:00.749Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "future architecture/reference",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "mem0-production-agent-memory",
+      "title": "Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory",
+      "shortTitle": "Mem0",
+      "authors": "Prateek Chhikara, Dev Khant, Saket Aryan, Taranjeet Singh, Deshraj Yadav",
+      "venue": "arXiv 2025 / production agent memory",
+      "arxivId": "2504.19413",
+      "contentType": "paper",
+      "paperType": "agent_architecture",
+      "publishedAt": "2025-04-28",
+      "updatedAt": "2025-04-28",
+      "oneSentenceTakeaway": "它把 agent memory 讲成生产系统问题：动态抽取、整合、检索，还要同时控制延迟和 token 成本。",
+      "whyItMatters": "memory 是 agent 产品很快会问到的能力；这篇比抽象 memory 讨论更贴近工程落地。",
+      "targetAudience": [
+        "AI engineer 求职准备",
+        "Agent / RAG 系统开发者"
+      ],
+      "readingTime": "40-55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 88,
+      "readabilityScore": 78,
+      "actionabilityScore": 84,
+      "confidenceScore": 88,
+      "difficulty": "medium-hard",
+      "recommendedAction": "精读方法和评测设计，把它转成自己的 agent 项目检查表。",
+      "tags": [
+        "Agent",
+        "Memory",
+        "RAG",
+        "Open Source"
+      ],
+      "sourceName": "arXiv:2504.19413",
+      "sourceUrl": "https://arxiv.org/abs/2504.19413",
+      "sources": [
+        {
+          "name": "arXiv:2504.19413",
+          "url": "https://arxiv.org/abs/2504.19413"
+        }
+      ],
+      "versionQuestion": "生产 agent memory 应该如何在准确率、延迟和 token 成本之间取舍？",
+      "versions": [
+        {
+          "id": "mem0-production-agent-memory-v1",
+          "label": "初版问题定义",
+          "versionType": "paper",
+          "submittedAt": "2025-04-28",
+          "changeSummary": "提出 Mem0 和 graph-memory variant。",
+          "whyChanged": "先把真实 agent 系统中最难被普通 benchmark 覆盖的问题定义出来。",
+          "readerQuestion": "为什么 full-context 不是长期方案？",
+          "evidence": "arXiv 2025-04-28 提交。",
+          "impactScore": 82
+        },
+        {
+          "id": "mem0-production-agent-memory-tracked",
+          "label": "当前跟踪版本",
+          "versionType": "paper",
+          "submittedAt": "2025-04-28",
+          "changeSummary": "当前版本报告 LOCOMO 上多类 baseline 对比和 latency/token 成本收益。",
+          "whyChanged": "这一版更接近 AI Brief 要追踪的工程/求职价值。",
+          "readerQuestion": "structured persistent memory 是否值得进入生产架构？",
+          "evidence": "摘要报告 p95 latency 降低 91%，token cost 节省超过 90%。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "Mem0 是生产 memory 的工程样板，可与 LongMemEval-V2/MemoryArena 的评测视角一起看。",
+      "showVersionLens": false,
+      "plainLanguage": {
+        "beginnerSummary": "不要把 memory 想成把所有聊天记录塞回 prompt。Mem0 更像一个会整理重点、合并重复、按需取回的长期笔记系统。",
+        "mentalModel": "memory pipeline = 抽取重要信息 -> 合并进长期记忆 -> 查询时取回少量相关记忆。",
+        "whyItWorks": "它减少上下文噪声，同时保留跨会话一致性。",
+        "oneThingToRemember": "生产 memory 先看准确率，再看延迟和成本。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Salient information",
+          "plainMeaning": "对未来有用的关键信息。",
+          "whyItMatters": "memory 不该保存所有 token。"
+        },
+        {
+          "term": "Graph memory",
+          "plainMeaning": "用关系图保存实体和事件之间的连接。",
+          "whyItMatters": "适合多跳和时间关系。"
+        },
+        {
+          "term": "LOCOMO",
+          "plainMeaning": "长期对话记忆评测。",
+          "whyItMatters": "常用来检查跨会话一致性。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "如何让长期对话 agent 既记得住，又不被成本和延迟拖垮？",
+        "coreMove": "动态抽取、整合、检索关键信息，并用 graph memory 捕捉关系。",
+        "designChoices": [
+          {
+            "title": "抽取而非全量上下文",
+            "choice": "只保存未来可能有用的信息。",
+            "why": "降低 token 成本和噪声。",
+            "tradeoff": "抽取错了会永久丢失细节。"
+          },
+          {
+            "title": "图结构增强",
+            "choice": "用关系表示多实体、多事件联系。",
+            "why": "帮助多跳记忆问题。",
+            "tradeoff": "图构建质量依赖 LLM 判断。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "Step 1",
+            "title": "Memory extraction",
+            "body": "从对话中识别重要事实和偏好。"
+          },
+          {
+            "label": "Step 2",
+            "title": "Consolidation",
+            "body": "合并重复或冲突记忆，维护长期状态。"
+          },
+          {
+            "label": "Step 3",
+            "title": "Retrieval",
+            "body": "在新问题到来时取回相关记忆。"
+          }
+        ],
+        "optimizationLogic": "用结构化记忆降低长上下文成本，同时提升多跳/时间问题正确率。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "论文主要围绕 conversational memory，不覆盖所有 agent action memory。",
+        "modernExtensionBoundary": "可扩展到 coding agent：保存项目约定、用户偏好、常见命令和失败恢复。",
+        "blocks": [
+          {
+            "label": "Block 1",
+            "title": "Extractor",
+            "role": "挑出重要信息",
+            "beginnerExplanation": "像读聊天记录做笔记。",
+            "connectsTo": "Consolidator"
+          },
+          {
+            "label": "Block 2",
+            "title": "Consolidator",
+            "role": "整理长期记忆",
+            "beginnerExplanation": "把重复和冲突内容合并。",
+            "connectsTo": "Retriever"
+          },
+          {
+            "label": "Block 3",
+            "title": "Retriever",
+            "role": "按需取回",
+            "beginnerExplanation": "回答时只拿相关记忆。",
+            "connectsTo": "Agent response"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "Mem0 相对 OpenAI 在 LLM-as-a-Judge 指标上提升 26%，p95 latency 降 91%，token cost 省 90%+。",
+        "whatWasCompared": "memory-augmented systems、RAG、full-context、开源/商业 memory 方案等六类 baseline。",
+        "whatToTrust": "可信的是 accuracy-latency-cost 三维对比。",
+        "whatNotToOverclaim": "LOCOMO 不等于所有 agent memory 场景，不能替代 action memory benchmark。"
+      },
+      "experimentReadings": [
+        {
+          "question": "结构化长期记忆是否比 full-context/RAG 更适合多会话对话？",
+          "setup": "在 LOCOMO 上比较六类 baseline。",
+          "metric": "LLM-as-a-Judge、latency、token cost",
+          "result": "26% relative improvement，p95 latency 低 91%，token cost 省 90%+。",
+          "conclusion": "memory pipeline 可以同时提高质量并降低部署成本。",
+          "limitation": "LLM-as-a-Judge 和特定数据集仍有偏差。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "你要学的是系统取舍：保存什么、不保存什么、什么时候取回、怎么证明它值得。",
+        "beginnerPath": [
+          "先读指标：质量、延迟、成本。",
+          "再看 graph memory。",
+          "最后设计一个自己的 memory schema。"
+        ],
+        "commonMisreadings": [
+          "以为 memory 就是向量检索。",
+          "忽略 memory 更新和冲突处理。"
+        ],
+        "practicePrompt": "为 AI Brief 用户偏好设计 5 类 memory：主题、难度、来源、项目方向、历史忽略项。"
+      },
+      "verificationTasks": [
+        {
+          "level": "入门",
+          "title": "画出最小系统图",
+          "task": "不用看原文，把 Mem0 的输入、核心模块、输出、评分方式画成 4 个框。",
+          "passCriteria": [
+            "能说清楚每个框的数据是什么",
+            "能解释为什么这个设计比普通 prompt demo 更能暴露真实问题"
+          ],
+          "commonMistake": "只复述论文摘要，没有画出数据如何流动。",
+          "sampleAnswer": "conversation -> extractor -> memory store/graph -> retriever -> compact context -> response。"
+        },
+        {
+          "level": "进阶",
+          "title": "找一个失败模式",
+          "task": "从论文里挑一个失败模式，解释它为什么会在真实产品里发生，并给出一个可观测指标。",
+          "passCriteria": [
+            "失败原因不是泛泛地说模型不够强",
+            "指标能通过日志、测试或 benchmark 自动检查"
+          ],
+          "commonMistake": "把失败归因到模型大小，而不是环境、工具、记忆、评测或数据流设计。",
+          "sampleAnswer": "抽取器可能把临时偏好写成永久记忆；指标可看过期/冲突记忆比例。"
+        },
+        {
+          "level": "作品集",
+          "title": "做一个 30 分钟复现练习",
+          "task": "实现一个最小 memory JSON store，支持 add/update/retrieve 三个操作。",
+          "passCriteria": [
+            "有固定输入样例",
+            "有明确 pass/fail 标准",
+            "能输出一段可放进作品集 README 的分析"
+          ],
+          "commonMistake": "只跑一个 demo，没有保存轨迹、失败日志和评价标准。",
+          "sampleAnswer": "展示 schema、检索示例、冲突处理和延迟记录。"
+        }
+      ],
+      "conceptMap": [
+        "memory extraction -> consolidation -> retrieval",
+        "graph memory -> multi-hop recall -> production cost"
+      ],
+      "charts": [
+        {
+          "title": "Mem0 报告的生产收益",
+          "metric": "relative improvement/saving",
+          "unit": "%",
+          "maxValue": 100,
+          "bars": [
+            {
+              "label": "LLM Judge",
+              "value": 26,
+              "display": "+26%"
+            },
+            {
+              "label": "p95 latency",
+              "value": 91,
+              "display": "-91%"
+            },
+            {
+              "label": "token cost",
+              "value": 90,
+              "display": ">-90%"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "agent memory 的产品化价值来自准确率、延迟和成本三者同时成立。",
+        "background": "长上下文能缓解遗忘，但成本高、噪声大，不适合所有生产场景。",
+        "method": "Mem0 构建抽取、整合、检索 pipeline，并加入 graph memory variant。",
+        "experiments": "用 LOCOMO 和多类 baseline 检查质量、延迟和 token 成本。",
+        "limitations": "memory 抽取错误、隐私合规和图结构质量仍是生产风险。",
+        "professorLens": "这篇适合你学 memory engineering，而不是 memory 玄学。",
+        "verificationChecklist": [
+          "能画出抽取-整合-检索流程",
+          "能解释为什么 full-context 贵",
+          "能提出一个 memory 删除策略"
+        ]
+      },
+      "nextSteps": [
+        "把 AI Brief 用户偏好设计成 memory schema。",
+        "评估是否需要 graph memory 还是普通 JSON 足够。"
+      ],
+      "templateDecision": {
+        "suggestedPaperType": "agent_architecture",
+        "activePaperType": "agent_architecture",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "methodFlow",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 76,
+        "tier": "strong",
+        "selectionReason": "先判定为高质量/高岗位相关文章，再为它选择解读模板。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "进入每日 5 篇候选，适合 deep dive。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-21T00:50:00.749Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "foundation/background",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "react-reasoning-acting",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "shortTitle": "ReAct",
+      "authors": "Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao",
+      "venue": "ICLR 2023 / Princeton + Google Research",
+      "arxivId": "2210.03629",
+      "contentType": "paper",
+      "publishedAt": "2022-10-06",
+      "updatedAt": "2023-03-10",
+      "oneSentenceTakeaway": "ReAct 把“想”和“做”交替起来：模型先写出下一步思考，再调用工具或环境动作，再根据观察结果更新计划。",
+      "whyItMatters": "今天很多工具型 agent、浏览器 agent、代码 agent 都绕不开这个基本循环：Thought -> Action -> Observation。它让学生理解 agent 不是一次性回答，而是带反馈的执行过程。",
+      "targetAudience": [
+        "AI 初学者",
+        "Agent 产品学习者",
+        "想做工具调用应用的开发者"
+      ],
+      "readingTime": "55 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 95,
+      "readabilityScore": 82,
+      "actionabilityScore": 93,
+      "confidenceScore": 94,
+      "difficulty": "中等：需要理解 prompt、工具调用和少量 benchmark",
+      "recommendedAction": "精读架构循环并自己复刻一个小型搜索 agent",
+      "tags": [
+        "Agent",
+        "Workflow",
+        "Prompt",
+        "Research"
+      ],
+      "sourceName": "arXiv / ICLR 2023",
+      "sourceUrl": "https://arxiv.org/abs/2210.03629",
+      "sources": [
+        {
+          "name": "arXiv: ReAct",
+          "url": "https://arxiv.org/abs/2210.03629"
+        },
+        {
+          "name": "Google Research Blog",
+          "url": "https://research.google/blog/react-synergizing-reasoning-and-acting-in-language-models/"
+        }
+      ],
+      "versionQuestion": "为什么模型不能只“想清楚”，还必须边做边观察？",
+      "versions": [
+        {
+          "id": "v1",
+          "label": "arXiv v1",
+          "submittedAt": "2022-10-06",
+          "versionType": "initial preprint",
+          "changeSummary": "提出 interleaved reasoning/action 的基本形式。",
+          "whyChanged": "当时 CoT 和行动规划通常分开研究，ReAct 把二者放进同一条轨迹。",
+          "readerQuestion": "模型什么时候应该思考，什么时候应该查工具？",
+          "evidence": "作者在知识问答和交互式决策任务中比较 ReAct、CoT 和 acting-only。",
+          "impactScore": 90
+        },
+        {
+          "id": "v3",
+          "label": "arXiv v3 / ICLR revision",
+          "submittedAt": "2023-03-10",
+          "versionType": "conference revision",
+          "changeSummary": "补充和整理实验、案例与论文表达，使方法更适合作为 ICLR 论文引用。",
+          "whyChanged": "ReAct 迅速成为 agent 提示范式，需要更清楚说明可解释性和失败模式。",
+          "readerQuestion": "这个循环是不是只是 prompt 模板，还是一种 agent 设计模式？",
+          "evidence": "最终版本强调 reasoning traces 帮助计划，actions 帮助获取新信息。",
+          "impactScore": 95
+        }
+      ],
+      "versionRelation": "v1 给出 Thought/Action/Observation 的核心想法；v3 让它成为更稳定的论文形态。学习时版本变化不是重点，重点是理解“行动会改变下一步思考”。",
+      "plainLanguage": {
+        "beginnerSummary": "普通问答像“一口气写答案”。ReAct 像一个会边查边想的学生：先说我下一步要查什么，然后真的去查，拿到结果后再决定下一步。",
+        "mentalModel": "把 ReAct 想成打游戏或做实验：你不能只在脑子里想完整路线，必须每走一步看环境反馈，再调整计划。",
+        "whyItWorks": "LLM 的内部知识会过期或不完整。Action 让模型能接触外部事实，Observation 让模型把新事实放回推理链，Thought 则负责维护目标和解释下一步。",
+        "oneThingToRemember": "ReAct 的精髓不是三个英文标签，而是“推理和行动互相校正”。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Chain-of-thought",
+          "plainMeaning": "模型把中间推理过程写出来，而不是直接给最终答案。",
+          "whyItMatters": "ReAct 继承了推理链，但增加了外部行动。"
+        },
+        {
+          "term": "Tool use",
+          "plainMeaning": "模型调用搜索、计算器、数据库、代码执行等外部能力。",
+          "whyItMatters": "Action 部分通常就是工具调用或环境动作。"
+        },
+        {
+          "term": "Observation",
+          "plainMeaning": "工具或环境返回给模型的新信息。",
+          "whyItMatters": "没有观察结果，模型就无法判断上一动作是否有效。"
+        },
+        {
+          "term": "Trajectory",
+          "plainMeaning": "一次任务中模型所有思考、动作和反馈的完整轨迹。",
+          "whyItMatters": "评估 agent 时常常要看整条轨迹，而不只是最终答案。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "能不能让语言模型像人一样边思考边行动，而不是把推理和执行拆成两个互不沟通的步骤？",
+        "coreMove": "把输出格式改成 Thought -> Action -> Observation 的循环，让思考指导行动，行动返回的信息再修正思考。",
+        "designChoices": [
+          {
+            "title": "显式思考轨迹",
+            "choice": "让模型写出当前判断和下一步计划。",
+            "why": "这让模型更容易保持目标，也让人类更容易检查它为什么这么做。",
+            "tradeoff": "思考文本可能冗长，也可能出现看似合理但实际错误的解释。"
+          },
+          {
+            "title": "环境动作",
+            "choice": "让模型在需要事实或状态时调用外部工具。",
+            "why": "外部工具可以补足模型记忆和静态知识的缺陷。",
+            "tradeoff": "工具结果可能有噪声，动作选择错误会把任务带偏。"
+          },
+          {
+            "title": "观察反馈",
+            "choice": "每次行动后把 Observation 放回上下文。",
+            "why": "模型可以根据真实反馈更新计划，而不是沿着错误假设继续写。",
+            "tradeoff": "上下文会越来越长，需要控制信息选择。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "读任务",
+            "body": "模型先理解目标、约束和需要外部信息的地方。"
+          },
+          {
+            "label": "02",
+            "title": "写 Thought",
+            "body": "模型说明当前判断和下一步行动理由。"
+          },
+          {
+            "label": "03",
+            "title": "执行 Action",
+            "body": "模型调用搜索、数据库、环境动作或其他工具。"
+          },
+          {
+            "label": "04",
+            "title": "接收 Observation",
+            "body": "工具结果回到上下文，成为下一轮推理材料。"
+          },
+          {
+            "label": "05",
+            "title": "迭代到答案",
+            "body": "重复循环，直到能给出可验证结论或完成任务。"
+          }
+        ],
+        "optimizationLogic": "ReAct 优化的是任务控制结构，而不是训练一个新模型。它用 prompt 让模型把内部推理、外部动作和反馈放进同一个闭环，从而降低瞎编、偏航和不可解释行动的概率。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文主要讨论语言模型如何用交替式 reasoning/action 解决知识问答和交互式决策任务。",
+        "modernExtensionBoundary": "后来的 browser agent、coding agent、多工具 planner、memory agent 都可以借鉴 ReAct，但工具协议、权限控制和长期记忆不是原论文全部内容。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "User Goal",
+            "role": "给出任务目标和约束。",
+            "beginnerExplanation": "比如“查一个事实并解释原因”，这是循环的起点。",
+            "connectsTo": "触发第一轮 Thought。"
+          },
+          {
+            "label": "B",
+            "title": "Thought",
+            "role": "维护计划和解释下一步。",
+            "beginnerExplanation": "模型先决定自己缺什么信息或该做什么动作。",
+            "connectsTo": "选择 Action。"
+          },
+          {
+            "label": "C",
+            "title": "Action",
+            "role": "调用工具或操作环境。",
+            "beginnerExplanation": "这一步把模型从纯文本回答带到外部世界。",
+            "connectsTo": "产生 Observation。"
+          },
+          {
+            "label": "D",
+            "title": "Observation",
+            "role": "把外部结果反馈给模型。",
+            "beginnerExplanation": "工具返回的事实会改变下一步判断。",
+            "connectsTo": "回到下一轮 Thought。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文的证据重点不是一个单一分数，而是 ReAct 在知识密集问答和交互环境中比只思考或只行动更稳，并且轨迹更容易被人检查。",
+        "whatWasCompared": "比较对象包括 chain-of-thought、acting-only 和 ReAct，在 HotpotQA、FEVER、ALFWorld、WebShop 等任务上观察表现。",
+        "whatToTrust": "可信结论是：需要外部事实或环境反馈的任务中，把推理和动作交替能提升可控性与可解释性。",
+        "whatNotToOverclaim": "不要说 ReAct 解决了所有 agent 问题。它不能自动保证工具选择正确、事实一定真实或长任务不会失控。"
+      },
+      "experimentReadings": [
+        {
+          "question": "交替式推理和行动是否比单纯 CoT 更适合需要外部信息的任务？",
+          "setup": "作者让模型在问答和交互环境中分别使用不同提示策略。",
+          "metric": "任务成功率、答案正确性、轨迹可解释性。",
+          "result": "ReAct 在多类任务中表现更稳，尤其适合需要边查边推理的场景。",
+          "conclusion": "外部行动和内部推理互相补强。",
+          "limitation": "prompt 模式依赖工具质量和上下文设计，复杂长程任务仍可能循环或偏航。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生先手写一个 ReAct 轨迹：不要上来写代码，先模拟一个人如何查资料。你会发现每个 Action 都应该服务于一个明确 Thought，每个 Observation 都应该改变下一步，而不是机械地搜来搜去。",
+        "beginnerPath": [
+          "读摘要，抓住 reasoning/action 分开研究的问题。",
+          "画出 Thought -> Action -> Observation 循环。",
+          "找一个网页搜索问题，手工写 3 轮 ReAct 轨迹。"
+        ],
+        "commonMisreadings": [
+          "把 ReAct 当成固定 prompt 模板，而不是反馈控制结构。",
+          "以为写了 Thought 就一定更真实。",
+          "忽略 Observation 的筛选和工具错误。"
+        ],
+        "practicePrompt": "用 ReAct 格式回答“某个开源项目是否值得 deep dive”，每轮只能查一个信息源，并说明 Observation 如何改变你的判断。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释 ReAct 的三段循环",
+          "task": "用自己的话解释 Thought、Action、Observation 各自作用。",
+          "passCriteria": [
+            "能说出 Thought 是计划/推理。",
+            "能说出 Action 是外部工具或环境操作。",
+            "能说出 Observation 会反馈并改变下一步。"
+          ],
+          "commonMistake": "把 Observation 当成模型自己编的内容。",
+          "sampleAnswer": "Thought 负责决定下一步，Action 负责去外部世界拿信息或改变状态，Observation 是外部返回结果，下一轮 Thought 要基于它修正计划。"
+        },
+        {
+          "level": "画图题",
+          "title": "画一个两轮 ReAct 轨迹",
+          "task": "为一个需要搜索的问题画出两轮 Thought/Action/Observation。",
+          "passCriteria": [
+            "每轮 Action 都有明确目的。",
+            "第二轮 Thought 使用了第一轮 Observation。"
+          ],
+          "commonMistake": "每轮都重复搜索同一个关键词，没有利用反馈。",
+          "sampleAnswer": "第一轮查官方文档拿事实，第二轮根据事实查 benchmark 或案例，最后综合回答。"
+        },
+        {
+          "level": "迁移题",
+          "title": "识别 ReAct 失败模式",
+          "task": "列出一个 ReAct agent 可能失败的场景，并给出修复办法。",
+          "passCriteria": [
+            "提到工具结果错误或上下文过长。",
+            "给出校验、停止条件或信息筛选办法。"
+          ],
+          "commonMistake": "认为多循环一定更好。",
+          "sampleAnswer": "如果搜索结果互相冲突，agent 可能沿错误事实继续推理。修复方式是要求至少两个来源一致，并在结论中标注不确定性。"
+        }
+      ],
+      "conceptMap": [
+        "Thought",
+        "Action",
+        "Observation",
+        "Tool use",
+        "Feedback loop"
+      ],
+      "charts": [
+        {
+          "title": "Agent loop components",
+          "metric": "Visible components",
+          "unit": "count",
+          "maxValue": 3,
+          "bars": [
+            {
+              "label": "CoT only",
+              "value": 1,
+              "display": "reasoning"
+            },
+            {
+              "label": "Act only",
+              "value": 1,
+              "display": "actions"
+            },
+            {
+              "label": "ReAct",
+              "value": 3,
+              "display": "thought + action + observation"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "ReAct 的论文主张是：语言模型应该把推理和行动交替生成，让计划和外部反馈互相校正。",
+        "background": "在 ReAct 前，CoT 更偏内部推理，行动规划更偏外部环境；二者割裂会导致模型要么想得多但拿不到新事实，要么行动多但缺乏解释。",
+        "method": "用提示格式约束模型输出 Thought、Action、Observation 循环，在需要时调用外部知识库或环境动作。",
+        "experiments": "论文在知识问答和交互决策任务中比较 ReAct 与 CoT、acting-only 等基线，观察正确率和轨迹质量。",
+        "limitations": "ReAct 依赖提示、工具和上下文管理；长任务可能循环，工具错误可能污染后续推理。",
+        "professorLens": "从教授视角看，ReAct 是 agent 控制论入门：你要学的是反馈闭环，而不是背 prompt 标签。",
+        "verificationChecklist": [
+          "能画出循环图。",
+          "能解释为什么 Action 会改变下一轮 Thought。",
+          "能设计停止条件。",
+          "能指出工具错误风险。"
+        ]
+      },
+      "nextSteps": [
+        "复刻一个搜索型 ReAct agent。",
+        "给它加入来源校验。",
+        "比较 ReAct 和一次性问答在同一问题上的错误率。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 66,
+        "tier": "archive",
+        "selectionReason": "保留到 archive，后续需要补基础或复用架构思路时再打开。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [
+          "较老，更适合 archive/foundation，不适合作为每日主 feed。"
+        ],
+        "recommendedUse": "作为资料库保存，不进入今日 active feed。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "foundation/background",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "generative-agents",
+      "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+      "shortTitle": "Generative Agents",
+      "authors": "Joon Sung Park, Joseph C. OBrien, Carrie J. Cai, Meredith Ringel Morris, Percy Liang, Michael S. Bernstein",
+      "venue": "UIST 2023 / Stanford HCI + Google Research",
+      "arxivId": "2304.03442",
+      "contentType": "paper",
+      "publishedAt": "2023-04-07",
+      "updatedAt": "2023-08-06",
+      "oneSentenceTakeaway": "这篇论文把 LLM 变成会记忆、反思和计划的“虚拟人”，让 25 个 agent 在小镇里产生看起来合理的社交行为。",
+      "whyItMatters": "它是理解多智能体系统、长期记忆和 agent 行为涌现的经典入口。它提醒我们：agent 不只是调用工具，还需要记忆选择、时间规划和社会互动。",
+      "targetAudience": [
+        "多智能体系统学习者",
+        "AI 产品学生",
+        "HCI/交互设计方向"
+      ],
+      "readingTime": "65 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 92,
+      "readabilityScore": 84,
+      "actionabilityScore": 86,
+      "confidenceScore": 92,
+      "difficulty": "中等：技术不深，但系统组件多",
+      "recommendedAction": "精读 memory/reflection/planning 三层架构，并做一个小型角色模拟",
+      "tags": [
+        "Agent",
+        "Workflow",
+        "Research",
+        "Multimodal"
+      ],
+      "sourceName": "arXiv / UIST 2023",
+      "sourceUrl": "https://arxiv.org/abs/2304.03442",
+      "sources": [
+        {
+          "name": "arXiv: Generative Agents",
+          "url": "https://arxiv.org/abs/2304.03442"
+        }
+      ],
+      "versionQuestion": "一个 LLM 角色为什么需要记忆、反思和计划，而不是每次直接 prompt 一下？",
+      "versions": [
+        {
+          "id": "v1",
+          "label": "arXiv v1",
+          "submittedAt": "2023-04-07",
+          "versionType": "initial preprint",
+          "changeSummary": "提出生成式 agent 小镇、记忆流、反思和计划结构。",
+          "whyChanged": "单个 LLM 的短上下文难以维持长期人格和事件因果。",
+          "readerQuestion": "如何让一个角色记得过去并影响未来行为？",
+          "evidence": "论文展示 25 个 agent 的小镇模拟和用户/评审观察。",
+          "impactScore": 88
+        },
+        {
+          "id": "v2",
+          "label": "arXiv v2",
+          "submittedAt": "2023-08-06",
+          "versionType": "UIST revision",
+          "changeSummary": "修订论文表述和实验呈现，形成 UIST 2023 版本。",
+          "whyChanged": "HCI 读者需要更清楚理解系统设计、互动设置和评估边界。",
+          "readerQuestion": "哪些行为来自架构，哪些只是 LLM 表演？",
+          "evidence": "最终版本强调完整经验记录、反思生成和动态检索如何支持计划。",
+          "impactScore": 92
+        }
+      ],
+      "versionRelation": "v1 给出小镇和 agent 架构的核心；v2 更像正式论文版本。学习时重点不是版本差异，而是三层结构如何把短期对话扩展成长期行为。",
+      "plainLanguage": {
+        "beginnerSummary": "如果普通 chatbot 像“临场扮演”，Generative Agents 像给角色配了日记本、复盘能力和日程表。它会记得发生过什么，抽象出长期想法，再安排下一步。",
+        "mentalModel": "想象一个游戏 NPC：它不是每次刷新都失忆，而是把经历写进记忆库，定期总结成信念，再用这些信念规划今天做什么。",
+        "whyItWorks": "LLM 擅长用自然语言解释和生成行为。论文把记忆、反思和计划都表示成自然语言，让模型可以在同一种表示里检索、总结和行动。",
+        "oneThingToRemember": "可信 agent 行为不是靠“人格提示词”堆出来的，而是靠记忆选择、反思抽象和计划执行维持一致性。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Memory stream",
+          "plainMeaning": "按时间保存 agent 经历和观察的记录。",
+          "whyItMatters": "这是角色不失忆的基础。"
+        },
+        {
+          "term": "Reflection",
+          "plainMeaning": "把很多零散记忆总结成更高层的想法或信念。",
+          "whyItMatters": "没有反思，agent 只会堆事件，不会形成长期动机。"
+        },
+        {
+          "term": "Planning",
+          "plainMeaning": "把目标拆成未来一段时间的行动安排。",
+          "whyItMatters": "让 agent 的行为在时间上更连贯。"
+        },
+        {
+          "term": "Retrieval",
+          "plainMeaning": "从记忆中取出当前最相关的信息。",
+          "whyItMatters": "记忆太多时，检索决定模型看见什么。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "如何让 LLM 驱动的角色表现出长期一致、可互动、看起来可信的人类行为？",
+        "coreMove": "把 agent 的经历保存成 memory stream，再通过检索、反思和计划把过去经验转成未来行为。",
+        "designChoices": [
+          {
+            "title": "自然语言记忆",
+            "choice": "用自然语言记录观察和经历。",
+            "why": "LLM 本身最擅长处理语言，系统实现简单。",
+            "tradeoff": "记忆可能冗余、主观或被错误总结污染。"
+          },
+          {
+            "title": "反思层",
+            "choice": "定期把低层事件总结成高层见解。",
+            "why": "角色需要长期信念，而不是只记得碎片。",
+            "tradeoff": "反思结果如果错了，会长期影响行为。"
+          },
+          {
+            "title": "计划层",
+            "choice": "生成日程和短期行动。",
+            "why": "没有计划，agent 行为容易像即时回复，没有时间连续性。",
+            "tradeoff": "计划遇到环境变化需要动态调整。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "观察环境",
+            "body": "agent 接收自己看见的人、地点、事件和对话。"
+          },
+          {
+            "label": "02",
+            "title": "写入记忆",
+            "body": "系统把观察追加到 memory stream。"
+          },
+          {
+            "label": "03",
+            "title": "检索相关记忆",
+            "body": "根据当前情境取出近期、重要、相关的记忆。"
+          },
+          {
+            "label": "04",
+            "title": "生成反思",
+            "body": "把多条记忆总结成更抽象的信念或关系。"
+          },
+          {
+            "label": "05",
+            "title": "制定计划并行动",
+            "body": "用记忆和反思生成日程、对话和下一步行为。"
+          }
+        ],
+        "optimizationLogic": "这篇论文优化的不是模型参数，而是 agent 的状态管理。它用外部记忆和周期性反思，解决 LLM 上下文短、人格易漂移、行为难连续的问题。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文的边界是一个交互式 sandbox 小镇，重点观察 believable behavior，而不是证明 agent 具有人类意识或真实社会理解。",
+        "modernExtensionBoundary": "后续产品里的 AI companion、multi-agent workflow、模拟市场和游戏 NPC 可以借鉴该架构，但真实用户安全、隐私和长期记忆治理需要额外设计。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Sandbox World",
+            "role": "提供地点、时间、角色和事件。",
+            "beginnerExplanation": "小镇是 agent 行为发生的舞台。",
+            "connectsTo": "产生观察并触发行动。"
+          },
+          {
+            "label": "B",
+            "title": "Memory Stream",
+            "role": "保存每个 agent 的经历。",
+            "beginnerExplanation": "相当于角色日记。",
+            "connectsTo": "供检索和反思使用。"
+          },
+          {
+            "label": "C",
+            "title": "Reflection",
+            "role": "把经历压缩成高层认知。",
+            "beginnerExplanation": "像角色晚上复盘今天发生了什么。",
+            "connectsTo": "影响未来计划。"
+          },
+          {
+            "label": "D",
+            "title": "Planning",
+            "role": "把目标安排成可执行日程。",
+            "beginnerExplanation": "让角色有今天要做什么的连续感。",
+            "connectsTo": "生成具体行为和对话。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文证据来自系统展示和人类评估：加入 memory/reflection/planning 后，agent 行为更可信，也能出现邀请传播、关系变化和活动协调等涌现现象。",
+        "whatWasCompared": "比较了带完整架构的 generative agents 与去掉部分组件的变体，以及人类评审对行为可信度的判断。",
+        "whatToTrust": "可以相信该架构能显著提升角色连续性和互动可信度。",
+        "whatNotToOverclaim": "不要把“看起来像人”理解成真正理解人类心理，也不要把 25 个角色小镇直接外推到真实社会。"
+      },
+      "experimentReadings": [
+        {
+          "question": "记忆、反思和计划是否让 agent 行为更可信？",
+          "setup": "作者在小镇环境中运行 25 个 agent，并观察他们的日常行为和社交互动。",
+          "metric": "人类评估、消融比较、具体事件轨迹。",
+          "result": "完整架构产生了更连贯的个人行为和涌现社交事件。",
+          "conclusion": "长期状态管理是可信 agent 的关键。",
+          "limitation": "环境规模小，评估含主观判断，且行为依赖底层 LLM 质量。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生先不要讨论“这是不是 AGI”，而是把它当成一个系统设计题：短上下文模型如何拥有长期状态？答案是外部记忆、重要性打分、检索、反思和计划。",
+        "beginnerPath": [
+          "先画 memory/reflection/planning 三层图。",
+          "再读一个 agent 的行为轨迹，看哪条记忆影响了哪个行动。",
+          "最后做一个 3 个角色的小模拟。"
+        ],
+        "commonMisreadings": [
+          "把 believable behavior 当成真实心理。",
+          "以为只写 persona prompt 就能长期稳定。",
+          "忽略记忆检索和反思错误会累积。"
+        ],
+        "practicePrompt": "设计 3 个学生 agent 的一天：每人 5 条记忆、2 条反思、1 个计划，观察他们会不会自然产生互动。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释三层架构",
+          "task": "说明 memory stream、reflection、planning 分别解决什么问题。",
+          "passCriteria": [
+            "说出 memory 解决不失忆。",
+            "说出 reflection 解决抽象总结。",
+            "说出 planning 解决时间连续性。"
+          ],
+          "commonMistake": "把三者都说成“存上下文”。",
+          "sampleAnswer": "memory 记录事件，reflection 把事件总结成信念，planning 把信念和当前目标转成日程与行动。"
+        },
+        {
+          "level": "画图题",
+          "title": "画一个角色行为链",
+          "task": "从一条记忆开始，画出它如何经过反思影响某个行动。",
+          "passCriteria": [
+            "包含记忆、反思、计划、行动。",
+            "能说明因果关系。"
+          ],
+          "commonMistake": "只列行为，不解释记忆如何影响行为。",
+          "sampleAnswer": "记忆“Alex 邀请我参加派对”被反思成“Alex 是友好的人”，计划里安排晚饭后去派对，行动是提醒朋友一起去。"
+        },
+        {
+          "level": "迁移题",
+          "title": "设计安全边界",
+          "task": "如果把这种 agent 用在真实产品里，列出两个长期记忆风险。",
+          "passCriteria": [
+            "提到隐私或错误记忆。",
+            "提出删除、审计或用户确认机制。"
+          ],
+          "commonMistake": "只关心功能，不关心记忆治理。",
+          "sampleAnswer": "长期记忆可能保存敏感信息，也可能把错误总结当事实。需要用户可查看/删除记忆，并对高影响记忆做确认。"
+        }
+      ],
+      "conceptMap": [
+        "Memory stream",
+        "Reflection",
+        "Planning",
+        "Retrieval",
+        "Emergent behavior"
+      ],
+      "charts": [
+        {
+          "title": "Behavior architecture",
+          "metric": "Core modules",
+          "unit": "count",
+          "maxValue": 3,
+          "bars": [
+            {
+              "label": "Prompt-only role",
+              "value": 1,
+              "display": "persona only"
+            },
+            {
+              "label": "Generative agent",
+              "value": 3,
+              "display": "memory + reflection + planning"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "可信的 LLM agent 需要外部状态管理：记忆保存过去，反思形成高层认知，计划连接未来行为。",
+        "background": "LLM 对话通常短期、无状态，很难维持角色长期一致性。",
+        "method": "在 sandbox 中为每个 agent 维护 memory stream，通过检索、反思和计划驱动行为。",
+        "experiments": "通过小镇模拟、人类评估和消融分析观察完整架构带来的行为可信度。",
+        "limitations": "规模小、评估主观、社会行为不可直接外推，且长期记忆可能引入隐私和错误累积问题。",
+        "professorLens": "这篇适合训练系统思维：模型能力之外，状态、检索、总结和计划同样决定 agent 表现。",
+        "verificationChecklist": [
+          "能画三层结构。",
+          "能解释反思为什么需要。",
+          "能指出记忆风险。",
+          "能设计一个小型模拟。"
+        ]
+      },
+      "nextSteps": [
+        "做一个 3-agent 小镇模拟。",
+        "给每个角色加入可删除记忆。",
+        "比较有无 reflection 时行为是否更一致。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 63,
+        "tier": "archive",
+        "selectionReason": "保留到 archive，后续需要补基础或复用架构思路时再打开。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [
+          "较老，更适合 archive/foundation，不适合作为每日主 feed。"
+        ],
+        "recommendedUse": "作为资料库保存，不进入今日 active feed。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "foundation/background",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "dpo",
+      "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+      "shortTitle": "DPO",
+      "authors": "Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D. Manning, Chelsea Finn",
+      "venue": "NeurIPS 2023 / arXiv:2305.18290",
+      "arxivId": "2305.18290",
+      "contentType": "paper",
+      "publishedAt": "2023-05-29",
+      "updatedAt": "2024-07-29",
+      "oneSentenceTakeaway": "DPO 的核心是把复杂的 RLHF 强化学习管线，改写成一个更像监督学习的偏好优化目标。",
+      "whyItMatters": "今天大量开源对齐、偏好优化、RLHF 替代方法和指令模型训练都会拿 DPO 做基线。",
+      "targetAudience": [
+        "AI 学生",
+        "对齐学习者",
+        "开源模型训练者",
+        "LLM 研究者"
+      ],
+      "readingTime": "20 min",
+      "actionLabel": "打开 DPO 工作台",
+      "impactScore": 94,
+      "readabilityScore": 80,
+      "actionabilityScore": 90,
+      "confidenceScore": 92,
+      "difficulty": "advanced",
+      "recommendedAction": "read",
+      "tags": [
+        "Research",
+        "Safety",
+        "Open Source",
+        "Prompt"
+      ],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/2305.18290",
+      "sources": [
+        {
+          "name": "arXiv:2305.18290",
+          "url": "https://arxiv.org/abs/2305.18290"
+        },
+        {
+          "name": "DPO project",
+          "url": "https://github.com/eric-mitchell/direct-preference-optimization"
+        }
+      ],
+      "versionQuestion": "DPO 为什么能把 RLHF 从 reward model + RL 变成 supervised-style preference loss？",
+      "versions": [
+        {
+          "id": "dpo-v1",
+          "label": "v1 方法初稿",
+          "submittedAt": "2023-05-29",
+          "versionType": "Initial Method",
+          "changeSummary": "提出一种 reward model 参数化，使最优 policy 可以闭式表达，从而用简单分类损失优化偏好。",
+          "whyChanged": "PPO 式 RLHF 复杂、不稳定、需要 reward model 和采样，开源训练者很难复现。",
+          "readerQuestion": "DPO 是不是去掉了 reward model，还是把 reward model 隐式写进了 policy？",
+          "evidence": "arXiv 显示 v1 提交于 2023-05-29；摘要说明 DPO eliminates sampling during fine-tuning and significant hyperparameter tuning。",
+          "impactScore": 94
+        },
+        {
+          "id": "dpo-v2",
+          "label": "v2 会议期修订",
+          "submittedAt": "2023-12-13",
+          "versionType": "Review Revision",
+          "changeSummary": "进入会议后修订阶段，读者应重点检查推导、实验设置和与 PPO/RLHF baseline 的比较。",
+          "whyChanged": "偏好优化论文最核心的质疑通常来自推导假设和 baseline 公平性。",
+          "readerQuestion": "DPO 的稳定性来自目标函数，还是来自实现细节更少？",
+          "evidence": "arXiv history 显示 v2 为 2023-12-13。",
+          "impactScore": 88
+        },
+        {
+          "id": "dpo-v3",
+          "label": "v3 最终维护版",
+          "submittedAt": "2024-07-29",
+          "versionType": "Stable Reference",
+          "changeSummary": "最终版本成为后续 IPO、KTO、ORPO、SimPO 等偏好优化方法比较的基础参照。",
+          "whyChanged": "当一个方法成为基线，版本稳定性会影响后续论文如何引用、复现和对比。",
+          "readerQuestion": "后续 DPO 变体到底是在改目标函数，还是在改数据和正则？",
+          "evidence": "arXiv 显示最后修订为 2024-07-29 v3。",
+          "impactScore": 86
+        }
+      ],
+      "versionRelation": "v1 提出从 RLHF 到分类损失的核心变换；v2/v3 让推导和实验成为稳定引用。学生应从 DPO 再往后读偏好优化家族。",
+      "plainLanguage": {
+        "beginnerSummary": "DPO 在问：如果我们已经有“用户更喜欢 A 答案、不喜欢 B 答案”的数据，能不能直接训练模型更倾向 A，而不先训练一个 reward model 再跑 PPO？",
+        "mentalModel": "把 RLHF 想成先请一个裁判打分，再让选手按裁判反馈反复调整。DPO 更像直接拿成对样卷告诉学生：这份答案比那份更好，然后用这个差异来训练。",
+        "whyItWorks": "论文利用 RLHF 目标里的数学关系，把 reward model 隐式写进 policy 的概率比里。结果是模型只需要比较 chosen 和 rejected response 的 log-prob 差异。",
+        "oneThingToRemember": "DPO 不是没有偏好信号，而是把 reward model + RL 的复杂过程，折叠成了一个更容易训练的 preference loss。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Preference pair",
+          "plainMeaning": "同一个问题下，一条回答被标为更好 chosen，另一条被标为更差 rejected。",
+          "whyItMatters": "DPO 的训练信号不是标准答案，而是这种成对偏好。"
+        },
+        {
+          "term": "Reward model",
+          "plainMeaning": "RLHF 里用来给模型回答打分的模型，像一个自动裁判。",
+          "whyItMatters": "DPO 的卖点之一是不用显式训练这个裁判。"
+        },
+        {
+          "term": "Reference model",
+          "plainMeaning": "训练前的参考模型，用来约束新模型不要偏离原能力太远。",
+          "whyItMatters": "DPO loss 里需要比较 policy 和 reference 的概率差异。"
+        },
+        {
+          "term": "Log-prob",
+          "plainMeaning": "模型给某个回答分配的概率的对数，可以理解成模型有多愿意说这句话。",
+          "whyItMatters": "DPO 通过 chosen/rejected 的 log-prob 差异来更新模型。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "能不能不用单独 reward model 和 PPO，也让模型学会人类偏好？",
+        "coreMove": "用 chosen/rejected 偏好对和 reference model，把偏好学习写成一个分类式损失。",
+        "designChoices": [
+          {
+            "title": "偏好对数据",
+            "choice": "训练样本不是单个标准答案，而是一对更好/更差的回答。",
+            "why": "很多对齐问题很难写唯一标准答案，但人更容易比较两个答案哪个更好。",
+            "tradeoff": "偏好数据本身可能有偏见，且不同标注者标准不一定一致。"
+          },
+          {
+            "title": "Reference model",
+            "choice": "保留一个参考模型，用来约束新模型不要偏离太远。",
+            "why": "这相当于保留 KL 约束的作用，避免为了迎合偏好数据而输出崩坏。",
+            "tradeoff": "reference 的选择会影响训练方向，约束太强也可能限制改进。"
+          },
+          {
+            "title": "隐式 reward",
+            "choice": "不显式训练 reward model，而是从 policy 和 reference 的概率比里得到 reward 形式。",
+            "why": "减少了训练管线里的组件数量，降低 PPO 采样和调参复杂度。",
+            "tradeoff": "方法更简单，但仍然需要高质量偏好数据和仔细的超参设置。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "准备偏好对",
+            "body": "每个 prompt 对应 chosen 和 rejected 两个回答。"
+          },
+          {
+            "label": "02",
+            "title": "计算概率",
+            "body": "policy model 和 reference model 分别计算两个回答的 log-prob。"
+          },
+          {
+            "label": "03",
+            "title": "比较差距",
+            "body": "目标是让 chosen 相对 rejected 的优势变大，同时参考 reference 的偏离程度。"
+          },
+          {
+            "label": "04",
+            "title": "更新模型",
+            "body": "用一个分类式 loss 直接更新 policy，不需要 PPO rollouts。"
+          },
+          {
+            "label": "05",
+            "title": "评估偏好",
+            "body": "检查模型是否更符合人类偏好，同时没有明显牺牲基础能力。"
+          }
+        ],
+        "optimizationLogic": "DPO 的优化点是减少系统里的不稳定环节：少一个 reward model，少一段 RL 采样循环，少很多 PPO 超参。它不是魔法，而是把原本 RLHF 目标重新参数化，让训练更接近普通监督学习。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文关注的是把带 KL 约束的 RLHF 目标重写成直接偏好优化目标，让语言模型用偏好对训练。",
+        "modernExtensionBoundary": "KTO、ORPO、SimPO、在线偏好优化和复杂多轮对齐是后续方法族扩展，不是 DPO 原论文全部内容。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Preference Dataset",
+            "role": "提供 chosen/rejected 成对训练信号。",
+            "beginnerExplanation": "数据不告诉模型唯一标准答案，而是告诉它两个回答里哪个更好。",
+            "connectsTo": "每个偏好对都会进入 DPO loss。"
+          },
+          {
+            "label": "B",
+            "title": "Policy Model",
+            "role": "正在被训练、希望更符合偏好的模型。",
+            "beginnerExplanation": "它会被鼓励提高 chosen 的概率、降低 rejected 的相对概率。",
+            "connectsTo": "和 reference model 的概率一起形成 log-ratio。"
+          },
+          {
+            "label": "C",
+            "title": "Reference Model",
+            "role": "提供训练前行为基线，防止模型偏离太远。",
+            "beginnerExplanation": "它像原始答题习惯，DPO 不希望新模型为了追偏好而完全失去原本能力。",
+            "connectsTo": "保留 KL 约束的效果。"
+          },
+          {
+            "label": "D",
+            "title": "DPO Loss",
+            "role": "把偏好学习写成一个分类式目标。",
+            "beginnerExplanation": "如果 chosen 相对 rejected 的优势不够大，loss 就推动 policy 调整。",
+            "connectsTo": "替代显式 reward model + PPO 训练循环。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文展示 DPO 在情感控制、摘要和对话偏好任务上可以匹配或超过 PPO-style RLHF，并且训练流程更简单。",
+        "whatWasCompared": "比较对象包括 PPO-based RLHF、监督微调以及不同偏好优化设置。",
+        "whatToTrust": "可以相信的结论是：在有成对偏好数据时，DPO 是非常强的偏好优化基线，尤其适合开源社区复现和迭代。",
+        "whatNotToOverclaim": "不要把 DPO 理解成解决了所有对齐问题。它仍依赖偏好数据质量，也不能自动消除偏见、幻觉或多轮交互问题。"
+      },
+      "experimentReadings": [
+        {
+          "question": "不用 reward model 和 PPO，直接优化偏好对能不能达到 RLHF 类似效果？",
+          "setup": "作者在情感控制、摘要和单轮对话等任务上比较 DPO、PPO-style RLHF 和监督微调。",
+          "metric": "任务奖励、偏好胜率、输出质量等与具体任务相关的评价。",
+          "result": "DPO 在论文实验中能匹配或超过 PPO-style RLHF，同时训练管线更简单。",
+          "conclusion": "实验支持“偏好优化可以被重写成更简单的监督式目标”。",
+          "limitation": "这不证明 DPO 自动解决所有安全和对齐问题；偏好数据质量、reference model 和 beta 仍然关键。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生先画 RLHF 管线，再把 DPO 放在旁边：reward model 和 PPO 被折叠到了一个 log-prob ratio 里。看懂这个折叠，你就知道 DPO 为什么简单，也知道它没有凭空消除偏好数据的风险。",
+        "beginnerPath": [
+          "先理解 chosen/rejected pair 是什么。",
+          "再复习 reference model 和 KL 约束的作用。",
+          "最后手推一次 DPO loss，看 log-ratio 为什么出现。"
+        ],
+        "commonMisreadings": [
+          "以为 DPO 不需要人类偏好数据。",
+          "以为不用 PPO 就没有 reward 或对齐风险。",
+          "只看公式简洁，不检查 reference model 和 beta 的影响。"
+        ],
+        "practicePrompt": "用 20 条小型偏好样本做一次 DPO 思维实验：列出 chosen/rejected，说明每对偏好依据，再判断这些偏好是否会把模型带向某种偏见。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释 DPO 简化了什么",
+          "task": "用自己的话说明 DPO 相比 PPO-style RLHF 少了哪些组件，但仍然依赖什么数据。",
+          "passCriteria": [
+            "说出不用显式 reward model。",
+            "说出不用 PPO 采样训练循环。",
+            "说出仍然需要 chosen/rejected 偏好数据。"
+          ],
+          "commonMistake": "以为 DPO 不需要人类偏好，只靠模型自己优化。",
+          "sampleAnswer": "DPO 不再先训练 reward model 再用 PPO 调 policy，而是直接用偏好对训练。它少了 RLHF 管线里的复杂环节，但仍然需要高质量 chosen/rejected 数据。"
+        },
+        {
+          "level": "画图题",
+          "title": "画出 DPO 的两个模型比较",
+          "task": "画出 policy model 和 reference model 如何分别给 chosen/rejected 计算概率，并说明为什么要比较它们。",
+          "passCriteria": [
+            "能标出 policy 和 reference 都会看 chosen/rejected。",
+            "能说明比较 log-prob 差异。",
+            "能说明 reference 用来约束偏离。"
+          ],
+          "commonMistake": "只画一个模型，忽略 reference model 的作用。",
+          "sampleAnswer": "policy 和 reference 都对 chosen/rejected 打 log-prob。DPO 看 policy 相对 reference 是否更偏向 chosen。reference 防止模型为了追偏好而偏离原模型太远。"
+        },
+        {
+          "level": "迁移题",
+          "title": "判断 DPO 的风险",
+          "task": "给定一批偏好数据，指出可能导致模型变差的两个数据问题。",
+          "passCriteria": [
+            "提到偏好标注不一致或有偏见。",
+            "提到 rejected 不一定真的差，或 chosen 只是风格讨好。"
+          ],
+          "commonMistake": "认为 loss 简单就代表训练结果一定安全。",
+          "sampleAnswer": "如果标注者偏好过度讨好的回答，模型会学会迎合而不是诚实。如果 chosen/rejected 差异很小或标注混乱，DPO 会放大噪声。"
+        }
+      ],
+      "conceptMap": [
+        "Preference pairs",
+        "Implicit reward",
+        "KL constraint",
+        "Classification loss",
+        "RLHF without PPO"
+      ],
+      "charts": [
+        {
+          "title": "Pipeline simplification",
+          "metric": "Training components",
+          "unit": "steps",
+          "maxValue": 4,
+          "bars": [
+            {
+              "label": "PPO-style RLHF",
+              "value": 3,
+              "display": "reward + RL + tuning"
+            },
+            {
+              "label": "DPO",
+              "value": 1,
+              "display": "classification loss",
+              "highlight": true
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "标准 RLHF 的最优解可以改写成一个只依赖偏好对的 supervised-style 目标，降低训练复杂度。",
+        "background": "RLHF 通常需要训练 reward model，再用 PPO 优化 policy，工程不稳定且超参数敏感。",
+        "method": "通过 reward-policy 对偶关系，把偏好概率写成 chosen/rejected response 的 log-prob 差，形成 DPO loss。",
+        "experiments": "论文比较情感控制、摘要和单轮对话质量，强调 DPO 能匹配或超过 PPO-based RLHF。",
+        "limitations": "DPO 仍依赖偏好数据质量；它简化训练管线，但不会自动解决 reward hacking、数据偏见和多轮偏好问题。",
+        "professorLens": "教授会要求学生推一遍 DPO loss：不是背公式，而是理解 reference model、KL 和 preference pair 的角色。",
+        "verificationChecklist": [
+          "能解释 chosen/rejected pair",
+          "能说明 reference model 为什么存在",
+          "能推导 log-ratio 在 loss 中的作用",
+          "能比较 DPO、PPO、KTO/ORPO 的差异"
+        ]
+      },
+      "nextSteps": [
+        "先复习 RLHF/PPO 管线。",
+        "手推 DPO loss。",
+        "用一个小偏好数据集训练 DPO，观察 beta 对输出的影响。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 55,
+        "tier": "archive",
+        "selectionReason": "保留到 archive，后续需要补基础或复用架构思路时再打开。",
+        "qualitySignals": [
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [],
+        "recommendedUse": "作为资料库保存，不进入今日 active feed。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "foundation/background",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "attention-is-all-you-need",
+      "title": "Attention Is All You Need",
+      "shortTitle": "Transformer",
+      "authors": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin",
+      "venue": "NeurIPS 2017 / arXiv:1706.03762",
+      "arxivId": "1706.03762",
+      "contentType": "paper",
+      "publishedAt": "2017-06-12",
+      "updatedAt": "2023-08-02",
+      "oneSentenceTakeaway": "Transformer 的核心不是一个 attention 技巧，而是把序列建模改造成更适合 GPU 并行训练的计算系统。",
+      "whyItMatters": "几乎所有现代 LLM、扩散模型文本编码器、多模态模型和 agent 语言骨架都继承了这篇论文的核心抽象。",
+      "targetAudience": [
+        "AI 学生",
+        "LLM 学习者",
+        "模型架构学习者",
+        "论文精读者"
+      ],
+      "readingTime": "22 min",
+      "actionLabel": "打开 Transformer 工作台",
+      "impactScore": 100,
+      "readabilityScore": 78,
+      "actionabilityScore": 86,
+      "confidenceScore": 95,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "tags": [
+        "Research",
+        "Multimodal",
+        "RAG",
+        "AI Coding"
+      ],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/1706.03762",
+      "sources": [
+        {
+          "name": "arXiv:1706.03762",
+          "url": "https://arxiv.org/abs/1706.03762"
+        },
+        {
+          "name": "NeurIPS Proceedings",
+          "url": "https://papers.nips.cc/paper/7181-attention-is-all-you-need"
+        }
+      ],
+      "versionQuestion": "为什么 v1 的研究突破，在 v7 之后仍然值得回头读？",
+      "versions": [
+        {
+          "id": "transformer-v1",
+          "label": "v1 初稿",
+          "submittedAt": "2017-06-12",
+          "versionType": "Research Breakthrough",
+          "changeSummary": "首次提出完全基于 attention 的 encoder-decoder 架构，去掉 RNN/CNN 序列路径。",
+          "whyChanged": "当时机器翻译主流仍依赖循环或卷积结构，训练并行度和长距离依赖都是核心瓶颈。",
+          "readerQuestion": "如果不用循环，模型如何知道词序和远距离依赖？",
+          "evidence": "arXiv 显示 v1 提交于 2017-06-12；摘要给出 WMT14 En-De 28.4 BLEU、En-Fr 41.8 BLEU。",
+          "impactScore": 100
+        },
+        {
+          "id": "transformer-v5",
+          "label": "v5 会议稳定版",
+          "submittedAt": "2017-12-06",
+          "versionType": "Conference Stabilization",
+          "changeSummary": "研究主张已经稳定，读者应重点看 architecture、attention、positional encoding 和 BLEU 实验如何互相支撑。",
+          "whyChanged": "会议版通常会把论证、实验表述和相关工作打磨成可引用形态。",
+          "readerQuestion": "哪些设计是后来 LLM 继承的核心，哪些只是机器翻译时代的配置？",
+          "evidence": "arXiv submission history 显示 v5 为 2017-12-06；NeurIPS 2017 收录版本成为主流引用基础。",
+          "impactScore": 96
+        },
+        {
+          "id": "transformer-v7",
+          "label": "v7 长期维护版",
+          "submittedAt": "2023-08-02",
+          "versionType": "Long-tail Maintenance",
+          "changeSummary": "多年后仍有版本维护，说明这类基础论文不只是历史材料，也需要在引用、元数据或排版层面保持可用。",
+          "whyChanged": "高影响论文会被教材、课程和复现工程长期使用，后续版本常服务于可引用性和长期维护。",
+          "readerQuestion": "当一篇论文已经成为基础设施，读论文时应该读原始创新还是读后续生态？",
+          "evidence": "arXiv 显示最后修订为 2023-08-02 v7。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "v1 是范式突破，v5 是会议稳定表达，v7 是长期维护信号。学习时应该先读 v1 的问题意识，再用最终版确认公式、实验和引用。",
+      "plainLanguage": {
+        "beginnerSummary": "这篇论文在问一个很直接的问题：如果机器翻译不再像 RNN 那样一个词一个词往后读，能不能让所有词同时互相看一眼，然后更快地学会句子关系？Transformer 的答案是可以。",
+        "mentalModel": "把一句话想成一个会议室。每个词都是一个人，self-attention 让每个人同时判断：我现在最应该听谁说话？多头 attention 就像开了几个不同主题的小组讨论，有的看语法关系，有的看指代关系，有的看远距离依赖。",
+        "whyItWorks": "Q/K/V 可以理解成三张卡片：Q 是我在找什么，K 是我有什么标签，V 是我真正带来的信息。模型用 Q 和 K 算谁和谁相关，再把相关人的 V 汇总起来。",
+        "oneThingToRemember": "Transformer 最重要的不是“有 attention”，而是它把原来按时间排队的计算，改成了大矩阵一次性并行计算。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Token",
+          "plainMeaning": "模型不能直接读中文或英文单词，它先把文本切成一个个小块，这些小块就是 token。",
+          "whyItMatters": "Transformer 的每一步计算都发生在 token 向量上，不理解 token 就很难理解“每个位置互相看”。"
+        },
+        {
+          "term": "Embedding",
+          "plainMeaning": "把 token 变成一串数字向量。你可以把它想成给每个词发一张能被计算机理解的身份证。",
+          "whyItMatters": "attention、前馈网络、残差连接都不是在文字上算，而是在 embedding 向量上算。"
+        },
+        {
+          "term": "Q/K/V",
+          "plainMeaning": "Q 是“我想找什么”，K 是“我有什么标签”，V 是“我真正提供的信息”。",
+          "whyItMatters": "self-attention 的核心就是用 Q 和 K 算相关性，再用这个相关性加权汇总 V。"
+        },
+        {
+          "term": "Mask",
+          "plainMeaning": "一种遮挡规则，让模型在生成时不能偷看未来答案。",
+          "whyItMatters": "原论文 decoder 里有 masked self-attention；今天的 decoder-only LLM 也靠 causal mask 做自回归生成。"
+        },
+        {
+          "term": "Residual / LayerNorm",
+          "plainMeaning": "残差像给信息留一条直达通道，LayerNorm 像把每层输出重新整理到稳定范围。",
+          "whyItMatters": "它们让很多层 Transformer 可以稳定训练，不只是装饰结构。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "不用循环结构时，模型怎样同时理解词序、上下文和远距离依赖？",
+        "coreMove": "用 self-attention 让所有位置同时互相建立关系，再用 positional encoding 把顺序信息补回来。",
+        "designChoices": [
+          {
+            "title": "去掉 RNN 时间步",
+            "choice": "不再强迫模型从左到右一步步传递隐藏状态。",
+            "why": "这样训练时可以把整句话作为矩阵并行计算，GPU 利用率更高。",
+            "tradeoff": "模型必须额外解决顺序感问题，所以需要 positional encoding。"
+          },
+          {
+            "title": "多头注意力",
+            "choice": "同一层里并行使用多个 attention head。",
+            "why": "一个 head 可能看主谓关系，另一个看指代关系，多头让模型同时观察多种关系。",
+            "tradeoff": "head 的含义不一定总能被人类清楚解释，后续研究也发现有些 head 可以被剪掉。"
+          },
+          {
+            "title": "位置编码",
+            "choice": "把词在句子里的位置作为额外信号加进 embedding。",
+            "why": "attention 本身只看集合关系，不天然知道第一个词和最后一个词的顺序。",
+            "tradeoff": "原始位置编码不等于今天所有长上下文方案，后来模型发展出 RoPE、ALiBi 等新做法。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "Token + 位置",
+            "body": "先把词变成向量，再加上位置信号，让模型知道词在哪里。"
+          },
+          {
+            "label": "02",
+            "title": "生成 Q/K/V",
+            "body": "每个词被投影成 query、key、value 三种向量，用来询问、匹配和传递信息。"
+          },
+          {
+            "label": "03",
+            "title": "计算注意力",
+            "body": "每个词和所有词做相似度计算，得到一张“应该关注谁”的权重表。"
+          },
+          {
+            "label": "04",
+            "title": "多头合并",
+            "body": "多个 head 分别看不同关系，再把结果拼回一个表示。"
+          },
+          {
+            "label": "05",
+            "title": "前馈与堆叠",
+            "body": "每层再经过 feed-forward、残差连接和归一化，层层抽象出更高级关系。"
+          }
+        ],
+        "optimizationLogic": "RNN 的瓶颈像排队，前一个时间步没算完后一个很难开始；Transformer 更像把整句话铺成一张表做矩阵乘法。GPU 擅长大规模矩阵运算，所以这个设计既是建模创新，也是硬件友好的工程创新。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文讲的是 encoder-decoder Transformer，用在机器翻译：encoder 读源语言句子，decoder 一边看已经生成的目标语言，一边通过 cross-attention 看 encoder 输出。",
+        "modernExtensionBoundary": "今天很多 LLM 是 decoder-only，只保留生成侧结构；RoPE、长上下文、检索增强和工具调用都不是这篇 2017 论文原本解决的问题。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Input Embedding + Position",
+            "role": "把离散文字变成带位置感的向量序列。",
+            "beginnerExplanation": "如果只给模型词向量，它知道词是什么，但不知道词在第几个位置。位置编码就是把“第几个”也告诉模型。",
+            "connectsTo": "送入 encoder 的 self-attention，或 decoder 的 masked self-attention。"
+          },
+          {
+            "label": "B",
+            "title": "Encoder Self-Attention",
+            "role": "让源语言句子里的每个词互相看见。",
+            "beginnerExplanation": "翻译一句话时，某个词可能要看很远处的词才能确定意思。encoder self-attention 负责建立这些关系。",
+            "connectsTo": "输出一组上下文表示，供 decoder 通过 cross-attention 查询。"
+          },
+          {
+            "label": "C",
+            "title": "Masked Decoder Self-Attention",
+            "role": "让 decoder 只能看已经生成的目标词，不能偷看未来。",
+            "beginnerExplanation": "训练时答案已经在数据里，但生成时未来词不存在，所以必须用 mask 模拟真实生成条件。",
+            "connectsTo": "接着进入 cross-attention，去看 encoder 读懂的源句。"
+          },
+          {
+            "label": "D",
+            "title": "Cross-Attention",
+            "role": "让 decoder 在生成目标词时查询源语言信息。",
+            "beginnerExplanation": "decoder 要生成下一个英文词时，会问 encoder：源句里哪些词和我现在要说的内容有关？",
+            "connectsTo": "连接 encoder 输出和 decoder 生成过程，是机器翻译里的关键桥梁。"
+          },
+          {
+            "label": "E",
+            "title": "Feed-Forward + Residual + Norm",
+            "role": "在每个位置上进一步加工信息，并保持深层网络稳定。",
+            "beginnerExplanation": "attention 负责混合不同词的信息，feed-forward 负责对每个位置做更深的特征加工；残差和归一化帮助训练不崩。",
+            "connectsTo": "这一层完成后继续堆叠到下一层，最后输出预测。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文用 WMT14 机器翻译结果证明：不用 RNN/CNN 也能达到强翻译质量，并且训练效率更好。",
+        "whatWasCompared": "主要比较的是当时机器翻译里的循环、卷积和 attention-based 序列模型。",
+        "whatToTrust": "可以相信的结论是：在机器翻译任务上，完全基于 attention 的架构已经足够强，而且并行训练优势明显。",
+        "whatNotToOverclaim": "不要把这篇论文直接理解成“解决了所有语言智能”。它没有处理今天 LLM 面临的超长上下文、对齐、工具使用、检索增强和大规模预训练全链路。"
+      },
+      "experimentReadings": [
+        {
+          "question": "不用 RNN/CNN，只靠 attention，机器翻译质量会不会下降？",
+          "setup": "作者在 WMT14 English-German 和 English-French 翻译任务上训练 Transformer，并和当时强机器翻译系统比较。",
+          "metric": "BLEU。它粗略衡量机器翻译结果和参考译文的 n-gram 重合程度，适合当时翻译论文横向比较。",
+          "result": "摘要报告 En-De 28.4 BLEU、En-Fr 41.8 BLEU，并强调训练成本更低。",
+          "conclusion": "这个实验支持“完全基于 attention 的架构可以做强机器翻译”，也支持“并行训练是重要优势”。",
+          "limitation": "BLEU 不能证明模型真正理解语言，也不能代表今天开放式 LLM 对话、推理、工具使用等能力。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生先不要背公式，而是画一层 Transformer：输入向量怎样变成 Q/K/V，attention 权重怎样加权 V，多头怎样合并，最后为什么能并行。图画清楚以后，公式只是这张图的数学写法。",
+        "beginnerPath": [
+          "先理解 RNN 为什么慢：它太依赖时间顺序。",
+          "再画 self-attention 的 Q/K/V 数据流。",
+          "最后比较 encoder-decoder Transformer 和今天 decoder-only LLM 的差别。"
+        ],
+        "commonMisreadings": [
+          "把 Transformer 等同于 attention 一个模块。",
+          "以为 positional encoding 是可有可无的装饰。",
+          "只记住 BLEU 分数，却没看懂并行训练这个根本动机。"
+        ],
+        "practicePrompt": "用 4 个词组成一句短句，手动写出每个词最应该关注的另一个词，并解释为什么。然后再把这个直觉映射到 Q/K/V。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "用自己的话解释 Transformer 的核心动机",
+          "task": "不看原文，用 3 句话解释：RNN 的问题是什么，Transformer 改了什么，为什么这对训练有帮助。",
+          "passCriteria": [
+            "说出 RNN 难并行或长距离依赖成本高。",
+            "说出 Transformer 用 attention 让位置之间直接交互。",
+            "说出矩阵并行计算更适合 GPU。"
+          ],
+          "commonMistake": "只说“Transformer 用 attention”，但没有解释它为什么比循环结构更适合训练。",
+          "sampleAnswer": "RNN 像按时间排队，一个位置要等前面算完。Transformer 让句子里所有 token 同时互相计算相关性。这样可以用大矩阵并行训练，所以更适合 GPU，也更容易建模远距离关系。"
+        },
+        {
+          "level": "画图题",
+          "title": "画出单层 Transformer 的数据流",
+          "task": "画一个从 token embedding 到 attention、feed-forward、输出的流程图，并标出 Q/K/V、mask、残差、LayerNorm 的位置。",
+          "passCriteria": [
+            "能标出 Q/K/V 来自同一批输入向量。",
+            "能说明 decoder self-attention 需要 mask。",
+            "能把 cross-attention 放在 encoder 和 decoder 之间。"
+          ],
+          "commonMistake": "把 encoder self-attention、decoder masked self-attention、cross-attention 混成同一个模块。",
+          "sampleAnswer": "输入先变成 embedding 加位置；encoder 经过 self-attention 和 feed-forward；decoder 先做 masked self-attention，再用 cross-attention 查询 encoder 输出，最后 feed-forward 产生下一步预测。"
+        },
+        {
+          "level": "迁移题",
+          "title": "区分原论文 Transformer 和今天的 LLM",
+          "task": "解释 encoder-decoder Transformer 和 decoder-only LLM 的差别，并指出至少两个不是原论文直接解决的问题。",
+          "passCriteria": [
+            "能说 encoder-decoder 原本面向翻译，decoder-only 面向自回归生成。",
+            "能说现代长上下文、对齐、工具调用或 RAG 不是原论文核心内容。"
+          ],
+          "commonMistake": "把 ChatGPT 这类产品的所有能力都归因于 2017 年 Transformer 论文。",
+          "sampleAnswer": "原论文主要是翻译系统，有 encoder 读源句、decoder 生成目标句。今天很多 LLM 只用 decoder 结构做下一个 token 预测。长上下文、RLHF、RAG、工具使用等是后续系统工程和训练方法继续发展的结果。"
+        }
+      ],
+      "conceptMap": [
+        "Self-attention",
+        "Multi-head attention",
+        "Positional encoding",
+        "Encoder-decoder",
+        "Parallel training"
+      ],
+      "charts": [
+        {
+          "title": "WMT14 headline results",
+          "metric": "BLEU reported in abstract",
+          "unit": "BLEU",
+          "maxValue": 50,
+          "bars": [
+            {
+              "label": "En-De",
+              "value": 28.4,
+              "display": "28.4",
+              "highlight": true
+            },
+            {
+              "label": "En-Fr",
+              "value": 41.8,
+              "display": "41.8",
+              "highlight": true
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "把序列建模的核心计算从逐步递归改成可并行 attention，让模型同时获得长距离依赖和训练效率。",
+        "background": "RNN/CNN 在序列任务中要么难以并行，要么需要堆很多层才能覆盖长距离关系。",
+        "method": "用 scaled dot-product attention、multi-head attention、position-wise feed-forward 和 positional encoding 组成 encoder-decoder。",
+        "experiments": "机器翻译实验显示质量和训练效率同时提升，并在 English-to-German、English-to-French 上给出强结果。",
+        "limitations": "原论文阶段还没有解决超长上下文、检索增强、稀疏 attention 和大规模预训练问题。",
+        "professorLens": "教授会让学生先画出一层 Transformer 的数据流，再解释为什么 attention 的矩阵乘法比 RNN 时间步更适合 GPU。",
+        "verificationChecklist": [
+          "能手写 Q/K/V 计算流程",
+          "能解释 positional encoding 为什么必要",
+          "能区分 encoder-decoder Transformer 和 decoder-only LLM",
+          "能说明 BLEU 指标和今天 LLM 评测的差异"
+        ]
+      },
+      "nextSteps": [
+        "读第 3 节模型架构并画图。",
+        "用小矩阵手算一次 attention。",
+        "再读 BERT/GPT，观察 Transformer 如何分化成 encoder-only 与 decoder-only。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 55,
+        "tier": "archive",
+        "selectionReason": "保留到 archive，后续需要补基础或复用架构思路时再打开。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [
+          "较老，更适合 archive/foundation，不适合作为每日主 feed。",
+          "属于基础经典，重要但不应挤占每日新文章名额。"
+        ],
+        "recommendedUse": "作为资料库保存，不进入今日 active feed。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "foundation/background",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "retrieval-augmented-generation",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "shortTitle": "RAG",
+      "authors": "Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela",
+      "venue": "NeurIPS 2020 / arXiv:2005.11401",
+      "arxivId": "2005.11401",
+      "contentType": "paper",
+      "publishedAt": "2020-05-22",
+      "updatedAt": "2021-04-12",
+      "oneSentenceTakeaway": "RAG 的核心不是“先搜再答”这么简单，而是把参数记忆和非参数记忆接成可训练的生成系统。",
+      "whyItMatters": "今天几乎所有企业知识库、AI 搜索、文档问答和 agent 记忆系统都在使用 RAG 思想的工程化变体。",
+      "targetAudience": [
+        "AI 学生",
+        "RAG 工程师",
+        "Agent 学习者",
+        "企业知识库开发者"
+      ],
+      "readingTime": "18 min",
+      "actionLabel": "打开 RAG 工作台",
+      "impactScore": 96,
+      "readabilityScore": 82,
+      "actionabilityScore": 94,
+      "confidenceScore": 93,
+      "difficulty": "intermediate",
+      "recommendedAction": "read",
+      "tags": [
+        "RAG",
+        "Workflow",
+        "Agent",
+        "Research",
+        "Business"
+      ],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/2005.11401",
+      "sources": [
+        {
+          "name": "arXiv:2005.11401",
+          "url": "https://arxiv.org/abs/2005.11401"
+        },
+        {
+          "name": "NeurIPS 2020",
+          "url": "https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html"
+        }
+      ],
+      "versionQuestion": "RAG 从初稿到 NeurIPS 接收版，读者应该关注哪些论证被稳定下来？",
+      "versions": [
+        {
+          "id": "rag-v1",
+          "label": "v1 初稿",
+          "submittedAt": "2020-05-22",
+          "versionType": "Initial Method",
+          "changeSummary": "提出把预训练 seq2seq 模型和 dense vector index 的 Wikipedia 记忆结合。",
+          "whyChanged": "纯参数模型更新知识困难，且难以给出来源；检索模块可以补足外部知识。",
+          "readerQuestion": "知识应该存在模型参数里，还是存在可更新的外部索引里？",
+          "evidence": "arXiv 显示 v1 提交于 2020-05-22；摘要说明 parametric memory + non-parametric memory。",
+          "impactScore": 96
+        },
+        {
+          "id": "rag-v2",
+          "label": "v2 接收前修订",
+          "submittedAt": "2020-12-07",
+          "versionType": "Conference Revision",
+          "changeSummary": "版本进入会议期修订，读者应重点确认实验范围、任务设置和 RAG-Sequence / RAG-Token 的比较。",
+          "whyChanged": "从方法初稿到会议论文，需要让实验、baseline 和表述更可审查。",
+          "readerQuestion": "两种 RAG formulation 分别适合什么生成场景？",
+          "evidence": "arXiv history 显示 v2 为 2020-12-07；comments 标注 accepted at NeurIPS 2020。",
+          "impactScore": 90
+        },
+        {
+          "id": "rag-v4",
+          "label": "v4 最终 arXiv 版",
+          "submittedAt": "2021-04-12",
+          "versionType": "Finalized Reference",
+          "changeSummary": "最终版本成为后续 RAG 工程和研究引用的稳定入口。",
+          "whyChanged": "高影响方法需要稳定的 citation、排版和最终实验说明，便于后续研究复用。",
+          "readerQuestion": "今天的向量数据库 RAG 和原论文的 end-to-end RAG 有何差异？",
+          "evidence": "arXiv 显示最后修订为 2021-04-12 v4。",
+          "impactScore": 88
+        }
+      ],
+      "versionRelation": "v1 负责提出 parametric/non-parametric memory 组合，v2/v4 负责把方法论证稳定成可引用版本。今天读 RAG，要同时读论文方法和现代工程变体的差异。",
+      "plainLanguage": {
+        "beginnerSummary": "RAG 解决的是一个现实问题：模型脑子里记住的知识会过期，也不容易指出来源。那能不能让模型回答前先查资料，再基于查到的内容生成答案？",
+        "mentalModel": "把语言模型想成一个会写作的人，把检索器想成图书管理员。纯语言模型是靠记忆写，RAG 是先让图书管理员找几段资料，再让写作者组织答案。",
+        "whyItWorks": "模型参数适合存通用语言能力，外部索引适合存会变化的事实知识。RAG 把这两种记忆接起来：一个负责找，一个负责说。",
+        "oneThingToRemember": "RAG 不是简单的“搜索 + 拼接 prompt”，原论文的关键是把外部知识当成生成模型的一部分来建模。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Parametric memory",
+          "plainMeaning": "存在模型参数里的知识，比如模型训练时记住的语言规律和事实。",
+          "whyItMatters": "RAG 的出发点就是参数记忆更新困难、来源不透明。"
+        },
+        {
+          "term": "Non-parametric memory",
+          "plainMeaning": "存在外部文档库或索引里的知识，可以单独添加、删除和更新。",
+          "whyItMatters": "RAG 让模型回答时可以临时查询这类外部记忆。"
+        },
+        {
+          "term": "Dense retrieval",
+          "plainMeaning": "把问题和文档都变成向量，再用向量相似度找相关内容。",
+          "whyItMatters": "原论文不是普通关键词搜索，而是用 dense retriever 找 Wikipedia passages。"
+        },
+        {
+          "term": "Generator",
+          "plainMeaning": "负责把问题和检索到的材料组织成自然语言答案的生成模型。",
+          "whyItMatters": "检索只负责找材料，最终答案质量还依赖 generator 如何使用材料。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "知识应该只存在模型参数里，还是应该放到可更新、可追溯的外部记忆里？",
+        "coreMove": "把 dense retrieval 和 seq2seq generation 接成一个系统，让模型先检索 Wikipedia passage，再基于 passage 生成答案。",
+        "designChoices": [
+          {
+            "title": "参数记忆 + 外部记忆",
+            "choice": "保留预训练模型的语言能力，同时加入可检索的非参数知识库。",
+            "why": "事实会变化，外部索引比重新训练模型更容易更新。",
+            "tradeoff": "系统效果开始依赖检索质量，搜错了后面生成也会被带偏。"
+          },
+          {
+            "title": "Dense retriever",
+            "choice": "用向量相似度找相关段落，而不是只靠关键词匹配。",
+            "why": "向量检索能捕捉语义相近但措辞不同的问题和文档。",
+            "tradeoff": "向量召回不透明，调试时需要额外看召回样本、rerank 和负样本。"
+          },
+          {
+            "title": "RAG-Sequence / RAG-Token",
+            "choice": "论文比较了整段生成共享检索结果，以及每个 token 可以依赖不同文档的两种 formulation。",
+            "why": "不同生成任务需要不同粒度的证据绑定。",
+            "tradeoff": "更细粒度的方法表达力更强，但计算和实现复杂度更高。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "输入问题",
+            "body": "用户问题先被编码成一个向量查询。"
+          },
+          {
+            "label": "02",
+            "title": "检索文档",
+            "body": "retriever 在外部向量索引里找最相关的 passages。"
+          },
+          {
+            "label": "03",
+            "title": "组合上下文",
+            "body": "系统把问题和检索到的 passages 一起交给 generator。"
+          },
+          {
+            "label": "04",
+            "title": "生成答案",
+            "body": "generator 利用语言能力组织答案，并受到检索内容约束。"
+          },
+          {
+            "label": "05",
+            "title": "更新知识",
+            "body": "当知识变化时，优先更新外部索引，而不是重新训练整个模型。"
+          }
+        ],
+        "optimizationLogic": "RAG 的优化不是只追求模型更大，而是把“记忆”拆成两层：稳定的语言能力放在参数里，经常变化的事实放在外部索引里。这让系统在知识更新、来源追踪和成本控制上更像一个可维护产品。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文关注的是把 dense retriever 和 seq2seq generator 组合成可训练的知识密集 NLP 系统，主要知识源是 Wikipedia passages。",
+        "modernExtensionBoundary": "今天企业 RAG 常加入 chunking、rerank、权限、缓存、引用校验和观测系统；这些是工程扩展，不是原论文的完整方案。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Query Encoder",
+            "role": "把用户问题变成可以检索的向量。",
+            "beginnerExplanation": "系统先把问题翻译成一串数字，用这串数字去外部知识库里找相似内容。",
+            "connectsTo": "连接 dense index，决定最先召回哪些 passages。"
+          },
+          {
+            "label": "B",
+            "title": "Dense Index",
+            "role": "保存外部文档的向量表示。",
+            "beginnerExplanation": "这像一个按语义摆放的图书馆，相近意思的文档会在向量空间里更靠近。",
+            "connectsTo": "把 top passages 交给 generator 作为证据。"
+          },
+          {
+            "label": "C",
+            "title": "Retriever",
+            "role": "从外部记忆里选出最可能有用的文档片段。",
+            "beginnerExplanation": "它不是回答问题的人，而是找材料的人。找错材料时，后面的回答很容易错。",
+            "connectsTo": "影响 generator 能看到什么上下文。"
+          },
+          {
+            "label": "D",
+            "title": "Generator",
+            "role": "基于问题和检索材料生成答案。",
+            "beginnerExplanation": "它像写作者，把找到的材料整理成一句完整回答，而不是简单复制文档。",
+            "connectsTo": "最终输出答案，也决定是否忠实使用检索内容。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文用开放域问答和生成任务说明：检索增强可以提升知识密集任务的事实性和具体性。",
+        "whatWasCompared": "比较对象包括不使用检索的 parametric-only 模型，以及不同 RAG formulation 的效果差异。",
+        "whatToTrust": "可以相信的结论是：对知识密集任务，外部文档能补足模型参数记忆的局限。",
+        "whatNotToOverclaim": "不要把原论文当成今天企业 RAG 的完整答案。现代系统还要处理 chunking、rerank、权限、缓存、引用质量和持续评测。"
+      },
+      "experimentReadings": [
+        {
+          "question": "给生成模型增加外部检索，是否能改善知识密集任务？",
+          "setup": "作者在开放域问答和生成任务上比较 parametric-only 模型、RAG-Sequence、RAG-Token 等设置。",
+          "metric": "不同任务使用不同指标，例如问答准确性、生成质量和事实相关性指标。",
+          "result": "检索增强模型在多项知识密集任务上更有竞争力，生成内容也更具体。",
+          "conclusion": "实验支持“外部知识能补足模型参数记忆”的主张。",
+          "limitation": "这些实验不能直接证明现代企业 RAG 会自动可靠；真实系统还受文档质量、切块、召回、重排和引用校验影响。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生把 RAG 拆成两门课：研究课看 retriever-generator 的概率建模，工程课看数据清洗、切块、召回、重排、引用和评测。只会调 prompt 不等于懂 RAG。",
+        "beginnerPath": [
+          "先区分参数记忆和非参数记忆。",
+          "再画出 query -> retriever -> passages -> generator 的数据流。",
+          "最后用一个小文档集比较“无检索”和“有检索”的答案差异。"
+        ],
+        "commonMisreadings": [
+          "以为 RAG 就是把搜索结果塞进 prompt。",
+          "只关注生成模型，忽略检索失败是主要错误来源。",
+          "以为有引用就一定可信，不检查引用是否真的支持答案。"
+        ],
+        "practicePrompt": "拿 5 篇你自己的课程笔记做一个小 RAG：同一个问题分别让模型直接答、只给检索片段答、检索加生成答，然后比较哪一步改善最大。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释 RAG 为什么需要两种记忆",
+          "task": "用自己的话解释参数记忆和非参数记忆分别适合存什么。",
+          "passCriteria": [
+            "说出参数记忆更新成本高但语言能力强。",
+            "说出外部记忆更容易更新和追溯来源。"
+          ],
+          "commonMistake": "只说 RAG 是“先搜索再回答”，没有解释为什么要把知识放到外部。",
+          "sampleAnswer": "模型参数适合存语言能力和通用模式，但事实知识会变化，重训模型很贵。外部文档库可以随时更新，也更容易指出来源。RAG 把两者接起来。"
+        },
+        {
+          "level": "画图题",
+          "title": "画出 retriever-generator 数据流",
+          "task": "画出 query encoder、dense index、retriever、generator 四个模块，并说明每个模块输入输出是什么。",
+          "passCriteria": [
+            "能说明 query 被编码成向量。",
+            "能说明 retriever 输出 passages。",
+            "能说明 generator 基于 passages 生成答案。"
+          ],
+          "commonMistake": "把 retriever 当成最终回答者，忽略 generator 如何使用材料。",
+          "sampleAnswer": "问题先进入 query encoder 变成向量；retriever 用向量去 index 找 passages；generator 同时看问题和 passages，生成最终答案。"
+        },
+        {
+          "level": "迁移题",
+          "title": "判断一个 RAG 系统的失败点",
+          "task": "给定一个错误答案，列出可能是检索错、重排错、生成错还是引用错，并说明怎么检查。",
+          "passCriteria": [
+            "至少区分检索和生成两个错误来源。",
+            "提出查看召回文档、引用是否支持答案等检查方法。"
+          ],
+          "commonMistake": "只调 prompt，不检查检索结果是否已经错了。",
+          "sampleAnswer": "我会先看 top passages 是否包含正确信息；如果没有，是召回或切块问题。如果有但排序靠后，是重排问题。如果有正确证据但答案仍错，是 generator 忠实性问题。"
+        }
+      ],
+      "conceptMap": [
+        "Parametric memory",
+        "Non-parametric memory",
+        "Dense retrieval",
+        "RAG-Sequence",
+        "RAG-Token",
+        "Provenance"
+      ],
+      "charts": [
+        {
+          "title": "RAG design split",
+          "metric": "Core formulation count",
+          "unit": "count",
+          "maxValue": 4,
+          "bars": [
+            {
+              "label": "Memory types",
+              "value": 2,
+              "display": "2"
+            },
+            {
+              "label": "RAG formulations",
+              "value": 2,
+              "display": "2",
+              "highlight": true
+            },
+            {
+              "label": "arXiv versions",
+              "value": 4,
+              "display": "v1-v4"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "模型不应该只依赖参数记忆；可更新、可追溯的外部记忆能让生成更适合知识密集任务。",
+        "background": "纯语言模型在事实更新、来源追踪和长尾知识上受限，传统检索系统又缺少生成能力。",
+        "method": "用 dense retriever 找 Wikipedia passage，再由 seq2seq generator 基于检索结果生成答案；论文比较 RAG-Sequence 和 RAG-Token。",
+        "experiments": "在开放域问答和生成任务上比较 parametric-only 与 retrieval-augmented 模型，强调事实性、具体性和多样性。",
+        "limitations": "原始 RAG 不是今天企业 RAG 的完整答案，现代系统还要处理 chunking、rerank、权限、缓存、引用和评测。",
+        "professorLens": "教授会要求学生区分研究 RAG 和工程 RAG：前者关注可训练 formulation，后者关注数据治理和检索质量。",
+        "verificationChecklist": [
+          "能解释 parametric vs non-parametric memory",
+          "能画出 retriever-generator 数据流",
+          "能区分 RAG-Sequence 和 RAG-Token",
+          "能设计一个引用正确率评测"
+        ]
+      },
+      "nextSteps": [
+        "读摘要和方法图。",
+        "用 5 篇文档手写一个最小 RAG。",
+        "比较不检索、只检索、检索+生成三种输出。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 54,
+        "tier": "ignore",
+        "selectionReason": "保留到 archive，后续需要补基础或复用架构思路时再打开。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "有可迁移的系统架构或工程设计思路。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [
+          "较老，更适合 archive/foundation，不适合作为每日主 feed。",
+          "属于基础经典，重要但不应挤占每日新文章名额。"
+        ],
+        "recommendedUse": "作为资料库保存，不进入今日 active feed。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "foundation/background",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "latent-diffusion-models",
+      "title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+      "shortTitle": "Latent Diffusion Models",
+      "authors": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Bjorn Ommer",
+      "venue": "CVPR 2022 / CompVis, LMU Munich, Runway lineage",
+      "arxivId": "2112.10752",
+      "contentType": "paper",
+      "publishedAt": "2021-12-20",
+      "updatedAt": "2022-04-13",
+      "oneSentenceTakeaway": "LDM 的关键是：不要在像素空间直接扩散，而是先把图像压到 latent space，再在那里去噪生成，最后解码回图像。",
+      "whyItMatters": "Stable Diffusion 这类 AIGC 图像模型的核心思想就来自这里。它让高质量图像生成从昂贵实验室能力变成更可训练、可开源、可部署的系统。",
+      "targetAudience": [
+        "AIGC 学习者",
+        "多模态方向学生",
+        "想理解 Stable Diffusion 的开发者"
+      ],
+      "readingTime": "75 分钟",
+      "actionLabel": "Deep Dive",
+      "impactScore": 97,
+      "readabilityScore": 76,
+      "actionabilityScore": 91,
+      "confidenceScore": 95,
+      "difficulty": "中高：需要理解 autoencoder、diffusion 和 cross-attention",
+      "recommendedAction": "精读 latent space、autoencoder、cross-attention 三个模块",
+      "tags": [
+        "Multimodal",
+        "Research",
+        "Open Source",
+        "Local AI"
+      ],
+      "sourceName": "arXiv / CVPR 2022",
+      "sourceUrl": "https://arxiv.org/abs/2112.10752",
+      "sources": [
+        {
+          "name": "arXiv: Latent Diffusion Models",
+          "url": "https://arxiv.org/abs/2112.10752"
+        },
+        {
+          "name": "CVF Open Access",
+          "url": "https://openaccess.thecvf.com/content/CVPR2022/papers/Rombach_High-Resolution_Image_Synthesis_With_Latent_Diffusion_Models_CVPR_2022_paper.pdf"
+        }
+      ],
+      "versionQuestion": "为什么图像生成要从像素空间搬到 latent space？",
+      "versions": [
+        {
+          "id": "v1",
+          "label": "arXiv v1",
+          "submittedAt": "2021-12-20",
+          "versionType": "initial preprint",
+          "changeSummary": "提出 latent diffusion 的主要架构和高分辨率生成结果。",
+          "whyChanged": "像素空间 diffusion 训练和推理太贵，需要更省算力的表示空间。",
+          "readerQuestion": "压缩后还会不会损失细节？",
+          "evidence": "论文展示 latent space 在复杂度和细节保留之间取得近似最优折中。",
+          "impactScore": 94
+        },
+        {
+          "id": "v2",
+          "label": "arXiv v2 / CVPR",
+          "submittedAt": "2022-04-13",
+          "versionType": "conference revision",
+          "changeSummary": "形成 CVPR 2022 版本，整理实验和任务覆盖。",
+          "whyChanged": "方法影响面扩大，需要更完整呈现 inpainting、super-resolution、text conditioning 等任务。",
+          "readerQuestion": "LDM 是降成本技巧还是生成范式变化？",
+          "evidence": "最终版本强调 cross-attention 让 diffusion 可以接受文本、框等条件。",
+          "impactScore": 97
+        }
+      ],
+      "versionRelation": "v1 提出 latent diffusion 核心；v2 强化论文呈现。学习时重点是“空间迁移”：把最贵的去噪过程从像素空间转移到更紧凑的 latent space。",
+      "plainLanguage": {
+        "beginnerSummary": "直接在像素上生成图片，像在超大的画布上一点点修改每个像素，很贵。LDM 先把图片压缩成更小的“语义草图”，在草图空间里生成，再还原成大图。",
+        "mentalModel": "像先画缩略设计稿，再让专业画师细化成高清图。你不需要在每一步都操作最终高清画布。",
+        "whyItWorks": "好的 autoencoder 可以保留人眼关心的结构和语义，同时丢掉很多像素级冗余。Diffusion 在 latent space 里去噪更省算力，再由 decoder 还原细节。",
+        "oneThingToRemember": "LDM 的核心不是“会画图”，而是把生成问题搬到一个更便宜但仍有语义的空间里。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Diffusion model",
+          "plainMeaning": "从噪声开始一步步去噪，生成数据的模型。",
+          "whyItMatters": "LDM 仍然是 diffusion，只是去噪地点变了。"
+        },
+        {
+          "term": "Autoencoder",
+          "plainMeaning": "把图像压缩成 latent，再从 latent 还原图像的模型。",
+          "whyItMatters": "它决定 latent space 是否既省算力又保留细节。"
+        },
+        {
+          "term": "Latent space",
+          "plainMeaning": "比像素更紧凑的隐藏表示空间。",
+          "whyItMatters": "LDM 的生成主要发生在这里。"
+        },
+        {
+          "term": "Cross-attention",
+          "plainMeaning": "让图像生成过程参考文本或其他条件的机制。",
+          "whyItMatters": "文本生成图像依赖它把 prompt 信息注入图像生成。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "如何在不牺牲图像质量和可控性的情况下，大幅降低 diffusion 图像生成的训练和推理成本？",
+        "coreMove": "先训练 autoencoder 学到图像 latent space，再在 latent space 里训练 diffusion，并用 cross-attention 接入文本等条件。",
+        "designChoices": [
+          {
+            "title": "先压缩再生成",
+            "choice": "把图像编码到 latent space。",
+            "why": "降低空间维度，让 diffusion 不必直接处理所有像素。",
+            "tradeoff": "压缩太强会损失细节，太弱又省不了算力。"
+          },
+          {
+            "title": "保留 perceptual detail",
+            "choice": "选择近似最优压缩率，兼顾复杂度和细节。",
+            "why": "AIGC 图像既要快，也要看起来真实。",
+            "tradeoff": "autoencoder 本身会带来重建误差。"
+          },
+          {
+            "title": "Cross-attention conditioning",
+            "choice": "用 cross-attention 接入文本、框等条件。",
+            "why": "让同一个生成架构可以处理多种控制信号。",
+            "tradeoff": "条件对齐不稳定会导致 prompt 不听话。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "训练 autoencoder",
+            "body": "学习把图像压缩到 latent，并能解码回图像。"
+          },
+          {
+            "label": "02",
+            "title": "编码训练图像",
+            "body": "把像素图转成 latent 表示。"
+          },
+          {
+            "label": "03",
+            "title": "latent 去噪训练",
+            "body": "在 latent space 里训练 diffusion denoiser。"
+          },
+          {
+            "label": "04",
+            "title": "加入条件",
+            "body": "通过 cross-attention 注入文本或其他控制信息。"
+          },
+          {
+            "label": "05",
+            "title": "解码成图像",
+            "body": "生成 latent 后用 decoder 还原高清图。"
+          }
+        ],
+        "optimizationLogic": "LDM 的优化逻辑是把计算花在更有语义密度的表示上。它不是简单降采样，而是用 autoencoder 学到一个保真度足够高、计算量更低的生成空间。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文关注 latent diffusion 架构和多个图像生成任务，包括文本条件、高分辨率合成、inpainting、super-resolution 等。",
+        "modernExtensionBoundary": "Stable Diffusion、ControlNet、SDXL、DiT 视频模型等是后续扩展；它们继承或改造 latent/diffusion/conditioning 思想，但不是原论文全部内容。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Encoder",
+            "role": "把图像压缩成 latent。",
+            "beginnerExplanation": "像把高清图变成更小但有语义的草图。",
+            "connectsTo": "输入 latent diffusion。"
+          },
+          {
+            "label": "B",
+            "title": "Latent Denoiser",
+            "role": "在 latent space 中逐步去噪。",
+            "beginnerExplanation": "真正的生成过程主要在这里发生。",
+            "connectsTo": "输出干净 latent。"
+          },
+          {
+            "label": "C",
+            "title": "Conditioning",
+            "role": "用文本或其他条件控制生成。",
+            "beginnerExplanation": "prompt 通过 cross-attention 影响图像内容。",
+            "connectsTo": "调节 denoiser。"
+          },
+          {
+            "label": "D",
+            "title": "Decoder",
+            "role": "把 latent 还原成像素图。",
+            "beginnerExplanation": "把草图细化成最终图片。",
+            "connectsTo": "产出高分辨率图像。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文证据显示 LDM 在多个图像生成任务上保持高质量，同时显著降低计算需求，是高分辨率 AIGC 可用化的重要一步。",
+        "whatWasCompared": "比较 latent diffusion 与像素空间 diffusion 以及不同压缩率、条件方式和图像任务。",
+        "whatToTrust": "可信结论是：在合适 autoencoder 表示中训练 diffusion，可以在质量和成本之间取得更好折中。",
+        "whatNotToOverclaim": "不要把 LDM 等同于所有 Stable Diffusion 后续能力。RLHF 图像偏好、ControlNet、SDXL、视频扩散和 DiT 都是后来的扩展。"
+      },
+      "experimentReadings": [
+        {
+          "question": "latent space diffusion 是否能保持质量并降低成本？",
+          "setup": "作者在多个图像生成和编辑任务上比较不同空间和条件方式。",
+          "metric": "FID、感知质量、任务表现和计算需求。",
+          "result": "LDM 在多个任务上达到强性能，并比像素空间 diffusion 更省计算。",
+          "conclusion": "latent space 是高分辨率图像 diffusion 的关键折中。",
+          "limitation": "结果依赖 autoencoder 质量，文本对齐和安全控制不是原论文主线。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生先画两条路径：像素 diffusion 和 latent diffusion。只要你看懂“去噪在哪里发生”，就能理解为什么 Stable Diffusion 能在消费级 GPU 和开源生态里爆发。",
+        "beginnerPath": [
+          "先复习 diffusion 是从噪声去噪。",
+          "再理解 autoencoder 如何压缩图像。",
+          "最后看 cross-attention 如何把 prompt 注入生成。"
+        ],
+        "commonMisreadings": [
+          "以为 latent diffusion 只是把图片缩小。",
+          "忽略 decoder 会带来重建误差。",
+          "把后来的 ControlNet/SDXL 能力算成原论文贡献。"
+        ],
+        "practicePrompt": "画一张图说明 prompt 如何经过 text encoder/cross-attention 影响 latent denoiser，再解码成图片。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释 latent space",
+          "task": "说明为什么 LDM 不直接在像素空间去噪。",
+          "passCriteria": [
+            "提到像素空间计算量大。",
+            "提到 latent 保留语义且更紧凑。"
+          ],
+          "commonMistake": "只说“为了变快”，不解释为什么还能保留质量。",
+          "sampleAnswer": "像素空间太大，直接 diffusion 很贵。LDM 用 autoencoder 把图像压到保留语义的 latent，再在更小空间去噪，最后解码回图像。"
+        },
+        {
+          "level": "画图题",
+          "title": "画 LDM 架构",
+          "task": "画出 encoder、latent denoiser、conditioning、decoder 的关系。",
+          "passCriteria": [
+            "包含四个模块。",
+            "说明 prompt 通过 conditioning 影响 denoising。"
+          ],
+          "commonMistake": "把文本 prompt 直接连到 decoder。",
+          "sampleAnswer": "图像先被 encoder 压缩，denoiser 在 latent 里去噪，文本通过 cross-attention 控制 denoiser，最后 decoder 出图。"
+        },
+        {
+          "level": "迁移题",
+          "title": "判断后续模型继承了什么",
+          "task": "说明 Stable Diffusion 从 LDM 继承了哪两个核心思想。",
+          "passCriteria": [
+            "提到 latent space。",
+            "提到文本条件或 cross-attention。"
+          ],
+          "commonMistake": "把 Stable Diffusion 的所有功能都归因于 LDM 原论文。",
+          "sampleAnswer": "Stable Diffusion 继承了在 latent space 里做 diffusion，以及用文本条件控制生成的思想；后续控制、偏好和安全机制是额外扩展。"
+        }
+      ],
+      "conceptMap": [
+        "Autoencoder",
+        "Latent space",
+        "Diffusion denoising",
+        "Cross-attention",
+        "Decoder"
+      ],
+      "charts": [
+        {
+          "title": "Where denoising happens",
+          "metric": "Relative compute burden",
+          "unit": "index",
+          "maxValue": 100,
+          "bars": [
+            {
+              "label": "Pixel diffusion",
+              "value": 100,
+              "display": "high cost"
+            },
+            {
+              "label": "Latent diffusion",
+              "value": 35,
+              "display": "lower cost"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "高分辨率图像 diffusion 的关键瓶颈是计算空间，LDM 通过 latent space 在质量和成本之间取得实用折中。",
+        "background": "像素空间 diffusion 质量强但训练和推理成本高，限制了高分辨率生成的可用性。",
+        "method": "训练 autoencoder 得到 latent 表示，在 latent space 训练 diffusion，并用 cross-attention 接入条件。",
+        "experiments": "在图像合成、inpainting、super-resolution、文本条件生成等任务上评估质量和效率。",
+        "limitations": "依赖 autoencoder 表示质量；文本对齐、安全和用户偏好不是原论文完整解决的问题。",
+        "professorLens": "教授会要求学生把“空间选择”讲清楚：为什么换空间能省算力，为什么不会完全丢掉图像质量。",
+        "verificationChecklist": [
+          "能画像素 diffusion vs latent diffusion。",
+          "能解释 autoencoder 作用。",
+          "能解释 cross-attention。",
+          "能区分原论文和后续 Stable Diffusion 生态。"
+        ]
+      },
+      "nextSteps": [
+        "跑一个 Stable Diffusion pipeline，看 latent tensor 形状。",
+        "比较不同 VAE 对图像细节的影响。",
+        "继续读 DiT，理解 diffusion backbone 从 U-Net 到 Transformer 的变化。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 45,
+        "tier": "ignore",
+        "selectionReason": "保留到 archive，后续需要补基础或复用架构思路时再打开。",
+        "qualitySignals": [
+          "命中 AI engineer 主线：agent / coding / RAG / memory / evaluation / reliability 之一。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [
+          "较老，更适合 archive/foundation，不适合作为每日主 feed。",
+          "属于基础经典，重要但不应挤占每日新文章名额。"
+        ],
+        "recommendedUse": "作为资料库保存，不进入今日 active feed。",
+        "archiveValue": "future architecture/reference",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "future architecture/reference",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    },
+    {
+      "id": "lora",
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "shortTitle": "LoRA",
+      "authors": "Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen",
+      "venue": "ICLR 2022 / arXiv:2106.09685",
+      "arxivId": "2106.09685",
+      "contentType": "paper",
+      "publishedAt": "2021-06-17",
+      "updatedAt": "2021-10-16",
+      "oneSentenceTakeaway": "LoRA 的核心是一个很工程化的低秩假设：大模型微调时，不一定要改全部权重，只训练一小块增量就可能够用。",
+      "whyItMatters": "LoRA 是今天大模型微调、adapter 生态、QLoRA、PEFT 和本地模型训练的基础方法之一。",
+      "targetAudience": [
+        "AI 学生",
+        "微调学习者",
+        "Local AI 开发者",
+        "模型工程师"
+      ],
+      "readingTime": "16 min",
+      "actionLabel": "打开 LoRA 工作台",
+      "impactScore": 95,
+      "readabilityScore": 86,
+      "actionabilityScore": 95,
+      "confidenceScore": 94,
+      "difficulty": "intermediate",
+      "recommendedAction": "try",
+      "tags": [
+        "Local AI",
+        "Open Source",
+        "AI Coding",
+        "Research"
+      ],
+      "sourceName": "arXiv",
+      "sourceUrl": "https://arxiv.org/abs/2106.09685",
+      "sources": [
+        {
+          "name": "arXiv:2106.09685",
+          "url": "https://arxiv.org/abs/2106.09685"
+        },
+        {
+          "name": "LoRA GitHub",
+          "url": "https://github.com/microsoft/LoRA"
+        }
+      ],
+      "versionQuestion": "为什么 LoRA v2 的 baseline 和 latency 补强，比单纯提出方法更重要？",
+      "versions": [
+        {
+          "id": "lora-v1",
+          "label": "v1 方法初稿",
+          "submittedAt": "2021-06-17",
+          "versionType": "Initial Method",
+          "changeSummary": "提出冻结预训练权重，只训练低秩分解矩阵来完成下游适配。",
+          "whyChanged": "全量微调 175B 级模型成本过高，部署多个 full fine-tuned checkpoint 不现实。",
+          "readerQuestion": "为什么权重更新可以用低秩矩阵近似？",
+          "evidence": "arXiv 显示 v1 提交于 2021-06-17；摘要称 trainable parameters 可减少 10,000 倍，GPU memory 需求减少 3 倍。",
+          "impactScore": 95
+        },
+        {
+          "id": "lora-v2",
+          "label": "v2 实验补强",
+          "submittedAt": "2021-10-16",
+          "versionType": "Baselines & Latency",
+          "changeSummary": "作者在 comments 中说明 v2 加入 better baselines、GLUE 实验和更多 adapter latency 分析。",
+          "whyChanged": "参数高效方法最容易被质疑 baseline 不公平或推理延迟隐藏成本，v2 正是在补这些可信度缺口。",
+          "readerQuestion": "LoRA 的优势来自低秩方法本身，还是来自比较对象设置？",
+          "evidence": "arXiv comments: Draft V2 includes better baselines, experiments on GLUE, and more on adapter latency。",
+          "impactScore": 92
+        }
+      ],
+      "versionRelation": "v1 给出核心低秩思想，v2 补上 baseline、公平比较和 latency 论证。学生读 LoRA 时，必须把方法简洁性和实验可信度一起看。",
+      "plainLanguage": {
+        "beginnerSummary": "LoRA 在问：如果一个大模型已经学得很好，我们为了一个新任务真的需要改动它所有参数吗？答案是：很多时候不用，只需要学一个很小的“修正量”。",
+        "mentalModel": "把原模型想成一本很厚的教材。全量微调是把整本书都重写一遍；LoRA 更像在关键页旁边贴几张便签，只记录这门任务需要的补充说明。",
+        "whyItWorks": "论文假设任务适配所需的权重变化其实落在一个低维空间里，所以可以用两个小矩阵 A 和 B 表示一个近似的更新量，而不是训练完整大矩阵。",
+        "oneThingToRemember": "LoRA 不是让模型变小，而是让“训练和保存一个任务适配版本”的成本大幅变小。"
+      },
+      "prerequisiteTerms": [
+        {
+          "term": "Fine-tuning",
+          "plainMeaning": "在已有大模型基础上，用新数据继续训练，让它适配某个任务。",
+          "whyItMatters": "LoRA 的问题就是：微调时到底要不要更新全部参数。"
+        },
+        {
+          "term": "Weight matrix",
+          "plainMeaning": "神经网络里的参数通常可以看成矩阵，输入向量乘上矩阵得到新的表示。",
+          "whyItMatters": "LoRA 要改的就是这些权重矩阵的更新方式。"
+        },
+        {
+          "term": "Rank",
+          "plainMeaning": "可以粗略理解为一个矩阵表达复杂变化所需要的维度数量。",
+          "whyItMatters": "LoRA 用低 rank 近似完整更新，rank 直接控制参数量和表达能力。"
+        },
+        {
+          "term": "Adapter latency",
+          "plainMeaning": "给模型额外加模块后，推理可能变慢，这种额外耗时就是延迟成本。",
+          "whyItMatters": "LoRA 的一个卖点是可以把增量合并回权重，避免传统 adapter 的额外推理层延迟。"
+        }
+      ],
+      "ideaArchitecture": {
+        "centralQuestion": "大模型适配新任务时，必须更新全部参数吗？",
+        "coreMove": "冻结预训练权重 W，只训练一个低秩更新 BA，让最终效果近似 W + BA。",
+        "designChoices": [
+          {
+            "title": "冻结基础模型",
+            "choice": "原始大模型参数不参与训练，只作为稳定底座。",
+            "why": "这样显存、优化器状态和保存 checkpoint 的成本都更低。",
+            "tradeoff": "如果任务需要非常深的知识改写，单靠小增量可能不够。"
+          },
+          {
+            "title": "低秩矩阵 A/B",
+            "choice": "用 d x r 和 r x k 两个小矩阵近似 d x k 的完整更新。",
+            "why": "当 rank r 很小，总参数量会显著下降。",
+            "tradeoff": "r 太小会限制表达能力，r 太大又会损失效率优势。"
+          },
+          {
+            "title": "推理时可合并",
+            "choice": "训练后的 LoRA 增量可以并回原权重。",
+            "why": "这避免了传统 adapter 在推理时额外增加层带来的延迟。",
+            "tradeoff": "多任务切换时需要管理不同 LoRA 权重的加载、合并和版本。"
+          }
+        ],
+        "methodFlow": [
+          {
+            "label": "01",
+            "title": "保留 W",
+            "body": "基础模型权重被冻结，不直接更新。"
+          },
+          {
+            "label": "02",
+            "title": "插入 A/B",
+            "body": "在目标层旁边放入两个可训练的小矩阵。"
+          },
+          {
+            "label": "03",
+            "title": "只训练增量",
+            "body": "训练过程只更新 A/B，优化器也只维护这部分参数。"
+          },
+          {
+            "label": "04",
+            "title": "得到任务适配",
+            "body": "推理时使用 W + BA 的效果完成任务。"
+          },
+          {
+            "label": "05",
+            "title": "保存小权重",
+            "body": "每个任务只保存 LoRA 权重，部署和分享都更轻。"
+          }
+        ],
+        "optimizationLogic": "LoRA 的核心优化是把“完整矩阵更新”压缩成“低秩增量更新”。如果原更新矩阵很大，而 rank r 很小，那么训练参数、显存和 checkpoint 都会明显下降；这也是它后来成为 PEFT 生态基础的原因。"
+      },
+      "architectureWalkthrough": {
+        "originalPaperBoundary": "原论文讨论的是在大语言模型权重中注入低秩可训练矩阵，用更少参数完成下游任务适配。",
+        "modernExtensionBoundary": "QLoRA、PEFT 库、多 LoRA 路由、合并与量化部署是后续生态扩展，不等于 LoRA 论文本身全部内容。",
+        "blocks": [
+          {
+            "label": "A",
+            "title": "Frozen Base Weight W",
+            "role": "保留基础模型原本能力。",
+            "beginnerExplanation": "大模型原来的权重像一本厚教材，LoRA 训练时不改这本书。",
+            "connectsTo": "和低秩更新 BA 相加，形成任务适配后的有效权重。"
+          },
+          {
+            "label": "B",
+            "title": "Low-rank A/B",
+            "role": "用两个小矩阵表示任务需要的权重增量。",
+            "beginnerExplanation": "不直接训练一整张大表，而是训练两张小表，让它们相乘后近似大表变化。",
+            "connectsTo": "训练时只更新 A/B，减少显存和 checkpoint 成本。"
+          },
+          {
+            "label": "C",
+            "title": "Target Modules",
+            "role": "决定 LoRA 插到哪些层或哪些投影矩阵上。",
+            "beginnerExplanation": "不是模型每个地方都必须贴便签，常见做法是在 attention 的投影矩阵上加 LoRA。",
+            "connectsTo": "影响效果、训练成本和不同任务的适配能力。"
+          },
+          {
+            "label": "D",
+            "title": "Merge for Inference",
+            "role": "推理时把 LoRA 增量并回基础权重。",
+            "beginnerExplanation": "训练后可以把便签内容抄进对应页面，读的时候不需要额外翻一本小册子。",
+            "connectsTo": "解释为什么 LoRA 相比一些 adapter 方法没有额外推理层延迟。"
+          }
+        ]
+      },
+      "evidenceLens": {
+        "benchmarkTakeaway": "论文摘要强调 trainable parameters 可减少最高 10,000 倍，GPU memory 需求减少约 3 倍，同时保持有竞争力的任务效果。",
+        "whatWasCompared": "比较的是 LoRA、全量微调、adapter、prefix tuning 等参数高效微调方法在多个模型和任务上的效果、参数量与延迟。",
+        "whatToTrust": "可以相信的结论是：低秩增量是一种非常强的参数高效微调基线，尤其适合多任务、多 adapter 的工程场景。",
+        "whatNotToOverclaim": "不要以为 LoRA 永远等价于全量微调。目标层选择、rank、数据质量、任务类型都会影响结果。"
+      },
+      "experimentReadings": [
+        {
+          "question": "只训练低秩增量，能不能接近全量微调效果，同时显著降低成本？",
+          "setup": "作者在 RoBERTa、DeBERTa、GPT-2、GPT-3 等模型和多种 NLP 任务上比较 LoRA 与全量微调、adapter、prefix tuning。",
+          "metric": "任务质量指标、可训练参数量、GPU memory、吞吐和 adapter latency。",
+          "result": "论文报告可训练参数大幅减少，显存需求降低，同时在多项任务上保持有竞争力结果。",
+          "conclusion": "实验支持“许多下游任务的有效更新可以用低秩增量表示”。",
+          "limitation": "结果依赖 rank、插入层、目标模块和任务数据；不能推出所有任务都适合很小 rank。"
+        }
+      ],
+      "studyLens": {
+        "professorExplanation": "我会让学生亲手算参数量：完整更新是 d x k，LoRA 是 d x r + r x k。当 r 远小于 d 和 k 时，为什么差距会非常大？算完这个，你就理解了 LoRA 的工程吸引力。",
+        "beginnerPath": [
+          "先复习矩阵乘法和 rank 的直觉。",
+          "再写出 W + BA 的形式。",
+          "最后用 PEFT 跑一个小模型，比较 r=4、r=8、r=16 的效果和显存。"
+        ],
+        "commonMisreadings": [
+          "以为 LoRA 会压缩基础模型本身。",
+          "只看参数减少，不检查任务质量和延迟。",
+          "以为 rank 越大越好，忽略成本和过拟合。"
+        ],
+        "practicePrompt": "选一个小模型和一个小分类/指令数据集，分别用 r=4 和 r=16 跑 LoRA。记录显存、训练时间、验证集效果，然后解释哪个设置更合适。"
+      },
+      "verificationTasks": [
+        {
+          "level": "复述题",
+          "title": "解释 LoRA 到底省了什么",
+          "task": "用 3 句话说明 LoRA 不改变什么、训练什么、节省什么。",
+          "passCriteria": [
+            "说出基础模型 W 被冻结。",
+            "说出只训练低秩 A/B 增量。",
+            "说出节省的是训练参数、显存和任务 checkpoint。"
+          ],
+          "commonMistake": "说 LoRA 把基础模型压缩变小了。",
+          "sampleAnswer": "LoRA 不重写整个基础模型，而是冻结 W。它只训练两个小矩阵 A/B 形成增量 BA。这样每个任务只需要保存小增量，训练显存和参数量都更低。"
+        },
+        {
+          "level": "计算题",
+          "title": "手算低秩参数量",
+          "task": "假设完整矩阵是 4096 x 4096，LoRA rank r=8，计算完整更新和 LoRA 更新分别大约多少参数。",
+          "passCriteria": [
+            "完整更新写出 4096 x 4096。",
+            "LoRA 写出 4096 x 8 + 8 x 4096。",
+            "能说明两者数量级差异。"
+          ],
+          "commonMistake": "只背 10,000x，不会自己算参数量。",
+          "sampleAnswer": "完整更新约 1677 万参数。LoRA 是 32768 + 32768，约 6.5 万参数。差距来自 r 远小于 4096。"
+        },
+        {
+          "level": "迁移题",
+          "title": "判断什么时候不用 LoRA",
+          "task": "列出两个 LoRA 可能不够用或需要谨慎的场景。",
+          "passCriteria": [
+            "提到任务需要大幅改变模型知识或行为时可能不够。",
+            "提到 rank、目标模块和数据质量会限制效果。"
+          ],
+          "commonMistake": "认为 LoRA 永远和全量微调一样好。",
+          "sampleAnswer": "如果任务要求模型学习大量新领域知识，低 rank 增量可能表达不够。另一个风险是 LoRA 插入位置或 rank 选得不好，虽然省显存但效果差。"
+        }
+      ],
+      "conceptMap": [
+        "Low-rank adaptation",
+        "Frozen pretrained weights",
+        "Trainable rank matrices",
+        "Adapter latency",
+        "PEFT"
+      ],
+      "charts": [
+        {
+          "title": "Efficiency claims",
+          "metric": "Reduction factor reported in abstract",
+          "unit": "x",
+          "maxValue": 10000,
+          "bars": [
+            {
+              "label": "Trainable params",
+              "value": 10000,
+              "display": "10,000x",
+              "highlight": true
+            },
+            {
+              "label": "GPU memory",
+              "value": 3,
+              "display": "3x"
+            }
+          ]
+        }
+      ],
+      "analysis": {
+        "thesis": "下游微调不一定需要更新全部参数；许多任务的有效权重更新可以落在低秩子空间里。",
+        "background": "模型越大，全量微调越贵，保存和部署多个任务版本也越困难。",
+        "method": "冻结原模型，在 Transformer 层里注入可训练的低秩矩阵 A/B，只训练这些小矩阵。",
+        "experiments": "比较 RoBERTa、DeBERTa、GPT-2、GPT-3 上的质量、吞吐、参数量和 adapter latency。",
+        "limitations": "LoRA 的 rank、插入层位置、目标模块选择会影响效果；它也不能替代数据质量和评测。",
+        "professorLens": "教授会要求学生自己算一次参数量：为什么 d x r + r x k 比 d x k 小得多。",
+        "verificationChecklist": [
+          "能写出 W + BA 的形式",
+          "能解释 rank r 的作用",
+          "能说明为什么 LoRA 没有额外推理层延迟",
+          "能用 PEFT 跑一个小模型微调"
+        ]
+      },
+      "nextSteps": [
+        "用一个小模型跑 LoRA 微调。",
+        "比较 r=4、r=8、r=16 的效果和显存。",
+        "读 QLoRA，理解量化和 LoRA 如何组合。"
+      ],
+      "paperType": "system_method",
+      "showVersionLens": false,
+      "templateDecision": {
+        "suggestedPaperType": "system_method",
+        "activePaperType": "system_method",
+        "confidence": "high",
+        "reason": "文章通过质量筛选后，再根据题材和已有深度模块选择该解读模板。",
+        "requiredModules": [
+          "plainLanguage",
+          "ideaArchitecture",
+          "architectureWalkthrough",
+          "evidenceLens",
+          "verificationTasks"
+        ]
+      },
+      "qualityDecision": {
+        "qualityScore": 40,
+        "tier": "ignore",
+        "selectionReason": "保留到 archive，后续需要补基础或复用架构思路时再打开。",
+        "qualitySignals": [
+          "对 AI coding / SWE agent 面试和项目有直接价值。",
+          "来源或作者机构具备较高可信度/行业影响力。"
+        ],
+        "redFlags": [
+          "较老，更适合 archive/foundation，不适合作为每日主 feed。",
+          "属于基础经典，重要但不应挤占每日新文章名额。"
+        ],
+        "recommendedUse": "作为资料库保存，不进入今日 active feed。",
+        "archiveValue": "foundation/background",
+        "selectedForDaily": false
+      },
+      "archivedAt": "2026-05-20T23:24:10.163Z",
+      "archiveReason": "未进入今日 top 5，但保留作后续思路/架构资料。",
+      "reusableFor": [
+        "foundation/background",
+        "idea architecture reuse",
+        "background reading"
+      ]
+    }
+  ]
+}
