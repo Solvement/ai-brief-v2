@@ -29,6 +29,24 @@ function validateRepo(repo, path) {
 
   if (!Array.isArray(repo.tags)) fail(`${path}.tags`, "must be an array");
 
+  if (repo.rankingReason !== undefined) {
+    const rr = repo.rankingReason;
+    if (!rr || typeof rr !== "object") {
+      fail(`${path}.rankingReason`, "must be an object");
+    } else {
+      const validDecisions = ["boost", "cap-low-priority", "cap-non-core", "no-change"];
+      if (!validDecisions.includes(rr.decision)) fail(`${path}.rankingReason.decision`, `must be one of ${validDecisions.join(", ")}`);
+      for (const numKey of ["rawScore", "finalScore"]) {
+        if (!isNumber(rr[numKey]) || rr[numKey] < 0 || rr[numKey] > 100) fail(`${path}.rankingReason.${numKey}`, "must be a number 0-100");
+      }
+      for (const arrKey of ["matchedBoostTerms", "matchedCapTerms"]) {
+        if (!Array.isArray(rr[arrKey])) fail(`${path}.rankingReason.${arrKey}`, "must be an array");
+        else if (rr[arrKey].some((t) => typeof t !== "string")) fail(`${path}.rankingReason.${arrKey}`, "must be array of strings");
+      }
+      if (typeof rr.explanation !== "string" || rr.explanation.trim() === "") fail(`${path}.rankingReason.explanation`, "must be a non-empty string");
+    }
+  }
+
   if (repo.deep) {
     const deep = repo.deep;
     for (const key of ["atGlance", "howItWorks", "novelty", "ecosystem"]) {

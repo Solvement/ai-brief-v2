@@ -303,6 +303,7 @@ async function processBoard(window, all, cache) {
       tags: lights[i]?.tags || [],
       light: lights[i]?.light || "",
       worthDeepDive: lights[i]?.worthDeepDive ?? 0,
+      ...(lights[i]?.rankingReason ? { rankingReason: lights[i].rankingReason } : {}),
       ...(deeps[i] ? { deep: deeps[i] } : {}),
     })),
   };

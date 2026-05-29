@@ -1,6 +1,6 @@
 # goals.md
 
-Last updated: 2026-05-21
+Last updated: 2026-05-24
 
 ## Purpose
 
@@ -24,6 +24,8 @@ The product should help a student, builder, or AI PM answer:
 4. Should I read, try, save, ignore, or monitor it?
 5. What can I do next?
 6. How do I verify success?
+
+Default analysis should read like a clear GPT answer, not a visual dashboard. Start with judgment and a mental model, keep paragraphs short, and reserve visualization for architecture, workflow, data flow, and concrete examples.
 
 ## Long-Term Identity
 
@@ -97,7 +99,7 @@ Goal:
 - deep-dive priority should favor agent, RAG, MCP, A2A, memory, AI coding, tool-use, evaluation, workflow automation, and other AIGC engineering systems;
 - generic skills/course/tutorial/awesome-list/cookbook and finance/fintech/crypto projects should usually stay light-read unless they teach reusable AI architecture;
 - cards should let users decide within 5 seconds whether to open;
-- detail pages should teach architecture, concepts, ecosystem, limitations, and try-it workflow.
+- detail pages should first make the project readable: judgment, solved problem, core mechanism, transferable pattern, and verification action. Architecture/workflow can be visualized; ecosystem, limitations, and judgment should stay mostly prose/list based.
 
 Future direction:
 
@@ -137,6 +139,7 @@ Goal:
 - good selection signals include recent/high-signal AI papers from big labs, well-known universities, top conferences, strong AI-engineer relevance, architecture value, evaluation quality, practicality, novelty, and transfer potential;
 - topics should bias toward agents, RAG, memory, MCP/A2A-adjacent protocols, AI coding, tool-use, evaluation, multimodal/AIGC systems, and production AI engineering;
 - explain the paper's central question in beginner-friendly Chinese;
+- open the detail page with a reader-first explanation before exposing the full workbench;
 - show prerequisite terms, idea, architecture, method flow, evidence, limitations, and professor lens as separate views;
 - choose the analysis template by `paper_type` only after the paper passes quality selection, because benchmark/evaluation papers need claim/evidence/experiment/反方/落地 translation more than a normal method-summary flow;
 - separate original paper content from later ecosystem extensions;

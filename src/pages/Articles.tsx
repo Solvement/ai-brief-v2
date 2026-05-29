@@ -97,6 +97,28 @@ function joinNarrativeParts(parts: Array<string | undefined | null>): string {
     .join(" ");
 }
 
+function compactReadingText(text: string, max = 180): string {
+  const clean = text.replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, "").replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const sentence = clean.match(/^(.+?[。！？.!?])\s*/)?.[1];
+  if (sentence && sentence.length <= max) return sentence;
+  return `${clean.slice(0, Math.max(0, max - 1)).trim()}…`;
+}
+
+function firstPaperTask(paper: AcademicArticle): string {
+  const task = paper.verificationTasks[0];
+  if (task) return compactReadingText(task.task, 150);
+  return "读完后用自己的话复述问题、方法、证据和一个可迁移做法。";
+}
+
+function paperMechanismLine(paper: AcademicArticle): string {
+  if (paper.paperType === "benchmark_evaluation" && paper.benchmarkEvaluation) {
+    const claim = paper.benchmarkEvaluation.claimMap[0]?.claim;
+    if (claim) return compactReadingText(claim, 150);
+  }
+  return compactReadingText(joinNarrativeParts([paper.ideaArchitecture.coreMove, paper.ideaArchitecture.optimizationLogic]), 170);
+}
+
 function isSystemArchitecturePaper(paper: AcademicArticle): boolean {
   return paper.paperType === "system_method" || paper.paperType === "agent_architecture";
 }
@@ -577,9 +599,7 @@ function ArticleDetail({ paper, generatedAt, papers }: { paper: AcademicArticle;
           </aside>
 
           <div className="article-main">
-            <PaperQuestionBoard paper={paper} />
-
-            <LearningLoop paper={paper} />
+            <ArticleReaderBrief paper={paper} />
 
             <nav className="paper-view-tabs" aria-label="论文阅读视图">
               {views.map((view) => (
@@ -615,6 +635,58 @@ function ArticleDetail({ paper, generatedAt, papers }: { paper: AcademicArticle;
         </section>
       </main>
     </>
+  );
+}
+
+function ArticleReaderBrief({ paper }: { paper: AcademicArticle }) {
+  const benchmark = paper.benchmarkEvaluation;
+  const firstExperiment = paper.experimentReadings[0];
+  const firstTerm = paper.prerequisiteTerms[0];
+  const evidenceLine =
+    benchmark?.claimMap[0]?.evidence ||
+    firstExperiment?.conclusion ||
+    paper.evidenceLens.benchmarkTakeaway;
+  const transferLine =
+    benchmark?.applicationDeploymentTranslation.concreteImplementationIdea ||
+    paper.analysis.professorLens;
+
+  return (
+    <section className="reader-brief article-reader-brief">
+      <div className="reader-brief-lead">
+        <div className="section-kicker">Reader First</div>
+        <h3>先把论文讲成人话</h3>
+        <p>{compactReadingText(paper.plainLanguage.beginnerSummary, 210)}</p>
+      </div>
+
+      <div className="reader-brief-grid">
+        <article>
+          <span>它在问什么</span>
+          <p>{compactReadingText(benchmark?.paperQuestion.researchQuestion || paper.ideaArchitecture.centralQuestion, 170)}</p>
+        </article>
+        <article>
+          <span>核心机制</span>
+          <p>{paperMechanismLine(paper)}</p>
+        </article>
+        <article>
+          <span>证据怎么看</span>
+          <p>{compactReadingText(evidenceLine, 170)}</p>
+        </article>
+        <article>
+          <span>可以迁移什么</span>
+          <p>{compactReadingText(transferLine, 170)}</p>
+        </article>
+      </div>
+
+      <div className="reader-next-line">
+        <b>先记住</b>
+        <span>{paper.plainLanguage.oneThingToRemember}</span>
+      </div>
+
+      <div className="reader-next-line muted">
+        <b>下一步</b>
+        <span>{firstTerm ? `先懂 ${firstTerm.term}，然后做自测：${firstPaperTask(paper)}` : firstPaperTask(paper)}</span>
+      </div>
+    </section>
   );
 }
 
@@ -663,16 +735,27 @@ function PaperMainPathView({ paper }: { paper: AcademicArticle }) {
         <p>{paper.plainLanguage.beginnerSummary}</p>
       </article>
       <section className="main-path-grid">
-        <PrerequisiteTerms terms={paper.prerequisiteTerms.slice(0, 4)} />
+        <article className="main-path-card compact-list-card">
+          <div className="section-kicker">Step 2 · 先扫清术语</div>
+          <h3>只先看最影响理解的词</h3>
+          <div className="compact-term-list">
+            {paper.prerequisiteTerms.slice(0, 4).map((term) => (
+              <div key={term.term}>
+                <b>{term.term}</b>
+                <span>{compactReadingText(term.plainMeaning, 90)}</span>
+              </div>
+            ))}
+          </div>
+        </article>
         <article className="main-path-card">
-          <div className="section-kicker">Step 2 · 看总图</div>
-          <h3>这篇论文的结构怎么连起来</h3>
-          <ArchitectureFlowMap blocks={paper.architectureWalkthrough.blocks} />
+          <div className="section-kicker">Step 3 · 看流程</div>
+          <h3>把方法压成一条主线</h3>
+          <MethodFlowMini steps={paper.ideaArchitecture.methodFlow.slice(0, 4)} />
         </article>
       </section>
       {firstExperiment && (
         <article className="main-path-card">
-          <div className="section-kicker">Step 3 · 看证据</div>
+          <div className="section-kicker">Step 4 · 看证据</div>
           <h3>{firstExperiment.question}</h3>
           <div className="main-path-evidence">
             <EvidenceFact label="怎么比" body={firstExperiment.setup} />
@@ -683,7 +766,7 @@ function PaperMainPathView({ paper }: { paper: AcademicArticle }) {
       )}
       {firstTask && (
         <article className="main-path-card">
-          <div className="section-kicker">Step 4 · 自测</div>
+          <div className="section-kicker">Step 5 · 自测</div>
           <h3>{firstTask.title}</h3>
           <p>{firstTask.task}</p>
           <div className="main-path-evidence">
@@ -694,6 +777,21 @@ function PaperMainPathView({ paper }: { paper: AcademicArticle }) {
         </article>
       )}
     </section>
+  );
+}
+
+function MethodFlowMini({ steps }: { steps: ArticleFlowStep[] }) {
+  if (steps.length === 0) return <p>这篇内容没有明确的方法流程，先读核心机制和证据。</p>;
+  return (
+    <div className="method-flow-mini">
+      {steps.map((step, index) => (
+        <div key={`${step.title}-${index}`}>
+          <span>{index + 1}</span>
+          <b>{step.title}</b>
+          <p>{compactReadingText(step.body, 95)}</p>
+        </div>
+      ))}
+    </div>
   );
 }
 

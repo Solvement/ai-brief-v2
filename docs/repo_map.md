@@ -1,6 +1,6 @@
 # repo_map.md
 
-Last updated: 2026-05-21
+Last updated: 2026-05-24
 
 ## Purpose
 
@@ -142,14 +142,14 @@ src/pages/
 - `Home.tsx`: navigation hub plus compact Agentic Pipeline status panel loaded from `public/data/pipeline-status.json`.
 - `Projects.tsx`: GitHub Trending boards and manual one-click ingest trigger.
 - `Detail.tsx`: project detail page for `#/repo/:owner/:name`.
-  It includes beginner overview loops, lite details for non-deep repos, and derived project verification prompts.
+  It includes a reader-first overview, lightweight workflow sketch, lite details for non-deep repos, and compact derived project verification prompts.
 - `Models.tsx`: model company archive, version workbench, benchmark charts.
   It includes release chips, benchmark plain-language notes, previous-release deltas, and derived model verification prompts.
 - `Articles.tsx`: academic paper workbench with `paper_type`-aware detail views.
   The index is quality-first: it displays the daily active top 5 from `public/data/articles.json`, sorted by `qualityDecision.qualityScore`, and only then shows the chosen interpretation template.
-  Generic/system papers keep plain-language, architecture, evidence, professor/self-check, and optional version views.
+  Detail pages start with a reader-first brief before workbench tabs. Generic/system papers keep plain-language, architecture, evidence, professor/self-check, and optional version views.
   Benchmark/evaluation papers use dedicated Paper Question, Claim Map, Experiment Matrix, Critical Review, Application, and Interview Card views, with the version lens hidden unless the paper has meaningful version differences.
-  It defaults to a main reading path before tab-specific exploration.
+  The main reading path stays compact: essential terms, method flow, evidence, and self-test before deeper tab-specific exploration.
 
 ## public/
 

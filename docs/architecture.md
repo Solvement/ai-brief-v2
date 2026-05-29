@@ -1,6 +1,6 @@
 # architecture.md
 
-Last updated: 2026-05-21
+Last updated: 2026-05-24
 
 ## Purpose
 
@@ -98,9 +98,10 @@ Current frontend presentation adds a beginner-first layer on top of the generate
 
 - cards expose what / why / who / recommended action;
 - score badges distinguish value score from total score;
-- project detail overview shows a learning loop before tabs;
+- project detail overview now starts with a reader-first brief: judgment, solved problem, core mechanism, transferable idea, and next verification step;
+- project detail uses a compact workflow sketch only for actual architecture/workflow explanation;
 - non-deep projects use a lite detail instead of developer-facing ingest instructions;
-- deep projects derive a verification panel from available `tldr`, `tryIt`, and deep analysis fields.
+- deep projects derive a compact verification panel from available `tldr`, `tryIt`, and deep analysis fields.
 
 ### Models
 
@@ -155,7 +156,7 @@ Each paper should explain:
 - executable verification tasks with pass criteria, common mistakes, and answer key points;
 - optional arXiv version timeline only when version changes are meaningful;
 
-Current frontend presentation defaults to a main reading path that connects plain-language summary, prerequisite terms, architecture flow map, evidence, and self-test before optional tab exploration.
+Current frontend presentation defaults to a reader-first brief that explains the paper in plain Chinese before optional tab exploration. The main path then keeps the reading route compact: essential terms, a lightweight method flow, evidence, and self-test.
 For `benchmark_evaluation` papers, the frontend switches to a smaller reading route and dedicated Claim Map, Experiment Matrix, Critical Review, Application, and Interview Card views. SWE-Bench Illusion is the first benchmark/evaluation template instance.
 
 ### Placeholder Sections

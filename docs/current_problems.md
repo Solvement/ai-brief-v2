@@ -1,6 +1,6 @@
 # current_problems.md
 
-Last updated: 2026-05-21
+Last updated: 2026-05-24
 
 ## Purpose
 
@@ -48,9 +48,10 @@ Recent Articles improvement:
 Recent cross-section UX improvement:
 
 - Projects cards now expose decision signals and score meanings.
-- Project detail now has a beginner learning loop and derived verification prompts.
+- Project detail now has a reader-first brief, lightweight workflow sketch, and compact derived verification prompts.
 - Models cards now show representative releases and recommended starting point.
 - Models detail now has benchmark plain-language notes, previous-release deltas, and derived verification prompts.
+- Articles detail now opens with a plain-language reader brief and keeps the main path to essential terms, method flow, evidence, and self-test.
 
 Recent data quality fix:
 
@@ -141,6 +142,25 @@ What future agents should do:
 - Add a provenance panel in detail pages.
 - For papers/models, distinguish official facts from interpretation.
 - For paper deep dives, keep "original paper" and "modern extension" boundaries visible so students do not confuse later ecosystem knowledge with the paper's own contribution.
+
+### 3a. Analysis Readability Can Still Regress
+
+Current state:
+
+- Projects and Articles now have reader-first default panels.
+- Project prompts now require judgment and mental model before implementation details.
+- Existing generated data still contains some dense passages, so the frontend uses compact excerpts in the default path.
+
+Symptoms:
+
+- A future ingest run can still produce analysis that is technically valid but hard to read if prompts or reviewers drift.
+- Rich tabs can still become too card-heavy if every field is visualized.
+
+What future agents should do:
+
+- Keep default detail pages closer to a clear GPT answer than a dashboard.
+- Visualize only architecture, workflow, data flow, and concrete examples.
+- Prefer short paragraphs and compact lists for judgment, risks, ecosystem, and next actions.
 
 ### 4. Derived Verification Is A Stopgap
 
