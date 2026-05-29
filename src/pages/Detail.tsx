@@ -225,47 +225,45 @@ function ProjectReaderBrief({ repo, onSelectTab }: { repo: AnalyzedRepo; onSelec
   const firstConcept = deep.keyConcepts[0];
   const reasons = deep.whyItMatters.slice(0, 3);
   return (
-    <section className="reader-brief project-reader-brief">
-      <div className="reader-brief-lead">
-        <div className="section-kicker">Reader First</div>
-        <h3>先给判断</h3>
-        <p>{compactText(deep.atGlance, 190)}</p>
+    <section className="dd-lead">
+      <div className="dd-kicker">先给判断</div>
+      <h2 className="dd-verdict">{firstSentence(deep.atGlance)}</h2>
+      <p className="dd-verdict-sub">{compactText(repo.light, 190)}</p>
+
+      <div className="dd-insight">
+        <div className="dd-insight-tag">核心洞见</div>
+        <p>{compactText(deep.novelty, 240)}</p>
       </div>
 
-      <div className="reader-brief-grid">
-        <article>
-          <span>它解决什么</span>
-          <p>{compactText(repo.light, 190)}</p>
-        </article>
-        <article>
-          <span>核心机制</span>
-          <p>{projectMechanism(deep)}</p>
-          <button className="text-link-button" type="button" onClick={() => onSelectTab("howItWorks")}>看完整流程</button>
-        </article>
-        <article>
-          <span>先懂一个概念</span>
-          <p>{firstConcept ? `${firstConcept.term}：${compactText(firstConcept.explain, 150)}` : "没有明显专有术语。先抓住目标用户、输入、输出和 quickstart。"}</p>
-          {firstConcept && <button className="text-link-button" type="button" onClick={() => onSelectTab("concepts")}>看术语</button>}
-        </article>
-        <article>
-          <span>可以迁移什么</span>
-          <p>{projectTransfer(repo, deep)}</p>
-        </article>
-      </div>
+      {reasons.length > 0 && (
+        <div className="dd-why">
+          {reasons.map((reason) => (
+            <article key={reason.title}>
+              <b>{reason.title}</b>
+              <span>{compactText(reason.body, 70)}</span>
+            </article>
+          ))}
+        </div>
+      )}
 
-      <div className="reader-brief-reasons">
-        {reasons.map((reason) => (
-          <div key={reason.title}>
-            <b>{reason.title}</b>
-            <span>{compactText(reason.body, 95)}</span>
+      {firstConcept && (
+        <>
+          <div className="dd-block-kicker">先懂一个概念</div>
+          <div className="dd-concept">
+            <div className="dd-term"><i>1</i>{firstConcept.term}</div>
+            <div className="dd-concept-body prose"><Markdown text={firstConcept.explain} /></div>
           </div>
-        ))}
-      </div>
+        </>
+      )}
 
-      <div className="reader-next-line">
-        <b>下一步</b>
-        <span>{firstTryStep(deep.tryIt)}</span>
-        <button className="text-link-button" type="button" onClick={() => onSelectTab("tryIt")}>看上手步骤</button>
+      <div className="dd-threads">
+        <div className="dd-threads-lab">想再深挖（点开展开，不打扰主线）：</div>
+        <div className="dd-chips">
+          <button type="button" className="dd-chip" onClick={() => onSelectTab("howItWorks")}>＋ 完整流程</button>
+          <button type="button" className="dd-chip" onClick={() => onSelectTab("concepts")}>＋ 全部术语</button>
+          <button type="button" className="dd-chip" onClick={() => onSelectTab("novelty")}>＋ 跟同类的差异</button>
+          <button type="button" className="dd-chip" onClick={() => onSelectTab("tryIt")}>＋ 上手步骤</button>
+        </div>
       </div>
     </section>
   );

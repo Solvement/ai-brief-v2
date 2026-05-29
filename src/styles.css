@@ -3614,3 +3614,27 @@ button { font-family: inherit; cursor: pointer; }
 /* fix: verification card titles were dark-on-dark after the flip */
 .verification-compact-grid article b { color: var(--ink); }
 .verification-compact-grid article span { color: var(--ink-3); }
+
+/* deep dive interior — approved B "Focus Console" design (visual only) */
+.dd-lead { margin: 4px 0 8px; }
+.dd-kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.22em; color: var(--accent); margin-bottom: 14px; }
+.dd-verdict { font-size: 28px; line-height: 1.45; font-weight: 760; letter-spacing: 0.005em; color: var(--ink); margin: 0 0 14px; }
+.dd-verdict-sub { font-size: 15.5px; color: var(--ink-2); line-height: 1.85; max-width: 62ch; margin: 0; }
+.dd-insight { margin: 28px 0; padding: 22px 24px; background: linear-gradient(180deg, rgba(232, 173, 94, 0.10), rgba(232, 173, 94, 0.03)); border: 1px solid rgba(232, 173, 94, 0.25); border-radius: 14px; }
+.dd-insight-tag { font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 9px; }
+.dd-insight p { font-size: 15.5px; line-height: 1.85; color: var(--ink); margin: 0; }
+.dd-why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+.dd-why article { padding: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+.dd-why b { display: block; font-size: 14.5px; margin-bottom: 5px; color: var(--ink); }
+.dd-why span { font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+.dd-block-kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.2em; color: var(--ink-3); margin: 32px 0 14px; }
+.dd-concept { padding: 20px 22px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; }
+.dd-term { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
+.dd-term i { width: 26px; height: 26px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-style: normal; font-size: 14px; font-weight: 800; }
+.dd-concept-body { font-size: 14.5px; color: var(--ink-2); line-height: 1.8; padding-left: 14px; border-left: 2px solid var(--accent); }
+.dd-concept-body p { margin: 0; }
+.dd-threads { margin: 26px 0 0; }
+.dd-threads-lab { font-size: 13px; color: var(--ink-3); margin-bottom: 10px; }
+.dd-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.dd-chip { font-size: 13.5px; color: var(--ink-2); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+.dd-chip:hover { border-color: var(--accent); color: var(--accent); }
