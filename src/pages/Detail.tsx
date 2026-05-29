@@ -125,7 +125,6 @@ export function Detail({ owner, name }: Props) {
               {tab === "overview" && (
                 <>
                   <ProjectReaderBrief repo={repo} onSelectTab={setTab} />
-                  <ProjectWorkflowSketch repo={repo} onSelectTab={setTab} compact />
                   <ProjectVerificationPanel repo={repo} />
                 </>
               )}

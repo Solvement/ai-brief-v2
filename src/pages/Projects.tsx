@@ -40,6 +40,7 @@ type IngestState = "idle" | "running" | "done" | "error";
 
 export function Projects() {
   const [data, setData] = useState<TrendingData | null>(null);
+  const [win, setWin] = useState<TrendingWindow>("daily");
   const [err, setErr] = useState<string | null>(null);
   const [ingest, setIngest] = useState<IngestState>("idle");
   const [log, setLog] = useState("");
@@ -119,11 +120,18 @@ export function Projects() {
         {!data && !err && <div className="loading">正在加载榜单…</div>}
 
         {data && (
-          <div className="boards">
-            <BoardCol board={data.daily} />
-            <BoardCol board={data.weekly} />
-            <BoardCol board={data.monthly} />
-          </div>
+          <>
+            <div className="board-tabs">
+              {(["daily", "weekly", "monthly"] as TrendingWindow[]).map((w) => (
+                <button key={w} className={`board-tab${win === w ? " active" : ""}`} onClick={() => setWin(w)}>
+                  {TITLES[w]}<span className="board-tab-count">{data[w].repos.length}</span>
+                </button>
+              ))}
+            </div>
+            <div className="boards single">
+              <BoardCol board={data[win]} />
+            </div>
+          </>
         )}
       </main>
 
