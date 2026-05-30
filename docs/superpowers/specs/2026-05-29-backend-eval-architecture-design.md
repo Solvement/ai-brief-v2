@@ -42,6 +42,11 @@ discover WIDE → collectEvidence → evaluate (cheap model triage)
 
 Cheap model triages everything; expensive model only deep-dives top-N (institutionalize ingest's light=flash / deep=pro split into the kernel).
 
+### Two axes of "light/deep" (do not conflate)
+
+- **Axis A — selection tier (cost routing):** cheap model triages ALL → cheap card for everyone; expensive model deep-analyzes only top-N. **Only Projects strongly needs it** (Trending is noisy); Papers' filter replaces the gate; Models has no gate (coverage).
+- **Axis B — presentation tier (progressive disclosure, SPEC §4):** every SHOWN item leads with one big judgment → core insight → one example → 线头 folds the deep content. **All columns need Axis B** — it is the product spine serving Kevin's energy state.
+
 ## 3. Two evals (explicit in the interface)
 
 ### evaluate() — SELECTION, two modes
@@ -56,10 +61,11 @@ Cheap model triages everything; expensive model only deep-dives top-N (instituti
 ## 4. Per-column rulers
 
 ### Projects (rank mode)
-- discover: GitHub Trending daily/weekly/monthly, dedupe only.
+- discover: GitHub Trending daily/weekly/monthly (spine) + GitHub topic/search for the boost terms (agent/rag/mcp/a2a/memory/eval/AI coding…) to catch good repos not yet trending; merge + dedupe. Star/star-gained = the 直观信号 (SPEC §3).
 - evidence: README (+ description, language, stars/gained).
 - evaluate: cheap-model light read → `worthDeepDive` + tags + tldr + **intent class (理解型/教学型/工具型)**. **Keyword signals become scoring FEATURES, not a hard cap** — a repo with "finance" + strong agent-infra signals must NOT be auto-capped (current bug). 
 - analyze (deep): per intent — 理解型: 应用价值+怎么做到; 教学型: 怎么跟着学/看啥跳啥; 工具型: 怎么用+扩展用法.
+- **`tryIt` is intent-gated (Kevin拍板):** 理解型/教学型 → NO operational commands, only 内在思路/创新/概念怎么实现 (SPEC §4 砍掉操作内容); 工具型 → keep a CONCISE "怎么用 + 扩展用法". The current universal `tryIt`-with-commands in DEEP_SYS must become intent-gated.
 - "好" = AI-engineer learning value (agents/RAG/MCP/A2A/memory/eval/AI coding/AIGC eng).
 
 ### Papers (rank mode, provenance-critical) — also feeds the Articles surface
