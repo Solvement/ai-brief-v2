@@ -4,7 +4,7 @@
 
 ## 一句话技术栈
 
-本地优先 MVP：Vite + React + TypeScript（前端） + Node 脚本（管线） + 静态 JSON 数据契约。无后端服务、无数据库。
+本地优先 MVP：Vite + React + TypeScript（前端） + Node 脚本（管线） + 静态 JSON 数据契约。无后端服务；后端评估管线使用本地 SQLite（`data/ai-brief.db`）作为发布前中间层。
 
 ## 前端（Claude 的活）
 
@@ -43,6 +43,13 @@ data/          agent-memory/*.json、papers/*  （本地生成，不直接服务
 ## 验证
 
 `npm run verify` = `lint && test && build`（`test` 已含 `validate`）。改数据形状 → 先改 `types.ts` + 对应 `validate-*`。
+
+## Backend eval foundation (2026-05-29)
+
+- `scripts/lib/db.mjs` owns the local SQLite schema/access layer for `candidates`, `evidence`, `evals`, `analyses`, `qa_verdicts`, and `runs`. Driver choice on this Windows machine: Node `v24.13.1`, so Chunk 1 uses built-in `node:sqlite`; no `better-sqlite3` dependency was added.
+- `scripts/lib/llm.mjs` is the shared DeepSeek chat/JSON client used by `ingest.mjs` with the same flags, retry behavior, timeout, and JSON repair pass.
+- `scripts/lib/pipeline-kernel.mjs` defines the formal ColumnModule runner for `discover -> evidence -> evaluate -> select -> analyze -> qaGate -> publish -> archive`. `scripts/lib/agentic-pipeline.mjs` keeps its old exports and re-exports the kernel helpers.
+- `scripts/lib/qa-base.mjs` provides deterministic structural QA checks plus an opt-in LLM groundedness judge harness guarded by `AI_BRIEF_LLM_JUDGE=1`.
 
 ## "改某功能去哪"
 

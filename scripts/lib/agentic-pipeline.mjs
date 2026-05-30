@@ -3,6 +3,16 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+export {
+  COLUMN_MODULE_STAGES,
+  REQUIRED_COLUMN_MODULE_METHODS,
+  assertColumnModule,
+  defaultSelect,
+  describeColumnModule,
+  mapLimit,
+  runColumnPipeline,
+} from "./pipeline-kernel.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
 const MEMORY_DIR = path.join(ROOT, "data", "agent-memory");

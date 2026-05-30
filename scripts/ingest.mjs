@@ -22,6 +22,7 @@ import {
   selectDeepDiveIndices,
 } from "./lib/project-ranking.mjs";
 import { DEEP_SYS, LIGHT_SYS, deepUser, lightUser } from "./lib/project-prompts.mjs";
+import { createDeepSeekClient, projectDeepModel, projectLightModel } from "./lib/llm.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -55,70 +56,7 @@ const WORTH_THRESHOLD = numFlag("worth", 60);
 const API_TIMEOUT_MS = numFlag("api-timeout-ms", Number(process.env.DEEPSEEK_TIMEOUT_MS) || 180000);
 const LIGHT_MAX_TOKENS = numFlag("light-max-tokens", Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200);
 const DEEP_MAX_TOKENS = numFlag("deep-max-tokens", Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 8000);
-
-function deepseekBaseUrl() {
-  return process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
-}
-
-function projectLightModel() {
-  return process.env.PROJECT_LIGHT_MODEL || process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
-}
-
-function projectDeepModel() {
-  return process.env.PROJECT_DEEP_MODEL || process.env.DEEPSEEK_PRO_MODEL || process.env.DEEPSEEK_MODEL || "deepseek-v4-pro";
-}
-
-async function chat({ system, user, model, jsonMode = false, retries = 2, maxTokens = 800 }) {
-  if (!process.env.DEEPSEEK_API_KEY) throw new Error("缺少 DEEPSEEK_API_KEY");
-  const selectedModel = model || process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
-  const body = { model: selectedModel, messages: [{ role: "system", content: system }, { role: "user", content: user }], temperature: jsonMode ? 0.3 : 0.5, max_tokens: maxTokens };
-  if (jsonMode) body.response_format = { type: "json_object" };
-  let lastErr;
-  for (let i = 0; i <= retries; i++) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
-    try {
-      const r = await fetch(`${deepseekBaseUrl()}/chat/completions`, {
-        method: "POST",
-        headers: { "content-type": "application/json", authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}` },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      });
-      if (!r.ok) { const e = await r.text().catch(() => ""); throw new Error(`DeepSeek ${r.status}: ${e.slice(0, 200)}`); }
-      const d = await r.json(); const c = d?.choices?.[0]?.message?.content;
-      if (!c) throw new Error("empty content");
-      return c;
-    } catch (e) {
-      lastErr = e;
-      if (i < retries) { await new Promise((rr) => setTimeout(rr, 1500 * (i + 1))); console.warn(`  retry: ${e.message}`); }
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-  throw lastErr;
-}
-
-function parseJson(raw) { let s = raw.trim(); if (s.startsWith("```")) s = s.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim(); return JSON.parse(s); }
-
-async function chatJson({ system, user, model, maxTokens }) {
-  let lastError;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const strictSystem = attempt === 0
-      ? system
-      : `${system}\n\n上一轮输出不是合法 JSON。现在只重新输出一个完整 JSON object：不要 markdown，不要注释，不要尾随逗号，字符串内部的英文双引号必须转义。`;
-    const strictUser = attempt === 0
-      ? user
-      : `${user}\n\n上一次 JSON 解析错误：${lastError?.message || "unknown"}。请重新生成完整、可被 JSON.parse 直接解析的 JSON。`;
-    const raw = await chat({ system: strictSystem, user: strictUser, model, jsonMode: true, maxTokens });
-    try {
-      return parseJson(raw);
-    } catch (error) {
-      lastError = error;
-      console.warn(`  JSON parse retry ${attempt + 1}/2: ${error.message}`);
-    }
-  }
-  throw lastError;
-}
+const { chatJson } = createDeepSeekClient({ apiTimeoutMs: API_TIMEOUT_MS });
 
 function offlineLight(r) {
   const k = r.language ? `一个 ${r.language} 项目` : "一个开源项目";
