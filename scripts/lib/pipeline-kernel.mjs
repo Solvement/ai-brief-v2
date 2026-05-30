@@ -66,7 +66,7 @@ export async function runColumnPipeline(module, options = {}) {
     archived: null,
   };
 
-  result.candidates = await runStage(result, "discover", () => asArray(module.discover(ctx)));
+  result.candidates = await runStage(result, "discover", async () => asArray(await module.discover(ctx)));
 
   result.evidence = await runStage(result, "evidence", () => mapLimit(
     result.candidates,

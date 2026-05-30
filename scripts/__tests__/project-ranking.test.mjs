@@ -18,32 +18,32 @@ test("boost path: agent keyword raises score by 6 and records reason", () => {
   assert.ok(out.rankingReason.explanation.includes("boost") || out.rankingReason.explanation.includes("加权"));
 });
 
-test("cap-low-priority path: trading keyword caps score at 39", () => {
+test("low-priority keyword is a penalty feature, not a hard cap when AI signals are strong", () => {
   const out = adjustWorthForAiEngineerFocus(
-    { fullName: "org/trader", description: "crypto trading bot" },
-    null,
+    { fullName: "org/trader", description: "crypto trading agent with MCP memory and eval workflow" },
+    "Reusable agent infrastructure for finance workflows, including RAG memory and tool use.",
     { tldr: "", light: "", tags: [], worthDeepDive: 80 },
   );
 
-  assert.equal(out.worthDeepDive, 39);
-  assert.equal(out.rankingReason.decision, "cap-low-priority");
+  assert.ok(out.worthDeepDive >= 70, `expected score >= 70, got ${out.worthDeepDive}`);
+  assert.equal(out.rankingReason.decision, "boost");
   assert.ok(out.rankingReason.matchedCapTerms.length > 0);
-  assert.equal(out.rankingReason.finalScore, 39);
+  assert.ok(out.rankingReason.matchedBoostTerms.length > 0);
   assert.equal(out.rankingReason.rawScore, 80);
 });
 
-test("cap-non-core path: neutral text caps score at 58", () => {
+test("neutral text keeps the model score without a non-core hard cap", () => {
   const out = adjustWorthForAiEngineerFocus(
     { fullName: "org/utility", description: "a generic utility library" },
     null,
     { tldr: "", light: "", tags: [], worthDeepDive: 70 },
   );
 
-  assert.equal(out.worthDeepDive, 58);
-  assert.equal(out.rankingReason.decision, "cap-non-core");
+  assert.equal(out.worthDeepDive, 70);
+  assert.equal(out.rankingReason.decision, "no-change");
   assert.equal(out.rankingReason.matchedBoostTerms.length, 0);
   assert.equal(out.rankingReason.matchedCapTerms.length, 0);
-  assert.equal(out.rankingReason.finalScore, 58);
+  assert.equal(out.rankingReason.finalScore, 70);
 });
 
 test("BOOST_TERMS and CAP_TERMS are non-empty, deduped, lowercase", () => {

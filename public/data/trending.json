@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-24T02:40:44.683Z",
+  "generatedAt": "2026-05-30T02:33:06.208Z",
   "analysisModels": {
     "projectLight": "deepseek-v4-flash",
     "projectDeep": "deepseek-v4-pro"
   },
   "pipelineRun": {
-    "id": "projects-2026-05-24-1779590444610",
+    "id": "projects-2026-05-30-1780108386210",
     "memoryFile": "data/agent-memory/projects.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -14,13 +14,13 @@
       "stage": "discover",
       "role": "Discoverer",
       "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-      "signal": "45 repos from GitHub Trending daily/weekly/monthly"
+      "signal": "37 repos from GitHub Trending plus topic/search supplements"
     },
     {
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "45 README fetch attempts, cache entries 40"
+      "signal": "37 README evidence records in SQLite"
     },
     {
       "stage": "rank",
@@ -32,13 +32,13 @@
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "18 project deep dives, 27 light reads"
+      "signal": "10 project deep dives, 35 light reads"
     },
     {
       "stage": "verify",
       "role": "Verifier",
       "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
-      "signal": "validate-trending + text encoding gate"
+      "signal": "projects qaGate + validate-trending + text encoding gate"
     },
     {
       "stage": "publish",
@@ -50,14 +50,14 @@
       "stage": "archive",
       "role": "Archivist",
       "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
-      "signal": ".cache/analyses.json + data/agent-memory/projects.json"
+      "signal": "SQLite + data/agent-memory/projects.json"
     }
   ],
   "qualityGate": {
     "schemaVersion": 1,
     "surface": "projects",
     "status": "pass",
-    "checkedAt": "2026-05-24T02:40:44.591Z",
+    "checkedAt": "2026-05-30T02:33:06.208Z",
     "checks": [
       {
         "id": "boards-present",
@@ -81,13 +81,13 @@
         "id": "deep-dive-coverage",
         "label": "at least one high-value project gets a deep dive",
         "status": "pass",
-        "details": "18 deep dives selected"
+        "details": "10 deep dives selected"
       }
     ]
   },
   "daily": {
     "window": "daily",
-    "generatedAt": "2026-05-24T02:32:42.685Z",
+    "generatedAt": "2026-05-30T02:33:06.207Z",
     "repos": [
       {
         "fullName": "Lum1104/Understand-Anything",
@@ -98,9 +98,9 @@
         "description": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 21757,
-        "forks": 1946,
-        "starsGained": 2299,
+        "stars": 21785,
+        "forks": 1950,
+        "starsGained": 4880,
         "rank": 1,
         "tldr": "这是一个多代理代码理解工具，用于将任意代码库转换为可搜索、可对话的知识图谱，特别在结合静态解析与LLM语义分析，并支持增量更新和多平台集成。",
         "tags": [
@@ -111,7 +111,18 @@
           "LLM应用"
         ],
         "light": "它解决新开发者面对大型代码库时无法快速理解结构和业务逻辑的问题。这周/月值得关注因为它是目前少有的将多代理管道、Tree-sitter静态分析和LLM语义分析紧密结合的实战项目，展示了如何构建一个实用的代码理解agent系统，对于学习agent编排、知识图谱构建以及LLM在软件工程中的应用有直接参考价值。",
-        "worthDeepDive": 91,
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 97,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "llm"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 97; final 100; intent understanding; boost: agent, llm; popularity +8"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它用一个可交互的知识图谱来打破新加入大型代码库时的茫然。它适合开发者、团队新人以及技术负责人，特别是当面对复杂项目需要快速理解结构和业务逻辑时。现在看它是因为它集成了多家 AI 编码平台，安装极简，且图谱可提交到版本库中共享。",
           "whyItMatters": [
@@ -146,9 +157,9 @@
               "explain": "根据依赖关系自动生成按依赖排序的架构浏览路径，让开发者按正确顺序学习代码库。"
             }
           ],
-          "howItWorks": "## 一句话模型\n可以把项目想象成一个聪明的导游：它先用机械的方式（Tree-sitter）给所有代码建筑拍下精确的平面图（导入导出关系），再请一位语言专家（LLM）给每栋建筑写上说明和标签（功能、架构层），最后生成一张可以随意缩放、搜索、点击的互动地图。\n\n## 工作流\n1. 用户执行 `/understand` 命令，启动多智能体流水线。\n2. `project-scanner` 扫描文件树，识别语言和框架。\n3. 多个 `file-analyzer` 并行工作（最多5个并发，每批20-30个文件），先用 Tree-sitter 提取函数、类、导入等事实，生成图节点和边；再将解析结果与源码一并送给 LLM，输出摘要、标签、架构层。\n4. `architecture-analyzer` 将节点分组到 API、Service、Data 等层。\n5. `tour-builder` 生成依赖排序的学习路径。\n6. `graph-reviewer` 检查引用完整性和缺失节点（可选全量 LLM 审查）。\n7. 最终图谱保存为 `.understand-anything/knowledge-graph.json`，增量分析时指纹比对仅更新变更文件。\n\n## 关键组件\n- **确定性解析器**：Tree-sitter 保证输入相同代码输出相同结构，杜绝 LLM 幻觉导致边缺失。\n- **LLM 代理**：并非全权生成，而是作为增强层，只负责需要理解意图的任务（摘要、标签、架构层）。\n- **增量更新引擎**：基于文件指纹检测变更，下次运行只重新分析改动过的文件，大幅加快大型仓库的重复分析。\n\n## 验证点\n运行 `/understand-dashboard` 后，浏览器打开本地网页，能看到彩色节点按架构层分布，点击节点可查看摘要和关系，搜索“auth”应定位到认证相关代码，说明图谱构建成功。",
-          "novelty": "可迁移模式：将静态代码解析与大型语言模型互补结合，而非让 LLM 独自“阅读”代码——这保证了图的拓扑结构可完全复现，同时叠加人类可读的语义层。这种做法可迁移到任何需要静态分析加自然语言理解的场景，比如配置依赖图、数据血缘图等。\n\n与同领域方案对比：纯 LLM 工具（如直接用 Claude Code 对话）能回答问题，但无法给出可靠的结构化全貌，且每次可能给出不同答案。Sourcegraph 等代码搜索平台可提供精确索引和搜索，但不自动生成人类可读的摘要与导览。CodeSee 等可视化工具专注于标准调用图，但无 AI 语义层。相比之下，Understand-Anything 把两者结合得较为轻量，且作为插件横跨多个 AI 编码助手生态，降低了切换成本。其增量分析和图谱共享是实用的工程补充，但核心思想并非首创，更多是对现有能力的精巧整合。",
-          "ecosystem": "核心依赖：Tree-sitter 及其语言语法库，以及一个能够处理大上下文（如 Claude 200K）的 LLM。\n它作为插件深度集成到多种 AI 编码平台（Claude Code 原生，Cursor/VS Code 自动发现，Copilot CLI 等），充当“增强层”而非独立工具。\n竞争方面，它替代了一部分手动绘制架构图的工作，也与代码浏览器、文档生成器有一定重叠；但它的独特定位是：生成的可交互图谱可直接提交到仓库，团队成员无需额外工具即可查看。\n可以与 CI 流程配合（post-commit hook 更新图谱），也可作为团队共享知识的持久化中间层。",
+          "howItWorks": "## 一句话模型 可以把项目想象成一个聪明的导游：它先用机械的方式（Tree-sitter）给所有代码建筑拍下精确的平面图（导入导出关系），再请一位语言专家（LLM）给每栋建筑写上说明和标签（功能、架构层），最后生成一张可以随意缩放、搜索、点击的互动地图。 ## 工作流 1. 用户执行 `/understand` 命令，启动多智能体流水线。 2. `project-scanner` 扫描文件树，识别语言和框架。 3. 多个 `file-analyzer` 并行工作（最多5个并发，每批20-30个文件），先用 Tree-sitter 提取函数、类、导入等事实，生成图节点和边；再将解析结果与源码一并送给 LLM，输出摘要、标签、架构层。 4. `architecture-analyzer` 将节点分组到 API、Service、Data 等层。 5. `tour-builder` 生成依赖排序的学习路径。 6. `graph-reviewer` 检查引用完整性和缺失节点（可选全量 LLM 审查）。 7. 最终图谱保存为 `.understand-anything/knowledge-graph.json`，增量分析时指纹比对仅更新变更文件。 ## 关键组件 - **确定性解析器**：Tree-sitter 保证输入相同代码输出相同结构，杜绝 LLM 幻觉导致边缺失。 - **LLM 代理**：并非全权生成，而是作为增强层，只负责需要理解意图的任务（摘要、标签、架构层）。 - **增量更新引擎**：基于文件指纹检测变更，下次运行只重新分析改动过的文件，大幅加快大型仓库的重复分析。 ## 验证点 运行 `/understand-dashboard` 后，浏览器打开本地网页，能看到彩色节点按架构层分布，点击节点可查看摘要和关系，搜索“auth”应定位到认证相关代码，说明图谱构建成功。",
+          "novelty": "可迁移模式：将静态代码解析与大型语言模型互补结合，而非让 LLM 独自“阅读”代码——这保证了图的拓扑结构可完全复现，同时叠加人类可读的语义层。这种做法可迁移到任何需要静态分析加自然语言理解的场景，比如配置依赖图、数据血缘图等。 与同领域方案对比：纯 LLM 工具（如直接用 Claude Code 对话）能回答问题，但无法给出可靠的结构化全貌，且每次可能给出不同答案。Sourcegraph 等代码搜索平台可提供精确索引和搜索，但不自动生成人类可读的摘要与导览。CodeSee 等可视化工具专注于标准调用图，但无 AI 语义层。相比之下，Understand-Anything 把两者结合得较为轻量，且作为插件横跨多个 AI 编码助手生态，降低了切换成本。其增量分析和图谱共享是实用的工程补充，但核心思想并非首创，更多是对现有能力的精巧整合。",
+          "ecosystem": "核心依赖：Tree-sitter 及其语言语法库，以及一个能够处理大上下文（如 Claude 200K）的 LLM。 它作为插件深度集成到多种 AI 编码平台（Claude Code 原生，Cursor/VS Code 自动发现，Copilot CLI 等），充当“增强层”而非独立工具。 竞争方面，它替代了一部分手动绘制架构图的工作，也与代码浏览器、文档生成器有一定重叠；但它的独特定位是：生成的可交互图谱可直接提交到仓库，团队成员无需额外工具即可查看。 可以与 CI 流程配合（post-commit hook 更新图谱），也可作为团队共享知识的持久化中间层。",
           "limitations": [
             {
               "title": "LLM 成本与延迟",
@@ -170,40 +181,19 @@
           "tryIt": [
             {
               "step": "在 Claude Code 中通过插件市场安装",
-              "cmd": "/plugin marketplace add Lum1104/Understand-Anything\n/plugin install understand-anything",
               "note": "如果使用其它平台，请参照 README 中的安装脚本"
             },
             {
               "step": "在项目根目录运行分析命令，等待多代理流水线完成",
-              "cmd": "/understand",
               "note": "首次运行会解析整个项目并调用 LLM，耗时视代码量而定"
             },
             {
               "step": "启动交互式仪表板",
-              "cmd": "/understand-dashboard",
               "note": "浏览器会自动打开，可看到力导向布局的知识图谱"
             },
             {
               "step": "点击搜索框输入“auth”",
               "note": "节点和关系会被过滤，展示认证相关部分"
-            },
-            {
-              "step": "点击某个文件或函数节点",
-              "note": "右侧面板显示英文摘要、源码摘要、依赖关系及架构层"
-            },
-            {
-              "step": "在仪表板中找到 Tour 按钮并点击",
-              "note": "按照依赖顺序逐步浏览关键文件，适合新人入门"
-            },
-            {
-              "step": "运行增量分析（修改任意文件后）",
-              "cmd": "/understand",
-              "note": "这次只重新分析变更的文件，速度极快"
-            },
-            {
-              "step": "提交生成的图谱 JSON 到 Git",
-              "cmd": "git add .understand-anything/knowledge-graph.json && git commit -m 'update knowledge graph'",
-              "note": "建议配合 git-lfs 管理大文件"
             }
           ],
           "score": {
@@ -235,7 +225,17 @@
           "插件开发"
         ],
         "light": "它解决Claude Code插件发现和安装的分散问题，提供结构化的目录和标准插件结构。这周值得看因为Claude Code插件生态正在快速发展，了解其插件规格和提交流程有助于你参与或构建自己的插件，尤其是MCP服务器配置和技能定义部分。",
-        "worthDeepDive": 56
+        "worthDeepDive": 70,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 56,
+          "finalScore": 70,
+          "matchedBoostTerms": [
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 56; final 70; intent understanding; boost: mcp; popularity +8"
+        }
       },
       {
         "fullName": "colbymchenry/codegraph",
@@ -246,9 +246,9 @@
         "description": "Pre-indexed code knowledge graph for Claude Code, Codex, Cursor, OpenCode, and Hermes Agent — fewer tokens, fewer tool calls, 100% local",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 19669,
-        "forks": 1093,
-        "starsGained": 2456,
+        "stars": 19698,
+        "forks": 1095,
+        "starsGained": 17463,
         "rank": 3,
         "tldr": "这是一个MCP工具，用来为AI编程代理提供预索引代码知识图谱，特别在显著降低token消耗和工具调用次数。",
         "tags": [
@@ -259,7 +259,18 @@
           "性能优化"
         ],
         "light": "它解决AI编程代理在大型代码库中探索时消耗大量token和工具调用的问题。这周值得看是因为它通过预索引的符号关系图，展示了如何将代理的探索成本降低35%以上，并提供了跨多个主流代理的集成方案，对构建高效AI编码工具有直接参考价值。",
-        "worthDeepDive": 91,
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent understanding; boost: agent, mcp; popularity +8"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它在7个真实代码库的基准测试中让AI代理成本平均降低35%、工具调用减少70%，收益随着代码规模增大而放大。适合所有使用Claude Code、Cursor等编码代理的开发者，尤其适合处理大型或多语言项目、且重视本地隐私和即时价值的团队。",
           "whyItMatters": [
@@ -294,9 +305,9 @@
               "explain": "为避免主会话上下文被大量源码填满，工具指令建议代理生成子Explore代理，专门使用codegraph_explore工具获取完整源码，主会话只做轻量查询。"
             }
           ],
-          "howItWorks": "## 一句话模型\n就像给整个代码库建一座智慧图书馆的索引卡片，AI代理问“这本书在哪里”时，图书馆员直接调出关联的所有卡片，而不是满屋子翻找。CodeGraph预先用tree-sitter解析代码，将符号、调用关系、路由等结构化信息存入SQLite，然后通过MCP协议向编码代理提供查询接口。\n\n## 工作流\n安装后运行`codegraph init -i`，它会遍历项目文件，用tree-sitter解析19+种语言的AST，提取符号、引用、路由等信息，构建成关系图并存储到`.codegraph/`目录下的SQLite数据库（利用FTS5支持全文搜索）。同时启动文件监视器，监听文件变更并自动增量更新索引。代理启动时加载MCP服务器配置，获得8个代码查询工具（如codegraph_search、codegraph_context）。当用户提出探索性问题时，代理按指令生成子代理，子代理使用这些工具直接获取结构化结果，避免反复执行grep/read等昂贵操作。\n\n## 关键组件\n- **索引器**：核心依赖tree-sitter多语言语法解析，负责生成符号表、调用图和路由图；\n- **MCP服务器**：一个stdio接口的Node服务，代理通过标准JSON-RPC调用它暴露的工具；\n- **智能指令注入**：安装器自动写入代理的提示文件（如CLAUDE.md），指导何时使用子代理、何时直接查询，确保工具被高效使用；\n- **文件监视器**：利用操作系统的原生事件（FSEvents/inotify）实现实时同步，确保索引始终是最新的。\n\n## 验证点\n代理启动后，针对项目提出一个架构问题（例如“路由分发机制是怎样的？”）。如果配置正确，你应该看到代理生成了一个Explore子代理，子代理调用了codegraph_context和codegraph_explore，主会话中几乎没有grep或Read调用，且最终答案准确且响应迅速。在大型项目上，工具调用总数通常从数十次降至十次以内。",
-          "novelty": "CodeGraph的可迁移模式在于将“代码库静态分析”与“LLM代理工具调用”解耦，通过预索引生成紧凑的语义表示，并以通用协议（MCP）提供给多个代理。这不同于传统做法中让代理实时扫描文件系统——那会导致大量令牌浪费和子代理泛滥。\n\n与知名方案对比：LangChain的代码分析工具通常需要Python运行时并依赖特定链式调用，难以集成到不同桌面代理中；AutoGen或MetaGPT的多代理架构更侧重任务编排，而非底层代码理解的优化；GitHub Copilot的本地索引虽然也能提供符号信息，但仅限于特定IDE且不暴露可编程接口。CodeGraph的创新在于：1）纯本地、跨代理的轻量级MCP服务，任何支持该协议的代理均可即插即用；2）细粒度的框架感知路由识别（14种Web框架），这在现有通用代码智能工具中少见；3）通过基准测试证明了30-50%的成本节省，提供了数据驱动的说服力。不过，其核心索引技术（tree-sitter + SQLite）并不新颖，新颖度更多体现在工程集成和针对LLM代理的指令优化上。",
-          "ecosystem": "CodeGraph站在Tree-sitter的肩上，依赖其多语言解析能力（覆盖19+语言），并深度集成到Model Context Protocol生态中。它不依赖任何云服务，所有数据存储在本地SQLite（FTS5）文件中，可搭配任何文本编辑器或代理使用。\n\n它直接替代了代理原生的文件搜索工具（grep/glob/Read），成为代码理解的中枢。在竞争格局中，它与Sourcegraph（基于服务器的代码搜索）形成互补，后者更侧重团队协作和共享索引，而CodeGraph是个人本地用的极简方案；与JetBrains IDE的代码索引相比，CodeGraph不绑定特定IDE，且专为LLM代理优化了接口。自包含的运行时（内置Node）确保了极低的使用门槛，未来如果MCP协议进一步普及，它可能成为本地代码智能的默认组件。",
+          "howItWorks": "## 一句话模型 就像给整个代码库建一座智慧图书馆的索引卡片，AI代理问“这本书在哪里”时，图书馆员直接调出关联的所有卡片，而不是满屋子翻找。CodeGraph预先用tree-sitter解析代码，将符号、调用关系、路由等结构化信息存入SQLite，然后通过MCP协议向编码代理提供查询接口。 ## 工作流 安装后运行`codegraph init -i`，它会遍历项目文件，用tree-sitter解析19+种语言的AST，提取符号、引用、路由等信息，构建成关系图并存储到`.codegraph/`目录下的SQLite数据库（利用FTS5支持全文搜索）。同时启动文件监视器，监听文件变更并自动增量更新索引。代理启动时加载MCP服务器配置，获得8个代码查询工具（如codegraph_search、codegraph_context）。当用户提出探索性问题时，代理按指令生成子代理，子代理使用这些工具直接获取结构化结果，避免反复执行grep/read等昂贵操作。 ## 关键组件 - **索引器**：核心依赖tree-sitter多语言语法解析，负责生成符号表、调用图和路由图； - **MCP服务器**：一个stdio接口的Node服务，代理通过标准JSON-RPC调用它暴露的工具； - **智能指令注入**：安装器自动写入代理的提示文件（如CLAUDE.md），指导何时使用子代理、何时直接查询，确保工具被高效使用； - **文件监视器**：利用操作系统的原生事件（FSEvents/inotify）实现实时同步，确保索引始终是最新的。 ## 验证点 代理启动后，针对项目提出一个架构问题（例如“路由分发机制是怎样的？”）。如果配置正确，你应该看到代理生成了一个Explore子代理，子代理调用了codegraph_context和codegraph_explore，主会话中几乎没有grep或Read调用，且最终答案准确且响应迅速。在大型项目上，工具调用总数通常从数十次降至十次以内。",
+          "novelty": "CodeGraph的可迁移模式在于将“代码库静态分析”与“LLM代理工具调用”解耦，通过预索引生成紧凑的语义表示，并以通用协议（MCP）提供给多个代理。这不同于传统做法中让代理实时扫描文件系统——那会导致大量令牌浪费和子代理泛滥。 与知名方案对比：LangChain的代码分析工具通常需要Python运行时并依赖特定链式调用，难以集成到不同桌面代理中；AutoGen或MetaGPT的多代理架构更侧重任务编排，而非底层代码理解的优化；GitHub Copilot的本地索引虽然也能提供符号信息，但仅限于特定IDE且不暴露可编程接口。CodeGraph的创新在于：1）纯本地、跨代理的轻量级MCP服务，任何支持该协议的代理均可即插即用；2）细粒度的框架感知路由识别（14种Web框架），这在现有通用代码智能工具中少见；3）通过基准测试证明了30-50%的成本节省，提供了数据驱动的说服力。不过，其核心索引技术（tree-sitter + SQLite）并不新颖，新颖度更多体现在工程集成和针对LLM代理的指令优化上。",
+          "ecosystem": "CodeGraph站在Tree-sitter的肩上，依赖其多语言解析能力（覆盖19+语言），并深度集成到Model Context Protocol生态中。它不依赖任何云服务，所有数据存储在本地SQLite（FTS5）文件中，可搭配任何文本编辑器或代理使用。 它直接替代了代理原生的文件搜索工具（grep/glob/Read），成为代码理解的中枢。在竞争格局中，它与Sourcegraph（基于服务器的代码搜索）形成互补，后者更侧重团队协作和共享索引，而CodeGraph是个人本地用的极简方案；与JetBrains IDE的代码索引相比，CodeGraph不绑定特定IDE，且专为LLM代理优化了接口。自包含的运行时（内置Node）确保了极低的使用门槛，未来如果MCP协议进一步普及，它可能成为本地代码智能的默认组件。",
           "limitations": [
             {
               "title": "小项目收益有限",
@@ -322,35 +333,19 @@
           "tryIt": [
             {
               "step": "在macOS/Linux终端运行一键安装脚本，自动下载适合你平台的构建版本。",
-              "cmd": "curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh",
               "note": "Windows下使用PowerShell命令：irm https://.../install.ps1 | iex"
             },
             {
               "step": "运行codegraph命令启动交互式配置，选择你要集成的代理（如Claude Code、Cursor）。",
-              "cmd": "codegraph",
               "note": "如果已安装Node，也可使用npx @colbymchenry/codegraph零安装体验"
             },
             {
               "step": "进入你的项目目录，初始化知识图谱索引。",
-              "cmd": "cd your-project && codegraph init -i",
               "note": "构建索引可能需要几十秒到几分钟，取决于项目大小"
             },
             {
               "step": "重启你的AI代理（如完全退出Claude Code或重启Cursor窗口），让MCP服务器加载。",
               "note": "确保代理已经加载了codegraph的MCP配置，可以在代理设置中查看"
-            },
-            {
-              "step": "向代理提出一个架构问题，例如：“请解释这个项目的路由系统是如何工作的？”",
-              "note": "确保问题需要探索代码库，这样才能触发CodeGraph工具"
-            },
-            {
-              "step": "观察代理的行为——它应该生成一个子代理，子代理调用codegraph_explore获取源码，主会话几乎不直接读文件。检查响应速度是否变快。",
-              "note": "你可以在代理日志中看到工具调用列表，应该以codegraph_开头的调用为主"
-            },
-            {
-              "step": "如果想要卸载，运行卸载命令，它会清除所有代理中的CodeGraph配置。",
-              "cmd": "codegraph uninstall",
-              "note": "项目中的.codegraph/索引目录不会被删除，需手动移除或运行`codegraph uninit`"
             }
           ],
           "score": {
@@ -370,9 +365,9 @@
         "description": "Learn it. Build it. Ship it for others.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 13840,
-        "forks": 2584,
-        "starsGained": 1521,
+        "stars": 13847,
+        "forks": 2588,
+        "starsGained": 5026,
         "rank": 4,
         "tldr": "这是一个系统性AI工程课程仓库，用来从零构建完整AI系统，特别在每个课程产出可复用的agent、MCP server等实用工具。",
         "tags": [
@@ -383,7 +378,18 @@
           "AI工程"
         ],
         "light": "它解决AI学习碎片化的问题，提供从数学基础到多智能体系统的完整路径，每个课程要求从零实现算法并产出可用工具。这周/月值得关注是因为它涵盖当前热门的agent和MCP工程实践，且课程设计系统深入，适合作为AI工程能力建设的参考蓝图。",
-        "worthDeepDive": 91,
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 97,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 97; final 100; intent understanding; boost: agent, mcp; popularity +8"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它提供了一个从数学基础到生产级AI系统的完整学习路径，每个算法都要求从原始数学开始手动实现。适合希望彻底理解AI内部机制的工程师，以及需要系统化技能而不仅仅是调用API的从业者。",
           "whyItMatters": [
@@ -418,9 +424,9 @@
               "explain": "20个阶段像堆叠积木，数学为底层，代理和生产为顶层，后续阶段依赖前序知识，允许按需跳过但鼓励路径内置检查。"
             }
           ],
-          "howItWorks": "## 一句话模型\n这个课程就像从地基开始亲手建造一座AI大厦，每一块砖（算法）都必须自己烧制，最后你不仅知道全貌，还能随时拿出某个房间（工件）独立使用。\n\n## 工作流\n整个课程遵循“问题→数学→代码→测试→工件”的六步循环。每个阶段包含多个课时，每个课时以一个问题开始，然后手动推导数学公式，再用Python/TypeScript/Rust/Julia之一编写实现，最后通过测试并产出可复用的提示词、技能、代理或MCP服务器。阶段间存在依赖关系，底层阶段（如数学、ML基础）为上层提供支撑。\n\n## 关键组件\n- **课程结构**：20个阶段，435个课时，每个课时有独立目录包含代码、文档和产出。\n- **内置技能**：`/find-your-level`通过10个问题生成个性化起点和路径；`/check-understanding`提供8题阶段测验并反馈复习点。\n- **多语言实现**：核心算法同时提供Python、TypeScript、Rust、Julia版本，拓展学习者视野。\n\n## 验证点\n克隆仓库后运行一个基础课时（如线性代数）应看到正确输出；在支持的AI助手中使用`/find-your-level`应得到个性化阶段建议；完成一个阶段后使用`/check-understanding`可验证掌握程度。",
-          "novelty": "本课程的新颖之处在于它强制从原始数学构建每一个AI算法，而不是依赖框架或高级API。这种“先拆解，后组装”的模式帮助学习者建立完整的心理模型，迁移到其他领域时能快速定位问题。与fast.ai相比，fast.ai更侧重快速应用和工业落地，而本课程强调底层理解；与DeepLearning.AI的专项课程相比，后者更偏重理论和调参，本课程加入大量手动实现和多语言支持；与Stanford的CS231n等学术课程相比，本课程更结构化、更面向生产交付。\n\n另一个可迁移模式是“学习即生产”，每节课产出可立即使用的工具，避免了传统教育中“学完即忘”的痛点。整体上，它提供了一条从理论到实战的完整登山路径，而非散落的知识点。",
-          "ecosystem": "本课程依赖本地Python/TypeScript/Rust/Julia开发环境及相关包管理器，建议搭配AI编程助手（如Claude、Cursor）使用内置技能以优化学习路径。它不替代任何特定工具，但可以视为`fast.ai`、`DeepLearning.AI`和教科书式学习的竞争者或补充。在生产环境中，输出的MCP服务器和代理可直接集成到现有AI工作流中，与LangChain、AutoGen等框架形成互补。\n\n主要竞争对象是系统化的在线AI课程和书籍，但本课程的开源和手动构建特性使其在透彻性和可定制性上具有优势。",
+          "howItWorks": "## 一句话模型 这个课程就像从地基开始亲手建造一座AI大厦，每一块砖（算法）都必须自己烧制，最后你不仅知道全貌，还能随时拿出某个房间（工件）独立使用。 ## 工作流 整个课程遵循“问题→数学→代码→测试→工件”的六步循环。每个阶段包含多个课时，每个课时以一个问题开始，然后手动推导数学公式，再用Python/TypeScript/Rust/Julia之一编写实现，最后通过测试并产出可复用的提示词、技能、代理或MCP服务器。阶段间存在依赖关系，底层阶段（如数学、ML基础）为上层提供支撑。 ## 关键组件 - **课程结构**：20个阶段，435个课时，每个课时有独立目录包含代码、文档和产出。 - **内置技能**：`/find-your-level`通过10个问题生成个性化起点和路径；`/check-understanding`提供8题阶段测验并反馈复习点。 - **多语言实现**：核心算法同时提供Python、TypeScript、Rust、Julia版本，拓展学习者视野。 ## 验证点 克隆仓库后运行一个基础课时（如线性代数）应看到正确输出；在支持的AI助手中使用`/find-your-level`应得到个性化阶段建议；完成一个阶段后使用`/check-understanding`可验证掌握程度。",
+          "novelty": "本课程的新颖之处在于它强制从原始数学构建每一个AI算法，而不是依赖框架或高级API。这种“先拆解，后组装”的模式帮助学习者建立完整的心理模型，迁移到其他领域时能快速定位问题。与fast.ai相比，fast.ai更侧重快速应用和工业落地，而本课程强调底层理解；与DeepLearning.AI的专项课程相比，后者更偏重理论和调参，本课程加入大量手动实现和多语言支持；与Stanford的CS231n等学术课程相比，本课程更结构化、更面向生产交付。 另一个可迁移模式是“学习即生产”，每节课产出可立即使用的工具，避免了传统教育中“学完即忘”的痛点。整体上，它提供了一条从理论到实战的完整登山路径，而非散落的知识点。",
+          "ecosystem": "本课程依赖本地Python/TypeScript/Rust/Julia开发环境及相关包管理器，建议搭配AI编程助手（如Claude、Cursor）使用内置技能以优化学习路径。它不替代任何特定工具，但可以视为`fast.ai`、`DeepLearning.AI`和教科书式学习的竞争者或补充。在生产环境中，输出的MCP服务器和代理可直接集成到现有AI工作流中，与LangChain、AutoGen等框架形成互补。 主要竞争对象是系统化的在线AI课程和书籍，但本课程的开源和手动构建特性使其在透彻性和可定制性上具有优势。",
           "limitations": [
             {
               "title": "内容未全部完成",
@@ -446,37 +452,18 @@
           "tryIt": [
             {
               "step": "克隆仓库到本地",
-              "cmd": "git clone https://github.com/rohitg00/ai-engineering-from-scratch.git",
               "note": "确保已安装Git"
             },
             {
-              "step": "进入项目目录",
-              "cmd": "cd ai-engineering-from-scratch"
+              "step": "进入项目目录"
             },
             {
               "step": "运行一个基础课时以验证环境（如线性代数），观察输出",
-              "cmd": "python phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py",
               "note": "需Python环境已安装，可能需要安装依赖"
             },
             {
               "step": "若使用AI编程助手，尝试技能定位起点",
-              "cmd": "/find-your-level",
               "note": "在Claude、Cursor等支持SKILL.md的助手中键入"
-            },
-            {
-              "step": "根据推荐阶段完成一个课时后，运行测验检查理解",
-              "cmd": "/check-understanding <阶段号>",
-              "note": "例如 /check-understanding 3"
-            },
-            {
-              "step": "查看产出的工件，例如提示词或技能文件",
-              "cmd": "ls phases/03-deep-learning-core/05-loss-functions/outputs/",
-              "note": "具体路径根据课时调整"
-            },
-            {
-              "step": "安装所有技能到AI助手中（可选）",
-              "cmd": "python3 scripts/install_skills.py",
-              "note": "将技能文件复制到助手识别的位置"
             }
           ],
           "score": {
@@ -509,7 +496,19 @@
           "Qt6"
         ],
         "light": "它解决的是金融分析师和交易者需要一个高性能、可扩展的集成平台的问题，整合了数据获取、分析、AI决策和交易执行。这周值得关注是因为其AGPL开源许可和活跃的开发节奏（v4.0.3发布，Roadmap清晰），展示了如何将多种AI代理模式（37个代理，支持本地LLM）嵌入到传统桌面应用中，对构建工具使用型AI系统有参考价值。",
-        "worthDeepDive": 39
+        "worthDeepDive": 45,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 45,
+          "matchedBoostTerms": [
+            "llm"
+          ],
+          "matchedCapTerms": [
+            "finance"
+          ],
+          "explanation": "raw 39; final 45; intent teaching; boost: llm; penalty features: finance; popularity +6"
+        }
       },
       {
         "fullName": "multica-ai/andrej-karpathy-skills",
@@ -520,9 +519,9 @@
         "description": "A single CLAUDE.md file to improve Claude Code behavior, derived from Andrej Karpathy's observations on LLM coding pitfalls.",
         "language": null,
         "languageColor": null,
-        "stars": 149780,
-        "forks": 15363,
-        "starsGained": 3507,
+        "stars": 149791,
+        "forks": 15367,
+        "starsGained": 70773,
         "rank": 6,
         "tldr": "这是一个CLAUDE.md配置文件，通过四个原则改善Claude Code行为，特别在减少假设和过度复杂化。",
         "tags": [
@@ -532,7 +531,21 @@
           "coding-agents"
         ],
         "light": "本周因Andrej Karpathy关于LLM编码陷阱的帖子引发热议，该仓库直接将他的观察转化为可实践的CLAUDE.md配置，帮助开发者规避常见错误。随着Claude Code用户增长，这类优化提示文件受到关注。",
-        "worthDeepDive": 39
+        "worthDeepDive": 57,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 57,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "llm"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 57; intent understanding; boost: agent, agents, llm; penalty features: skills; popularity +8"
+        }
       },
       {
         "fullName": "dotnet/skills",
@@ -556,7 +569,21 @@
           "plugin-marketplace"
         ],
         "light": "它解决了AI编码代理在执行.NET/C#任务时缺乏领域知识的问题，通过结构化、可安装的技能插件提升准确性和效率。这周值得看因为微软正式发布此仓库，展示了如何为特定平台构建AI代理技能，对理解技能定义、组织和分发包有参考价值。",
-        "worthDeepDive": 39
+        "worthDeepDive": 55,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 55,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "ai coding"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 55; intent tool; boost: agent, agents, ai coding; penalty features: skills; popularity +4"
+        }
       },
       {
         "fullName": "ChromeDevTools/chrome-devtools-mcp",
@@ -581,6 +608,18 @@
         ],
         "light": "它解决 AI 代理无法直接利用浏览器 DevTools 进行精确调试和性能分析的问题。这周值得关注是因为 MCP 生态正快速扩张，而此项目展示了如何将 Chrome DevTools 完整能力封装为标准化工具供代理调用，对构建可靠 Web 自动化代理和调试工具有极高的工程参考价值。",
         "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent understanding; boost: agent, agents, mcp; popularity +6"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它将 Chrome DevTools 的强大能力直接注入 AI 编程助手，实现了浏览器自动化、性能分析和深度调试的无缝衔接。适合所有需要 AI 进行网页测试、抓取或性能优化的开发者，尤其是已经在用 MCP 客户端的用户。",
           "whyItMatters": [
@@ -619,8 +658,8 @@
               "explain": "精简模式，仅加载基本浏览器操作工具，适合简单任务，减少资源占用。启动时使用 --slim 标志。"
             }
           ],
-          "howItWorks": "## 一句话模型\n像一个能操控并检查浏览器的机器人助手，AI 通过命令告诉它做什么，它就在 Chrome 里执行并返回结果。\n\n## 工作流\nAI 代理通过 MCP 协议发送指令（如 navigate、take_screenshot），服务器调用 Puppeteer 或 DevTools Protocol 在浏览器中执行，并返回结果或分析数据。整个流程是：用户用自然语言向 AI 编码助手描述任务 → 助手将任务转换为对 chrome-devtools-mcp 的工具调用 → chrome-devtools-mcp 在 Chrome 实例中执行操作并通过 MCP 返回结构化结果 → 助手解读结果并回应用户。\n\n## 关键组件\n- **MCP 服务器核心**：负责处理来自客户端的 JSON-RPC 请求，将工具调用映射到具体的浏览器操作。\n- **Puppeteer 自动化引擎**：封装了 Chrome 的远程控制，提供稳定的动作执行和等待机制。\n- **Chrome 浏览器实例**：实际运行的 Chrome 浏览器，可以是有头或无头模式，由 Puppeteer 连接和管理。\n\n## 验证点\n启动后，在 MCP 客户端中列出可用工具（如 navigate、screenshot、performance_analyze）。让 AI 导航到一个页面并截屏，应看到 Chrome 自动打开并完成操作，客户端返回截屏图像。性能分析工具会返回 Core Web Vitals 数据和优化建议。",
-          "novelty": "该项目的核心新颖性在于将 Chrome DevTools 的完整调试和性能分析能力通过 MCP 协议暴露给 AI 编码代理。此前虽有 Puppeteer、Playwright 等浏览器自动化工具，但它们多是面向脚本或测试，缺乏与 AI 代理的深度集成，且往往不直接提供 DevTools 特有的性能追踪、网络分析等诊断功能。chrome-devtools-mcp 填补了这一空白，让 AI 不仅能操作浏览器，还能像人类开发者一样审查网络请求、提取 JavaScript 错误堆栈、获取性能洞察。\n\n可迁移的模式是：将任何复杂的本地工具通过 MCP 包装为 AI 可用的工具集。相比 AutoGen 的浏览器代理（依赖 Playwright 或 Selenium）和 LangChain 的浏览器工具（仅提供有限的操作），chrome-devtools-mcp 直接利用 DevTools 协议，能获取更底层的运行时信息。这为自动化调试和性能优化提供了独特的价值，可以作为 AI 辅助开发的标准实践模板。",
+          "howItWorks": "## 一句话模型 像一个能操控并检查浏览器的机器人助手，AI 通过命令告诉它做什么，它就在 Chrome 里执行并返回结果。 ## 工作流 AI 代理通过 MCP 协议发送指令（如 navigate、take_screenshot），服务器调用 Puppeteer 或 DevTools Protocol 在浏览器中执行，并返回结果或分析数据。整个流程是：用户用自然语言向 AI 编码助手描述任务 → 助手将任务转换为对 chrome-devtools-mcp 的工具调用 → chrome-devtools-mcp 在 Chrome 实例中执行操作并通过 MCP 返回结构化结果 → 助手解读结果并回应用户。 ## 关键组件 - **MCP 服务器核心**：负责处理来自客户端的 JSON-RPC 请求，将工具调用映射到具体的浏览器操作。 - **Puppeteer 自动化引擎**：封装了 Chrome 的远程控制，提供稳定的动作执行和等待机制。 - **Chrome 浏览器实例**：实际运行的 Chrome 浏览器，可以是有头或无头模式，由 Puppeteer 连接和管理。 ## 验证点 启动后，在 MCP 客户端中列出可用工具（如 navigate、screenshot、performance_analyze）。让 AI 导航到一个页面并截屏，应看到 Chrome 自动打开并完成操作，客户端返回截屏图像。性能分析工具会返回 Core Web Vitals 数据和优化建议。",
+          "novelty": "该项目的核心新颖性在于将 Chrome DevTools 的完整调试和性能分析能力通过 MCP 协议暴露给 AI 编码代理。此前虽有 Puppeteer、Playwright 等浏览器自动化工具，但它们多是面向脚本或测试，缺乏与 AI 代理的深度集成，且往往不直接提供 DevTools 特有的性能追踪、网络分析等诊断功能。chrome-devtools-mcp 填补了这一空白，让 AI 不仅能操作浏览器，还能像人类开发者一样审查网络请求、提取 JavaScript 错误堆栈、获取性能洞察。 可迁移的模式是：将任何复杂的本地工具通过 MCP 包装为 AI 可用的工具集。相比 AutoGen 的浏览器代理（依赖 Playwright 或 Selenium）和 LangChain 的浏览器工具（仅提供有限的操作），chrome-devtools-mcp 直接利用 DevTools 协议，能获取更底层的运行时信息。这为自动化调试和性能优化提供了独特的价值，可以作为 AI 辅助开发的标准实践模板。",
           "ecosystem": "chrome-devtools-mcp 依赖 Node.js、Chrome 浏览器和 Puppeteer 库。它主要搭配各种支持 MCP 的 AI 编码助手使用，如 Claude Code、Cursor、Antigravity、Gemini CLI 等。它替代了手动打开 DevTools 进行调试或编写自定义 Puppeteer 脚本的流程，尤其适合那些需要 AI 自主排查网页问题的场景。在竞争中，Playwright MCP 服务器（如 @anthropic/playwright-mcp）提供了跨浏览器自动化，但缺少 DevTools 级别的性能分析和网络检查。chrome-devtools-mcp 与 Chrome DevTools Protocol 深度绑定，定位更偏向诊断和优化，而非单纯的自动化测试。此外，项目本身还以插件形式提供技能（skills），直接指导 AI 如何有效使用这些工具，形成了完整的开发者体验链。",
           "limitations": [
             {
@@ -647,12 +686,10 @@
           "tryIt": [
             {
               "step": "确保已安装 Node.js LTS、Chrome 浏览器和 npm。",
-              "cmd": "node -v && npm -v && google-chrome --version",
               "note": "检查版本符合要求，Chrome 需为最新稳定版。"
             },
             {
               "step": "在 Claude Code 中添加 chrome-devtools MCP 服务器（以 Claude Code 为例）。",
-              "cmd": "claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest",
               "note": "其他客户端请参考 README 中的对应配置。"
             },
             {
@@ -660,22 +697,6 @@
             },
             {
               "step": "向 AI 助手提出一个浏览器操作任务，例如：“请导航到 https://example.com 并截屏。”"
-            },
-            {
-              "step": "观察 Chrome 浏览器自动启动（或连接已有实例），执行导航和截屏，助手返回截图或描述。",
-              "note": "如果是首次使用，可能需允许自动化权限。"
-            },
-            {
-              "step": "尝试性能分析，对助手说：“分析当前页面的性能。”",
-              "cmd": "请帮我调用 performance_analyze 工具分析 https://example.com 的性能。"
-            },
-            {
-              "step": "查看返回的性能报告，应包含 Core Web Vitals 数据及优化建议。"
-            },
-            {
-              "step": "如果只需要基本功能，可改用 slim 模式：在配置中添加 --slim --headless 参数，然后重启。",
-              "cmd": "claude mcp add chrome-devtools --args \"--slim --headless\" npx chrome-devtools-mcp@latest",
-              "note": "slim 模式不包含性能分析等高级工具，但启动更快、资源占用更少。"
             }
           ],
           "score": {
@@ -708,7 +729,20 @@
           "Tool Integration"
         ],
         "light": "它解决的是AI代理缺乏领域专家级的结构化操作知识的问题。传统代理只能泛泛回答，而通过这个技能库，代理能像资深安全分析师一样按步骤执行任务。这周/月值得关注的原因是它展示了如何为代理构建高质量的、可复用的结构化知识库，包含上下文感知的渐进式加载设计，对理解代理工具使用和系统集成有直接参考价值。",
-        "worthDeepDive": 39
+        "worthDeepDive": 51,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 51,
+          "matchedBoostTerms": [
+            "agent",
+            "agents"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 51; intent tool; boost: agent, agents; penalty features: skills; popularity +4"
+        }
       },
       {
         "fullName": "presenton/presenton",
@@ -732,7 +766,21 @@
           "Open Source"
         ],
         "light": "它解决商业AI演示工具的厂商锁定和隐私问题。本月亮点在于集成MCP协议和Mem0记忆系统，展示了多模型编排、本地运行和API暴露的工程化实践，对AI工程师学习构建生产级AIGC系统有直接参考价值。",
-        "worthDeepDive": 96,
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 96,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "mcp",
+            "memory",
+            "mem0",
+            "llm",
+            "aigc"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 96; final 100; intent tool; boost: mcp, memory, mem0, llm, aigc; popularity +4"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它把 AI 做 PPT 这件事完全开源了，没有 SaaS 订阅束缚，还能自托管或本地跑。适合想用自己模型生成演示文稿的开发者、团队或注重隐私的企业用户。现在看是因为它刚集成 MCP 协议和 Mem0 记忆，生态扩展性强。",
           "whyItMatters": [
@@ -767,8 +815,8 @@
               "explain": "用 HTML 和 Tailwind CSS 设计模板，也可以从现有的 PowerPoint 文件中提取模板，AI 在此基础上生成内容。"
             }
           ],
-          "howItWorks": "## 一句话模型\n它就像一个会做 PPT 的助手：你告诉它主题或上传文件，它根据你选的模板和风格，自动生成大纲、内容、配图，最后输出可编辑的 PPTX 文件。\n\n## 工作流\n输入 → 模板选择 → 内容生成 → 媒体填充 → 导出。用户通过 Web 界面或 API 提供提示（如“季度销售报告”）或上传文档（PDF、Word、PPT），系统调用 LLM 生成幻灯片大纲和正文，同时根据配置调用图像生成 API（DALL·E 3 / Gemini Flash / Pexels / Pixabay）获取配图、图标和图表，最终将 HTML+Tailwind 模板渲染并转换为 PPTX。\n\n## 关键组件\n- **前后端分离**：Next.js 前端 + FastAPI 后端，通过 Rest API 和 WebSocket 通信。\n- **模板引擎**：基于 HTML 和 Tailwind CSS，支持从 PPT 文件逆向提取模板。\n- **Mem0 集成**：利用本地 Qdrant 向量库存储演示文稿上下文，让生成内容更连贯。\n- **MCP 支持**：内置 MCP 服务器，让其他 AI 应用能程序化地生成 PPT。\n\n## 验证点\n启动后访问 Web UI，输入一段描述（如“产品发布计划”），观察是否生成了多页幻灯片，并且能下载为 PPTX 文件，文件可在 PowerPoint 或 LibreOffice 中打开编辑。",
-          "novelty": "可迁移的模式是**全栈自托管 + 完全可编辑导出**，打破了同类产品（如 Gamma、Decktopus）必须在线订阅的壁垒。与 Gamma 相比，Presenton 开源且允许本地部署，数据不出环境；与 Decktopus 相比，它不限制模板数量，可以自由设计。技术架构上的新意在于将 Mem0 记忆系统和 MCP 协议整合到演示文稿生成中，使得 AI 能保持上下文并作为 Agent 工具链的一环。\n\n对比 LangChain 或 AutoGen 等通用框架：它们本身不输出 PPTX，而 Presenton 提供了垂直领域完整流水线。和 Midjourney 这类纯图像生成工具比，它在结构化内容布局上有天然优势。虽然 PPT 生成逻辑不算突破性技术，但把远程/本地模型自由切换、模板自定义、API 化、记忆增强打包成开源方案，在实用性和可控性上确实领先。",
+          "howItWorks": "## 一句话模型 它就像一个会做 PPT 的助手：你告诉它主题或上传文件，它根据你选的模板和风格，自动生成大纲、内容、配图，最后输出可编辑的 PPTX 文件。 ## 工作流 输入 → 模板选择 → 内容生成 → 媒体填充 → 导出。用户通过 Web 界面或 API 提供提示（如“季度销售报告”）或上传文档（PDF、Word、PPT），系统调用 LLM 生成幻灯片大纲和正文，同时根据配置调用图像生成 API（DALL·E 3 / Gemini Flash / Pexels / Pixabay）获取配图、图标和图表，最终将 HTML+Tailwind 模板渲染并转换为 PPTX。 ## 关键组件 - **前后端分离**：Next.js 前端 + FastAPI 后端，通过 Rest API 和 WebSocket 通信。 - **模板引擎**：基于 HTML 和 Tailwind CSS，支持从 PPT 文件逆向提取模板。 - **Mem0 集成**：利用本地 Qdrant 向量库存储演示文稿上下文，让生成内容更连贯。 - **MCP 支持**：内置 MCP 服务器，让其他 AI 应用能程序化地生成 PPT。 ## 验证点 启动后访问 Web UI，输入一段描述（如“产品发布计划”），观察是否生成了多页幻灯片，并且能下载为 PPTX 文件，文件可在 PowerPoint 或 LibreOffice 中打开编辑。",
+          "novelty": "可迁移的模式是**全栈自托管 + 完全可编辑导出**，打破了同类产品（如 Gamma、Decktopus）必须在线订阅的壁垒。与 Gamma 相比，Presenton 开源且允许本地部署，数据不出环境；与 Decktopus 相比，它不限制模板数量，可以自由设计。技术架构上的新意在于将 Mem0 记忆系统和 MCP 协议整合到演示文稿生成中，使得 AI 能保持上下文并作为 Agent 工具链的一环。 对比 LangChain 或 AutoGen 等通用框架：它们本身不输出 PPTX，而 Presenton 提供了垂直领域完整流水线。和 Midjourney 这类纯图像生成工具比，它在结构化内容布局上有天然优势。虽然 PPT 生成逻辑不算突破性技术，但把远程/本地模型自由切换、模板自定义、API 化、记忆增强打包成开源方案，在实用性和可控性上确实领先。",
           "ecosystem": "依赖 OpenAI / Google / Anthropic / Ollama 等模型 API，但也可使用本地完全脱机模式（Ollama + Mem0 本地 LLM）。搭配**Pexels/Pixabay** 提供免费图库，**DALL·E 3** / **Gemini Flash** 用于 AI 绘图。可替代 Gamma、Beautiful.ai、Decktopus 等商业产品，尤其适合需要私有化部署的团队。与 **Slidev** 或 **reveal.js** 等开发者幻灯片框架不是直接竞争，因为后者侧重 Markdown 语法手动编写，而 Presenton 是用 AI 自动生成内容。它还内置 MCP 能力，可与 Copilot、Claude Desktop 等工具配合，作为 Agent 的“做 PPT 工具”。",
           "limitations": [
             {
@@ -800,7 +848,6 @@
             },
             {
               "step": "打开浏览器访问",
-              "cmd": "open http://localhost:5000",
               "note": "Windows 用 start 命令或手动输入 URL。"
             },
             {
@@ -811,11 +858,6 @@
             },
             {
               "step": "生成完成后，点击下载按钮得到 `.pptx` 文件并验证可编辑。"
-            },
-            {
-              "step": "体验桌面 App（可选）",
-              "cmd": "# 从 https://presenton.ai/download 下载对应系统安装包，安装后直接启动",
-              "note": "桌面版自带 Electron 后端，无需 Docker。"
             }
           ],
           "score": {
@@ -848,7 +890,21 @@
           "multi-agent"
         ],
         "light": "它解决了多个AI编码代理难以协作、任务分配和进度追踪的问题。这周/月值得看，因为它提供了一个完整的开源方案来管理代理工作流，支持多种主流代理CLI，架构清晰（Next.js+Go+PostgreSQL），并且有实际部署的cloud和self-hosted选项，对AI工程实践有直接参考价值。",
-        "worthDeepDive": 39
+        "worthDeepDive": 57,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 57,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "workflow"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 57; intent tool; boost: agent, agents, workflow; penalty features: skills; popularity +6"
+        }
       },
       {
         "fullName": "trimstray/the-book-of-secret-knowledge",
@@ -872,7 +928,17 @@
           "Cheatsheet"
         ],
         "light": "它解决的是技术工作者需要快速查找高质量工具和手册的问题。这周/月值得看是因为它持续更新，新增了许多实用工具和技巧，对于系统管理、网络排查和安全研究仍然是一站式参考。但如果你专注AI研究，可能优先级不高。",
-        "worthDeepDive": 20
+        "worthDeepDive": 26,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 20,
+          "finalScore": 26,
+          "matchedBoostTerms": [],
+          "matchedCapTerms": [
+            "cheatsheet"
+          ],
+          "explanation": "raw 20; final 26; intent tool; penalty features: cheatsheet; popularity +6"
+        }
       },
       {
         "fullName": "odoo/odoo",
@@ -895,7 +961,15 @@
           "企业软件"
         ],
         "light": "它解决企业业务管理碎片化的问题，提供从销售到财务的一站式开源解决方案。这周值得关注的是其稳定的社区和持续的功能更新，但如果你专注AI研究，它没有直接借鉴价值。",
-        "worthDeepDive": 20
+        "worthDeepDive": 28,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 20,
+          "finalScore": 28,
+          "matchedBoostTerms": [],
+          "matchedCapTerms": [],
+          "explanation": "raw 20; final 28; intent understanding; popularity +6"
+        }
       },
       {
         "fullName": "NVlabs/LongLive",
@@ -919,7 +993,17 @@
           "扩散模型"
         ],
         "light": "它解决长视频生成中显存和计算瓶颈，通过NVFP4量化与序列并行实现更长视频和更高吞吐。本周值得看是因为来自NVlabs，技术成熟度高，包含训练、推理、蒸馏全流程，并展示了如何将低精度格式落地到视频生成系统，对构建大规模AIGC系统有直接参考价值。",
-        "worthDeepDive": 96,
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 96,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "aigc"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 96; final 100; intent tool; boost: aigc"
+        },
         "deep": {
           "atGlance": "这个项目值得深度关注，因为它展示了一个工业级长视频生成基础设施，将最新的低精度 NVFP4 量化和序列并行先进策略落地到视频扩散模型，实现了最高 45.7 FPS 的推理速度。适合对视频生成部署、推理优化和模型量化感兴趣的研究者和工程师，现在关注可以了解在大模型时代如何将生成式视频应用推到实时交互级别。",
           "whyItMatters": [
@@ -958,9 +1042,9 @@
               "explain": "异步解码允许 VAE 解码与模型推理重叠进行，流水线化处理，减少总延迟，进一步提升吞吐量。"
             }
           ],
-          "howItWorks": "## 一句话模型\nLongLive 2.0 像一个视频生成流水线工厂：输入文本描述，经过低精度量化的扩散模型以自回归方式一段段生成视频 token，然后使用轻量级解码器并行解码成最终视频，整个过程由 NVFP4 量化加速。\n\n## 工作流\n1. **文本输入**：用户提供自然语言提示，可包含多镜头指令。\n2. **自回归序列生成**：使用基于因果扩散的 transformer 模型逐帧生成 latent token 序列。对于多镜头，利用**注意力汇**（attention sink）稳定上下文转换。\n3. **并行与量化加速**：在生成过程中，模型权重和 KV 缓存采用 NVFP4 量化；序列被切分到多个 GPU 上**序列并行**处理，同时**异步解码**重叠 VAE 解码与计算。\n4. **视频输出**：VAE 解码器将 latent token 流式解码为 RGB 视频帧，并根据设置的帧率保存为 mp4 文件。\n\n## 关键组件\n- **CausalDiffusionInferencePipeline**：核心推理管线，封装了生成器（transformer）和 VAE 解码器，负责完整推理流程。\n- **setup_nvfp4_pipeline**：自动处理 NVFP4 量化的权重加载、模块替换和 flow，根据配置选择 TransformerEngine 或 FourOverSix 后端。\n- **Balanced Sequence Parallel**：训练时使用，通过均匀分配序列长度到各 GPU 实现负载均衡，减少通信开销，适应自回归 teacher-forcing 训练。\n\n## 验证点\n运行快速入门脚本后，应在 `videos/quickstart/` 目录下生成一段 mp4 视频，内容为银色的机器人在实验室行走，帧率 24，时长由配置决定（默认约 5 秒）。NVFP4 版本输出的视频质量应与 BF16 版本接近，但生成速度更快。",
-          "novelty": "LongLive 2.0 的核心贡献是将先进的量化与并行技术系统化地集成到视频扩散生成 pipeline 中，形成了一个面向长视频的高效基础设施。可迁移的模式在于：**用低精度量化（NVFP4）结合序列并行来解决长序列扩散模型的推理吞吐瓶颈**，这一思路可直接应用到其他类似的自回归或扩散长序列生成任务中。\n\n与同领域的方案对比：早期如 Make-A-Video、VideoGen 等聚焦于单次生成长视频，未专门优化交互式多镜头生成；Sora 展现了惊人效果但未公开技术细节；EMO 等侧重音频驱动面部动画，不强调通用文本生成长视频。在推理优化方面，常见量化方案如 FP8、INT8 已用于 LLM 推理，但首次被应用于视频扩散模型并达到 W4A4 级别，且与序列并行、异步解码联合设计。相较于 Vchitect、VideoComposer 等基于扩散的多阶段方法，LongLive 通过自回归生成一段段视频并由注意力 sink 保证连贯性，实现了理论上无限长度的流式生成。",
-          "ecosystem": "LongLive 2.0 建立在 NVIDIA 生态之上，深度依赖 **TransformerEngine** 或 **FourOverSix** 这类 NVFP4 推理后端，并需要安装特定的 toolkit（如 nvfp4_wheel）。模型主体基于 **Wan2.2** 的扩散骨干，训练代码则从 **Self-Forcing** 框架扩展而来。可选地集成了 **TriAttention** 用于 KV 缓存压缩。\n\n在部署上，目前仅支持 NVIDIA GPU（至少 Ampere 架构或更高以支持 FP4 硬件加速），依赖 CUDA 和 PyTorch 生态。它可以搭配 HuggingFace 的模型仓库分发权重，并与 VLM（如用于 prompt 理解）组合构建完整应用。\n\n替代方案可能包括使用其他视频生成模型（如 SVD、ModelScopeT2V）并自行实现量化推理，或者采用外挂的 VAE 加速（如 Fast-VAE）。但与 LongLive 高度优化的并行和量化 pipeline 相比，这些方案往往无法达到同等的效率与长视频连贯性。",
+          "howItWorks": "## 一句话模型 LongLive 2.0 像一个视频生成流水线工厂：输入文本描述，经过低精度量化的扩散模型以自回归方式一段段生成视频 token，然后使用轻量级解码器并行解码成最终视频，整个过程由 NVFP4 量化加速。 ## 工作流 1. **文本输入**：用户提供自然语言提示，可包含多镜头指令。 2. **自回归序列生成**：使用基于因果扩散的 transformer 模型逐帧生成 latent token 序列。对于多镜头，利用**注意力汇**（attention sink）稳定上下文转换。 3. **并行与量化加速**：在生成过程中，模型权重和 KV 缓存采用 NVFP4 量化；序列被切分到多个 GPU 上**序列并行**处理，同时**异步解码**重叠 VAE 解码与计算。 4. **视频输出**：VAE 解码器将 latent token 流式解码为 RGB 视频帧，并根据设置的帧率保存为 mp4 文件。 ## 关键组件 - **CausalDiffusionInferencePipeline**：核心推理管线，封装了生成器（transformer）和 VAE 解码器，负责完整推理流程。 - **setup_nvfp4_pipeline**：自动处理 NVFP4 量化的权重加载、模块替换和 flow，根据配置选择 TransformerEngine 或 FourOverSix 后端。 - **Balanced Sequence Parallel**：训练时使用，通过均匀分配序列长度到各 GPU 实现负载均衡，减少通信开销，适应自回归 teacher-forcing 训练。 ## 验证点 运行快速入门脚本后，应在 `videos/quickstart/` 目录下生成一段 mp4 视频，内容为银色的机器人在实验室行走，帧率 24，时长由配置决定（默认约 5 秒）。NVFP4 版本输出的视频质量应与 BF16 版本接近，但生成速度更快。",
+          "novelty": "LongLive 2.0 的核心贡献是将先进的量化与并行技术系统化地集成到视频扩散生成 pipeline 中，形成了一个面向长视频的高效基础设施。可迁移的模式在于：**用低精度量化（NVFP4）结合序列并行来解决长序列扩散模型的推理吞吐瓶颈**，这一思路可直接应用到其他类似的自回归或扩散长序列生成任务中。 与同领域的方案对比：早期如 Make-A-Video、VideoGen 等聚焦于单次生成长视频，未专门优化交互式多镜头生成；Sora 展现了惊人效果但未公开技术细节；EMO 等侧重音频驱动面部动画，不强调通用文本生成长视频。在推理优化方面，常见量化方案如 FP8、INT8 已用于 LLM 推理，但首次被应用于视频扩散模型并达到 W4A4 级别，且与序列并行、异步解码联合设计。相较于 Vchitect、VideoComposer 等基于扩散的多阶段方法，LongLive 通过自回归生成一段段视频并由注意力 sink 保证连贯性，实现了理论上无限长度的流式生成。",
+          "ecosystem": "LongLive 2.0 建立在 NVIDIA 生态之上，深度依赖 **TransformerEngine** 或 **FourOverSix** 这类 NVFP4 推理后端，并需要安装特定的 toolkit（如 nvfp4_wheel）。模型主体基于 **Wan2.2** 的扩散骨干，训练代码则从 **Self-Forcing** 框架扩展而来。可选地集成了 **TriAttention** 用于 KV 缓存压缩。 在部署上，目前仅支持 NVIDIA GPU（至少 Ampere 架构或更高以支持 FP4 硬件加速），依赖 CUDA 和 PyTorch 生态。它可以搭配 HuggingFace 的模型仓库分发权重，并与 VLM（如用于 prompt 理解）组合构建完整应用。 替代方案可能包括使用其他视频生成模型（如 SVD、ModelScopeT2V）并自行实现量化推理，或者采用外挂的 VAE 加速（如 Fast-VAE）。但与 LongLive 高度优化的并行和量化 pipeline 相比，这些方案往往无法达到同等的效率与长视频连贯性。",
           "limitations": [
             {
               "title": "对 GPU 要求高",
@@ -992,7 +1076,6 @@
             },
             {
               "step": "准备推理配置：确认 configs/inference.yaml 中路径指向下载的 checkpoint，并可调整帧率等参数。",
-              "cmd": "vim configs/inference.yaml",
               "note": "默认配置适用于单 GPU 推理，无需修改即可运行。"
             },
             {
@@ -1002,17 +1085,7 @@
             },
             {
               "step": "检查输出视频：打开生成的 sample.mp4，确认内容为银机器人行走。",
-              "cmd": "open videos/quickstart/sample.mp4",
               "note": "视频长度约 5 秒，帧率 24。"
-            },
-            {
-              "step": "(可选) 测试 NVFP4 加速：下载 NVFP4 模型并修改配置文件，运行 NVFP4 推理脚本。",
-              "cmd": "python quickstart_nvfp4.py",
-              "note": "需要安装 NVFP4 支持库，推理速度应比 BF16 快 50% 以上。"
-            },
-            {
-              "step": "查看性能日志：观察终端输出的 FPS 和延迟信息，与 README 表格对比。",
-              "note": "若使用多 GPU 序列并行，需设置 WORLD_SIZE 环境变量。"
             }
           ],
           "score": {
@@ -1044,13 +1117,21 @@
           "media"
         ],
         "light": "它解决从各式网站下载音视频的问题，尤其是当网站频繁更新反爬策略时。这周/月值得看是因为它持续更新以适配新网站和修复下载错误，社区活跃，是数据收集的可靠工具。",
-        "worthDeepDive": 31
+        "worthDeepDive": 41,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 31,
+          "finalScore": 41,
+          "matchedBoostTerms": [],
+          "matchedCapTerms": [],
+          "explanation": "raw 31; final 41; intent tool; popularity +6"
+        }
       }
     ]
   },
   "weekly": {
     "window": "weekly",
-    "generatedAt": "2026-05-24T02:35:32.338Z",
+    "generatedAt": "2026-05-30T02:33:06.208Z",
     "repos": [
       {
         "fullName": "colbymchenry/codegraph",
@@ -1061,9 +1142,9 @@
         "description": "Pre-indexed code knowledge graph for Claude Code, Codex, Cursor, OpenCode, and Hermes Agent — fewer tokens, fewer tool calls, 100% local",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 19692,
-        "forks": 1094,
-        "starsGained": 15909,
+        "stars": 19698,
+        "forks": 1095,
+        "starsGained": 17463,
         "rank": 1,
         "tldr": "这是一个MCP工具，用来为AI编程代理提供预索引代码知识图谱，特别在显著降低token消耗和工具调用次数。",
         "tags": [
@@ -1074,7 +1155,18 @@
           "性能优化"
         ],
         "light": "它解决AI编程代理在大型代码库中探索时消耗大量token和工具调用的问题。这周值得看是因为它通过预索引的符号关系图，展示了如何将代理的探索成本降低35%以上，并提供了跨多个主流代理的集成方案，对构建高效AI编码工具有直接参考价值。",
-        "worthDeepDive": 97,
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent understanding; boost: agent, mcp; popularity +8"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它在7个真实代码库的基准测试中让AI代理成本平均降低35%、工具调用减少70%，收益随着代码规模增大而放大。适合所有使用Claude Code、Cursor等编码代理的开发者，尤其适合处理大型或多语言项目、且重视本地隐私和即时价值的团队。",
           "whyItMatters": [
@@ -1109,9 +1201,9 @@
               "explain": "为避免主会话上下文被大量源码填满，工具指令建议代理生成子Explore代理，专门使用codegraph_explore工具获取完整源码，主会话只做轻量查询。"
             }
           ],
-          "howItWorks": "## 一句话模型\n就像给整个代码库建一座智慧图书馆的索引卡片，AI代理问“这本书在哪里”时，图书馆员直接调出关联的所有卡片，而不是满屋子翻找。CodeGraph预先用tree-sitter解析代码，将符号、调用关系、路由等结构化信息存入SQLite，然后通过MCP协议向编码代理提供查询接口。\n\n## 工作流\n安装后运行`codegraph init -i`，它会遍历项目文件，用tree-sitter解析19+种语言的AST，提取符号、引用、路由等信息，构建成关系图并存储到`.codegraph/`目录下的SQLite数据库（利用FTS5支持全文搜索）。同时启动文件监视器，监听文件变更并自动增量更新索引。代理启动时加载MCP服务器配置，获得8个代码查询工具（如codegraph_search、codegraph_context）。当用户提出探索性问题时，代理按指令生成子代理，子代理使用这些工具直接获取结构化结果，避免反复执行grep/read等昂贵操作。\n\n## 关键组件\n- **索引器**：核心依赖tree-sitter多语言语法解析，负责生成符号表、调用图和路由图；\n- **MCP服务器**：一个stdio接口的Node服务，代理通过标准JSON-RPC调用它暴露的工具；\n- **智能指令注入**：安装器自动写入代理的提示文件（如CLAUDE.md），指导何时使用子代理、何时直接查询，确保工具被高效使用；\n- **文件监视器**：利用操作系统的原生事件（FSEvents/inotify）实现实时同步，确保索引始终是最新的。\n\n## 验证点\n代理启动后，针对项目提出一个架构问题（例如“路由分发机制是怎样的？”）。如果配置正确，你应该看到代理生成了一个Explore子代理，子代理调用了codegraph_context和codegraph_explore，主会话中几乎没有grep或Read调用，且最终答案准确且响应迅速。在大型项目上，工具调用总数通常从数十次降至十次以内。",
-          "novelty": "CodeGraph的可迁移模式在于将“代码库静态分析”与“LLM代理工具调用”解耦，通过预索引生成紧凑的语义表示，并以通用协议（MCP）提供给多个代理。这不同于传统做法中让代理实时扫描文件系统——那会导致大量令牌浪费和子代理泛滥。\n\n与知名方案对比：LangChain的代码分析工具通常需要Python运行时并依赖特定链式调用，难以集成到不同桌面代理中；AutoGen或MetaGPT的多代理架构更侧重任务编排，而非底层代码理解的优化；GitHub Copilot的本地索引虽然也能提供符号信息，但仅限于特定IDE且不暴露可编程接口。CodeGraph的创新在于：1）纯本地、跨代理的轻量级MCP服务，任何支持该协议的代理均可即插即用；2）细粒度的框架感知路由识别（14种Web框架），这在现有通用代码智能工具中少见；3）通过基准测试证明了30-50%的成本节省，提供了数据驱动的说服力。不过，其核心索引技术（tree-sitter + SQLite）并不新颖，新颖度更多体现在工程集成和针对LLM代理的指令优化上。",
-          "ecosystem": "CodeGraph站在Tree-sitter的肩上，依赖其多语言解析能力（覆盖19+语言），并深度集成到Model Context Protocol生态中。它不依赖任何云服务，所有数据存储在本地SQLite（FTS5）文件中，可搭配任何文本编辑器或代理使用。\n\n它直接替代了代理原生的文件搜索工具（grep/glob/Read），成为代码理解的中枢。在竞争格局中，它与Sourcegraph（基于服务器的代码搜索）形成互补，后者更侧重团队协作和共享索引，而CodeGraph是个人本地用的极简方案；与JetBrains IDE的代码索引相比，CodeGraph不绑定特定IDE，且专为LLM代理优化了接口。自包含的运行时（内置Node）确保了极低的使用门槛，未来如果MCP协议进一步普及，它可能成为本地代码智能的默认组件。",
+          "howItWorks": "## 一句话模型 就像给整个代码库建一座智慧图书馆的索引卡片，AI代理问“这本书在哪里”时，图书馆员直接调出关联的所有卡片，而不是满屋子翻找。CodeGraph预先用tree-sitter解析代码，将符号、调用关系、路由等结构化信息存入SQLite，然后通过MCP协议向编码代理提供查询接口。 ## 工作流 安装后运行`codegraph init -i`，它会遍历项目文件，用tree-sitter解析19+种语言的AST，提取符号、引用、路由等信息，构建成关系图并存储到`.codegraph/`目录下的SQLite数据库（利用FTS5支持全文搜索）。同时启动文件监视器，监听文件变更并自动增量更新索引。代理启动时加载MCP服务器配置，获得8个代码查询工具（如codegraph_search、codegraph_context）。当用户提出探索性问题时，代理按指令生成子代理，子代理使用这些工具直接获取结构化结果，避免反复执行grep/read等昂贵操作。 ## 关键组件 - **索引器**：核心依赖tree-sitter多语言语法解析，负责生成符号表、调用图和路由图； - **MCP服务器**：一个stdio接口的Node服务，代理通过标准JSON-RPC调用它暴露的工具； - **智能指令注入**：安装器自动写入代理的提示文件（如CLAUDE.md），指导何时使用子代理、何时直接查询，确保工具被高效使用； - **文件监视器**：利用操作系统的原生事件（FSEvents/inotify）实现实时同步，确保索引始终是最新的。 ## 验证点 代理启动后，针对项目提出一个架构问题（例如“路由分发机制是怎样的？”）。如果配置正确，你应该看到代理生成了一个Explore子代理，子代理调用了codegraph_context和codegraph_explore，主会话中几乎没有grep或Read调用，且最终答案准确且响应迅速。在大型项目上，工具调用总数通常从数十次降至十次以内。",
+          "novelty": "CodeGraph的可迁移模式在于将“代码库静态分析”与“LLM代理工具调用”解耦，通过预索引生成紧凑的语义表示，并以通用协议（MCP）提供给多个代理。这不同于传统做法中让代理实时扫描文件系统——那会导致大量令牌浪费和子代理泛滥。 与知名方案对比：LangChain的代码分析工具通常需要Python运行时并依赖特定链式调用，难以集成到不同桌面代理中；AutoGen或MetaGPT的多代理架构更侧重任务编排，而非底层代码理解的优化；GitHub Copilot的本地索引虽然也能提供符号信息，但仅限于特定IDE且不暴露可编程接口。CodeGraph的创新在于：1）纯本地、跨代理的轻量级MCP服务，任何支持该协议的代理均可即插即用；2）细粒度的框架感知路由识别（14种Web框架），这在现有通用代码智能工具中少见；3）通过基准测试证明了30-50%的成本节省，提供了数据驱动的说服力。不过，其核心索引技术（tree-sitter + SQLite）并不新颖，新颖度更多体现在工程集成和针对LLM代理的指令优化上。",
+          "ecosystem": "CodeGraph站在Tree-sitter的肩上，依赖其多语言解析能力（覆盖19+语言），并深度集成到Model Context Protocol生态中。它不依赖任何云服务，所有数据存储在本地SQLite（FTS5）文件中，可搭配任何文本编辑器或代理使用。 它直接替代了代理原生的文件搜索工具（grep/glob/Read），成为代码理解的中枢。在竞争格局中，它与Sourcegraph（基于服务器的代码搜索）形成互补，后者更侧重团队协作和共享索引，而CodeGraph是个人本地用的极简方案；与JetBrains IDE的代码索引相比，CodeGraph不绑定特定IDE，且专为LLM代理优化了接口。自包含的运行时（内置Node）确保了极低的使用门槛，未来如果MCP协议进一步普及，它可能成为本地代码智能的默认组件。",
           "limitations": [
             {
               "title": "小项目收益有限",
@@ -1137,35 +1229,19 @@
           "tryIt": [
             {
               "step": "在macOS/Linux终端运行一键安装脚本，自动下载适合你平台的构建版本。",
-              "cmd": "curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh",
               "note": "Windows下使用PowerShell命令：irm https://.../install.ps1 | iex"
             },
             {
               "step": "运行codegraph命令启动交互式配置，选择你要集成的代理（如Claude Code、Cursor）。",
-              "cmd": "codegraph",
               "note": "如果已安装Node，也可使用npx @colbymchenry/codegraph零安装体验"
             },
             {
               "step": "进入你的项目目录，初始化知识图谱索引。",
-              "cmd": "cd your-project && codegraph init -i",
               "note": "构建索引可能需要几十秒到几分钟，取决于项目大小"
             },
             {
               "step": "重启你的AI代理（如完全退出Claude Code或重启Cursor窗口），让MCP服务器加载。",
               "note": "确保代理已经加载了codegraph的MCP配置，可以在代理设置中查看"
-            },
-            {
-              "step": "向代理提出一个架构问题，例如：“请解释这个项目的路由系统是如何工作的？”",
-              "note": "确保问题需要探索代码库，这样才能触发CodeGraph工具"
-            },
-            {
-              "step": "观察代理的行为——它应该生成一个子代理，子代理调用codegraph_explore获取源码，主会话几乎不直接读文件。检查响应速度是否变快。",
-              "note": "你可以在代理日志中看到工具调用列表，应该以codegraph_开头的调用为主"
-            },
-            {
-              "step": "如果想要卸载，运行卸载命令，它会清除所有代理中的CodeGraph配置。",
-              "cmd": "codegraph uninstall",
-              "note": "项目中的.codegraph/索引目录不会被删除，需手动移除或运行`codegraph uninit`"
             }
           ],
           "score": {
@@ -1199,103 +1275,16 @@
         ],
         "light": "本周/月在GitHub trending上因为其创新的“记忆树”和自动上下文获取特性吸引了大量关注。与传统AI助手不同，OpenHuman通过OAuth接入118+第三方服务，并每20分钟自动拉取数据到本地SQLite知识库，使用令牌压缩技术降低80%成本。这种“零配置”的持续学习体验让用户快速拥有一个了解自身工作流的智能体，符合当前AI个人助理和记忆管理系统的发展趋势。",
         "worthDeepDive": 100,
-        "deep": {
-          "atGlance": "OpenHuman 是一个开箱即用的个人 AI 助理，能通过一键 OAuth 接入你所有常用服务，并在本地构建可编辑的记忆树，让你无需等待数周训练即可获得深度上下文理解。30 分钟即可体验其自动同步、令牌压缩和持久记忆的独特组合。",
-          "whyItMatters": [
-            {
-              "title": "分钟级上下文",
-              "body": "连接账户后，20 分钟自动同步循环让 AI 立即掌握你的邮件、日历、代码仓库，消除传统助手的冷启动等待。"
-            },
-            {
-              "title": "118+ 一键集成",
-              "body": "覆盖 Gmail、Notion、GitHub 等主流服务，OAuth 授权即用，无需编写任何集成代码或配置轮询。"
-            },
-            {
-              "title": "本地可控记忆",
-              "body": "记忆树存储在本地 SQLite 和 Obsidian 兼容的 Markdown vault 中，数据完全在你手中，可随时浏览、编辑或导出。"
-            }
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "llm"
           ],
-          "keyConcepts": [
-            {
-              "term": "Memory Tree",
-              "explain": "将来自连接源的数据规范化为 ≤3k token 的 Markdown 块，分层摘要后存入本地 SQLite，形成树状记忆结构，同时输出为 Obsidian 可读的 .md 文件，实现跨会话持久上下文。"
-            },
-            {
-              "term": "Auto-fetch",
-              "explain": "每 20 分钟自动遍历活跃 OAuth 连接，获取最新数据并注入记忆树，无需用户编写任何脚本；更新后的信息直接进入压缩和摘要管道，确保 AI 时刻拥有最新背景。"
-            },
-            {
-              "term": "TokenJuice",
-              "explain": "内置令牌压缩引擎，在工具输出进入 LLM 前进行规范化（HTML→Markdown、URL 缩短、去重摘要），并通过可配置规则避免过度压缩，特别保护多字节字符，降低 token 消耗且保留语义。"
-            },
-            {
-              "term": "Model Routing",
-              "explain": "根据任务类型（推理、快速、视觉）自动将请求分派到内部订阅中的不同 LLM，并支持本地 Ollama 模型卸载部分计算，实现最佳性能与成本平衡，无需管理多供应商密钥。"
-            }
-          ],
-          "howItWorks": "## 组件\n\nOpenHuman 桌面应用基于 **Tauri + Rust** 构建（源码依赖 CEF，用于渲染 UI），并提供可通过 `pnpm dev` 运行的 Web 侧面板。Rust 核心负责本地数据库（SQLite）、令牌压缩（TokenJuice）、外部连接轮询（auto-fetch）和模型路由。前端使用现代 Web 技术，支持桌面吉祥物、语音交互（ElevenLabs TTS）和 Google Meet 参与。集成层通过 OAuth 2.0 对接 118+ 第三方服务，每个连接以类型化工具的形式暴露给 agent。另外可选后端组件如 agentmemory 记忆代理，允许跨 AI 工具共享记忆存储。\n\n## 数据流\n\n用户通过 UI 授权 OAuth 连接后，auto-fetch 每 20 分钟触发一次同步：Rust 核心使用对应服务的 API 拉取增量数据（邮件、事件、文档等）。原始数据先经过 TokenJuice 压缩管道，转换为干净的 Markdown 文本，且长文本被分割为 ≤3k token 的块。这些块随后通过摘要算法生成多层树状结构，作为记忆节点存入 SQLite，并同时写入本地 Obsidian vault 的 .md 文件。当用户与 agent 对话时，Rust 代理首先在记忆树中检索相关块，组装上下文，然后通过模型路由器选择合适的 LLM（远程或本地 Ollama）生成回答。回答同样经过压缩后返回给前端，吉祥物可配合语音输出形成自然交互。所有本地存储数据均使用设备加密，不上传云端。\n\n## 关键算法 / 配置\n\n记忆树的构建使用**分层摘要算法**：叶节点为原始数据块，向上逐层生成摘要节点，深度和分支因子可通过 `config.toml` 调整。TokenJuice 的压缩规则基于可配置的覆盖层，包括正则替换、HTML 剥离、URL 缩短服务等，并在处理多字节文本时采用字形边界保持。模型路由采用基于任务分类的调度器，分类模型（本地 fast）通过分析提示词的特征值（预期长度、是否含图像、推理深度需求）将请求分发到推理、快速或视觉模型，所有调用封装在统一订阅中。同步调度器对每个连接维护状态，通过指数退避处理 API 频率限制。整体设置可通过图形界面完成，高级参数保留在 `config.toml` 中。",
-          "novelty": "OpenHuman 的定位是一个**完全集成的个人 AI 助手**，而非传统的 AI 开发框架。相比 LangChain、AutoGen 等通用 agent 构建库，它不需要用户编写链式调用或编排代码；相比 Claude Cowork 等竞品，它强调「开箱即用的记忆」而非仅对话范围的上下文。\n\n具体而言，LangChain/AutoGen 等方案提供模块化、可组合的 agent 工具，但要求用户具备编程能力并自行管理数据流动；OpenHuman 则通过 UI 将集成、记忆和压缩封装为产品功能。与 OpenClaw 和 Hermes 等「插件经纪」式助手相比，OpenHuman 的 auto-fetch 和记忆树实现了主动的、持续更新的多源知识融合，而非被动等待插件注入上下文。此外，TokenJuice 的令牌压缩并非无关紧要的字符串处理，而是深度集成到工具层，作用于所有 LLM 调用，这在同类产品中较为少见。\n\n然而，从算法角度而言，记忆树本质上是分层摘要和检索增强的组合，未见颠覆性创新；令牌压缩规则也受到规则引擎的限制，可能无法处理非常规数据。综合来看，OpenHuman 的新意主要在于工程整合与产品体验的突破，而非基础模型或核心算法的革新。",
-          "ecosystem": "OpenHuman 构建在 **Tauri 桌面框架**和 **Rust** 生态之上，前端依赖 pnpm 和现代 Web 技术。集成的第三方服务通过 OAuth 提供数据，语音输出调用 **ElevenLabs** API，本地模型路由可选 **Ollama**。它可与 **agentmemory** 记忆代理搭配，实现跨工具（如 Claude Code、Cursor）的共享记忆存储，形成个人知识网络。\n\n作为一款一体化助手，OpenHuman 意图替代用户对多个单一功能工具的依赖：它整合了邮件客户端、日历、任务管理、代码仓库监控和 AI 对话，减少供应商碎片化。与 **Claude Cowork**、**OpenClaw** 等产品形成直接竞争，但在记忆持久性和自动同步上更具优势。同时，它和 LangChain 等开发框架并非直接竞争，而是面向不同用户群：OpenHuman 面向最终用户，而 LangChain 等面向构建者。在隐私方面，本地优先的设计可部分替代依赖云存储的笔记工具（如 Notion），但 Obsidian vault 的生态让用户可以结合社区插件进一步扩展。",
-          "limitations": [
-            {
-              "title": "早期 beta 不稳定",
-              "body": "标记为 Early Beta，可能存在界面卡顿、同步中断或部分集成尚未完成，不适合用于关键工作流或生产环境。"
-            },
-            {
-              "title": "本地资源占用高",
-              "body": "随着连接服务增多，SQLite 记忆库和 Obsidian vault 可能增长到数百 MB，同步过程会消耗 CPU 和磁盘 I/O，低配机器上体验下降。"
-            },
-            {
-              "title": "离线能力受限",
-              "body": "118+ 集成依赖网络和 OAuth 令牌，离线时无法拉取新数据；模型路由虽支持 Ollama 本地模型，但整体强大功能需在线使用。"
-            },
-            {
-              "title": "压缩可能丢细节",
-              "body": "TokenJuice 的规则化压缩在去重和摘要时可能丢弃细粒度信息，对需要精确全文的场景（如法律条款）无法替代原样存储。"
-            },
-            {
-              "title": "单订阅模型局限",
-              "body": "内置路由只提供单一 LLM 订阅方案，无法混用不同供应商的高级模型（如 GPT-4 和 Claude 同时使用），灵活性低于 BYOK 方案。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "使用命令行安装 OpenHuman 桌面应用（macOS 或 Linux）",
-              "cmd": "curl -fsSL https://raw.githubusercontent.com/tinyhumansai/openhuman/main/scripts/install.sh | bash",
-              "note": "Windows 用户可使用 PowerShell 脚本：irm ... | iex，具体命令见 README。"
-            },
-            {
-              "step": "从应用程序目录启动 OpenHuman，初次启动将显示欢迎向导",
-              "note": "若系统提示安全警告，请允许运行。"
-            },
-            {
-              "step": "在集成页面点击连接，例如选择 Gmail，通过 OAuth 授权访问",
-              "note": "需要浏览器完成 Google 登录授权。"
-            },
-            {
-              "step": "等待自动同步完成（约 5-10 分钟），状态栏会显示进度",
-              "note": "期间可以继续添加其他服务。"
-            },
-            {
-              "step": "在聊天面板询问助手关于已同步数据的问题，如“总结我今天的未读邮件”",
-              "note": "助手会参考记忆树给出回答，初次响应可能稍慢。"
-            },
-            {
-              "step": "打开 Obsidian（未安装需先安装），在仓库路径中查看 Memory Vault 文件夹",
-              "cmd": "open ~/.openhuman/memory-vault",
-              "note": "路径在设置页面的「Memory」选项卡中可查看，包含编译后的 Markdown 文件。"
-            },
-            {
-              "step": "（可选）编辑 Obsidian 中的 .md 文件，观察助手后续回答是否反映修改",
-              "note": "记忆树与 Obsidian 双向同步，手动编辑可能被自动同步覆盖，谨慎测试。"
-            }
-          ],
-          "score": {
-            "novelty": 16,
-            "engineering": 23,
-            "reproducibility": 20,
-            "timeToValue": 22
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent tool; boost: agent, llm; popularity +8"
         }
       },
       {
@@ -1307,9 +1296,9 @@
         "description": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 19772,
+        "stars": 19773,
         "forks": 1699,
-        "starsGained": 11691,
+        "starsGained": 16073,
         "rank": 3,
         "tldr": "这是一个Claude Code技能套件，用于学术研究全流程，特别强调引用验证和完整性检查。",
         "tags": [
@@ -1320,7 +1309,19 @@
           "claude-code"
         ],
         "light": "该项目近期在GitHub Trending上受到关注，主要是因为学术界对AI辅助写作中引用幻觉和数据造假问题的担忧日益加剧。它提供了从研究到发表的全流程AI辅助，并通过多阶段完整性检查、引用审计等机制降低风险，引用了《Nature》和arXiv上的相关研究，切中当前热点。",
-        "worthDeepDive": 39
+        "worthDeepDive": 49,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 49,
+          "matchedBoostTerms": [
+            "agent"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 49; intent understanding; boost: agent; penalty features: skills; popularity +8"
+        }
       },
       {
         "fullName": "ruvnet/RuView",
@@ -1345,107 +1346,13 @@
         ],
         "light": "本周/月趋势因WiFi感知技术突破和完全开源而上升。项目展示了如何用廉价ESP32硬件和Rust实现高精度空间感知，结合SNN和边缘AI，无需云依赖。其完整的硬件-软件-模型流水线、105个边缘模块目录和高质量ADR文档，满足了AI工程师对隐私、低成本和实时性的需求，符合当前边缘计算和智能感知趋势。",
         "worthDeepDive": 100,
-        "deep": {
-          "atGlance": "这个项目值得深看，因为它将廉价 WiFi 信号变成了穿墙感知系统，无需摄像头即可检测人体、呼吸和心跳。适合对边缘 AI、无隐私侵入的智能空间感兴趣的嵌入式开发者或研究者；当前热度高，因为它刚在 GitHub 新增大量星标。",
-          "whyItMatters": [
-            {
-              "title": "隐私优先感知",
-              "body": "利用 WiFi 射频扰动而非视频，实现穿墙人体检测与生命体征监测，杜绝摄像头带来的隐私风险。"
-            },
-            {
-              "title": "$9 硬件成本",
-              "body": "基于 ESP32-S3 的 CSI 感知节点成本极低，使大规模室内部署成为现实，加速智能建筑和健康看护应用。"
-            },
-            {
-              "title": "全离线边缘运行",
-              "body": "所有推理都在本地完成，不需要互联网或云服务，结合 Ed25519 见证链提供可信数据溯源。"
-            }
-          ],
-          "keyConcepts": [
-            {
-              "term": "WiFi CSI",
-              "explain": "信道状态信息，反映无线信号在传播中受到的振幅和相位变化，RuView 利用它提取人体的呼吸、心跳、位置等精细特征，比 RSSI 包含更多物理信息。"
-            },
-            {
-              "term": "Cognitum Seed",
-              "explain": "一个硬件扩展模块（约 $140），为 ESP32 网格节点增加持久向量存储、kNN 搜索和 Ed25519 见证链，用于长期记忆和 AI 集成。"
-            },
-            {
-              "term": "WiFi DensePose",
-              "explain": "从 WiFi CSI 信号估计 17 个关键点的人体骨架姿势，模型通过对比学习自监督预训练，再以摄像头作为真值微调，目标 PCK@20 达 35% 以上。"
-            },
-            {
-              "term": "Edge Module (Cog)",
-              "explain": "运行在 ESP32 本身或通过 Cognitum 工具链加载的预编译智能模块，覆盖健康、安全、零售等 105 个场景，可本地执行无需云端。"
-            },
-            {
-              "term": "Spiking Neural Network (SNN)",
-              "explain": "脉冲神经网络，用于在设备上实现环境自适应学习，低于 30 秒即可适应新的 WiFi 环境，减少重复训练需求。"
-            }
-          ],
-          "howItWorks": "## 一句话模型\n就像蝙蝠用声波回声感知环境，RuView 使用 WiFi 无线电波的回声——当人体在空间中活动或呼吸时，会扰动这些无线电波，通过分析扰动模式就能推测人的位置、动作甚至生命体征。\n\n## 工作流\n输入：ESP32-S3 设备实时采集 WiFi 的 CSI 数据流（通过监听环境中已有的路由器广播）。处理：CSI 数据经带通滤波分离呼吸（0.1–0.5 Hz）和心跳（0.8–2.0 Hz）信号，同时送入量化后的对比学习模型提取 128 维嵌入，用于存在检测和姿势估计。输出：通过本地 Web 服务或集成到智能模块产生事件（如存在告警、呼吸率数值）。\n\n## 关键组件\n**ESP32 固件**负责 CSI 捕获和初步信号处理，通过 mesh 组网扫描 6 个 WiFi 信道。**Sensing Server** 是 Rust 编写的可选聚合服务，可以从多个节点汇总数据。**模型服务**基于 Candle 深度学习框架加载 8 KB 的 4-bit 量化模型完成超低延迟推理。\n\n## 验证点\n用 Docker 快速启动，访问 `http://localhost:3000` 查看模拟数据的可视化面板；或烧录 ESP32-S3 硬件后，通过 `http://localhost:3000/pose-fusion.html` 实时看到绿色骨架叠加在摄像头画面上，并在控制台输出呼吸和心率估计值。",
-          "novelty": "可迁移模式：将昂贵的专用雷达硬件需求降级为 $9 的消费级 WiFi 芯片，并提供了从自监督训练到边缘推理的完整开源流水线，为隐私优先的智能空间提供了可复现范式。\n\n对比同类方案：传统的 WiFi 感知通常使用 Intel 5300 等研究网卡（成本高、体积大），且多停留在实验室阶段；而商业方案如 Origin Wireless 的 Wireless AI 依赖于专有天线且不开源。RuView 在开源生态（Hugging Face、Candle、Rust）中提供了端到端的落地路径，并且通过 SNN 实现秒级环境适配，这是多数研究原型所欠缺的。但其相机辅助训练尚在开发中，目前纯 WiFi 的姿势估计精度仍很低，限制了实际应用。",
-          "ecosystem": "依赖：ESP-IDF 开发框架、Rust 语言、Candle 推理引擎、RuVector 向量库、Cognitum Seed 的可选硬件扩展。搭配：预训练模型发布在 Hugging Face，可通过 safetensors 格式在 Python 中使用；提供 Docker 仿真环境供评估。替代：可替代 PIR 红外传感器、摄像头或穿戴设备实现非接触式感知。竞争：在 WiFi 感知领域与 RF-Pose（MIT）、WiFi sensing 学术研究、以及商业的 Origin Wireless 方案竞争；在边缘 AI 推理上与 Soniox、Edge Impulse 等平台形成互补。",
-          "limitations": [
-            {
-              "title": "芯片限制",
-              "body": "不支持原版 ESP32 和 ESP32-C3，必须使用 ESP32-S3 才能获取 CSI 数据，限制了存量硬件利用。"
-            },
-            {
-              "title": "空间分辨率有限",
-              "body": "单个 ESP32 节点的空间分辨率不足，需 2 个以上节点或搭配 Cognitum Seed 才能获得较好效果。"
-            },
-            {
-              "title": "姿势精度待提升",
-              "body": "无摄像头辅助的姿势估计准确率极低（PCK@20 约 2.5%），官方虽已规划摄像头微调管道，但尚未公布训练好的关键点权重。"
-            },
-            {
-              "title": "模型加载断层",
-              "body": "Hugging Face 上的模型以 JSONL 格式发布，但感知服务器目前只支持二进制 RVF 格式，直接使用会报错，暂时只能通过 Docker 模拟或 Python 侧加载。"
-            },
-            {
-              "title": "穿墙距离受信号约束",
-              "body": "有效感知距离约 5 米，且依赖环境射频复杂性，钢筋墙或低信号强度会显著降低性能。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "使用 Docker 快速体验（无需硬件，提供模拟数据）",
-              "cmd": "docker pull ruvnet/wifi-densepose:latest && docker run -p 3000:3000 ruvnet/wifi-densepose:latest",
-              "note": "启动后访问 http://localhost:3000 即可查看仪表盘"
-            },
-            {
-              "step": "下载 Hugging Face 预训练模型",
-              "cmd": "huggingface-cli download ruvnet/wifi-densepose-pretrained --local-dir models/wifi-densepose-pretrained",
-              "note": "模型包含量化版本，使用 safetensors 加载"
-            },
-            {
-              "step": "准备 ESP32-S3 硬件并烧录固件",
-              "cmd": "esptool --chip esp32s3 --port COM9 --baud 460800 write_flash 0x0 bootloader.bin 0x8000 partition-table.bin 0xf000 ota_data_initial.bin 0x20000 esp32-csi-node.bin",
-              "note": "替换 COM9 为实际串口，确保已安装 esptool"
-            },
-            {
-              "step": "配置 ESP32-S3 的 WiFi 连接",
-              "cmd": "python firmware/esp32-csi-node/provision.py --port COM9 --ssid 'YourWiFi' --password 'secret' --target-ip 192.168.1.20",
-              "note": "target-ip 为网络中已存在的设备，用于回传目标响应"
-            },
-            {
-              "step": "启动感知服务器（若无模型则省略 --model）",
-              "cmd": "cargo run --bin sensing-server -- --bind 0.0.0.0:3000",
-              "note": "Rust 项目需提前编译，或使用 release 构建"
-            },
-            {
-              "step": "打开实时姿态融合页面验证",
-              "cmd": "open https://ruvnet.github.io/RuView/pose-fusion.html",
-              "note": "页面会通过 WebSocket 连接到 localhost:3000，需要允许摄像头权限以查看覆盖效果；若使用硬件，需先运行 ESP32 数据流管道"
-            }
-          ],
-          "score": {
-            "novelty": 22,
-            "engineering": 23,
-            "reproducibility": 20,
-            "timeToValue": 18
-          }
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [],
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent tool; popularity +8"
         }
       },
       {
@@ -1457,9 +1364,9 @@
         "description": "#1 Persistent memory for AI coding agents based on real-world benchmarks",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 16876,
+        "stars": 16877,
         "forks": 1391,
-        "starsGained": 6734,
+        "starsGained": 14753,
         "rank": 5,
         "tldr": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。",
         "tags": [
@@ -1471,107 +1378,23 @@
         ],
         "light": "本周AI编码代理工具（Claude Code、Cursor等）爆发式增长，开发者普遍面临代理重复解释上下文的痛点。agentmemory 通过即插即用的MCP服务器和本地嵌入实现零依赖持久化记忆，并在LongMemEval基准上达到95.2% R@5，显著优于内部提示。这种“一次安装，所有代理共享记忆”的模式正好契合当前主流代理生态，因此迅速走红。",
         "worthDeepDive": 100,
-        "deep": {
-          "atGlance": "agentmemory 是首个基于真实基准验证的 AI 编码助手持久记忆方案，通过自动钩子和混合检索实现 95.2% 的检索召回率，节省 92% 的 token，无需外部数据库，几分钟即可集成到 Claude Code、Cursor 等主流 agent，值得投入 30 分钟掌握其原理与实操。",
-          "whyItMatters": [
-            {
-              "title": "跨 Agent 记忆共享",
-              "body": "一个服务器，所有 agent 共享记忆，无需重新解释上下文，大幅减少重复工作，提升开发效率。"
-            },
-            {
-              "title": "大幅降低 Token 成本",
-              "body": "相比粘贴完整上下文，每年节省 99.5% 的 token，仅需 ~10 美元，结合本地嵌入可降至零成本。"
-            },
-            {
-              "title": "基于基准的验证",
-              "body": "在 LongMemEval-S 上 R@5 达 95.2%，自建编码语料库精准度 2.2 倍于 grep，性能经过严格测试。"
-            }
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "mcp",
+            "memory",
+            "llm",
+            "ai coding",
+            "coding agent",
+            "eval",
+            "benchmark"
           ],
-          "keyConcepts": [
-            {
-              "term": "MCP Server",
-              "explain": "agentmemory 实现为 **Model Context Protocol** 服务器，任何支持 MCP 的 agent（如 Claude Code、Cursor）均可无缝接入，通过标准协议读取和写入记忆。"
-            },
-            {
-              "term": "Hybrid Search",
-              "explain": "结合向量语义搜索和 BM25 关键词匹配的混合检索策略，确保高召回率和精准度，在 `all-MiniLM-L6-v2` 嵌入支持下本地运行。"
-            },
-            {
-              "term": "Auto Hooks",
-              "explain": "12 个自动钩子在 agent 会话的关键节点（如启动、工具调用、错误发生）静默捕获上下文，无需人工干预，自动将事件压缩为结构化记忆。"
-            },
-            {
-              "term": "Lifecycle Management",
-              "explain": "记忆具有置信度评分和生命周期，系统根据使用频率和相关性更新时间戳和重要性，自动遗忘过时信息，防止上下文污染。"
-            },
-            {
-              "term": "Knowledge Graph",
-              "explain": "在向量数据库之上构建知识图谱，记录实体（文件、函数、概念）之间的关联，支持复杂推理和上下文关联检索。"
-            }
-          ],
-          "howItWorks": "## 组件\nagentmemory 由多个核心组件构成，专为低延迟、零外部依赖的记忆服务设计。**内存服务器**（端口 3111）是整个系统的心脏，基于 **iii 引擎** 的事件总线和状态管理构建，负责任务调度、记忆压缩和查询处理。**MCP 代理** 将独立的 MCP 服务器请求转发到运行中的内存服务器，确保自动钩子和实时查看器看到一致的数据视图。**实时查看器**（端口 3113）是一个轻量 Web 界面，以图谱和列表形式展示记忆的内部状态，方便开发者调试。**文件系统连接器** `@agentmemory/fs-watcher` 监控项目文件变更，自动将文件创建、修改等事件转化为结构化记忆。存储层使用 **SQLite** 一个文件，无需 PostgreSQL 等外部数据库；嵌入层集成 **all-MiniLM-L6-v2** 模型，通过 ONNX Runtime 在本地执行向量化，不产生 API 调用费用。`agentmemory` 命令行工具提供 `demo`、`connect`、`eval` 等子命令，简化与不同 agent 的集成。\n\n## 数据流\n当与 agent 会话开始时，agentmemory 通过 12 个自动钩子或 MCP 工具调用静默捕获上下文。以 Claude Code 为例，其原生插件会在用户输入、LLM 响应、工具执行、错误发生等关键节点触发事件，这些事件被推送到内存服务器。服务器的 **压缩管道** 提取文件路径、代码片段、决策和元数据，丢弃冗余噪声，生成精简的“记忆项”。随后，本地 ONNX 模型将记忆文本编码为 384 维向量，同时原始文本被保存用于 BM25 倒排索引。向量和索引数据一并写入 SQLite 的 `memories` 表，并更新 **知识图谱** 中的节点关系和置信度分数。当 agent 需要回忆上下文时，它会通过 MCP 调用 `search_memories` 或 REST API 发送查询字符串。混合搜索模块并行执行：向量索引进行余弦相似度近似最近邻检索，BM25 引擎进行精确词匹配，两者结果经分数归一化和加权融合（权重可配置），再根据置信度衰减和时间衰减重排序，最终返回 top-k 结果。这些记忆片段被注入到 agent 的下个会话的系统提示中，整个过程通常在 **14 毫秒**内完成。\n\n## 关键算法/配置\nagentmemory 的检索优越性源于 **混合搜索算法**。向量搜索采用 `all-MiniLM-L6-v2` 模型生成的句子嵌入，通过余弦相似度度量语义相关性；BM25 则是 TF-IDF 的改进版本，专为代码中的标识符和关键词匹配设计，两者得分线性组合，默认权重各 0.5。**置信度评分** 采用指数衰减公式，综合记忆的创建时间、最后访问时间、访问频率和相关性信号，确保新出现且频繁使用的记忆优先级更高。**生命周期管理** 设定可配置的保留阈值，当置信度跌至阈值以下时，记忆被标记为“遗忘”或直接删除，防止上下文窗口污染和数据库无限膨胀。核心配置通过环境变量暴露：`MEMORY_MAX_TOKENS` 限制每次注入的 token 数；`EMBEDDING_MODEL` 可指定自定义 ONNX 模型路径；`AUDIT_POLICY` 记录所有删除操作，满足合规需求；`MEMORY_MIN_CONFIDENCE` 控制遗忘阈值。系统内置 eval 套件，支持 LongMemEval-S 等公开基准，并提供适配器接口，方便对比不同检索方案。",
-          "novelty": "相较于 LangChain 的 Memory 模块，agentmemory 的核心新颖之处在于其**完全自动化**和**编码场景特化**。LangChain 的 Memory 要求开发者显式定义记忆提取和注入逻辑，而 agentmemory 通过 12 个预置的自动钩子，在无需修改 agent 代码的情况下，静默捕获 Claude Code、Cursor 等主流工具的事件流，自动完成从捕获到压缩的全生命周期。而且，LangChain 的多数记忆实现依赖外部向量数据库（如 Pinecone）和嵌入 API，agentmemory 则内嵌 ONNX 模型和 SQLite，真正实现零外部依赖和零网络成本。\n\n与同为记忆层的 mem0 相比，agentmemory 的检索质量有实证优势。根据 README 中的 LongMemEval-S 基准，agentmemory 的 R@5 为 95.2%，而 mem0 在 LoCoMo 数据集上仅 68.5%；在上传的编码基准 `coding-agent-life-v1` 中，agentmemory 的混合搜索精度达到 grep 基线的 2.2 倍。这种差异源于 agentmemory 的混合搜索和置信度引导的重排序，而 mem0 更偏向通用的向量检索。Letta/MemGPT 则需要更换整个 agent 运行时，侵入性高，agentmemory 作为独立的 MCP 服务器，与现有 agent 完全解耦，整合成本极低。另外，agentmemory 独有的实时可视化查看器，让调试记忆状态变得直观，这在其他方案中少见。整体而言，agentmemory 虽未引入突破性算法，但其在编码 agent 记忆场景的工程聚焦、基准驱动迭代和无感集成设计上颇具新意。",
-          "ecosystem": "agentmemory 围绕轻量记忆服务构建，主要依赖 Node.js 生态：`@agentmemory/agentmemory` 本体，底层 **iii 引擎** 提供事件系统和状态管理，**better-sqlite3** 操作本地数据库，**@xenova/transformers** 运行 `all-MiniLM-L6-v2` 嵌入模型。它专为 MCP（Model Context Protocol）设计，因此可与任何支持 MCP 的 agent 搭配，包括 Claude Code、Codex CLI、Cursor、Gemini CLI、OpenCode 等，通过 `agentmemory connect <agent>` 命令快速集成。对于不支持 MCP 的 agent（如 Aider），提供 REST API 作为替代。\n\n在记忆解决方案领域，agentmemory 直接替代传统的静态记忆文件（如 CLAUDE.md、.cursorrules），这些文件受行数限制、易过时；它与 mem0、Letta/MemGPT 等服务竞争，凭借更高的检索准确率、零托管成本和开源特性吸引用户。开发者也可配合文件系统连接器 `@agentmemory/fs-watcher` 自动将文件变更纳入记忆，扩展了感知范围。此外，eval 工具鼓励社区贡献基准，促进良性发展。整体生态虽年轻，但已覆盖主流编程 agent，并利用 MCP 标准降低切换成本。",
-          "limitations": [
-            {
-              "title": "嵌入模型局限",
-              "body": "默认 `all-MiniLM-L6-v2` 仅支持英文，对中文或专业领域语义理解有限，替换模型需手动下载 ONNX 文件并调参，门槛较高。"
-            },
-            {
-              "title": "记忆容量膨胀",
-              "body": "长期使用后 SQLite 数据库可能增长至数百 MB，检索速度下降，目前缺乏分片或自动归档策略，需人工清理。"
-            },
-            {
-              "title": "仅限编码场景",
-              "body": "设计和基准聚焦于编码 agent，扩展到通用对话式 agent 可能效果打折，缺少对长对话、多模态等场景的验证。"
-            },
-            {
-              "title": "可视化基础",
-              "body": "实时查看器功能简单，无记忆时间线回放、高级过滤或对比分析，调试复杂记忆问题时仍依赖命令行。"
-            },
-            {
-              "title": "iii 引擎依赖",
-              "body": "基础框架 iii 引擎外部维护，若其停止更新或发生破坏性变更，agentmemory 可能面临兼容性风险，升级需谨慎。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "全局安装 agentmemory，使 `agentmemory` 命令可用。",
-              "cmd": "npm install -g @agentmemory/agentmemory",
-              "note": "需要 Node.js 18+ 环境。"
-            },
-            {
-              "step": "启动记忆服务器，默认占用 3111 端口。",
-              "cmd": "agentmemory",
-              "note": "首次运行会下载 ONNX 模型（约 80MB）。"
-            },
-            {
-              "step": "生成演示会话数据，快速验证记忆存储和召回。",
-              "cmd": "agentmemory demo",
-              "note": "会创建 3 个模拟的编码会话。"
-            },
-            {
-              "step": "打开实时查看器，浏览器观察记忆列表和知识图谱。",
-              "cmd": "open http://localhost:3113",
-              "note": "默认端口 3113，可查看最近记忆变更。"
-            },
-            {
-              "step": "连接一个实际 agent（例如 Claude Code）开始自动记忆。",
-              "cmd": "agentmemory connect claude-code",
-              "note": "确保 Claude Code 已安装且支持插件。"
-            },
-            {
-              "step": "在新会话中询问之前讨论过的技术细节，验证 agent 是否自动回忆。",
-              "cmd": "在 agent 终端输入：'帮我在 auth 中间件里加个速率限制，记得我们用 jose 吗？'",
-              "note": "若记忆正常，agent 会直接引用之前的 jose 实现。"
-            }
-          ],
-          "score": {
-            "novelty": 20,
-            "engineering": 23,
-            "reproducibility": 22,
-            "timeToValue": 25
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent tool; boost: agent, agents, mcp, memory, llm, ai coding, coding agent, eval, benchmark; popularity +8"
         }
       },
       {
@@ -1596,7 +1419,15 @@
           "OpenWeights"
         ],
         "light": "它解决的是在设备端实现快速、高质量、多语言文本转语音的问题，无需云端API，保护隐私。这周/月值得看是因为它展示了如何用99M参数达到接近大模型效果的压缩TTS，并提供Python、Web、移动等完整SDK，适合学习ONNX部署和边缘AI。表达式标签和语言无关处理也有新意。",
-        "worthDeepDive": 81
+        "worthDeepDive": 93,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 81,
+          "finalScore": 93,
+          "matchedBoostTerms": [],
+          "matchedCapTerms": [],
+          "explanation": "raw 81; final 93; intent tool; popularity +8"
+        }
       },
       {
         "fullName": "CloakHQ/CloakBrowser",
@@ -1609,7 +1440,7 @@
         "languageColor": "#3572A5",
         "stars": 19614,
         "forks": 1554,
-        "starsGained": 6991,
+        "starsGained": 17847,
         "rank": 7,
         "tldr": "这是一个开源Stealth Chromium浏览器，用于绕过网站反爬检测，特点是在C++源码层修改指纹，而非JS注入或配置补丁。",
         "tags": [
@@ -1620,7 +1451,17 @@
           "playwright"
         ],
         "light": "近期AI agent与网页自动化工具（如browser-use、Crawl4AI）热度高涨，对高通过率的反检测浏览器需求激增。CloakBrowser以源码级修补实现reCAPTCHA v3得分0.9、通过Cloudflare Turnstile等检测，且提供与Playwright/Puppeteer完全兼容的API，一键切换即可集成到现有agent工作流中，因此迅速登上趋势榜。",
-        "worthDeepDive": 88
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 94,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 94; final 100; intent tool; boost: agent; popularity +8"
+        }
       },
       {
         "fullName": "HKUDS/ViMax",
@@ -1644,7 +1485,21 @@
           "workflow automation"
         ],
         "light": "它解决的是传统AI视频工具只能生成短片段、角色场景不一致、缺乏叙事结构的问题。这周值得关注的原因是它展示了如何用LLM和多模态模型构建复杂的多智能体流水线，包含RAG剧本生成、故事板设计、一致性格检查等工程细节，对于学习agent系统设计和AIGC工作流自动化很有参考价值。",
-        "worthDeepDive": 91
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 91,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "rag",
+            "llm",
+            "aigc",
+            "workflow"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 91; final 100; intent tool; boost: agent, rag, llm, aigc, workflow; popularity +8"
+        }
       },
       {
         "fullName": "humanlayer/12-factor-agents",
@@ -1668,7 +1523,19 @@
           "设计模式"
         ],
         "light": "它解决当前agent框架在达到80%质量后难以改进的问题，主张用结构化工程方法（如状态机、可控流程）替代黑盒循环。这周值得看因为作者与百位创始人交流后总结出12个可操作因子，为将agent投入生产的工程师提供具体工程原则。",
-        "worthDeepDive": 86
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 86,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "llm"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 86; final 100; intent understanding; boost: agent, agents, llm; popularity +8"
+        }
       },
       {
         "fullName": "rohitg00/ai-engineering-from-scratch",
@@ -1692,7 +1559,18 @@
           "AI工程"
         ],
         "light": "它解决AI学习碎片化的问题，提供从数学基础到多智能体系统的完整路径，每个课程要求从零实现算法并产出可用工具。这周/月值得关注是因为它涵盖当前热门的agent和MCP工程实践，且课程设计系统深入，适合作为AI工程能力建设的参考蓝图。",
-        "worthDeepDive": 97,
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 97,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 97; final 100; intent understanding; boost: agent, mcp; popularity +8"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它提供了一个从数学基础到生产级AI系统的完整学习路径，每个算法都要求从原始数学开始手动实现。适合希望彻底理解AI内部机制的工程师，以及需要系统化技能而不仅仅是调用API的从业者。",
           "whyItMatters": [
@@ -1727,9 +1605,9 @@
               "explain": "20个阶段像堆叠积木，数学为底层，代理和生产为顶层，后续阶段依赖前序知识，允许按需跳过但鼓励路径内置检查。"
             }
           ],
-          "howItWorks": "## 一句话模型\n这个课程就像从地基开始亲手建造一座AI大厦，每一块砖（算法）都必须自己烧制，最后你不仅知道全貌，还能随时拿出某个房间（工件）独立使用。\n\n## 工作流\n整个课程遵循“问题→数学→代码→测试→工件”的六步循环。每个阶段包含多个课时，每个课时以一个问题开始，然后手动推导数学公式，再用Python/TypeScript/Rust/Julia之一编写实现，最后通过测试并产出可复用的提示词、技能、代理或MCP服务器。阶段间存在依赖关系，底层阶段（如数学、ML基础）为上层提供支撑。\n\n## 关键组件\n- **课程结构**：20个阶段，435个课时，每个课时有独立目录包含代码、文档和产出。\n- **内置技能**：`/find-your-level`通过10个问题生成个性化起点和路径；`/check-understanding`提供8题阶段测验并反馈复习点。\n- **多语言实现**：核心算法同时提供Python、TypeScript、Rust、Julia版本，拓展学习者视野。\n\n## 验证点\n克隆仓库后运行一个基础课时（如线性代数）应看到正确输出；在支持的AI助手中使用`/find-your-level`应得到个性化阶段建议；完成一个阶段后使用`/check-understanding`可验证掌握程度。",
-          "novelty": "本课程的新颖之处在于它强制从原始数学构建每一个AI算法，而不是依赖框架或高级API。这种“先拆解，后组装”的模式帮助学习者建立完整的心理模型，迁移到其他领域时能快速定位问题。与fast.ai相比，fast.ai更侧重快速应用和工业落地，而本课程强调底层理解；与DeepLearning.AI的专项课程相比，后者更偏重理论和调参，本课程加入大量手动实现和多语言支持；与Stanford的CS231n等学术课程相比，本课程更结构化、更面向生产交付。\n\n另一个可迁移模式是“学习即生产”，每节课产出可立即使用的工具，避免了传统教育中“学完即忘”的痛点。整体上，它提供了一条从理论到实战的完整登山路径，而非散落的知识点。",
-          "ecosystem": "本课程依赖本地Python/TypeScript/Rust/Julia开发环境及相关包管理器，建议搭配AI编程助手（如Claude、Cursor）使用内置技能以优化学习路径。它不替代任何特定工具，但可以视为`fast.ai`、`DeepLearning.AI`和教科书式学习的竞争者或补充。在生产环境中，输出的MCP服务器和代理可直接集成到现有AI工作流中，与LangChain、AutoGen等框架形成互补。\n\n主要竞争对象是系统化的在线AI课程和书籍，但本课程的开源和手动构建特性使其在透彻性和可定制性上具有优势。",
+          "howItWorks": "## 一句话模型 这个课程就像从地基开始亲手建造一座AI大厦，每一块砖（算法）都必须自己烧制，最后你不仅知道全貌，还能随时拿出某个房间（工件）独立使用。 ## 工作流 整个课程遵循“问题→数学→代码→测试→工件”的六步循环。每个阶段包含多个课时，每个课时以一个问题开始，然后手动推导数学公式，再用Python/TypeScript/Rust/Julia之一编写实现，最后通过测试并产出可复用的提示词、技能、代理或MCP服务器。阶段间存在依赖关系，底层阶段（如数学、ML基础）为上层提供支撑。 ## 关键组件 - **课程结构**：20个阶段，435个课时，每个课时有独立目录包含代码、文档和产出。 - **内置技能**：`/find-your-level`通过10个问题生成个性化起点和路径；`/check-understanding`提供8题阶段测验并反馈复习点。 - **多语言实现**：核心算法同时提供Python、TypeScript、Rust、Julia版本，拓展学习者视野。 ## 验证点 克隆仓库后运行一个基础课时（如线性代数）应看到正确输出；在支持的AI助手中使用`/find-your-level`应得到个性化阶段建议；完成一个阶段后使用`/check-understanding`可验证掌握程度。",
+          "novelty": "本课程的新颖之处在于它强制从原始数学构建每一个AI算法，而不是依赖框架或高级API。这种“先拆解，后组装”的模式帮助学习者建立完整的心理模型，迁移到其他领域时能快速定位问题。与fast.ai相比，fast.ai更侧重快速应用和工业落地，而本课程强调底层理解；与DeepLearning.AI的专项课程相比，后者更偏重理论和调参，本课程加入大量手动实现和多语言支持；与Stanford的CS231n等学术课程相比，本课程更结构化、更面向生产交付。 另一个可迁移模式是“学习即生产”，每节课产出可立即使用的工具，避免了传统教育中“学完即忘”的痛点。整体上，它提供了一条从理论到实战的完整登山路径，而非散落的知识点。",
+          "ecosystem": "本课程依赖本地Python/TypeScript/Rust/Julia开发环境及相关包管理器，建议搭配AI编程助手（如Claude、Cursor）使用内置技能以优化学习路径。它不替代任何特定工具，但可以视为`fast.ai`、`DeepLearning.AI`和教科书式学习的竞争者或补充。在生产环境中，输出的MCP服务器和代理可直接集成到现有AI工作流中，与LangChain、AutoGen等框架形成互补。 主要竞争对象是系统化的在线AI课程和书籍，但本课程的开源和手动构建特性使其在透彻性和可定制性上具有优势。",
           "limitations": [
             {
               "title": "内容未全部完成",
@@ -1755,37 +1633,18 @@
           "tryIt": [
             {
               "step": "克隆仓库到本地",
-              "cmd": "git clone https://github.com/rohitg00/ai-engineering-from-scratch.git",
               "note": "确保已安装Git"
             },
             {
-              "step": "进入项目目录",
-              "cmd": "cd ai-engineering-from-scratch"
+              "step": "进入项目目录"
             },
             {
               "step": "运行一个基础课时以验证环境（如线性代数），观察输出",
-              "cmd": "python phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py",
               "note": "需Python环境已安装，可能需要安装依赖"
             },
             {
               "step": "若使用AI编程助手，尝试技能定位起点",
-              "cmd": "/find-your-level",
               "note": "在Claude、Cursor等支持SKILL.md的助手中键入"
-            },
-            {
-              "step": "根据推荐阶段完成一个课时后，运行测验检查理解",
-              "cmd": "/check-understanding <阶段号>",
-              "note": "例如 /check-understanding 3"
-            },
-            {
-              "step": "查看产出的工件，例如提示词或技能文件",
-              "cmd": "ls phases/03-deep-learning-core/05-loss-functions/outputs/",
-              "note": "具体路径根据课时调整"
-            },
-            {
-              "step": "安装所有技能到AI助手中（可选）",
-              "cmd": "python3 scripts/install_skills.py",
-              "note": "将技能文件复制到助手识别的位置"
             }
           ],
           "score": {
@@ -1818,7 +1677,19 @@
           "入门"
         ],
         "light": "它解决零基础用户如何利用AI（如Claude）进行编程的问题。这周/月值得看是因为教程覆盖了从原型到全栈再到高级Agent工作流的完整路径，且支持10种语言，适合全球学习者。但作为AI研究生，若你对AI编码教学法感兴趣可参考其课程设计，否则价值有限。",
-        "worthDeepDive": 39
+        "worthDeepDive": 47,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 47,
+          "matchedBoostTerms": [
+            "agent"
+          ],
+          "matchedCapTerms": [
+            "course"
+          ],
+          "explanation": "raw 39; final 47; intent teaching; boost: agent; penalty features: course; popularity +8"
+        }
       },
       {
         "fullName": "Lum1104/Understand-Anything",
@@ -1842,7 +1713,98 @@
           "LLM应用"
         ],
         "light": "它解决新开发者面对大型代码库时无法快速理解结构和业务逻辑的问题。这周/月值得关注因为它是目前少有的将多代理管道、Tree-sitter静态分析和LLM语义分析紧密结合的实战项目，展示了如何构建一个实用的代码理解agent系统，对于学习agent编排、知识图谱构建以及LLM在软件工程中的应用有直接参考价值。",
-        "worthDeepDive": 97
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 97,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "llm"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 97; final 100; intent understanding; boost: agent, llm; popularity +8"
+        },
+        "deep": {
+          "atGlance": "这个项目值得深看，因为它用一个可交互的知识图谱来打破新加入大型代码库时的茫然。它适合开发者、团队新人以及技术负责人，特别是当面对复杂项目需要快速理解结构和业务逻辑时。现在看它是因为它集成了多家 AI 编码平台，安装极简，且图谱可提交到版本库中共享。",
+          "whyItMatters": [
+            {
+              "title": "降低上手门槛",
+              "body": "新人加入代码库时，通过可视化图谱和引导式漫游，可以迅速建立结构认知，不再盲目阅读代码。"
+            },
+            {
+              "title": "动静结合分析",
+              "body": "用 Tree-sitter 做确定性解析保证图谱结构可复现，LLM 补充语义理解，两者互补使图谱既有精确边又有可读摘要。"
+            },
+            {
+              "title": "跨 AI 平台运行",
+              "body": "支持 Claude Code、Codex、Copilot、Cursor 等 14+ 平台，一条安装脚本即可适配，降低工具链锁定风险。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "知识图谱节点",
+              "explain": "每个文件、函数、类都化为一个节点，节点之间通过导入、调用、继承等关系连接，形成代码的拓扑视图。"
+            },
+            {
+              "term": "多智能体流水线",
+              "explain": "由项目扫描器、文件分析器、架构分析器等 5-6 个专门代理组成，各司其职：扫描文件树、提取结构、分配架构层、构建导览、验证图谱完整性。"
+            },
+            {
+              "term": "Tree-sitter + LLM 混合",
+              "explain": "Tree-sitter 负责精确解析语法提取 imports/exports 等，保证结构可复现；LLM 读取解析结果和源码，生成英文摘要、标签和架构层，提供人可读的语义。"
+            },
+            {
+              "term": "引导式导览",
+              "explain": "根据依赖关系自动生成按依赖排序的架构浏览路径，让开发者按正确顺序学习代码库。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 可以把项目想象成一个聪明的导游：它先用机械的方式（Tree-sitter）给所有代码建筑拍下精确的平面图（导入导出关系），再请一位语言专家（LLM）给每栋建筑写上说明和标签（功能、架构层），最后生成一张可以随意缩放、搜索、点击的互动地图。 ## 工作流 1. 用户执行 `/understand` 命令，启动多智能体流水线。 2. `project-scanner` 扫描文件树，识别语言和框架。 3. 多个 `file-analyzer` 并行工作（最多5个并发，每批20-30个文件），先用 Tree-sitter 提取函数、类、导入等事实，生成图节点和边；再将解析结果与源码一并送给 LLM，输出摘要、标签、架构层。 4. `architecture-analyzer` 将节点分组到 API、Service、Data 等层。 5. `tour-builder` 生成依赖排序的学习路径。 6. `graph-reviewer` 检查引用完整性和缺失节点（可选全量 LLM 审查）。 7. 最终图谱保存为 `.understand-anything/knowledge-graph.json`，增量分析时指纹比对仅更新变更文件。 ## 关键组件 - **确定性解析器**：Tree-sitter 保证输入相同代码输出相同结构，杜绝 LLM 幻觉导致边缺失。 - **LLM 代理**：并非全权生成，而是作为增强层，只负责需要理解意图的任务（摘要、标签、架构层）。 - **增量更新引擎**：基于文件指纹检测变更，下次运行只重新分析改动过的文件，大幅加快大型仓库的重复分析。 ## 验证点 运行 `/understand-dashboard` 后，浏览器打开本地网页，能看到彩色节点按架构层分布，点击节点可查看摘要和关系，搜索“auth”应定位到认证相关代码，说明图谱构建成功。",
+          "novelty": "可迁移模式：将静态代码解析与大型语言模型互补结合，而非让 LLM 独自“阅读”代码——这保证了图的拓扑结构可完全复现，同时叠加人类可读的语义层。这种做法可迁移到任何需要静态分析加自然语言理解的场景，比如配置依赖图、数据血缘图等。 与同领域方案对比：纯 LLM 工具（如直接用 Claude Code 对话）能回答问题，但无法给出可靠的结构化全貌，且每次可能给出不同答案。Sourcegraph 等代码搜索平台可提供精确索引和搜索，但不自动生成人类可读的摘要与导览。CodeSee 等可视化工具专注于标准调用图，但无 AI 语义层。相比之下，Understand-Anything 把两者结合得较为轻量，且作为插件横跨多个 AI 编码助手生态，降低了切换成本。其增量分析和图谱共享是实用的工程补充，但核心思想并非首创，更多是对现有能力的精巧整合。",
+          "ecosystem": "核心依赖：Tree-sitter 及其语言语法库，以及一个能够处理大上下文（如 Claude 200K）的 LLM。 它作为插件深度集成到多种 AI 编码平台（Claude Code 原生，Cursor/VS Code 自动发现，Copilot CLI 等），充当“增强层”而非独立工具。 竞争方面，它替代了一部分手动绘制架构图的工作，也与代码浏览器、文档生成器有一定重叠；但它的独特定位是：生成的可交互图谱可直接提交到仓库，团队成员无需额外工具即可查看。 可以与 CI 流程配合（post-commit hook 更新图谱），也可作为团队共享知识的持久化中间层。",
+          "limitations": [
+            {
+              "title": "LLM 成本与延迟",
+              "body": "初次分析大型仓库时需调用多次 LLM，可能会产生费用且耗时较长（并发加速但仍有上限），对于开源或个人项目需考虑 API 开销。"
+            },
+            {
+              "title": "图谱精准度依赖静态分析",
+              "body": "动态特性（如 Python 的 monkey-patching、反射注入）难以被 Tree-sitter 捕获，导致部分关系缺失，LLM 也无法完全弥补。"
+            },
+            {
+              "title": "多语言支持局限",
+              "body": "Tree-sitter 的语言覆盖虽广，但每种语言都需维护语法库，较新的语言或框架可能解析不完全，影响图谱的完整性。"
+            },
+            {
+              "title": "增量更新可能遗漏间接变更",
+              "body": "指纹比对仅检测文件变更，若修改了全局配置影响多处文件而未触发重新分析，图谱可能暂时不一致，需手动全量运行一次。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "在 Claude Code 中通过插件市场安装",
+              "note": "如果使用其它平台，请参照 README 中的安装脚本"
+            },
+            {
+              "step": "在项目根目录运行分析命令，等待多代理流水线完成",
+              "note": "首次运行会解析整个项目并调用 LLM，耗时视代码量而定"
+            },
+            {
+              "step": "启动交互式仪表板",
+              "note": "浏览器会自动打开，可看到力导向布局的知识图谱"
+            },
+            {
+              "step": "点击搜索框输入“auth”",
+              "note": "节点和关系会被过滤，展示认证相关部分"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 23,
+            "reproducibility": 24,
+            "timeToValue": 22
+          }
+        }
       },
       {
         "fullName": "obra/superpowers",
@@ -1866,7 +1828,20 @@
           "workflow-automation"
         ],
         "light": "它出现在trending上是因为它提供了一套系统化的方法，让AI编码代理不再随机生成代码，而是像有经验的工程师一样思考、设计、测试和迭代。通过插件化形式集成到多种主流AI编码工具中，解决了当前AI编码中缺乏结构化流程的问题，实际效果显著，受到开发者社区关注。",
-        "worthDeepDive": 39
+        "worthDeepDive": 55,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 55,
+          "matchedBoostTerms": [
+            "agent",
+            "workflow"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 55; intent tool; boost: agent, workflow; penalty features: skills; popularity +8"
+        }
       },
       {
         "fullName": "can1357/oh-my-pi",
@@ -1891,111 +1866,18 @@
         ],
         "light": "oh-my-pi近期在GitHub trending上表现突出，因其创新性地将hash-anchored编辑（hashline）引入编码代理，显著降低了模型编辑失败率，并集成了完整的LSP和DAP支持，让代理具备IDE级别的代码智能。此外，子代理、流式规则注入、多文件系统协议（pr://, conflict://）等特性，使其远超同类工具，吸引了大量AI和开发者社区关注。",
         "worthDeepDive": 100,
-        "deep": {
-          "atGlance": "这个项目值得深看，因为它将 IDE 级别的代码智能（LSP、调试器）和精心调校的编辑策略（hashline、ast_edit）深度整合到终端代理中，显著提升编辑准确率并降低 token 开销。适合需要端到端自动化编码工作流、重视跨平台原生性能的开发者，尤其适合在 CLI 环境中追求低摩擦、高可控性的团队。",
-          "whyItMatters": [
-            {
-              "title": "编辑成功率飙升",
-              "body": "hashline 和 ast_edit 将编辑成功率提升数倍，Grok 4 Fast 输出 token 减少 61%，避免传统 diff 格式的反复重试，直接减少 token 成本和无效交互。"
-            },
-            {
-              "title": "IDE 能力终端化",
-              "body": "LSP 重命名会更新所有引用和 barrel 文件，调试器可直接附加 lldb/dlv/debugpy 分析崩溃，代理像开发者一样理解代码库，不只是文本替换。"
-            },
-            {
-              "title": "原生跨平台零依赖",
-              "body": "ripgrep、glob 等搜索工具直接编译进 Rust 核心，无需 fork-exec 外部二进制，同一二进制文件覆盖 macOS、Linux、Windows，避免 WSL 桥接。"
-            }
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "llm",
+            "ai coding",
+            "coding agent"
           ],
-          "keyConcepts": [
-            {
-              "term": "Hashline Edit",
-              "explain": "通过内容哈希锚点标记编辑位置，模型只需指定锚点而非整行文本，避免空格/字符串缺失导致的编辑失败，并通过锚点漂移检测防止损坏文件。"
-            },
-            {
-              "term": "LSP Integration",
-              "explain": "代理直接调用语言服务器的 workspace/willRenameFiles 等端点，重命名时同步更新所有 import/export，搜索结果与 IDE 实时一致。"
-            },
-            {
-              "term": "Subagents with Typed Results",
-              "explain": "task 工具将作业拆分为隔离工作树的子代理，返回 JSON Schema 验证的结果，父代理直接读取字段，无需解析长文本，避免兄弟编辑冲突。"
-            },
-            {
-              "term": "Time-Traveling Stream Rules",
-              "explain": "当模型生成违规代码时，正则匹配中断输出流并注入规则提醒后重试，注入的规则会在上下文压缩后保留，实现无启动 token 消耗的持续纠正。"
-            },
-            {
-              "term": "Code Review with Priorities",
-              "explain": "`/review` 生成带 P0–P3 优先级和置信度评分的审查判决，子代理并行扫描分支或提交，优先展示阻塞发布的问题。"
-            }
-          ],
-          "howItWorks": "## 一句话模型\n将 oh-my-pi 想象成一个扎根于终端的超级 IDE 助手：它用一套经过深度优化的工具（编辑、搜索、语言服务器、调试器）与代码库交互，利用 LLM 以更少的 token 进行更准确的编辑，并可调用子代理或浏览器完成多步骤工作流。\n\n## 工作流\n用户在 TUI 或命令行中发出指令（如“重命名函数”“审查 PR #1428”），代理解析意图后调用对应的工具：用 `read` 获取文件/网页/PR 内容，用 `search` 或 `find` 定位符号，用 `edit` 进行 hashline 锚定修改，或通过 `lsp` 发起语言服务器操作。复杂任务可通过 `task` 派生子代理，每个子代理在隔离的工作树中运行并返回类型化结果。编辑操作会先提交为“提议”，经预览或审查后执行 `resolve` 原子写入。\n\n## 关键组件\n- **Rust 核心**：约 27k 行 Rust 代码，将 ripgrep、glob 等直接编译进进程，提供跨平台无依赖的文件搜索与操作能力。\n- **工具命名空间**：32 个内置工具共享 `read`、`edit` 等统一接口，支持虚拟 `://` 协议（pr://、agent://等），模型只需学习一套对话模式。\n- **Hashline 编辑格式**：专为减少 token 和消除格式错误设计，通过内容哈希锚定修改行，配合 ast_edit 进行结构化改动。\n- **LSP/DAP 集成**：直接与语言服务器和调试适配器通信，实现 IDE 级别的符号重命名、代码跳转和运行时调试。\n\n## 验证点\n安装后运行 `omp` 启动 TUI，在一个代码目录中尝试：用 `read src/foo.ts` 阅读文件，用 `edit` 命令进行 hashline 修改并预览，观察“proposed”卡片和最终的原子写入；或运行 `/review` 查看带优先级的审查输出；通过 `task` 可以验证子代理的结果收集。",
-          "novelty": "oh-my-pi 的新颖之处在于它将 IDE 功能完整迁移到终端代理，并通过“harness 优化”而非模型微调来提升效果。其核心可迁移模式是：将编辑、搜索、语言服务器和调试器视为一等工具，并设计减少 token 浪费、抵抗幻觉的交互协议（如 hashline）。\n\n相较于 LangChain/AutoGen 等通用多代理框架，oh-my-pi 更面向编码任务的端到端体验，子代理通过类型化返回避免对话协调难题；与 aider、claude-code 等终端代理相比，它的 LSP 集成和原生调试器是独特优势，而 hashline 编辑在成功率上超越传统的 `str_replace` 格式（Grok 4 Fast 减少 61% token）。尽管 cursor、Copilot 等 IDE 插件也提供代码智能，但 oh-my-pi 以独立进程运行，可自动处理复杂的项目级重构、多仓库操作，且完全开源、跨平台原生，无外部依赖。",
-          "ecosystem": "oh-my-pi 运行于 Bun 运行时，核心用 Rust 编译，依赖 tree-sitter、ripgrep 等开源组件，并直接内嵌以避免外部命令行工具的缺失。它与 GitHub、Zed 编辑器（通过 ACP 紧密合作）集成，可作为 Cursor MDC、Cline .clinerules 等配置的即插即用替代品，不需要迁移导入。\n\n在终端 AI 代理领域中，它直接与 aider、claude-code、Cline 等竞争，但以集成度（LSP、调试器、浏览器）和性能（原生 Rust 工具）区分；同时，它也部分替代 IDE 中的 Copilot、Cody 等内嵌助手，尤其适合 vim/emacs 用户或远程开发场景。如果团队已有 CI/CD 流程，它的 `/review` 和 `omp commit` 可集成到代码审查环节。",
-          "limitations": [
-            {
-              "title": "配置复杂",
-              "body": "虽然开箱支持 40+ 模型提供者，但首次安装仍需配置 API key 和模型选择，对新手有一定的门槛，且调试代理行为需要理解规则和工具设置。"
-            },
-            {
-              "title": "对 LLM 质量敏感",
-              "body": "尽管工具链优化了成功率，但代理最终依赖底层模型能力，弱模型仍可能产生错误编辑，尤其在复杂逻辑或罕见语言中。"
-            },
-            {
-              "title": "Rust 核心需编译",
-              "body": "虽然提供预编译二进制，但从源码安装或开发需要 Rust 工具链，对于不熟悉 Rust 的开发者可能不便。"
-            },
-            {
-              "title": "子代理隔离成本",
-              "body": "每个子代理运行在独立工作树中，若项目巨大，克隆工作树可能导致较高的磁盘和内存开销。"
-            },
-            {
-              "title": "规则稳定性",
-              "body": "时间旅行流规则（TTSR）依赖正则匹配，复杂的违规模式可能未被捕获，且注入时机不当可能打断有益的思路。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "安装 oh-my-pi 代理（macOS/Linux）",
-              "cmd": "curl -fsSL https://omp.sh/install | sh",
-              "note": "也可用 Bun: bun install -g @oh-my-pi/pi-coding-agent"
-            },
-            {
-              "step": "启动交互式 TUI",
-              "cmd": "omp",
-              "note": "首次启动将引导配置模型提供者（如 Anthropic, OpenAI 等），需要输入 API key。"
-            },
-            {
-              "step": "在一个代码目录中阅读文件",
-              "cmd": "read src/main.ts",
-              "note": "观察结构化摘要输出，而非全文转储。"
-            },
-            {
-              "step": "尝试 hashline 编辑",
-              "cmd": "edit src/main.ts",
-              "note": "代理会生成一个带内容哈希锚点的编辑提议，预览后选择接受（resolve）或放弃。"
-            },
-            {
-              "step": "使用代码审查功能",
-              "cmd": "/review",
-              "note": "在包含未提交更改的仓库中运行，观察带 P0-P3 优先级和置信度分数的审查结果。"
-            },
-            {
-              "step": "派生子代理任务",
-              "cmd": "task \"找出所有导出函数并检查文档完整性\"",
-              "note": "代理会生成子代理工作树，收集并展示类型化结果。"
-            },
-            {
-              "step": "配置与 Zed 编辑器联动（可选）",
-              "note": "若使用 Zed，可启用 ACP 功能，使代理直接在编辑器缓冲区中操作。详见文档。"
-            }
-          ],
-          "score": {
-            "novelty": 22,
-            "engineering": 24,
-            "reproducibility": 23,
-            "timeToValue": 20
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent understanding; boost: agent, llm, ai coding, coding agent; popularity +8"
         }
       },
       {
@@ -2020,13 +1902,26 @@
           "Agent Skills标准"
         ],
         "light": "它解决科研人员需要为AI代理配置专业知识和工具的问题，避免重复集成。这周值得看是因为提供了138个即用型技能，覆盖生物、化学、物理等多个领域，并与Agent Skills标准兼容，可快速集成到Cursor、Claude Code等工具中。对于AI工程学习者，展示了如何构建结构化的代理技能集及工程实践（如安全扫描）。",
-        "worthDeepDive": 39
+        "worthDeepDive": 45,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 45,
+          "matchedBoostTerms": [
+            "agent"
+          ],
+          "matchedCapTerms": [
+            "finance",
+            "skills"
+          ],
+          "explanation": "raw 39; final 45; intent understanding; boost: agent; penalty features: finance, skills; popularity +8"
+        }
       }
     ]
   },
   "monthly": {
     "window": "monthly",
-    "generatedAt": "2026-05-24T02:40:44.515Z",
+    "generatedAt": "2026-05-30T02:33:06.208Z",
     "repos": [
       {
         "fullName": "mattpocock/skills",
@@ -2050,7 +1945,20 @@
           "claude-code"
         ],
         "light": "随着Claude Code、Codex等编码代理工具流行，开发者发现简单的提示词往往导致结果不可控。Matt Pocock这套技能将多年软件工程经验（DDD、TDD、架构设计）提炼为可复用的agent指令，从对齐需求到保持代码质量形成闭环。其`/grill-with-docs`和`/tdd`等技能直击痛点，因此迅速获得关注。",
-        "worthDeepDive": 39
+        "worthDeepDive": 53,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 53,
+          "matchedBoostTerms": [
+            "agent",
+            "agents"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 53; intent understanding; boost: agent, agents; penalty features: skills; popularity +8"
+        }
       },
       {
         "fullName": "colbymchenry/codegraph",
@@ -2075,6 +1983,17 @@
         ],
         "light": "它解决AI编程代理在大型代码库中探索时消耗大量token和工具调用的问题。这周值得看是因为它通过预索引的符号关系图，展示了如何将代理的探索成本降低35%以上，并提供了跨多个主流代理的集成方案，对构建高效AI编码工具有直接参考价值。",
         "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent understanding; boost: agent, mcp; popularity +8"
+        },
         "deep": {
           "atGlance": "这个项目值得深看，因为它在7个真实代码库的基准测试中让AI代理成本平均降低35%、工具调用减少70%，收益随着代码规模增大而放大。适合所有使用Claude Code、Cursor等编码代理的开发者，尤其适合处理大型或多语言项目、且重视本地隐私和即时价值的团队。",
           "whyItMatters": [
@@ -2109,9 +2028,9 @@
               "explain": "为避免主会话上下文被大量源码填满，工具指令建议代理生成子Explore代理，专门使用codegraph_explore工具获取完整源码，主会话只做轻量查询。"
             }
           ],
-          "howItWorks": "## 一句话模型\n就像给整个代码库建一座智慧图书馆的索引卡片，AI代理问“这本书在哪里”时，图书馆员直接调出关联的所有卡片，而不是满屋子翻找。CodeGraph预先用tree-sitter解析代码，将符号、调用关系、路由等结构化信息存入SQLite，然后通过MCP协议向编码代理提供查询接口。\n\n## 工作流\n安装后运行`codegraph init -i`，它会遍历项目文件，用tree-sitter解析19+种语言的AST，提取符号、引用、路由等信息，构建成关系图并存储到`.codegraph/`目录下的SQLite数据库（利用FTS5支持全文搜索）。同时启动文件监视器，监听文件变更并自动增量更新索引。代理启动时加载MCP服务器配置，获得8个代码查询工具（如codegraph_search、codegraph_context）。当用户提出探索性问题时，代理按指令生成子代理，子代理使用这些工具直接获取结构化结果，避免反复执行grep/read等昂贵操作。\n\n## 关键组件\n- **索引器**：核心依赖tree-sitter多语言语法解析，负责生成符号表、调用图和路由图；\n- **MCP服务器**：一个stdio接口的Node服务，代理通过标准JSON-RPC调用它暴露的工具；\n- **智能指令注入**：安装器自动写入代理的提示文件（如CLAUDE.md），指导何时使用子代理、何时直接查询，确保工具被高效使用；\n- **文件监视器**：利用操作系统的原生事件（FSEvents/inotify）实现实时同步，确保索引始终是最新的。\n\n## 验证点\n代理启动后，针对项目提出一个架构问题（例如“路由分发机制是怎样的？”）。如果配置正确，你应该看到代理生成了一个Explore子代理，子代理调用了codegraph_context和codegraph_explore，主会话中几乎没有grep或Read调用，且最终答案准确且响应迅速。在大型项目上，工具调用总数通常从数十次降至十次以内。",
-          "novelty": "CodeGraph的可迁移模式在于将“代码库静态分析”与“LLM代理工具调用”解耦，通过预索引生成紧凑的语义表示，并以通用协议（MCP）提供给多个代理。这不同于传统做法中让代理实时扫描文件系统——那会导致大量令牌浪费和子代理泛滥。\n\n与知名方案对比：LangChain的代码分析工具通常需要Python运行时并依赖特定链式调用，难以集成到不同桌面代理中；AutoGen或MetaGPT的多代理架构更侧重任务编排，而非底层代码理解的优化；GitHub Copilot的本地索引虽然也能提供符号信息，但仅限于特定IDE且不暴露可编程接口。CodeGraph的创新在于：1）纯本地、跨代理的轻量级MCP服务，任何支持该协议的代理均可即插即用；2）细粒度的框架感知路由识别（14种Web框架），这在现有通用代码智能工具中少见；3）通过基准测试证明了30-50%的成本节省，提供了数据驱动的说服力。不过，其核心索引技术（tree-sitter + SQLite）并不新颖，新颖度更多体现在工程集成和针对LLM代理的指令优化上。",
-          "ecosystem": "CodeGraph站在Tree-sitter的肩上，依赖其多语言解析能力（覆盖19+语言），并深度集成到Model Context Protocol生态中。它不依赖任何云服务，所有数据存储在本地SQLite（FTS5）文件中，可搭配任何文本编辑器或代理使用。\n\n它直接替代了代理原生的文件搜索工具（grep/glob/Read），成为代码理解的中枢。在竞争格局中，它与Sourcegraph（基于服务器的代码搜索）形成互补，后者更侧重团队协作和共享索引，而CodeGraph是个人本地用的极简方案；与JetBrains IDE的代码索引相比，CodeGraph不绑定特定IDE，且专为LLM代理优化了接口。自包含的运行时（内置Node）确保了极低的使用门槛，未来如果MCP协议进一步普及，它可能成为本地代码智能的默认组件。",
+          "howItWorks": "## 一句话模型 就像给整个代码库建一座智慧图书馆的索引卡片，AI代理问“这本书在哪里”时，图书馆员直接调出关联的所有卡片，而不是满屋子翻找。CodeGraph预先用tree-sitter解析代码，将符号、调用关系、路由等结构化信息存入SQLite，然后通过MCP协议向编码代理提供查询接口。 ## 工作流 安装后运行`codegraph init -i`，它会遍历项目文件，用tree-sitter解析19+种语言的AST，提取符号、引用、路由等信息，构建成关系图并存储到`.codegraph/`目录下的SQLite数据库（利用FTS5支持全文搜索）。同时启动文件监视器，监听文件变更并自动增量更新索引。代理启动时加载MCP服务器配置，获得8个代码查询工具（如codegraph_search、codegraph_context）。当用户提出探索性问题时，代理按指令生成子代理，子代理使用这些工具直接获取结构化结果，避免反复执行grep/read等昂贵操作。 ## 关键组件 - **索引器**：核心依赖tree-sitter多语言语法解析，负责生成符号表、调用图和路由图； - **MCP服务器**：一个stdio接口的Node服务，代理通过标准JSON-RPC调用它暴露的工具； - **智能指令注入**：安装器自动写入代理的提示文件（如CLAUDE.md），指导何时使用子代理、何时直接查询，确保工具被高效使用； - **文件监视器**：利用操作系统的原生事件（FSEvents/inotify）实现实时同步，确保索引始终是最新的。 ## 验证点 代理启动后，针对项目提出一个架构问题（例如“路由分发机制是怎样的？”）。如果配置正确，你应该看到代理生成了一个Explore子代理，子代理调用了codegraph_context和codegraph_explore，主会话中几乎没有grep或Read调用，且最终答案准确且响应迅速。在大型项目上，工具调用总数通常从数十次降至十次以内。",
+          "novelty": "CodeGraph的可迁移模式在于将“代码库静态分析”与“LLM代理工具调用”解耦，通过预索引生成紧凑的语义表示，并以通用协议（MCP）提供给多个代理。这不同于传统做法中让代理实时扫描文件系统——那会导致大量令牌浪费和子代理泛滥。 与知名方案对比：LangChain的代码分析工具通常需要Python运行时并依赖特定链式调用，难以集成到不同桌面代理中；AutoGen或MetaGPT的多代理架构更侧重任务编排，而非底层代码理解的优化；GitHub Copilot的本地索引虽然也能提供符号信息，但仅限于特定IDE且不暴露可编程接口。CodeGraph的创新在于：1）纯本地、跨代理的轻量级MCP服务，任何支持该协议的代理均可即插即用；2）细粒度的框架感知路由识别（14种Web框架），这在现有通用代码智能工具中少见；3）通过基准测试证明了30-50%的成本节省，提供了数据驱动的说服力。不过，其核心索引技术（tree-sitter + SQLite）并不新颖，新颖度更多体现在工程集成和针对LLM代理的指令优化上。",
+          "ecosystem": "CodeGraph站在Tree-sitter的肩上，依赖其多语言解析能力（覆盖19+语言），并深度集成到Model Context Protocol生态中。它不依赖任何云服务，所有数据存储在本地SQLite（FTS5）文件中，可搭配任何文本编辑器或代理使用。 它直接替代了代理原生的文件搜索工具（grep/glob/Read），成为代码理解的中枢。在竞争格局中，它与Sourcegraph（基于服务器的代码搜索）形成互补，后者更侧重团队协作和共享索引，而CodeGraph是个人本地用的极简方案；与JetBrains IDE的代码索引相比，CodeGraph不绑定特定IDE，且专为LLM代理优化了接口。自包含的运行时（内置Node）确保了极低的使用门槛，未来如果MCP协议进一步普及，它可能成为本地代码智能的默认组件。",
           "limitations": [
             {
               "title": "小项目收益有限",
@@ -2137,35 +2056,19 @@
           "tryIt": [
             {
               "step": "在macOS/Linux终端运行一键安装脚本，自动下载适合你平台的构建版本。",
-              "cmd": "curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh",
               "note": "Windows下使用PowerShell命令：irm https://.../install.ps1 | iex"
             },
             {
               "step": "运行codegraph命令启动交互式配置，选择你要集成的代理（如Claude Code、Cursor）。",
-              "cmd": "codegraph",
               "note": "如果已安装Node，也可使用npx @colbymchenry/codegraph零安装体验"
             },
             {
               "step": "进入你的项目目录，初始化知识图谱索引。",
-              "cmd": "cd your-project && codegraph init -i",
               "note": "构建索引可能需要几十秒到几分钟，取决于项目大小"
             },
             {
               "step": "重启你的AI代理（如完全退出Claude Code或重启Cursor窗口），让MCP服务器加载。",
               "note": "确保代理已经加载了codegraph的MCP配置，可以在代理设置中查看"
-            },
-            {
-              "step": "向代理提出一个架构问题，例如：“请解释这个项目的路由系统是如何工作的？”",
-              "note": "确保问题需要探索代码库，这样才能触发CodeGraph工具"
-            },
-            {
-              "step": "观察代理的行为——它应该生成一个子代理，子代理调用codegraph_explore获取源码，主会话几乎不直接读文件。检查响应速度是否变快。",
-              "note": "你可以在代理日志中看到工具调用列表，应该以codegraph_开头的调用为主"
-            },
-            {
-              "step": "如果想要卸载，运行卸载命令，它会清除所有代理中的CodeGraph配置。",
-              "cmd": "codegraph uninstall",
-              "note": "项目中的.codegraph/索引目录不会被删除，需手动移除或运行`codegraph uninit`"
             }
           ],
           "score": {
@@ -2198,7 +2101,21 @@
           "Claude"
         ],
         "light": "近期 AI agent 和 MCP 协议热度飙升，Anthropic 推出的这个仓库恰逢其时：它不仅展示了如何为金融行业定制 agent，还提供了可复用的 agent 架构——插件化的 skill/command 系统、标准化的 MCP 连接器、以及从 Cowork 到 Managed Agent 的平滑部署。对于关注 agent 工程化的开发者，这是一个高质量的参考模板。",
-        "worthDeepDive": 39
+        "worthDeepDive": 51,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 51,
+          "matchedBoostTerms": [
+            "agent",
+            "mcp"
+          ],
+          "matchedCapTerms": [
+            "financial",
+            "skill"
+          ],
+          "explanation": "raw 39; final 51; intent tool; boost: agent, mcp; penalty features: financial, skill; popularity +8"
+        }
       },
       {
         "fullName": "CloakHQ/CloakBrowser",
@@ -2222,106 +2139,16 @@
           "playwright"
         ],
         "light": "近期AI agent与网页自动化工具（如browser-use、Crawl4AI）热度高涨，对高通过率的反检测浏览器需求激增。CloakBrowser以源码级修补实现reCAPTCHA v3得分0.9、通过Cloudflare Turnstile等检测，且提供与Playwright/Puppeteer完全兼容的API，一键切换即可集成到现有agent工作流中，因此迅速登上趋势榜。",
-        "worthDeepDive": 94,
-        "deep": {
-          "atGlance": "这个项目值得深看，因为它是首个将隐身浏览器做到 C++ 源码级别的开源方案，不是靠 JS 注入或配置修补。适合需要绕过 Cloudflare、reCAPTCHA v3 等严格检测的大规模自动化抓取或测试人员，且只需替换一行导入即可从 Playwright 无缝迁移。",
-          "whyItMatters": [
-            {
-              "title": "源码级隐身",
-              "body": "通过在 Chromium C++ 源码中修改 49 处指纹相关代码，从二进制层面消除自动化特征，不是简单地注入 JavaScript 脚本。"
-            },
-            {
-              "title": "即插即用",
-              "body": "完全兼容 Playwright/Puppeteer API，替换 `launch` 即可，零学习成本，30 秒内解除封锁。"
-            },
-            {
-              "title": "人类行为模拟",
-              "body": "`humanize=True` 一个标志即启用贝塞尔鼠标曲线、真实键盘时序、滚动模式，通过行为检测。"
-            }
+        "worthDeepDive": 100,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 94,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent"
           ],
-          "keyConcepts": [
-            {
-              "term": "C++ 指纹补丁",
-              "explain": "在 Chromium 源码中直接修改 canvas、WebGL、音频、字体、GPU 等 49 处底层实现，编译后二进制自带隐身能力，JS 层无迹可寻。"
-            },
-            {
-              "term": "Humanize 行为引擎",
-              "explain": "通过 `humanize=True` 启用，将 CDP 输入事件替换为带有贝塞尔曲线、人类打字计时和自然滚动模式的模拟，可调预设速度。"
-            },
-            {
-              "term": "二进制自动下载",
-              "explain": "首次运行时自动从 GitHub 拉取对应平台的预编译隐身 Chromium（约 200 MB），静默升级到最新构建，无需用户管理。"
-            },
-            {
-              "term": "Profile Manager",
-              "explain": "类似 Multilogin 的自托管浏览器配置文件管理器，可通过 noVNC 在浏览器中创建和运行带独立指纹、代理的持久化会话。"
-            }
-          ],
-          "howItWorks": "## 一句话模型\nCloakBrowser 就像给普通 Chromium 做了一次“整形手术”，把能暴露自动化身份的底层特征全部替换成真实浏览器的样子，然后打包成一个可以直接替换 Playwright 启动的二进制文件。\n\n## 工作流\n开发者安装 Python/JS 包后，首次导入时会自动下载平台对应的定制 Chromium 二进制（已缓存在本地）。每次调用 `launch()` 时，程序启动这个二进制，并传入一些额外的隐身参数（如禁用自动化标志）。用户代码使用标准 Playwright/Puppeteer API，所有页面操作都会通过这条“隐形”通道，目标网站检测到的指纹与真实 Chrome 无异。\n\n## 关键组件\n- **预编译隐身二进制**：包含所有 C++ 补丁的 Chromium，是核心。通过 SHA-256 校验保证完整性。\n- **Python/JS Wrapper**：极薄的一层，负责下载二进制、管理进程、转发 Playwright/Puppeteer 的所有 `launch` 参数，不做额外 JS 注入。\n- **自动更新机制**：后台检查 GitHub 发布，有新版本时提示或自动更新，确保隐身能力随 Chromium 版本更新而持续有效。\n\n## 验证点\n安装后运行 `docker run --rm cloakhq/cloakbrowser cloaktest` 会执行内部测试套件，输出 30/30 测试通过。若用自己代码访问 `https://bot.incolumitas.com` 应只报 `WEBDRIVER` 一个错误而其他全部通过。",
-          "novelty": "可迁移模式：将浏览器指纹对抗从“打补丁”（JS 注入、配置修改）提高到“编译时修改源码”的理念，类似 iOS 越狱中对系统库的替换，而非仅仅 Hook 几个函数。这意味着任何基于源码检测的反爬机制（如对 navigator.webdriver 的深层检查）都会被根源消除。\n\n对比同类方案：\n- **playwright-stealth / puppeteer-extra**：通过 JS 注入修改浏览器属性，但每次 Chrome 更新都可能失效，且注入代码自身可能被检测。CloakBrowser 直接在二进制层修改，无 JS 痕迹。\n- **undetected-chromedriver**：通过配置标志和少量 JS 隐藏 WebDriver，但 reCAPTCHA v3 得分通常无法达到 0.9，且对 Cloudflare Turnstile 表现不稳定。\n- **Camoufox**：基于 Firefox 的 C++ 补丁方案，但生态更偏向 Selenium，且 Playwright 支持不如 Chromium 完善；CloakBrowser 则完美兼容 Playwright API，更现代。\n\nCloakBrowser 的新意在于将“源码级隐身”与“即插即用 Playwright”结合，目前开源领域几乎没有对手能做到同等的反检测深度和易用性。",
-          "ecosystem": "CloakBrowser 本质上是一个 Playwright/Puppeteer 的替换品，因此可以与所有依赖这些框架的爬虫、测试、AI 代理工具集成，如 Crawl4AI、Browser-Use、Stagehand 等。\n\n依赖：Playwright 或 Puppeteer（核心库需要自行安装），CloakBrowser 只提供二进制和启动器。可搭配任何代理服务（HTTP/SOCKS5），并提供 GeoIP 自动匹配时区和区域。\n\n竞争：商业方案如 Multilogin、GoLogin、AdsPower 提供图形化的反指纹浏览器管理，但价格昂贵；CloakBrowser 提供开源自托管的 Profile Manager 作为替代。另有一些侵入式方案如 Selenium Stealth，但深度和稳定性不足。\n\n生态扩展：作者还提供 Browser Profile Manager 镜像，可快速搭建多账号管理服务，适合需要批量操控独立浏览器环境的场景。",
-          "limitations": [
-            {
-              "title": "不解决验证码",
-              "body": "只防止验证码出现，不提供自动求解。遇到需要点击图片、音频识别的验证码仍需接入第三方服务或人工处理。"
-            },
-            {
-              "title": "必须自带代理",
-              "body": "为防止 IP 封禁，使用者需自行提供高质量代理。CloakBrowser 不内置代理轮换功能，也不会绕过 IP 检测。"
-            },
-            {
-              "title": "二进制较大",
-              "body": "下载约 200 MB，第一次启动需要较长时间（取决于网络）。虽然有缓存，但会增加 Docker 镜像体积和部署复杂度。"
-            },
-            {
-              "title": "更新依赖社区",
-              "body": "Chromium 更新频繁，C++ 补丁需要持续跟进，补丁维护是重体力活。如果社区活跃度下降，可能出现延迟。"
-            },
-            {
-              "title": "仅限 Chromium",
-              "body": "不支持 Firefox 或 WebKit，如果目标网站对非 Chromium 浏览器有特殊检测，则无法覆盖。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "使用 Docker 快速运行内置测试，验证环境是否可用",
-              "cmd": "docker run --rm cloakhq/cloakbrowser cloaktest",
-              "note": "应看到 All 30 tests passed 的输出"
-            },
-            {
-              "step": "安装 Python 包（Playwright 需预先安装）",
-              "cmd": "pip install cloakbrowser playwright"
-            },
-            {
-              "step": "编写测试脚本 test_cloak.py",
-              "cmd": "from cloakbrowser import launch\nbrowser = launch()\npage = browser.new_page()\npage.goto('https://bot.incolumitas.com')\nprint(page.title())\nbrowser.close()",
-              "note": "保存为 .py 文件"
-            },
-            {
-              "step": "运行脚本，观察输出中是否只有 'WEBDRIVER' 相关的一个错误",
-              "cmd": "python test_cloak.py"
-            },
-            {
-              "step": "启用人类行为模拟，访问行为检测站点",
-              "cmd": "browser = launch(humanize=True)\n# ...\npage.goto('https://deviceandbrowserinfo.com')\nprint(page.content())",
-              "note": "页面应显示 'You are human!'"
-            },
-            {
-              "step": "尝试带代理和地理位置自动匹配的用法",
-              "cmd": "browser = launch(proxy='http://user:pass@proxy:8080', geoip=True)\n# 注意：需要先安装 geoip 依赖 pip install cloakbrowser[geoip]"
-            },
-            {
-              "step": "尝试使用 Profile Manager 创建多个独立浏览器环境",
-              "cmd": "docker run -p 8080:8080 -v cloakprofiles:/data cloakhq/cloakbrowser-manager",
-              "note": "浏览器访问 http://localhost:8080，创建配置文件并启动"
-            }
-          ],
-          "score": {
-            "novelty": 24,
-            "engineering": 22,
-            "reproducibility": 24,
-            "timeToValue": 25
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 94; final 100; intent tool; boost: agent; popularity +8"
         }
       },
       {
@@ -2347,107 +2174,23 @@
         ],
         "light": "本周AI编码代理工具（Claude Code、Cursor等）爆发式增长，开发者普遍面临代理重复解释上下文的痛点。agentmemory 通过即插即用的MCP服务器和本地嵌入实现零依赖持久化记忆，并在LongMemEval基准上达到95.2% R@5，显著优于内部提示。这种“一次安装，所有代理共享记忆”的模式正好契合当前主流代理生态，因此迅速走红。",
         "worthDeepDive": 100,
-        "deep": {
-          "atGlance": "agentmemory 是首个基于真实基准验证的 AI 编码助手持久记忆方案，通过自动钩子和混合检索实现 95.2% 的检索召回率，节省 92% 的 token，无需外部数据库，几分钟即可集成到 Claude Code、Cursor 等主流 agent，值得投入 30 分钟掌握其原理与实操。",
-          "whyItMatters": [
-            {
-              "title": "跨 Agent 记忆共享",
-              "body": "一个服务器，所有 agent 共享记忆，无需重新解释上下文，大幅减少重复工作，提升开发效率。"
-            },
-            {
-              "title": "大幅降低 Token 成本",
-              "body": "相比粘贴完整上下文，每年节省 99.5% 的 token，仅需 ~10 美元，结合本地嵌入可降至零成本。"
-            },
-            {
-              "title": "基于基准的验证",
-              "body": "在 LongMemEval-S 上 R@5 达 95.2%，自建编码语料库精准度 2.2 倍于 grep，性能经过严格测试。"
-            }
+        "rankingReason": {
+          "decision": "no-change",
+          "rawScore": 100,
+          "finalScore": 100,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "mcp",
+            "memory",
+            "llm",
+            "ai coding",
+            "coding agent",
+            "eval",
+            "benchmark"
           ],
-          "keyConcepts": [
-            {
-              "term": "MCP Server",
-              "explain": "agentmemory 实现为 **Model Context Protocol** 服务器，任何支持 MCP 的 agent（如 Claude Code、Cursor）均可无缝接入，通过标准协议读取和写入记忆。"
-            },
-            {
-              "term": "Hybrid Search",
-              "explain": "结合向量语义搜索和 BM25 关键词匹配的混合检索策略，确保高召回率和精准度，在 `all-MiniLM-L6-v2` 嵌入支持下本地运行。"
-            },
-            {
-              "term": "Auto Hooks",
-              "explain": "12 个自动钩子在 agent 会话的关键节点（如启动、工具调用、错误发生）静默捕获上下文，无需人工干预，自动将事件压缩为结构化记忆。"
-            },
-            {
-              "term": "Lifecycle Management",
-              "explain": "记忆具有置信度评分和生命周期，系统根据使用频率和相关性更新时间戳和重要性，自动遗忘过时信息，防止上下文污染。"
-            },
-            {
-              "term": "Knowledge Graph",
-              "explain": "在向量数据库之上构建知识图谱，记录实体（文件、函数、概念）之间的关联，支持复杂推理和上下文关联检索。"
-            }
-          ],
-          "howItWorks": "## 组件\nagentmemory 由多个核心组件构成，专为低延迟、零外部依赖的记忆服务设计。**内存服务器**（端口 3111）是整个系统的心脏，基于 **iii 引擎** 的事件总线和状态管理构建，负责任务调度、记忆压缩和查询处理。**MCP 代理** 将独立的 MCP 服务器请求转发到运行中的内存服务器，确保自动钩子和实时查看器看到一致的数据视图。**实时查看器**（端口 3113）是一个轻量 Web 界面，以图谱和列表形式展示记忆的内部状态，方便开发者调试。**文件系统连接器** `@agentmemory/fs-watcher` 监控项目文件变更，自动将文件创建、修改等事件转化为结构化记忆。存储层使用 **SQLite** 一个文件，无需 PostgreSQL 等外部数据库；嵌入层集成 **all-MiniLM-L6-v2** 模型，通过 ONNX Runtime 在本地执行向量化，不产生 API 调用费用。`agentmemory` 命令行工具提供 `demo`、`connect`、`eval` 等子命令，简化与不同 agent 的集成。\n\n## 数据流\n当与 agent 会话开始时，agentmemory 通过 12 个自动钩子或 MCP 工具调用静默捕获上下文。以 Claude Code 为例，其原生插件会在用户输入、LLM 响应、工具执行、错误发生等关键节点触发事件，这些事件被推送到内存服务器。服务器的 **压缩管道** 提取文件路径、代码片段、决策和元数据，丢弃冗余噪声，生成精简的“记忆项”。随后，本地 ONNX 模型将记忆文本编码为 384 维向量，同时原始文本被保存用于 BM25 倒排索引。向量和索引数据一并写入 SQLite 的 `memories` 表，并更新 **知识图谱** 中的节点关系和置信度分数。当 agent 需要回忆上下文时，它会通过 MCP 调用 `search_memories` 或 REST API 发送查询字符串。混合搜索模块并行执行：向量索引进行余弦相似度近似最近邻检索，BM25 引擎进行精确词匹配，两者结果经分数归一化和加权融合（权重可配置），再根据置信度衰减和时间衰减重排序，最终返回 top-k 结果。这些记忆片段被注入到 agent 的下个会话的系统提示中，整个过程通常在 **14 毫秒**内完成。\n\n## 关键算法/配置\nagentmemory 的检索优越性源于 **混合搜索算法**。向量搜索采用 `all-MiniLM-L6-v2` 模型生成的句子嵌入，通过余弦相似度度量语义相关性；BM25 则是 TF-IDF 的改进版本，专为代码中的标识符和关键词匹配设计，两者得分线性组合，默认权重各 0.5。**置信度评分** 采用指数衰减公式，综合记忆的创建时间、最后访问时间、访问频率和相关性信号，确保新出现且频繁使用的记忆优先级更高。**生命周期管理** 设定可配置的保留阈值，当置信度跌至阈值以下时，记忆被标记为“遗忘”或直接删除，防止上下文窗口污染和数据库无限膨胀。核心配置通过环境变量暴露：`MEMORY_MAX_TOKENS` 限制每次注入的 token 数；`EMBEDDING_MODEL` 可指定自定义 ONNX 模型路径；`AUDIT_POLICY` 记录所有删除操作，满足合规需求；`MEMORY_MIN_CONFIDENCE` 控制遗忘阈值。系统内置 eval 套件，支持 LongMemEval-S 等公开基准，并提供适配器接口，方便对比不同检索方案。",
-          "novelty": "相较于 LangChain 的 Memory 模块，agentmemory 的核心新颖之处在于其**完全自动化**和**编码场景特化**。LangChain 的 Memory 要求开发者显式定义记忆提取和注入逻辑，而 agentmemory 通过 12 个预置的自动钩子，在无需修改 agent 代码的情况下，静默捕获 Claude Code、Cursor 等主流工具的事件流，自动完成从捕获到压缩的全生命周期。而且，LangChain 的多数记忆实现依赖外部向量数据库（如 Pinecone）和嵌入 API，agentmemory 则内嵌 ONNX 模型和 SQLite，真正实现零外部依赖和零网络成本。\n\n与同为记忆层的 mem0 相比，agentmemory 的检索质量有实证优势。根据 README 中的 LongMemEval-S 基准，agentmemory 的 R@5 为 95.2%，而 mem0 在 LoCoMo 数据集上仅 68.5%；在上传的编码基准 `coding-agent-life-v1` 中，agentmemory 的混合搜索精度达到 grep 基线的 2.2 倍。这种差异源于 agentmemory 的混合搜索和置信度引导的重排序，而 mem0 更偏向通用的向量检索。Letta/MemGPT 则需要更换整个 agent 运行时，侵入性高，agentmemory 作为独立的 MCP 服务器，与现有 agent 完全解耦，整合成本极低。另外，agentmemory 独有的实时可视化查看器，让调试记忆状态变得直观，这在其他方案中少见。整体而言，agentmemory 虽未引入突破性算法，但其在编码 agent 记忆场景的工程聚焦、基准驱动迭代和无感集成设计上颇具新意。",
-          "ecosystem": "agentmemory 围绕轻量记忆服务构建，主要依赖 Node.js 生态：`@agentmemory/agentmemory` 本体，底层 **iii 引擎** 提供事件系统和状态管理，**better-sqlite3** 操作本地数据库，**@xenova/transformers** 运行 `all-MiniLM-L6-v2` 嵌入模型。它专为 MCP（Model Context Protocol）设计，因此可与任何支持 MCP 的 agent 搭配，包括 Claude Code、Codex CLI、Cursor、Gemini CLI、OpenCode 等，通过 `agentmemory connect <agent>` 命令快速集成。对于不支持 MCP 的 agent（如 Aider），提供 REST API 作为替代。\n\n在记忆解决方案领域，agentmemory 直接替代传统的静态记忆文件（如 CLAUDE.md、.cursorrules），这些文件受行数限制、易过时；它与 mem0、Letta/MemGPT 等服务竞争，凭借更高的检索准确率、零托管成本和开源特性吸引用户。开发者也可配合文件系统连接器 `@agentmemory/fs-watcher` 自动将文件变更纳入记忆，扩展了感知范围。此外，eval 工具鼓励社区贡献基准，促进良性发展。整体生态虽年轻，但已覆盖主流编程 agent，并利用 MCP 标准降低切换成本。",
-          "limitations": [
-            {
-              "title": "嵌入模型局限",
-              "body": "默认 `all-MiniLM-L6-v2` 仅支持英文，对中文或专业领域语义理解有限，替换模型需手动下载 ONNX 文件并调参，门槛较高。"
-            },
-            {
-              "title": "记忆容量膨胀",
-              "body": "长期使用后 SQLite 数据库可能增长至数百 MB，检索速度下降，目前缺乏分片或自动归档策略，需人工清理。"
-            },
-            {
-              "title": "仅限编码场景",
-              "body": "设计和基准聚焦于编码 agent，扩展到通用对话式 agent 可能效果打折，缺少对长对话、多模态等场景的验证。"
-            },
-            {
-              "title": "可视化基础",
-              "body": "实时查看器功能简单，无记忆时间线回放、高级过滤或对比分析，调试复杂记忆问题时仍依赖命令行。"
-            },
-            {
-              "title": "iii 引擎依赖",
-              "body": "基础框架 iii 引擎外部维护，若其停止更新或发生破坏性变更，agentmemory 可能面临兼容性风险，升级需谨慎。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "全局安装 agentmemory，使 `agentmemory` 命令可用。",
-              "cmd": "npm install -g @agentmemory/agentmemory",
-              "note": "需要 Node.js 18+ 环境。"
-            },
-            {
-              "step": "启动记忆服务器，默认占用 3111 端口。",
-              "cmd": "agentmemory",
-              "note": "首次运行会下载 ONNX 模型（约 80MB）。"
-            },
-            {
-              "step": "生成演示会话数据，快速验证记忆存储和召回。",
-              "cmd": "agentmemory demo",
-              "note": "会创建 3 个模拟的编码会话。"
-            },
-            {
-              "step": "打开实时查看器，浏览器观察记忆列表和知识图谱。",
-              "cmd": "open http://localhost:3113",
-              "note": "默认端口 3113，可查看最近记忆变更。"
-            },
-            {
-              "step": "连接一个实际 agent（例如 Claude Code）开始自动记忆。",
-              "cmd": "agentmemory connect claude-code",
-              "note": "确保 Claude Code 已安装且支持插件。"
-            },
-            {
-              "step": "在新会话中询问之前讨论过的技术细节，验证 agent 是否自动回忆。",
-              "cmd": "在 agent 终端输入：'帮我在 auth 中间件里加个速率限制，记得我们用 jose 吗？'",
-              "note": "若记忆正常，agent 会直接引用之前的 jose 实现。"
-            }
-          ],
-          "score": {
-            "novelty": 20,
-            "engineering": 23,
-            "reproducibility": 22,
-            "timeToValue": 25
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 100; final 100; intent tool; boost: agent, agents, mcp, memory, llm, ai coding, coding agent, eval, benchmark; popularity +8"
         }
       },
       {
@@ -2472,107 +2215,16 @@
           "AI编码"
         ],
         "light": "近期Claude Code热度持续攀升，但官方API需要付费。该项目通过将Claude Code的请求路由到NVIDIA NIM、DeepSeek、Ollama等免费或本地模型，降低了使用门槛。同时其管理UI、模型分级路由、Discord/Telegram集成等功能吸引大量用户尝鲜，因此在GitHub上快速获得关注。",
-        "worthDeepDive": 82,
-        "deep": {
-          "atGlance": "这个项目值得深看，因为它巧妙地将 Claude Code 对 Anthropic API 的依赖，透明地转发到多个免费或低价模型后端，从而实现了近乎无成本的 AI 辅助编程。适合所有使用 Claude Code 并希望降低 API 开销，或想试试非 Claude 模型但保持相同编码体验的开发者。现在看它，是因为本地 LLM 生态成熟，这种代理模式可能成为主流。",
-          "whyItMatters": [
-            {
-              "title": "免费使用 Claude Code",
-              "body": "通过路由到 NVIDIA NIM、OpenRouter 免费模型或本地 Ollama，消除了对 Anthropic 付费计划的硬性依赖。"
-            },
-            {
-              "title": "模型自由切换",
-              "body": "可按任务层级（Opus/Sonnet/Haiku）指定不同提供商的模型，实现性能和成本的精细平衡。"
-            },
-            {
-              "title": "无侵入式集成",
-              "body": "仅需设置环境变量即可让 Claude Code 走代理，无需修改客户端代码或替换二进制文件。"
-            }
+        "worthDeepDive": 98,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 82,
+          "finalScore": 98,
+          "matchedBoostTerms": [
+            "llm"
           ],
-          "keyConcepts": [
-            {
-              "term": "fcc-server",
-              "explain": "代理服务器进程，拦截 Claude Code 的 API 请求，根据配置转发到选定的模型提供商，同时提供 Web 管理界面。"
-            },
-            {
-              "term": "fcc-claude",
-              "explain": "自动设置环境变量并启动 Claude Code CLI 的封装命令，每次从 Admin UI 管理的配置中读取最新设置。"
-            },
-            {
-              "term": "Admin UI",
-              "explain": "基于 Web 的本地管理界面，可修改 API 密钥、模型路由和消息平台设置，通过验证和应用按钮即时生效。"
-            },
-            {
-              "term": "Provider Routing",
-              "explain": "按请求中的模型名或用户设置的层级（MODEL_OPUS/SONNET/HAIKU）将流量路由到不同后端，实现多源混合。"
-            }
-          ],
-          "howItWorks": "## 一句话模型\n它像一个聪明的“中间人”，把 Claude Code 发出的所有 API 请求拦截下来，根据你的配置，悄悄转发给 NVIDIA、Kimi 甚至你自己电脑上的 Ollama，再把回复原样送回，让 Claude Code 毫不察觉背后模型已变。\n\n## 工作流\n用户启动 fcc-server 代理，并通过 Admin UI 配置目标模型（如 `nvidia_nim/z-ai/glm4.7`）和 API 密钥。然后运行 `fcc-claude`，它会自动设置 `ANTHROPIC_BASE_URL` 等环境变量，让 Claude Code CLI 连接到本地代理。Claude Code 正常发起对话或工具调用，代理拦截请求，将 Anthropic Messages API 格式的请求体转换为目标提供商的格式（如果需要），并处理流式响应、工具调用和思考块，再返回标准 Anthropic 格式的响应给 Claude Code。整个过程对用户透明，还支持 Discord/Telegram 机器人发起远程会话。\n\n## 关键组件\n- **fcc-server**：Uvicorn 驱动的 ASGI 应用，包含代理逻辑和 Admin UI。它读取一个托管的配置文件（由 Admin UI 修改），并在检测到配置变更时自动重启。\n- **Admin UI**：一个 Web 界面，用于管理 API 密钥、模型路由、消息平台和语音设置，提供验证和应用按钮，确保配置有效。\n- **fcc-claude**：一个包装脚本，从 Admin UI 管理的配置中读取端口和认证令牌，设置 Claude Code 所需的环境变量，然后启动真实的 `claude` 命令。\n- **Provider Adapters**：每个提供商（NVIDIA NIM、Kimi、OpenRouter 等）都有一个适配器，负责转换请求/响应格式，处理认证头等。\n\n## 验证点\n启动 fcc-server 后，打开 Admin UI 查看状态。配置 NVIDIA NIM 并应用，然后运行 `fcc-claude`，在 Claude Code 中询问模型名（如“你是什么模型”），应该返回 NVIDIA NIM 上配置的模型（如 GLM-4.7），而不是 Claude。",
-          "novelty": "可迁移模式：代理+适配器模式可以让任何依赖特定 API 的客户端透明地切换到其他后端，适用于降低成本和绑定风险。该项目将这一模式针对 Claude Code 的 Anthropic Messages API 进行了专门适配，并利用 Claude Code 的 Gateway Model Discovery 特性提供原生模型选择。\n\n对比同领域方案：直接使用 Anthropic API 成本高且模型固定；OpenRouter 等中转服务聚合了多个模型但缺乏专用客户端适配，且无法混合本地模型；Cline + Ollama 等组合虽然免费，但失去了 Claude Code 的原生体验和生态。本项目的优势在于保留了 Claude Code 的所有功能（如自动压缩窗口、工具调用）的同时，允许后端模型自由切换。另一代理项目 `llmproxy` 更通用，但缺少 Admin UI 和专门针对 Claude Code 的优化，如模型层级路由。因此，虽然核心代理技术并不新颖，但针对 Claude Code 的封装和集成体现了切实的工程价值。",
-          "ecosystem": "依赖：Python 3.14、uv、Claude Code CLI 以及至少一个模型提供商（如 NVIDIA NIM、Kimi、OpenRouter 等）。\n搭配：Claude Code 在终端、VS Code 和 JetBrains 中的原生集成，以及 Discord/Telegram 聊天机器人。也可搭配本地模型推理框架如 Ollama、LM Studio、llama.cpp 实现完全离线。\n替代：它替代了直接向 Anthropic 付费使用 Claude 模型，可以替代对高成本 API 的依赖。\n竞争：类似的代理中间件有 LiteLLM、Portkey，但它们更偏向于 OpenAI 生态和通用代理，而本项目专注于 Claude Code 的协议适配并提供一站式管理界面和聊天机器人集成。此外，开源社区中也有一些单点方案（如用 Ollama 直连 Claude Code），但缺少统一配置和模型路由。",
-          "limitations": [
-            {
-              "title": "提供商稳定性依赖",
-              "body": "免费 API 可能随时更改限额或可用模型，导致 Claude Code 突然无法使用。例如 NVIDIA NIM 的免费层级有速率限制。"
-            },
-            {
-              "title": "本地模型能力不足",
-              "body": "Ollama 等本地模型可能不完全支持工具调用或推理链，影响 Claude Code 的代码生成和操作文件的能力。"
-            },
-            {
-              "title": "代理延迟增加",
-              "body": "每一轮对话都需要经过代理转发和可能的格式转换，可能引入额外数百毫秒延迟，影响实时编码体验。"
-            },
-            {
-              "title": "提供商兼容性风险",
-              "body": "并非所有提供商的 Anthropic 兼容端点都完美实现了消息 API，工具调用或流式处理可能出现异常。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "确保已安装 Node.js，全局安装最新版 Claude Code CLI",
-              "cmd": "npm install -g @anthropic-ai/claude-code",
-              "note": "需要 Node.js 18+"
-            },
-            {
-              "step": "安装 Python 3.14 和 uv 包管理器（如已安装可跳过）",
-              "cmd": "curl -LsSf https://astral.sh/uv/install.sh | sh && uv python install 3.14",
-              "note": "macOS/Linux 命令，Windows 见 README"
-            },
-            {
-              "step": "前往 build.nvidia.com 注册并获取免费的 NVIDIA NIM API 密钥",
-              "note": "免费密钥有每日请求限制"
-            },
-            {
-              "step": "使用 uv 安装代理",
-              "cmd": "uv tool install --force git+https://github.com/Alishahryar1/free-claude-code.git",
-              "note": "force 选项用于更新或覆盖安装"
-            },
-            {
-              "step": "启动代理服务器",
-              "cmd": "fcc-server",
-              "note": "观察终端输出，记下 Admin UI 地址（例如 http://127.0.0.1:8082/admin）"
-            },
-            {
-              "step": "在浏览器打开 Admin UI，粘贴 NVIDIA NIM API 密钥，点击验证和应用",
-              "note": "默认模型已设为 nvidia_nim/z-ai/glm4.7，可直接使用"
-            },
-            {
-              "step": "新开终端，运行封装好的 Claude Code",
-              "cmd": "fcc-claude",
-              "note": "此命令自动设置环境变量并启动原生 claude"
-            },
-            {
-              "step": "验证代理是否生效：在 Claude Code 中输入“你是什么模型”，应返回 GLM-4.7 之类非 Claude 模型名",
-              "note": "若返回 Claude 模型名，请检查 Admin UI 配置和终端环境变量"
-            }
-          ],
-          "score": {
-            "novelty": 18,
-            "engineering": 22,
-            "reproducibility": 23,
-            "timeToValue": 24
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 82; final 98; intent tool; boost: llm; popularity +8"
         }
       },
       {
@@ -2597,7 +2249,18 @@
           "skills"
         ],
         "light": "它解决了如何快速发现和安装 Codex 技能的问题，避免了从零编写自动化脚本的麻烦。这周/月值得关注是因为 Codex 生态正在快速发展，社区贡献的技能涵盖了开发、协作、数据分析等多个领域，能启发你构建自己的自动化工作流。",
-        "worthDeepDive": 35
+        "worthDeepDive": 39,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 35,
+          "finalScore": 39,
+          "matchedBoostTerms": [],
+          "matchedCapTerms": [
+            "skills",
+            "awesome"
+          ],
+          "explanation": "raw 35; final 39; intent tool; penalty features: skills, awesome; popularity +8"
+        }
       },
       {
         "fullName": "Imbad0202/academic-research-skills",
@@ -2621,7 +2284,19 @@
           "claude-code"
         ],
         "light": "该项目近期在GitHub Trending上受到关注，主要是因为学术界对AI辅助写作中引用幻觉和数据造假问题的担忧日益加剧。它提供了从研究到发表的全流程AI辅助，并通过多阶段完整性检查、引用审计等机制降低风险，引用了《Nature》和arXiv上的相关研究，切中当前热点。",
-        "worthDeepDive": 39
+        "worthDeepDive": 49,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 49,
+          "matchedBoostTerms": [
+            "agent"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 49; intent understanding; boost: agent; penalty features: skills; popularity +8"
+        }
       },
       {
         "fullName": "multica-ai/andrej-karpathy-skills",
@@ -2644,7 +2319,21 @@
           "coding-agents"
         ],
         "light": "本周因Andrej Karpathy关于LLM编码陷阱的帖子引发热议，该仓库直接将他的观察转化为可实践的CLAUDE.md配置，帮助开发者规避常见错误。随着Claude Code用户增长，这类优化提示文件受到关注。",
-        "worthDeepDive": 39
+        "worthDeepDive": 57,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 57,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "llm"
+          ],
+          "matchedCapTerms": [
+            "skills"
+          ],
+          "explanation": "raw 39; final 57; intent understanding; boost: agent, agents, llm; penalty features: skills; popularity +8"
+        }
       },
       {
         "fullName": "soxoj/maigret",
@@ -2668,7 +2357,15 @@
           "Python-tool"
         ],
         "light": "Maigret近期在GitHub trending上回升，主要得益于其新增的AI分析模式（--ai），可以自动生成调查摘要，吸引了安全研究者和隐私关注者。同时，其大规模网站支持、无需API、可嵌入Python库以及Tor/I2P支持等特性也持续吸引用户。随着人们对在线隐私和数字足迹的关注增加，该工具成为调查用户名关联账户的热门选择。",
-        "worthDeepDive": 58
+        "worthDeepDive": 70,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 58,
+          "finalScore": 70,
+          "matchedBoostTerms": [],
+          "matchedCapTerms": [],
+          "explanation": "raw 58; final 70; intent tool; popularity +8"
+        }
       },
       {
         "fullName": "TauricResearch/TradingAgents",
@@ -2692,7 +2389,22 @@
           "framework"
         ],
         "light": "它解决了如何利用多个专业化LLM智能体协作进行金融交易决策的问题。这周/月值得看是因为其工程实现展示了多智能体系统在复杂场景下的角色分工、结构化辩论和风险管理，架构基于LangGraph，对学习可复用的Agent设计模式有参考价值。",
-        "worthDeepDive": 39
+        "worthDeepDive": 55,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 39,
+          "finalScore": 55,
+          "matchedBoostTerms": [
+            "agent",
+            "agents",
+            "llm"
+          ],
+          "matchedCapTerms": [
+            "financial",
+            "trading"
+          ],
+          "explanation": "raw 39; final 55; intent tool; boost: agent, agents, llm; penalty features: financial, trading; popularity +8"
+        }
       },
       {
         "fullName": "AIDC-AI/Pixelle-Video",
@@ -2716,100 +2428,17 @@
           "多模态"
         ],
         "light": "近期因AI短视频创作热潮而受关注，项目持续更新添加动作迁移、数字人口播等新功能，并提供Windows一键整合包降低使用门槛，吸引了大量内容创作者和AI爱好者，推动了Star增长。",
-        "worthDeepDive": 77,
-        "deep": {
-          "atGlance": "这个项目值得深看，因为它是目前开源界最完整的全自动短视频生成引擎之一，近期更新频繁且功能全面。适合内容创作者、AI 应用开发者及想快速把 idea 变成视频的人，现在看能直接上手体验零门槛视频生产。",
-          "whyItMatters": [
-            {
-              "title": "输入主题即出片",
-              "body": "把视频制作从‘写稿-找素材-配音-剪辑’的多步手动流程压缩成一句话指令，真正实现零剪辑经验的全自动产出。"
-            },
-            {
-              "title": "模块化可替换",
-              "body": "LLM、图像生成、TTS、模板等核心环节均支持即插即换，可自由组合本地免费方案或云端效果好但付费的模型，兼顾成本与效果。"
-            },
-            {
-              "title": "活跃发展生态",
-              "body": "基于 ComfyUI 架构，近期新增数字人口播、动作迁移等高级模块，且有社区维护的 Windows 整合包，降低部署门槛，持续扩展可能性。"
-            }
+        "worthDeepDive": 97,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 77,
+          "finalScore": 97,
+          "matchedBoostTerms": [
+            "llm",
+            "aigc"
           ],
-          "keyConcepts": [
-            {
-              "term": "全自动流水线",
-              "explain": "从用户输入主题到最终 MP4 视频输出的端到端流程，包含 LLM 写稿→分镜规划→逐帧生成配图/视频→TTS 合成语音→合成 BGM→渲染视频，全程无需人工干预。"
-            },
-            {
-              "term": "ComfyUI 工作流",
-              "explain": "图像或语音生成的后台编排逻辑，以 JSON 文件定义在 \\`workflows/\\` 下。用户可替换为 FLUX、ChatTTS 等任意模型，实现‘原子能力自由组合’。"
-            },
-            {
-              "term": "视频模板系统",
-              "explain": "基于 HTML 的视觉布局文件，命名约定 \\`static_*\\`（纯文字）、\\`image_*\\`（AI 图片背景）、\\`video_*\\`（AI 视频背景），决定画面中字幕、图片、动效的呈现方式，可按尺寸分组切换。"
-            },
-            {
-              "term": "多模型适配层",
-              "explain": "统一的 LLM 调用接口，支持通义千问、GPT-4o、DeepSeek、Ollama 等，通过下拉选择预设自动填充 \\`base_url\\` 和 \\`model\\`，让文案风格可灵活切换。"
-            }
-          ],
-          "howItWorks": "## 一句话模型\n它像一个智能视频工厂：你输入主题，工厂里的 AI 编剧（LLM）写出分镜头脚本，AI 画师（图像/视频生成）为每个镜头创作画面，AI 配音员（TTS）读出解说词，最后 AI 剪辑师把所有素材合成为带配乐的视频。\n\n## 工作流\n1. 用户在 Web UI 输入主题或粘贴固定文案，选择模板、TTS 引擎、BGM。\n2. 后端依次：LLM 生成文案并分割为分镜 → 按分镜调用 ComfyUI/RunningHub 生成图片或短视频 → 调用 TTS 服务合成每个分镜的语音 → 将图片/视频、音频、字幕等数据注入 HTML 模板 → 使用 ffmpeg 最终合成视频。\n\n## 关键组件\n- **LLM 桥接器**：通过统一接口调用多种大模型，负责文案创作和分镜规划。\n- **媒体生成网关**：封装 ComfyUI 本地 API 和 RunningHub 云端 API，支持并行请求和并发控制。\n- **TTS 调度器**：扫描 \\`workflows/\\` 下的 TTS 工作流，支持 Edge-TTS、Index-TTS 等，可上传参考音频进行声音克隆。\n- **模板渲染引擎**：用 HTML+CSS 定义画面布局，动态替换图片/视频/字幕，生成每帧的临时页面，再借助 headless 浏览器或直接生成视频帧。\n\n## 验证点\n启动 Web 界面后，配置好 LLM API 和图像后端（本地 ComfyUI 或云端），输入‘为什么要养成阅读习惯’，点击生成，几分钟后能在右侧预览区看到一个带字幕、配图和背景音乐的完整短视频，且 \\`output/\\` 目录下会保存 MP4 文件。",
-          "novelty": "Pixelle-Video 的核心创新在于把 ComfyUI 的工作流思维引入短视频生成，使整个 pipeline 变成了可自由插拔的‘原子能力乐高’。这种设计让用户不必局限于内置模型，可以无缝替换为 FLUX、ChatTTS 等任何遵循环节的工具，扩展性远超同类固定流程的项目。\n\n同领域知名方案 MoneyPrinterTurbo 更依赖预设模板和单一模型链路，自定义空间有限；NarratoAI 侧重影视解说，流程深度但普适性不足。而 Pixelle-Video 通过浏览器端配置即可切换 LLM、TTS、图像源，并已支持数字人口播、动作迁移等高级玩法，近期更新甚至集成了 RunningHub 48G 显存机器调用，显示出较强的工程落地能力。它还将视频模板提升为可预览的 HTML 选择器，降低了非程序员筛选风格的门槛。",
-          "ecosystem": "本项目构建在 uv、ffmpeg、Streamlit 之上，依赖外部 AI 服务（各 LLM API、ComfyUI 或 RunningHub）完成核心生成。适合搭配 ComfyUI 本地部署形成零成本方案，或使用 Ollama 完全离线运行。它直接与短视频内容创作赛道中的 MoneyPrinterTurbo、NarratoAI、MoneyPrinterPlus 等竞争，但因其模块化和持续迭代，更易适应长尾需求。\n\n参考项目列表中包含 Pixelle-MCP，暗示未来可能打通 ComfyUI MCP 协议，让 AI 助手直接操控工作流，进一步融入 Agent 生态。同时，它与 FilmAgent、Anim-Director 等研究项目同源（出自 AIDC 团队），形成了从脚本到动画的完整学术-工程矩阵，方向定义力较强。",
-          "limitations": [
-            {
-              "title": "画面一致性弱",
-              "body": "每帧图片独立生成，即使有统一 prompt 前缀，同一视频中的风格、人物形象仍可能出现漂移，无法保证叙事连贯性。"
-            },
-            {
-              "title": "长视频处理慢",
-              "body": "文案越长、分镜越多，需串行等待每帧图片/视频的生成和语音合成，总耗时线性增长，且没有断点续传，中断后需重头开始。"
-            },
-            {
-              "title": "本地高配需求",
-              "body": "完全免费方案需要本地部署 ComfyUI 和运行图像/语言模型，对显卡和内存有一定要求，低配机器可能需要选择云端付费方案。"
-            },
-            {
-              "title": "自定义模板门槛",
-              "body": "若要定制视频布局，需掌握 HTML/CSS，并理解模板中变量替换的约定，对非前端用户不够友好。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "下载整合包（Windows 用户）或克隆仓库（其他系统）",
-              "cmd": "git clone https://github.com/AIDC-AI/Pixelle-Video.git && cd Pixelle-Video",
-              "note": "Windows 用户可下载 exe 整合包，无需执行此命令"
-            },
-            {
-              "step": "安装依赖并启动 Web 界面",
-              "cmd": "uv run streamlit run web/app.py",
-              "note": "首次运行 uv 将自动安装 Python 依赖，确保已安装 uv 和 ffmpeg"
-            },
-            {
-              "step": "浏览器访问 http://localhost:8501，展开‘系统配置’面板",
-              "note": "如未自动打开浏览器，手动输入地址"
-            },
-            {
-              "step": "配置 LLM：选择预设模型（如通义千问）并填入 API Key",
-              "note": "若无 API，可本地启动 Ollama 并选择 Ollama 预设，但需提前拉取模型"
-            },
-            {
-              "step": "配置图像后端：填写 ComfyUI 地址或 RunningHub API Key",
-              "note": "若本地无 ComfyUI，可使用 RunningHub 云端服务（需注册获取 key）"
-            },
-            {
-              "step": "在左侧‘内容输入’输入主题，如‘为什么要养成阅读习惯’，点击‘生成视频’",
-              "note": "等待过程中右侧会显示实时进度"
-            },
-            {
-              "step": "生成完成后预览视频，文件位于 output/ 文件夹",
-              "note": "可尝试更换模板、TTS 或 BGM 再次生成对比效果"
-            }
-          ],
-          "score": {
-            "novelty": 18,
-            "engineering": 22,
-            "reproducibility": 23,
-            "timeToValue": 23
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 77; final 97; intent tool; boost: llm, aigc; popularity +8"
         }
       },
       {
@@ -2834,7 +2463,17 @@
           "CLI Integration"
         ],
         "light": "它解决AI代码工具频繁遭遇API配额限制、成本高和需手动切换提供商的问题。9Router作为中间层，自动压缩工具输出令牌（RTK技术可节省20-40%），并按订阅→廉价→免费的多层策略回退，确保零停机。这周值得看是因为它提供了免费访问多种前沿模型的实用方案，尤其对于预算有限的开发者，其令牌压缩和回退设计思路也可借鉴。",
-        "worthDeepDive": 56
+        "worthDeepDive": 72,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 56,
+          "finalScore": 72,
+          "matchedBoostTerms": [
+            "ai coding"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 56; final 72; intent tool; boost: ai coding; popularity +8"
+        }
       },
       {
         "fullName": "refactoringhq/tolaria",
@@ -2858,7 +2497,18 @@
           "git-first"
         ],
         "light": "它解决的是个人知识管理中的数据锁定和格式不兼容问题，通过文件优先和Git优先确保数据可迁移和版本追溯。这周值得关注因为Tolaria将AI集成（MCP服务器、AGENTS文件）纳入离线知识库管理，展示了如何让桌面应用与AI代理协作，为构建个人AI知识工场提供了实用范本。",
-        "worthDeepDive": 71
+        "worthDeepDive": 91,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 71,
+          "finalScore": 91,
+          "matchedBoostTerms": [
+            "agents",
+            "mcp"
+          ],
+          "matchedCapTerms": [],
+          "explanation": "raw 71; final 91; intent tool; boost: agents, mcp; popularity +8"
+        }
       },
       {
         "fullName": "ruvnet/ruflo",
@@ -2882,104 +2532,18 @@
           "自学习"
         ],
         "light": "它解决单个Claude代理无法完成复杂协作、跨会话记忆和跨机器安全通信的问题。这周/月值得看是因为代理系统是AI工程热点，该项目提供了从CLI到插件的完整实现，包含自学习循环、向量记忆、联邦安全等生产级特性。虽然专为Claude设计，但其架构思想和组件拆分（如插件市场、MCP服务器）对构建可扩展代理系统有参考价值。",
-        "worthDeepDive": 74,
-        "deep": {
-          "atGlance": "这个项目值得深看，因为它为 Claude Code 提供了一个高度集成、功能丰富的多智能体编排层，覆盖从单机到跨机器联邦的完整工作流。适合想要在 Claude Code 中构建自学习、记忆协同的复杂 AI 系统的开发者；近期社区涌入海量关注，表明其解决方案正切中当前 AI 工具链的痛点。",
-          "whyItMatters": [
-            {
-              "title": "深度集成 Claude Code",
-              "body": "不是通用框架，而是专门为 Claude Code 打造的插件与 MCP 服务器，让代理能够直接在开发者工作环境中协同，降低集成成本。"
-            },
-            {
-              "title": "自学习群智能",
-              "body": "代理会从成功任务中学习、优化路由，并利用 SONA 等模式实现持续自我改进，使得系统越用越高效。"
-            },
-            {
-              "title": "零信任联邦通信",
-              "body": "支持跨机器、跨组织的安全代理协作，实现去中心化的任务分配与知识共享，适合企业级部署。"
-            }
+        "worthDeepDive": 98,
+        "rankingReason": {
+          "decision": "boost",
+          "rawScore": 74,
+          "finalScore": 98,
+          "matchedBoostTerms": [
+            "agent",
+            "rag",
+            "mcp"
           ],
-          "keyConcepts": [
-            {
-              "term": "Swarm Coordination",
-              "explain": "将多个专业化代理编排成一个群，支持层次、网状和自适应拓扑，按任务需求动态选择协作模式，可类比为'为 Claude Code 定制的代理微服务架构'。"
-            },
-            {
-              "term": "Self-Learning (SONA)",
-              "explain": "代理记录轨迹并应用自组织神经模式，将历史成功路径抽象为可复用策略，使系统在没有外部干预的情况下自我优化。"
-            },
-            {
-              "term": "AgentDB",
-              "explain": "基于 HNSW 索引的向量数据库，为代理提供 150 倍以上的搜索加速，支撑记忆存储和 RAG 实时检索。"
-            },
-            {
-              "term": "MCP Server",
-              "explain": "通过 Model Context Protocol 将 Ruflo 的内部能力暴露给 Claude，使代理的记忆、群初始化等操作可直接由 Claude 调用。"
-            },
-            {
-              "term": "Federation",
-              "explain": "零信任安全模型下的跨安装点代理通信，代理能够发现、认证和交换任务，形成去中心化协作网络。"
-            }
-          ],
-          "howItWorks": "## 一句话模型\n它就像 Claude Code 的“代理操作系统”——你正常写代码、下指令，后台会自动将复杂任务分发给一群会学习、能记忆、可跨机器通信的专业化代理。\n\n## 工作流\n用户通过 `npx ruflo init` 或插件安装后，Claude Code 中注入了一套完整的代理基础设施。当用户给出自然语言任务时，内部的**路由器**根据任务类型将工作分配给一个**群**，群再将子任务下发给特定代理（如安全审计、测试生成等）。代理执行过程中可以读写**向量记忆**、调用外部工具，并通过**反馈回路**更新自身策略。最终结果返回给用户，同时存入记忆库供未来使用。\n\n## 关键组件\n- **CLI/MCP 接口**：用户与系统的唯一入口，负责初始化、插件管理和任务分发。\n- **Swarm 引擎**：管理代理分组、拓扑和共识，实现多代理动态协调。\n- **AgentDB 与学习模块**：提供高速记忆存储和基于成功轨迹的自学习能力。\n- **Federation 层**：通过加密信道实现跨机器的代理发现与身份认证。\n\n## 验证点\n安装并启动后，在 Claude Code 中执行一个需要多步骤的任务（例如“为我的项目生成测试并审计安全风险”），应观察到多个代理并发工作，且事后可通过 `memory_search` 命令查看是否生成了相关记忆。",
-          "novelty": "可迁移的模式在于将多代理编排与特定 IDE 深度绑定，通过 MCP 协议让代理无缝嵌入开发者工作流，这比通用代理框架（如 LangChain、AutoGen）更能减少配置和集成负担。对比来看，**LangChain** 提供灵活的链式调用但需要手动拼装整个逻辑；**AutoGen** 强调对话式群组，但并未专为某一 IDE 优化；**CrewAI** 更偏向角色扮演式协作。Ruflo 的新意在于提供了一套无需离开 Claude Code 就能立即使用的完整“代理生态”，包含自学习、跨机联邦和插件市场，目前在同赛道中独树一帜。",
-          "ecosystem": "它的核心依赖是 **Claude Code**（作为运行载体）和 **MCP**（通信协议）。通过插件市场，它可以搭配 30+ 内置插件（如测试、安全、记忆）使用，也兼容外部 npm 包（如 `neural-trader`）。它替代了开发者自己用 LangChain/OpenAI 函数调用搭建代理管线的需求，但与这些通用框架并非完全竞争——若需要深度定制，也可以将 Ruflo 作为上层编排器，下层仍使用 LangChain。此外，它与 `ruvector`、`ollama` 等工具形成组合，适合从本地到云端的各种部署场景。",
-          "limitations": [
-            {
-              "title": "绑定 Claude Code",
-              "body": "整个系统深度绑定 Claude Code，若团队无 Claude 使用许可或希望跨 IDE 平台则无法直接复用，限制了受众范围。"
-            },
-            {
-              "title": "安装路径复杂",
-              "body": "提供两种安装方式（插件和完整 CLI），且不同路径能力差异大，新手可能因选错方式而得不到完整功能。"
-            },
-            {
-              "title": "潜在性能开销",
-              "body": "100+ 代理和向量检索在本地运行时可能占用大量内存，尤其在资源受限的开发机上可能影响体验。"
-            },
-            {
-              "title": "学习曲线较陡",
-              "body": "尽管目标是自动运行，但理解群拓扑、自学习机制、联邦配置仍需阅读大量文档，对简单任务可能过度设计。"
-            },
-            {
-              "title": "部分功能尚处预览",
-              "body": "README 标注 Web UI 和 Goal Planner 为 Beta/研究版，生产环境中可能不稳定或缺失关键特性。"
-            }
-          ],
-          "tryIt": [
-            {
-              "step": "运行全功能初始化向导（推荐用于完整体验），该命令会安装 98 个代理、记忆服务器等所有组件。",
-              "cmd": "npx ruflo@latest init wizard",
-              "note": "若遇权限问题，先确保 Node.js ≥18"
-            },
-            {
-              "step": "将 Ruflo 注册为 Claude Code 的 MCP 服务器（若使用 Path B 安装则已自动添加），让代理能力对 Claude 可见。",
-              "cmd": "claude mcp add ruflo -- npx ruflo@latest mcp start"
-            },
-            {
-              "step": "重启 Claude Code 或打开新对话，使用 `/help` 查看新增的代理、记忆等命令列表。"
-            },
-            {
-              "step": "尝试一个真实任务：要求 Claude “扫描当前项目安全漏洞并生成修复建议”，观察 `security-audit` 代理如何自动启动。",
-              "note": "代理输出会直接嵌入 Claude 回复"
-            },
-            {
-              "step": "查看代理记忆：运行 `memory_search` 工具查询刚才任务的关键字，确认系统已学习并存储了这次交互。"
-            },
-            {
-              "step": "（可选）体验 Web UI 多代理面板，访问 https://flo.ruv.io/ 并连接本地 MCP 服务器，可视化代理协作。",
-              "note": "Web UI 处于 Beta 阶段"
-            },
-            {
-              "step": "尝试跨机器联邦：按插件文档设置另一台机器并配置 discovery，观察双方代理是否能在零信任下自动发现并协同。"
-            }
-          ],
-          "score": {
-            "novelty": 22,
-            "engineering": 23,
-            "reproducibility": 24,
-            "timeToValue": 23
-          }
+          "matchedCapTerms": [],
+          "explanation": "raw 74; final 98; intent tool; boost: agent, rag, mcp; popularity +8"
         }
       }
     ]
