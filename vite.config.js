@@ -56,7 +56,7 @@ function ingestPlugin() {
         });
       });
 
-      server.middlewares.use("/__refresh-articles", (req, res, next) => {
+      server.middlewares.use("/__publish-papers", (req, res, next) => {
         if (req.method !== "POST") return next();
         if (articlesBusy) {
           res.statusCode = 429;
@@ -71,10 +71,10 @@ function ingestPlugin() {
 
         const cwd = process.cwd();
         const env = { ...process.env, NODE_USE_ENV_PROXY: "1", FORCE_COLOR: "0" };
-        const args = ["--no-warnings", path.join(cwd, "scripts", "refresh-articles.mjs")];
+        const args = ["--no-warnings", path.join(cwd, "scripts", "run.mjs"), "papers", "all", "--dry-run"];
         const child = spawn(process.execPath, args, { cwd, env });
         const start = Date.now();
-        res.write(`[articles] starting ${args.slice(1).join(" ")}\n`);
+        res.write(`[papers] starting ${args.slice(1).join(" ")}\n`);
         child.stdout.on("data", (d) => res.write(d));
         child.stderr.on("data", (d) => res.write(d));
         child.on("close", (code) => {

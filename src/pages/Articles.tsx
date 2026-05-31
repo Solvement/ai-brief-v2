@@ -277,7 +277,7 @@ function ArticlesIndex({ data }: { data: ArticlesData }) {
     setRefresh("running");
     setLog("");
     try {
-      const res = await fetch("/__refresh-articles", { method: "POST" });
+      const res = await fetch("/__publish-papers", { method: "POST" });
       if (!res.ok || !res.body) {
         if (res.status === 404) throw new Error("dev server middleware 没生效。请重启 npm run dev。");
         throw new Error("HTTP " + res.status);

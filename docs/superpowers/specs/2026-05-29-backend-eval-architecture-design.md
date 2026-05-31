@@ -72,7 +72,7 @@ Cheap model triages everything; expensive model only deep-dives top-N (instituti
 - discover: the **7 sources** (HF Daily, PapersWithCode trending, arXiv filtered queries, OpenReview, ACL Anthology, CVF OpenAccess, company research blogs). **This resolves SPEC §10.3 open source-list.**
 - evaluate = **汇聚 × 赛道 × idea质量**: aggregation (≥2 independent trusted sources → strong; single source must be 顶会/官方); track (FOCUS_TOPICS: agent/RAG/memory/eval/AI coding/AIGC eng); idea-quality (cheap-model triage). Single 订阅号/推荐 never auto-enters.
 - analyze (deep): core idea/architecture + 为什么是进展 + 可迁移到哪 + 术语用例子大白话.
-- Retire `refresh-articles.mjs` hardcoded seeds; Articles surface consumes papers output (see memory: articles-radar-single-engine).
+- Retire the legacy hardcoded Articles seeds; Articles surface consumes papers output (see memory: articles-radar-single-engine).
 
 ### Models (coverage mode — NO selection) — first real Models pipeline
 - discover: watch official sources per model org (release notes / blog / model cards).
@@ -104,7 +104,7 @@ public/data/*.json        # build artifacts from DB
 
 - **Chunk 1 — foundation (no behavior change):** add `db.mjs` (SQLite schema+access), extract DeepSeek client from `ingest.mjs` into `lib/llm.mjs` (ingest imports it; identical behavior), formalize `pipeline-kernel.mjs` module interface, add `qa-base.mjs` (structural QA + LLM-judge harness). Unit tests for db + qa-base. Existing pipelines untouched and still pass.
 - **Chunk 2 — Projects → module:** port ingest into `columns/projects/*` on the kernel; `publish` emits the same `trending.json`. Behavioral tests for `evaluate` (incl. the finance-not-capped case).
-- **Chunk 3 — Papers → module + retire articles:** port papers-radar; retire `refresh-articles` hardcode; Articles surface ← papers output. Tests for 汇聚×赛道×idea质量.
+- **Chunk 3 — Papers → module + retire articles:** port papers-radar; retire legacy Articles hardcode; Articles surface ← papers output. Tests for 汇聚×赛道×idea质量.
 - **Chunk 4 — Models coverage pipeline:** first real Models module; dated-verify QA.
 - **Chunk 5 — (future) Podcast module.**
 

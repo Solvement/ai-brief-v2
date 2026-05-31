@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Backend tasks (1–8) are Codex's lane (RULES §2); Task 9 (frontend) is Claude's lane and is gated on Kevin's GPT-image-2 mockups.
 
-**Goal:** Make `papers-radar` the single academic engine on the pipeline kernel, producing a new *flexible, section-mirroring* `articles.json` contract (per the 2026-05-30 content-analysis redesign), and retire the hardcoded `refresh-articles` seeds.
+**Goal:** Make `papers-radar` the single academic engine on the pipeline kernel, producing a new *flexible, section-mirroring* `articles.json` contract (per the 2026-05-30 content-analysis redesign), and retire the hardcoded legacy Articles seeds.
 
 **Architecture:** Port `papers-radar.mjs` onto the existing `columns/<id>/{sources,evaluate,prompts,qa,index}.mjs` + `pipeline-kernel` pattern already used by Projects (Chunk 2). `evaluate()` = 汇聚×赛道×idea triage (coverage of the existing deterministic + cheap-model triage). `analyze()` = professor-voice analysis that **mirrors the paper's own sections** (translate+summarize each + locate load-bearing + lay out evidence/limits as facts; never renders a good/bad verdict). `publish()` writes the new `articles.json` and keeps `paper-radar.json`. Frontend (`Articles.tsx`) adapts to the new contract separately.
 
@@ -14,7 +14,7 @@
 
 ## Scope
 
-This plan = **academic backend** only (papers single-engine + new contract + retire refresh-articles). Out of scope, each its own later plan: Models (Chunk 4), Projects analysis upgrade + Understand-Anything, knowledge-graph/embeddings/净化池, Podcast. Frontend `Articles.tsx` rework (Task 9) is Claude's lane and waits on Kevin's mockups; the **types are defined here (Task 1)** so backend and frontend share one contract.
+This plan = **academic backend** only (papers single-engine + new contract + retire legacy Articles seeds). Out of scope, each its own later plan: Models (Chunk 4), Projects analysis upgrade + Understand-Anything, knowledge-graph/embeddings/净化池, Podcast. Frontend `Articles.tsx` rework (Task 9) is Claude's lane and waits on Kevin's mockups; the **types are defined here (Task 1)** so backend and frontend share one contract.
 
 ## File Structure
 
@@ -27,9 +27,9 @@ This plan = **academic backend** only (papers single-engine + new contract + ret
 - `scripts/columns/papers/qa.mjs` — **create**: `qaGate` (structural + groundedness harness via `qa-base`).
 - `scripts/columns/papers/index.mjs` — **create**: the `ColumnModule` (id `papers`) + `publish`/`archive`.
 - `scripts/run.mjs` — **modify**: register `papers` in `MODULES`.
-- `scripts/refresh-articles.mjs` — **delete** (and its `refresh:articles` script).
-- `package.json` — **modify**: drop `refresh:articles`; add `papers` run wiring if needed.
-- `dev-map.md` — **modify**: reflect papers single-engine + retired refresh-articles.
+- Legacy Articles seed script — **delete** (and its package script).
+- `package.json` — **modify**: drop legacy Articles seed script; add `papers` run wiring if needed.
+- `dev-map.md` — **modify**: reflect papers single-engine + retired legacy Articles seeds.
 - Tests: `scripts/__tests__/papers-evaluate.test.mjs`, `papers-analyze.test.mjs`, `papers-qa.test.mjs`.
 - Fixtures: `scripts/__tests__/fixtures/papers-harness-survey.json` (the harness-survey paper as a deterministic test input).
 
@@ -322,16 +322,16 @@ test("offline fallback yields a valid shape from evidence only", () => {
 
 ---
 
-## Task 8: Retire `refresh-articles` hardcode
+## Task 8: Retire legacy Articles seed hardcode
 
 **Files:**
-- Delete: `scripts/refresh-articles.mjs`
-- Modify: `package.json` (remove `refresh:articles`), `dev-map.md`
+- Delete: legacy Articles seed script
+- Modify: `package.json` (remove legacy Articles seed script), `dev-map.md`
 
-- [ ] **Step 1:** `git rm scripts/refresh-articles.mjs`.
-- [ ] **Step 2:** Remove the `refresh:articles` script from `package.json`. Grep for other references: `node scripts/lint.mjs` and `rg refresh-articles` → none remain.
-- [ ] **Step 3:** Update `dev-map.md`: papers-radar = single academic engine; Articles surface ← papers `publish`; refresh-articles retired.
-- [ ] **Step 4: Commit** `git add -A && git commit -m "chore: retire refresh-articles hardcoded seeds (papers is single engine)"`
+- [ ] **Step 1:** `git rm` the legacy Articles seed script.
+- [ ] **Step 2:** Remove the legacy Articles seed package script from `package.json`. Grep for other references: `node scripts/lint.mjs` and repo-wide identifier search → none remain.
+- [ ] **Step 3:** Update `dev-map.md`: papers-radar = single academic engine; Articles surface ← papers `publish`; legacy Articles seed script retired.
+- [ ] **Step 4: Commit** `git add -A && git commit -m "chore: retire hardcoded article seeds (papers is single engine)"`
 
 ---
 

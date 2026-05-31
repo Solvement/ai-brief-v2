@@ -26,8 +26,8 @@ src/
 ```
 scripts/
 ├── ingest.mjs               # GitHub Trending → README → DeepSeek → trending.json
-├── refresh-articles.mjs     # 策展文章批次
 ├── papers-radar.mjs         # AI Job Research Radar：discover/triage/review/daily/run
+├── columns/papers/          # papers-radar 单一学术引擎；publish 产出 public/data/articles.json
 ├── lib/{agentic-pipeline, github-trending, project-ranking, project-prompts}.mjs
 ├── validate-*.mjs           # 各数据契约 + 文本编码校验
 └── lint.mjs
@@ -55,7 +55,7 @@ data/          agent-memory/*.json、papers/*  （本地生成，不直接服务
 
 - 项目栏内容/排序 → `ingest.mjs` + `lib/project-*`
 - 模型栏 → `public/data/models.json`（当前手工策展）
-- 文章/学术 → `refresh-articles.mjs` + `papers-radar.mjs`（学术"好"=汇聚×赛道×idea质量，见 SPEC 第3节）
+- 文章/学术 → `papers-radar.mjs` + `columns/papers/`。papers-radar 是单一学术引擎；Articles surface 由 papers column publish 产出 `public/data/articles.json`；`refresh`-`articles` 已退役。
 - 任何视觉 → `styles.css`（:root + 末尾 B 覆盖块）+ 对应 page
 
 ## 旧 harness 去哪了

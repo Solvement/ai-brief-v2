@@ -50,7 +50,7 @@ Routes:
 - Static JSON data contracts in `public/data/`.
 - GitHub Trending ingestion through `npm run ingest`.
 - One-click dev refresh from the Projects page.
-- Curated Articles refresh through `npm run refresh:articles`.
+- Articles are published from the papers pipeline into `public/data/articles.json`.
 - AI Job Research Radar through `npm run papers:run`.
 - Shared local pipeline status through `public/data/pipeline-status.json`.
 - Validation gates for JSON shape, UI contract checks, and Chinese text encoding.
@@ -95,7 +95,8 @@ npm run ingest:dry
 Articles and paper radar:
 
 ```bash
-npm run refresh:articles
+node scripts/run.mjs papers all --dry-run
+node scripts/run.mjs papers publish
 npm run papers:discover
 npm run papers:triage
 npm run papers:review
