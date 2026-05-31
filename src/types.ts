@@ -371,6 +371,47 @@ export interface FdeTakeaways {
   roiHypothesis?: string;            // what it saves / failure-rate reduced / business metric / evidence needed
   interviewStory?: string;           // FDE interview narrative: technical depth + business impact
 }
+// ---- Iteration 2 (2026-05-31): research-workbench schema ----
+export type PaperType = "survey" | "theory" | "system" | "benchmark" | "dataset" | "industry_case" | "evaluation_audit" | "tooling" | "position_roadmap";
+export type VenueStatus = "verified" | "unverified" | "not_provided";
+
+/** Decision layer shown at the top of the detail page. */
+export interface PaperVerdict {
+  readDecision: "must_read" | "read" | "skim" | "watch" | "skip";
+  fdeFit: "high" | "medium" | "low";
+  evidenceStrength: "strong" | "medium" | "weak";
+  artifactStatus: "official" | "partial" | "third_party_only" | "none";
+  oneLineJudgment: string;
+  whyNow: string[];
+  whyNotOverclaim: string[];
+}
+/** A claim with auditable provenance + FDE transfer — distinguishes proven / implied / FDE-extrapolation. */
+export interface ClaimLedgerItem {
+  claim: string;
+  claimType: "theoretical" | "empirical" | "engineering" | "fde_extrapolation";
+  evidencePointer: string;   // Sec / Fig / Table / Appendix / repo
+  evidenceStrength: "high" | "medium" | "low";
+  threat: string;
+  fdeTransfer: string;
+}
+/** One experiment row with source exactness (guards against false precision). */
+export interface EvidenceMatrixItem {
+  experiment: string;
+  sampleSize?: string;
+  modelBackend?: string;
+  metric: string;
+  result: string;
+  exactness: "exact" | "estimated_from_figure" | "author_claim";
+  limitation: string;
+}
+/** Reproducibility audit — splits official vs referenced/dependency/third-party artifacts. */
+export interface ArtifactAudit {
+  officialCode: "verified" | "not_found" | "partial" | "third_party_only";
+  data: "available" | "not_found" | "restricted" | "not_applicable";
+  repoStatus?: string;
+  reproducibility: "full" | "partial" | "artifact_light" | "paper_only" | "third_party_only";
+  notes: string[];
+}
 export interface PaperDeepDive {
   /** 重判定位 — what the paper REALLY is, not its self-description. */
   reframe: string;
@@ -386,6 +427,13 @@ export interface PaperDeepDive {
   suggestedExperiments: string[];
   /** FDE methodology extraction (the career lens) — present only for FDE-relevant papers. */
   fdeTakeaways?: FdeTakeaways;
+  // ---- Iteration 2 workbench fields (preferred over the flatter fields above when present) ----
+  verdict?: PaperVerdict;
+  claimLedger?: ClaimLedgerItem[];
+  evidenceMatrix?: EvidenceMatrixItem[];
+  artifactAudit?: ArtifactAudit;
+  /** Falsification: what results would overturn the engineering conclusion. */
+  whatWouldInvalidate?: string[];
 }
 
 export interface AcademicPaperAnalysis {
@@ -406,6 +454,8 @@ export interface AcademicPaperAnalysis {
   limitsAndFuture: AcademicPaperLimits;
   selection: AcademicPaperSelection;
   provenance: { sourceUrl: string; evidenceKind: string };
+  paperType?: PaperType;
+  venueStatus?: VenueStatus;
   /** Reasoned reviewer scorecard (deep tier) — dimensions with /10 + justification. */
   scorecard?: ScoreCardItem[];
   /** Reviewer-style deep dive (deep tier only). */
