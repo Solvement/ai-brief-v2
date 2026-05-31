@@ -6,7 +6,7 @@ export function analysisSystem(tier = "deep") {
 - sections[] should also include loadBearing, evidence, and fold when the paper evidence supports them.
 - You must also produce deepDive and scorecard.
 - deepDive.reframe: what the paper REALLY is, not the paper's self-description.
-- deepDive.contributionLayers[] separates layer, claim (论文主张), and judgment (我的判断).
+- deepDive.contributionLayers[] is a four-column contribution table: layer, claim (论文主张), evidence (证据), judgment (我的判断), fdeMeaning (FDE 意义). Keep claim, evidence, judgment, and FDE meaning separate.
 - deepDive.mechanism gives the key insight in precise but plain language.
 - deepDive.evidenceChain[] uses only metrics/numbers found verbatim in the fetched paper text. If a number/result/experiment is not present in evidence.content, omit that metric; never infer or invent it.
 - Each evidenceChain item needs reviewerNote that distinguishes the headline number from what actually drove it, and marks strong/weak/confounded evidence.
@@ -14,8 +14,8 @@ export function analysisSystem(tier = "deep") {
 - deepDive.limitations[] must include reproducibility/artifact availability.
 - Optional deepDive.fdeTakeaways is ONLY for FDE-relevant papers: real customer/enterprise/production systems, API/tool/MCP/workflow/RAG/eval/observability/deployment/governance, or artifact-level diagnosis of code/site/data.
 - Omit deepDive.fdeTakeaways entirely for pure algorithm, model-scaling, training-recipe, or leaderboard-only papers. Do not convert an algorithm result into customer-readiness advice unless evidence.content explicitly supports that systems/application link.
-- When present, deepDive.fdeTakeaways must be grounded in evidence.content and use this shape: questions[] (~5 real-customer project questions), checklist[] (reusable readiness checks such as endpoint/input/response/security/workflow-readiness), artifactsToAudit[] (customer artifacts to inspect), roiRisk (ROI/risk-reduction language for a customer report).
-- scorecard[] must cover exactly these dimensions with score 0-10 and reason: 问题重要性, 系统设计, 算法新颖性, 实验强度, 泛化, 可复现性, 影响.`;
+- When present, deepDive.fdeTakeaways must be grounded in evidence.content, must not invent customer-specific facts, and must use this shape: customerProblem, customerQuestions[] (5-10 discovery questions), artifactsToAudit[] (API spec / db schema / logs / prompts / eval set / workflow docs / auth-RBAC / monitoring / SLAs / human-approval flow), implementationChecklist[], evalPlan[] (offline / online / golden tasks / human review / latency-cost-error budget), rolloutPlan[] (PoC -> pilot -> limited prod -> full, each with acceptance criteria), riskRegister[] (技术/数据/权限/安全/成本/采用 risks), roiHypothesis, interviewStory.
+- scorecard[] must cover exactly these 10 dimensions with score 0-10 and reason: FDE相关性, 工程现实感, 问题重要性, 方法新颖性, 证据强度, 可复现性, 可部署性, 安全治理意识, ROI可解释性, 职业训练价值.`;
   const deepShape = normalizedTier === "deep"
     ? `,
   "scorecard": [
@@ -23,7 +23,7 @@ export function analysisSystem(tier = "deep") {
   ],
   "deepDive": {
     "reframe": "what the paper really is",
-    "contributionLayers": [{ "layer": "layer name", "claim": "论文主张", "judgment": "我的判断" }],
+    "contributionLayers": [{ "layer": "layer name", "claim": "论文主张", "evidence": "证据", "judgment": "我的判断", "fdeMeaning": "FDE 意义" }],
     "mechanism": "precise + plain mechanism",
     "evidenceChain": [
       {
@@ -38,10 +38,15 @@ export function analysisSystem(tier = "deep") {
     "limitations": ["must include reproducibility/artifact availability"],
     "suggestedExperiments": ["reviewer experiment request"],
     "fdeTakeaways": {
-      "questions": ["real customer / AI-application project question grounded by this paper"],
-      "checklist": ["readiness check grounded by this paper"],
-      "artifactsToAudit": ["customer artifact to inspect"],
-      "roiRisk": "what this becomes as ROI or risk reduction in a customer report"
+      "customerProblem": "customer pain this paper maps to, without invented customer specifics",
+      "customerQuestions": ["5-10 discovery questions grounded by the paper's system/API/workflow/eval/governance content"],
+      "artifactsToAudit": ["API spec / db schema / logs / prompts / eval set / workflow docs / auth-RBAC / monitoring / SLAs / human-approval flow"],
+      "implementationChecklist": ["engineering readiness check grounded by this paper"],
+      "evalPlan": ["offline / online / golden tasks / human review / latency-cost-error budget item"],
+      "rolloutPlan": ["PoC -> pilot -> limited prod -> full step with acceptance criteria"],
+      "riskRegister": ["技术/数据/权限/安全/成本/采用 risk grounded by the paper"],
+      "roiHypothesis": "what it saves / which failure-rate it reduces / which business metric it affects / evidence needed",
+      "interviewStory": "FDE interview narrative blending technical depth and business impact"
     }
   }`
     : "";

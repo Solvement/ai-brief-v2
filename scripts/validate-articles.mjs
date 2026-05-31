@@ -3,6 +3,18 @@ import { readFile } from "node:fs/promises";
 const FILE = new URL("../public/data/articles.json", import.meta.url);
 const REPLACEMENT = /\uFFFD|\u00ef\u00bf\u00bd/; // mojibake guard (RULES §9)
 const PLACEHOLDER = /\[\u5360\u4f4d\]|\b(?:TODO|TBD)\b/i;
+const FDE_SCORECARD_DIMENSIONS = new Set([
+  "FDE相关性",
+  "工程现实感",
+  "问题重要性",
+  "方法新颖性",
+  "证据强度",
+  "可复现性",
+  "可部署性",
+  "安全治理意识",
+  "ROI可解释性",
+  "职业训练价值",
+]);
 
 function fail(msg) { console.error(`articles.json validation failed: ${msg}`); process.exit(1); }
 
@@ -35,11 +47,17 @@ console.log(`articles.json validation passed (${data.papers.length} papers)`);
 function validateOptionalScorecard(value, where) {
   if (value === undefined) return;
   if (!Array.isArray(value)) fail(`${where}: scorecard must be an array`);
+  const dimensions = new Set();
   for (const [i, item] of value.entries()) {
     const path = `${where}.scorecard[${i}]`;
     requireString(item?.dimension, `${path}.dimension`);
     if (typeof item?.score !== "number" || item.score < 0 || item.score > 10) fail(`${path}.score must be number 0-10`);
     requireString(item?.reason, `${path}.reason`);
+    dimensions.add(item.dimension);
+  }
+  const expandedCount = [...dimensions].filter((dimension) => FDE_SCORECARD_DIMENSIONS.has(dimension)).length;
+  if (expandedCount > 0 && expandedCount !== 10 && value.length >= 10) {
+    fail(`${where}: expanded scorecard must include all 10 FDE dimensions`);
   }
 }
 
@@ -63,6 +81,10 @@ function validateContributionLayers(value, path) {
   for (const [i, item] of value.entries()) {
     requireString(item?.layer, `${path}[${i}].layer`);
     requireString(item?.claim, `${path}[${i}].claim`);
+    if (item?.evidence !== undefined || item?.fdeMeaning !== undefined) {
+      requireString(item?.evidence, `${path}[${i}].evidence`);
+      requireString(item?.fdeMeaning, `${path}[${i}].fdeMeaning`);
+    }
     requireString(item?.judgment, `${path}[${i}].judgment`);
   }
 }
@@ -93,15 +115,22 @@ function validateAudit(value, path) {
 function validateOptionalFdeTakeaways(value, path) {
   if (value === undefined) return;
   if (!value || typeof value !== "object" || Array.isArray(value)) fail(`${path} must be an object`);
-  validateStringArray(value.questions, `${path}.questions`, { nonEmpty: true });
-  validateStringArray(value.checklist, `${path}.checklist`, { nonEmpty: true });
+  requireString(value.customerProblem, `${path}.customerProblem`);
+  validateStringArray(value.customerQuestions, `${path}.customerQuestions`, { nonEmpty: true, min: 5, max: 10 });
   validateStringArray(value.artifactsToAudit, `${path}.artifactsToAudit`, { nonEmpty: true });
-  requireString(value.roiRisk, `${path}.roiRisk`);
+  validateStringArray(value.implementationChecklist, `${path}.implementationChecklist`, { nonEmpty: true });
+  validateStringArray(value.evalPlan, `${path}.evalPlan`, { nonEmpty: true });
+  validateStringArray(value.rolloutPlan, `${path}.rolloutPlan`, { nonEmpty: true });
+  validateStringArray(value.riskRegister, `${path}.riskRegister`, { nonEmpty: true });
+  requireString(value.roiHypothesis, `${path}.roiHypothesis`);
+  requireString(value.interviewStory, `${path}.interviewStory`);
 }
 
-function validateStringArray(value, path, { nonEmpty = false } = {}) {
+function validateStringArray(value, path, { nonEmpty = false, min = 0, max = Infinity } = {}) {
   if (!Array.isArray(value)) fail(`${path} must be an array`);
   if (nonEmpty && value.length === 0) fail(`${path} must not be empty`);
+  if (value.length < min) fail(`${path} must contain at least ${min} item(s)`);
+  if (value.length > max) fail(`${path} must contain at most ${max} item(s)`);
   for (const [i, item] of value.entries()) requireString(item, `${path}[${i}]`);
 }
 
