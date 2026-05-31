@@ -1,6 +1,286 @@
 {
-  "generatedAt": "2026-05-31T13:35:19.305Z",
+  "generatedAt": "2026-05-31T15:23:49.147Z",
   "papers": [
+    {
+      "id": "paper:arxiv-2605-27922",
+      "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
+      "authors": "Yilun Yao, Xinyu Tan, Chao-Hsuan Liu, Yaoming Li, Zhengyang Wang, Wenhan Yu, Zhewen Tan, Yuxuan Tian, Guangxiang Zhao, Lin Sun, Xiangzheng Zhang, Tong Yang",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv terminal agents observability",
+      "sourceUrl": "https://arxiv.org/abs/2605.27922",
+      "verifiedAt": "2026-05-31T15:23:13.405Z",
+      "tier": "deep",
+      "leadJudgment": "该论文引入了Harness-Bench，一个诊断基准，用于量化不同模型-配置组合下的harness效应。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "LLM代理越来越多地被部署为可执行系统，使用工具、修改工作空间并产生具体工件。性能不仅取决于基础模型，还取决于harness（管理上下文、工具、状态、约束、权限、追踪和恢复的系统层）。现有基准通常抽象掉执行层、比较完整代理系统或固定harness，使得执行层变异难以研究。Harness-Bench是一个诊断基准，在共享任务环境、预算和评估协议下评估多个模型后端上的代表性harness配置，同时保留每个harness的原生执行行为。包含106个沙箱离线任务，来源于实际代理使用模式，经过人工审核确保真实性、可解性、可验证性和完整性。每次运行记录最终工件、执行轨迹、使用统计和验证器输出，支持超越最终完成的深度分析。在5,194条执行轨迹中，观察到模型-harness配对在完成率、过程质量、效率和失败行为上存在显著差异。结果表明代理能力应以模型-harness配置级别报告，而非仅归因于基础模型。分析还识别出重复的执行对齐失败，即合理的推理与工具反馈、工作空间状态、证据或可验证输出契约脱钩。Harness-Bench为诊断和改进可靠、高效、可审计的代理执行栈提供了可重复的基础。",
+          "loadBearing": "代理能力应以模型-harness配置级别报告，而非仅归因于基础模型。",
+          "evidence": "论文基于5,194条执行轨迹和106个沙箱任务，观察到不同模型-harness配对在完成率、过程质量、效率和失败行为上的显著差异。采样范围限于沙箱离线任务，评估的是配置级harness效应，未覆盖在线或动态环境。适用边界：该基准专注于诊断harness配置的影响，不评估完整代理系统的端到端表现。",
+          "fold": "论文还识别出执行对齐失败类型，即推理与工具反馈或工作空间状态脱钩，但未提供具体频率或分类的详细数据。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文在摘要中未明确列出局限性，但指出现有基准忽略执行层面，而本基准限于106个沙箱离线任务，且评估的是配置级harness效应。未来工作可扩展至在线环境、更多模型和harness变体。",
+        "evidenceNotes": "证据强度中等：基于5,194条轨迹，但任务数量有限（106个），且为沙箱环境；结果揭示了模型-harness配置的重要性，但适用性边界限于离线、规则明确的代理工作流。采样范围覆盖多个模型后端和代表性harness配置，但未穷举所有可能组合。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "Evaluation / Benchmarks"
+        ],
+        "ideaSignal": "deep_dive:100+ahe:observability"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.27922",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.27922v1",
+      "publishedAt": "2026-05-27T03:47:35Z"
+    },
+    {
+      "id": "paper:arxiv-2605-26112",
+      "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
+      "authors": "Shangding Gu",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv agent harness engineering",
+      "sourceUrl": "https://arxiv.org/abs/2605.26112",
+      "verifiedAt": "2026-05-31T15:23:02.697Z",
+      "tier": "deep",
+      "leadJudgment": "本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "本文指出智能体AI的下一个主要瓶颈是系统缩放，而不仅仅是模型缩放：需要围绕基础模型设计可审计、持久、模块化和可验证的架构。作者将这种转变称为“缩放 harness”，即将基础模型周围的结构化执行层作为设计、评估和优化的第一类对象。尽管大型语言模型使智能体能够使用工具、检索信息、维护记忆和执行长期工作流，但评估仍以模型为中心，通常仅关注最终任务成功，而将记忆、检索、工具使用、编排、验证和治理视为次要实现细节。这种框架越来越不充分，因为智能体性能源于基础模型、记忆基板、上下文构造器、技能路由层、编排循环以及验证和治理层之间的交互。这些组件共同构成了智能体 harness，将模型能力转化为长期智能体行为。论文通过三个核心瓶颈研究缩放harness：上下文治理、可信记忆和动态技能路由，以及协调和约束它们的编排和治理机制。还概述了 harness 级基准的研究议程，超越一次性任务成功，衡量轨迹质量、记忆卫生、上下文效率、通信保真度、验证成本和随时间的安全演变。为使讨论具体化，作者开发了 CheetahClaws（Python 原生参考 harness），并与 Claude Code 和 OpenClaw 进行了比较。主要主张：未来智能体AI的进展将同样依赖于系统设计，而非仅仅更强的基础模型。",
+          "loadBearing": "主要主张：未来智能体AI的进展将依赖于系统设计（即 harness 的缩放）与更强基础模型的同等程度。",
+          "evidence": "论文基于对现有评估偏模型中心的分析，并开发了参考实现 CheetahClaws 与现有工具对比，但未提供定量实验结果。证据范围限于概念论证和架构设计，尚未有大规模实证。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文指出当前评估主要关注最终任务成功，忽视了 harness 组件的细节，这限制了系统整体性能；未来需要新型 harness 级基准，评估轨迹质量、记忆卫生、上下文效率、通信保真度、验证成本和随时间的安全演变。论文未明确讨论自身局限性。",
+        "evidenceNotes": "证据主要来自对现状的分析和概念论证，缺乏大规模实验数据。论文提出的瓶颈（上下文治理、可信记忆、动态技能路由）和基准议程尚待实证验证。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability",
+          "Human-AI Interaction"
+        ],
+        "ideaSignal": "deep_dive:100+ahe:harness engineering"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.26112",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.26112v1",
+      "publishedAt": "2026-05-25T17:59:36Z"
+    },
+    {
+      "id": "paper:arxiv-2604-25850",
+      "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
+      "authors": "Jiahang Lin, Shichun Liu, Chengjun Pan, Lizhi Lin, Shihan Dou, Zhiheng Xi, Xuanjing Huang, Hang Yan, Zhenhua Han, Tao Gui, Yu-Gang Jiang",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv agent harness engineering",
+      "sourceUrl": "https://arxiv.org/abs/2604.25850",
+      "verifiedAt": "2026-05-31T15:22:50.802Z",
+      "tier": "deep",
+      "leadJudgment": "本文提出通过三个可观测性支柱实现编码智能体套件的自动演化，将每一次编辑转化为可验证的合约。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "套件在编码智能体性能中至关重要，但套件工程仍然是手工操作，因为自动化面临三个挑战：可编辑组件的异构动作空间、海量轨迹中淹没可行动信号、以及编辑效果难以归因。本文引入Agentic Harness Engineering (AHE)，一个闭环系统，通过三个可观测性支柱解决这些问题：(1) 组件可观测性：为每个可编辑套件组件提供文件级表示，使动作空间明确且可回滚；(2) 经验可观测性：将数百万原始轨迹token蒸馏为分层的、可下钻的证据语料库，供演化智能体实际使用；(3) 决策可观测性：每次编辑伴随自声明预测，随后根据下一轮任务级结果验证。这些支柱将每次编辑变为可证伪的合约，使套件演化自主进行而不陷入试错。实验表明，十次AHE迭代将Terminal-Bench 2上的pass@1从69.7%提升至77.0%，超越了人类设计的套件Codex-CLI (71.9%)以及自我演化基线ACE和TF-GRPO。冻结的套件无需重新演化即可迁移：在SWE-bench-verified上以比种子少12%的token取得最高聚合成功率，在Terminal-Bench 2上跨三个替代模型家族获得+5.1至+10.1个百分点的增益，表明演化组件编码了通用工程经验而非基准特调。消融实验将增益定位到工具、中间件和长期记忆而非系统提示，表明事实性套件结构可迁移而散文级策略则不能。",
+          "loadBearing": "三个可观测性支柱（组件、经验、决策）是AHE的核心主张，它们使套件演化成为可能。",
+          "evidence": "实证在Terminal-Bench 2和SWE-bench-verified上进行，包含多次迭代和跨模型家族迁移测试，但具体数据集统计量未详细给出。",
+          "fold": "消融实验表明增益主要来自工具、中间件和长期记忆，而非系统提示，揭示了可迁移的套件结构。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文证据未提供明确的局限性和未来工作陈述。",
+        "evidenceNotes": "证据基于两个基准（Terminal-Bench 2和SWE-bench-verified）和多个模型家族，但未讨论套件在其他类型任务或更大规模场景中的表现。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "AI Agents",
+          "Tool Use",
+          "AI Coding / SWE Agents",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks"
+        ],
+        "ideaSignal": "deep_dive:100+ahe:harness engineering"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2604.25850",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2604.25850v4",
+      "publishedAt": "2026-04-28T16:55:02Z"
+    },
+    {
+      "id": "paper:arxiv-2605-29861",
+      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+      "authors": "Chenghao Zhang, Guanting Dong, Yufan Liu, Tong Zhao, Zhicheng Dou",
+      "venue": "Venue not provided",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.29861",
+      "verifiedAt": "2026-05-31T15:23:37.372Z",
+      "tier": "deep",
+      "leadJudgment": "本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。",
+      "sections": [
+        {
+          "heading": "动机与挑战",
+          "summary": "大型语言模型使自主智能体从深度搜索（获取简短事实答案）发展到深度研究（将分散证据综合成长篇报告）。然而，可验证的多模态深度研究仍然具有挑战性：开放式的合成缺乏确定性基准，且需要将文本论证与视觉证据交错结合。",
+          "loadBearing": "论文的主要假设是：通过专门的多智能体编排和验证机制，可以生成更可靠、视觉信息更丰富的多模态报告。",
+          "evidence": "论文通过实验对比强基线来支持该假设，但摘要未提供具体效果大小或统计显著性。"
+        },
+        {
+          "heading": "方法：Ptah多智能体框架",
+          "summary": "Ptah编排了从用户查询到渲染网页报告的完整生命周期，包括规划、研究和写作三个阶段。专门智能体构建视觉感知计划、收集基于主张的证据、在视觉工作记忆中维护源对齐图像，并通过声明式多模态工具使用组成报告。验证智能体作为框架的接受函数，在整个工作流中强制执行事实基础、引用保真度和跨模态一致性。",
+          "loadBearing": "框架的核心主张是：通过专用智能体和验证器，系统能够确保报告的可验证性。",
+          "evidence": "论文描述了框架架构，但未提供消融实验或组件贡献的定量分析。"
+        },
+        {
+          "heading": "评估：PtahEval协议与实验结果",
+          "summary": "提出了PtahEval评估协议，用图像级别和呈现级别评估补充现有基准。在深度研究基准上的实验表明，Ptah生成的报告比强基线更可靠、视觉信息更丰富、对用户更友好。",
+          "loadBearing": "论文声称Ptah优于基线，但摘要未报告具体指标数值。",
+          "evidence": "实验证据仅限于定性陈述；论文证据未提供具体评估分数或统计检验。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文未在摘要中明确讨论局限性或未来工作。",
+        "evidenceNotes": "实验证据仅来自摘要中的定性描述；采样范围、基准选择和适用边界未说明。根据已有信息，无法评估证据强度。"
+      },
+      "selection": {
+        "convergence": [
+          "Hugging Face Daily Papers",
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks"
+        ],
+        "ideaSignal": "deep_dive:97+ahe:harness engineering"
+      },
+      "provenance": {
+        "sourceUrl": "https://huggingface.co/papers/2605.29861",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.29861",
+      "publishedAt": "2026-05-28T12:40:34Z"
+    },
+    {
+      "id": "paper:arxiv-2605-14271",
+      "title": "Auditing Agent Harness Safety",
+      "authors": "Chengzhi Liu, Yichen Guo, Yepeng Liu, Yuzhe Yang, Qianqi Yan, Xuandong Zhao, Wenyue Hua, Sheng Liu, Sharon Li, Yuheng Bu, Xin Eric Wang",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv agent harness engineering",
+      "sourceUrl": "https://arxiv.org/abs/2605.14271",
+      "verifiedAt": "2026-05-31T15:23:20.670Z",
+      "tier": "deep",
+      "leadJudgment": "提出 HarnessAudit 框架，通过审计完整执行轨迹来评估 LLM agent 安全，而非仅检查最终输出。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "LLM 智能体在执行框架（harness）中运行，框架负责调度工具、分配资源、路由消息。但框架可能返回正确、无害的结果，而轨迹却访问了未授权资源或向错误智能体泄露上下文。仅基于输出的评估无法捕获此类失败，现有安全基准大多只评分最终输出或终止状态，但许多违规发生在轨迹中间而非终点。核心问题是：框架在整个执行过程中是否尊重用户意图、权限边界和信息流约束。为此，提出 HarnessAudit，一个审计完整执行轨迹的框架，涵盖边界合规、执行保真度和系统稳定性，重点关注多智能体框架。同时引入 HarnessAudit-Bench，一个包含 210 个任务、覆盖八个真实世界领域、同时配置单智能体和多智能体并嵌入安全约束的基准。评估了跨前沿模型的十个框架配置和三个多智能体框架，发现：(i) 任务完成与安全执行不一致，违规随轨迹长度累积；(ii) 安全风险因领域、任务类型和智能体角色而异；(iii) 大多数违规集中在资源访问和智能体间信息传输；(iv) 多智能体协作扩大了安全风险面，而框架设计设定了安全部署的上限。",
+          "loadBearing": "核心主张是：仅基于输出的安全评估不足以检测执行轨迹中的违规行为，必须审计完整轨迹。",
+          "evidence": "基准包含 210 个任务、8 个领域、10 个框架配置、3 个多智能体框架，结果展示了任务完成与安全执行的脱节、风险分布及框架设计的约束作用。",
+          "fold": "论文未提供详细实验结果，仅列出了四点主要发现。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文未明确列出局限性，但从上下文可推断：基准任务数和框架配置有限（210 任务、10 配置），且仅聚焦于资源访问和信息传输等特定违规类型。",
+        "evidenceNotes": "证据来自提出的基准和实验，覆盖多个前沿模型和框架，但样本规模中等（210 任务），且未提供统计显著性度量。适用边界：主要针对多智能体框架，单智能体也包含，但结论可能不适用于所有 agent 架构。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability",
+          "Human-AI Interaction"
+        ],
+        "ideaSignal": "deep_dive:97+ahe:harness engineering"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.14271",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.14271v2",
+      "publishedAt": "2026-05-14T02:14:28Z"
+    },
+    {
+      "id": "paper:arxiv-2605-15040",
+      "title": "Orchard: An Open-Source Agentic Modeling Framework",
+      "authors": "Baolin Peng, Wenlin Yao, Qianhui Wu, Hao Cheng, Xiao Yu, Rui Yang, Tao Ge, Alessandro Sordoni, Xingdi Yuan, Yelong Shen, Pengcheng He, Tong Zhang, Zhou Yu, Jianfeng Gao",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv agent harness engineering",
+      "sourceUrl": "https://arxiv.org/abs/2605.15040",
+      "verifiedAt": "2026-05-31T15:23:49.112Z",
+      "tier": "deep",
+      "leadJudgment": "Orchard 是一个开源 agent 建模框架，其核心是轻量的环境服务层，支持跨领域、跨管道的智能体数据、训练配方与评估复用。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "论文提出 Orchard 开源框架，用于可扩展的 agent 建模。核心是 Orchard Env 环境服务，提供沙箱生命周期管理的可复用原语。基于此构建三个训练配方：Orchard-SWE（代码智能体，基于 Qwen3-30B-A3B-Thinking 在 SWE-bench Verified 达 64.3% SFT、67.5% SFT+RL，为同尺寸开源最佳）、Orchard-GUI（4B 视觉语言计算机使用智能体，WebVoyager 74.1%、Online-Mind2Web 67.0%、DeepShop 64.0%）、Orchard-Claw（个人助手，Claw-Eval 59.6% pass@3，配合更强 harness 达 73.9%）。结果表明轻量、开放、与 harness 无关的环境层可实现跨领域可复用的 agent 数据、训练配方与评估。",
+          "loadBearing": "核心主张是 Orchard Env 作为轻量、开放、与 harness 无关的环境服务层，能够支持可扩展的 agent 建模，并实现跨领域的可复用性。",
+          "evidence": "论文给出了三个配方的基准性能数字：Orchard-SWE 在 SWE-bench Verified 上 64.3% 和 67.5%；Orchard-GUI 在三个评估上 74.1%、67.0%、64.0%；Orchard-Claw 在 Claw-Eval 上 59.6% 和 73.9%。这些结果验证了环境层的有效性，但证据仅限于特定蒸馏数据（107K、0.4K、0.2K 轨迹）和特定基准，未提供在不同数据规模或不同环境下的泛化性测试。",
+          "fold": "训练方法包括：信用分配 SFT（从未解决轨迹的学习生产性片段）和平衡自适应展开 RL（Orchard-SWE）；使用极少蒸馏轨迹和开放任务（Orchard-GUI 和 Orchard-Claw）。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文未在摘要中明确讨论局限性，但指出许多高性能系统依赖专有代码库/模型/服务，而 Orchard 旨在填补开源训练基础设施的空白。未来工作可能包括扩展到更多领域、更大模型、更复杂的任务。证据未提供更详细的限制说明。",
+        "evidenceNotes": "证据强度中等：三个配方的性能数字来自蒸馏轨迹和特定基准，采样范围有限（每个配方仅一个或几个基准），适用边界主要集中在编码、GUI 和个人助手三个具体领域，未在更广泛的 agent 任务上验证。Orchard Env 的通用性需更多跨领域实验支持。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "AI Coding / SWE Agents",
+          "Agent Harness / Observability",
+          "Multimodal UI",
+          "Evaluation / Benchmarks",
+          "Human-AI Interaction"
+        ],
+        "ideaSignal": "deep_dive:94+ahe:harness engineering"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.15040",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.15040v2",
+      "publishedAt": "2026-05-14T16:35:12Z"
+    },
     {
       "id": "paper:arxiv-2605-29341",
       "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
@@ -66,78 +346,10 @@
       },
       "arxivId": "2605.29341",
       "publishedAt": "2026-05-28T04:27:20Z"
-    },
-    {
-      "id": "paper:arxiv-2605-29861",
-      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
-      "authors": "Chenghao Zhang, Guanting Dong, Yufan Liu, Tong Zhao, Zhicheng Dou",
-      "venue": "Venue not provided",
-      "sourceName": "Hugging Face Daily Papers",
-      "sourceUrl": "https://huggingface.co/papers/2605.29861",
-      "verifiedAt": "2026-05-31T13:35:19.292Z",
-      "tier": "deep",
-      "leadJudgment": "提出一个多智能体系统Ptah，用于生成可验证、图文交织的多模态深度研究报告，并配以专门的评估协议PtahEval。",
-      "sections": [
-        {
-          "heading": "背景与挑战",
-          "summary": "大型语言模型将自主智能体从深度搜索（检索简洁事实答案）推进到深度研究（综合分散证据成报告）。但可验证的多模态深度研究仍面临挑战：开放端合成无确定真值，且需要将文本论证与视觉证据交织。",
-          "loadBearing": "核心假设：通过多智能体编排和验证机制可以实现可靠、视觉信息丰富的多模态报告生成。",
-          "evidence": "论文未提供具体实验数据支撑该假设的边界条件。"
-        },
-        {
-          "heading": "Ptah多智能体系统",
-          "summary": "Ptah编排从用户查询到渲染网页报告的完整生命周期，包括规划、研究和写作三个阶段。专门智能体构建视觉感知计划、收集声明相关的证据、在视觉工作记忆中维护源对齐的图像，并通过声明式多模态工具使用撰写报告。",
-          "loadBearing": "关键设计：视觉工作记忆用于保持图像与源的关联，声明式工具使用实现文本与图像的灵活交织。",
-          "evidence": "论文未提供消融实验证明各组件贡献。"
-        },
-        {
-          "heading": "验证机制",
-          "summary": "验证智能体作为系统接受函数，强制在整个工作流程中实现事实基础、引用保真度和跨模态一致性。",
-          "loadBearing": "验证智能体是保证报告可信度的核心组件。",
-          "evidence": "论文未提供验证智能体误报/漏报率等量化评估。"
-        },
-        {
-          "heading": "PtahEval评估协议",
-          "summary": "提出PtahEval评估协议，在现有基准基础上增加图像级和呈现级评估，涵盖事实基础、引用保真度、视觉相关性、跨模态一致性和呈现质量。",
-          "loadBearing": "评估协议本身是多维度、层次化的，但论文未给出其与人类判断的一致性验证。",
-          "evidence": "论文未提供PtahEval的可靠性和有效性度量。"
-        },
-        {
-          "heading": "实验结果",
-          "summary": "在深度研究基准上，Ptah生成比强基线更可靠、视觉信息更丰富、更实用的人类可读多模态报告。",
-          "loadBearing": "结论基于与强基线的比较，但论文未披露基线选择标准和实验设置细节。",
-          "evidence": "论文未提供实验数据集规模、统计显著性检验或误差条等细节。采样范围未知。适用边界：可能仅适用于文本与图像交织的报告生成任务。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文未明确说明局限性，但隐含挑战包括开放端合成无确定真值和跨模态一致性保持。",
-        "evidenceNotes": "论文未提供实验细节，包括数据集、基线、评估量表和重复性信息。证据强度无法客观评估。"
-      },
-      "selection": {
-        "convergence": [
-          "Hugging Face Daily Papers",
-          "arXiv"
-        ],
-        "track": [
-          "AI Agents",
-          "Tool Use",
-          "Agent Harness / Observability",
-          "RAG / Knowledge Systems",
-          "Multimodal UI",
-          "Evaluation / Benchmarks"
-        ],
-        "ideaSignal": "deep_dive:89+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://huggingface.co/papers/2605.29861",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.29861",
-      "publishedAt": "2026-05-28T12:40:34Z"
     }
   ],
   "pipelineRun": {
-    "id": "papers-2026-05-31-1780234519310",
+    "id": "papers-2026-05-31-1780241029158",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -152,19 +364,19 @@
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "2 analyzed candidate(s) with paper-text evidence"
+      "signal": "7 analyzed candidate(s) with paper-text evidence"
     },
     {
       "stage": "rank",
       "role": "Ranker",
       "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-      "signal": "2 current analysis item(s) available after QA filtering"
+      "signal": "7 current analysis item(s) available after QA filtering"
     },
     {
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "2 section-mirroring academic analysis item(s)"
+      "signal": "7 section-mirroring academic analysis item(s)"
     },
     {
       "stage": "verify",
@@ -189,19 +401,19 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-05-31T13:35:19.308Z",
+    "checkedAt": "2026-05-31T15:23:49.155Z",
     "checks": [
       {
         "id": "papers-present",
         "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "2 paper(s)"
+        "details": "7 paper(s)"
       },
       {
         "id": "section-shape",
         "label": "every paper has section summaries",
         "status": "pass",
-        "details": "2 paper(s) checked"
+        "details": "7 paper(s) checked"
       },
       {
         "id": "qa-fail-excluded",

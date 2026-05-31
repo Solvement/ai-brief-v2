@@ -272,45 +272,27 @@ function PaperRadarPanel({ radar, error }: { radar: PaperRadarPublicData | null;
         </div>
       </div>
 
-      <div className="paper-radar-flow">
-        {radar.agentFlow.map((step) => (
-          <article key={step.role}>
-            <b>{step.role}</b>
-            <p>{step.responsibility}</p>
-            <small>{step.signal}</small>
-          </article>
-        ))}
-      </div>
-
-      {(radar.runTrace || radar.reflection) && (
-        <div className="paper-radar-observability">
+      {(radar.agentFlow?.length || radar.runTrace || radar.reflection) && (
+        <details className="radar-more">
+          <summary>展开今日流水线</summary>
+          <div className="paper-radar-flow">
+            {radar.agentFlow.map((step) => (
+              <article key={step.role}>
+                <b>{step.role}</b>
+                <p>{step.responsibility}</p>
+                <small>{step.signal}</small>
+              </article>
+            ))}
+          </div>
           {radar.runTrace && (
-            <article className="radar-trace-card">
-              <div className="section-kicker">Trace</div>
-              <div className="radar-trace-metrics">
-                <InfoMini label="Reviewed" value={String(radar.runTrace.summary.reviewedCount || 0)} />
-                <InfoMini label="Source Fail" value={String(radar.runTrace.summary.sourceFailureCount || 0)} />
-                <InfoMini label="Model Calls" value={String(radar.runTrace.summary.modelCalls || 0)} />
-                <InfoMini label="Tokens" value={String(radar.runTrace.summary.totalTokens || 0)} />
-              </div>
-              <div className="radar-stage-list">
-                {radar.runTrace.stages.map((stage) => (
-                  <span key={`${stage.stage}-${stage.startedAt || stage.durationMs}`}>
-                    <b>{stage.stage}</b>
-                    <small>{formatMs(stage.durationMs)}</small>
-                  </span>
-                ))}
-              </div>
-            </article>
+            <div className="radar-trace-metrics">
+              <InfoMini label="Reviewed" value={String(radar.runTrace.summary.reviewedCount || 0)} />
+              <InfoMini label="Source Fail" value={String(radar.runTrace.summary.sourceFailureCount || 0)} />
+              <InfoMini label="Model Calls" value={String(radar.runTrace.summary.modelCalls || 0)} />
+              <InfoMini label="Tokens" value={String(radar.runTrace.summary.totalTokens || 0)} />
+            </div>
           )}
-          {radar.reflection && (
-            <article className="radar-reflection-card">
-              <div className="section-kicker">Reflection</div>
-              <h3>{radar.reflection.summary}</h3>
-              <p>Review depth: {radar.reflection.averageReviewDepth}</p>
-            </article>
-          )}
-        </div>
+        </details>
       )}
     </section>
   );

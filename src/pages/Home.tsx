@@ -5,11 +5,11 @@ import type { PipelineStatusData } from "../types";
 
 const HOME_SECTIONS = [
   {
-    title: "News",
-    href: "#/news",
-    label: "AI 新闻与动态",
-    body: "跟踪发布、融资、产品变化和重要行业事件。",
-    state: "规划中",
+    title: "Articles",
+    href: "#/articles",
+    label: "学术文章深读",
+    body: "顺着论文自己的思路，用大白话讲清是什么、为什么是进展；想深了一键看对照原文的精读。",
+    state: "已接入",
   },
   {
     title: "Models",
@@ -22,22 +22,15 @@ const HOME_SECTIONS = [
     title: "Projects",
     href: "#/projects",
     label: "GitHub 项目",
-    body: "项目榜单、AI 评分、深度解读和可执行上手路径。",
+    body: "高收藏 + 快速攀升 + AI 相关的项目，一句话讲清做什么、为什么值得看。",
     state: "已接入",
   },
   {
-    title: "Skills",
-    href: "#/skills",
-    label: "能力专题",
-    body: "把 prompt、workflow、MCP、RAG、AI Coding 等能力整理成学习路径。",
-    state: "规划中",
-  },
-  {
-    title: "Articles",
-    href: "#/articles",
-    label: "学术文章深读",
-    body: "用小白能懂的语言拆论文问题、思路、架构、方法流程、实验证据、局限和教授视角；版本线作为补充线索。",
-    state: "已接入",
+    title: "Podcast",
+    href: "#/podcast",
+    label: "播客蒸馏",
+    body: "把一两小时的 AI 播客蒸馏成能刷的洞见，转录稿只作内部证据。",
+    state: "待建",
   },
 ];
 
@@ -60,7 +53,7 @@ export function Home() {
               <span>Judgment -&gt; Action</span>
             </h1>
             <p>
-              中文优先的 AI 情报工作台。Home 只保留栏目入口，具体内容分别进入 News、Models、Projects、Skills、Articles。
+              中文优先的 AI 情报工作台。先给你新鲜的，再让你一键往深里看。Home 只保留栏目入口：Articles、Models、Projects、Podcast。
             </p>
           </div>
           <div className="home-principle-grid">

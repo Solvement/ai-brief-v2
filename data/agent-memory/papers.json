@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "surface": "papers",
+  "updatedAt": "2026-05-31T15:23:49.156Z",
+  "runs": [
+    {
+      "id": "papers-2026-05-31-1780241029158",
+      "surface": "papers",
+      "date": "2026-05-31",
+      "generatedAt": "2026-05-31T15:23:49.156Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "15 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "7 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "7 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "7 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-05-31T15:23:49.155Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "7 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has section summaries",
+            "status": "pass",
+            "details": "7 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-27922",
+          "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
+          "score": 100,
+          "reason": "该论文引入了Harness-Bench，一个诊断基准，用于量化不同模型-配置组合下的harness效应。"
+        },
+        {
+          "id": "paper:arxiv-2605-26112",
+          "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
+          "score": 100,
+          "reason": "本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。"
+        },
+        {
+          "id": "paper:arxiv-2604-25850",
+          "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
+          "score": 100,
+          "reason": "本文提出通过三个可观测性支柱实现编码智能体套件的自动演化，将每一次编辑转化为可验证的合约。"
+        },
+        {
+          "id": "paper:arxiv-2605-29861",
+          "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+          "score": 97,
+          "reason": "本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。"
+        },
+        {
+          "id": "paper:arxiv-2605-14271",
+          "title": "Auditing Agent Harness Safety",
+          "score": 97,
+          "reason": "提出 HarnessAudit 框架，通过审计完整执行轨迹来评估 LLM agent 安全，而非仅检查最终输出。"
+        },
+        {
+          "id": "paper:arxiv-2605-15040",
+          "title": "Orchard: An Open-Source Agentic Modeling Framework",
+          "score": 94,
+          "reason": "Orchard 是一个开源 agent 建模框架，其核心是轻量的环境服务层，支持跨领域、跨管道的智能体数据、训练配方与评估复用。"
+        },
+        {
+          "id": "paper:arxiv-2605-29341",
+          "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
+          "score": 89,
+          "reason": "WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 7 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
+    {
+      "id": "papers-2026-05-31-1780234519310",
+      "surface": "papers",
+      "date": "2026-05-31",
+      "generatedAt": "2026-05-31T13:35:19.310Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "15 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "2 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "2 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "2 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-05-31T13:35:19.308Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "2 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has section summaries",
+            "status": "pass",
+            "details": "2 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-29341",
+          "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
+          "score": 97,
+          "reason": "WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。"
+        },
+        {
+          "id": "paper:arxiv-2605-29861",
+          "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+          "score": 89,
+          "reason": "提出一个多智能体系统Ptah，用于生成可验证、图文交织的多模态深度研究报告，并配以专门的评估协议PtahEval。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 2 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    }
+  ],
+  "reusablePatterns": [
+    {
+      "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 该论文引入了Harness-Bench，一个诊断基准，用于量化不同模型-配置组合下的harness效应。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T15:23:49.156Z",
+      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+    },
+    {
+      "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T15:23:49.156Z",
+      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+    },
+    {
+      "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 本文提出通过三个可观测性支柱实现编码智能体套件的自动演化，将每一次编辑转化为可验证的合约。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T15:23:49.156Z",
+      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+    },
+    {
+      "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T15:23:49.156Z",
+      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+    },
+    {
+      "text": "Auditing Agent Harness Safety: 提出 HarnessAudit 框架，通过审计完整执行轨迹来评估 LLM agent 安全，而非仅检查最终输出。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T15:23:49.156Z",
+      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+    },
+    {
+      "text": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction: WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T13:35:19.310Z",
+      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+    },
+    {
+      "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 提出一个多智能体系统Ptah，用于生成可验证、图文交织的多模态深度研究报告，并配以专门的评估协议PtahEval。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T13:35:19.310Z",
+      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+    }
+  ]
+}
