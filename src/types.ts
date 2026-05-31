@@ -329,9 +329,11 @@ export interface AcademicPaperSelection {
 // ---- Reviewer-style deep dive (2026-05-31): the "审稿式" deep tier ----
 /** One contribution layer: what the paper claims vs the analyst's judgment (kept separate). */
 export interface ContributionLayer {
-  layer: string;       // e.g. 基础设施层 / 训练方法层 / 通用性层
-  claim: string;       // 论文主张
-  judgment: string;    // 我的判断 (assessment, not a bare verdict)
+  layer: string;        // e.g. 基础设施层 / 训练方法层 / 通用性层
+  claim: string;        // 论文主张
+  evidence?: string;    // 证据 (what actually supports it)
+  judgment: string;     // 我的判断 (assessment, not a bare verdict)
+  fdeMeaning?: string;  // FDE 意义 (what this means for AI-application delivery)
 }
 /** A real metric pulled from the full text (with provenance note). */
 export interface EvidenceMetric {
@@ -357,12 +359,17 @@ export interface ScoreCardItem {
   score: number;       // 0-10
   reason: string;
 }
-/** FDE / AI-application-delivery takeaways (the stable career lens). Populated only for FDE-relevant papers. */
+/** FDE / AI-application-delivery memo (the stable career lens). Populated only for FDE-relevant papers. All optional. */
 export interface FdeTakeaways {
-  questions: string[];        // the 5 questions this paper teaches you to ask on a customer project
-  checklist: string[];        // reusable readiness checklist items
-  artifactsToAudit: string[]; // which customer artifacts to audit
-  roiRisk: string;            // what this becomes as ROI / risk-reduction in a customer report
+  customerProblem?: string;          // the customer pain this paper maps to
+  customerQuestions?: string[];      // 5-10 discovery questions to ask the customer
+  artifactsToAudit?: string[];       // API spec / db schema / logs / prompts / eval set / workflow / auth-RBAC / monitoring / SLAs / human-approval
+  implementationChecklist?: string[];
+  evalPlan?: string[];               // offline / online / golden tasks / human review / latency-cost-error budget
+  rolloutPlan?: string[];            // PoC -> pilot -> limited prod -> full, each with acceptance criteria
+  riskRegister?: string[];           // 技术 / 数据 / 权限 / 安全 / 成本 / 采用
+  roiHypothesis?: string;            // what it saves / failure-rate reduced / business metric / evidence needed
+  interviewStory?: string;           // FDE interview narrative: technical depth + business impact
 }
 export interface PaperDeepDive {
   /** 重判定位 — what the paper REALLY is, not its self-description. */

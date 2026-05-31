@@ -386,7 +386,9 @@ function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: Sc
                 <b>{l.layer}</b>
                 <div className="dd-layer-cols">
                   <div><span>论文主张</span><p>{l.claim}</p></div>
+                  {l.evidence ? <div><span>证据</span><p>{l.evidence}</p></div> : null}
                   <div><span>我的判断</span><p>{l.judgment}</p></div>
+                  {l.fdeMeaning ? <div className="dd-fde-cell"><span>FDE 意义</span><p>{l.fdeMeaning}</p></div> : null}
                 </div>
               </div>
             ))}
@@ -442,19 +444,16 @@ function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: Sc
 
       {dive.fdeTakeaways ? (
         <section className="dd-block dd-fde">
-          <div className="section-kicker">FDE 方法论 · 用在客户现场</div>
-          {dive.fdeTakeaways.questions?.length ? (
-            <div className="dd-fde-row"><span>该问客户的问题</span><ul>{dive.fdeTakeaways.questions.map((q, i) => <li key={i}>{q}</li>)}</ul></div>
-          ) : null}
-          {dive.fdeTakeaways.checklist?.length ? (
-            <div className="dd-fde-row"><span>可复用 checklist</span><ul>{dive.fdeTakeaways.checklist.map((q, i) => <li key={i}>{q}</li>)}</ul></div>
-          ) : null}
-          {dive.fdeTakeaways.artifactsToAudit?.length ? (
-            <div className="dd-fde-row"><span>要审计的 artifact</span><ul>{dive.fdeTakeaways.artifactsToAudit.map((q, i) => <li key={i}>{q}</li>)}</ul></div>
-          ) : null}
-          {dive.fdeTakeaways.roiRisk ? (
-            <div className="dd-fde-row"><span>ROI / 风险消减</span><p>{dive.fdeTakeaways.roiRisk}</p></div>
-          ) : null}
+          <div className="section-kicker">FDE 项目化 memo · 用在客户现场</div>
+          {dive.fdeTakeaways.customerProblem ? <FdeRow label="客户痛点" text={dive.fdeTakeaways.customerProblem} /> : null}
+          <FdeRow label="该问客户的问题" items={dive.fdeTakeaways.customerQuestions} />
+          <FdeRow label="要审计的 artifact" items={dive.fdeTakeaways.artifactsToAudit} />
+          <FdeRow label="实施 checklist" items={dive.fdeTakeaways.implementationChecklist} />
+          <FdeRow label="评估方案" items={dive.fdeTakeaways.evalPlan} />
+          <FdeRow label="上线路线" items={dive.fdeTakeaways.rolloutPlan} />
+          <FdeRow label="风险登记" items={dive.fdeTakeaways.riskRegister} />
+          {dive.fdeTakeaways.roiHypothesis ? <FdeRow label="ROI 假设" text={dive.fdeTakeaways.roiHypothesis} /> : null}
+          {dive.fdeTakeaways.interviewStory ? <FdeRow label="面试故事" text={dive.fdeTakeaways.interviewStory} /> : null}
         </section>
       ) : null}
 
@@ -499,6 +498,16 @@ function PaperSection({ section }: { section: PaperAnalysisSection }) {
         </details>
       ) : null}
     </article>
+  );
+}
+
+function FdeRow({ label, items, text }: { label: string; items?: string[]; text?: string }) {
+  if (!text && !(items && items.length)) return null;
+  return (
+    <div className="dd-fde-row">
+      <span>{label}</span>
+      {text ? <p>{text}</p> : <ul>{(items || []).map((s, i) => <li key={i}>{s}</li>)}</ul>}
+    </div>
   );
 }
 
