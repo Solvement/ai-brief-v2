@@ -440,6 +440,24 @@ function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: Sc
         {dive.suggestedExperiments?.length ? <div className="dd-card"><span>该补的实验</span><ul>{dive.suggestedExperiments.map((s, i) => <li key={i}>{s}</li>)}</ul></div> : null}
       </section>
 
+      {dive.fdeTakeaways ? (
+        <section className="dd-block dd-fde">
+          <div className="section-kicker">FDE 方法论 · 用在客户现场</div>
+          {dive.fdeTakeaways.questions?.length ? (
+            <div className="dd-fde-row"><span>该问客户的问题</span><ul>{dive.fdeTakeaways.questions.map((q, i) => <li key={i}>{q}</li>)}</ul></div>
+          ) : null}
+          {dive.fdeTakeaways.checklist?.length ? (
+            <div className="dd-fde-row"><span>可复用 checklist</span><ul>{dive.fdeTakeaways.checklist.map((q, i) => <li key={i}>{q}</li>)}</ul></div>
+          ) : null}
+          {dive.fdeTakeaways.artifactsToAudit?.length ? (
+            <div className="dd-fde-row"><span>要审计的 artifact</span><ul>{dive.fdeTakeaways.artifactsToAudit.map((q, i) => <li key={i}>{q}</li>)}</ul></div>
+          ) : null}
+          {dive.fdeTakeaways.roiRisk ? (
+            <div className="dd-fde-row"><span>ROI / 风险消减</span><p>{dive.fdeTakeaways.roiRisk}</p></div>
+          ) : null}
+        </section>
+      ) : null}
+
       {scorecard?.length ? (
         <section className="dd-block">
           <div className="section-kicker">审稿式评分</div>

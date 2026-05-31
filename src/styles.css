@@ -3724,3 +3724,11 @@ button { font-family: inherit; cursor: pointer; }
 .dd-score-head span { font-family: var(--font-mono); font-weight: 700; color: var(--accent); }
 .dd-score p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: var(--ink-3); }
 @media (max-width: 720px) { .dd-layer-cols, .dd-cards, .dd-scorecard { grid-template-columns: 1fr; } }
+
+.dd-fde { background: var(--accent-soft); border: 1px solid var(--accent-soft-2); border-radius: var(--radius); padding: 20px 22px; }
+.dd-fde .section-kicker { color: var(--gold-deep); }
+.dd-fde-row { margin-top: 14px; }
+.dd-fde-row > span { font-size: 12px; font-weight: 700; color: var(--gold-deep); }
+.dd-fde-row ul { margin: 8px 0 0; padding-left: 18px; }
+.dd-fde-row li { font-size: 14px; line-height: 1.7; color: var(--ink); margin: 5px 0; }
+.dd-fde-row p { margin: 8px 0 0; font-size: 14px; line-height: 1.7; color: var(--ink); }

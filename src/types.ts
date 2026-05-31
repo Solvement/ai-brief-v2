@@ -357,6 +357,13 @@ export interface ScoreCardItem {
   score: number;       // 0-10
   reason: string;
 }
+/** FDE / AI-application-delivery takeaways (the stable career lens). Populated only for FDE-relevant papers. */
+export interface FdeTakeaways {
+  questions: string[];        // the 5 questions this paper teaches you to ask on a customer project
+  checklist: string[];        // reusable readiness checklist items
+  artifactsToAudit: string[]; // which customer artifacts to audit
+  roiRisk: string;            // what this becomes as ROI / risk-reduction in a customer report
+}
 export interface PaperDeepDive {
   /** 重判定位 — what the paper REALLY is, not its self-description. */
   reframe: string;
@@ -370,6 +377,8 @@ export interface PaperDeepDive {
   strongestEvidence: string[];
   limitations: string[];
   suggestedExperiments: string[];
+  /** FDE methodology extraction (the career lens) — present only for FDE-relevant papers. */
+  fdeTakeaways?: FdeTakeaways;
 }
 
 export interface AcademicPaperAnalysis {
