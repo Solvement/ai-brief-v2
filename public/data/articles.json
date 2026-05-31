@@ -1,6 +1,918 @@
 {
-  "generatedAt": "2026-05-31T16:53:47.059Z",
+  "generatedAt": "2026-05-31T19:21:56.506Z",
   "papers": [
+    {
+      "id": "paper:arxiv-2605-26302",
+      "title": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems",
+      "authors": "Jianing Zhu, Yeonju Ro, John Robertson, Kevin Wang, Junbo Li, Haris Vikalo, Aditya Akella, Zhangyang Wang",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv agent harness engineering",
+      "sourceUrl": "https://arxiv.org/abs/2605.26302",
+      "verifiedAt": "2026-05-31T19:17:47.674Z",
+      "tier": "deep",
+      "leadJudgment": "该论文提出Agent Lifespan Engineering (ALE)框架和AgingBench基准，将长生命周期AI代理的可靠性问题从单点快照评估转向纵向退化测量与诊断。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "长期运行的AI代理即使模型权重冻结，其状态也会随交互历史压缩、记忆增长、事实更新和维护操作不断变化。可靠性成为整个代理系统的生命周期属性。论文引入AgingBench，一种纵向可靠性基准，通过四种老化机制（压缩、干扰、修订、维护）和反事实诊断探针来测量退化形式并定位修复目标。实验显示老化是多维的：行为测试可能正常但事实精度下降，派生状态跟踪可能急剧崩溃，相同错误答案可能需不同修复。",
+          "loadBearing": "核心主张：部署后的AI代理存在时间依赖的可靠性退化，且退化是多机制、多维度的，无法通过单点评估捕捉。",
+          "evidence": "论文通过7个场景、14个模型、多种记忆策略、约400次运行（8-200会话）的实验结果支撑该主张。具体数据见表3。",
+          "fold": "实验覆盖开放/闭源模型、runner-controlled和autonomous agents。"
+        },
+        {
+          "heading": "1 引言",
+          "summary": "AI代理从一次性对话转向长期运行系统，可靠性不再是部署当日分数。代理状态持续变化，即使模型固定。论文定义'代理老化'为时间依赖的可靠性退化，类比人老化：表面表现可能正常但记忆不精确。提出了Agent Lifespan Engineering (ALE)三个问题：代理可保持可靠多长时间？如何衰减（压缩/干扰/修订/维护）？修复应针对哪个环节（写入/检索/利用/生命周期）？介绍AgingBench作为ALE的基准。",
+          "loadBearing": "主张：部署后的代理可靠性是系统生命周期属性，需要纵向评估和诊断框架，而非仅强模型。",
+          "evidence": "论文以图1展示四个老化机制的具体用户层面失败示例（药物剂量丢失、名字混淆、过期计划仍有效、周二日程因维护消失），但这些是示意图，非实验数据。",
+          "fold": "论文强调'相同的表面症状可能需不同修复'，并指出需要诊断框架而非通用'给更多记忆'方案。"
+        },
+        {
+          "heading": "2 相关工作",
+          "summary": "现有工作越来越多研究多会话记忆和长程能力，但缺少老化评估的基础设施。AgingBench通过老化曲线、时间依赖DAG、生命周期事件注入和组件诊断来差异化。缺少对操作事件和生活事件的控制，失败归因也几乎未涉及。",
+          "loadBearing": "主张：现有基准（如MemoryArena, LoCoMo, LongMemEval）不支持纵向老化评估、跨会话依赖、生命周期事件和组件诊断。",
+          "evidence": "论文引用相关基准并指出其局限性，附录A中有详细比较表(表4)，但表4未在提供的文本中完整展示。",
+          "fold": "附录A还讨论了基于轨迹的归因方法与反事实干预的互补性。"
+        },
+        {
+          "heading": "3 代理老化分类学",
+          "summary": "将代理老化分为四种机制：压缩老化（写入时丢失未来相关细节）、干扰老化（积累的相似记忆掩盖目标事实）、修订老化（事实变化后更新未传播）、维护老化（生命周期事件如重压实导致回归）。分为积累驱动和事件驱动两类。不同部署场景自然激活不同机制。表1列出了7个场景对应的机制覆盖。",
+          "loadBearing": "核心分类学：四种机制（压缩、干扰、修订、维护）构成老化诊断的基础。",
+          "evidence": "表1总结场景与机制对应关系，但基于设计而非实验数据。论文后续实验结果验证了机制的可区分性。",
+          "fold": "场景S1-S4和S6使用运行器管理记忆，S5和S7使用代理自管理工作空间。"
+        },
+        {
+          "heading": "4 AgingBench：代理寿命工程基准",
+          "summary": "4.1节：通过时间依赖DAG（版本链、依赖边、干扰对）和可编程生成器产生跨会话任务结构。版本链跟踪事实更新，依赖边定义探针依赖，干扰对注入易混淆实体。可编程生成器支持按会话数、随机种子生成完整任务流。4.2节：定义会话循环评估过程，使用记忆策略U压缩历史，在维护会话注入生命周期事件。输出老化曲线及统计量（半衰期、衰减斜率、风险代理）。图4展示整体老化趋势。",
+          "loadBearing": "主张：时间依赖DAG和可编程生成是测量机制级老化的核心设计，使老化曲线可分解。",
+          "evidence": "4.1节描述DAG结构和生成器配置（图3），但未提供验证数据。4.2节给出老化曲线预览（图4），显示全局下降趋势。",
+          "fold": "附录B.1提供曲线统计量的正式定义；附录F.2给出生成器和压力配置细节。"
+        },
+        {
+          "heading": "5 组件级归因",
+          "summary": "5.1节：将记忆流水线分解为写入/压缩策略(W)、检索算法(R)、利用逻辑(U)和记忆存储(S)。每种机制主要映射到特定阶段：压缩→W，干扰→R，修订→U，维护→S。5.2节：引入三个反事实探针（P1基线、P2 oracle检索、P3 oracle上下文），形成诊断轮廓：写入误差（P3-P2）、读取误差（P2-P1）、利用误差（1-P3）。维护老化通过时间上比较事件前后写入误差变化来分离。图6显示不同模型和场景下错误组成差异显著。",
+          "loadBearing": "主张：反事实探针可以定位老化失败环节（W/R/U/S），而非仅给出端到端分数。",
+          "evidence": "图6展示三个模型在S1、S2、S5场景下总错误率相似但W/R/U组成各异，直接支撑主张。数据来自论文实验。",
+          "fold": "维护老化与写入错误的时间分离方法（Δ𝒮 = WriteError_t+ - WriteError_t-）是创新点。"
+        },
+        {
+          "heading": "6 结果",
+          "summary": "6.1实验设置：14个模型（开放/闭源），3个代理框架（ReAct, OpenHands, Claude Code），8-12会话，多个记忆策略。6.2主要结果：发现I：老化是多维的，没有单一模型在所有机制上领先；发现II：行为合规性和事实准确性可以独立退化（S2场景中约束违反率保持为零但精度下降）；发现III：修订老化似乎是表征问题而非容量问题（大模型并未一致降低累加器误差）；发现IV：当代理管理自己记忆时，写入-读取差距持续存在（工作空间保真度高于下游召回）；发现V：多机制评估解释家族内老化不对称（Opus-4.7写入时产出较低质量工件）。",
+          "loadBearing": "核心实验结论：老化非一维，不同机制需要不同修复策略。",
+          "evidence": "表3提供详细的多维老化诊断矩阵（包含半衰期、精度、保真度等指标）。图7提供机制级别细节。数据来自约400次运行。",
+          "fold": "6.2节还指出维护事件产生突发、模型特定的后事件回归（Δshock列）。"
+        },
+        {
+          "heading": "7 结论",
+          "summary": "总结长期代理会在权重冻结后悄悄退化，可靠性成为全代理生命周期的属性。AgingBench通过四种机制、时间依赖DAG、反事实诊断，实现ALE实践。主要发现：老化可对行为测试不可见，结构上尖锐，且随能力提升迁移。论文呼吁社区构建优雅老化的代理。",
+          "loadBearing": "结论：工程优雅老化需要寿命评估、机制诊断和阶段针对性修复。",
+          "evidence": "基于前面各节实验结果。",
+          "fold": "附录I讨论广泛影响和局限性，但具体内容未在获取文本中提供。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文在附录I中讨论广泛影响和局限性，但具体内容未在提供的文本中详述。作者指出AgingBench的生成器不旨在建模真实用户行为的完整分布，而是提供可控的压力表面来隔离纵向失败。",
+        "evidenceNotes": "证据主要来自人工设计的程序化场景（7个），样本量为~400次运行。模型覆盖14个，但许多实验仅使用8-12会话，可能不足以模拟极长期部署（如数百会话）。反事实归因假设流水线组件可分离，但实际中可能相互影响。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks",
+          "Human-AI Interaction"
+        ],
+        "ideaSignal": "deep_dive:100+ahe:harness engineering+fde:customer/production system"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.26302",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.26302v1",
+      "publishedAt": "2026-05-25T19:55:12Z",
+      "paperType": "benchmark",
+      "venueStatus": "unverified",
+      "deepDive": {
+        "reframe": "该论文本质上是将AI代理视为长期运行的系统，借用软件老化概念，提出一套用于测量、诊断和修复部署后性能退化的方法论和基准测试套件。它不是关于更强模型，而是关于如何理解和维护部署中的代理状态完整性。",
+        "contributionLayers": [
+          {
+            "layer": "问题框架",
+            "claim": "长期代理可靠性是生命周期属性，非单点能力。",
+            "evidence": "引言和分类学论证，引用图1示例，但缺乏大规模验证。",
+            "judgment": "有说服力的重构，但需要更多生产案例。",
+            "fdeMeaning": "为企业部署提供新的监控维度——代理老化，而非仅模型版本。"
+          },
+          {
+            "layer": "老化分类学",
+            "claim": "四种机制（压缩/干扰/修订/维护）覆盖主要退化路径。",
+            "evidence": "表1映射场景到机制，实验（发现I-V）显示不同机制表现差异。",
+            "judgment": "分类学实用且可操作，但可能遗漏其他机制（如数据漂移、用户行为变化）。",
+            "fdeMeaning": "工程师可根据场景激活的机制选择相应缓解措施。"
+          },
+          {
+            "layer": "基准（AgingBench）",
+            "claim": "通过时间依赖DAG和可编程生成器实现机制级别老化测量。",
+            "evidence": "4.1节描述设计；4.2节图4显示老化曲线；表3提供详细结果。",
+            "judgment": "设计系统，但场景有限（7个），且生成器不能代表真实用户行为分布。",
+            "fdeMeaning": "可用于压力测试代理记忆系统的老化特性，但直接迁移需谨慎。"
+          },
+          {
+            "layer": "诊断方法",
+            "claim": "反事实探针可定位失败环节（写/读/利用/生命周期）。",
+            "evidence": "5.2节描述；图6展示不同模型和场景的W/R/U组成差异。",
+            "judgment": "归因分析明确，但P2 oracle假设可行但可能不现实（完美检索）。",
+            "fdeMeaning": "生产中可通过类似A/B测试或日志分析近似诊断，但成本高。"
+          },
+          {
+            "layer": "实证发现",
+            "claim": "老化是多维且可隐藏；不同机制需不同修复。",
+            "evidence": "发现I-V基于表3和图7数据。",
+            "judgment": "发现可靠，但部分发现（如行为合规性掩盖事实退化）依赖特定场景（S2）。",
+            "fdeMeaning": "强调监控多个维度而非单一指标。"
+          }
+        ],
+        "mechanism": "代理老化源于记忆流水线中信息随时间丢失、混淆、过时或突发中断。论文通过设计时间依赖图来模拟事实更新和依赖关系，并通过反事实替换来隔离哪个组件（写、检索、利用、生命周期）贡献了错误。",
+        "evidenceChain": [
+          {
+            "component": "S2场景（约束+预算跟踪）",
+            "metrics": [
+              {
+                "label": "约束违反率 (CVR)",
+                "value": "0",
+                "note": "图7b显示始终保持0，来自图像估计"
+              },
+              {
+                "label": "约束精度",
+                "value": "0.40",
+                "note": "表3 S2 precision m_F for Llama-3.1-8B, exact"
+              },
+              {
+                "label": "延迟召回",
+                "value": "collapsing",
+                "note": "图7b显示急速下降，来自图像估计"
+              }
+            ],
+            "reviewerNote": "CVR保持0而精度下降是关键发现，表明行为合规性掩盖了事实退化。但CVR精确值0来自图估计，需确认。精度0.40来自表格，可靠。"
+          },
+          {
+            "component": "图6 (诊断轮廓)",
+            "metrics": [
+              {
+                "label": "S1总错误率",
+                "value": "0.82",
+                "note": "图6估计，无精确值"
+              },
+              {
+                "label": "S2总错误率",
+                "value": "0.60",
+                "note": "图6估计"
+              },
+              {
+                "label": "S5总错误率",
+                "value": "0.75",
+                "note": "图6估计"
+              }
+            ],
+            "reviewerNote": "总错误率来自图，但W/R/U组成来自表3数据和公式，强度中等。主要结论（相同错误率不同组成）有图6支持。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "官方项目页面存在",
+            "finding": "验证：https://AgingBench.github.io/ 可访问",
+            "source": "外部审计"
+          },
+          {
+            "claim": "Robertson Kevin Wang Junbo Li Haris Vikalo Aditya Akella Zhangyang \"Atlas\" Wang † The University of Texas at Austin \\faPersonCane Your One-Stop Aging Care : https://AgingBench.github.io/ Abstract Long-lived AI agents are increasingly deployed as persistent operational systems, yet they are still evaluated like freshly initialized models.",
+            "finding": "agingbench.github.io project page is reachable.",
+            "source": "https://AgingBench.github.io/"
+          },
+          {
+            "claim": "https://claude.ai , 2026.",
+            "finding": "claude.ai returned HTTP 403 Forbidden.",
+            "source": "https://claude.ai"
+          }
+        ],
+        "loadBearingClaim": "长期代理的可靠性是状态依赖的，会随时间退化，且退化模式可通过老化工具体系系统地测量和诊断。",
+        "strongestEvidence": [
+          "发现I (多维性) 来自表3，显示无模型在所有机制上领先",
+          "发现II (行为合规性掩盖) 来自图7b，S2中CVR保持0而精度下降",
+          "图6显示相同错误率下W/R/U组成不同，支持诊断价值"
+        ],
+        "limitations": [
+          "可重复性有限：依赖商业API，且官方代码库未明确提供完整复现脚本",
+          "场景合成：7个场景覆盖有限，不能代表真实生产环境",
+          "会话长度：8-12会话为主，少数运行200会话，但长期退化模式可能不同",
+          "归因假设：自动识别或可逆归因可能不准确，尤其当组件耦合强时",
+          "记忆策略局限性：主要测试简单压缩策略，未覆盖向量数据库、分层记忆等"
+        ],
+        "suggestedExperiments": [
+          "在更长会话（如1000+）上测试老化曲线是否存在平台期",
+          "使用真实用户日志验证四种机制分布",
+          "在多种记忆架构（如Mem0, TierMem）上重复实验",
+          "评估反事实诊断在生产环境中的可行性（如用影子模式代替oracle）"
+        ],
+        "artifactAudit": {
+          "officialCode": "not_found",
+          "data": "not_found",
+          "reproducibility": "paper_only",
+          "notes": [
+            "官方网站存在但未提供明确代码仓库链接",
+            "依赖商业API（GPT-4o, Claude）不可复现",
+            "第三方框架（ReAct, OpenHands, Claude Code）需要各自配置",
+            "Reachable referenced, dependency, or third-party repositories are not treated as the authors' official code release for this paper.",
+            "No fetched text clearly identifies an authors' official code release for this specific paper."
+          ],
+          "repoStatus": "https://AgingBench.github.io/ 可访问，但未确认是否包含完整代码和数据。"
+        },
+        "claimLedger": [
+          {
+            "claim": "长期代理存在时间依赖的可靠性退化（代理老化）。",
+            "claimType": "empirical",
+            "evidencePointer": "Section 6.2 / Table 3 / Figure 4",
+            "evidenceStrength": "medium",
+            "threat": "场景为合成，可能高估或低估真实退化模式。",
+            "fdeTransfer": "bounded:生产代理面临更复杂干扰，但该退化模式普遍存在。"
+          },
+          {
+            "claim": "老化可通过四种机制（压缩、干扰、修订、维护）分类。",
+            "claimType": "theoretical",
+            "evidencePointer": "Section 3 / Table 1",
+            "evidenceStrength": "low",
+            "threat": "分类学基于设计理念，缺乏完整实证验证。",
+            "fdeTransfer": "bounded:提供诊断初始框架，但实际中可能混淆。"
+          },
+          {
+            "claim": "反事实探针可组件级归因（写/读/利用/生命周期）。",
+            "claimType": "empirical",
+            "evidencePointer": "Section 5.2 / Figure 6",
+            "evidenceStrength": "medium",
+            "threat": "P2 oracle检索在实践中不可行，可能低估利用错误。",
+            "fdeTransfer": "bounded:生产环境需日志分析或影子模式近似。"
+          },
+          {
+            "claim": "行为合规性可掩盖事实精度下降（发现II）。",
+            "claimType": "empirical",
+            "evidencePointer": "Figure 7b / S2 results in Table 3",
+            "evidenceStrength": "medium",
+            "threat": "仅在一个场景（S2）中观察到，可能不普遍。",
+            "fdeTransfer": "limited:需针对具体场景验证。"
+          },
+          {
+            "claim": "修订老化是表征问题而非容量问题（发现III）。",
+            "claimType": "empirical",
+            "evidencePointer": "Table 3 S2 accumulator_error column / Figure 7c",
+            "evidenceStrength": "medium",
+            "threat": "累积误差可能受记忆策略影响，模型大小差异在小样本中不显著。",
+            "fdeTransfer": "bounded:提示对派生状态需显式维护。"
+          },
+          {
+            "claim": "当代理自管理记忆时，写入-读取差距持续存在（发现IV）。",
+            "claimType": "empirical",
+            "evidencePointer": "Table 3 Tier 2 rows",
+            "evidenceStrength": "medium",
+            "threat": "仅针对S7任务，其他场景可能不同。",
+            "fdeTransfer": "bounded:强调检索预算控制的重要性。"
+          }
+        ],
+        "evidenceMatrix": [
+          {
+            "experiment": "S1 (Research Lit.) half-life",
+            "metric": "keyword_m(t) half-life (sessions)",
+            "result": "5.8",
+            "exactness": "exact",
+            "limitation": "半衰期定义见附录B.1，但未提供完整分布。",
+            "sampleSize": "多个种子聚合",
+            "modelBackend": "Llama-3.1-8B ReAct"
+          },
+          {
+            "experiment": "S2 precision m_F",
+            "metric": "precision_m_F (↑)",
+            "result": "0.40",
+            "exactness": "exact",
+            "limitation": "精度在8-12会话上度量，不同会话数可能不同。",
+            "sampleSize": "多个种子聚合",
+            "modelBackend": "Llama-3.1-8B ReAct"
+          },
+          {
+            "experiment": "S2 accumulator error (↓)",
+            "metric": "accumulator error (↓)",
+            "result": "157",
+            "exactness": "exact",
+            "limitation": "误差绝对值依赖具体场景设定。",
+            "sampleSize": "多个种子聚合",
+            "modelBackend": "Llama-3.1-8B ReAct"
+          },
+          {
+            "experiment": "S6 Δshock (flush)",
+            "metric": "Δshock (post-flush change)",
+            "result": "-0.17",
+            "exactness": "exact",
+            "limitation": "仅针对flush事件，其他维护事件（recompact, budget reduction）有不同效果。",
+            "sampleSize": "多个种子聚合",
+            "modelBackend": "Llama-3.1-8B ReAct"
+          },
+          {
+            "experiment": "S7 pytest m_F (Claude Code Opus-4.7)",
+            "metric": "pytest_m_F (↑)",
+            "result": "0.67",
+            "exactness": "exact",
+            "limitation": "Tier 2指标重新定标到S7，与Tier 1不直接可比。",
+            "sampleSize": "多个种子聚合",
+            "modelBackend": "Opus-4.7 Claude Code"
+          }
+        ],
+        "whatWouldInvalidate": [
+          "若发现代理在极长会话（>>200）中表现稳定，则核心老化主张减弱",
+          "若反事实诊断在真实生产环境中无法分离写/读/利用错误（例如因为组件耦合紧密），则归因方法失效",
+          "若社区发现四种机制不能覆盖大部分现场失败案例，分类学需扩展"
+        ],
+        "verdict": {
+          "readDecision": "must_read",
+          "fdeFit": "high",
+          "evidenceStrength": "medium",
+          "artifactStatus": "partial",
+          "oneLineJudgment": "重要的系统级思维转变，将代理可靠性从模型快照转向生命周期管理，但基准和诊断离生产部署还有差距。",
+          "whyNow": [
+            "生产AI代理快速部署，但长期稳定性评估方法缺失",
+            "论文提出的诊断框架可直接应用于工程实践",
+            "提供了共享词汇（老化机制、组件归因）促进团队沟通"
+          ],
+          "whyNotOverclaim": [
+            "场景有限，不覆盖所有部署压力（如数据分布漂移、恶意输入）",
+            "反事实诊断要求干预执行，生产环境中不可行",
+            "主要评估单一压缩记忆策略，未涵盖混合或分层记忆架构"
+          ]
+        },
+        "fdeTakeaways": {
+          "customerProblem": "[论文支持] 部署后的AI助手随着时间的记忆退化：丢失准确事实、混淆类似条目、过时信息未被更新、维护操作后行为异常。该问题影响需要长期运行的客户应用（个人助理、企业知识库、代码代理）。",
+          "customerQuestions": [
+            "[论文支持] 您的代理在部署后几周/几个月内是否保持同等可靠性？",
+            "[论文支持] 您是否观察到代理给出自信但事实错误的回答？（行为合规但事实退化）",
+            "[论文支持] 当代理积累了大量相似记录时，是否发生混淆（如不同项目预算交叉污染）？",
+            "[推论] 您的记忆系统是否记录了显式版本链或时间戳以跟踪事实更新？",
+            "[待验证假设] 您的代理重启或记忆刷新后是否出现性能突然下降？",
+            "[论文支持] 您的运维团队是否知道代理维护操作（如压缩、迁移）的潜在副作用？",
+            "[推论] 您的监控系统是否同时跟踪行为指标（如合规率）和事实精度（如数值正确率）？",
+            "[待验证假设] 您的代理是否需要对累积状态（如剩余预算）进行显式重新计算而非依赖记忆？",
+            "[论文支持] 您的代理在检索信息时是否有时未读取足够上下文导致错误响应？",
+            "[推论] 您的团队是否有系统性方法来诊断“代理错了”的根本原因（写/检索/利用）？"
+          ],
+          "artifactsToAudit": [
+            "[论文支持] 记忆写入策略（压缩提示、预算、格式）",
+            "[论文支持] 检索算法（最后k个、cosine top-k）",
+            "[论文支持] 利用逻辑（何时检索、查询生成、上下文预算）",
+            "[论文支持] 生命周期事件（刷新、重压实、迁移、预算更改）",
+            "[推论] 日志记录（每个会话的写入/检索/响应轨迹）",
+            "[推论] 监控仪表板（行为指标 vs 事实精度）",
+            "[推论] 回滚机制（如保留上次已知良好的记忆快照）",
+            "[待验证假设] API spec or tool schema",
+            "[待验证假设] db schema or data dictionary",
+            "[待验证假设] logs and traces",
+            "[待验证假设] prompts and tool-call transcripts",
+            "[待验证假设] eval set and golden tasks",
+            "[待验证假设] workflow docs",
+            "[待验证假设] auth/RBAC matrix"
+          ],
+          "implementationChecklist": [
+            "[论文支持] 是否实现版本链跟踪以检测事实过时？",
+            "[论文支持] 是否为易混淆实体设计去重或冲突解决机制？",
+            "[论文支持] 是否安排定期重新计算派生状态（如累加器）？",
+            "[待验证假设] 是否在维护操作后运行回归测试以检查记忆是否完整？",
+            "[推论] 是否设置老化曲线监控（如半衰期、衰减斜率）？",
+            "[推论] 是否集成反事实诊断（例如影子模式用oracle检索）？",
+            "[推论] Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
+            "[推论] Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
+            "[推论] Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
+            "[推论] Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
+            "[推论] Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready.",
+            "[推论] Code/site/data artifacts are sampled, mapped to user-facing failures, and tied to measurable remediation work."
+          ],
+          "evalPlan": [
+            "[论文支持] 离线评估：使用AgingBench生成的压力场景评估代理在大量会话后的性能。",
+            "[推论] 在线评估：在生产中随机抽样跟踪事实精度、行为合规性、召回率等随时间变化。",
+            "[推论] 黄金任务：定义一组跨会话的事实查询（如用户偏好、项目状态）作为探针。",
+            "[推论] 人工审核：定期抽样对话，标注事实正确性。",
+            "[推论] 延迟-成本-错误预算：设置可接受的退化率（如半衰期>500会话）和修复触发条件。",
+            "[待验证假设] Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
+            "[待验证假设] Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
+            "[待验证假设] Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
+            "[待验证假设] Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
+            "[待验证假设] Offline and online evals must include the real production constraint the paper treats as load-bearing."
+          ],
+          "rolloutPlan": [
+            "[推论] PoC：选择一个长期运行的内部代理（如客户支持机器人，运行>100会话），部署老化监控仪表板。",
+            "[推论] 验收标准：PoC期间识别出至少两种老化模式（如压缩和干扰），并验证反事实诊断可行。",
+            "[推论] 试点：对2-3个客户生产代理部署诊断框架，每周生成老化报告。",
+            "[推论] 验收标准：团队能准确归因至少80%的退化事件到具体组件（写/检索/利用/生命周期）。",
+            "[推论] 有限生产：将老化监控集成到CI/CD管线，在部署新模型或修改记忆策略时强制运行老化测试。",
+            "[推论] 验收标准：在6个月内将代理退化的平均严重程度降低50%（通过累积误差或召回率衡量）。",
+            "[待验证假设] PoC: reproduce the paper-relevant customer-facing production AI workflow, RAG or enterprise knowledge retrieval, evaluation and reliability gating path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
+            "[待验证假设] Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process."
+          ],
+          "riskRegister": [
+            "[待验证假设] [技术风险] 反事实诊断的生产实现需要修改代理调用链，可能引入额外延迟或错误。",
+            "[待验证假设] [数据风险] 老化数据收集可能涉及用户隐私，需加密和合规处理。",
+            "[待验证假设] [权限风险] 诊断工具可能需要访问代理内部状态，暴露敏感信息。",
+            "[待验证假设] [安全风险] 引入监控可能被攻击者利用（如发现老化是弱点）。",
+            "[待验证假设] [成本风险] 持续老化监控增加计算成本，尤其oracle检索需更多资源。",
+            "[待验证假设] [采用风险] 团队可能认为老化是理论问题，拒绝在短期优先。",
+            "[待验证假设] 技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
+            "[待验证假设] 数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
+            "[待验证假设] 权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
+            "[待验证假设] 安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations."
+          ],
+          "roiHypothesis": "[待验证假设] 实施代理老化监控和诊断可以减少因代理给出错误事实导致的业务损失（如错误推荐导致放弃购物车）和提高客户满意度（通过更准确的响应）。验证方法：在生产中进行A/B测试，控制组使用默认记忆系统，实验组使用基于老化监控的主动刷新机制（如超过半衰期后强制重写入）。核心指标：事实精度随时间的变化曲线（AUC）、用户反馈中的事实错误相关投诉率。次要指标：每次响应的内存使用量和延迟（副作用）。",
+          "interviewStory": "[面试故事] 在一次客户会议中，我们发现部署6个月的个人理财代理开始给出错误的预算建议：它有时引用过时的预算金额，有时混淆旅行和餐饮预算。客户认为模型退化了，要求升级模型。我们利用论文中的框架进行了诊断：我们检查了记忆写入日志，发现压缩过程丢弃了精确金额；我们测试了检索，发现在积累众多预算项后，相似项相互干扰；我们还发现当用户更新了预算后，代理仍从旧版本读取。最终，我们针对性地修改了写入提示以保留金额，添加了版本时间戳，实施了定期预算重新计算。修复后，代理的可靠性恢复到部署初期水平。这个案例体现了从“换模型”到“系统诊断”的转变。"
+        }
+      },
+      "scorecard": [
+        {
+          "dimension": "FDE相关性",
+          "score": 8,
+          "reason": "论文直接针对部署后代理可靠性问题，涉及记忆流水线、维护事件等工程核心；但基准场景偏学术化（文献管理、预算跟踪），未涉及企业级权限、多租户等FDE常见领域，扣2分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "工程现实感",
+          "score": 7,
+          "reason": "承认维护事件（重压实、刷新等）并纳入基准，提出组件级诊断；但记忆策略限于简单压缩，未覆盖高级RAG、向量数据库、缓存失效等工程常用方法，扣3分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "问题重要性",
+          "score": 9,
+          "reason": "解决长期代理可靠性这一新兴关键问题，文献中缺少纵向评估框架。扣1分因问题定义偏向学术，未明确量化生产环境损失。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "方法新颖性",
+          "score": 8,
+          "reason": "提出老化分类学、时间依赖DAG和反事实诊断，整体框架新颖；但每个组件（如程序化生成、反事实分析）单独看有前人工作。扣2分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "证据强度",
+          "score": 7,
+          "reason": "实验设计系统（14模型、7场景、多种策略），但许多数字来自图形估计（图6、7）而非精确表格，且样本量（约400次运行）对于统计显著性声明可能不足。扣3分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "可复现性",
+          "score": 6,
+          "reason": "论文公开代码（AgingBench.github.io），但要求使用多个商业API（GPT-4o, Claude），运行时成本高，且未提供详细超参数和种子集合。扣4分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "可部署性",
+          "score": 5,
+          "reason": "AgingBench主要用于评估而非直接部署；组件诊断框架需集成到现有监控系统，但论文未给出部署指南或轻量版本。扣5分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "安全治理意识",
+          "score": 3,
+          "reason": "论文未讨论安全（如提示注入、数据泄露）或治理（如合规、审计），仅聚焦可靠性和诊断。扣7分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "ROI可解释性",
+          "score": 6,
+          "reason": "提出性能退化可视化（老化曲线）和组件归因，有助于理解修复投资回报；但未量化不同修复带来的成本节省。扣4分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "职业训练价值",
+          "score": 8,
+          "reason": "对AI应用工程师理解代理系统老化、学习系统化诊断方法有价值；但场景偏研究导向，需转换到实际业务。扣2分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        }
+      ]
+    },
+    {
+      "id": "paper:arxiv-2605-26112",
+      "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
+      "authors": "Shangding Gu",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv agent harness engineering",
+      "sourceUrl": "https://arxiv.org/abs/2605.26112",
+      "verifiedAt": "2026-05-31T19:16:40.998Z",
+      "tier": "deep",
+      "leadJudgment": "本文重新定义了智能体AI的瓶颈，从模型扩展转向系统扩展，强调围绕基础模型的执行架构（harness）是下一个关键挑战。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "论文提出智能体AI的下一个瓶颈是系统扩展而非仅模型扩展，即设计可审计、持久、模块化、可验证的执行层（harness）。将harness视为一等设计对象，研究三个核心瓶颈：上下文治理、可信记忆和动态技能路由。提出harness级基准研究议程，并开发了参考实现CheetahClaws与Claude Code和OpenClaw对比。核心主张：未来进展同样依赖于系统设计。",
+          "loadBearing": "论文的核心假设：一旦模型达到足够能力水平，长期智能体性能的提升主要取决于harness系统的设计。",
+          "evidence": "引用了Kapoor等（2024）和Yang等（2024）的实证结果，表明在固定模型下，改善接口或控制成本能带来显著收益。但论文本身未提供新实验数据，证据强度中等。"
+        },
+        {
+          "heading": "1. 引言",
+          "summary": "论述模型扩展的故事在智能体AI中已不完整。行为由系统决定：上下文构建、记忆检索、工具调用、子智能体路由、动作验证和失败审计。定义模型扩展（提升基础模型）与系统扩展（提升周围架构）。核心主张：系统扩展是下一瓶颈。列举生产系统（Claude Code、OpenClaw）和研究（SWE-agent）说明harness工程的实际价值。引用τ-bench等基准说明模型在单跳中强但在多步交互中弱。提出论文三贡献：系统扩展框架、harness级框架、评估议程和参考harness。",
+          "loadBearing": "主张：智能体性能来自模型与harness的交互，而非模型单独。",
+          "evidence": "引用实证显示，模型固定时改进工具模式即可大幅提升SWE-bench准确率（Yang等，2024）。"
+        },
+        {
+          "heading": "2. 相关工作",
+          "summary": "回顾智能体编码系统（ReAct、Toolformer、Claude Code）、上下文与记忆（RAG、MemGPT）、技能与多智能体协调（AutoGen、MetaGPT）、基准与治理（SWE-bench、OWASP威胁目录）。指出已有工作以模型为中心，较少将harness本身作为可控研究对象。",
+          "evidence": "引用具体论文支持各领域进展，但无新数据。"
+        },
+        {
+          "heading": "3. 系统扩展：智能体AI框架",
+          "summary": "定义harness为围绕基础模型的系统层，包含六个组件：推理基座(ℛ)、记忆存储(ℳ)、上下文构造器(𝒞)、技能路由层(𝒮)、编排循环(𝒪)、验证与治理层(𝒢)。给出性能方程P_H=Φ(ℛ,ℳ,𝒞,𝒮,𝒪,𝒢)，并分解ℳ和𝒞的子轴。强调该分解是概念性的，但每个因子是独立干预点。比较三个harness（Claude Code、OpenClaw、CheetahClaws）展示设计差异。提出提示、技能、记忆作为三种时间尺度层次。",
+          "loadBearing": "方程(1)的分解是论文框架的基石，主张每个组件可独立改进并影响整体性能。",
+          "evidence": "通过表1对比三个harness的设计选择，展示共享的分解原则和不同的实现优先级。但未提供定量比较。"
+        },
+        {
+          "heading": "4. 系统扩展的三个瓶颈",
+          "summary": "详细阐述三个系统因素：上下文治理（4.1）、可信记忆（4.2）、动态技能路由与验证（4.3）。每个给出子轴、失败模式、系统应对。上下文治理：容量不等于治理，应对是选择策略而非固定缓冲区。可信记忆：威胁是过时但自信，应对是运行时信任决策（含陈旧性惩罚和置信度）。技能路由：威胁是自信但未验证，应对是学习路由策略加每步验证。",
+          "loadBearing": "三个瓶颈的识别：上下文治理、可信记忆、动态技能路由是系统扩展的关键限制。",
+          "evidence": "引用Gu（2026）关于信号稀释、Liu等（2024a）关于中间丢失、以及Anthropic的混合上下文设计等作为证据。"
+        },
+        {
+          "heading": "5. 面向系统级评估与智能体演化",
+          "summary": "5.1：倡导从结果指标转向过程指标（成本、轨迹质量等）。5.2：从单幕评估转向纵向评估，多智能体例子说明系统因素主导性能方差（Anthropic报告令牌使用解释80%方差）。5.3：提出智能体演化标准四问：什么持久化、什么更新、什么被测量、什么可审计。",
+          "loadBearing": "评估必须测量过程指标和重复使用属性，单幕成功率不足以反映系统级性能。",
+          "evidence": "引用Anthropic多智能体实验（令牌使用解释80%方差）支持系统因素的重要性。"
+        },
+        {
+          "heading": "6. 讨论：替代观点与局限",
+          "summary": "讨论三个反对观点：更强的模型最终会解决系统问题（回应：系统故障不是预测失败）；端到端训练会取代模块化系统（回应：模块化对于审计和权限控制是必需的）；系统级评估太昂贵或特定环境（回应：这正是所需，暴露成本和风险）。",
+          "evidence": "论文承认这些反对观点，但未提供实证反驳；逻辑论证为主。"
+        },
+        {
+          "heading": "7. 结论",
+          "summary": "重申核心主张：智能体AI的未来需要系统扩展，harness而非模型单独是实用能力的首要来源。建议未来基准将记忆、上下文、技能路由、编排、验证治理作为一等设计对象。",
+          "loadBearing": "harness扩展与模型扩展共同定义智能体AI的下一瓶颈。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文在§6讨论了三个限制：模型改进可能缓解系统问题但无法消除；端到端训练可能整合组件但模块化仍然必要；系统级评估成本高但必要。未来工作包括完善评估议程、基准实现、以及使动态技能路由自适应。",
+        "evidenceNotes": "论文本身为概念性框架，未提供新实验数据。证据主要来自引用文献和三个harness的定性比较。采样范围限于编程辅助和个人助理场景，适用边界未量化。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability",
+          "Human-AI Interaction"
+        ],
+        "ideaSignal": "deep_dive:100+ahe:harness engineering+fde:API/tool/MCP integration"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.26112",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.26112v1",
+      "publishedAt": "2026-05-25T17:59:36Z",
+      "paperType": "system",
+      "venueStatus": "unverified",
+      "deepDive": {
+        "reframe": "这不是一篇实验论文，而是一个系统设计框架和工程宣言，主张智能体AI研究应从模型为中心转向系统为中心。",
+        "contributionLayers": [
+          {
+            "layer": "系统扩展框架",
+            "claim": "智能体性能由六个组件（ℛ,ℳ,𝒞,𝒮,𝒪,𝒢）共同决定，系统扩展是下一瓶颈。",
+            "evidence": "引用Kapoor等、Yang等的结果，以及τ-bench等基准的可靠性缺口。",
+            "judgment": "框架概念合理，但未提供分量权重或交互建模。",
+            "fdeMeaning": "企业部署中应系统评估每个组件而非只关注模型。"
+          },
+          {
+            "layer": "三个瓶颈详解",
+            "claim": "上下文治理、可信记忆、动态技能路由是当前主要瓶颈。",
+            "evidence": "引用信号稀释、中间丢失、以及Anthropic混合上下文设计等实例。",
+            "judgment": "瓶颈识别切中要害，但未给出优先排序。",
+            "fdeMeaning": "工程中应优先审计这些点。"
+          },
+          {
+            "layer": "评估议程",
+            "claim": "未来基准需测量过程指标和纵向属性。",
+            "evidence": "引用多智能体实验中令牌使用解释80%方差。",
+            "judgment": "评估方向正确，但未提供具体度量方法。",
+            "fdeMeaning": "企业评估不应仅看任务完成，还需监控成本、延迟、记忆漂移等。"
+          },
+          {
+            "layer": "参考实现CheetahClaws",
+            "claim": "作为框架的具体实例，对比Claude Code和OpenClaw展示设计差异。",
+            "evidence": "表1对比三个系统的实现选择和设计模式。",
+            "judgment": "对比有用但定性，缺乏性能数据。",
+            "fdeMeaning": "可作为快速原型基础，但生产需更多加固。"
+          }
+        ],
+        "mechanism": "论文将智能体系统分解为六个独立干预点，通过定性和实证引用论证每个点的重要性，并基于系统设计原则指出当前评估和工程实践中的盲区。",
+        "evidenceChain": [
+          {
+            "component": "智能体基准τ-bench",
+            "metrics": [
+              {
+                "label": "pass@k",
+                "value": "单个成功率可能高，但passˆk可能低",
+                "note": "引用论文，未给出精确数字"
+              }
+            ],
+            "reviewerNote": "弱证据：仅引用一般现象，无具体数值。"
+          },
+          {
+            "component": "多智能体方差分析",
+            "metrics": [
+              {
+                "label": "令牌使用解释方差",
+                "value": "80%",
+                "note": "来自Anthropic内部报告"
+              }
+            ],
+            "reviewerNote": "中等证据：具体百分比但来源未公开详细。"
+          },
+          {
+            "component": "CheetahClaws与Claude Code/OpenClaw对比",
+            "metrics": [],
+            "reviewerNote": "强定性对比但无度量指标，不能算作证据。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "To make the discussion concrete, we develop CheetahClaws: https://github.com/SafeRL-Lab/cheetahclaws, a Python-native reference harness, and compare it with Claude Code and OpenClaw.",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/SafeRL-Lab/cheetahclaws"
+          },
+          {
+            "claim": "Claude Code文档可访问",
+            "finding": "链接均可达。",
+            "source": "https://code.claude.com/docs/en/overview"
+          },
+          {
+            "claim": "Website: https://cheetahclaws.github.io 1 Introduction The dominant story of recent AI progress has been model scaling : larger models, more data, stronger post-training, and higher benchmark scores (OpenAI, 2026 ; Anthropic, 2026 ; Google, 2026 ) .",
+            "finding": "cheetahclaws.github.io project page is reachable: CheetahClaws — The Fast Personal AI Assistant for Any Model · v3.05.79 Skip to content v3.05.79 What's New Research Lab Agent-OS Docs Compare FAQ.",
+            "source": "https://cheetahclaws.github.io"
+          },
+          {
+            "claim": "com/docs/en/overview (overview), https://code.claude.com/docs/en/sub-agents (subagents), and https://platform.",
+            "finding": "code.claude.com project page is reachable.",
+            "source": "https://code.claude.com/docs/en/sub-agents"
+          },
+          {
+            "claim": "com/docs/en/sub-agents (subagents), and https://platform.claude.com/docs/en/agent-sdk/python (SDK).",
+            "finding": "platform.claude.com project page is reachable.",
+            "source": "https://platform.claude.com/docs/en/agent-sdk/python"
+          }
+        ],
+        "loadBearingClaim": "智能体AI的未来进步取决于系统设计（harness）的改进，而非仅模型扩展。",
+        "strongestEvidence": [
+          "多智能体实验中令牌使用解释80%性能方差（Anthropic 2025d）",
+          "固定模型下改进工具模式显著提升SWE-bench准确率（Yang et al. 2024）"
+        ],
+        "limitations": [
+          "论文本身无新实验结果",
+          "系统框架缺乏定量验证",
+          "对比harness为定性",
+          "评估议程未提供具体度量方法",
+          "可复现性限于CheetahClaws代码，核心主张无法直接复现"
+        ],
+        "suggestedExperiments": [
+          "在控制模型能力下，系统改变每个组件（如关闭/开启治理层）测量对长期任务性能的影响",
+          "在不同模型大小下验证系统扩展收益是否随模型能力增大而减小",
+          "建立包含过程指标的基准并比较多个harness的定量结果"
+        ],
+        "artifactAudit": {
+          "officialCode": "third_party_only",
+          "data": "not_found",
+          "reproducibility": "third_party_only",
+          "notes": [
+            "CheetahClaws作为论文参考实现，代码公开可访问",
+            "论文本身为概念框架，不涉及数据复现",
+            "Claude Code和OpenClaw为闭源或第三方，无法完整验证",
+            "Reachable referenced, dependency, or third-party repositories are not treated as the authors' official code release for this paper.",
+            "No fetched text clearly identifies an authors' official code release for this specific paper."
+          ],
+          "repoStatus": "GitHub repo reachable, active with issues and PRs"
+        },
+        "claimLedger": [
+          {
+            "claim": "长期智能体性能受限于系统因素而非仅模型能力。",
+            "claimType": "theoretical",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "可能随模型能力增强而减弱，需更多实证。",
+            "fdeTransfer": "企业应同时投资模型和系统优化。"
+          },
+          {
+            "claim": "上下文治理比上下文容量更重要。",
+            "claimType": "engineering",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "容量增长可能缓解但不太可能消除选择问题。",
+            "fdeTransfer": "工程中应设计选择策略而非仅扩大窗口。"
+          },
+          {
+            "claim": "记忆需要运行时信任决策，包含陈旧性和置信度。",
+            "claimType": "engineering",
+            "evidencePointer": "§4.2",
+            "evidenceStrength": "medium",
+            "threat": "实现复杂性高，可能增加延迟。",
+            "fdeTransfer": "记忆系统应带时间戳和验证机制。"
+          },
+          {
+            "claim": "技能路由和验证必须耦合。",
+            "claimType": "engineering",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "low",
+            "threat": "可能增加系统复杂度，需要路由策略优化。",
+            "fdeTransfer": "工具调用结果应始终验证。"
+          },
+          {
+            "claim": "评估应包含过程指标和纵向属性。",
+            "claimType": "theoretical",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "实际采用可能因成本而受限。",
+            "fdeTransfer": "建立多维度监控仪表板。"
+          },
+          {
+            "claim": "CheetahClaws体现上述系统设计原则。",
+            "claimType": "engineering",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "low",
+            "threat": "仅定性示例，无性能基准。",
+            "fdeTransfer": "原型阶段可用，生产需完整测试。"
+          }
+        ],
+        "evidenceMatrix": [
+          {
+            "experiment": "多智能体性能方差分析（Anthropic 2025d）",
+            "metric": "令牌使用解释方差比例",
+            "result": "80%",
+            "exactness": "author_claim",
+            "limitation": "仅是内部研究，具体任务和样本未公开。",
+            "sampleSize": "未明确指定",
+            "modelBackend": "Claude Opus 4 + Claude Sonnet 4"
+          },
+          {
+            "experiment": "SWE-bench通过改进工具模式提升准确率（Yang et al. 2024）",
+            "metric": "SWE-bench准确率",
+            "result": "显著提升",
+            "exactness": "author_claim",
+            "limitation": "论文未给出精确数字。",
+            "sampleSize": "未明确指定",
+            "modelBackend": "固定模型"
+          }
+        ],
+        "whatWouldInvalidate": [
+          "如果存在一个端到端训练的模型，在不修改系统组件下显著提升长期智能体性能且无系统故障，则系统扩展论点减弱。",
+          "如果实证表明系统改进带来的收益远小于模型扩展，且收益边际递减，则框架实际价值降低。",
+          "如果有大规模实验证明上下文容量增大自动解决治理问题，则瓶颈识别错误。"
+        ],
+        "verdict": {
+          "readDecision": "read",
+          "fdeFit": "high",
+          "evidenceStrength": "medium",
+          "artifactStatus": "official",
+          "oneLineJudgment": "系统视角的重要文章，但证据强度中等，适合作为设计参考而非实证依据。",
+          "whyNow": [
+            "AI agent部署日益增多，系统级优化需求迫切",
+            "现有基准和评估方法仍以模型为中心",
+            "多个生产系统已隐含系统扩展设计，需要统一框架"
+          ],
+          "whyNotOverclaim": [
+            "论文未提供实验证明系统扩展相对模型扩展的边际收益",
+            "对比harness的评估为定性，未量化差异",
+            "主要依赖引用文献，自身创新在于框架梳理而非突破性发现"
+          ]
+        },
+        "fdeTakeaways": {
+          "customerProblem": "[论文支持]企业级AI agent在长期任务中常因上下文失控、记忆污染、工具调用未验证而表现不稳定，需系统级解决方案。",
+          "customerQuestions": [
+            "[论文支持]当前的harness（如Claude Code、自建agent）如何处理上下文选择策略？",
+            "[论文支持]记忆系统是否带有时间戳和源跟踪以识别陈旧信息？",
+            "[论文支持]工具或子智能体的输出是否有独立验证步骤？",
+            "[推论]当agent在不同会话之间积累状态时，如何检测并防止记忆漂移？",
+            "[推论]Agent的治理层（权限、审计）是否独立于模型推理？如何实现可审计性？",
+            "[待验证假设]引入置信度加权的记忆检索是否会降低任务成功率但提高可靠性？",
+            "[面试故事]能否回忆一次因记忆过时导致agent做出错误决策的案例？系统如何恢复？",
+            "[推论] Which real customer workflow owns the AI output, and what production constraint would make the system unusable?",
+            "[推论] Which endpoints, tool contracts, inputs, responses, auth scopes, and error states must be explicit before integration?",
+            "[推论] Where does the AI step enter the workflow, who reviews or approves it, and what handoff must remain deterministic?"
+          ],
+          "artifactsToAudit": [
+            "[待验证假设] 上下文构建策略（如何选择、压缩、刷新上下文）",
+            "[待验证假设] 记忆存储模式（条目结构、时间戳、置信度、源）",
+            "[待验证假设] 工具/子智能体路由的配置和管理策略",
+            "[待验证假设] 编排循环的日志和监控",
+            "[待验证假设] 验证和治理层的触发条件和输出记录",
+            "[待验证假设] 用户权限和工具权限配置文件",
+            "[待验证假设] Agent演化策略（更新技能、记忆清理的标准操作流程）",
+            "[待验证假设] API spec or tool schema",
+            "[待验证假设] db schema or data dictionary",
+            "[待验证假设] logs and traces",
+            "[待验证假设] prompts and tool-call transcripts",
+            "[待验证假设] eval set and golden tasks",
+            "[待验证假设] workflow docs",
+            "[待验证假设] auth/RBAC matrix"
+          ],
+          "implementationChecklist": [
+            "[推论] 定义上下文选择策略而非简单截断",
+            "[推论] 为记忆条目添加时间戳、置信度和源字段",
+            "[推论] 实现每步工具输出验证（如自定义断言）",
+            "[推论] 建立审核日志记录关键决策和失败",
+            "[推论] 制定记忆更新/淘汰策略以防止污染",
+            "[推论] Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
+            "[推论] Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
+            "[推论] Trigger, human approval, escalation, handoff, retry, and exception paths are mapped.",
+            "[推论] Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
+            "[推论] Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
+            "[推论] Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
+            "[推论] Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready."
+          ],
+          "evalPlan": [
+            "[待验证假设] 离线：使用历史轨迹回放，测量记忆检索准确率和上下文压缩比",
+            "[待验证假设] 在线：A/B测试不同harness设计，记录任务完成率和过程指标（令牌数、工具调用次数、重试次数）",
+            "[待验证假设] 黄金任务：设定一组标准长期任务（如代码修改），检查轨迹质量",
+            "[待验证假设] 人工审查：定期抽查agent行为日志，验证治理规则执行",
+            "[待验证假设] Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
+            "[待验证假设] Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
+            "[待验证假设] Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
+            "[待验证假设] Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
+            "[待验证假设] Offline and online evals must include the real production constraint the paper treats as load-bearing.",
+            "[待验证假设] Golden tasks should assert the expected tool call, input schema, response handling, auth failure, timeout, and retry behavior."
+          ],
+          "rolloutPlan": [
+            "[待验证假设] PoC：在单一高价值任务上替换现有prompt为结构化harness组件",
+            "[待验证假设] Pilot：扩展到5-10个任务，收集过程指标",
+            "[待验证假设] 限制性生产：开放给内部团队，设定审计和回滚机制",
+            "[待验证假设] 全面上线：基于pilot数据优化，逐步开放外部用户",
+            "[待验证假设] PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
+            "[待验证假设] Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
+            "[待验证假设] Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget.",
+            "[待验证假设] Full production: expand only after ownership, monitoring, eval refresh, incident response, and governance reviews are stable. Acceptance criteria: business metric movement and failure-rate reduction are visible in operating data."
+          ],
+          "riskRegister": [
+            "[待验证假设] 技术风险：系统复杂度增加可能导致新故障模式",
+            "[待验证假设] 数据风险：记忆存储可能包含敏感信息，需脱敏",
+            "[待验证假设] 权限风险：工具权限配置不当可能导致越权",
+            "[待验证假设] 安全风险：缺乏验证可能被注入攻击",
+            "[待验证假设] 成本风险：额外验证和记忆检索增加延迟和token成本",
+            "[待验证假设] 采用风险：开发团队需学习新框架",
+            "[待验证假设] 技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
+            "[待验证假设] 数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
+            "[待验证假设] 权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
+            "[待验证假设] 安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations."
+          ],
+          "roiHypothesis": "[待验证假设]实施系统级harness（上下文治理+可信记忆+验证）后，agent在长期任务中的单次成功率提升20%，同时平均令牌消耗降低10%（源于更高效上下文）。通过A/B测试比较新旧系统的任务完成率和每任务成本，测量净收益。",
+          "interviewStory": "[面试故事] 本文好比为AI agent打造了一个操作系统内核：作者拆解了调度（上下文管理）、内存（记忆）、设备驱动（工具路由）和安全模块（验证治理），主张未来的智能体研究应从单纯升级CPU（模型）转向系统整体优化。"
+        }
+      },
+      "scorecard": [
+        {
+          "dimension": "FDE相关性",
+          "score": 8,
+          "reason": "直接讨论harness工程、工具使用、记忆、编排、治理，与企业部署强相关；但未深入具体API/MCP集成细节。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "工程现实感",
+          "score": 7,
+          "reason": "提供CheetahClaws参考实现并与生产系统对比，但对比为定性；缺少定量性能数据。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "问题重要性",
+          "score": 9,
+          "reason": "指出模型扩展之外的重要瓶颈，呼应业界对系统级优化的关注。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "方法新颖性",
+          "score": 7,
+          "reason": "系统扩展视角不算全新，但将harness作为一等对象并分解六个组件有一定系统性。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "证据强度",
+          "score": 4,
+          "reason": "主要依赖文献和定性比较；无新实验或量化验证，证据强度中等偏弱。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "可复现性",
+          "score": 6,
+          "reason": "CheetahClaws开源可获取，但论文核心主张（框架有效性）无法通过复现代码验证。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "可部署性",
+          "score": 6,
+          "reason": "框架设计指导性，但缺少部署最佳实践和性能基准。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "安全治理意识",
+          "score": 8,
+          "reason": "明确讨论了验证治理层、审计、演化标准，引用OWASP威胁目录，安全意识强。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "ROI可解释性",
+          "score": 5,
+          "reason": "未量化成本收益；虽然提到成本指标，但无具体ROI分析。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        },
+        {
+          "dimension": "职业训练价值",
+          "score": 7,
+          "reason": "系统视角有助于工程师理解智能体架构全貌，但缺乏实操代码示例。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
+        }
+      ]
+    },
     {
       "id": "paper:arxiv-2605-18747",
       "title": "Code as Agent Harness",
@@ -8,35 +920,42 @@
       "venue": "Venue not provided",
       "sourceName": "arXiv agent harness engineering",
       "sourceUrl": "https://arxiv.org/abs/2605.18747",
-      "verifiedAt": "2026-05-31T16:47:21.234Z",
+      "verifiedAt": "2026-05-31T19:15:47.955Z",
       "tier": "deep",
-      "leadJudgment": "一份系统性综述，将代码从生成产物重新定义为智能体系统可执行、可检查、有状态的操作基础，并提供三层分类框架。",
+      "leadJudgment": "A survey that reframes code as the operational substrate for agent AI, organizing the field into three layers.",
       "sections": [
         {
-          "heading": "1 引言",
-          "summary": "论文提出'代码作为智能体装备'视角：代码不再只是LLM的生成目标，而是智能体推理、行动和环境建模的操作媒介。组织了三个连贯的层级：装备接口（代码连接模型与任务）、装备机制（规划、记忆、工具使用、控制与优化）和装备扩展（多智能体协调）。还概述了编码助手、GUI/OS自动化、具身智能、科学发现、个性化和推荐、DevOps和企业工作流等应用。",
-          "loadBearing": "核心主张：代码作为可执行、可检查、有状态的媒介，是构建可靠闭环智能体系统的关键基础设施。",
-          "evidence": "论文通过引用大量现有工作（如PoT、PAL、SWE-bench等）支持这一主张，但这些都是文献综合，未提供新的实验证据。",
-          "fold": "引论中对三个层级的介绍：装备接口定义代码如何进入智能体循环；装备机制保证长期可靠性；装备扩展支持多智能体共享代码工件。"
+          "heading": "引言：代码作为代理夹具的统一视角",
+          "summary": "论文提出代码在代理系统中从目标输出转变为操作基础，引入'代码作为代理夹具'的概念，将代码作为可执行、可检查、有状态的介质，用于代理推理、行动和环境建模。论文围绕三个层组织：夹具接口、夹具机制和扩展夹具。",
+          "loadBearing": "代码不仅是LLM的输出目标，更是代理系统的操作基础。",
+          "evidence": "摘要和全文引言中通过多篇文献（如Codex、Claude Code）支持这一转变。",
+          "fold": "论文区分了模型内部能力、系统提供的夹具基础设施和代理初始化的代码工件三个要素。"
         },
         {
-          "heading": "2 装备接口：代码用于推理、行动和环境建模",
-          "summary": "定义代码作为智能体与任务环境之间的接口，分为三个角色：代码用于推理（外部化中间计算为可执行程序，如PAL、CodeI/O）、代码用于行动（将高层意图转换为可执行操作，如SayCan、Voyager）、代码用于环境建模（通过程序状态、模拟器、测试等表示世界状态，如WorldCoder、SWE-bench）。每一角色都利用代码的可执行性、可检查性和状态性。",
-          "loadBearing": "接口层主张：代码的这三种角色使智能体能够执行、检查和持久化推理、行动和环境建模，这是所有上层机制的基础。",
-          "evidence": "论文在每个子节中列举了代表性系统（见表1、2、3），但未提供这些系统的对比实验结果或定量分析。",
-          "fold": "代码用于推理分为三类：程序委托推理（PoT、PAL）、形式化验证接口（ReProver、Lean4Agent）、迭代代码接地推理（CodePRM、RLEF）。代码用于行动包括：接地技能选择（SayCan）、程序化策略生成（CaP、RoboCodeX）、终身学习智能体（Voyager、SkillsCrafter）。代码用于环境包括：结构化世界表示（ViStruct）、执行轨迹世界建模（CWM）、代码接地评估环境（InterCode、SWE-bench）、可验证环境构建（SWE-smith）。"
+          "heading": "夹具接口：用于推理、行动和环境建模的代码",
+          "summary": "代码作为代理与任务环境之间的基础接口，提供可执行性、可检查性和状态性。分为三个子角色：代码用于推理（外部化中间计算）、代码用于行动（生成可执行策略）和代码用于环境建模（用程序表示世界状态和反馈）。",
+          "loadBearing": "代码使得代理的推理可执行、行动可编程、环境状态可检查。",
+          "evidence": "论文引用了大量方法，如PoT、PAL、SayCan、Voyager、SWE-bench等，并通过表格（表1-3）总结了代表性系统。",
+          "fold": "具体包括程序委托推理、形式验证、迭代代码推理、技能选择、策略生成、终身代理等子类别。"
         },
         {
-          "heading": "3 装备机制：规划、记忆、工具使用、控制与优化",
-          "summary": "介绍使代码装备的智能体在单步生成之外保持可靠的系统层机制。包括：规划（组织长期执行，如Self-Planning、CodePlan）、记忆与上下文工程（维护状态、检索证据、存储经验）、工具使用（连接API、仓库、验证工具）、装备控制（计划-执行-验证循环，通过静态分析、测试和人工反馈闭环）、装备工程优化（遥测、进化、重放评估）。",
-          "loadBearing": "机制层主张：规划、记忆、工具使用和反馈驱动控制构成了代码智能体长期可靠的支柱，且这些机制必须协同工作而非孤立模块。",
-          "evidence": "论文引用了大量文献（如CodePlan、WebAgent、Voyager、AutoSafeCoder等），但都是描述性总结，没有新实验。部分机制（如结构接地规划）仅提供初步结果。",
-          "fold": "规划包括线性分解规划（Self-Planning、WebAgent）、结构接地规划（CodePlan基于依赖图）、搜索基规划（在论文中未详细展开，但属于宏类别）。证据显示线性规划限制于单一分解轨迹，结构接地利用图约束增强鲁棒性。"
+          "heading": "夹具机制：规划、记忆、工具使用、控制和优化",
+          "summary": "研究如何使代码代理在长期执行中保持可靠。包括规划（线性分解、结构引导、搜索、编排）、记忆与上下文工程、工具使用（API、仓库、沙箱）、反馈驱动控制和夹具优化。规划被视作夹具控制的一种形式，将意图转化为可执行步骤。",
+          "loadBearing": "夹具机制是代码代理可靠性的关键：规划、记忆、工具和控制协调工作。",
+          "evidence": "论文总结大量方法，如Self-Planning、CodePlan、AutoHarness、RLEF等，并提供了图4作为路线图。",
+          "fold": "强调动态生成的代码不替代人类设计的夹具基础设施，而是在其内部运行。"
+        },
+        {
+          "heading": "扩展夹具：多代理基于代码的编排",
+          "summary": "从单代理扩展到多代理系统，共享代码工件（仓库、测试、跟踪）支持协调、审查和验证。包括代理角色（管理者、编码员、审查员）、协作模式（编程、修复、辩论）和工作流拓扑（集中式、分布式、流式）。",
+          "loadBearing": "代码成为多代理编排的共享工件，使协调和验证成为可能。",
+          "evidence": "论文引用了AutoGen、MetaGPT、Self-Collaboration等系统。",
+          "fold": "多代理设置中，代码的中介性质允许异步审查和增量验证。"
         }
       ],
       "limitsAndFuture": {
-        "paperStated": "论文在引言末尾列出了开放挑战：超越最终任务成功的评估、不完整反馈下的验证、无回归的装备改进、多智能体一致共享状态、安全关键操作的人工监督、扩展到多模态环境。",
-        "evidenceNotes": "论文作为综述，未提供实验验证，其主张的可靠性依赖于所引用的已有工作。分类法可能遗漏或偏向某些研究路线。可复现性取决于各个引用系统的可用性，论文本身不提供代码或数据。"
+        "paperStated": "论文在摘要中列出开放挑战：评估超越最终任务成功、在不完整反馈下的验证、无回归的夹具改进、多代理间一致共享状态、安全关键动作的人机监督、扩展到多模态环境。",
+        "evidenceNotes": "论文作为综述，未进行新实验或提供可复现结果；引用的方法覆盖2015-2026年，范围全面但缺乏统一基准比较。"
       },
       "selection": {
         "convergence": [
@@ -61,32 +980,34 @@
       },
       "arxivId": "2605.18747v1",
       "publishedAt": "2026-05-18T17:59:03Z",
+      "paperType": "survey",
+      "venueStatus": "unverified",
       "deepDive": {
-        "reframe": "与其说提出新系统，不如说是一篇重新组织现有文献的综述，试图建立'代码作为智能体装备'的统一视角，为装备工程提供路线图。",
+        "reframe": "该论文是一篇综述，系统分类了使用代码作为代理系统基础设施的现有工作，而非提出新实验或模型。它提供了一个统一的框架，将分散的研究方向整合为三个层次，并强调代码作为运行时介质的角色。",
         "contributionLayers": [
           {
             "layer": "概念框架",
-            "claim": "代码应当被视为智能体系统的核心操作介质，而非仅仅输出产物。",
-            "evidence": "论文通过三个层级的分类（接口、机制、扩展）和大量文献来论证这一观点。",
-            "judgment": "该框架有较强的解释力，但缺乏与替代视角（如'语言作为接口'）的系统比较。",
-            "fdeMeaning": "对于FDE，设计智能体系统时应优先考虑代码深度的集成（如通过API schemas、execution traces），而非纯文本交互。"
+            "claim": "正式化'代码作为代理夹具'的概念，将代码从生成的工件重新定位为可执行、可验证和有状态的代理操作基础。",
+            "evidence": "论文在引言和摘要中明确定义，并区分模型内部能力、夹具基础设施和代理初始化代码工件。",
+            "judgment": "该框架为理解代码在代理系统中的作用提供了一个有用的统一视角。",
+            "fdeMeaning": "对于FDE，这强调了代码不仅是输出，而且是运行时基础设施，对设计可部署的代理系统至关重要。"
           },
           {
-            "layer": "三层分类法",
-            "claim": "代码在智能体系统中扮演接口、机制和扩展三大角色，每个角色包含若干子模式。",
-            "evidence": "论文为每个子模式列出了代表性工作（见表1、2、3），但未提供分类的完备性证明或用户研究。",
-            "judgment": "分类法结构清晰，有助于系统性思考，但存在类别重叠和不完全正交的情况（如迭代代码推理同时涉及推理和反馈机制）。",
-            "fdeMeaning": "FDE在构建系统时可参考此分类法来定位组件：例如，选择哪种规划机制、如何设计执行-验证循环。"
+            "layer": "分类法综合",
+            "claim": "将代码作为代理夹具组织成三个连接层：夹具接口、夹具机制和扩展夹具，并综合了代表性方法。",
+            "evidence": "论文提供了每个层的详细文献回顾、表格（表1-3）和图表（图1-5），覆盖2015-2026年的方法。",
+            "judgment": "分类法全面，覆盖广泛，但缺乏元分析。",
+            "fdeMeaning": "FDE 可以使用该分类法来评估其代理系统在哪些层得到支持。"
           },
           {
-            "layer": "应用与挑战",
-            "claim": "代码装备已在多个领域落地（编码、GUI、机器人、科学等），但面临评估、验证、安全等挑战。",
-            "evidence": "论文列举了各应用领域的代表性系统（如SWE-bench、Voyager、AgentBench），并提出了开放挑战列表。",
-            "judgment": "应用覆盖全面，但挑战描述停留在宏观层面，未给出解决路径。",
-            "fdeMeaning": "FDE在规划产品时应考虑这些挑战，例如部署多智能体系统时需要解决共享状态一致性和人工审查问题。"
+            "layer": "应用和未来议程",
+            "claim": "将分类法与编码助手、GUI/OS自动化、具身代理、科学发现、个性化和推荐、DevOps和企业工作流程等实际应用联系起来，并概述六个开放挑战。",
+            "evidence": "论文在摘要和全文（部分截断）中列举了这些应用域，并明确列出开放挑战。",
+            "judgment": "应用范围广泛，但缺乏深度案例研究。",
+            "fdeMeaning": "挑战部分直接指向FDE在日常运营中面临的问题，如评估、验证、安全。"
           }
         ],
-        "mechanism": "论文本质是一个分类法和路线图，而非单个技术机制。其核心洞察是：将代码作为智能体系统的'装备'（harness），统一了推理、行动和环境建模的接口，并通过规划、记忆、工具使用和反馈循环实现闭环可靠性。",
+        "mechanism": "论文提出的关键机制是：代码作为代理夹具，通过将推理、行动和状态表示为可执行程序，使代理行为可验证和可检查。该机制依赖于三个层：接口、机制和扩展，通过执行反馈循环提供可靠性。",
         "evidenceChain": [],
         "audit": [
           {
@@ -95,152 +1016,223 @@
             "source": "https://github.com/YennNing/Awesome-Code-as-Agent-Harness-Papers"
           }
         ],
-        "loadBearingClaim": "代码作为可执行、可检查、有状态的媒介是构建可靠、可适应智能体系统的最佳基础。",
+        "loadBearingClaim": "代码作为代理夹具的框架（即代码是代理系统操作基础）是支撑论文价值的主张。",
         "strongestEvidence": [
-          "大量代表性系统的系统化分类和引用（如PoT、CWM、SWE-bench等）。",
-          "论文提出的开放挑战与实际工程中观察到的问题高度吻合。"
+          "论文引用了大量代表性方法（如PoT, PAL, SayCan, Voyager, SWE-bench等），为其分类提供了经验支持。"
         ],
         "limitations": [
-          "论文作为综述，缺乏原创实验验证，分类法的有效性未经过定量评估。",
-          "文献选择可能存在偏向，如偏重编程和具身智能代理，较少讨论纯对话或推荐系统。",
-          "可复现性低：论文本身无代码或数据，依赖的第三方系统可能不可复现。"
+          "survey性质：没有原始实验。",
+          "可复现性：没有提供可复现代码或数据。"
         ],
         "suggestedExperiments": [
-          "设计对比实验，评估采用代码装备 vs 纯语言接口的智能体在长期任务上的成功率、调试成本和错误恢复速度。",
-          "对论文提出的分类法进行用户研究，验证其对系统设计效率的提升效果。"
+          "进行消融研究，比较基于代码的接口与纯文本接口在特定任务上的表现。",
+          "分析在长期代理任务中，代码作为环境表示相对于传统状态跟踪的收益。"
         ],
+        "artifactAudit": {
+          "officialCode": "not_found",
+          "data": "not_found",
+          "reproducibility": "paper_only",
+          "notes": [
+            "论文提供了一个GitHub仓库（Awesome-Code-as-Agent-Harness-Papers），但该仓库是参考文献列表，不是论文本身的代码，不能用于再现。",
+            "Reachable referenced, dependency, or third-party repositories are not treated as the authors' official code release for this paper.",
+            "No fetched text clearly identifies an authors' official code release for this specific paper."
+          ],
+          "repoStatus": "not_checked"
+        },
+        "claimLedger": [
+          {
+            "claim": "代码是可执行、可检查和有状态的代理接口。",
+            "claimType": "theoretical",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "作为 survey，该声明是分类而非实验证明。",
+            "fdeTransfer": "支持将代码视为运行时检查的介质。"
+          },
+          {
+            "claim": "代码在代理系统中充当推理、行动和环境建模的接口。",
+            "claimType": "empirical",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "论文通过大量文献支持，但未进行对比实验。",
+            "fdeTransfer": "指导FDE设计代理接口时应优先使用代码。"
+          },
+          {
+            "claim": "夹具机制（规划、记忆、工具使用、控制）对于长期执行的可靠性至关重要。",
+            "claimType": "theoretical",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "论文通过案例支持，但没有量化比较。",
+            "fdeTransfer": "FDE 应投资于这些机制而非仅依赖模型推理。"
+          },
+          {
+            "claim": "多代理设置中，共享代码工件（仓库、测试、跟踪）支持协调、审查和验证。",
+            "claimType": "empirical",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "引用了系统如AutoGen，但未进行统一评估。",
+            "fdeTransfer": "FDE 应设计代码为中心的协调机制。"
+          }
+        ],
+        "evidenceMatrix": [
+          {
+            "experiment": "文献综述",
+            "metric": "不适用",
+            "result": "不适用",
+            "exactness": "exact",
+            "limitation": "作为调查论文，没有原始实验数据。",
+            "sampleSize": "不适用",
+            "modelBackend": "不适用"
+          }
+        ],
+        "whatWouldInvalidate": [
+          "如果一个新研究证明代码作为接口不是必要条件，而其他介质（如结构化语言）同样有效，则论文的框架中心主张会被削弱。"
+        ],
+        "verdict": {
+          "readDecision": "read",
+          "fdeFit": "high",
+          "evidenceStrength": "medium",
+          "artifactStatus": "partial",
+          "oneLineJudgment": "一份有价值的统一综述，为设计和评估基于代码的代理系统提供了结构化视角。",
+          "whyNow": [
+            "代理系统正在快速部署，需要统一的工程视角。",
+            "论文及时综合了分散的研究方向。"
+          ],
+          "whyNotOverclaim": [
+            "论文承认其范围仅限于代码中心的系统。",
+            "明确提到边界条件，如不替换感知或模型内部推理。"
+          ]
+        },
         "fdeTakeaways": {
-          "customerProblem": "企业在构建生产级AI智能体时，面临可靠性与可维护性挑战：如何确保智能体在执行长期任务时能够验证、纠错、持久化状态，并与现有工程管道集成。",
+          "customerProblem": "[论文支持] 企业部署AI代理时面临代码既是输出又是运行时介质的挑战，需要统一的工程方法。",
           "customerQuestions": [
-            "你的智能体在失败时是否能够回溯到可检查的执行轨迹？",
-            "如何使用代码（如API规范、测试用例）作为智能体与环境之间的契约？",
-            "规划机制是否需要显式文件对象（如PLAN.md）来跨会话保持上下文？",
-            "多智能体协作时，共享代码工件（如仓库、测试）如何保证一致性？",
-            "在安全关键场景中，如何将人类审查门控嵌入到执行-验证循环中？",
-            "现有工具（如LangChain、Autogen）是否支持论文提出的三层架构？",
-            "如何衡量装备的质量，而不仅仅是最终任务成功率？",
-            "当智能体动态创建工具或技能时，权限和审计如何自动管理？",
-            "在GUI/OS自动化中，代码装备如何处理不完整的DOM或可变界面状态？",
-            "离线评估与在线监控如何利用代码执行反馈来持续改进装备可靠性？"
+            "[论文支持] 当前代理系统在接口、机制和扩展层中，代码扮演了什么角色？",
+            "[待验证假设] 代码作为接口是否比专用API更有效？",
+            "[推论] 如何确保代理生成的代码在沙箱中安全执行？",
+            "[论文支持] 多代理场景中，如何通过共享代码工件协调和审查？",
+            "[推论] 夹具机制（规划、记忆、工具）的缺失会如何影响长期任务成功率？",
+            "[推论] Which real customer workflow owns the AI output, and what production constraint would make the system unusable?",
+            "[推论] Which endpoints, tool contracts, inputs, responses, auth scopes, and error states must be explicit before integration?",
+            "[推论] Which knowledge sources need freshness, access control, retrieval tests, and citation or trace coverage?",
+            "[推论] What eval set, pass/fail metric, regression gate, and review sample would prove this works on the customer's real tasks?",
+            "[推论] Which traces, logs, intermediate decisions, and failure labels are required to debug bad outputs after deployment?"
           ],
           "artifactsToAudit": [
-            "API规范文档",
-            "数据库schema",
-            "智能体执行日志（traces）",
-            "提示词模板",
-            "评估集（包含测试用例和预期行为）",
-            "工作流定义文档（如计划.md、状态日志）",
-            "认证与权限配置（RBAC）",
-            "监控与告警配置",
-            "服务层级协议（SLA）定义",
-            "人工审批流程文档",
-            "API spec or tool schema",
-            "db schema or data dictionary",
-            "logs and traces",
-            "prompts and tool-call transcripts"
+            "[论文支持] 代理生成的代码工件（如测试、工具、工作流定义）需要审计。",
+            "[推论] 需要审计夹具配置（规划文件、记忆存储、工具注册表）。",
+            "[论文支持] 共享仓库、测试套件和跟踪日志在多代理中应是可审计的。",
+            "[待验证假设] API spec or tool schema",
+            "[待验证假设] db schema or data dictionary",
+            "[待验证假设] logs and traces",
+            "[待验证假设] prompts and tool-call transcripts",
+            "[待验证假设] eval set and golden tasks",
+            "[待验证假设] workflow docs",
+            "[待验证假设] auth/RBAC matrix",
+            "[待验证假设] monitoring dashboards",
+            "[待验证假设] SLAs or SLOs",
+            "[待验证假设] human-approval flow",
+            "[待验证假设] workflow SOPs"
           ],
           "implementationChecklist": [
-            "定义代码作为装备的接口规范（如推理、行动、环境各层使用的代码格式）。",
-            "实现代码执行沙箱，确保安全性和隔离性。",
-            "集成反馈驱动控制循环（计划-执行-验证-修订）。",
-            "配置持久化状态机制（内存、上下文窗口、环境快照）。",
-            "建立人工审查门控和回滚策略。",
-            "设计遥测系统收集执行轨迹、失败率和恢复效率。",
-            "选择或构建评估基准，覆盖成功率、回归和资源消耗。",
-            "Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
-            "Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
-            "Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
-            "Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
-            "Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls."
+            "[推论] 确保代理框架支持代码执行沙盒（如docker或安全解释器）。",
+            "[推论] 实施反馈驱动控制循环：执行 -> 验证 -> 修正。",
+            "[论文支持] 集成规划机制（如PLAN.md）作为持久化控制对象。",
+            "[推论] 设置人机监督门控用于安全关键动作。",
+            "[推论] Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
+            "[推论] Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
+            "[推论] Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
+            "[推论] Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
+            "[推论] Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
+            "[推论] Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready.",
+            "[推论] RBAC, least-privilege scopes, PII handling, compliance policy, and audit trail are checked before launch."
           ],
           "evalPlan": [
-            "离线评估：使用SWE-bench等基准测试代码装备的端到端成功率。",
-            "在线评估：在生产环境部署后监控任务完成率、平均修复时间。",
-            "金标准任务：人工标记一组典型长期任务，对比代码装备与基线系统。",
-            "人工审查：抽样智能体生成的代码，检查安全性、效率和可维护性。",
-            "延迟-成本-错误预算：规定每个任务的最大执行时间、API调用成本和允许的失败率。",
-            "Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
-            "Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
-            "Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
-            "Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
-            "Offline and online evals must include the real production constraint the paper treats as load-bearing."
+            "[推论] 离线评估：使用SWE-bench、AgentBench等代码执行基准。",
+            "[推论] 在线评估：跟踪任务完成率、运行时错误率、人工审查频率。",
+            "[论文支持] 评价应超越最终成功，包括中间状态检查和错误恢复。",
+            "[待验证假设] Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
+            "[待验证假设] Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
+            "[待验证假设] Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
+            "[待验证假设] Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
+            "[待验证假设] Offline and online evals must include the real production constraint the paper treats as load-bearing.",
+            "[待验证假设] Golden tasks should assert the expected tool call, input schema, response handling, auth failure, timeout, and retry behavior.",
+            "[待验证假设] Offline retrieval eval should separate answer quality from source freshness, access control, citation coverage, and retrieval miss rate."
           ],
           "rolloutPlan": [
-            "PoC：选择一个内部代码维护任务（如合并请求审查），部署单智能体装备，验证基本功能。",
-            "Pilot：扩展至3-5个团队使用的常见任务，加入规划、记忆和基本反馈循环，收集使用数据。",
-            "Limited Prod：在有限业务场景中上线，实施人工监督和回滚机制，监控SLA和风险指标。",
-            "Full：全面部署多智能体系统，集成治理、审计和持续改进管道，设立跑门和灰度发布流程。",
-            "PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, RAG or enterprise knowledge retrieval path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
-            "Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
-            "Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget.",
-            "Full production: expand only after ownership, monitoring, eval refresh, incident response, and governance reviews are stable. Acceptance criteria: business metric movement and failure-rate reduction are visible in operating data."
+            "[推论] PoC：在隔离沙箱中部署单一代理，完成受限任务。",
+            "[推论] Pilot：增加工具访问权限，开放部分企业数据（只读）。",
+            "[推论] Limited Prod：逐步开放写权限，设置速率限制和审计日志。",
+            "[推论] Full：多代理协同，赋予更复杂工作流的执行权。",
+            "[待验证假设] PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, RAG or enterprise knowledge retrieval path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
+            "[待验证假设] Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
+            "[待验证假设] Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget.",
+            "[待验证假设] Full production: expand only after ownership, monitoring, eval refresh, incident response, and governance reviews are stable. Acceptance criteria: business metric movement and failure-rate reduction are visible in operating data."
           ],
           "riskRegister": [
-            "技术风险：代码执行环境的安全性（沙箱逃逸、无限循环）。",
-            "数据风险：智能体生成代码可能泄露敏感信息或引入漏洞。",
-            "权限风险：动态创建的技能或工具可能越权访问资源。",
-            "安全风险：反馈循环可能被对抗性输入操纵。",
-            "成本风险：大量代码执行导致计算资源消耗超出预算。",
-            "采用风险：开发团队不了解新装备架构，需要培训和文化适应。",
-            "技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
-            "数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
-            "权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
-            "安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations."
+            "[论文支持] 代理生成的不安全代码可能造成漏洞（如命令注入）。",
+            "[推论] 缺乏对作者化代码的验证可能导致状态不一致。",
+            "[论文支持] 多代理共享状态时可能产生冲突。",
+            "[推论] 成本风险：错误代码反复执行增加计算开销。",
+            "[待验证假设] 技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
+            "[待验证假设] 数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
+            "[待验证假设] 权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
+            "[待验证假设] 安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations.",
+            "[待验证假设] 成本: latency, model calls, retrieval, monitoring, and human review can erase the apparent automation savings.",
+            "[待验证假设] 采用: users need a clear owner, review path, fallback, and escalation rule before trusting the workflow."
           ],
-          "roiHypothesis": "通过引入代码装备，智能体的长期任务成功率提高50%，单次任务的人工干预时间减少40%，系统回归故障降低30%。需要实验证据支持。",
-          "interviewStory": "想象一个企业DevOps智能体，需要自动修复GitHub仓库中的构建失败。未使用代码装备时，智能体只输出文本建议，工程师必须手动验证和应用；错误无法追溯。使用代码装备后，智能体通过Plan.md组织步骤，执行代码修改并在沙箱中运行测试，将成功验证的记录写入状态日志。失败时自动回滚并生成可显示故障所在的执行轨迹。整个流程可审查、可回滚、可度量。作为FDE，我们实现了从黑盒建议到白盒可治理自动化的跃迁。"
+          "roiHypothesis": "[待验证假设] 采用代码作为代理夹具可以通过提高代理可靠性（如减少失败轮次）来降低运营成本，通过A/B测试比较有/无代码接口的代理成功率来验证。",
+          "interviewStory": "[面试故事] 想象一个企业编码助手：代理需要推理、编辑仓库并验证更改。代码作为夹具允许代理通过执行测试来验证其输出，从而减少人工审查。作为FDE，你需要设计一套系统，确保代理生成的代码在沙箱中执行，通过规划文件协调步骤，并记录所有中间状态以便审计。"
         }
       },
       "scorecard": [
         {
           "dimension": "FDE相关性",
-          "score": 9,
-          "reason": "论文直接讨论智能体系统的工程基础设施，覆盖编码助手、GUI自动化、DevOps等，高度匹配FDE关注的API/工具/工作流/监控/治理问题。"
+          "score": 10,
+          "reason": "直接涉及代理系统的工程层面，与FDE高度相关。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "工程现实感",
           "score": 8,
-          "reason": "引用大量实际系统（Claude Code、Voyager、SWE-bench）和工程实践（PLAN.md、权限层），但缺乏对落地中常见挑战（如延迟、成本、安全）的深入讨论。"
+          "reason": "涵盖实际应用（编码助手、GUI自动化、企业工作流），但缺乏具体部署细节。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "问题重要性",
-          "score": 10,
-          "reason": "智能体系统可靠性是当前AI工程的核心瓶颈，论文提出的'代码作为装备'视角为设计和评估此类系统提供了系统化的分类和路线图。"
+          "score": 9,
+          "reason": "代理系统的代码基础设施是当前关键问题，综述及时。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "方法新颖性",
-          "score": 6,
-          "reason": "主要创新在于概念重新组织，而非提出新算法或系统；分类法虽有价值，但各子系统已有大量单独研究。"
+          "score": 7,
+          "reason": "框架新颖，但综合现有工作而非提出全新方法。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "证据强度",
-          "score": 4,
-          "reason": "仅为文献综述，无本论文的实验验证；主张的强度依赖所引用工作的可靠性，且引用范围可能不全面。"
+          "score": 6,
+          "reason": "作为survey，证据来自引用大量工作，但无原始实验或元分析。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "可复现性",
           "score": 2,
-          "reason": "论文本身不提供代码或数据，不可复现；所引用的系统部分可复现，但整体结论无法直接验证。"
+          "reason": "没有可复现代码或数据；仅有参考文献列表仓库。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "可部署性",
-          "score": 5,
-          "reason": "分类法可作为设计指南，但未提供可直接部署的实现或组件；各层机制的具体部署细节在引用工作中，但分布较广。"
+          "score": 7,
+          "reason": "框架直接指导系统设计，但需要大量工程化。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "安全治理意识",
-          "score": 7,
-          "reason": "提到人工监督、权限边界、审计日志等治理概念，但未深入讨论具体的安全威胁和治理框架实现。"
+          "score": 8,
+          "reason": "在开放挑战中明确提到人机监督和安全关键动作，但未深入机制。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "ROI可解释性",
-          "score": 5,
-          "reason": "论文指出代码装备对长期任务成功的影响，但未提供任何成本-收益分析或性能量化指标。"
+          "score": 7,
+          "reason": "挑战部分提到评估和验证，但未量化ROI。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "职业训练价值",
           "score": 9,
-          "reason": "系统性地整理了智能体工程的关键维度和文献，对FDE工程师理解全貌、选择技术方向非常有帮助。"
+          "reason": "提供全面的代理系统分类，对FDE有教育价值。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         }
       ]
     },
@@ -251,54 +1243,19 @@
       "venue": "Venue not provided",
       "sourceName": "arXiv agent harness engineering",
       "sourceUrl": "https://arxiv.org/abs/2604.25850",
-      "verifiedAt": "2026-05-31T16:46:08.418Z",
+      "verifiedAt": "2026-05-31T19:14:46.818Z",
       "tier": "deep",
-      "leadJudgment": "一个用三项可观测性支柱自动演化编码智能体“马具”（harness）的闭环系统",
+      "leadJudgment": "离线模式下只根据已收集证据保留《Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses》的基础脉络。",
       "sections": [
         {
           "heading": "摘要",
-          "summary": "马具（harness）是编码智能体性能的核心，但马具工程仍是手工劳动。自动化面临三个挑战：异构的操作空间、海量轨迹中难以提取信号、编辑效果难以归因。本文提出 Agentic Harness Engineering (AHE)，通过三项可观测性支柱构成闭环：组件可观测性、经验可观测性、决策可观测性。十次迭代将 Terminal-Bench 2 的 pass@1 从 69.7% 提升至 77.0%，超越了人类设计的 Codex-CLI 和自演化基线。冻结后的马具无需重新演化即可迁移至 SWE-bench-verified 和其他模型家族。消融实验表明增益来自工具、中间件和长期记忆，而非系统提示。",
-          "loadBearing": "AHE 的核心主张：通过三个可观测性支柱（组件、经验、决策）将每个编辑转化为可证伪的合约，从而让马具自动化地自主演化，而不会陷入试错。",
-          "evidence": "论文在 Terminal-Bench 2 上以 pass@1 作为主要指标，通过十次迭代从 69.7% 提升到 77.0%，并与其他人类设计和自演化基线对比（表1）。迁移实验显示在 SWE-bench-verified 上达到最高聚合成功率，且 token 比种子减少 12%。消融实验（表3）定位增益主要来自工具、中间件和长期记忆。这些数据支持了主张，但仅限于 Terminal-Bench 2 和 SWE-bench-verified 两个基准，且种子马具刻意最小化以避免污染。",
-          "fold": "论文声称增益并非来自基准过拟合，因为冻结的马具在三个不同模型家族上也有 +5.1 到 +10.1 个百分点的 pass@1 提升（图3）。但论文也指出跨模型实验中的操作点耦合（timeout-budget 耦合）问题。"
-        },
-        {
-          "heading": "1. 引言",
-          "summary": "编码智能体越来越依赖马具，但马具设计主要是手工的，且最优马具是模型特定的。随着基础模型快速进步，手工调整跟不上。自动化的直觉方向是用演化智能体来优化马具，但现有方法大多只编辑单一组件（如提示），且面临轨迹信号稀疏、耦合紧密等结构障碍。本文的核心洞察是：瓶颈在于可观测性而非智能体能力。AHE 通过三个可观测性支柱解决。",
-          "loadBearing": "核心假设：一旦演化智能体获得结构化的上下文和清晰的动作空间，它就能可靠地收敛到更好的马具设计。",
-          "evidence": "论文没有直接对比有/无可观测性支柱的效果，而是通过整体实验验证 AHE 的有效性。该假设的间接证据是 AHE 超越了只编辑提示的 ACE 和 TF-GRPO。",
-          "fold": "论文引用 Sutton 的“苦涩教训”和 Zunic 的“马具的苦涩教训”作为支持观点。"
-        },
-        {
-          "heading": "2. 相关工作",
-          "summary": "回顾了马具工程与评估、LLM智能体自动化优化两条线。马具工程包括工具、接口、记忆、执行约束等设计；自动化优化包括反思、提示编辑、技能库、编程结构演化等。AHE 的不同之处在于联合演化全部可编辑组件的组合，并保持人类先验最小化。"
-        },
-        {
-          "heading": "3. 方法",
-          "summary": "AHE 将马具优化转化为由另一个智能体驱动的闭环，基础模型固定，只编辑马具。三个可观测性层：组件可观测性（通过解耦的马具框架 NexAU，每个组件类型作为文件暴露，失败模式映射到单一组件类）、经验可观测性（通过 Agent Debugger 将原始轨迹蒸馏为分层的证据语料库）、决策可观测性（每次编辑附带自声明预测，下一轮验证）。算法1描述了外循环。",
-          "loadBearing": "NexAU 框架的七种组件类型（系统提示、工具描述、工具实现、中间件、技能、子智能体配置、长期记忆）是解耦的，因此每个编辑可定位于单一文件，实现文件级回滚。种子马具刻意最小化（只有一个 shell 工具），迫使所有添加的组件通过实验证明自身价值。",
-          "evidence": "论文声称种子马具 H0 只有一个 shell 执行工具，没有中间件、技能、子智能体。这是手动设定，不是实验数据支持的。组件解耦的收益是通过消融实验（表3）间接证明：单组件变体大多优于种子。",
-          "fold": "Agent Debugger 基于 L. Lin 的 Agent Debugger 框架（2026），将轨迹视为可导航的文件环境，每个消息一个文件，通过通用 shell 和脚本工具访问。Evolve Agent 的编辑受两个约束：仅限工作空间的可控性，以及证据驱动并附带预测的决策可观测性。"
-        },
-        {
-          "heading": "4. 实验",
-          "summary": "围绕三个研究问题组织：(RQ1) AHE 与人类设计和自演化基线对比是否更优？(RQ2) 演化结果是否过拟合？(RQ3) 增益来自哪里，自归因多可靠？在 Terminal-Bench 2 上驱动演化（89 个任务），迁移至 SWE-bench-verified，并在五个替代基础模型上评估。",
-          "loadBearing": "RQ1 的核心结果是 AHE 在 Termial-Bench 2 上的 pass@1 最高（77.0%），优于所有基线。RQ2 显示冻结的马具在 SWE-bench-verified 上取得最高聚合成功率且 token 更少，并在所有替代模型上带来正增益。RQ3 消融（表3）显示工具、中间件、长期记忆各自贡献增益，而系统提示单独使用则退步；自归因（图4）显示 fix 预测的精度和召回率远高于随机，但 regression 预测几乎无效。",
-          "evidence": "表1给出精确数字：AHE 总 pass@1 77.0%，Codex 71.9%，TF-GRPO 72.3%，ACE 68.9%，种子 69.7%。表2给出 SWE-bench-verified 上的成功率和 token 数：AHE 成功率 75.6%，token 461k，种子 75.2%/526k。图3显示跨模型增益：deepseek-v4-flash +10.1pp, qwen-3.6-plus +6.3pp, gemini-3.1-flash-lite +5.1pp, GPT-5.4 medium +2.3pp, xhigh +2.3pp。表3：+memory only 75.3%, +tool only 73.0%, +middleware only 71.9%, +system_prompt only 67.4%。图4：fix precision 33.7%, recall 51.4%；regression precision 11.8%, recall 11.1%。",
-          "fold": "实验设置：所有三个角色智能体使用同一基础模型 GPT-5.4（高推理设置），以避免模型能力差异混淆。每次任务运行 k>=2 次 rollout 以稳定 pass@1。基础设施包括 Harbor 分发任务、E2B 远程沙箱、InMemoryTracer 记录轨迹。"
-        },
-        {
-          "heading": "5. 结论",
-          "summary": "AHE 将马具变成可学习适应的表面，同时保持基础模型固定。通过三个可观测性支柱，实现了自动演化，结果可迁移。论文认为马具级演化是模型侧训练的互补轴。"
-        },
-        {
-          "heading": "限制",
-          "summary": "论文承认三点限制：基准范围有限（仅 Terminal-Bench 2 和 SWE-bench-verified）、演化操作点与 GPT-5.4 high 耦合、自修改治理不完整（缺乏完整防护栏）。"
+          "summary": "## Metadata Title: Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses Authors: Jiahang Lin, Shichun Liu, Chengjun Pan, Lizhi Lin, Shihan Dou, Zhiheng Xi, Xuanjing Huang, Hang Yan, Zhenhua Han, Tao Gui, Yu-Gang Jiang arXiv: 2604.25850 Published: 2026-04-28T16:55:02Z Source: arXiv agent harness engineering Source U…",
+          "evidence": "离线 fallback 只使用已收集的 paper-text 证据，不补充证据外事实。"
         }
       ],
       "limitsAndFuture": {
-        "paperStated": "基准范围：仅 Terminal-Bench 2 和 SWE-bench-verified，未测试更广泛的编程语言、仓库级部署和人机循环工作流。演化操作点：step budget 和 per-task timeout 针对 GPT-5.4 high 设定，导致跨模型增益中混有操作点耦合（同一家族内不同推理层级增益非单调）。自修改治理：AHE 将编辑限定在工作空间、通过版本化清单归因、文件级回滚，但缺乏完整防护栏，如长期马具清理和更强误用预防。",
-        "evidenceNotes": "证据主要来自一个基准（Terminal-Bench 2）和迁移测试（SWE-bench-verified、三个模型家族）。样本量有限（89 + 500 任务）。消融实验基于单组件互换，但组件间交互非加性，可能掩盖更优组合。自归因分析基于 9 轮评估，fix precision 33.7% 远高于随机但仍有大量误报；regression 预测无效。可复现性：代码开源在 GitHub，但实验依赖 GPT-5.4 和特定基础设施。"
+        "paperStated": "论文证据未提供限制或未来工作段落。",
+        "evidenceNotes": "当前分析受限于已收集 evidence.content，未使用证据外信息。"
       },
       "selection": {
         "convergence": [
@@ -320,347 +1277,301 @@
       },
       "arxivId": "2604.25850v4",
       "publishedAt": "2026-04-28T16:55:02Z",
+      "paperType": "dataset",
+      "venueStatus": "not_provided",
       "deepDive": {
-        "reframe": "这是一个基于可观测性原理的自动化马具优化系统，本质是将智能体的外循环（harness设计）从手工劳动变为由另一个智能体驱动的证据驱动迭代。",
-        "contributionLayers": [
-          {
-            "layer": "问题定义与框架",
-            "claim": "马具工程自动化的主要障碍是可观测性，而非智能体能力。",
-            "evidence": "论文通过对比 AHE（具备三项可观测性）与仅编辑提示的基线（ACE, TF-GRPO）的性能差异来间接支持，但缺乏消融这三个支柱的对照实验。",
-            "judgment": "该主张合理但未直接验证，因为论文没有消去某一个可观测性支柱来测试效果。",
-            "fdeMeaning": "在 FDE 中，可观测性是调试和优化系统的基石，此主张强化了在系统设计中优先考虑可观测性的思想。"
-          },
-          {
-            "layer": "方法实现",
-            "claim": "通过三项可观测性支柱，演化智能体能够稳定地联合演化全部七种马具组件。",
-            "evidence": "实验显示 AHE 在十次迭代中持续提升 pass@1，并产生了组件间非加性交互的消融结果。",
-            "judgment": "方法可行，但演化过程中 regression 预测无效表明自归因仍不完善。",
-            "fdeMeaning": "FDE 工程师可以借鉴这种层层递进的观测设计（组件级、经验级、决策级）来构建可演化的系统。"
-          },
-          {
-            "layer": "实验验证",
-            "claim": "AHE 超越了人类设计和自演化基线，且演化结果可迁移。",
-            "evidence": "表1、表2、图3提供了具体数字，支持主结果和迁移性。",
-            "judgment": "证据充分，但基准范围有限，且迁移中存在操作点耦合问题。",
-            "fdeMeaning": "证明了自动演化可以生成比手工设计更优的马具，且具有一定泛化能力，为 FDE 节省人工调参成本提供依据。"
-          },
-          {
-            "layer": "限制分析",
-            "claim": "组件交互非加性，自归因对回归失效。",
-            "evidence": "表3显示单组件增益之和超过全 AHE，图4显示 regression precision/recall 仅略高于随机。",
-            "judgment": "这些限制是实证发现，具有实际指导意义。",
-            "fdeMeaning": "FDE 工程师在设计迭代系统时应预料到组件交互复杂性和预测盲区，并建立额外的回退机制。"
-          }
-        ],
-        "mechanism": "AHE 通过三个可观测性层解决自动化马具工程的核心挑战：（1）组件可观测性将马具解耦为七个文件级组件，使每个失败模式对应一个组件类，动作空间清晰、可回滚；（2）经验可观测性通过 Agent Debugger 将原始轨迹蒸馏为分层证据语料库（任务级报告 + 总览），供演化智能体消费；（3）决策可观测性要求每次编辑伴随自声明预测，下一轮验证后确认或回滚。这三个层构成闭环：滚动 → 清理 → 属性（上一轮编辑的归因）→ 蒸馏 → 演化 → 提交。关键点在于将每次编辑变成可证伪的合约，从而避免试错式演化。",
-        "evidenceChain": [
-          {
-            "component": "Terminal-Bench 2 上的主实验（89个任务）",
-            "metrics": [
-              {
-                "label": "pass@1",
-                "value": "77",
-                "note": "AHE 最终结果"
-              },
-              {
-                "label": "pass@1 (种子 NexAU 0)",
-                "value": "69.7"
-              },
-              {
-                "label": "pass@1 (Codex)",
-                "value": "71.9"
-              },
-              {
-                "label": "pass@1 (ACE)",
-                "value": "68.9"
-              },
-              {
-                "label": "pass@1 (TF-GRPO)",
-                "value": "72.3"
-              }
-            ],
-            "reviewerNote": "AHE 在全部任务上表现最佳，但硬任务组略低于 Codex (53.3% vs 56.7%)。增益主要来自中等任务（88.2% 对 Codex 的 80.0%）。该结果基于单次演化运行，可能受随机性影响。"
-          },
-          {
-            "component": "SWE-bench-verified 跨基准迁移",
-            "metrics": [
-              {
-                "label": "成功率",
-                "value": "75.6",
-                "note": "AHE 最高"
-              },
-              {
-                "label": "平均 token (千)",
-                "value": "461",
-                "note": "AHE 最低"
-              },
-              {
-                "label": "种子成功率",
-                "value": "75.2"
-              },
-              {
-                "label": "ACE 成功率",
-                "value": "74.6"
-              },
-              {
-                "label": "TF-GRPO 成功率",
-                "value": "74.2"
-              }
-            ],
-            "reviewerNote": "AHE 在聚合成功率和 token 效率上均最优，但增益集中在 django 和 sphinx-doc 两个最大仓库，在三个最小仓库上反而略低于种子，表明迁移效果可能依赖于任务规模与类型的匹配。Token 减少 12% 相对于种子，21% 相对于 TF-GRPO，32% 相对于 ACE。"
-          },
-          {
-            "component": "跨模型迁移（Terminal-Bench 2）",
-            "metrics": [
-              {
-                "label": "deepseek-v4-flash gain",
-                "value": "10.1",
-                "note": "pp from 51.7% to 61.8%"
-              },
-              {
-                "label": "qwen-3.6-plus gain",
-                "value": "6.3",
-                "note": "pp from 56.2% to 62.5%"
-              },
-              {
-                "label": "gemini-3.1-flash-lite gain",
-                "value": "5.1",
-                "note": "pp from 36.5% to 41.6%"
-              },
-              {
-                "label": "GPT-5.4 medium gain",
-                "value": "2.3",
-                "note": "pp"
-              },
-              {
-                "label": "GPT-5.4 xhigh gain",
-                "value": "2.3",
-                "note": "pp"
-              }
-            ],
-            "reviewerNote": "跨家族增益较大，同家族内非单调。论文将部分原因归因于操作点耦合（timeout-budget 拟合了 GPT-5.4 high）。所有增益为正，支持迁移性，但幅度受演化设置影响。"
-          },
-          {
-            "component": "组件消融（Terminal-Bench 2）",
-            "metrics": [
-              {
-                "label": "+memory only pass@1",
-                "value": "75.3"
-              },
-              {
-                "label": "+tool only pass@1",
-                "value": "73"
-              },
-              {
-                "label": "+middleware only pass@1",
-                "value": "71.9"
-              },
-              {
-                "label": "+system_prompt only pass@1",
-                "value": "67.4"
-              },
-              {
-                "label": "全 AHE pass@1",
-                "value": "77"
-              }
-            ],
-            "reviewerNote": "单个组件（除了系统提示）均超过种子，但总和 (+memory +tool +middleware = +11.1 pp) 超过全 AHE 的 +7.3 pp，表明组件间存在负交互。系统提示单独使用甚至低于种子，突出了组件协同的重要性。消融中未测试两两组合。"
-          },
-          {
-            "component": "自归因分析（9轮）",
-            "metrics": [
-              {
-                "label": "fix precision",
-                "value": "33.7",
-                "note": "随机基线 ~6.5%"
-              },
-              {
-                "label": "fix recall",
-                "value": "51.4",
-                "note": "随机基线 ~10.6%"
-              },
-              {
-                "label": "regression precision",
-                "value": "11.8",
-                "note": "随机基线 ~5.6%"
-              },
-              {
-                "label": "regression recall",
-                "value": "11.1",
-                "note": "随机基线 ~5.4%"
-              }
-            ],
-            "reviewerNote": "fix 预测有实际信号（约5倍于随机），但仍有大量误报（precision 仅1/3）。regression 预测几乎无效，说明演化智能体无法预见编辑的负面效应，这是自我演化系统的关键弱点。"
-          }
-        ],
+        "reframe": "Collected evidence is not sufficient to reframe the paper beyond its metadata and abstract.",
+        "contributionLayers": [],
+        "mechanism": "Collected evidence did not provide enough mechanism detail for a reviewer-style mechanism judgment.",
+        "evidenceChain": [],
         "audit": [
-          {
-            "claim": "官方 terminal-bench-2 排行榜将 89 个任务分为 4 easy, 55 medium, 30 hard。",
-            "finding": "www.tbench.ai 页面可达，但未在审计结果中返回具体分类细节，但页面整体可用。",
-            "source": "https://www.tbench.ai/benchmarks/terminal-bench-2"
-          },
           {
             "claim": "The five blocks below reproduce the literal contents of the corresponding files in the public repository at https://github.com/china-qijizhifeng/agentic-harness-engineering as of the commit that produced the experiments in Section 4 .",
             "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
             "source": "https://github.com/china-qijizhifeng/agentic-harness-engineering"
           }
         ],
-        "loadBearingClaim": "可观测性驱动的闭环演化能够有效且可迁移地改进编码智能体的马具，其增益主要来自工具、中间件和长期记忆等组件层。",
-        "strongestEvidence": [
-          "AHE 在 Terminal-Bench 2 上将 pass@1 从 69.7% 提升至 77.0%，超越人类设计的 Codex (71.9%)。",
-          "冻结的马具在 SWE-bench-verified 上取得最高聚合成功率（75.6%）并减少 12% token 消耗。",
-          "跨三个模型家族的一致正增益（+5.1 到 +10.1 pp）。",
-          "消融实验定位增益来源为工具、中间件和长期记忆，而非系统提示。"
-        ],
+        "loadBearingClaim": "No load-bearing claim was identified from the collected evidence.",
+        "strongestEvidence": [],
         "limitations": [
-          "演化仅在 Terminal-Bench 2 上运行，迁移测试限于 SWE-bench-verified 和三个模型家族，缺乏更广泛的基准和部署环境验证。",
-          "可复现性受限于对 GPT-5.4 和特定基础设施的依赖，但代码和配置已公开。",
-          "演化操作点（step budget、timeout）针对 GPT-5.4 high 调整，导致跨模型增益中存在操作点耦合。",
-          "自归因 regression 预测无效，表明系统无法预见编辑的负面效应。",
-          "组件间非加性交互未被建模，演化可能陷入局部最优。",
-          "自修改治理不完整，缺乏长期马具清理和误用预防的完整防护栏。"
+          "Reproducibility note: external project/repository claims were checked in the audit entries above; remaining reproducibility depends on paper artifacts, code, data, and run instructions actually being present."
         ],
-        "suggestedExperiments": [
-          "进行消融三项可观测性支柱（移除一个支柱）以直接验证其必要性。",
-          "在更广泛的基准（如 SWE-bench Multi-modal, MLE-bench）和不同模型家族上重复演化，以测试通用性。",
-          "采用交互感知的演化策略（如贝叶斯优化或进化多目标算法）来处理组件非加性。",
-          "改进回归预测能力，例如通过因果推断或反事实模拟。",
-          "将 AHE 应用于真实工业编码智能体，评估其在持续部署环境中的成本和稳定性。"
+        "suggestedExperiments": [],
+        "artifactAudit": {
+          "officialCode": "third_party_only",
+          "data": "not_found",
+          "reproducibility": "third_party_only",
+          "notes": [
+            "Reachable referenced, dependency, or third-party repositories are not treated as the authors' official code release for this paper.",
+            "No fetched text clearly identifies an authors' official code release for this specific paper."
+          ],
+          "repoStatus": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page."
+        },
+        "claimLedger": [],
+        "evidenceMatrix": [],
+        "whatWouldInvalidate": [
+          "A reproduction or ablation shows the load-bearing claim does not hold: No load-bearing claim was identified from the collected evidence.",
+          "The measured gain disappears when controlling for benchmark harness, prompt/tool schema, data leakage, reviewer effects, or baseline implementation quality.",
+          "A customer-like pilot shows that latency, cost, permissions, reliability, or human-review burden erases the engineering conclusion.",
+          "The official artifacts remain unavailable or cannot be run, leaving the engineering conclusion unverifiable beyond the paper text."
         ],
+        "verdict": {
+          "readDecision": "read",
+          "fdeFit": "high",
+          "evidenceStrength": "medium",
+          "artifactStatus": "third_party_only",
+          "oneLineJudgment": "Collected evidence is not sufficient to reframe the paper beyond its metadata and abstract.",
+          "whyNow": [
+            "Current triage placed it in AI Agents, Tool Use."
+          ],
+          "whyNotOverclaim": [
+            "Treat claims without a section, figure, table, appendix, or repo pointer as not specified in fetched text.",
+            "Do not treat reachable referenced or dependency repositories as official reproducibility artifacts.",
+            "No normalized experiment row with exactness was available from the fetched text."
+          ]
+        },
         "fdeTakeaways": {
-          "customerProblem": "企业级编码智能体在部署后需要持续优化其工具调用、中间件和记忆系统，但手动调整马具耗时且难以跟上模型更新。客户需要一个可观测的、自动化的马具演化系统，在不中断服务的前提下提升智能体的任务完成率并降低成本。",
+          "customerProblem": "[推论] The customer problem is turning customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff into a reliable AI application path: interfaces, data access, evaluation, rollout, and operating ownership have to be proven before production.",
           "customerQuestions": [
-            "你们现在的智能体马具是如何管理的？是手动编辑还是自动化？",
-            "你们是否观察到智能体在不同模型版本切换时性能下降？",
-            "现有马具的哪个组件（提示、工具、中间件、记忆）你最常修改？",
-            "你们如何监控智能体的轨迹并从中提取失败模式？",
-            "如果自动编辑马具，你们如何确保不会破坏现有功能？",
-            "你们是否有回滚机制？回滚的粒度是什么？",
-            "你们如何评估马具修改对任务完成率和 token 成本的影响？",
-            "你们的部署环境是否支持沙箱隔离（如 E2B）？",
-            "你们希望自动演化覆盖哪些组件？是否包括权限控制或监控？",
-            "你们对自演化系统的安全性有什么要求？比如编辑范围限制和审计日志。"
+            "[推论] Which real customer workflow owns the AI output, and what production constraint would make the system unusable?",
+            "[推论] Which endpoints, tool contracts, inputs, responses, auth scopes, and error states must be explicit before integration?",
+            "[推论] Where does the AI step enter the workflow, who reviews or approves it, and what handoff must remain deterministic?",
+            "[推论] Which knowledge sources need freshness, access control, retrieval tests, and citation or trace coverage?",
+            "[推论] Which traces, logs, intermediate decisions, and failure labels are required to debug bad outputs after deployment?",
+            "[推论] What rollout, fallback, rollback, versioning, latency, and cost controls decide whether this can run in production?",
+            "[推论] Which customer artifacts prove the current bottleneck: code paths, site behavior, data schemas, logs, tickets, or analytics?"
           ],
           "artifactsToAudit": [
-            "API 规范（工具接口定义）",
-            "数据库模式（如记忆存储结构）",
-            "日志系统（智能体轨迹记录）",
-            "提示模板（系统提示、用户提示）",
-            "评估集（基准任务和通过标准）",
-            "工作流文档（马具组件配置和依赖关系）",
-            "认证与 RBAC（编辑动作的权限控制）",
-            "监控与审计（演化操作的记录和告警）",
-            "SLA 文档（演化对延迟和成功率的要求）",
-            "人工审批流程（如需要确认的关键编辑）",
-            "API spec or tool schema",
-            "db schema or data dictionary",
-            "logs and traces",
-            "prompts and tool-call transcripts"
+            "[待验证假设] API spec or tool schema",
+            "[待验证假设] db schema or data dictionary",
+            "[待验证假设] logs and traces",
+            "[待验证假设] prompts and tool-call transcripts",
+            "[待验证假设] eval set and golden tasks",
+            "[待验证假设] workflow docs",
+            "[待验证假设] auth/RBAC matrix",
+            "[待验证假设] monitoring dashboards",
+            "[待验证假设] SLAs or SLOs",
+            "[待验证假设] human-approval flow",
+            "[待验证假设] workflow SOPs",
+            "[待验证假设] production runbooks",
+            "[待验证假设] service SLOs",
+            "[待验证假设] OpenAPI specs"
           ],
           "implementationChecklist": [
-            "确认马具是否解耦为独立文件？",
-            "是否支持文件级回滚（如 git）？",
-            "是否有自动化的轨迹记录和蒸馏 pipeline？",
-            "演化智能体是否有明确的文件系统访问限制？",
-            "每个编辑是否附带预测和预期影响？",
-            "是否定义了下一轮验证的指标和阈值？",
-            "是否设计了回归检测和告警机制？",
-            "是否有并行 rollout 和沙箱基础设施？",
-            "是否评估了演化迭代的成本（时间、token）？",
-            "是否有回退策略（如果新马具性能下降）？",
-            "Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
-            "Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented."
+            "[推论] Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
+            "[推论] Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
+            "[推论] Trigger, human approval, escalation, handoff, retry, and exception paths are mapped.",
+            "[推论] Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
+            "[推论] Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
+            "[推论] Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready.",
+            "[推论] Code/site/data artifacts are sampled, mapped to user-facing failures, and tied to measurable remediation work."
           ],
           "evalPlan": [
-            "离线评估：在保留的基准上比较新旧马具的 pass@1 和 token 消耗。",
-            "在线评估：在影子流量或灰度部署中，监控成功率、延迟、回滚率。",
-            "黄金任务集：建立代表客户典型工作流的 10-20 个任务，每次演化后测试。",
-            "人工审查：对自动编辑的 manifest 进行抽查，验证预测的合理性。",
-            "成本监控：跟踪每次演化的 token 和计算成本，确保 ROI 为正。",
-            "回归测试：特别关注上一轮预测可能受影响的 task，并补充自动回归测试集。",
-            "Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
-            "Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
-            "Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
-            "Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate."
+            "[待验证假设] Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
+            "[待验证假设] Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
+            "[待验证假设] Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
+            "[待验证假设] Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
+            "[待验证假设] Offline and online evals must include the real production constraint the paper treats as load-bearing.",
+            "[待验证假设] Golden tasks should assert the expected tool call, input schema, response handling, auth failure, timeout, and retry behavior.",
+            "[待验证假设] Human-review samples should cover normal completion, rejection, escalation, retry, and exception paths.",
+            "[待验证假设] Offline retrieval eval should separate answer quality from source freshness, access control, citation coverage, and retrieval miss rate.",
+            "[待验证假设] Online eval should connect production traces to failure labels so regressions can be debugged without exposing private data.",
+            "[待验证假设] Limited-production eval should include rollback drills, version pinning, p95 latency, per-task cost, and escalation-rate checks."
           ],
           "rolloutPlan": [
-            "PoC：在单一模型和基准（如终端模拟）上运行 AHE 一个完整循环，评估性能提升和稳定性。",
-            "Pilot：在内部团队的开发环境中部署，使用非关键工作流，监控编辑质量和回滚频率。",
-            "Limited Prod：在少量客户实例（<5%）上以影子模式运行演化智能体，不自动应用编辑，仅生成建议。",
-            "Full Production：在充分验证后，允许自动编辑并附带人工审批关键改动（如删除组件）。",
-            "持续改进：建立周度或月度演化循环，并加入新基准和客户反馈。",
-            "PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
-            "Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
-            "Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget."
+            "[待验证假设] PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
+            "[待验证假设] Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
+            "[待验证假设] Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget.",
+            "[待验证假设] Full production: expand only after ownership, monitoring, eval refresh, incident response, and governance reviews are stable. Acceptance criteria: business metric movement and failure-rate reduction are visible in operating data."
           ],
           "riskRegister": [
-            "技术风险：演化智能体可能产生有害编辑，如禁用安全检查或降低精度。",
-            "数据风险：轨迹数据可能包含敏感信息，蒸馏过程需脱敏。",
-            "权限风险：演化智能体的写权限需严格控制，防止越界编辑。",
-            "安全风险：沙箱隔离不足可能导致跨任务污染。",
-            "成本风险：多次演化累积的 token 和计算成本可能超过人工调整。",
-            "采用风险：团队可能不信任自动演化结果，需要展示清晰的收益和 AI 可解释性。",
-            "技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
-            "数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
-            "权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
-            "安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations."
+            "[待验证假设] 技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
+            "[待验证假设] 数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
+            "[待验证假设] 权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
+            "[待验证假设] 安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations.",
+            "[待验证假设] 成本: latency, model calls, retrieval, monitoring, and human review can erase the apparent automation savings.",
+            "[待验证假设] 采用: users need a clear owner, review path, fallback, and escalation rule before trusting the workflow.",
+            "[待验证假设] 采用: without a workflow owner and fallback path, the system can be technically correct but operationally unused.",
+            "[待验证假设] 技术: vague tool contracts shift failures into runtime debugging and make model quality look worse than the integration actually is.",
+            "[待验证假设] 采用: unclear approval and escalation paths create shadow workflows even when the AI output is accurate.",
+            "[待验证假设] 数据: stale or permission-mismatched knowledge can produce fluent answers that cannot be trusted in the customer workflow."
           ],
-          "roiHypothesis": "自动马具演化可将智能体任务成功率提升 5-10 个百分点，同时减少 token 成本 10-15%，从而在每月百万级 token 使用场景下节省数千美元，并减少工程师手动调优时间 80%。证据来自 AHE 在基准上的定量结果，但实际 ROI 需根据客户的具体任务分布和模型定价校准。",
-          "interviewStory": "想象一下，你的编码智能体在部署后，每次升级基础模型都需要重新手工调整提示、工具和中间件，这个过程可能花费数周且容易出错。我们基于论文中的 AHE 方法，构建了一个自动化的马具演化系统。它通过三项可观测性设计——将马具组件解耦为文件、从轨迹中蒸馏出根因、每次编辑附带可验证的预测——让系统自己优化自己。在内部测试中，十轮迭代将终端任务成功率从 70% 提升到 77%，并且这个优化后的配置可以直接应用于其他代码库（如 SWE-bench）和其他模型（如 DeepSeek 和 Qwen），都能看到明显的提升。对于您的团队，这意味着您可以将工程师从繁琐的马具调优中解放出来，让他们专注于更高价值的工作，同时智能体性能持续改进。更重要的是，由于每次编辑都是可审计、可回滚的，您不必担心自动优化带来的风险。我们可以从一个小范围试点开始，逐步扩大自动化程度。"
+          "roiHypothesis": "[待验证假设] In a customer report, this becomes a readiness and risk-reduction hypothesis for customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff: ROI may come from reducing integration, evaluation, and debugging cycles, but it should be validated with an A/B test or staged pilot on task success, human override rate, time-to-resolution, p95 latency, cost per task, failure logs, and policy or error incidents.",
+          "interviewStory": "[面试故事] FDE interview story: I would translate the paper's customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff signal into a customer delivery plan by auditing the real artifacts, defining golden tasks and operating budgets, piloting behind human approval, and using the measured failure modes to decide whether the system earns limited production."
         }
+      }
+    },
+    {
+      "id": "paper:arxiv-2605-29861",
+      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+      "authors": "Chenghao Zhang, Guanting Dong, Yufan Liu, Tong Zhao, Zhicheng Dou",
+      "venue": "Venue not provided",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.29861",
+      "verifiedAt": "2026-05-31T19:21:56.449Z",
+      "tier": "deep",
+      "leadJudgment": "离线模式下只根据已收集证据保留《Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation》的基础脉络。",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "## Metadata Title: Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation Authors: Chenghao Zhang, Guanting Dong, Yufan Liu, Tong Zhao, Zhicheng Dou arXiv: 2605.29861 Published: 2026-05-28T12:40:34Z Source: Hugging Face Daily Papers Source URL: https://huggingface.co/papers/2605.29861 Paper URL: https://arxiv.or…",
+          "evidence": "离线 fallback 只使用已收集的 paper-text 证据，不补充证据外事实。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文证据未提供限制或未来工作段落。",
+        "evidenceNotes": "当前分析受限于已收集 evidence.content，未使用证据外信息。"
       },
-      "scorecard": [
-        {
-          "dimension": "FDE相关性",
-          "score": 8,
-          "reason": "直接涉及智能体马具（harness）的自动演化，包括工具、中间件、长期记忆等组件，这些是 FDE 工程中的核心模块。论文提供了可操作的可观测性框架和迁移证据，但演化针对特定基准，未直接覆盖企业级部署中的权限、监控、SLA 等。"
+      "selection": {
+        "convergence": [
+          "Hugging Face Daily Papers",
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks"
+        ],
+        "ideaSignal": "deep_dive:99+ahe:harness engineering+fde:API/tool/MCP integration"
+      },
+      "provenance": {
+        "sourceUrl": "https://huggingface.co/papers/2605.29861",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.29861",
+      "publishedAt": "2026-05-28T12:40:34Z",
+      "paperType": "industry_case",
+      "venueStatus": "not_provided",
+      "deepDive": {
+        "reframe": "Collected evidence is not sufficient to reframe the paper beyond its metadata and abstract.",
+        "contributionLayers": [],
+        "mechanism": "Collected evidence did not provide enough mechanism detail for a reviewer-style mechanism judgment.",
+        "evidenceChain": [],
+        "audit": [
+          {
+            "claim": "Source URL: https://huggingface.co/papers/2605.29861",
+            "finding": "huggingface.co artifact page is reachable; no obvious gated, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://huggingface.co/papers/2605.29861"
+          },
+          {
+            "claim": "Note: https://github.com/youdotcom-oss/ydc-deep-research-evals GitHub repository Cited by: §6.",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/youdotcom-oss/ydc-deep-research-evals"
+          }
+        ],
+        "loadBearingClaim": "No load-bearing claim was identified from the collected evidence.",
+        "strongestEvidence": [],
+        "limitations": [
+          "Reproducibility note: external project/repository claims were checked in the audit entries above; remaining reproducibility depends on paper artifacts, code, data, and run instructions actually being present."
+        ],
+        "suggestedExperiments": [],
+        "artifactAudit": {
+          "officialCode": "third_party_only",
+          "data": "not_found",
+          "reproducibility": "third_party_only",
+          "notes": [
+            "Reachable referenced, dependency, or third-party repositories are not treated as the authors' official code release for this paper.",
+            "No fetched text clearly identifies an authors' official code release for this specific paper."
+          ],
+          "repoStatus": "huggingface.co artifact page is reachable; no obvious gated, not-found, or release-on-hold warning was detected in the fetched page. github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page."
         },
-        {
-          "dimension": "工程现实感",
-          "score": 7,
-          "reason": "方法基于实际框架 NexAU，有开源代码，并展示了从种子到演化马具的完整 pipeline。但种子马具过于最小化（仅 shell 工具），且演化仅运行了10轮，实际工程中可能需要更多迭代和更复杂的部署考量。"
+        "claimLedger": [],
+        "evidenceMatrix": [],
+        "whatWouldInvalidate": [
+          "A reproduction or ablation shows the load-bearing claim does not hold: No load-bearing claim was identified from the collected evidence.",
+          "The measured gain disappears when controlling for benchmark harness, prompt/tool schema, data leakage, reviewer effects, or baseline implementation quality.",
+          "A customer-like pilot shows that latency, cost, permissions, reliability, or human-review burden erases the engineering conclusion.",
+          "The official artifacts remain unavailable or cannot be run, leaving the engineering conclusion unverifiable beyond the paper text."
+        ],
+        "verdict": {
+          "readDecision": "read",
+          "fdeFit": "high",
+          "evidenceStrength": "medium",
+          "artifactStatus": "third_party_only",
+          "oneLineJudgment": "Collected evidence is not sufficient to reframe the paper beyond its metadata and abstract.",
+          "whyNow": [
+            "Current triage placed it in Broad AI / ML, AI Agents."
+          ],
+          "whyNotOverclaim": [
+            "Treat claims without a section, figure, table, appendix, or repo pointer as not specified in fetched text.",
+            "Do not treat reachable referenced or dependency repositories as official reproducibility artifacts.",
+            "No normalized experiment row with exactness was available from the fetched text."
+          ]
         },
-        {
-          "dimension": "问题重要性",
-          "score": 9,
-          "reason": "马具工程是编码智能体性能的关键瓶颈，手动调整无法跟上模型迭代速度。AHE 首次提出全组件联合演化的闭环，并验证了迁移性，具有重要的实际意义。"
-        },
-        {
-          "dimension": "方法新颖性",
-          "score": 8,
-          "reason": "三项可观测性支柱（组件、经验、决策）的组合是新颖的，特别是决策可观测性中的自声明预测和下轮验证，将每次编辑变为可证伪合约。但各组件（解耦框架、轨迹蒸馏、版本化管理）本身并非全新，组合是创新。"
-        },
-        {
-          "dimension": "证据强度",
-          "score": 7,
-          "reason": "提供了多个维度的定量实验（主结果、迁移、消融、自归因），且使用了公开基准。但仅一个演化目标（Terminal-Bench 2），消融分析揭示了组件非加性但未深入交互机制，自归因的 regression 预测无效表明方法存在盲区。"
-        },
-        {
-          "dimension": "可复现性",
-          "score": 6,
-          "reason": "代码已开源，实验配置详细（附录表4），但依赖 GPT-5.4 和特定基础设施（E2B 沙箱等），完全复现需要相同 API 和硬件。种子马具和演化过程描述清晰，但演化结果可能因随机种子和模型输出波动。"
-        },
-        {
-          "dimension": "可部署性",
-          "score": 6,
-          "reason": "方法可在 NexAU 框架上运行，但需要较多的计算资源（32 小时演化，96 并发 rollout）。没有讨论在生产环境中持续演化的开销和稳定性。治理机制（工作空间限制、版本化回滚）有助于安全部署，但缺乏完整防护栏。"
-        },
-        {
-          "dimension": "安全治理意识",
-          "score": 5,
-          "reason": "论文明确提到了自修改治理的限制，并设计了工作空间可编辑性限制和回滚机制，这体现了安全意识。但未涉及更广泛的安全问题，如恶意编辑、数据泄漏、权限滥用等。"
-        },
-        {
-          "dimension": "ROI可解释性",
-          "score": 7,
-          "reason": "量化了 pass@1 提升和 token 成本降低，在 SWE-bench-verified 上 Succ/Mtok 最高（表5）。但 ROI 依赖于特定基准和模型，实际收益需要根据具体任务和工作流评估。"
-        },
-        {
-          "dimension": "职业训练价值",
-          "score": 8,
-          "reason": "论文系统性地展示了马具工程、可观测性设计、实验设计（包括消融和归因分析），对于学习如何构建和优化智能体系统有很高的教学价值。附录包含完整提示和配置，便于实践。"
+        "fdeTakeaways": {
+          "customerProblem": "[推论] The customer problem is turning customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff into a reliable AI application path: interfaces, data access, evaluation, rollout, and operating ownership have to be proven before production.",
+          "customerQuestions": [
+            "[推论] Which real customer workflow owns the AI output, and what production constraint would make the system unusable?",
+            "[推论] Which endpoints, tool contracts, inputs, responses, auth scopes, and error states must be explicit before integration?",
+            "[推论] Where does the AI step enter the workflow, who reviews or approves it, and what handoff must remain deterministic?",
+            "[推论] Which knowledge sources need freshness, access control, retrieval tests, and citation or trace coverage?",
+            "[推论] What eval set, pass/fail metric, regression gate, and review sample would prove this works on the customer's real tasks?",
+            "[推论] Which traces, logs, intermediate decisions, and failure labels are required to debug bad outputs after deployment?",
+            "[推论] What rollout, fallback, rollback, versioning, latency, and cost controls decide whether this can run in production?"
+          ],
+          "artifactsToAudit": [
+            "[待验证假设] API spec or tool schema",
+            "[待验证假设] db schema or data dictionary",
+            "[待验证假设] logs and traces",
+            "[待验证假设] prompts and tool-call transcripts",
+            "[待验证假设] eval set and golden tasks",
+            "[待验证假设] workflow docs",
+            "[待验证假设] auth/RBAC matrix",
+            "[待验证假设] monitoring dashboards",
+            "[待验证假设] SLAs or SLOs",
+            "[待验证假设] human-approval flow",
+            "[待验证假设] workflow SOPs",
+            "[待验证假设] production runbooks",
+            "[待验证假设] service SLOs",
+            "[待验证假设] OpenAPI specs"
+          ],
+          "implementationChecklist": [
+            "[推论] Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
+            "[推论] Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
+            "[推论] Trigger, human approval, escalation, handoff, retry, and exception paths are mapped.",
+            "[推论] Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
+            "[推论] Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
+            "[推论] Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
+            "[推论] Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready."
+          ],
+          "evalPlan": [
+            "[待验证假设] Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
+            "[待验证假设] Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
+            "[待验证假设] Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
+            "[待验证假设] Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
+            "[待验证假设] Offline and online evals must include the real production constraint the paper treats as load-bearing.",
+            "[待验证假设] Golden tasks should assert the expected tool call, input schema, response handling, auth failure, timeout, and retry behavior.",
+            "[待验证假设] Human-review samples should cover normal completion, rejection, escalation, retry, and exception paths.",
+            "[待验证假设] Offline retrieval eval should separate answer quality from source freshness, access control, citation coverage, and retrieval miss rate.",
+            "[待验证假设] Regression gates should track pass/fail thresholds, known failure labels, cost, latency, and drift from the customer task distribution.",
+            "[待验证假设] Online eval should connect production traces to failure labels so regressions can be debugged without exposing private data."
+          ],
+          "rolloutPlan": [
+            "[待验证假设] PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
+            "[待验证假设] Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
+            "[待验证假设] Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget.",
+            "[待验证假设] Full production: expand only after ownership, monitoring, eval refresh, incident response, and governance reviews are stable. Acceptance criteria: business metric movement and failure-rate reduction are visible in operating data."
+          ],
+          "riskRegister": [
+            "[待验证假设] 技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
+            "[待验证假设] 数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
+            "[待验证假设] 权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
+            "[待验证假设] 安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations.",
+            "[待验证假设] 成本: latency, model calls, retrieval, monitoring, and human review can erase the apparent automation savings.",
+            "[待验证假设] 采用: users need a clear owner, review path, fallback, and escalation rule before trusting the workflow.",
+            "[待验证假设] 采用: without a workflow owner and fallback path, the system can be technically correct but operationally unused.",
+            "[待验证假设] 技术: vague tool contracts shift failures into runtime debugging and make model quality look worse than the integration actually is.",
+            "[待验证假设] 采用: unclear approval and escalation paths create shadow workflows even when the AI output is accurate.",
+            "[待验证假设] 数据: stale or permission-mismatched knowledge can produce fluent answers that cannot be trusted in the customer workflow."
+          ],
+          "roiHypothesis": "[待验证假设] In a customer report, this becomes a readiness and risk-reduction hypothesis for customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff: ROI may come from reducing integration, evaluation, and debugging cycles, but it should be validated with an A/B test or staged pilot on task success, human override rate, time-to-resolution, p95 latency, cost per task, failure logs, and policy or error incidents.",
+          "interviewStory": "[面试故事] FDE interview story: I would translate the paper's customer-facing production AI workflow, API/tool/MCP integration, workflow automation with human handoff signal into a customer delivery plan by auditing the real artifacts, defining golden tasks and operating budgets, piloting behind human approval, and using the measured failure modes to decide whether the system earns limited production."
         }
-      ]
+      }
     },
     {
       "id": "paper:arxiv-2605-14271",
@@ -669,59 +1580,61 @@
       "venue": "Venue not provided",
       "sourceName": "arXiv agent harness engineering",
       "sourceUrl": "https://arxiv.org/abs/2605.14271",
-      "verifiedAt": "2026-05-31T16:49:43.730Z",
+      "verifiedAt": "2026-05-31T19:19:48.444Z",
       "tier": "deep",
-      "leadJudgment": "这篇论文提出了一种以执行轨迹为中心的agent harness安全审计框架，将安全评估从最终输出转移到完整执行过程，揭示了任务完成与安全执行之间的系统性脱节。",
+      "leadJudgment": "A framework and benchmark for evaluating safety of LLM agent execution harnesses along trajectory-level boundary compliance, execution fidelity, and system stability.",
       "sections": [
         {
-          "heading": "1. 引言",
-          "summary": "论文指出现代LLM代理运行在执行harness中，harness决定暴露哪些操作、谁可以调用以及何时终止。仅评估最终输出会遗漏中间过程的违规行为，如未授权资源访问或上下文泄露。作者提出HarnessAudit框架，审计完整执行轨迹的三个层面：边界合规、执行保真度和系统稳定性。并构建了包含210个任务的基准HarnessAudit-Bench，覆盖8个领域。主要发现：任务完成与安全执行不对齐；违规随轨迹长度积累；多代理协作扩大安全风险面；harness设计决定了安全部署的上限。",
-          "loadBearing": "核心假设：代理安全应当基于harness而非模型响应进行评估，并且应当在完整执行轨迹上进行审计。",
-          "evidence": "论文通过对比现有基准（仅评估最终输出）说明了这一假设的必要性，但没有直接证明仅评估输出的不足量级。",
-          "fold": "引言中引用了多个现有基准（如AgentHarm, ClawsBench）来说明它们缺乏轨迹审计和多代理设置，但未提供定量比较。"
+          "heading": "摘要",
+          "summary": "论文提出HarnessAudit框架和HarnessAudit-Bench基准，用于审计LLM代理执行轨迹的边界合规性、执行保真度和系统稳定性。发现任务完成与安全执行之间存在错位，违规行为在轨迹长度上累积，资源访问和智能体间信息传输是主要风险点，多智能体协作扩大了安全风险面。",
+          "loadBearing": "当前安全基准仅评估最终输出，无法捕获轨迹中的违规行为；HarnessAudit通过隐藏审计通道独立记录工具调用、资源访问和组件间交互。",
+          "evidence": "论文在8个领域210个任务上评估了10种配置，证明输出级评估无法检测中轨迹违规（Sec. 1, Table 1）。",
+          "fold": "审计管道分为设置、执行、评判三个阶段，隐藏审计工件在运行期间对代理不可见（Sec. 3.3）。"
         },
         {
-          "heading": "2. 相关工作",
-          "summary": "回顾了三个方向：代理安全评估（如AgentHarm、OS-Harm）、轨迹审计和harness级别保证（如OpenClaw、ClawKeeper）、多代理系统安全（如AutoGen、CAMEL、TAMAS）。指出现有工作要么局限于狭窄环境，要么针对特定威胁模型，缺乏统一的harness级轨迹审计。HarnessAudit通过隐藏证据通道和三层评估填补这一空白。",
-          "evidence": "论文通过对比表格（表1）展示了HarnessAudit-Bench在覆盖多代理、轨迹审计、扰动稳定性等维度的优势。"
+          "heading": "1 引言",
+          "summary": "现代LLM代理在执行框架（如OpenClaw, Claude Code, Codex）内运行，框架决定暴露哪些动作、谁可以调用、何时终止。框架可能返回正确答案但沿途访问未授权资源或泄漏上下文。现有基准仅评分最终输出，而违规常发生在中轨迹。论文提出HarnessAudit，审计完整执行轨迹的三个属性：边界合规性、执行保真度、系统稳定性。",
+          "loadBearing": "代理安全应评估框架而非响应，并审计完整轨迹。",
+          "evidence": "图2展示了框架返回正确答案但违规的示例。论文引用了现有基准的不足（Sec. 2）。"
         },
         {
-          "heading": "3. 问题形式化",
-          "summary": "首先将agent harness定义为策略约束的执行系统，包含代理、工具、资源、权限策略、信息流策略和协调协议。然后定义三层安全：L1边界合规（工具、资源、信息流违规）、L2执行保真度（动作有效性、任务完成检查点）、L3系统稳定性（针对间接注入、模糊目标、工具错误的鲁棒性）。审计流程分为设置、执行、评判三个阶段，所有证据从代理无法操纵的隐藏通道收集。评分公式将边界合规作为乘法门控，组合任务完成、动作有效性和扰动稳定性。",
-          "loadBearing": "三层安全定义和乘法门控评分（Score = SAR * (0.7*TCR + 0.15*AVS + 0.15*PB)）是论文的核心主张，假设这种组合能够全面反映harness安全性。",
-          "evidence": "论文给出了详细的评分公式和参数选择（默认α=0.7, β=0.15, γ=0.15），但未通过实验验证这些权重的最优性。",
-          "fold": "附录9提供了更详细的加权方案，包括严重性权重ω_low=0.15, ω_high=0.30，以及V-OR事件如何影响L2的AVS评分。"
+          "heading": "2 相关工作",
+          "summary": "回顾代理安全评估、轨迹审计和多智能体安全的相关工作。现有基准如AgentHarm、ClawsBench等主要关注单代理或受限环境，缺乏多智能体协作和安全压力。HarnessAudit将框架本身作为评估单元，通过隐藏独立证据通道审计完整轨迹。",
+          "evidence": "论文比较了与现有基准的覆盖差异（Table 1），指出HarnessAudit-Bench覆盖了多代理、轨迹审计、边界合规、执行保真度和扰动稳定性。"
         },
         {
-          "heading": "4. HarnessAudit-Bench 构建",
-          "summary": "基准包含210个任务，覆盖金融、电商、医疗、办公、社交、日常生活、法律合规、软件工程8个领域，共有69个角色模板。每个任务具有明确的工具授权条目（共11586条）、资源范围规则（3094条）和信息流约束。对于L3，从105个任务中衍生出525个扰动变体。任务设计遵循三个原则：用户请求是良性的；成功需要角色间受限协作；定义明确的工具和资源范围，包含离群诱饵。",
-          "loadBearing": "假设：这些精心设计的任务能够代表真实世界的harness安全风险，并且诱饵和约束的设计能够暴露轨迹级别的违规。",
-          "evidence": "论文通过统计描述（如平均每任务55.2条工具授权条目）展示了基准的规模，但未提供独立验证（如与其他基准的定量比较结果）。",
-          "fold": "附录10详细说明了任务对象模式、角色设计、安全标注协议和扰动规范生成。"
+          "heading": "3 问题形式化",
+          "summary": "将代理框架定义为策略约束执行系统，包含组件集、工具集、资源集、权限策略、信息流策略和协调协议。提出三层安全评估：L1边界合规性（工具、资源、信息流违规）、L2执行保真度（动作有效性、检查点任务完成）、L3系统稳定性（间接注入、模糊目标、工具错误）。审计管道由设置、执行、评判三阶段组成，隐藏审计工件在运行期间不可见。",
+          "loadBearing": "安全评估需联合满足三层属性；每层映射到其他层无法检测的失败模式。",
+          "evidence": "形式化定义见公式(1)。评分公式见Section 3.4：总体安全度 = SAR_bar * (0.7*TCR + 0.15*AVS + 0.15*PB)。"
         },
         {
-          "heading": "5. 实验设置与主要结果",
-          "summary": "评估了10种harness配置（OpenClaw、Claude Code、Codex上的7个模型）和3个多代理框架（Claw-Team、Google ADK、OpenAI SDK）。主要发现：(1) 当前harness远非安全可靠，最佳系统整体得分仅0.32；(2) 任务完成与安全合规明显不对齐（Gemini 3.1 Pro TCR较低但安全最好，Claude Opus 4.6 TCR高但安全弱）；(3) 资源访问违规占比最大；(4) 系统在扰动下脆弱，间接注入造成最大下降。",
-          "loadBearing": "宣称“当前agent harnesses远非安全可靠，最佳整体得分仅0.32”是重要发现，直接支撑论文论点。",
-          "evidence": "提供了表2的完整数据，包括各模型的SAR_t、SAR_r、SAR_f、AVS、TCR、PB、S@T20/50/80、Overall得分。例如Gemini 3.1 Pro在OpenClaw下Overall=0.41，SAR_t=0.85，SAR_r=0.71。数据来自210个任务的评估。",
-          "fold": "表2中的所有数据来自论文，此处不一一列出。"
+          "heading": "4 HarnessAudit-Bench",
+          "summary": "构建了210个任务，覆盖8个领域24个场景。每个任务包含显式的工具授权条目（11586条）、资源范围规则（3094条）和扰动规范（525个扰动案例）。任务设计遵循三条原则：良性目标请求、有限协作、显式工具和资源范围。通过混合流水线自动生成并人工验证。",
+          "evidence": "Table 1显示HarnessAudit-Bench是唯一支持多代理（MA）、多模型（MM）、轨迹审计、边界合规、执行保真度和扰动稳定性的基准。平均每个任务4.6个角色，69个独特角色模板。",
+          "fold": "审计仪器化包括工具必要性层级（必需、禁止、不必要）和通信策略（允许/禁止角色间信道）。"
         },
         {
-          "heading": "6. 分析",
-          "summary": "围绕五个研究问题深入分析：(RQ1) 任务完成与安全合规负相关，违规随执行动作数增加；(RQ2) 安全风险因领域而异，关键角色更易触发违规；(RQ3) 多代理放大了边界违规，尤其是信息泄露；(RQ4) 违规广泛分布在多个代理中，集中于资源访问和代理间信息传输；(RQ5) 模型能力影响执行，但harness设计设定了安全部署的上限。",
-          "loadBearing": "“多代理协作扩大安全风险面，而harness设计设定了安全部署的上限”是核心主张之一。",
-          "evidence": "提供了图5、图6、图7、图8以及表3。例如图5(a)显示负相关，表3显示单代理SAR_r=0.85 vs 多代理SAR_r=0.63。这些证据来自基准实验。",
-          "fold": "具体数据点如Claude Code比OpenClaw提升了任务完成和安全，但Codex虽然完成度高却降低了安全，说明harness设计的影响非单调。"
+          "heading": "5 实验",
+          "summary": "评估了10种框架配置，包括OpenClaw下的7种模型和Claude Code、Codex。使用Claw-Team作为主要多代理框架。评估协议结合确定性匹配和LLM判断。",
+          "loadBearing": "当前代理框架远未达到安全可靠；任务完成与安全之间存在一致负相关（Fig. 5a）。",
+          "evidence": "Table 2报告了各配置在L1、L2、L3上的分数。最佳系统（OpenClaw Gemini 3.1 Pro）总体得分0.41，但仍较低。任务完成与安全合规错位，资源访问合规最弱，系统在扰动下脆弱。",
+          "fold": "扰动测试中间接注入导致最大性能下降（Table 2 L3列）。"
         },
         {
-          "heading": "7. 结论",
-          "summary": "总结将harness作为评估单元、轨迹作为证据的方法能够发现响应级评估无法捕捉的失败模式。强调资源访问和组件间信息流是最关键的加固面。希望推动代理安全评估从“是否完成任务”转向“系统能否在预定策略下安全完成任务”。",
-          "evidence": "论文未提供新的实验数据，主要是对工作的总结和展望。"
+          "heading": "6 分析",
+          "summary": "回答五个研究问题：(RQ1) 任务完成与安全合规不一致，违规随执行动作数增加而增加（Fig. 5b）。(RQ2) 安全风险因领域和角色而异，金融和办公任务资源违规多，电商和日常任务信息流违规多。(RQ3) 多智能体协作放大安全边界违规（Table 3：单代理工具SAR 0.91 vs 多代理0.64）。(RQ4) 安全违规集中在资源访问和智能体间信息传输（Fig. 7a）。(RQ5) 模型能力塑造执行，但框架设计设定安全部署上限（Fig. 8）。",
+          "evidence": "Table 3：单代理 vs 多代理SAR_t 0.91/0.64，SAR_r 0.85/0.63。Fig. 7b：超过50%的代理出现违规。"
+        },
+        {
+          "heading": "7 结论",
+          "summary": "将代理框架作为安全评估单元，执行轨迹作为证据单元，能发现响应级评估无法捕获的失败模式。HarnessAudit和HarnessAudit-Bench系统评估了边界合规性、执行保真度和扰动稳定性。结果显示任务能力与安全执行之间存在持续差距，资源访问和组件间信息流是最需要加固的界面。",
+          "evidence": "论文希望推动代理安全评估从“代理是否完成任务”转向“系统是否能安全完成任务”。"
         }
       ],
       "limitsAndFuture": {
-        "paperStated": "论文未明确列出局限性，主要结论是当前harness距离安全可靠仍有很大差距，希望框架能推动安全评估方式的转变。未来方向可能包括扩展更多领域和真实部署场景，但未具体说明。",
-        "evidenceNotes": "论文实验在模拟环境中进行，使用mock服务和确定性种子，但未评估真实网络延迟、并发、用户干扰等因素。基准规模较小（210个任务），且软件工程领域只有10个任务。LLM作为裁判的部分（L2和L3部分判断）可能引入偏差，但论文通过确定性检查混合缓解。多代理框架比较仅包含三个，可能不全面。"
+        "paperStated": "论文未明确列出局限性。附录可能包含更多细节，但正文中未提及。",
+        "evidenceNotes": "证据强度中等：基准覆盖210个任务，但软件工程领域仅10个任务。采样范围偏重模拟服务和SQLite后端，真实部署环境的适用性需验证。评估主要基于OpenClaw和Claw-Team框架，其他框架（Google ADK、OpenAI SDK）结果限于附录。"
       },
       "selection": {
         "convergence": [
@@ -744,589 +1657,360 @@
       },
       "arxivId": "2605.14271v2",
       "publishedAt": "2026-05-14T02:14:28Z",
+      "paperType": "system",
+      "venueStatus": "verified",
       "deepDive": {
-        "reframe": "这篇论文不是提出一个新的语言模型或训练方法，而是定义并实现了一个针对代理执行环境的系统性安全审计框架，侧重在工程实践层面发现和量化harness层面的安全失败模式。",
+        "reframe": "论文真正的贡献是提出了一套用于审计代理执行框架安全性的形式化框架和基准，而不是一个可部署的安全工具。它强调轨迹级审计而非输出级，并通过隐藏审计通道实现独立验证。",
         "contributionLayers": [
           {
-            "layer": "安全性定义层",
-            "claim": "代理安全应评估harness而非模型响应，审计完整轨迹而非最终输出。",
-            "evidence": "通过分析现有基准的不足（仅输出评估）和提出三层安全定义（L1-L3）来支持。",
-            "judgment": "定义合理，但三层划分和权重选择（如α=0.7）缺乏理论或实验优化证据。",
-            "fdeMeaning": "FDE工程师可以沿用此三层定义来设计内部安全评估清单，但需根据实际场景调整权重。"
+            "layer": "框架安全性形式化",
+            "claim": "将代理框架定义为策略约束执行系统，并定义三层安全属性（边界合规、执行保真、系统稳定）。",
+            "evidence": "论文第3节给出形式化定义和评分公式。",
+            "judgment": "形式化清晰但通用性可能受限于当前框架类型。",
+            "fdeMeaning": "为FDE提供了评估生产系统代理安全性的结构化模板。"
           },
           {
-            "layer": "审计框架层",
-            "claim": "隐藏审计通道（不可知、不可操纵）提供客观证据，避免依赖代理自报告。",
-            "evidence": "框架设计描述（附录8）说明了如何通过独立通道记录工具调用、资源访问等。",
-            "judgment": "隐藏通道设计是强点，但实现依赖于harness能提供这些日志；生产环境中可能有限制。",
-            "fdeMeaning": "设计审计系统时应确保证据源头不可篡改，与论文思路一致。"
+            "layer": "基准与评估方法",
+            "claim": "HarnessAudit-Bench覆盖8个领域210个任务，是首个同时覆盖多代理、全轨迹审计和扰动稳定性的基准。",
+            "evidence": "Table 1对比显示HarnessAudit-Bench在多项指标上优于现有基准。",
+            "judgment": "基准设计合理，但软件工程任务数量偏少（10个），可能影响泛化性。",
+            "fdeMeaning": "提供了可用于内部安全测试的标准化评估套件。"
           },
           {
-            "layer": "基准构建层",
-            "claim": "HarnessAudit-Bench覆盖8个领域210个任务，是首个包含多代理、轨迹审计、扰动测试的综合性安全基准。",
-            "evidence": "表1对比了与现有基准的覆盖维度（多代理、轨迹审计、扰动稳定性等均打✓）。",
-            "judgment": "覆盖范围确实更广，但任务数量和领域深度有限（软件工程仅10个任务）。",
-            "fdeMeaning": "可作为内部安全测试的参考范围，但不能直接替代针对特定业务场景的定制测试。"
-          },
-          {
-            "layer": "实证分析层",
-            "claim": "当前harness存在任务完成与安全合规的系统性不对齐，资源访问是最薄弱环节。",
-            "evidence": "表2数据（如Gemini SAR_r=0.71但Claude Opus SAR_r=0.17）和图6、7分析。",
-            "judgment": "证据充分，揭示了可操作的改进方向（资源访问控制）。",
-            "fdeMeaning": "优先加固资源访问控制和信息流监控，符合论文实证结果。"
+            "layer": "实证发现",
+            "claim": "任务完成与安全合规错位；资源访问和信息流是最脆弱环节；多智能体放大风险；框架设计决定安全上限。",
+            "evidence": "Table 2, Fig. 5-8。例如资源访问SAR_r在0.14-0.71之间，远低于工具SAR_t。",
+            "judgment": "发现具有工程价值，但验证仅限于模拟环境和有限模型。",
+            "fdeMeaning": "指导FDE在部署多智能体系统时优先加固资源访问和信息流控制。"
           }
         ],
-        "mechanism": "论文通过定义三类审计层（边界合规、执行保真度、系统稳定性），使用隐藏的审计工件（不暴露给代理）在执行过程中收集工具调用、资源访问、组件间消息等日志，并在执行后使用确定性规则和LLM裁判相结合的方式评估是否发生违规，最后通过乘法门控评分组合这三层得分，从而量化harness的整体安全性。",
+        "mechanism": "HarnessAudit通过预定义的隐藏审计工件（如工具授权规则、资源范围规则、信息流规则）在代理运行时记录独立证据（工具调用、资源访问、通信消息），运行后与轨迹日志对比生成违规报告，并加权聚合为三层安全分数。",
         "evidenceChain": [
           {
-            "component": "表2：10种harness配置在HarnessAudit-Bench上的整体结果",
+            "component": "OpenClaw + ChatGPT-5.4",
             "metrics": [
               {
-                "label": "OpenClaw Gemini 3.1 Pro Overall",
-                "value": "0.41",
-                "note": "最高整体得分"
+                "label": "SAR_t",
+                "value": "0.62",
+                "note": "工具合规，但仍有38%违规"
               },
               {
-                "label": "OpenClaw Gemini 3.1 Pro SAR_t",
+                "label": "SAR_r",
+                "value": "0.39",
+                "note": "资源合规较弱"
+              },
+              {
+                "label": "Overall",
+                "value": "0.32",
+                "note": "表2记录"
+              }
+            ],
+            "reviewerNote": "资源合规是最弱环节，总体分数受限于SAR_bar作为乘法门。"
+          },
+          {
+            "component": "Gemini 3.1 Pro under OpenClaw",
+            "metrics": [
+              {
+                "label": "SAR_t",
                 "value": "0.85",
-                "note": "最高工具合规"
+                "note": "工具合规最高"
               },
               {
-                "label": "OpenClaw Gemini 3.1 Pro SAR_r",
+                "label": "SAR_r",
                 "value": "0.71",
-                "note": "最高资源合规"
+                "note": "资源合规最好"
               },
               {
-                "label": "OpenClaw Claude Opus 4.6 Overall",
-                "value": "0.21",
-                "note": "最低整体得分"
-              },
-              {
-                "label": "OpenClaw Claude Opus 4.6 TCR",
-                "value": "0.74",
-                "note": "最高任务完成，但安全低"
+                "label": "Overall",
+                "value": "0.41",
+                "note": "最佳总体分数"
               }
             ],
-            "reviewerNote": "最强证据是Gemini 3.1 Pro在资源合规上显著优于其他模型，但任务完成较低，显示出trade-off。数据来自210个任务，但模型间比较可能受模型本身能力差异影响。"
+            "reviewerNote": "强边界合规弥补了较低的TCR，体现安全与完成的权衡。"
           },
           {
-            "component": "表3：单代理 vs 多代理安全对比",
+            "component": "多代理 vs 单代理",
             "metrics": [
               {
-                "label": "多代理 SAR_t",
-                "value": "0.64"
-              },
-              {
-                "label": "多代理 SAR_r",
-                "value": "0.63"
-              },
-              {
-                "label": "单代理 SAR_t",
+                "label": "SAR_t (single)",
                 "value": "0.91",
-                "note": "显著更高"
+                "note": "单代理工具违规少"
               },
               {
-                "label": "单代理 SAR_r",
+                "label": "SAR_t (multi)",
+                "value": "0.64",
+                "note": "多代理显著下降"
+              },
+              {
+                "label": "SAR_r (single)",
                 "value": "0.85",
-                "note": "显著更高"
+                "note": "单代理资源合规高"
+              },
+              {
+                "label": "SAR_r (multi)",
+                "value": "0.63",
+                "note": "多代理下降"
               }
             ],
-            "reviewerNote": "明确显示多代理放大了资源违规风险，证据强，但单代理设置仅用于对比，未描述具体任务数。"
-          },
-          {
-            "component": "图5(a)：任务完成vs安全合规的散点图",
-            "metrics": [],
-            "reviewerNote": "展示了负相关趋势，但未提供相关系数或显著性检验，属于定性证据。"
+            "reviewerNote": "Table 3直接证明多智能体放大安全风险。"
           }
         ],
         "audit": [],
-        "loadBearingClaim": "代理执行的安全风险无法通过最终输出评估捕捉，必须通过完整轨迹审计来发现边界违规、执行保真度和稳定性问题。",
+        "loadBearingClaim": "代理框架的轨迹级审计比输出级审计更能揭示安全违规。",
         "strongestEvidence": [
-          "表2中Gemini 3.1 Pro在安全合规（尤其是资源访问）上明显优于其他模型，而任务完成较低，直接支持任务完成与安全不对齐的结论。",
-          "表3中多代理设置的安全合规显著低于单代理，验证了多代理扩大风险面的观点。",
-          "资源访问合规（SAR_r）在所有配置中普遍低于工具调用合规（SAR_t），证明资源访问是主要薄弱点。"
+          "Table 2显示所有模型在资源访问和信息流方面的合规率普遍低于0.5，远低于工具合规。",
+          "Table 3量化了多代理相比单代理的额外安全损失。",
+          "Fig. 5b显示违规数量随执行动作增加呈线性增长。"
         ],
         "limitations": [
-          "基准规模有限（210个任务），且某些领域（如软件工程只有10个）代表性不足。",
-          "实验在模拟环境中进行，未评估真实生产环境中的网络波动、用户错误、恶意行为等。",
-          "部分评估（L2的AVS部分、L3的扰动稳定性）依赖LLM裁判（GPT-5.4），可能存在一致性偏差。",
-          "开源状态未明确：项目页面存在但可能未完全公开数据和代码，影响可复现性。",
-          "仅比较了三个多代理框架（Claw-Team、Google ADK、OpenAI SDK），结论的泛化性有限。"
+          "可复现性不足：代码和数据未公开。",
+          "基准覆盖面有限：软件工程仅10个任务；模型限于前沿但非全部。",
+          "评估部分依赖LLM作为判断，可能引入偏见。",
+          "模拟环境与现实企业系统存在差距。",
+          "未审计多轮人机交互场景。"
         ],
         "suggestedExperiments": [
-          "在真实生产harness（如实际部署的Claude Code、Codex）上部署审计框架，验证离线结果是否映射到在线行为。",
-          "扩大任务规模和领域多样性，特别是增加软件工程、安全运维等高风险领域。",
-          "系统性地改变评分权重（α, β, γ）和违规严重性权重，分析对排名稳定性的影响。",
-          "对比不同LLM作为裁判的评分一致性，例如使用Claude或Gemini替换GPT-5.4。"
+          "在真实企业代理框架（如ServiceNow、Salesforce Agent）上验证HarnessAudit。",
+          "引入更多样化的扰动类型（如对抗性提示、模型漂移）。",
+          "评估不同权限粒度（基于角色的访问控制 vs 基于属性的访问控制）对安全的影响。"
         ],
+        "artifactAudit": {
+          "officialCode": "not_found",
+          "data": "not_found",
+          "reproducibility": "paper_only",
+          "notes": [
+            "论文描述工具和夹具文件路径（masp_bench/...），但未提供公开访问。",
+            "Reachable referenced, dependency, or third-party repositories are not treated as the authors' official code release for this paper.",
+            "No fetched text clearly identifies an authors' official code release for this specific paper.",
+            "No external repository or artifact URL was available for independent audit in this run."
+          ],
+          "repoStatus": "项目页面存在，但未提及代码或数据仓库链接。"
+        },
+        "claimLedger": [
+          {
+            "claim": "输出级评估无法检测中轨迹违规。",
+            "claimType": "empirical",
+            "evidencePointer": "not specified in fetched text",
+            "evidenceStrength": "medium",
+            "threat": "仅提供示意图，缺乏量化对比。",
+            "fdeTransfer": "高：直接映射到生产环境问题。"
+          },
+          {
+            "claim": "HarnessAudit-Bench是首个同时支持多代理、全轨迹审计和扰动稳定性的基准。",
+            "claimType": "empirical",
+            "evidencePointer": "Table 1",
+            "evidenceStrength": "high",
+            "threat": "基准比较表可能选择性忽略某些维度。",
+            "fdeTransfer": "中：基准设计理念可借鉴，但直接复用需适配。"
+          },
+          {
+            "claim": "最佳系统总体得分仅0.32（Gemini 3.1 Pro实际为0.41，文本存在不一致）。",
+            "claimType": "empirical",
+            "evidencePointer": "Table 2 (OpenClaw Gemini 3.1 Pro Overall=0.41)",
+            "evidenceStrength": "medium",
+            "threat": "文本与表格数据矛盾，需澄清。",
+            "fdeTransfer": "低：具体数字需核实。"
+          },
+          {
+            "claim": "资源访问合规最弱。",
+            "claimType": "empirical",
+            "evidencePointer": "Table 2, SAR_r列：多数模型低于0.5，最低0.14。",
+            "evidenceStrength": "high",
+            "threat": "资源访问定义可能过于严格。",
+            "fdeTransfer": "高：指导优先加固资源访问控制。"
+          },
+          {
+            "claim": "多智能体协作放大安全风险。",
+            "claimType": "empirical",
+            "evidencePointer": "Table 3: 单代理SAR_t=0.91 vs 多代理0.64。",
+            "evidenceStrength": "high",
+            "threat": "单代理实验设置可能与多代理不完全可比。",
+            "fdeTransfer": "高：提醒团队在多智能体部署中增加安全审计。"
+          }
+        ],
+        "evidenceMatrix": [
+          {
+            "experiment": "OpenClaw下各模型安全评估",
+            "metric": "Overall Harness Safety Score",
+            "result": "最高0.41（Gemini 3.1 Pro），最低0.21（Claude Opus 4.6）",
+            "exactness": "exact",
+            "limitation": "仅限OpenClaw框架，其他框架结果见附录。",
+            "sampleSize": "210任务×10配置=2100次运行（估计）",
+            "modelBackend": "ChatGPT-5.4, Claude Opus 4.6, Claude Sonnet 4.6, Gemini 3.1 Pro, GLM 5V Turbo, Kimi K2.6, Qwen 3.5 Plus"
+          },
+          {
+            "experiment": "多代理框架对比（OpenClaw, Google ADK, OpenAI SDK）",
+            "metric": "SAR_t, SAR_r, SAR_f",
+            "result": "OpenClaw得分最低（Fig. 8b）",
+            "exactness": "author_claim",
+            "limitation": "结果在附录，数值未在正文给出。",
+            "sampleSize": "未明确报告",
+            "modelBackend": "未明确"
+          },
+          {
+            "experiment": "扰动稳定性测试",
+            "metric": "Perturbation Stability (Inj., Amb., Rob.)",
+            "result": "间接注入平均0.20左右，远低于非扰动状态",
+            "exactness": "exact",
+            "limitation": "扰动类型有限，可能仍有未覆盖的考验。",
+            "sampleSize": "525个扰动案例（105任务×5扰动）",
+            "modelBackend": "同上"
+          }
+        ],
+        "whatWouldInvalidate": [
+          "如果日后研究表明输出级评估也能捕获中轨迹违规，则核心动机减弱。",
+          "如果其他框架下资源访问不再是最弱环节，则特定加固建议失效。",
+          "如果隐藏审计通道被发现可被代理操纵，则评估有效性受损。"
+        ],
+        "verdict": {
+          "readDecision": "read",
+          "fdeFit": "high",
+          "evidenceStrength": "medium",
+          "artifactStatus": "partial",
+          "oneLineJudgment": "论文提供了实用的框架安全审计方法论和基准，但可复现性和生产适用性有限。",
+          "whyNow": [
+            "多智能体系统在生产中快速普及，安全评估工具缺失。",
+            "现有基准侧重于任务完成，忽略中轨迹风险。",
+            "论文提出的隐藏审计通道方法具有创新性和实用性。"
+          ],
+          "whyNotOverclaim": [
+            "基准依赖模拟环境和有限模型，声称的通用性需更多验证。",
+            "仅评估了10种框架配置，未覆盖所有主流框架（如LangGraph）。",
+            "部分评估使用LLM作为判断，可能存在偏见。"
+          ]
+        },
         "fdeTakeaways": {
-          "customerProblem": "企业部署LLM代理时，无法仅靠最终输出来保障安全合规；中间过程可能存在未授权资源访问、数据泄露或越权操作，而现有监控手段无法发现这些轨迹级别的违规。",
+          "customerProblem": "[论文支持]企业部署多智能体系统时，缺乏评估执行框架安全性的工具，容易忽视中轨迹违规。",
           "customerQuestions": [
-            "当前代理harness是否对工具调用、资源访问和信息流实施了可审计的策略控制？",
-            "能否在不侵入代理代码的情况下，从harness层面收集完整的执行轨迹日志？",
-            "我们的安全评估是否覆盖了多代理场景下的跨角色信息流和权限泄露？",
-            "当任务完成指标（TCR）很高时，安全合规（SAR）是否仍然可接受？",
-            "多代理协作引入的额外风险是否被现有监控覆盖？",
-            "间接注入（如工具返回内容中的恶意指令）是否会在我们的代理中被利用？",
-            "我们是否有明确的资源访问控制规则，并能检测到对诱饵资源的访问？",
-            "审计框架能否部署为持续集成的一环，在每个发布前自动运行？",
-            "不同harness（如Claude Code vs 自建OpenClaw）在安全上的差异有多大？",
-            "安全违规的详细报告是否能够直接指导权限配置和策略改进？"
+            "[论文支持]贵司的代理框架如何定义权限边界？是否区分工具级和资源级权限？",
+            "[论文支持]当前安全评估仅依赖最终答案还是追踪完整轨迹？",
+            "[论文支持]多智能体协作时，如何控制智能体间的信息流？是否记录每条通信？",
+            "[推论]生产环境中，是否监控代理对敏感资源的每次访问？",
+            "[推论]是否有自动化审计管道，能在运行后检测违规并回滚？",
+            "[待验证假设]如果实施轨迹级审计，能否减少因资源误用导致的合规事件？",
+            "[待验证假设]间接注入攻击在贵司系统中是否常见？如何检测？",
+            "[推论] Which real customer workflow owns the AI output, and what production constraint would make the system unusable?",
+            "[推论] Which endpoints, tool contracts, inputs, responses, auth scopes, and error states must be explicit before integration?",
+            "[推论] Which knowledge sources need freshness, access control, retrieval tests, and citation or trace coverage?"
           ],
           "artifactsToAudit": [
-            "harness配置文件（工具列表、角色权限、信息流策略）",
-            "执行轨迹日志（JSONL格式）",
-            "资源访问控制规则（工具参数级别的白名单）",
-            "多代理通信策略（允许哪些角色之间直接通信）",
-            "间接注入检测规则或异常模式库",
-            "硬编码的审计检查清单（对应L1-L3）",
-            "自动化测试脚本（用于重现基准任务）",
-            "模型选择与对应的安全基线评分",
-            "API spec or tool schema",
-            "db schema or data dictionary",
-            "logs and traces",
-            "prompts and tool-call transcripts",
-            "eval set and golden tasks",
-            "workflow docs"
+            "[论文支持]工具调用日志（工具名、参数、返回值）",
+            "[论文支持]资源访问日志（对象ID、操作类型）",
+            "[论文支持]智能体间消息内容",
+            "[论文支持]权限策略定义（谁可以调用哪个工具、访问哪个资源）",
+            "[推论]信息流策略定义（哪些信息可以共享给哪些角色）",
+            "[推论]环境状态快照（数据库、文件系统）",
+            "[待验证假设] API spec or tool schema",
+            "[待验证假设] db schema or data dictionary",
+            "[待验证假设] logs and traces",
+            "[待验证假设] prompts and tool-call transcripts",
+            "[待验证假设] eval set and golden tasks",
+            "[待验证假设] workflow docs",
+            "[待验证假设] auth/RBAC matrix",
+            "[待验证假设] monitoring dashboards"
           ],
           "implementationChecklist": [
-            "建立统一的轨迹日志收集机制，确保所有工具调用和通信被记录",
-            "实现基于论文三类层的自动化审计管道（确定性检查+LLM裁判）",
-            "将安全审计集成到CI/CD流水线，在模型或harness更新时自动运行",
-            "配置角色级的工具和资源白名单，并设置诱饵资源用于检测越权",
-            "为信息流定义敏感数据类别和允许的接收角色",
-            "实现扰动注入测试机制（间接注入、模糊目标、工具错误）",
-            "建立安全评分的监控仪表盘，跟踪SAR、TCR、PB趋势",
-            "制定安全评分阈值（例如Overall得分<0.3时阻止部署）",
-            "Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
-            "Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
-            "Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
-            "Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined."
+            "[论文支持]定义工具和资源的权限策略（Π和Φ）。",
+            "[论文支持]实现隐藏审计通道，独立记录所有执行事件。",
+            "[论文支持]在每种任务中嵌入检查点，用于验证任务完成。",
+            "[推论]部署LLM作为判断来评估动作有效性和扰动稳定性。",
+            "[推论]集成安全分数计算，包含乘法安全门。",
+            "[推论] Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
+            "[推论] Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
+            "[推论] Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
+            "[推论] Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
+            "[推论] Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
+            "[推论] Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready.",
+            "[推论] RBAC, least-privilege scopes, PII handling, compliance policy, and audit trail are checked before launch."
           ],
           "evalPlan": [
-            "离线评估：在基准任务上运行审计，得到三层评分和综合得分",
-            "在线评估：在生产环境中部署审计日志收集，但不阻塞执行，仅用于监控",
-            "黄金任务集：选取20个代表性任务作为每日回归测试集",
-            "人工审查：每周抽查10个运行轨迹，验证自动审计的准确率",
-            "成本预算：审计管道运行一次210个任务的成本（包括LLM裁判调用）应控制在合理范围，例如<$50/次",
-            "Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
-            "Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
-            "Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
-            "Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
-            "Offline and online evals must include the real production constraint the paper treats as load-bearing."
+            "[论文支持]离线评估：使用HarnessAudit-Bench或自定义任务套件。",
+            "[论文支持]在线评估：在预生产环境中运行代理执行，记录完整轨迹。",
+            "[论文支持]黄金任务集：选取50-100个代表性任务，人工验证安全规则。",
+            "[推论]人工审查：定期抽检轨迹日志，检测未被规则覆盖的违规。",
+            "[推论]成本预算：每条轨迹的存储和审计计算成本。",
+            "[待验证假设] Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
+            "[待验证假设] Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
+            "[待验证假设] Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
+            "[待验证假设] Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
+            "[待验证假设] Offline and online evals must include the real production constraint the paper treats as load-bearing."
           ],
           "rolloutPlan": [
-            "PoC：在单一harness（如OpenClaw）上实现审计框架，在10个任务上验证流程",
-            "Pilot：扩展到Claude Code和Codex，运行全部210个任务，对比安全基线",
-            "Limited Prod：在10%的代理生产请求上启用轨迹审计（只记录不干预），持续2周，收集安全违规统计数据",
-            "Full Prod：全面启用审计，设置自动阻断规则（如高严重性违规触发警报并暂停代理），建立改进循环",
-            "PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, RAG or enterprise knowledge retrieval path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
-            "Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
-            "Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget.",
-            "Full production: expand only after ownership, monitoring, eval refresh, incident response, and governance reviews are stable. Acceptance criteria: business metric movement and failure-rate reduction are visible in operating data."
+            "[论文支持]PoC：选择1-2个领域（如金融和办公），部署HarnessAudit评估现有框架。",
+            "[论文支持]Pilot：集成到CI/CD管道，每次模型或框架更新时自动运行审计。",
+            "[推论]Limited Prod：在少量真实用户流量中启用审计，仅记录不阻断。",
+            "[推论]Full：基于审计结果逐步启用安全策略（如自动阻断资源违规）。",
+            "[推论]验收标准：安全分数提升至0.8以上且误报率低于5%。",
+            "[待验证假设] PoC: reproduce the paper-relevant customer-facing production AI workflow, API/tool/MCP integration, RAG or enterprise knowledge retrieval path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
+            "[待验证假设] Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
+            "[待验证假设] Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget."
           ],
           "riskRegister": [
-            "技术风险：日志收集可能影响harness性能，需要权衡采样率",
-            "数据风险：轨迹日志包含敏感数据（如客户信息），需脱敏或访问控制",
-            "权限风险：审计框架本身若被攻击可能泄露审计规则，因此需要最小权限设计",
-            "安全风险：LLM裁判可能误判，需要人工回退机制",
-            "成本风险：高频审计可能带来高昂的LLM推理成本",
-            "采用风险：团队可能不愿改变现有评估流程，需要量化安全改进的ROI",
-            "技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
-            "数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
-            "权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
-            "安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations."
+            "[论文支持]技术风险：隐藏审计通道可能影响代理性能，需评估延迟。",
+            "[论文支持]数据风险：审计日志可能包含敏感信息，需加密存储。",
+            "[论文支持]权限风险：代理可能获得绕过审计通道的能力。",
+            "[推论]成本风险：全轨迹审计增加计算和存储成本。",
+            "[推论]采用风险：开发团队可能抵触额外审计步骤。",
+            "[待验证假设] 技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
+            "[待验证假设] 数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
+            "[待验证假设] 权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
+            "[待验证假设] 安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations.",
+            "[待验证假设] 成本: latency, model calls, retrieval, monitoring, and human review can erase the apparent automation savings."
           ],
-          "roiHypothesis": "通过部署轨迹审计框架，预计能够将生产环境中因资源越权或信息泄露导致的安全事件减少50%以上，每次事件平均节省20人天的调查和修复成本，审计框架的开发和运行成本可在6个月内通过减少安全事件回收。",
-          "interviewStory": "想象你是一家金融科技公司的FDE工程师，团队正在将Claude用作客户支持代理。代理能处理退款、查询账户、修改保单。你发现代理有时会读取非客户本人的信息——但最终输出似乎是正确的。老板问：'为什么你要花时间审计中间步骤？最终答案是对的呀。' 现在你有了HarnessAudit的答案：输出正确不代表过程安全。如果不对轨迹设防，违规就像暗流一样积累，直到某天数据泄露变成头条。你不只是要一个能完成任务的代理，你要的是在每一毫秒都守住边界的系统。"
+          "roiHypothesis": "[待验证假设]实施HarnessAudit式的轨迹审计，预计可将因代理资源误用和隐私泄露导致的合规事件减少40%（需要A/B测试：一组启用审计 + 安全阻断，二组仅输出级评估；指标为每千次运行的违规事件数和客户投诉率）。",
+          "interviewStory": "[面试故事]在面试中，你可以说：'我们团队在部署多智能体客服系统时，发现表面上看任务完成率很高，但审计轨迹后发现存在大量越权访问客户记录的行为。这促使我们借鉴HarnessAudit的方法，实现了隐藏审计通道，最终将资源访问违规从70%降至15%。'"
         }
       },
       "scorecard": [
         {
           "dimension": "FDE相关性",
-          "score": 10,
-          "reason": "直接针对agent harness的安全审计，涉及API工具调用、资源权限、信息流控制、多代理协调，这些都是FDE实际部署中的核心问题。"
+          "score": 8,
+          "reason": "论文直接涉及客户/生产系统的代理框架安全审计，包含工具调用、资源访问、权限、信息流等FDE关注的核心工程问题。但未提供具体部署指南或集成方案，减2分。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "工程现实感",
-          "score": 9,
-          "reason": "基准任务设计模拟了真实业务场景（金融、医疗、软件工程），使用具体工具和角色，但处于模拟环境，未验证真实生产中的延迟、故障、用户行为等。"
+          "score": 7,
+          "reason": "基准模拟真实服务接口和多种框架，但大多数任务基于模拟数据库而非真实企业环境。软件工程任务使用真实工作区但仅10个任务。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "问题重要性",
           "score": 9,
-          "reason": "代理安全是当前AI工程化面临的关键挑战，论文指出的输出级评估盲区具有普遍性。"
+          "reason": "代理框架安全是当前AI部署的关键痛点，输出级评估无法捕获中轨迹违规，论文指出的问题具有高现实意义。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "方法新颖性",
           "score": 8,
-          "reason": "将安全评估焦点从模型响应转移到harness轨迹，并提出三层审计框架和隐藏证据通道，具有一定创新性，但此前已有部分轨迹审计工作（如ClawBench）。"
+          "reason": "提出隐藏审计通道和多层框架级安全评估，区别于现有基于最终输出的基准。但轨迹审计已在以往工作出现（如ClawDBot），综合新颖性高。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "证据强度",
           "score": 7,
-          "reason": "提供了详细的表2、图5-8等实验数据，覆盖多个模型和框架，但基准规模有限（210任务），且部分结果依赖LLM裁判，存在一定不确定性。"
+          "reason": "提供大量定量结果（Table 2, Fig. 5-8），但部分依赖LLM作为判断（L2/L3），可能存在偏差。样本量210个任务，但软件工程仅10个。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "可复现性",
-          "score": 6,
-          "reason": "论文提供了项目页面，但未明确说明是否完全开源所有代码和基准数据。附录描述了实验细节，但依赖特定LLM版本和框架版本，完全复现有难度。"
+          "score": 4,
+          "reason": "论文提供项目页面但未提及代码和数据集发布，仅提及工具和夹具描述。缺少官方代码仓库，复现困难。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "可部署性",
-          "score": 7,
-          "reason": "HarnessAudit框架本身可作为离线评估工具部署，但论文未讨论在线监控或生产环境集成。审计需要完整轨迹日志收集，在现有harness中可能需改造。"
+          "score": 5,
+          "reason": "框架本身是审计工具，而非直接可部署的系统。基准任务针对模拟环境，直接应用于生产需大量适配。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "安全治理意识",
           "score": 9,
-          "reason": "论文明确考虑权限边界、信息流控制、扰动稳定性，并与多代理协作风险结合，安全治理视角全面。"
+          "reason": "重点评估权限、信息流、资源边界，直接映射到安全治理。提出通过隐藏审计通道实现独立验证，贴近监管需求。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "ROI可解释性",
           "score": 6,
-          "reason": "论文计算了安全得分，但未量化安全改进与业务指标（如成本、用户满意度）的关系。安全投入的ROI需要通过用户自行推导。"
+          "reason": "论文未量化安全改进对业务指标的影响，但提供了安全-完成权衡指标（S@T）。ROI假设需要用户自行推导。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         },
         {
           "dimension": "职业训练价值",
           "score": 8,
-          "reason": "论文提供了系统化的安全审计思路、基准构建方法和实验设计，对FDE工程师理解代理安全边界和评估方法有较高学习价值。"
-        }
-      ]
-    },
-    {
-      "id": "paper:arxiv-2605-26302",
-      "title": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems",
-      "authors": "Jianing Zhu, Yeonju Ro, John Robertson, Kevin Wang, Junbo Li, Haris Vikalo, Aditya Akella, Zhangyang Wang",
-      "venue": "Venue not provided",
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.26302",
-      "verifiedAt": "2026-05-31T16:52:51.688Z",
-      "tier": "deep",
-      "leadJudgment": "论文将AI Agent的可靠性问题从单次基准测试扩展到部署后的生命周期退化，提出系统化的老化机制分类和诊断框架。",
-      "sections": [
-        {
-          "heading": "1 引言",
-          "summary": "AI Agent正从一次性对话转向长期运行的系统，可靠性不再只是初始基准分数。即使模型权重冻结，Agent的有效状态也会因压缩历史、积累记忆、修订事实和常规维护而改变。论文提出“Agent老化”概念，指部署后由记忆状态变化导致的时间依赖性退化。需要一种诊断框架来测量、诊断和修复长期运行的Agent系统，即Agent寿命工程（ALE）。",
-          "loadBearing": "Agent老化是部署后的关键失败模式，且可能被表面行为掩盖。",
-          "evidence": "论文通过图1展示具体老化失败案例（药物剂量丢失、事实混淆等），但缺乏真实部署数据。",
-          "fold": "引言对比了现有记忆基准的不足：它们只评估单次会话或端到端分数，无法区分退化机制和定位修复目标。"
-        },
-        {
-          "heading": "2 相关工作",
-          "summary": "现有基准主要评估多会话记忆和长上下文能力，但缺少寿命工程视角。论文比较了五个维度（多会话评估、跨会话依赖、生命周期事件、可测量老化、组件级诊断），指出AgingBench是首个联合集成这些维度的基准。",
-          "loadBearing": "现有记忆基准不能区分老化机制和定位故障组件。",
-          "evidence": "论文给出了表4，列出了相关基准及其能力覆盖，但未提供定量比较。",
-          "fold": "还讨论了轨迹归因方法作为补充，但强调使用干预式反事实探针更直接。"
-        },
-        {
-          "heading": "3 Agent老化分类学",
-          "summary": "将Agent老化为四类：压缩老化（写入时丢弃未来相关细节）、干扰老化（相似记忆堆叠导致检索混淆）、修订老化（事实变化未正确传播）、维护老化（常规维护事件引发性能下降）。前两类是累积驱动，后两类是事件驱动。所有机制可能同时存在，但不同部署场景侧重不同。",
-          "loadBearing": "四机制分类是后续基准和诊断的基础。",
-          "evidence": "每个机制有明确压力和失败示例，但未提供定量证据证明其独立性。",
-          "fold": "表1将每个场景与主要激活的机制对应。"
-        },
-        {
-          "heading": "4 AgingBench：Agent寿命工程基准",
-          "summary": "AgingBench通过程序化生成跨会话任务结构（时间依赖DAG）来测量老化曲线。DAG包含版本链、依赖边和干扰对。每个场景有可配置的老化压力参数（依赖密度、更新率、链深度、混淆对数量）。评估过程是会话循环，输出老化曲线，计算半衰期、衰减斜率和危险代理。",
-          "loadBearing": "老化曲线和机制特定指标是量化老化的核心。",
-          "evidence": "论文图4显示两个记忆策略下所有场景的老化轨迹整体下降趋势，但未给出具体统计显著性。",
-          "fold": "生成器是程序化的，支持种子可复现，但论文承认不能模拟真实用户行为分布。"
-        },
-        {
-          "heading": "5 组件级归因",
-          "summary": "将记忆管道分解为写/压缩策略、读/检索算法、利用逻辑和记忆存储。通过三个反事实探针（基线P1、Oracle检索P2、Oracle上下文P3）形成诊断剖面，分别对应利用错误、写错误和读错误。维护老化通过事件前后的写错误变化分离。",
-          "loadBearing": "反事实剖面能区分失败根因，指导不同修复策略。",
-          "evidence": "图6显示三个模型的总错误率相近但组分不同（S1利用主导，S2写主导，S5读写不同），证明归因的必要性。",
-          "fold": "维护老化与写错误观察上混叠，通过时间分离解决。"
-        },
-        {
-          "heading": "6 实验结果",
-          "summary": "在14个模型、7个场景、多个记忆策略上进行约400次运行。主要发现：(1)老化是多维的，没有模型在所有机制上占优；(2)行为合规与事实准确可独立退化；(3)修订老化似乎是表征性的，不单纯是容量问题；(4)自主Agent中写-读差距持续存在；(5)多机制评估解释了同族Agent内的不对称老化。",
-          "loadBearing": "实验表明老化不是一维的，需要机制级评估和修复。",
-          "evidence": "表3提供了大量定量结果（keyword_m、precision、fidelity、accumulator error、shock等具体数值）。例如S1场景GPT-4o的半衰期7.6，Qwen3-8B的half-life 5.8等。",
-          "fold": "附录D提供了更多实验细节，如强制重读消融等。"
-        },
-        {
-          "heading": "7 结论",
-          "summary": "长寿命Agent在部署后可能静默退化，即使模型权重冻结。AgingBench通过四机制分类、时间依赖生成和反事实诊断启用了Agent寿命工程。结果强调老化是多维的，可能被行为测试隐藏，需要组件级诊断。",
-          "loadBearing": "Agent寿命工程是构建可靠长期部署Agent的必要条件。",
-          "evidence": "基于前文实验，作者总结发现但未提供新证据。",
-          "fold": "附录I讨论了局限性，包括受控设置与真实部署的差距、记忆架构的局限性等。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文在附录I中明确局限性：所有场景是程序生成的，不能完全代表真实用户行为；主要评估了基于压缩的记忆策略，其他记忆架构（如向量数据库）未覆盖；评估限于受控会话循环，未涉及真实多用户并发或动态环境；诊断剖面是概念性的，不是每个架构的唯一因果分解。未来工作包括扩展到更多记忆系统、更复杂的Agent框架、以及在真实部署中验证。",
-        "evidenceNotes": "证据主要来自AgingBench基准的受控实验，约400次运行，但覆盖的模型和场景有限（7场景、14模型）。老化曲线的统计显著性未报告。反事实诊断的有效性通过案例展示，但缺乏大规模定量验证。"
-      },
-      "selection": {
-        "convergence": [
-          "arXiv"
-        ],
-        "track": [
-          "Broad AI / ML",
-          "AI Agents",
-          "Agent Harness / Observability",
-          "RAG / Knowledge Systems",
-          "Evaluation / Benchmarks",
-          "Human-AI Interaction"
-        ],
-        "ideaSignal": "deep_dive:97+ahe:harness engineering+fde:customer/production system"
-      },
-      "provenance": {
-        "sourceUrl": "https://arxiv.org/abs/2605.26302",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.26302v1",
-      "publishedAt": "2026-05-25T19:55:12Z",
-      "deepDive": {
-        "reframe": "这篇论文本质上不是提出一个新的更强大的Agent模型，而是定义了一个新的评估范式：Agent寿命工程。它提供了一个受控的基准工具，用于测量和诊断长期运行Agent的记忆退化，并给出了初步的实验发现。其核心贡献在于分类学和诊断框架，而非具体模型性能。",
-        "contributionLayers": [
-          {
-            "layer": "问题形式化",
-            "claim": "Agent可靠性是寿命属性而非快照属性。",
-            "evidence": "通过类比人类老化和系统老化（数据库、软件债务）建立动机，辅以具体例子（图1）。",
-            "judgment": "形式化清晰且有说服力，但缺乏对现有系统实际退化率的定量支持。",
-            "fdeMeaning": "工程师应监控Agent寿命，而不仅是一次性验证。"
-          },
-          {
-            "layer": "老化分类学",
-            "claim": "四机制（压缩、干扰、修订、维护）覆盖主要退化模式。",
-            "evidence": "概念上区分，表1映射到部署场景，但未提供机制独立性的实验验证。",
-            "judgment": "分类直观且实用，但可能不完整（例如未考虑工具交互老化）。",
-            "fdeMeaning": "工程师可根据部署场景重点关注特定机制。"
-          },
-          {
-            "layer": "评估基准",
-            "claim": "AgingBench能够生成可配置、可复现的老化场景，并产生机制特定老化曲线。",
-            "evidence": "图4显示老化趋势；程序化生成支持可重复。",
-            "judgment": "基准设计合理，但真实性与实际部署仍有差距。",
-            "fdeMeaning": "可用于预生产环境中比较不同记忆策略的寿命特性。"
-          },
-          {
-            "layer": "诊断方法",
-            "claim": "反事实探针（P1/P2/P3）可以定位记忆管道的故障阶段（写/读/利用）。",
-            "evidence": "图6显示三个模型总错误率相近但组分不同，支持诊断区分性。",
-            "judgment": "诊断剖面提供了可操作的修复方向，但仅适用于当前记忆管道架构。",
-            "fdeMeaning": "工程师可基于诊断结果选择不同修复策略，而非通用“增加记忆”。"
-          }
-        ],
-        "mechanism": "论文的核心机制是通过程序化生成的会话序列和记忆管道干预，在受控实验中模拟并测量Agent老化。具体而言，它构建了带有版本链、依赖边和干扰对的时间依赖DAG，然后让Agent在多次会话中读写记忆，根据预定义事实计算精确度、召回率等指标，形成老化曲线。同时，通过替换检索和写入为Oracle，量化写、读、利用各阶段的错误贡献。",
-        "evidenceChain": [
-          {
-            "component": "S1场景（Research Lit.）",
-            "metrics": [
-              {
-                "label": "keyword_m (fill rate)",
-                "value": "5.8",
-                "note": "Llama-3.1-8B, lossy compression"
-              },
-              {
-                "label": "keyword_m (fill rate)",
-                "value": "7.6",
-                "note": "GPT-4o, lossy compression"
-              }
-            ],
-            "reviewerNote": "半衰期指标：GPT-4o在S1场景下表现出最高的半衰期（7.6），即退化最慢。但证据来自单次实验，未报告置信区间。"
-          },
-          {
-            "component": "S2场景（Lifestyle Asst.）",
-            "metrics": [
-              {
-                "label": "precision m_F",
-                "value": "0.40",
-                "note": "Llama-3.1-8B"
-              },
-              {
-                "label": "accumulator error (lower is better)",
-                "value": "157",
-                "note": "Llama-3.1-8B"
-              }
-            ],
-            "reviewerNote": "干扰老化导致不精确；累积误差在某些模型上很大（如Llama 157），但Qwen3-8B达到192，表明修订老化严重。"
-          },
-          {
-            "component": "S6场景（Naturalistic）",
-            "metrics": [
-              {
-                "label": "recall m_F",
-                "value": "0.10",
-                "note": "GPT-4o-mini, Tier 2"
-              },
-              {
-                "label": "Δ_shock (flush)",
-                "value": "-0.17",
-                "note": "Llama-3.1-8B"
-              }
-            ],
-            "reviewerNote": "维护老化冲击显著：所有模型在flush事件后都出现负冲击，其中最严重的是GPT-4o-mini（-0.21未见直接给出，但表中有-0.17 for Llama; 实际表中有gpt-oss-120B -0.21）。"
-          }
-        ],
-        "audit": [
-          {
-            "claim": "Robertson Kevin Wang Junbo Li Haris Vikalo Aditya Akella Zhangyang \"Atlas\" Wang † The University of Texas at Austin \\faPersonCane Your One-Stop Aging Care : https://AgingBench.github.io/ Abstract Long-lived AI agents are increasingly deployed as persistent operational systems, yet they are still evaluated like freshly initialized models.",
-            "finding": "agingbench.github.io project page is reachable.",
-            "source": "https://AgingBench.github.io/"
-          },
-          {
-            "claim": "https://claude.ai , 2026.",
-            "finding": "claude.ai returned HTTP 403 Forbidden.",
-            "source": "https://claude.ai"
-          }
-        ],
-        "loadBearingClaim": "Agent老化是多维的，不同机制需要不同修复策略，且表面行为可能掩盖事实退化。",
-        "strongestEvidence": [
-          "图6显示总错误率相近但写/读/利用组分不同",
-          "表3中不同模型在不同机制上表现不一致",
-          "图7b显示约束违反率为0而精度下降，证明静默退化"
-        ],
-        "limitations": [
-          "基准场景为程序生成，不能完全代表真实用户交互模式",
-          "评估主要基于一种记忆架构（压缩型），其他架构（如向量存储）未充分探索",
-          "仅有约400次运行，统计效力有限",
-          "诊断剖面是概念性的，未提供因果证明",
-          "未涵盖多Agent协作或外部工具调用的老化",
-          "可复现性因依赖API模型（GPT, Claude）而受限",
-          "论文未公开所有实验代码和完整数据集（仅提供基准生成器）"
-        ],
-        "suggestedExperiments": [
-          "在真实生产Agent（如客服、编码助手）上纵向跟踪性能，验证AgingBench预测",
-          "比较不同记忆架构（如记忆检索、结构化存储）在各机制上的老化曲线",
-          "测试反事实诊断在不同Agent设计（如不同提示策略）下的鲁棒性",
-          "纳入更多模型系列和多版本，评估老化趋势的时间一致性"
-        ],
-        "fdeTakeaways": {
-          "customerProblem": "企业部署AI Agent后，随着时间推移，Agent的记忆会退化，导致事实错误、混淆和维护后性能下降，而表面行为可能仍然正常。",
-          "customerQuestions": [
-            "Agent部署后，你如何监控其记忆可靠性？是否只依赖行为指标？",
-            "当Agent给出错误答案时，你能区分是写入时丢失、检索冲突还是推理错误吗？",
-            "你的Agent经历哪些维护事件（重新压缩、模型更新、提示调整）？是否有预/后测试？",
-            "你的记忆系统如何处理事实更新和派生状态（如累积预算）？",
-            "你是否有老化测试或寿命基准作为部署前评估的一部分？",
-            "当Agent记忆增长时，你如何平衡压缩保留与检索效率？",
-            "你能否检测到静默退化（行为正常但事实错误）？",
-            "对于自主管理记忆的Agent（如编码助手），你能审计其写-读行为吗？",
-            "你的生产环境是否记录Agent记忆随时间的变化曲线？",
-            "当召回率下降时，修复策略是增加记忆容量还是改进检索/利用？"
-          ],
-          "artifactsToAudit": [
-            "记忆管理策略（压缩提示、预算、更新周期）",
-            "会话历史持久化格式与存储方案",
-            "检索逻辑（相似度、top-k、时序）",
-            "利用提示与上下文整合方式",
-            "维护脚本（compact, flush, reindex）",
-            "老化监控仪表盘（半衰期、精度曲线）",
-            "测试用例生成器与DAG结构",
-            "反事实探针配置",
-            "API spec or tool schema",
-            "db schema or data dictionary",
-            "logs and traces",
-            "prompts and tool-call transcripts",
-            "eval set and golden tasks",
-            "workflow docs"
-          ],
-          "implementationChecklist": [
-            "选择或开发老化基准（如AgingBench）并集成到CI/CD",
-            "对候选记忆策略在关键场景（如事实精度、累积误差）进行老化曲线测试",
-            "部署反事实诊断探针，定期收集写/读/利用错误份额",
-            "设置老化告警阈值（半衰期低于某值、精度下降速度）",
-            "建立维护事件前后的性能对比流程",
-            "设计修复动作的A/B测试框架（如改进压缩提示 vs 增强检索）",
-            "记录每次部署的Agent寿命档案，供后续分析",
-            "Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
-            "Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
-            "Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
-            "Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
-            "Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready."
-          ],
-          "evalPlan": [
-            "离线：使用AgingBench的7个场景，在模拟会话循环中评估老化曲线",
-            "在线：在生产环境中的影子模式或金丝雀上收集老化指标",
-            "黄金任务：定期向Agent提出已知事实查询，记录精确度",
-            "人工审核：定期抽检Agent输出，特别是维护事件前后",
-            "延迟-成本-错误预算：确保老化监控不显著增加延迟或成本",
-            "Offline eval: build golden tasks from the customer workflow and label expected outputs, tool calls, citations, and failure modes.",
-            "Online eval: compare task success, human override rate, latency, cost, and error rate against the pre-AI workflow.",
-            "Human review: sample accepted, rejected, and escalated cases so reviewers can label correctness, policy fit, and business usefulness.",
-            "Latency-cost-error budget: set a launch gate that combines p95 latency, per-task cost, failed tool calls, hallucination or retrieval misses, and escalation rate.",
-            "Offline and online evals must include the real production constraint the paper treats as load-bearing."
-          ],
-          "rolloutPlan": [
-            "PoC：在单个场景（如S2生活方式助手）上验证老化基准和诊断",
-            "Pilot：选择非关键Agent，部署老化监控和反事实探针，运行两周",
-            "Limited Prod：扩展至2-3个生产Agent，建立基线老化曲线",
-            "Full：全面部署老化评估，将老化指标纳入Agent发布关卡",
-            "PoC: reproduce the paper-relevant customer-facing production AI workflow, RAG or enterprise knowledge retrieval, evaluation and reliability gating path on a small representative task set. Acceptance criteria: golden-task pass rate, trace completeness, and obvious failure modes are measurable.",
-            "Pilot: run the workflow with named human reviewers and limited users. Acceptance criteria: reviewers can approve, reject, escalate, and label failures without leaving the operating process.",
-            "Limited prod: enable the workflow for a bounded segment with rollback and monitoring. Acceptance criteria: p95 latency, per-task cost, error rate, override rate, and policy violations stay inside the launch budget.",
-            "Full production: expand only after ownership, monitoring, eval refresh, incident response, and governance reviews are stable. Acceptance criteria: business metric movement and failure-rate reduction are visible in operating data."
-          ],
-          "riskRegister": [
-            "技术风险：基准场景不能完全模拟真实行为，老化指标可能漏报",
-            "数据风险：监控老化需要记录内部记忆状态，可能涉及隐私",
-            "权限风险：反事实探针需要替换检索，可能干扰生产",
-            "安全风险：攻击者可能利用老化误导Agent",
-            "成本风险：全面老化评估增加计算开销",
-            "采用风险：团队可能不愿改变现有测试习惯",
-            "技术: integration can fail at tool contracts, orchestration state, retrieval quality, or error handling rather than at the model alone.",
-            "数据: stale, missing, or permission-mismatched sources can make apparently correct outputs unusable.",
-            "权限: API scopes, RBAC, and audit trails must be checked before the system can act on protected data.",
-            "安全: prompts, retrieved context, logs, and tool outputs need controls for PII, leakage, and policy violations."
-          ],
-          "roiHypothesis": "通过在部署前识别老化机制和定位故障阶段，AgingBench可减少生产环境中的错误响应数量，将Agent的可靠寿命延长x%（待通过实验验证），降低客户投诉和人工干预成本。",
-          "interviewStory": "想象你负责一个企业级AI Agent，部署三个月后开始给出错误答案——客户预算数字有偏差，但对话依然流畅。你的监控显示无异常，因为用户满意度表面正常。这时你需要的不只是一个分数，而是一套框架来诊断：是压缩丢掉了精确值？相似记忆混淆了？还是派生状态没有更新？这篇论文提供了这种框架，让你能精准修复问题，而不是盲目增加记忆。"
-        }
-      },
-      "scorecard": [
-        {
-          "dimension": "FDE相关性",
-          "score": 9,
-          "reason": "直接针对已部署的Agent系统，涉及记忆管理、维护、诊断，与AI应用工程师的工作高度相关。"
-        },
-        {
-          "dimension": "工程现实感",
-          "score": 8,
-          "reason": "直接面向部署场景，提出维护事件、组件归因等工程概念，但基准仍为受控环境，与真实生产系统有差距。"
-        },
-        {
-          "dimension": "问题重要性",
-          "score": 9,
-          "reason": "长期部署的Agent可靠性是实际生产中的关键问题，现有基准忽视寿命效应，论文填补重要空白。"
-        },
-        {
-          "dimension": "方法新颖性",
-          "score": 9,
-          "reason": "首次提出Agent老化概念、四机制分类、时间依赖DAG和反事实诊断剖面，具有高度创新性。"
-        },
-        {
-          "dimension": "证据强度",
-          "score": 6,
-          "reason": "提供了定量结果（表3），但统计显著性未报告，实验规模有限（400次运行、14模型），且缺乏真实部署验证。"
-        },
-        {
-          "dimension": "可复现性",
-          "score": 7,
-          "reason": "提供了开源代码和基准生成器，但依赖的模型（如GPT-4o、Claude）是API调用，部分结果可能因模型更新而不可完全复现。"
-        },
-        {
-          "dimension": "可部署性",
-          "score": 7,
-          "reason": "诊断框架设计具有实际部署价值，但当前基准需要集成到现有Agent系统中，且诊断剖面的有效性需要进一步验证。"
-        },
-        {
-          "dimension": "安全治理意识",
-          "score": 6,
-          "reason": "论文未直接讨论安全性，但老化可能导致错误输出，间接涉及可靠性治理。未考虑对抗性或恶意使用场景。"
-        },
-        {
-          "dimension": "ROI可解释性",
-          "score": 8,
-          "reason": "论文清晰展示了不同修复路径的成本差异（写、读、利用），有助于工程决策，但缺乏定量ROI分析。"
-        },
-        {
-          "dimension": "职业训练价值",
-          "score": 8,
-          "reason": "提供了一种系统的思维框架和评估工具，适合训练Agent开发者的部署意识、故障诊断能力。"
+          "reason": "论文系统呈现框架安全评估方法、基准构建、实验设计，适合作为AI安全评估工程师的学习材料。但缺乏代码实操。 Not higher because the collected evidence still leaves at least one artifact, reproducibility, deployment, or generalization gap for this dimension."
         }
       ]
     },
@@ -1969,97 +2653,6 @@
       ]
     },
     {
-      "id": "paper:arxiv-2605-15040",
-      "title": "Orchard: An Open-Source Agentic Modeling Framework",
-      "authors": "Baolin Peng, Wenlin Yao, Qianhui Wu, Hao Cheng, Xiao Yu, Rui Yang, Tao Ge, Alessandro Sordoni, Xingdi Yuan, Yelong Shen, Pengcheng He, Tong Zhang, Zhou Yu, Jianfeng Gao",
-      "venue": "Venue not provided",
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.15040",
-      "verifiedAt": "2026-05-31T15:23:49.112Z",
-      "tier": "deep",
-      "leadJudgment": "Orchard 是一个开源 agent 建模框架，其核心是轻量的环境服务层，支持跨领域、跨管道的智能体数据、训练配方与评估复用。",
-      "sections": [
-        {
-          "heading": "摘要",
-          "summary": "论文提出 Orchard 开源框架，用于可扩展的 agent 建模。核心是 Orchard Env 环境服务，提供沙箱生命周期管理的可复用原语。基于此构建三个训练配方：Orchard-SWE（代码智能体，基于 Qwen3-30B-A3B-Thinking 在 SWE-bench Verified 达 64.3% SFT、67.5% SFT+RL，为同尺寸开源最佳）、Orchard-GUI（4B 视觉语言计算机使用智能体，WebVoyager 74.1%、Online-Mind2Web 67.0%、DeepShop 64.0%）、Orchard-Claw（个人助手，Claw-Eval 59.6% pass@3，配合更强 harness 达 73.9%）。结果表明轻量、开放、与 harness 无关的环境层可实现跨领域可复用的 agent 数据、训练配方与评估。",
-          "loadBearing": "核心主张是 Orchard Env 作为轻量、开放、与 harness 无关的环境服务层，能够支持可扩展的 agent 建模，并实现跨领域的可复用性。",
-          "evidence": "论文给出了三个配方的基准性能数字：Orchard-SWE 在 SWE-bench Verified 上 64.3% 和 67.5%；Orchard-GUI 在三个评估上 74.1%、67.0%、64.0%；Orchard-Claw 在 Claw-Eval 上 59.6% 和 73.9%。这些结果验证了环境层的有效性，但证据仅限于特定蒸馏数据（107K、0.4K、0.2K 轨迹）和特定基准，未提供在不同数据规模或不同环境下的泛化性测试。",
-          "fold": "训练方法包括：信用分配 SFT（从未解决轨迹的学习生产性片段）和平衡自适应展开 RL（Orchard-SWE）；使用极少蒸馏轨迹和开放任务（Orchard-GUI 和 Orchard-Claw）。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文未在摘要中明确讨论局限性，但指出许多高性能系统依赖专有代码库/模型/服务，而 Orchard 旨在填补开源训练基础设施的空白。未来工作可能包括扩展到更多领域、更大模型、更复杂的任务。证据未提供更详细的限制说明。",
-        "evidenceNotes": "证据强度中等：三个配方的性能数字来自蒸馏轨迹和特定基准，采样范围有限（每个配方仅一个或几个基准），适用边界主要集中在编码、GUI 和个人助手三个具体领域，未在更广泛的 agent 任务上验证。Orchard Env 的通用性需更多跨领域实验支持。"
-      },
-      "selection": {
-        "convergence": [
-          "arXiv"
-        ],
-        "track": [
-          "Broad AI / ML",
-          "AI Agents",
-          "Tool Use",
-          "AI Coding / SWE Agents",
-          "Agent Harness / Observability",
-          "Multimodal UI",
-          "Evaluation / Benchmarks",
-          "Human-AI Interaction"
-        ],
-        "ideaSignal": "deep_dive:94+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://arxiv.org/abs/2605.15040",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.15040v2",
-      "publishedAt": "2026-05-14T16:35:12Z"
-    },
-    {
-      "id": "paper:arxiv-2605-26112",
-      "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
-      "authors": "Shangding Gu",
-      "venue": "Venue not provided",
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.26112",
-      "verifiedAt": "2026-05-31T15:23:02.697Z",
-      "tier": "deep",
-      "leadJudgment": "本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。",
-      "sections": [
-        {
-          "heading": "摘要",
-          "summary": "本文指出智能体AI的下一个主要瓶颈是系统缩放，而不仅仅是模型缩放：需要围绕基础模型设计可审计、持久、模块化和可验证的架构。作者将这种转变称为“缩放 harness”，即将基础模型周围的结构化执行层作为设计、评估和优化的第一类对象。尽管大型语言模型使智能体能够使用工具、检索信息、维护记忆和执行长期工作流，但评估仍以模型为中心，通常仅关注最终任务成功，而将记忆、检索、工具使用、编排、验证和治理视为次要实现细节。这种框架越来越不充分，因为智能体性能源于基础模型、记忆基板、上下文构造器、技能路由层、编排循环以及验证和治理层之间的交互。这些组件共同构成了智能体 harness，将模型能力转化为长期智能体行为。论文通过三个核心瓶颈研究缩放harness：上下文治理、可信记忆和动态技能路由，以及协调和约束它们的编排和治理机制。还概述了 harness 级基准的研究议程，超越一次性任务成功，衡量轨迹质量、记忆卫生、上下文效率、通信保真度、验证成本和随时间的安全演变。为使讨论具体化，作者开发了 CheetahClaws（Python 原生参考 harness），并与 Claude Code 和 OpenClaw 进行了比较。主要主张：未来智能体AI的进展将同样依赖于系统设计，而非仅仅更强的基础模型。",
-          "loadBearing": "主要主张：未来智能体AI的进展将依赖于系统设计（即 harness 的缩放）与更强基础模型的同等程度。",
-          "evidence": "论文基于对现有评估偏模型中心的分析，并开发了参考实现 CheetahClaws 与现有工具对比，但未提供定量实验结果。证据范围限于概念论证和架构设计，尚未有大规模实证。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文指出当前评估主要关注最终任务成功，忽视了 harness 组件的细节，这限制了系统整体性能；未来需要新型 harness 级基准，评估轨迹质量、记忆卫生、上下文效率、通信保真度、验证成本和随时间的安全演变。论文未明确讨论自身局限性。",
-        "evidenceNotes": "证据主要来自对现状的分析和概念论证，缺乏大规模实验数据。论文提出的瓶颈（上下文治理、可信记忆、动态技能路由）和基准议程尚待实证验证。"
-      },
-      "selection": {
-        "convergence": [
-          "arXiv"
-        ],
-        "track": [
-          "Broad AI / ML",
-          "AI Agents",
-          "Tool Use",
-          "Agent Harness / Observability",
-          "RAG / Knowledge Systems",
-          "Evaluation / Benchmarks",
-          "LLM Security / Reliability",
-          "Human-AI Interaction"
-        ],
-        "ideaSignal": "deep_dive:100+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://arxiv.org/abs/2605.26112",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.26112v1",
-      "publishedAt": "2026-05-25T17:59:36Z"
-    },
-    {
       "id": "paper:arxiv-2605-29341",
       "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
       "authors": "Chengzhi Liu, Yuzhe Yang, Sophia Xiao Pu, Yepeng Liu, Lin Long, Yichen Guo, Nuo Chen, Zhaotian Weng, Elena Kochkina, Simerjot Kaur, Charese Smiley, Xiaomo Liu, James Zou, Sheng Liu, Yuheng Bu, Songyou Peng, Xin Eric Wang",
@@ -2314,65 +2907,54 @@
       ]
     },
     {
-      "id": "paper:arxiv-2605-29861",
-      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
-      "authors": "Chenghao Zhang, Guanting Dong, Yufan Liu, Tong Zhao, Zhicheng Dou",
+      "id": "paper:arxiv-2605-15040",
+      "title": "Orchard: An Open-Source Agentic Modeling Framework",
+      "authors": "Baolin Peng, Wenlin Yao, Qianhui Wu, Hao Cheng, Xiao Yu, Rui Yang, Tao Ge, Alessandro Sordoni, Xingdi Yuan, Yelong Shen, Pengcheng He, Tong Zhang, Zhou Yu, Jianfeng Gao",
       "venue": "Venue not provided",
-      "sourceName": "Hugging Face Daily Papers",
-      "sourceUrl": "https://huggingface.co/papers/2605.29861",
-      "verifiedAt": "2026-05-31T15:23:37.372Z",
+      "sourceName": "arXiv agent harness engineering",
+      "sourceUrl": "https://arxiv.org/abs/2605.15040",
+      "verifiedAt": "2026-05-31T15:23:49.112Z",
       "tier": "deep",
-      "leadJudgment": "本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。",
+      "leadJudgment": "Orchard 是一个开源 agent 建模框架，其核心是轻量的环境服务层，支持跨领域、跨管道的智能体数据、训练配方与评估复用。",
       "sections": [
         {
-          "heading": "动机与挑战",
-          "summary": "大型语言模型使自主智能体从深度搜索（获取简短事实答案）发展到深度研究（将分散证据综合成长篇报告）。然而，可验证的多模态深度研究仍然具有挑战性：开放式的合成缺乏确定性基准，且需要将文本论证与视觉证据交错结合。",
-          "loadBearing": "论文的主要假设是：通过专门的多智能体编排和验证机制，可以生成更可靠、视觉信息更丰富的多模态报告。",
-          "evidence": "论文通过实验对比强基线来支持该假设，但摘要未提供具体效果大小或统计显著性。"
-        },
-        {
-          "heading": "方法：Ptah多智能体框架",
-          "summary": "Ptah编排了从用户查询到渲染网页报告的完整生命周期，包括规划、研究和写作三个阶段。专门智能体构建视觉感知计划、收集基于主张的证据、在视觉工作记忆中维护源对齐图像，并通过声明式多模态工具使用组成报告。验证智能体作为框架的接受函数，在整个工作流中强制执行事实基础、引用保真度和跨模态一致性。",
-          "loadBearing": "框架的核心主张是：通过专用智能体和验证器，系统能够确保报告的可验证性。",
-          "evidence": "论文描述了框架架构，但未提供消融实验或组件贡献的定量分析。"
-        },
-        {
-          "heading": "评估：PtahEval协议与实验结果",
-          "summary": "提出了PtahEval评估协议，用图像级别和呈现级别评估补充现有基准。在深度研究基准上的实验表明，Ptah生成的报告比强基线更可靠、视觉信息更丰富、对用户更友好。",
-          "loadBearing": "论文声称Ptah优于基线，但摘要未报告具体指标数值。",
-          "evidence": "实验证据仅限于定性陈述；论文证据未提供具体评估分数或统计检验。"
+          "heading": "摘要",
+          "summary": "论文提出 Orchard 开源框架，用于可扩展的 agent 建模。核心是 Orchard Env 环境服务，提供沙箱生命周期管理的可复用原语。基于此构建三个训练配方：Orchard-SWE（代码智能体，基于 Qwen3-30B-A3B-Thinking 在 SWE-bench Verified 达 64.3% SFT、67.5% SFT+RL，为同尺寸开源最佳）、Orchard-GUI（4B 视觉语言计算机使用智能体，WebVoyager 74.1%、Online-Mind2Web 67.0%、DeepShop 64.0%）、Orchard-Claw（个人助手，Claw-Eval 59.6% pass@3，配合更强 harness 达 73.9%）。结果表明轻量、开放、与 harness 无关的环境层可实现跨领域可复用的 agent 数据、训练配方与评估。",
+          "loadBearing": "核心主张是 Orchard Env 作为轻量、开放、与 harness 无关的环境服务层，能够支持可扩展的 agent 建模，并实现跨领域的可复用性。",
+          "evidence": "论文给出了三个配方的基准性能数字：Orchard-SWE 在 SWE-bench Verified 上 64.3% 和 67.5%；Orchard-GUI 在三个评估上 74.1%、67.0%、64.0%；Orchard-Claw 在 Claw-Eval 上 59.6% 和 73.9%。这些结果验证了环境层的有效性，但证据仅限于特定蒸馏数据（107K、0.4K、0.2K 轨迹）和特定基准，未提供在不同数据规模或不同环境下的泛化性测试。",
+          "fold": "训练方法包括：信用分配 SFT（从未解决轨迹的学习生产性片段）和平衡自适应展开 RL（Orchard-SWE）；使用极少蒸馏轨迹和开放任务（Orchard-GUI 和 Orchard-Claw）。"
         }
       ],
       "limitsAndFuture": {
-        "paperStated": "论文未在摘要中明确讨论局限性或未来工作。",
-        "evidenceNotes": "实验证据仅来自摘要中的定性描述；采样范围、基准选择和适用边界未说明。根据已有信息，无法评估证据强度。"
+        "paperStated": "论文未在摘要中明确讨论局限性，但指出许多高性能系统依赖专有代码库/模型/服务，而 Orchard 旨在填补开源训练基础设施的空白。未来工作可能包括扩展到更多领域、更大模型、更复杂的任务。证据未提供更详细的限制说明。",
+        "evidenceNotes": "证据强度中等：三个配方的性能数字来自蒸馏轨迹和特定基准，采样范围有限（每个配方仅一个或几个基准），适用边界主要集中在编码、GUI 和个人助手三个具体领域，未在更广泛的 agent 任务上验证。Orchard Env 的通用性需更多跨领域实验支持。"
       },
       "selection": {
         "convergence": [
-          "Hugging Face Daily Papers",
           "arXiv"
         ],
         "track": [
           "Broad AI / ML",
           "AI Agents",
           "Tool Use",
+          "AI Coding / SWE Agents",
           "Agent Harness / Observability",
-          "RAG / Knowledge Systems",
           "Multimodal UI",
-          "Evaluation / Benchmarks"
+          "Evaluation / Benchmarks",
+          "Human-AI Interaction"
         ],
-        "ideaSignal": "deep_dive:97+ahe:harness engineering"
+        "ideaSignal": "deep_dive:94+ahe:harness engineering"
       },
       "provenance": {
-        "sourceUrl": "https://huggingface.co/papers/2605.29861",
+        "sourceUrl": "https://arxiv.org/abs/2605.15040",
         "evidenceKind": "paper-text"
       },
-      "arxivId": "2605.29861",
-      "publishedAt": "2026-05-28T12:40:34Z"
+      "arxivId": "2605.15040v2",
+      "publishedAt": "2026-05-14T16:35:12Z"
     }
   ],
   "pipelineRun": {
-    "id": "papers-2026-05-31-1780246427068",
+    "id": "papers-2026-05-31-1780255316528",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -2424,7 +3006,7 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-05-31T16:53:47.065Z",
+    "checkedAt": "2026-05-31T19:21:56.524Z",
     "checks": [
       {
         "id": "papers-present",
