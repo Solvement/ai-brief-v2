@@ -1,45 +1,143 @@
 {
-  "generatedAt": "2026-05-31T03:27:48.220Z",
+  "generatedAt": "2026-05-31T13:35:19.305Z",
   "papers": [
     {
-      "id": "agent-harness-engineering-survey",
-      "title": "Agent Harness Engineering: A Survey",
-      "authors": "双盲匿名 (TMLR under review)",
-      "venue": "TMLR · 在审",
-      "sourceName": "OpenReview",
-      "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
-      "verifiedAt": "2026-05-31T03:27:48.212Z",
+      "id": "paper:arxiv-2605-29341",
+      "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
+      "authors": "Chengzhi Liu, Yuzhe Yang, Sophia Xiao Pu, Yepeng Liu, Lin Long, Yichen Guo, Nuo Chen, Zhaotian Weng, Elena Kochkina, Simerjot Kaur, Charese Smiley, Xiaomo Liu, James Zou, Sheng Liu, Yuheng Bu, Songyou Peng, Xin Eric Wang",
+      "venue": "Venue not provided",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.29341",
+      "verifiedAt": "2026-05-31T13:35:06.071Z",
       "tier": "deep",
-      "leadJudgment": "离线模式下只根据已收集证据保留《Agent Harness Engineering: A Survey》的基础脉络。",
+      "leadJudgment": "WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。",
       "sections": [
         {
-          "heading": "摘要",
-          "summary": "## Metadata Title: Agent Harness Engineering: A Survey Authors: 双盲匿名 (TMLR under review) Venue: TMLR · 在审 Source: OpenReview Source URL: https://openreview.net/pdf?id=3hXEPbG0dh PDF URL: https://openreview.net/pdf?id=3hXEPbG0dh Source signals: OpenReview, TMLR · 在审, offline fixture Focus topics: AI Agents, Agent Harness / Observability ## Paper section list…",
-          "evidence": "离线 fallback 只使用已收集的 paper-text 证据，不补充证据外事实。"
+          "heading": "背景与动机",
+          "summary": "多模态大语言模型越来越多地作为长期智能体部署，记忆必须超越简单回忆，需要跟踪演化世界、更新过时信息、在决策时提供正确证据。现有基准只在静态对话上测量回忆，将记忆压缩成单次任务准确率，并将视觉观察简化为字幕，无法定位失败在写入、维护、检索或使用阶段。",
+          "loadBearing": "假设：现有基准无法定位记忆失败的具体阶段。",
+          "evidence": "论文指出现有基准测量静态对话回忆、单次任务准确率、视觉观察简化为字幕。",
+          "fold": "无"
+        },
+        {
+          "heading": "方法：WorldMemArena",
+          "summary": "将多模态智能体记忆形式化为行动-世界交互循环（Action-World Interaction Loop），具有可观察的四阶段生命周期。实例化为WorldMemArena：包含400个多会话多模态任务，涵盖终身演化（演化个人和任务状态）和智能体执行（来自真实观察、行动和反馈的记忆），并标注了金标准记忆点、更新、干扰物和证据链，支持阶段级诊断。",
+          "loadBearing": "核心主张：四阶段循环和细粒度标注可以定位记忆失败阶段。",
+          "evidence": "400个任务，两个子集，金标注。",
+          "fold": "无"
+        },
+        {
+          "heading": "实验设置与对比",
+          "summary": "首次头对头比较了长上下文、手动设计（RAG和外部记忆系统）以及基于harness的记忆智能体。",
+          "loadBearing": "假设：不同记忆策略可以在统一的基准上比较。",
+          "evidence": "论文未提供具体对比方法的数量或配置细节，仅提及类型。",
+          "fold": "论文未提供具体模型或系统名称。"
+        },
+        {
+          "heading": "主要发现",
+          "summary": "四个关键结果：(1) 更好的记忆写入和存储并不保证更好的整体性能；(2) 多模态记忆仍难以充分利用视觉证据；(3) 系统跨领域不稳定，且在真实智能体轨迹上性能下降；(4) 基于harness的记忆更灵活但成本高且可靠性较低。",
+          "loadBearing": "核心发现：记忆写入/存储与整体性能无正相关性；视觉证据利用不足。",
+          "evidence": "论文明确陈述了这四个结果。",
+          "fold": "论文未提供统计显著性或其他详细分析。"
         }
       ],
       "limitsAndFuture": {
-        "paperStated": "论文证据未提供限制或未来工作段落。",
-        "evidenceNotes": "当前分析受限于已收集 evidence.content，未使用证据外信息。"
+        "paperStated": "论文未明确列出局限性或未来工作，但指出基于harness的记忆成本高且可靠性低，暗示未来改进方向。",
+        "evidenceNotes": "结果基于400个任务，覆盖两个领域（终身演化和智能体执行），但样本规模尚可。未说明任务多样性或现实世界代表性。评估中使用的具体模型和系统未在摘要中提供。"
       },
       "selection": {
         "convergence": [
-          "OpenReview/top venue"
+          "Hugging Face Daily Papers",
+          "arXiv"
         ],
         "track": [
           "AI Agents",
-          "Agent Harness / Observability"
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks",
+          "Human-AI Interaction"
         ],
-        "ideaSignal": "review:79+ahe:harness engineering"
+        "ideaSignal": "deep_dive:97+ahe:harness engineering"
       },
       "provenance": {
-        "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
+        "sourceUrl": "https://huggingface.co/papers/2605.29341",
         "evidenceKind": "paper-text"
-      }
+      },
+      "arxivId": "2605.29341",
+      "publishedAt": "2026-05-28T04:27:20Z"
+    },
+    {
+      "id": "paper:arxiv-2605-29861",
+      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+      "authors": "Chenghao Zhang, Guanting Dong, Yufan Liu, Tong Zhao, Zhicheng Dou",
+      "venue": "Venue not provided",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.29861",
+      "verifiedAt": "2026-05-31T13:35:19.292Z",
+      "tier": "deep",
+      "leadJudgment": "提出一个多智能体系统Ptah，用于生成可验证、图文交织的多模态深度研究报告，并配以专门的评估协议PtahEval。",
+      "sections": [
+        {
+          "heading": "背景与挑战",
+          "summary": "大型语言模型将自主智能体从深度搜索（检索简洁事实答案）推进到深度研究（综合分散证据成报告）。但可验证的多模态深度研究仍面临挑战：开放端合成无确定真值，且需要将文本论证与视觉证据交织。",
+          "loadBearing": "核心假设：通过多智能体编排和验证机制可以实现可靠、视觉信息丰富的多模态报告生成。",
+          "evidence": "论文未提供具体实验数据支撑该假设的边界条件。"
+        },
+        {
+          "heading": "Ptah多智能体系统",
+          "summary": "Ptah编排从用户查询到渲染网页报告的完整生命周期，包括规划、研究和写作三个阶段。专门智能体构建视觉感知计划、收集声明相关的证据、在视觉工作记忆中维护源对齐的图像，并通过声明式多模态工具使用撰写报告。",
+          "loadBearing": "关键设计：视觉工作记忆用于保持图像与源的关联，声明式工具使用实现文本与图像的灵活交织。",
+          "evidence": "论文未提供消融实验证明各组件贡献。"
+        },
+        {
+          "heading": "验证机制",
+          "summary": "验证智能体作为系统接受函数，强制在整个工作流程中实现事实基础、引用保真度和跨模态一致性。",
+          "loadBearing": "验证智能体是保证报告可信度的核心组件。",
+          "evidence": "论文未提供验证智能体误报/漏报率等量化评估。"
+        },
+        {
+          "heading": "PtahEval评估协议",
+          "summary": "提出PtahEval评估协议，在现有基准基础上增加图像级和呈现级评估，涵盖事实基础、引用保真度、视觉相关性、跨模态一致性和呈现质量。",
+          "loadBearing": "评估协议本身是多维度、层次化的，但论文未给出其与人类判断的一致性验证。",
+          "evidence": "论文未提供PtahEval的可靠性和有效性度量。"
+        },
+        {
+          "heading": "实验结果",
+          "summary": "在深度研究基准上，Ptah生成比强基线更可靠、视觉信息更丰富、更实用的人类可读多模态报告。",
+          "loadBearing": "结论基于与强基线的比较，但论文未披露基线选择标准和实验设置细节。",
+          "evidence": "论文未提供实验数据集规模、统计显著性检验或误差条等细节。采样范围未知。适用边界：可能仅适用于文本与图像交织的报告生成任务。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文未明确说明局限性，但隐含挑战包括开放端合成无确定真值和跨模态一致性保持。",
+        "evidenceNotes": "论文未提供实验细节，包括数据集、基线、评估量表和重复性信息。证据强度无法客观评估。"
+      },
+      "selection": {
+        "convergence": [
+          "Hugging Face Daily Papers",
+          "arXiv"
+        ],
+        "track": [
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks"
+        ],
+        "ideaSignal": "deep_dive:89+ahe:harness engineering"
+      },
+      "provenance": {
+        "sourceUrl": "https://huggingface.co/papers/2605.29861",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.29861",
+      "publishedAt": "2026-05-28T12:40:34Z"
     }
   ],
   "pipelineRun": {
-    "id": "papers-20260531032748",
+    "id": "papers-2026-05-31-1780234519310",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -48,25 +146,25 @@
       "stage": "discover",
       "role": "Discoverer",
       "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-      "signal": "1 paper candidate(s) from the papers kernel"
+      "signal": "15 paper candidate(s) from the papers kernel"
     },
     {
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "1 analyzed candidate(s) with paper-text evidence"
+      "signal": "2 analyzed candidate(s) with paper-text evidence"
     },
     {
       "stage": "rank",
       "role": "Ranker",
       "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-      "signal": "1 current analysis item(s) available after QA filtering"
+      "signal": "2 current analysis item(s) available after QA filtering"
     },
     {
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "1 section-mirroring academic analysis item(s)"
+      "signal": "2 section-mirroring academic analysis item(s)"
     },
     {
       "stage": "verify",
@@ -91,19 +189,19 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-05-31T03:27:48.220Z",
+    "checkedAt": "2026-05-31T13:35:19.308Z",
     "checks": [
       {
         "id": "papers-present",
         "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "1 paper(s)"
+        "details": "2 paper(s)"
       },
       {
         "id": "section-shape",
         "label": "every paper has section summaries",
         "status": "pass",
-        "details": "1 paper(s) checked"
+        "details": "2 paper(s) checked"
       },
       {
         "id": "qa-fail-excluded",

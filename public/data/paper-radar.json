@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "date": "2026-05-31",
-  "generatedAt": "2026-05-31T03:27:48.220Z",
+  "generatedAt": "2026-05-31T13:35:19.305Z",
   "sourceFiles": {
     "daily": "data/papers/daily-2026-05-31.json",
     "triage": "data/papers/triage-2026-05-31.json"
   },
   "pipelineRun": {
-    "id": "papers-20260531032748",
+    "id": "papers-2026-05-31-1780234519310",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -15,19 +15,19 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-05-31T03:27:48.220Z",
+    "checkedAt": "2026-05-31T13:35:19.308Z",
     "checks": [
       {
         "id": "papers-present",
         "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "1 paper(s)"
+        "details": "2 paper(s)"
       },
       {
         "id": "section-shape",
         "label": "every paper has section summaries",
         "status": "pass",
-        "details": "1 paper(s) checked"
+        "details": "2 paper(s) checked"
       },
       {
         "id": "qa-fail-excluded",
@@ -47,35 +47,35 @@
   "reflection": null,
   "memoryVersion": 1,
   "triageSummary": {
-    "candidateCount": 1,
-    "selectedCount": 1,
+    "candidateCount": 2,
+    "selectedCount": 2,
     "rejectedCount": 0,
-    "cutoffScore": 79
+    "cutoffScore": 89
   },
   "agentFlow": [
     {
       "stage": "discover",
       "role": "Discoverer",
       "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-      "signal": "1 paper candidate(s) from the papers kernel"
+      "signal": "15 paper candidate(s) from the papers kernel"
     },
     {
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "1 analyzed candidate(s) with paper-text evidence"
+      "signal": "2 analyzed candidate(s) with paper-text evidence"
     },
     {
       "stage": "rank",
       "role": "Ranker",
       "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-      "signal": "1 current analysis item(s) available after QA filtering"
+      "signal": "2 current analysis item(s) available after QA filtering"
     },
     {
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "1 section-mirroring academic analysis item(s)"
+      "signal": "2 section-mirroring academic analysis item(s)"
     },
     {
       "stage": "verify",
@@ -97,56 +97,120 @@
     }
   ],
   "mustRead": {
-    "id": "agent-harness-engineering-survey",
-    "title": "Agent Harness Engineering: A Survey",
+    "id": "paper:arxiv-2605-29341",
+    "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
     "daily_action": "must_read",
-    "triage_decision": "review",
-    "total_score": 79,
-    "sourceName": "OpenReview",
-    "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
+    "triage_decision": "deep_dive",
+    "total_score": 97,
+    "sourceName": "Hugging Face Daily Papers",
+    "sourceUrl": "https://huggingface.co/papers/2605.29341",
     "matched_topics": [
       "AI Agents",
-      "Agent Harness / Observability"
+      "Agent Harness / Observability",
+      "RAG / Knowledge Systems",
+      "Multimodal UI",
+      "Evaluation / Benchmarks",
+      "Human-AI Interaction"
     ],
     "freshness_signal": "new",
     "hotness_signal": "high_signal_source",
-    "reason": "AI Agents, Agent Harness / Observability; total 79; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness."
+    "reason": "Multimodal agent memory benchmark, strong evaluation, high interview value."
   },
-  "skim": [],
-  "professorLesson": "离线模式下只根据已收集证据保留《Agent Harness Engineering: A Survey》的基础脉络。",
-  "goodIdeaToSteal": "## Metadata Title: Agent Harness Engineering: A Survey Authors: 双盲匿名 (TMLR under review) Venue: TMLR · 在审 Source: OpenReview Source URL: https://openreview.net/pdf?id=3hXEPbG0dh PDF URL: https://openreview.net/pdf?id=3hXEPbG0dh Source signals: OpenReview, TMLR · 在审, offline fixture Focus topics: AI Agents, Agent Harness / Observability ## Paper section list…",
-  "badIdeaOrRisk": "当前分析受限于已收集 evidence.content，未使用证据外信息。",
-  "transferablePattern": "离线 fallback 只使用已收集的 paper-text 证据，不补充证据外事实。",
-  "futureWorkApplication": "论文证据未提供限制或未来工作段落。",
-  "architectureTakeaway": "离线 fallback 只使用已收集的 paper-text 证据，不补充证据外事实。",
-  "interviewTalkingPoint": "review:79+ahe:harness engineering",
-  "projectIdea": "Build a grounded checklist from Agent Harness Engineering: A Survey and test it against one agent workflow.",
-  "topPapers": [
+  "skim": [
     {
-      "id": "agent-harness-engineering-survey",
-      "title": "Agent Harness Engineering: A Survey",
-      "daily_action": "must_read",
-      "triage_decision": "review",
-      "total_score": 79,
-      "sourceName": "OpenReview",
-      "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
+      "id": "paper:arxiv-2605-29861",
+      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+      "daily_action": "skim",
+      "triage_decision": "deep_dive",
+      "total_score": 89,
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.29861",
       "matched_topics": [
         "AI Agents",
-        "Agent Harness / Observability"
+        "Tool Use",
+        "Agent Harness / Observability",
+        "RAG / Knowledge Systems",
+        "Multimodal UI",
+        "Evaluation / Benchmarks"
       ],
       "freshness_signal": "new",
       "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, Agent Harness / Observability; total 79; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness."
+      "reason": "High relevance to AI agents, tool use, multimodal research; deterministic deep dive."
+    }
+  ],
+  "professorLesson": "WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。",
+  "goodIdeaToSteal": "假设：现有基准无法定位记忆失败的具体阶段。",
+  "badIdeaOrRisk": "结果基于400个任务，覆盖两个领域（终身演化和智能体执行），但样本规模尚可。未说明任务多样性或现实世界代表性。评估中使用的具体模型和系统未在摘要中提供。",
+  "transferablePattern": "论文指出现有基准测量静态对话回忆、单次任务准确率、视觉观察简化为字幕。",
+  "futureWorkApplication": "论文未明确列出局限性或未来工作，但指出基于harness的记忆成本高且可靠性低，暗示未来改进方向。",
+  "architectureTakeaway": "论文指出现有基准测量静态对话回忆、单次任务准确率、视觉观察简化为字幕。",
+  "interviewTalkingPoint": "deep_dive:97+ahe:harness engineering",
+  "projectIdea": "Build a grounded checklist from WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction and test it against one agent workflow.",
+  "topPapers": [
+    {
+      "id": "paper:arxiv-2605-29341",
+      "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
+      "daily_action": "must_read",
+      "triage_decision": "deep_dive",
+      "total_score": 97,
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.29341",
+      "matched_topics": [
+        "AI Agents",
+        "Agent Harness / Observability",
+        "RAG / Knowledge Systems",
+        "Multimodal UI",
+        "Evaluation / Benchmarks",
+        "Human-AI Interaction"
+      ],
+      "freshness_signal": "new",
+      "hotness_signal": "high_signal_source",
+      "reason": "Multimodal agent memory benchmark, strong evaluation, high interview value."
+    },
+    {
+      "id": "paper:arxiv-2605-29861",
+      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+      "daily_action": "skim",
+      "triage_decision": "deep_dive",
+      "total_score": 89,
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.29861",
+      "matched_topics": [
+        "AI Agents",
+        "Tool Use",
+        "Agent Harness / Observability",
+        "RAG / Knowledge Systems",
+        "Multimodal UI",
+        "Evaluation / Benchmarks"
+      ],
+      "freshness_signal": "new",
+      "hotness_signal": "high_signal_source",
+      "reason": "High relevance to AI agents, tool use, multimodal research; deterministic deep dive."
     }
   ],
   "selectionTrace": [
     {
-      "id": "agent-harness-engineering-survey",
-      "title": "Agent Harness Engineering: A Survey",
-      "score": 79,
-      "decision": "review",
+      "id": "paper:arxiv-2605-29341",
+      "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
+      "score": 97,
+      "decision": "deep_dive",
       "status": "selected",
-      "reason": "AI Agents, Agent Harness / Observability; total 79; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness.",
+      "reason": "AI Agents, Agent Harness / Observability, RAG / Knowledge Systems; total 89; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory.",
+      "aheSignals": [
+        "harness engineering",
+        "agent harness",
+        "trajectory"
+      ],
+      "freshness": "new",
+      "hotness": "high_signal_source"
+    },
+    {
+      "id": "paper:arxiv-2605-29861",
+      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
+      "score": 89,
+      "decision": "deep_dive",
+      "status": "selected",
+      "reason": "AI Agents, Tool Use, Agent Harness / Observability; total 89; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness.",
       "aheSignals": [
         "harness engineering",
         "agent harness"
