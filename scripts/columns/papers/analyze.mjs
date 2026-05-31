@@ -1,6 +1,35 @@
 import { createDeepSeekClient } from "../../lib/llm.mjs";
 import { analysisSystem, analysisUser } from "./prompts.mjs";
 
+const FDE_SIGNAL_RULES = [
+  { label: "customer/production system", patterns: [/\bcustomer\b/i, /\benterprise\b/i, /\bproduction\b/i, /\breal[- ]world\b/i, /\bdeployed\b/i, /\bdeployment\b/i, /\bservice\b/i] },
+  { label: "API/tool/MCP integration", patterns: [/\bAPI\b/i, /\bSDK\b/i, /\bendpoint\b/i, /\bwebhook\b/i, /\bconnector\b/i, /\bintegration\b/i, /\btool[- ]?use\b/i, /\bfunction calling\b/i, /\btool calling\b/i, /\bMCP\b/i] },
+  { label: "workflow readiness", patterns: [/\bworkflow\b/i, /\bbusiness process\b/i, /\bhuman[- ]in[- ]the[- ]loop\b/i, /\bhandoff\b/i, /\borchestrat/i] },
+  { label: "RAG/knowledge system", patterns: [/\bRAG\b/i, /\bretrieval[- ]augmented\b/i, /\bretriev/i, /\bknowledge base\b/i, /\bmemory\b/i, /\bGraphRAG\b/i] },
+  { label: "evaluation/reliability gate", patterns: [/\beval(?:uation)? harness\b/i, /\bregression (?:test|gate)\b/i, /\bfailure modes?\b/i, /\breliability\b/i, /\bbenchmark(?:ing)? framework\b/i] },
+  { label: "observability/debugging", patterns: [/\bobservability\b/i, /\bmonitoring\b/i, /\blog(?:ging|s)?\b/i, /\btrace(?:s|ability)?\b/i, /\bexecution trace\b/i, /\bdebugg/i] },
+  { label: "deployment/runbook", patterns: [/\bdeploy(?:ment|ed)?\b/i, /\brollout\b/i, /\brollback\b/i, /\brunbook\b/i, /\binfrastructure\b/i, /\blatency\b/i, /\bcost\b/i] },
+  { label: "governance/permissions", patterns: [/\bgovernance\b/i, /\bpermission(?:s)?\b/i, /\bauth(?:entication|orization)?\b/i, /\bRBAC\b/i, /\bPII\b/i, /\bprivacy\b/i, /\bsecurity\b/i, /\bcompliance\b/i, /\baudit trail\b/i] },
+  { label: "artifact-level diagnosis", patterns: [/\bcodebase\b/i, /\brepositor(?:y|ies)\b/i, /\bwebsite\b/i, /\bsite audit\b/i, /\bcustomer data\b/i, /\bdata schema\b/i, /\bdata pipeline\b/i, /\bdata quality\b/i, /\bdatabase\b/i, /\bwarehouse\b/i, /\bticket(?:s)?\b/i, /\banalytics\b/i, /\bartifact(?:s)?\b/i] },
+];
+
+const PURE_ALGORITHM_ONLY_PATTERNS = [
+  /\bscaling law\b/i,
+  /\bmodel scaling\b/i,
+  /\bpre[- ]?training\b/i,
+  /\btraining recipe\b/i,
+  /\boptimizer\b/i,
+  /\bloss function\b/i,
+  /\battention kernel\b/i,
+  /\bsparse attention\b/i,
+  /\bMoE routing\b/i,
+  /\btokenizer\b/i,
+  /\bparameter count\b/i,
+  /\bleaderboard[- ]only\b/i,
+  /\bstate[- ]of[- ]the[- ]art\b/i,
+  /\bSOTA\b/i,
+];
+
 export async function analyze(item, evidence, ctx = {}) {
   const options = ctx.options || {};
   const candidate = item?.candidate || item || {};
@@ -86,6 +115,8 @@ export function normalizeAnalysis(payload, opts = {}) {
       externalAudit: opts.externalAudit,
       fallback,
       sections: out.sections,
+      candidate: raw,
+      evaluation: opts.evaluation,
     });
     const scorecard = normalizeScorecard(payload?.scorecard);
     if (scorecard.length) out.scorecard = scorecard;
@@ -147,16 +178,16 @@ function normalizeScorecard(value) {
     .filter(Boolean);
 }
 
-function normalizeDeepDive(value, { evidence = {}, externalAudit = [], fallback = {}, sections = [] } = {}) {
+function normalizeDeepDive(value, { evidence = {}, externalAudit = [], fallback = {}, sections = [], candidate = {}, evaluation = {} } = {}) {
   const source = value || {};
   const evidenceText = cleanString(evidence.content);
   const audit = normalizeAudit([...asArray(source.audit), ...asArray(externalAudit)]);
   const limitations = ensureReproducibilityLimitation(
-    normalizeStringArray(source.limitations),
+    normalizeNarrativeArray(source.limitations),
     audit,
     fallback.limitsAndFuture,
   );
-  return {
+  const out = {
     reframe: cleanPublicString(source.reframe) || "Collected evidence is not sufficient to reframe the paper beyond its metadata and abstract.",
     contributionLayers: normalizeContributionLayers(source.contributionLayers),
     mechanism: cleanPublicString(source.mechanism) || "Collected evidence did not provide enough mechanism detail for a reviewer-style mechanism judgment.",
@@ -167,6 +198,9 @@ function normalizeDeepDive(value, { evidence = {}, externalAudit = [], fallback 
     limitations,
     suggestedExperiments: normalizeStringArray(source.suggestedExperiments),
   };
+  const fdeTakeaways = normalizeFdeTakeaways(source.fdeTakeaways, { candidate, evidence, evaluation, sections, source });
+  if (fdeTakeaways) out.fdeTakeaways = fdeTakeaways;
+  return out;
 }
 
 function normalizeContributionLayers(value) {
@@ -214,20 +248,267 @@ function metricValueSupported(value, evidenceText) {
   return numbers.some((number) => haystack.includes(number.replace(/,/g, "")));
 }
 
+function normalizeFdeTakeaways(value, context = {}) {
+  if (!isFdeRelevantContext(context)) return null;
+  const provided = normalizeProvidedFdeTakeaways(value);
+  if (provided) return provided;
+  return fallbackFdeTakeaways(context);
+}
+
+function normalizeProvidedFdeTakeaways(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const questions = normalizeFdeArray(value.questions, 7);
+  const checklist = normalizeFdeArray(value.checklist, 10);
+  const artifactsToAudit = normalizeFdeArray(value.artifactsToAudit, 10);
+  const roiRisk = cleanCompletePublicString(value.roiRisk, { max: 420 });
+  if (!questions.length || !checklist.length || !artifactsToAudit.length || !roiRisk) return null;
+  return { questions, checklist, artifactsToAudit, roiRisk };
+}
+
+function fallbackFdeTakeaways(context = {}) {
+  const text = fdeContextText(context);
+  const signals = detectFdeSignalsFromText(text);
+  if (!signals.length) return null;
+  const selected = uniqueObjectsBy(
+    [
+      ...FDE_TAKEAWAY_BANK.filter((item) => signals.includes(item.signal)),
+      ...FDE_TAKEAWAY_BANK.filter((item) => item.default),
+    ],
+    (item) => item.signal,
+  ).slice(0, 5);
+  const questions = selected.map((item) => item.question).slice(0, 5);
+  const checklist = selected.map((item) => item.checklist).slice(0, 8);
+  const artifactsToAudit = unique(selected.flatMap((item) => item.artifacts)).slice(0, 10);
+  const scope = signals.slice(0, 3).join(", ");
+  const roiRisk = `In a customer report, this becomes a readiness and risk-reduction section for ${scope}: ROI comes from reducing integration, evaluation, and debugging cycles, while risk reduction comes from finding contract, permission, workflow, and rollout gaps before deployment.`;
+  return { questions, checklist, artifactsToAudit, roiRisk };
+}
+
+const FDE_TAKEAWAY_BANK = [
+  {
+    signal: "customer/production system",
+    default: true,
+    question: "Which real customer workflow owns the AI output, and what production constraint would make the system unusable?",
+    checklist: "Production owner, success metric, latency/cost budget, fallback path, and rollout boundary are documented.",
+    artifacts: ["workflow SOPs", "production runbooks", "service SLOs"],
+  },
+  {
+    signal: "API/tool/MCP integration",
+    question: "Which endpoints, tool contracts, inputs, responses, auth scopes, and error states must be explicit before integration?",
+    checklist: "Endpoint, input schema, response schema, auth scope, rate limit, timeout, and error handling are documented.",
+    artifacts: ["OpenAPI specs", "tool schemas", "MCP server manifests", "auth scope inventory"],
+  },
+  {
+    signal: "workflow readiness",
+    default: true,
+    question: "Where does the AI step enter the workflow, who reviews or approves it, and what handoff must remain deterministic?",
+    checklist: "Trigger, human approval, escalation, handoff, retry, and exception paths are mapped.",
+    artifacts: ["process maps", "support tickets", "approval policies"],
+  },
+  {
+    signal: "RAG/knowledge system",
+    question: "Which knowledge sources need freshness, access control, retrieval tests, and citation or trace coverage?",
+    checklist: "Source ownership, indexing path, chunking policy, retrieval eval set, freshness SLA, and citation trace are present.",
+    artifacts: ["knowledge base exports", "index configuration", "retrieval eval logs", "document permission matrix"],
+  },
+  {
+    signal: "evaluation/reliability gate",
+    default: true,
+    question: "What eval set, pass/fail metric, regression gate, and review sample would prove this works on the customer's real tasks?",
+    checklist: "Golden tasks, failure labels, pass/fail thresholds, regression cadence, and owner for eval updates are defined.",
+    artifacts: ["eval datasets", "benchmark harness logs", "failure taxonomies"],
+  },
+  {
+    signal: "observability/debugging",
+    question: "Which traces, logs, intermediate decisions, and failure labels are required to debug bad outputs after deployment?",
+    checklist: "Prompt, retrieved context, tool call, model output, user action, and error trace are logged with privacy controls.",
+    artifacts: ["trace logs", "monitoring dashboards", "incident reports"],
+  },
+  {
+    signal: "deployment/runbook",
+    question: "What rollout, fallback, rollback, versioning, latency, and cost controls decide whether this can run in production?",
+    checklist: "Release gate, rollback plan, model/version pinning, cost guardrail, latency budget, and on-call path are ready.",
+    artifacts: ["deployment runbooks", "CI/CD config", "cost reports", "latency dashboards"],
+  },
+  {
+    signal: "governance/permissions",
+    question: "Which permissions, policy constraints, PII paths, and audit trails govern the AI action?",
+    checklist: "RBAC, least-privilege scopes, PII handling, compliance policy, and audit trail are checked before launch.",
+    artifacts: ["access-control matrix", "security reviews", "privacy impact assessments", "audit logs"],
+  },
+  {
+    signal: "artifact-level diagnosis",
+    question: "Which customer artifacts prove the current bottleneck: code paths, site behavior, data schemas, logs, tickets, or analytics?",
+    checklist: "Code/site/data artifacts are sampled, mapped to user-facing failures, and tied to measurable remediation work.",
+    artifacts: ["code repositories", "website flows", "data schemas", "analytics exports", "customer tickets"],
+  },
+];
+
+function isFdeRelevantContext(context = {}) {
+  const text = fdeContextText(context);
+  const signals = detectFdeSignalsFromText(text);
+  if (!signals.length) return false;
+  const hasSystemSignal = signals.some((signal) => signal !== "evaluation/reliability gate");
+  if (hasSystemSignal) return true;
+  return !PURE_ALGORITHM_ONLY_PATTERNS.some((pattern) => pattern.test(text));
+}
+
+function detectFdeSignalsFromText(text = "") {
+  return FDE_SIGNAL_RULES
+    .filter((rule) => rule.patterns.some((pattern) => pattern.test(text)))
+    .map((rule) => rule.label);
+}
+
+function fdeContextText({ candidate = {}, evidence = {}, evaluation = {}, sections = [], source = {} } = {}) {
+  const sourceFields = {
+    reframe: source.reframe,
+    mechanism: source.mechanism,
+    loadBearingClaim: source.loadBearingClaim,
+    contributionLayers: source.contributionLayers,
+  };
+  return textParts([
+    candidate.title,
+    candidate.abstract,
+    candidate.venue,
+    candidate.tags,
+    candidate.focusTopics,
+    candidate.sourceSignals,
+    evaluation.reason,
+    evaluation.signals,
+    evaluation.selection?.track,
+    evidence.sections,
+    String(evidence.content || "").slice(0, 12000),
+    sections,
+    sourceFields,
+  ]).join("\n");
+}
+
+function textParts(value, out = []) {
+  if (typeof value === "string" || typeof value === "number") {
+    out.push(String(value));
+  } else if (Array.isArray(value)) {
+    for (const item of value) textParts(item, out);
+  } else if (value && typeof value === "object") {
+    for (const item of Object.values(value)) textParts(item, out);
+  }
+  return out;
+}
+
+function normalizeFdeArray(value, limit) {
+  return unique(asArray(value)
+    .map((item) => cleanCompletePublicString(item, { max: 320 }))
+    .filter(Boolean))
+    .slice(0, limit);
+}
+
+function normalizeNarrativeArray(value) {
+  return unique(asArray(value)
+    .map((item) => cleanCompletePublicString(item, { max: 520 }))
+    .filter(Boolean));
+}
+
 function normalizeAudit(value) {
-  const bySourceAndClaim = new Map();
+  const bySource = new Map();
+  const withoutSource = new Map();
   for (const item of asArray(value)) {
-    const claim = cleanPublicString(item?.claim);
-    const finding = cleanPublicString(item?.finding);
+    const claim = cleanCompletePublicString(item?.claim, { max: 360 });
+    const finding = cleanCompletePublicString(item?.finding, { max: 360 });
     const source = cleanString(item?.source);
-    if (!claim || !finding) continue;
-    const key = `${source}\n${claim}\n${finding}`.toLowerCase();
-    if (bySourceAndClaim.has(key)) continue;
     const audit = { claim, finding };
     if (source) audit.source = source;
-    bySourceAndClaim.set(key, audit);
+    if (!claim || !finding || isGarbledClaimText(claim)) continue;
+    const sourceKey = source ? canonicalAuditSource(source) : "";
+    if (sourceKey) {
+      const existing = bySource.get(sourceKey);
+      if (!existing || auditSpecificityScore(audit) > auditSpecificityScore(existing)) bySource.set(sourceKey, audit);
+      continue;
+    }
+    const key = `${claim}\n${finding}`.toLowerCase();
+    if (!withoutSource.has(key)) withoutSource.set(key, audit);
   }
-  return [...bySourceAndClaim.values()];
+  return [...bySource.values(), ...withoutSource.values()];
+}
+
+function canonicalAuditSource(source) {
+  const raw = cleanString(source);
+  try {
+    const url = new URL(raw);
+    url.hash = "";
+    url.searchParams.sort();
+    return url.toString().replace(/\/$/, "").toLowerCase();
+  } catch {
+    return raw.toLowerCase();
+  }
+}
+
+function auditSpecificityScore(audit) {
+  let score = 0;
+  if (/returned HTTP|reachable|archived|gated|not found|release is on hold|restricted/i.test(audit.finding)) score += 4;
+  if (!/^Paper mentions an external project\/artifact URL\.$/i.test(audit.claim)) score += 2;
+  score += Math.min(cleanString(audit.finding).length, 240) / 120;
+  return score;
+}
+
+function cleanCompletePublicString(value, { max = 500 } = {}) {
+  const text = cleanPublicString(value);
+  if (!text || hasBadTextMarker(text)) return "";
+  const bounded = trimToCompleteText(text, max);
+  if (!bounded || looksCutOff(bounded)) return "";
+  return bounded;
+}
+
+function trimToCompleteText(text, max) {
+  const value = cleanString(text);
+  if (value.length <= max) return value;
+  const clipped = value.slice(0, max + 1);
+  const boundary = lastCompleteBoundary(clipped);
+  return boundary >= Math.max(80, Math.floor(max * 0.45)) ? clipped.slice(0, boundary + 1).trim() : "";
+}
+
+function lastCompleteBoundary(text) {
+  return Math.max(
+    text.lastIndexOf("."),
+    text.lastIndexOf("!"),
+    text.lastIndexOf("?"),
+    text.lastIndexOf("。"),
+    text.lastIndexOf("！"),
+    text.lastIndexOf("？"),
+  );
+}
+
+function looksCutOff(value) {
+  const text = cleanString(value);
+  return /(?:\.\.\.|…|â€¦)$/.test(text)
+    || /[,;:([{]$/.test(text)
+    || /\b(?:and|or|of|for|to|with|without|that|which|because|while|where|via|using|including|such as|the|a|an)$/i.test(text);
+}
+
+function hasBadTextMarker(value) {
+  return /\uFFFD|\u00ef\u00bf\u00bd|\[\u5360\u4f4d\]|\b(?:TODO|TBD)\b/i.test(String(value || ""));
+}
+
+function isGarbledClaimText(value) {
+  const text = cleanString(value);
+  if (/^(?:\d+\s+){2,}\d+\b/.test(text)) return true;
+  if (/\b(\d+)(?:\s+\1){2,}\b/.test(text)) return true;
+  if (/^(?:\d+[\s,;:.-]+){5,}/.test(text)) return true;
+  return false;
+}
+
+function unique(items) {
+  return [...new Set(items.filter(Boolean))];
+}
+
+function uniqueObjectsBy(items, keyFn) {
+  const seen = new Set();
+  const out = [];
+  for (const item of items) {
+    const key = keyFn(item);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
 }
 
 function ensureReproducibilityLimitation(limitations, audit, fallbackLimits = {}) {
@@ -239,7 +520,7 @@ function ensureReproducibilityLimitation(limitations, audit, fallbackLimits = {}
       : "Reproducibility note: no external project or repository URL was available in the collected evidence, so artifact availability could not be independently checked.";
     out.push(auditNote);
   }
-  const fallbackNote = cleanPublicString(fallbackLimits?.evidenceNotes);
+  const fallbackNote = cleanCompletePublicString(fallbackLimits?.evidenceNotes, { max: 520 });
   if (out.length === 0 && fallbackNote) out.push(fallbackNote);
   return out;
 }
@@ -371,9 +652,10 @@ function sentenceAroundUrl(text, url) {
   const previousBreak = Math.max(before.lastIndexOf("."), before.lastIndexOf("!"), before.lastIndexOf("?"), before.lastIndexOf("\n"), before.lastIndexOf("。"), before.lastIndexOf("！"), before.lastIndexOf("？"));
   const after = source.slice(index + url.length);
   const nextBreak = after.search(/[.!?。！？\n]/);
+  if (nextBreak < 0) return "";
   const start = Math.max(0, previousBreak + 1);
-  const end = nextBreak < 0 ? Math.min(source.length, index + url.length + 160) : index + url.length + nextBreak + 1;
-  return cleanPublicString(source.slice(start, end)).slice(0, 360);
+  const end = index + url.length + nextBreak + 1;
+  return cleanCompletePublicString(source.slice(start, end), { max: 360 });
 }
 
 function cleanUrl(value = "") {
@@ -404,7 +686,7 @@ function decodeBasicEntities(value = "") {
 function firstTitleLike(text = "") {
   const clean = cleanString(text);
   const title = clean.split(/(?:GitHub|Hugging Face|README|Files and versions|Model card)/i)[0]?.trim();
-  return title && title.length >= 4 ? title.slice(0, 160) : "";
+  return title && title.length >= 4 && title.length <= 160 ? title : "";
 }
 
 function cleanPublicString(value) {

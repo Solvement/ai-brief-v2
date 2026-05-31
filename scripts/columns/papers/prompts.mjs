@@ -12,6 +12,9 @@ export function analysisSystem(tier = "deep") {
 - Each evidenceChain item needs reviewerNote that distinguishes the headline number from what actually drove it, and marks strong/weak/confounded evidence.
 - deepDive.audit[] should include supplied externalAudit entries and any paper claims you can audit from the fetched text; if nothing was auditable, use [].
 - deepDive.limitations[] must include reproducibility/artifact availability.
+- Optional deepDive.fdeTakeaways is ONLY for FDE-relevant papers: real customer/enterprise/production systems, API/tool/MCP/workflow/RAG/eval/observability/deployment/governance, or artifact-level diagnosis of code/site/data.
+- Omit deepDive.fdeTakeaways entirely for pure algorithm, model-scaling, training-recipe, or leaderboard-only papers. Do not convert an algorithm result into customer-readiness advice unless evidence.content explicitly supports that systems/application link.
+- When present, deepDive.fdeTakeaways must be grounded in evidence.content and use this shape: questions[] (~5 real-customer project questions), checklist[] (reusable readiness checks such as endpoint/input/response/security/workflow-readiness), artifactsToAudit[] (customer artifacts to inspect), roiRisk (ROI/risk-reduction language for a customer report).
 - scorecard[] must cover exactly these dimensions with score 0-10 and reason: 问题重要性, 系统设计, 算法新颖性, 实验强度, 泛化, 可复现性, 影响.`;
   const deepShape = normalizedTier === "deep"
     ? `,
@@ -33,7 +36,13 @@ export function analysisSystem(tier = "deep") {
     "loadBearingClaim": "the claim that must hold for the paper to matter",
     "strongestEvidence": ["strong evidence item"],
     "limitations": ["must include reproducibility/artifact availability"],
-    "suggestedExperiments": ["reviewer experiment request"]
+    "suggestedExperiments": ["reviewer experiment request"],
+    "fdeTakeaways": {
+      "questions": ["real customer / AI-application project question grounded by this paper"],
+      "checklist": ["readiness check grounded by this paper"],
+      "artifactsToAudit": ["customer artifact to inspect"],
+      "roiRisk": "what this becomes as ROI or risk reduction in a customer report"
+    }
   }`
     : "";
 
@@ -87,6 +96,9 @@ export function analysisUser(candidate, evidence, evaluation = {}, tier = "deep"
       signals: evaluation?.signals || [],
       selection: evaluation?.selection || paper.selection || null,
     },
+    fdeNorthStar: normalizedTier === "deep"
+      ? "Kevin = FDE / AI-application engineer: integrate AI into real customer business with APIs, permissions, workflows, eval, deployment, observability, and governance. Only use this lens when the paper evidence supports it."
+      : undefined,
     evidence: {
       kind: evidence?.kind || "paper-text",
       sections: Array.isArray(evidence?.sections) ? evidence.sections : [],

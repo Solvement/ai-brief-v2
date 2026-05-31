@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 
 const FILE = new URL("../public/data/articles.json", import.meta.url);
-const REPLACEMENT = /�/;            // mojibake guard (RULES §9)
-const PLACEHOLDER = /\[占位\]|TODO|TBD/;
+const REPLACEMENT = /\uFFFD|\u00ef\u00bf\u00bd/; // mojibake guard (RULES §9)
+const PLACEHOLDER = /\[\u5360\u4f4d\]|\b(?:TODO|TBD)\b/i;
 
 function fail(msg) { console.error(`articles.json validation failed: ${msg}`); process.exit(1); }
 
@@ -52,6 +52,7 @@ function validateOptionalDeepDive(value, where) {
   validateContributionLayers(value.contributionLayers, `${where}.deepDive.contributionLayers`);
   validateEvidenceChain(value.evidenceChain, `${where}.deepDive.evidenceChain`);
   validateAudit(value.audit, `${where}.deepDive.audit`);
+  validateOptionalFdeTakeaways(value.fdeTakeaways, `${where}.deepDive.fdeTakeaways`);
   validateStringArray(value.strongestEvidence, `${where}.deepDive.strongestEvidence`);
   validateStringArray(value.limitations, `${where}.deepDive.limitations`);
   validateStringArray(value.suggestedExperiments, `${where}.deepDive.suggestedExperiments`);
@@ -89,8 +90,18 @@ function validateAudit(value, path) {
   }
 }
 
-function validateStringArray(value, path) {
+function validateOptionalFdeTakeaways(value, path) {
+  if (value === undefined) return;
+  if (!value || typeof value !== "object" || Array.isArray(value)) fail(`${path} must be an object`);
+  validateStringArray(value.questions, `${path}.questions`, { nonEmpty: true });
+  validateStringArray(value.checklist, `${path}.checklist`, { nonEmpty: true });
+  validateStringArray(value.artifactsToAudit, `${path}.artifactsToAudit`, { nonEmpty: true });
+  requireString(value.roiRisk, `${path}.roiRisk`);
+}
+
+function validateStringArray(value, path, { nonEmpty = false } = {}) {
   if (!Array.isArray(value)) fail(`${path} must be an array`);
+  if (nonEmpty && value.length === 0) fail(`${path} must not be empty`);
   for (const [i, item] of value.entries()) requireString(item, `${path}[${i}]`);
 }
 

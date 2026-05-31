@@ -1,13 +1,17 @@
 import { createDeepSeekClient } from "../../lib/llm.mjs";
 import { defaultSelect } from "../../lib/pipeline-kernel.mjs";
 
-const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|data preparation)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/i;
+const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|customer|enterprise|API|endpoint|MCP|deployment|governance|permission|codebase|data schema|data preparation)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/i;
 const NARROW_VERTICAL_RE = /\b(gaming|game|interior design|3D room|virtual reality|short-video|short video|bioinformatics|medical|protein|chemistry|robotics vertical)\b/i;
 
 const FOCUS_TOPICS = [
   {
     label: "Broad AI / ML",
     patterns: [/\bAI\b/i, /\bartificial intelligence\b/i, /\bmachine learning\b/i, /\bdeep learning\b/i, /\bfoundation models?\b/i, /\blarge language models?\b/i, /\bLLMs?\b/i, /\btransformers?\b/i, /\bpost[- ]?training\b/i, /\balignment\b/i, /人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/],
+  },
+  {
+    label: "AI Application Engineering / FDE",
+    patterns: [/\bcustomer\b/i, /\benterprise\b/i, /\bproduction\b/i, /\breal[- ]world\b/i, /\bdeployed\b/i, /\bdeployment\b/i, /\bAPI\b/i, /\bendpoint\b/i, /\bconnector\b/i, /\bMCP\b/i, /\bworkflow\b/i, /\bRAG\b/i, /\bretriev/i, /\bobservability\b/i, /\bgovernance\b/i, /\bpermission(?:s)?\b/i, /\bauth(?:entication|orization)?\b/i, /\bcodebase\b/i, /\bdata schema\b/i, /\bdata pipeline\b/i],
   },
   {
     label: "AI Agents",
@@ -62,7 +66,37 @@ const AHE_STRONG_SIGNALS = [
   { label: "self-improving coding agent", pattern: /\bself[- ]?improv(?:ing|ed)? coding agents?\b/i },
 ];
 
+const FDE_SIGNAL_RULES = [
+  { label: "customer/production system", patterns: [/\bcustomer\b/i, /\benterprise\b/i, /\bproduction\b/i, /\breal[- ]world\b/i, /\bdeployed\b/i, /\bdeployment\b/i, /\bservice\b/i] },
+  { label: "API/tool/MCP integration", patterns: [/\bAPI\b/i, /\bSDK\b/i, /\bendpoint\b/i, /\bwebhook\b/i, /\bconnector\b/i, /\bintegration\b/i, /\btool[- ]?use\b/i, /\bfunction calling\b/i, /\btool calling\b/i, /\bMCP\b/i] },
+  { label: "workflow readiness", patterns: [/\bworkflow\b/i, /\bbusiness process\b/i, /\bhuman[- ]in[- ]the[- ]loop\b/i, /\bhandoff\b/i, /\borchestrat/i] },
+  { label: "RAG/knowledge system", patterns: [/\bRAG\b/i, /\bretrieval[- ]augmented\b/i, /\bretriev/i, /\bknowledge base\b/i, /\bmemory\b/i, /\bGraphRAG\b/i] },
+  { label: "evaluation/reliability gate", patterns: [/\beval(?:uation)? harness\b/i, /\bregression (?:test|gate)\b/i, /\bfailure modes?\b/i, /\breliability\b/i, /\bbenchmark(?:ing)? framework\b/i] },
+  { label: "observability/debugging", patterns: [/\bobservability\b/i, /\bmonitoring\b/i, /\blog(?:ging|s)?\b/i, /\btrace(?:s|ability)?\b/i, /\bexecution trace\b/i, /\bdebugg/i] },
+  { label: "deployment/runbook", patterns: [/\bdeploy(?:ment|ed)?\b/i, /\brollout\b/i, /\brollback\b/i, /\brunbook\b/i, /\binfrastructure\b/i, /\blatency\b/i, /\bcost\b/i] },
+  { label: "governance/permissions", patterns: [/\bgovernance\b/i, /\bpermission(?:s)?\b/i, /\bauth(?:entication|orization)?\b/i, /\bRBAC\b/i, /\bPII\b/i, /\bprivacy\b/i, /\bsecurity\b/i, /\bcompliance\b/i, /\baudit trail\b/i] },
+  { label: "artifact-level diagnosis", patterns: [/\bcodebase\b/i, /\brepositor(?:y|ies)\b/i, /\bwebsite\b/i, /\bsite audit\b/i, /\bcustomer data\b/i, /\bdata schema\b/i, /\bdata pipeline\b/i, /\bdata quality\b/i, /\bdatabase\b/i, /\bwarehouse\b/i, /\bticket(?:s)?\b/i, /\banalytics\b/i, /\bartifact(?:s)?\b/i] },
+];
+
+const PURE_ALGORITHM_PATTERNS = [
+  /\bscaling law\b/i,
+  /\bmodel scaling\b/i,
+  /\bpre[- ]?training\b/i,
+  /\btraining recipe\b/i,
+  /\boptimizer\b/i,
+  /\bloss function\b/i,
+  /\battention kernel\b/i,
+  /\bsparse attention\b/i,
+  /\bMoE routing\b/i,
+  /\btokenizer\b/i,
+  /\bparameter count\b/i,
+  /\bleaderboard[- ]only\b/i,
+  /\bstate[- ]of[- ]the[- ]art\b/i,
+  /\bSOTA\b/i,
+];
+
 const TOPIC_ORDER = [
+  "AI Application Engineering / FDE",
   "Agent Harness / Observability",
   "AI Coding / SWE Agents",
   "Evaluation / Benchmarks",
@@ -113,7 +147,7 @@ export async function evaluate(candidate, evidence, ctx = {}) {
     mode: "rank",
     score: triage.total_score,
     reason: reasonForEval({ selected, triage, convergence, track, priority, model }),
-    signals: evalSignals({ convergence, track, priority, ideaSignal }),
+    signals: evalSignals({ convergence, track, priority, ideaSignal, fdeSignals: triage.matched_fde_signals }),
     provenance: {
       evaluator: model ? "llm+heuristic-features" : "heuristic-offline",
       source: candidate?.source || paper.source || "papers",
@@ -178,6 +212,8 @@ function deterministicTriage(candidate) {
   const hotnessSignal = /Hugging Face|Papers with Code|OpenReview|OpenAI|Anthropic|DeepMind|Meta|Microsoft|NVIDIA|Datawhale|科鲸|机器之心|Jiqizhixin|Synced|AI Best Paper|best paper|Outstanding Paper|最佳论文/i.test(`${candidate.sourceName} ${candidate.sourceSignals.join(" ")}`) ? "high_signal_source" : "standard_source";
   const matchedTopics = detectTopics(candidate).map((topic) => topic.label);
   const matchedAheSignals = detectAheSignals(candidate);
+  const matchedFdeSignals = detectFdeSignals(candidate);
+  const pureAlgorithmPenalty = pureAlgorithmPenaltyFor(candidate);
   const deterministicReason = deterministicReasonFor(candidate, scores, total);
   return {
     ...scores,
@@ -185,6 +221,8 @@ function deterministicTriage(candidate) {
     decision: decisionFor(total, scores),
     matched_topics: matchedTopics,
     matched_ahe_signals: matchedAheSignals,
+    matched_fde_signals: matchedFdeSignals,
+    pure_algorithm_penalty: pureAlgorithmPenalty,
     source_quality: sourceQuality(candidate),
     freshness_signal: freshnessSignal,
     freshness_days: Math.round(days * 10) / 10,
@@ -211,12 +249,16 @@ function deterministicScores(candidate) {
   const agentHits = countMatches(text, topicPatterns("AI Agents"));
   const harnessHits = countMatches(text, topicPatterns("Agent Harness / Observability"));
   const aheSignalCount = detectAheSignals(candidate).length;
+  const fdeSignals = detectFdeSignals(candidate);
+  const fdeSignalCount = fdeSignals.length;
+  const fdeHits = Object.fromEntries(FDE_SIGNAL_RULES.map((rule) => [rule.label, countMatches(text, rule.patterns)]));
+  const pureAlgorithmPenalty = pureAlgorithmPenaltyFor(candidate);
   const ragHits = countMatches(text, topicPatterns("RAG / Knowledge Systems"));
   const multimodalHits = countMatches(text, topicPatterns("Multimodal UI"));
   const securityHits = countMatches(text, topicPatterns("LLM Security / Reliability"));
-  const designWords = countMatches(text, [/\barchitecture\b/i, /\bsystem\b/i, /\bpipeline\b/i, /\bframework\b/i, /\binfrastructure\b/i, /\bworkflow\b/i, /\bmemory\b/i, /\btool\b/i, /\bharness\b/i, /\bobservability\b/i, /\btrajectory\b/i, /\bmiddleware\b/i, /\bcomponent\b/i]);
-  const evalWords = countMatches(text, [/\bbenchmark\b/i, /\bevaluation\b/i, /\bdataset\b/i, /\bmetric\b/i, /\bSWE-Bench\b/i, /\bTerminal-Bench\b/i, /\bpass@1\b/i, /\bablation\b/i, /\btransfer\b/i]);
-  const productWords = countMatches(text, [/\bdeploy\b/i, /\bproduction\b/i, /\bworkflow\b/i, /\btool\b/i, /\binterface\b/i, /\buser\b/i, /\bopen-source\b/i, /\bgithub\b/i, /\bobservability\b/i, /\brollback\b/i, /\bexecution\b/i]);
+  const designWords = countMatches(text, [/\barchitecture\b/i, /\bsystem\b/i, /\bpipeline\b/i, /\bframework\b/i, /\binfrastructure\b/i, /\bworkflow\b/i, /\bmemory\b/i, /\btool\b/i, /\bharness\b/i, /\bobservability\b/i, /\btrajectory\b/i, /\bmiddleware\b/i, /\bcomponent\b/i, /\bAPI\b/i, /\bendpoint\b/i, /\bgovernance\b/i]);
+  const evalWords = countMatches(text, [/\bbenchmark\b/i, /\bevaluation\b/i, /\bdataset\b/i, /\bmetric\b/i, /\bSWE-Bench\b/i, /\bTerminal-Bench\b/i, /\bpass@1\b/i, /\bablation\b/i, /\btransfer\b/i, /\bfailure modes?\b/i, /\bregression gate\b/i]);
+  const productWords = countMatches(text, [/\bdeploy\b/i, /\bproduction\b/i, /\bworkflow\b/i, /\btool\b/i, /\binterface\b/i, /\buser\b/i, /\bopen-source\b/i, /\bgithub\b/i, /\bobservability\b/i, /\brollback\b/i, /\bexecution\b/i, /\bcustomer\b/i, /\benterprise\b/i, /\bendpoint\b/i, /\bpermission\b/i]);
   const noveltyWords = countMatches(text, [/\bnew\b/i, /\bnovel\b/i, /\bfirst\b/i, /\bchallenge\b/i, /\bbenchmark\b/i, /\bframework\b/i, /\bstate-of-the-art\b/i, /\bself[- ]?improv/i, /\bautomatic evolution\b/i, /\bharness engineering\b/i]);
 
   const coreBoost = isCoreJob ? 8 : -8;
@@ -224,13 +266,13 @@ function deterministicScores(candidate) {
   const stalePenalty = ageDays(candidate) > 365 ? 18 : ageDays(candidate) > 180 ? 8 : 0;
 
   return {
-    role_relevance: clamp(18 + topicCount * 10 + agentHits * 8 + codingHits * 10 + harnessHits * 12 + aheSignalCount * 9 + ragHits * 7 + multimodalHits * 5 + securityHits * 5 + sourceBoost * 0.2 + coreBoost - verticalPenalty - stalePenalty),
-    architecture_value: clamp(18 + designWords * 10 + agentHits * 8 + harnessHits * 12 + aheSignalCount * 11 + ragHits * 6 + hasAbstract + sourceBoost * 0.2 + coreBoost - verticalPenalty * 0.5 - stalePenalty),
-    practicality: clamp(15 + productWords * 9 + hasCode + codingHits * 8 + harnessHits * 10 + aheSignalCount * 7 + recencyBoost + sourceBoost * 0.15 + coreBoost - verticalPenalty - stalePenalty),
-    novelty: clamp(18 + noveltyWords * 8 + harnessHits * 5 + aheSignalCount * 6 + recencyBoost + sourceBoost * 0.25 - verticalPenalty * 0.4 - stalePenalty),
-    evaluation_quality: clamp(12 + evalWords * 12 + benchmarkHits * 10 + harnessHits * 4 + aheSignalCount * 4 + sourceBoost * 0.25 + (benchmarkHits ? 4 : 0) - stalePenalty * 0.4),
-    interview_value: clamp(20 + codingHits * 10 + agentHits * 8 + harnessHits * 12 + aheSignalCount * 9 + benchmarkHits * 8 + ragHits * 6 + sourceBoost * 0.25 + coreBoost - verticalPenalty - stalePenalty),
-    build_potential: clamp(15 + productWords * 8 + designWords * 6 + hasCode + agentHits * 7 + codingHits * 8 + harnessHits * 12 + aheSignalCount * 8 + ragHits * 5 + coreBoost - verticalPenalty - stalePenalty),
+    role_relevance: clamp(18 + topicCount * 10 + agentHits * 8 + codingHits * 10 + harnessHits * 12 + aheSignalCount * 9 + fdeSignalCount * 7 + fdeHits["customer/production system"] * 8 + fdeHits["API/tool/MCP integration"] * 7 + ragHits * 7 + multimodalHits * 5 + securityHits * 5 + sourceBoost * 0.2 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    architecture_value: clamp(18 + designWords * 10 + agentHits * 8 + harnessHits * 12 + aheSignalCount * 11 + fdeSignalCount * 6 + fdeHits["API/tool/MCP integration"] * 10 + fdeHits["workflow readiness"] * 8 + fdeHits["governance/permissions"] * 8 + fdeHits["artifact-level diagnosis"] * 7 + ragHits * 6 + hasAbstract + sourceBoost * 0.2 + coreBoost - verticalPenalty * 0.5 - stalePenalty - pureAlgorithmPenalty * 0.7),
+    practicality: clamp(15 + productWords * 9 + hasCode + codingHits * 8 + harnessHits * 10 + aheSignalCount * 7 + fdeSignalCount * 8 + fdeHits["customer/production system"] * 12 + fdeHits["deployment/runbook"] * 10 + fdeHits["artifact-level diagnosis"] * 8 + recencyBoost + sourceBoost * 0.15 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    novelty: clamp(18 + noveltyWords * 8 + harnessHits * 5 + aheSignalCount * 6 + fdeSignalCount * 2 + recencyBoost + sourceBoost * 0.25 - verticalPenalty * 0.4 - stalePenalty - pureAlgorithmPenalty * 0.6),
+    evaluation_quality: clamp(12 + evalWords * 12 + benchmarkHits * 10 + harnessHits * 4 + aheSignalCount * 4 + fdeHits["evaluation/reliability gate"] * 10 + fdeHits["observability/debugging"] * 6 + fdeHits["artifact-level diagnosis"] * 4 + sourceBoost * 0.25 + (benchmarkHits ? 4 : 0) - stalePenalty * 0.4 - pureAlgorithmPenalty * 0.35),
+    interview_value: clamp(20 + codingHits * 10 + agentHits * 8 + harnessHits * 12 + aheSignalCount * 9 + fdeSignalCount * 7 + fdeHits["workflow readiness"] * 7 + fdeHits["governance/permissions"] * 6 + benchmarkHits * 8 + ragHits * 6 + sourceBoost * 0.25 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    build_potential: clamp(15 + productWords * 8 + designWords * 6 + hasCode + agentHits * 7 + codingHits * 8 + harnessHits * 12 + aheSignalCount * 8 + fdeSignalCount * 10 + fdeHits["API/tool/MCP integration"] * 9 + fdeHits["deployment/runbook"] * 9 + fdeHits["artifact-level diagnosis"] * 8 + ragHits * 5 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
   };
 }
 
@@ -244,6 +286,7 @@ function decisionFor(total, scores) {
 
 function selectDiverseTop(items, limit) {
   const caps = new Map([
+    ["AI Application Engineering / FDE", 6],
     ["Agent Harness / Observability", 6],
     ["AI Coding / SWE Agents", 4],
     ["Evaluation / Benchmarks", 4],
@@ -285,7 +328,7 @@ async function cheapModelAdjustment(candidates, ctx = {}) {
     deterministic: item.triage,
   }));
   const system = "You are a cheap triage model for an AI engineer research radar. Score papers conservatively. Return strict JSON only.";
-  const user = `For each paper, return {"items":[{"id","model_adjustment":-10..10,"decision_override":null|"ignore"|"skim"|"read"|"review"|"deep_dive","reason":"short"}]}.\nFocus on AI engineer interview and portfolio value: agents, tool use, AI coding/SWE agents, RAG/knowledge systems, AIGC product workflows, multimodal UI, eval/benchmarks, LLM security/reliability, human-AI interaction.\n\nPapers:\n${JSON.stringify(payload)}`;
+  const user = `For each paper, return {"items":[{"id","model_adjustment":-10..10,"decision_override":null|"ignore"|"skim"|"read"|"review"|"deep_dive","reason":"short"}]}.\nFocus on AI engineer interview and portfolio value: agents, tool use, AI coding/SWE agents, RAG/knowledge systems, AIGC product workflows, multimodal UI, eval/benchmarks, LLM security/reliability, human-AI interaction.\nAlso boost FDE / AI-application engineering signal: real customer/enterprise/production systems, APIs/tools/MCP/workflows/RAG/eval/observability/deployment/governance, and artifact-level diagnosis of code/site/data. De-prioritize pure algorithm, model-scaling, training-recipe, or leaderboard-only papers unless they have concrete systems/application relevance.\n\nPapers:\n${JSON.stringify(payload)}`;
 
   try {
     const chatJson = options.chatJson || createDeepSeekClient({ apiTimeoutMs: options.apiTimeoutMs, logger: ctx.logger }).chatJson;
@@ -364,7 +407,7 @@ function paperTracks(paper) {
 }
 
 function detectTopics(candidate) {
-  if (Array.isArray(candidate.focusTopics)) {
+  if (Array.isArray(candidate.focusTopics) && candidate.focusTopics.length > 0) {
     return unique(candidate.focusTopics.map(cleanString))
       .map((label) => FOCUS_TOPICS.find((topic) => topic.label === label) || { label, patterns: [] })
       .filter((topic) => topic.label);
@@ -376,6 +419,30 @@ function detectTopics(candidate) {
 function detectAheSignals(candidate) {
   const text = `${candidate.title}\n${candidate.abstract || ""}\n${candidate.tags.join(" ")}\n${candidate.venue || ""}\n${candidate.sourceSignals.join(" ")}`;
   return AHE_STRONG_SIGNALS.filter((signal) => signal.pattern.test(text)).map((signal) => signal.label);
+}
+
+function detectFdeSignals(candidate) {
+  const text = candidateSignalText(candidate);
+  return FDE_SIGNAL_RULES
+    .filter((rule) => rule.patterns.some((pattern) => pattern.test(text)))
+    .map((rule) => rule.label);
+}
+
+function pureAlgorithmPenaltyFor(candidate) {
+  const text = candidateSignalText(candidate);
+  const pureHits = countMatches(text, PURE_ALGORITHM_PATTERNS);
+  if (!pureHits) return 0;
+  const fdeSignals = detectFdeSignals(candidate);
+  const systemSignals = fdeSignals.filter((signal) => signal !== "evaluation/reliability gate").length;
+  const leaderboardOnly = /\b(?:leaderboard[- ]only|leaderboard|state[- ]of[- ]the[- ]art|SOTA)\b/i.test(text)
+    && !/\b(?:eval(?:uation)? harness|failure modes?|production|customer|workflow|deployment|observability|API|tool[- ]?use|RAG)\b/i.test(text);
+  if (systemSignals >= 2) return Math.min(8, pureHits * 2);
+  if (systemSignals === 1) return Math.min(14, pureHits * 4 + (leaderboardOnly ? 4 : 0));
+  return Math.min(26, pureHits * 7 + (leaderboardOnly ? 8 : 0));
+}
+
+function candidateSignalText(candidate) {
+  return `${candidate.title}\n${candidate.abstract || ""}\n${candidate.tags.join(" ")}\n${candidate.venue || ""}\n${candidate.sourceSignals.join(" ")}\n${asArray(candidate.focusTopics).join(" ")}`;
 }
 
 function sourceQuality(candidate) {
@@ -407,8 +474,12 @@ function deterministicReasonFor(candidate, scores, total) {
   const topics = detectTopics(candidate).map((topic) => topic.label).slice(0, 3).join(", ") || "weak focus match";
   const strengths = Object.entries(scores).filter(([key, value]) => key !== "source_quality" && value >= 70).map(([key]) => key).slice(0, 3).join(", ");
   const aheSignals = detectAheSignals(candidate).join(", ");
+  const fdeSignals = detectFdeSignals(candidate).slice(0, 3).join(", ");
+  const purePenalty = pureAlgorithmPenaltyFor(candidate);
   const aheReason = aheSignals ? ` AHE signals: ${aheSignals}.` : "";
-  return `${topics}; total ${total}; strongest signals: ${strengths || "none"}.${aheReason}`;
+  const fdeReason = fdeSignals ? ` FDE signals: ${fdeSignals}.` : "";
+  const penaltyReason = purePenalty ? ` Pure-algorithm/scaling penalty: ${purePenalty}.` : "";
+  return `${topics}; total ${total}; strongest signals: ${strengths || "none"}.${aheReason}${fdeReason}${penaltyReason}`;
 }
 
 function reasonForEval({ selected, triage, convergence, track, priority, model }) {
@@ -423,18 +494,20 @@ function reasonForEval({ selected, triage, convergence, track, priority, model }
   return `${selected ? "select" : "archive"}: ${sourceReason}${priorityReason}; ${trackReason}; idea=${ideaSignalFor(triage)}; score=${triage.total_score}.${modelReason}`;
 }
 
-function evalSignals({ convergence, track, priority, ideaSignal }) {
+function evalSignals({ convergence, track, priority, ideaSignal, fdeSignals = [] }) {
   return unique([
     `convergence:${convergence.length}`,
     priority ? `priority:${priority}` : "",
     ...track.map((item) => `track:${item}`),
+    ...asArray(fdeSignals).map((item) => `fde:${item}`),
     `idea:${ideaSignal}`,
   ]);
 }
 
 function ideaSignalFor(triage) {
   const ahe = triage.matched_ahe_signals?.length ? `+ahe:${triage.matched_ahe_signals[0]}` : "";
-  return ahe ? `${triage.decision}:${triage.total_score}${ahe}` : `${triage.decision}:${triage.total_score}`;
+  const fde = triage.matched_fde_signals?.length ? `+fde:${triage.matched_fde_signals[0]}` : "";
+  return `${triage.decision}:${triage.total_score}${ahe}${fde}`;
 }
 
 function primaryTopicBucket(item) {
