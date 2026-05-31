@@ -1,759 +1,158 @@
 {
   "schemaVersion": 2,
-  "date": "2026-05-20",
-  "generatedAt": "2026-05-21T01:19:09.968Z",
+  "date": "2026-05-31",
+  "generatedAt": "2026-05-31T03:27:48.220Z",
   "sourceFiles": {
-    "daily": "data/papers/daily-2026-05-20.json",
-    "triage": "data/papers/triage-2026-05-20.json"
+    "daily": "data/papers/daily-2026-05-31.json",
+    "triage": "data/papers/triage-2026-05-31.json"
   },
   "pipelineRun": {
-    "id": "paper_radar-2026-05-20-1779326349951",
-    "memoryFile": "data/agent-memory/paper_radar.json",
+    "id": "papers-20260531032748",
+    "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
   "qualityGate": {
     "schemaVersion": 1,
-    "surface": "paper_radar",
+    "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-05-21T01:19:09.950Z",
+    "checkedAt": "2026-05-31T03:27:48.220Z",
     "checks": [
       {
-        "id": "must-read",
-        "label": "daily output has one must-read paper",
+        "id": "papers-present",
+        "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "Auditing Agent Harness Safety"
+        "details": "1 paper(s)"
       },
       {
-        "id": "skim-count",
-        "label": "daily output keeps at most three skim papers",
+        "id": "section-shape",
+        "label": "every paper has section summaries",
         "status": "pass",
-        "details": "3 skim papers"
+        "details": "1 paper(s) checked"
       },
       {
-        "id": "triage-top",
-        "label": "triage top list stays small and present",
+        "id": "qa-fail-excluded",
+        "label": "QA fail verdicts are not published",
         "status": "pass",
-        "details": "10 top papers"
+        "details": "0 failed item(s) excluded"
       },
       {
-        "id": "professor-fields",
-        "label": "daily output includes professor learning fields",
+        "id": "qa-warnings",
+        "label": "published papers have no QA warnings",
         "status": "pass",
-        "details": "professor/good/risk/pattern fallbacks available"
-      },
-      {
-        "id": "review-cache",
-        "label": "at least one Pro review is attached or cached",
-        "status": "pass",
-        "details": "2 review files linked"
-      },
-      {
-        "id": "review-depth",
-        "label": "attached review reaches teaching-depth bar",
-        "status": "pass",
-        "details": "average review depth 95"
+        "details": "0 warning(s)"
       }
     ]
   },
-  "runTrace": {
-    "summary": {
-      "candidateCount": 160,
-      "selectedCount": 4,
-      "reviewedCount": 2,
-      "sourceFailureCount": 0,
-      "modelCalls": 0,
-      "totalTokens": 0
-    },
-    "stages": [
-      {
-        "stage": "daily",
-        "startedAt": "2026-05-21T01:19:09.944Z",
-        "inputFile": "data\\papers\\triage-2026-05-20.json",
-        "reviewFileCount": 2,
-        "mustReadId": "arxiv-2605-14271",
-        "skimCount": 3,
-        "averageReviewDepth": 95,
-        "finishedAt": "2026-05-21T01:19:09.950Z",
-        "durationMs": 6,
-        "modelUsage": {
-          "calls": 0,
-          "promptTokens": 0,
-          "completionTokens": 0,
-          "totalTokens": 0,
-          "models": {}
-        }
-      }
-    ],
-    "modelUsage": {
-      "calls": 0,
-      "promptTokens": 0,
-      "completionTokens": 0,
-      "totalTokens": 0,
-      "models": {}
-    },
-    "sourceFailures": []
-  },
-  "reflection": {
-    "schemaVersion": 1,
-    "summary": "Reflection found 1 watch item(s); keep the feed small and evidence-led.",
-    "averageReviewDepth": 95,
-    "whatWorked": [
-      "Must-read selected with score 97: Auditing Agent Harness Safety",
-      "4 selected paper(s) carried agent harness / observability signals.",
-      "2 reviewed paper file(s) are available for teaching-oriented reuse."
-    ],
-    "whatToWatch": [
-      "114 papers were below top cutoff; inspect if emerging concepts are being crowded out."
-    ],
-    "selfCorrections": [
-      "Do not treat fresh or hot as sufficient quality evidence; freshness only earns attention, not promotion.",
-      "Benchmark and evaluation papers must be read through claims, controlled variables, metrics, and failure modes.",
-      "A paper is only Articles-worthy when it teaches a reusable AI engineer pattern, not merely because it is about AI."
-    ],
-    "nextRunAdjustments": [
-      "Keep AHE rescue enabled, but prefer papers with concrete harness/eval evidence.",
-      "Use reviewed papers as candidates for full Articles deep dive only after manual read.",
-      "If a review lacks good/bad/transferable patterns, rerun review with stricter professor prompt instead of publishing a shallow analysis."
-    ]
-  },
+  "runTrace": null,
+  "reflection": null,
   "memoryVersion": 1,
   "triageSummary": {
-    "candidateCount": 160,
-    "scoredCount": 160,
-    "selectedCount": 10,
-    "rejectedCount": 36,
-    "belowTopCutoffCount": 114,
-    "cutoffScore": 75
+    "candidateCount": 1,
+    "selectedCount": 1,
+    "rejectedCount": 0,
+    "cutoffScore": 79
   },
   "agentFlow": [
     {
+      "stage": "discover",
       "role": "Discoverer",
-      "responsibility": "从 HF Daily、Papers with Code、arXiv、OpenReview、ACL、CVF 和公司研究页发现候选论文。",
-      "signal": "160 candidates entered triage"
+      "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+      "signal": "1 paper candidate(s) from the papers kernel"
     },
     {
+      "stage": "evidence",
       "role": "Evidence Collector",
-      "responsibility": "保留 sourceUrl、paperUrl、abstract、sourceSignals、focusTopics 和版本号，避免只看标题判断。",
-      "signal": "Papers with Code trending"
+      "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+      "signal": "1 analyzed candidate(s) with paper-text evidence"
     },
     {
+      "stage": "rank",
       "role": "Ranker",
-      "responsibility": "按岗位相关性、架构价值、实用性、新颖性、评估质量、面试表达和可构建性打分。",
-      "signal": "cutoff 75, selected 10"
+      "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+      "signal": "1 current analysis item(s) available after QA filtering"
     },
     {
+      "stage": "review",
       "role": "Teacher Reviewer",
-      "responsibility": "只对 1-2 篇高价值论文做教授式深读，讲清好设计、坏设计和可迁移模式。",
-      "signal": "review cache is version-aware"
+      "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+      "signal": "1 section-mirroring academic analysis item(s)"
     },
     {
+      "stage": "verify",
       "role": "Verifier",
-      "responsibility": "用 validate 脚本检查 trace、daily 输出、review 字段和中文编码。",
-      "signal": "npm run validate is the quality gate"
+      "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+      "signal": "0 QA failure(s) excluded before publish"
     },
     {
+      "stage": "publish",
       "role": "Publisher",
-      "responsibility": "把 daily radar 摘要发布到 public/data/paper-radar.json，供前端展示。",
-      "signal": "public radar data ready"
+      "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+      "signal": "public/data/articles.json and public/data/paper-radar.json"
     },
     {
+      "stage": "archive",
       "role": "Archivist",
-      "responsibility": "保存 candidates、triage、reviewed 和 daily 文件，后续复用思路架构。",
-      "signal": "data/papers/*-2026-05-20.json"
+      "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+      "signal": "SQLite runs table"
     }
   ],
   "mustRead": {
-    "id": "arxiv-2605-14271",
-    "title": "Auditing Agent Harness Safety",
+    "id": "agent-harness-engineering-survey",
+    "title": "Agent Harness Engineering: A Survey",
     "daily_action": "must_read",
-    "triage_decision": "deep_dive",
-    "total_score": 97,
-    "sourceName": "Papers with Code trending",
-    "sourceUrl": "https://paperswithcode.com/papers/2605.14271",
+    "triage_decision": "review",
+    "total_score": 79,
+    "sourceName": "OpenReview",
+    "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
     "matched_topics": [
       "AI Agents",
-      "Tool Use",
-      "Agent Harness / Observability",
-      "Evaluation / Benchmarks",
-      "LLM Security / Reliability",
-      "Human-AI Interaction"
+      "Agent Harness / Observability"
     ],
     "freshness_signal": "new",
     "hotness_signal": "high_signal_source",
-    "reason": "AI Agents, Tool Use, Agent Harness / Observability; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness, trajectory."
+    "reason": "AI Agents, Agent Harness / Observability; total 79; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness."
   },
-  "skim": [
-    {
-      "id": "arxiv-2605-18747",
-      "title": "Code as Agent Harness",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 93,
-      "sourceName": "Papers with Code trending",
-      "sourceUrl": "https://paperswithcode.com/papers/2605.18747",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Multimodal UI",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, rollback."
-    },
-    {
-      "id": "arxiv-2604-17288",
-      "title": "Clover: A Neural-Symbolic Agentic Harness with Stochastic Tree-of-Thoughts for Verified RTL Repair",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 93,
-      "sourceName": "AHE rescue cache",
-      "sourceUrl": "https://arxiv.org/abs/2604.17288",
-      "matched_topics": [
-        "AI Agents",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness."
-    },
-    {
-      "id": "arxiv-2605-18859",
-      "title": "TwinRouterBench: Fast Static and Live Dynamic Evaluation for Realistic Agentic LLM Routing",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 93,
-      "sourceName": "arXiv coding agents and SWE evals",
-      "sourceUrl": "https://arxiv.org/abs/2605.18859",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: trajectory."
-    }
-  ],
-  "professorLesson": "从教授视角看，这篇文章教学生如何为特定垂直领域（如工程设计）设计严谨的多智能体基准，尤其要注意分离检索贡献和测试条件分支。工程实践中，学生应学习如何将仿真工具、知识库和作业调度集成进智能体系统，并理解端到端测评比单一指标更有说服力。文中监督式架构是务实起点，但注意其局限（如单点故障），未来可探索更去中心化的设计。",
-  "goodIdeaToSteal": "三维基准分别考察工具使用、知识检索和长时间任务执行，维度互补",
-  "badIdeaOrRisk": "仅用两个领域问题，基准泛化能力不足，难以直接迁移至其他工程细分",
-  "transferablePattern": "构建多维度基准的模块化设计：将任务分解为不同认知维度，独立评测",
-  "futureWorkApplication": "在开发AI工程助手时，可借鉴其三维测评思路，从工具调用、知识检索、长任务执行三方面制定验收标准",
-  "architectureTakeaway": "多智能体系统采用监督式架构，基于状态图（LangGraph）编排工具调用、检索和仿真节点；评测设计将任务按认知需求分类，并引入门控评分隔离组件贡献，此模式可直接应用于企业级AI工程平台设计。",
-  "interviewTalkingPoint": "在面试中可举例说明多智能体系统如何协调工程仿真、检索和作业调度，展示端到端交付能力",
-  "projectIdea": "基于LangGraph构建一个简化的工程设计智能体，集成一个开源仿真工具（如FreeFEM）和文档检索，复现基础流程",
+  "skim": [],
+  "professorLesson": "离线模式下只根据已收集证据保留《Agent Harness Engineering: A Survey》的基础脉络。",
+  "goodIdeaToSteal": "## Metadata Title: Agent Harness Engineering: A Survey Authors: 双盲匿名 (TMLR under review) Venue: TMLR · 在审 Source: OpenReview Source URL: https://openreview.net/pdf?id=3hXEPbG0dh PDF URL: https://openreview.net/pdf?id=3hXEPbG0dh Source signals: OpenReview, TMLR · 在审, offline fixture Focus topics: AI Agents, Agent Harness / Observability ## Paper section list…",
+  "badIdeaOrRisk": "当前分析受限于已收集 evidence.content，未使用证据外信息。",
+  "transferablePattern": "离线 fallback 只使用已收集的 paper-text 证据，不补充证据外事实。",
+  "futureWorkApplication": "论文证据未提供限制或未来工作段落。",
+  "architectureTakeaway": "离线 fallback 只使用已收集的 paper-text 证据，不补充证据外事实。",
+  "interviewTalkingPoint": "review:79+ahe:harness engineering",
+  "projectIdea": "Build a grounded checklist from Agent Harness Engineering: A Survey and test it against one agent workflow.",
   "topPapers": [
     {
-      "id": "arxiv-2605-14271",
-      "title": "Auditing Agent Harness Safety",
+      "id": "agent-harness-engineering-survey",
+      "title": "Agent Harness Engineering: A Survey",
       "daily_action": "must_read",
-      "triage_decision": "deep_dive",
-      "total_score": 97,
-      "sourceName": "Papers with Code trending",
-      "sourceUrl": "https://paperswithcode.com/papers/2605.14271",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, Tool Use, Agent Harness / Observability; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness, trajectory."
-    },
-    {
-      "id": "arxiv-2605-18747",
-      "title": "Code as Agent Harness",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 93,
-      "sourceName": "Papers with Code trending",
-      "sourceUrl": "https://paperswithcode.com/papers/2605.18747",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Multimodal UI",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, rollback."
-    },
-    {
-      "id": "arxiv-2604-17288",
-      "title": "Clover: A Neural-Symbolic Agentic Harness with Stochastic Tree-of-Thoughts for Verified RTL Repair",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 93,
-      "sourceName": "AHE rescue cache",
-      "sourceUrl": "https://arxiv.org/abs/2604.17288",
-      "matched_topics": [
-        "AI Agents",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness."
-    },
-    {
-      "id": "arxiv-2605-18859",
-      "title": "TwinRouterBench: Fast Static and Live Dynamic Evaluation for Realistic Agentic LLM Routing",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 93,
-      "sourceName": "arXiv coding agents and SWE evals",
-      "sourceUrl": "https://arxiv.org/abs/2605.18859",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: trajectory."
-    },
-    {
-      "id": "arxiv-2605-09998",
-      "title": "Continual Harness: Online Adaptation for Self-Improving Foundation Agents",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 91,
-      "sourceName": "AHE rescue cache",
-      "sourceUrl": "https://arxiv.org/abs/2605.09998",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, Tool Use, Agent Harness / Observability; total 91; strongest signals: role_relevance, architecture_value, practicality. AHE signals: observability, trajectory."
-    },
-    {
-      "id": "arxiv-2604-25850",
-      "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 91,
-      "sourceName": "AHE rescue cache",
-      "sourceUrl": "https://arxiv.org/abs/2604.25850",
+      "triage_decision": "review",
+      "total_score": 79,
+      "sourceName": "OpenReview",
+      "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
       "matched_topics": [
         "AI Agents",
         "Agent Harness / Observability"
       ],
       "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, Agent Harness / Observability; total 91; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, observability."
-    },
-    {
-      "id": "arxiv-2605-18401",
-      "title": "SkillsVote: Lifecycle Governance of Agent Skills from Collection, Recommendation to Evolution",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 86,
-      "sourceName": "arXiv coding agents and SWE evals",
-      "sourceUrl": "https://arxiv.org/abs/2605.18401",
-      "matched_topics": [
-        "AI Agents",
-        "AI Coding / SWE Agents",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
       "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, AI Coding / SWE Agents, Evaluation / Benchmarks; total 86; strongest signals: role_relevance, architecture_value, practicality. AHE signals: trajectory, Terminal-Bench."
-    },
-    {
-      "id": "arxiv-2605-19743",
-      "title": "EngiAI: A Multi-Agent Framework and Benchmark Suite for LLM-Driven Engineering Design",
-      "daily_action": "skim",
-      "triage_decision": "review",
-      "total_score": 82,
-      "sourceName": "arXiv agent memory and RAG",
-      "sourceUrl": "https://arxiv.org/abs/2605.19743",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "RAG / Knowledge Systems",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, Tool Use, RAG / Knowledge Systems; total 82; strongest signals: role_relevance, architecture_value, practicality."
-    },
-    {
-      "id": "arxiv-2605-17242",
-      "title": "From Runnable to Shippable: Multi-Agent Test-Driven Development for Generating Full-Stack Web Applications from Requirements",
-      "daily_action": "skim",
-      "triage_decision": "review",
-      "total_score": 76,
-      "sourceName": "arXiv coding agents and SWE evals",
-      "sourceUrl": "https://arxiv.org/abs/2605.17242",
-      "matched_topics": [
-        "AI Agents",
-        "AI Coding / SWE Agents",
-        "Evaluation / Benchmarks",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, AI Coding / SWE Agents, Evaluation / Benchmarks; total 76; strongest signals: role_relevance, architecture_value, interview_value."
-    },
-    {
-      "id": "arxiv-2605-18652",
-      "title": "MementoGUI: Learning Agentic Multimodal Memory Control for Long-Horizon GUI Agents",
-      "daily_action": "skim",
-      "triage_decision": "review",
-      "total_score": 75,
-      "sourceName": "arXiv agent memory and RAG",
-      "sourceUrl": "https://arxiv.org/abs/2605.18652",
-      "matched_topics": [
-        "AI Agents",
-        "RAG / Knowledge Systems",
-        "Multimodal UI",
-        "Evaluation / Benchmarks",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "AI Agents, RAG / Knowledge Systems, Multimodal UI; total 75; strongest signals: role_relevance, architecture_value, interview_value. AHE signals: trajectory."
+      "reason": "AI Agents, Agent Harness / Observability; total 79; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness."
     }
   ],
   "selectionTrace": [
     {
-      "id": "arxiv-2605-14271",
-      "title": "Auditing Agent Harness Safety",
-      "score": 97,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Selected as top 1 after score and diversity ranking: AI Agents, Tool Use, Agent Harness / Observability; AHE signals: agent harness, trajectory; freshness=new; hotness=high_signal_source; score=97.",
-      "aheSignals": [
-        "agent harness",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-18747",
-      "title": "Code as Agent Harness",
-      "score": 93,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Selected as top 2 after score and diversity ranking: AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: harness engineering, agent harness, rollback; freshness=new; hotness=high_signal_source; score=93.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "rollback"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2604-17288",
-      "title": "Clover: A Neural-Symbolic Agentic Harness with Stochastic Tree-of-Thoughts for Verified RTL Repair",
-      "score": 93,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Selected as top 3 after score and diversity ranking: AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; AHE signals: agent harness; freshness=new; hotness=high_signal_source; score=93.",
-      "aheSignals": [
-        "agent harness"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-18859",
-      "title": "TwinRouterBench: Fast Static and Live Dynamic Evaluation for Realistic Agentic LLM Routing",
-      "score": 93,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Selected as top 4 after score and diversity ranking: AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: trajectory; freshness=new; hotness=standard_source; score=93.",
-      "aheSignals": [
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-09998",
-      "title": "Continual Harness: Online Adaptation for Self-Improving Foundation Agents",
-      "score": 91,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Selected as top 5 after score and diversity ranking: AI Agents, Tool Use, Agent Harness / Observability; AHE signals: observability, trajectory; freshness=new; hotness=high_signal_source; score=91.",
-      "aheSignals": [
-        "observability",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2604-25850",
-      "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
-      "score": 91,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Selected as top 6 after score and diversity ranking: AI Agents, Agent Harness / Observability; AHE signals: harness engineering, agent harness, observability; freshness=new; hotness=standard_source; score=91.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "observability"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-15040",
-      "title": "Orchard: An Open-Source Agentic Modeling Framework",
-      "score": 91,
-      "decision": "deep_dive",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=7, cutoffScore=75; AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: agent harness, trajectory; freshness=new; hotness=standard_source; score=91.",
-      "aheSignals": [
-        "agent harness",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-17444",
-      "title": "MemRepair: Hierarchical Memory for Agentic Repository-Level Vulnerability Repair",
-      "score": 88,
-      "decision": "deep_dive",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=8, cutoffScore=75; AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: trajectory; freshness=new; hotness=standard_source; score=88.",
-      "aheSignals": [
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-10913",
-      "title": "Shepherd: A Runtime Substrate Empowering Meta-Agents with a Formalized Execution Trace",
-      "score": 86,
-      "decision": "deep_dive",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=9, cutoffScore=75; AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; AHE signals: execution trace, Terminal-Bench; freshness=new; hotness=high_signal_source; score=86.",
-      "aheSignals": [
-        "execution trace",
-        "Terminal-Bench"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-18401",
-      "title": "SkillsVote: Lifecycle Governance of Agent Skills from Collection, Recommendation to Evolution",
-      "score": 86,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Selected as top 7 after score and diversity ranking: AI Agents, AI Coding / SWE Agents, Evaluation / Benchmarks; AHE signals: trajectory, Terminal-Bench; freshness=new; hotness=high_signal_source; score=86.",
-      "aheSignals": [
-        "trajectory",
-        "Terminal-Bench"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-17046",
-      "title": "1GC-7RC: One Graphic Card -- Seven Research Challenges! How Good Are AI Agents at Doing Your Job?",
-      "score": 86,
-      "decision": "deep_dive",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=11, cutoffScore=75; AI Agents, Tool Use, Agent Harness / Observability; freshness=new; hotness=standard_source; score=86.",
-      "aheSignals": [],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-16909",
-      "title": "TOBench: A Task-Oriented Omni-Modal Benchmark for Real-World Tool-Using Agents",
-      "score": 84,
-      "decision": "deep_dive",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=12, cutoffScore=75; AI Agents, Tool Use, Agent Harness / Observability; freshness=new; hotness=high_signal_source; score=84.",
-      "aheSignals": [],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-00663",
-      "title": "Affordance Agent Harness: Verification-Gated Skill Orchestration",
-      "score": 83,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=13, cutoffScore=75; AI Agents, Agent Harness / Observability, RAG / Knowledge Systems; AHE signals: agent harness, trajectory; freshness=new; hotness=high_signal_source; score=83.",
-      "aheSignals": [
-        "agent harness",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-19743",
-      "title": "EngiAI: A Multi-Agent Framework and Benchmark Suite for LLM-Driven Engineering Design",
-      "score": 82,
-      "decision": "review",
-      "status": "selected",
-      "reason": "Selected as top 8 after score and diversity ranking: AI Agents, Tool Use, RAG / Knowledge Systems; freshness=new; hotness=standard_source; score=82.",
-      "aheSignals": [],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-18703",
-      "title": "EnvFactory: Scaling Tool-Use Agents via Executable Environments Synthesis and Robust RL",
-      "score": 81,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=15, cutoffScore=75; AI Agents, Tool Use, Agent Harness / Observability; AHE signals: trajectory; freshness=new; hotness=high_signal_source; score=81.",
-      "aheSignals": [
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-17933",
-      "title": "AtlasVA: Self-Evolving Visual Skill Memory for Teacher-Free VLM Agents",
-      "score": 81,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=16, cutoffScore=75; AI Agents, Agent Harness / Observability, RAG / Knowledge Systems; AHE signals: trajectory; freshness=new; hotness=high_signal_source; score=81.",
-      "aheSignals": [
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-20061",
-      "title": "Rewarding Beliefs, Not Actions: Consistency-Guided Credit Assignment for Long-Horizon Agents",
-      "score": 81,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=17, cutoffScore=75; AI Agents, Agent Harness / Observability, Evaluation / Benchmarks; AHE signals: observability, trajectory; freshness=new; hotness=standard_source; score=81.",
-      "aheSignals": [
-        "observability",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-18451",
-      "title": "Code-as-Room: Generating 3D Rooms from Top-Down View Images via Agentic Code Synthesis",
-      "score": 81,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=18, cutoffScore=75; AI Agents, Agent Harness / Observability, RAG / Knowledge Systems; freshness=new; hotness=high_signal_source; score=81.",
-      "aheSignals": [],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-18332",
-      "title": "Same Signal, Different Semantics: A Cross-Framework Behavioral Analysis of Software Engineering Agents",
-      "score": 81,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=19, cutoffScore=75; AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: trajectory; freshness=new; hotness=standard_source; score=81.",
-      "aheSignals": [
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-19932",
-      "title": "PEEK: Context Map as an Orientation Cache for Long-Context LLM Agents",
-      "score": 80,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=20, cutoffScore=75; AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; AHE signals: trajectory; freshness=new; hotness=high_signal_source; score=80.",
-      "aheSignals": [
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-17969",
-      "title": "Generation Navigator: A State-Aware Agentic Framework for Image Generation",
+      "id": "agent-harness-engineering-survey",
+      "title": "Agent Harness Engineering: A Survey",
       "score": 79,
       "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=21, cutoffScore=75; AI Agents, Agent Harness / Observability, AIGC Image/Video/Product Workflows; AHE signals: trajectory; freshness=new; hotness=high_signal_source; score=79.",
-      "aheSignals": [
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2603-20380",
-      "title": "Herding CATs: ALARA for Agent Harness Engineering in Portable Composable Multi-Agent Teams",
-      "score": 79,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=22, cutoffScore=75; AI Agents, Agent Harness / Observability; AHE signals: harness engineering, agent harness; freshness=new; hotness=standard_source; score=79.",
+      "status": "selected",
+      "reason": "AI Agents, Agent Harness / Observability; total 79; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness.",
       "aheSignals": [
         "harness engineering",
         "agent harness"
       ],
       "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "arxiv-2605-16679",
-      "title": "CHI-Bench: Can AI Agents Automate End-to-End, Long-Horizon, Policy-Rich Healthcare Workflows?",
-      "score": 77,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=23, cutoffScore=75; AI Agents, Tool Use, Agent Harness / Observability; AHE signals: agent harness; freshness=new; hotness=high_signal_source; score=77.",
-      "aheSignals": [
-        "agent harness"
-      ],
-      "freshness": "new",
       "hotness": "high_signal_source"
-    },
-    {
-      "id": "arxiv-2605-19341",
-      "title": "HalluWorld: A Controlled Benchmark for Hallucination via Reference World Models",
-      "score": 76,
-      "decision": "review",
-      "status": "below_top_cutoff",
-      "reason": "Not selected because top 10 was filled by higher-priority or diversity-balanced papers; rank=24, cutoffScore=75; AI Agents, Agent Harness / Observability, RAG / Knowledge Systems; AHE signals: observability; freshness=new; hotness=standard_source; score=76.",
-      "aheSignals": [
-        "observability"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
     }
   ]
 }

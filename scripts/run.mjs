@@ -5,12 +5,14 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { openAiBriefDb } from "./lib/db.mjs";
 import { runColumnPipeline } from "./lib/pipeline-kernel.mjs";
+import papersColumnModule from "./columns/papers/index.mjs";
 import projectsColumnModule from "./columns/projects/index.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
 const MODULES = {
+  papers: papersColumnModule,
   projects: projectsColumnModule,
 };
 
@@ -33,12 +35,12 @@ export async function main(argv = process.argv.slice(2)) {
         state: {},
         result: { evals: [], qa: [] },
       });
-      console.log(`published ${published.file} (${published.repoCount} repos, ${published.deepCount} deep dives)`);
+      console.log(formatPublishSummary(column, published));
       return published;
     }
 
     if (stage !== "all") {
-      console.warn(`stage "${stage}" currently runs the full projects funnel and publishes from SQLite`);
+      console.warn(`stage "${stage}" currently runs the full ${column} funnel and publishes from SQLite`);
     }
     const result = await runColumnPipeline(module, {
       ...options,
@@ -51,7 +53,7 @@ export async function main(argv = process.argv.slice(2)) {
         qaGate: numberOption(options.qaConcurrency, 2),
       },
     });
-    console.log(`projects pipeline ${result.runId}: ${result.candidates.length} candidates, ${result.selected.length} deep selections`);
+    console.log(`${column} pipeline ${result.runId}: ${result.candidates.length} candidates, ${result.selected.length} selections`);
     return result;
   } finally {
     db.close();
@@ -107,6 +109,16 @@ function runId(column, options = {}) {
 function numberOption(value, fallback) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
+}
+
+function formatPublishSummary(column, published = {}) {
+  if (column === "projects") {
+    return `published ${published.file} (${published.repoCount} repos, ${published.deepCount} deep dives)`;
+  }
+  if (column === "papers") {
+    return `published ${published.file} and ${published.radarFile} (${published.paperCount} papers, ${published.excludedQaFailCount} QA failures excluded)`;
+  }
+  return `published ${published.file || column}`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

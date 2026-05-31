@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { readFile } from "node:fs/promises";
 
 const UA = "ai-brief-papers-column/0.1 (kernel papers discovery)";
 const DEFAULT_DISCOVER_LIMIT = 140;
@@ -136,6 +137,14 @@ export async function discover(ctx = {}) {
   const options = ctx.options || {};
   const limit = numberOption(options.limit, DEFAULT_DISCOVER_LIMIT);
   const discoveredAt = nowIso(options);
+
+  if (options.dryRun) {
+    const seeded = await dryRunSeedCandidates({ discoveredAt, limit });
+    if (options.db) {
+      for (const candidate of seeded) options.db.upsertCandidate(candidate);
+    }
+    return seeded;
+  }
 
   if (isOffline(options)) {
     return options.noCache ? [] : cachedCandidates(options.db, { limit });
@@ -707,6 +716,9 @@ function paperEvidence(candidateId, paper, { sourceText, fetchedAt, maxChars }) 
   ].filter(Boolean).join("\n"));
 
   if (paper.abstract) appendSection(lines, sections, "Abstract", paper.abstract);
+  if (Array.isArray(paper.evidence?.sections) && paper.evidence.sections.length) {
+    appendSection(lines, sections, "Paper section list", paper.evidence.sections.join("\n"));
+  }
   if (sourceText) appendSection(lines, sections, "Source page text", sourceText);
 
   const content = lines.join("\n\n").slice(0, maxChars);
@@ -760,6 +772,30 @@ function cachedEvidence(db, candidateId) {
   } catch {
     return null;
   }
+}
+
+async function dryRunSeedCandidates({ discoveredAt, limit }) {
+  const fixtureUrl = new URL("../../__tests__/fixtures/papers-harness-survey.json", import.meta.url);
+  const fixture = JSON.parse(await readFile(fixtureUrl, "utf8"));
+  const raw = finalizeCandidate({
+    ...fixture,
+    source: "openreview_fixture",
+    sourceName: fixture.sourceName || "OpenReview",
+    paperUrl: fixture.sourceUrl,
+    pdfUrl: fixture.sourceUrl,
+    sourceSignals: ["OpenReview", fixture.venue, "offline fixture"].filter(Boolean),
+    discoveredAt,
+    version: fixture.sourceUrl || fixture.id,
+  });
+  const candidate = {
+    id: fixture.id,
+    column: "papers",
+    source: raw.source,
+    raw,
+    dedupeKey: raw.key || fixture.id,
+    discoveredAt,
+  };
+  return [candidate].slice(0, limit);
 }
 
 async function runDiscoveryTrace(trace, meta, fn, logger = console) {
