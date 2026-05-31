@@ -2,26 +2,26 @@
    GH Trending Deep Dive — design tokens & components
    ============================================================ */
 :root {
-  /* B "Focus Console" dark soul — palette flipped, layout untouched */
-  --paper: #181b22; --canvas: #0d0e12; --canvas-2: #14161c;
-  --line: #262a33; --line-strong: #353b48;
-  --ink: #e9e6df; --ink-2: #b3b8c2; --ink-3: #8a909c; --ink-4: #6b7280;
-  --accent: #e8ad5e; --accent-2: #f0bf78; --accent-soft: rgba(232,173,94,.12); --accent-soft-2: rgba(232,173,94,.20);
-  --gold: #e8ad5e; --gold-soft: rgba(232,173,94,.14); --gold-deep: #f0bf78;
-  --green: #5ec98a; --green-soft: rgba(94,201,138,.14);
-  --orange: #e8975e; --orange-soft: rgba(232,151,94,.14);
-  --red: #e87070; --red-soft: rgba(232,112,112,.14);
+  /* Light "Reading Room" soul — warm white, near-black ink, amber accent */
+  --paper: #ffffff; --canvas: #f7f6f3; --canvas-2: #efece6;
+  --line: #e7e3da; --line-strong: #d6d1c5;
+  --ink: #1b1a17; --ink-2: #4a4843; --ink-3: #79756c; --ink-4: #a6a299;
+  --accent: #b27c22; --accent-2: #caa14e; --accent-soft: rgba(178,124,34,.10); --accent-soft-2: rgba(178,124,34,.18);
+  --gold: #b27c22; --gold-soft: rgba(178,124,34,.12); --gold-deep: #8f6316;
+  --green: #2f9e63; --green-soft: rgba(47,158,99,.12);
+  --orange: #c2722a; --orange-soft: rgba(194,114,42,.12);
+  --red: #c2433f; --red-soft: rgba(194,67,63,.12);
   --radius-lg: 16px; --radius: 12px; --radius-sm: 8px;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-2: 0 8px 24px -10px rgba(0, 0, 0, 0.5);
-  --shadow-3: 0 18px 48px -16px rgba(0, 0, 0, 0.6);
+  --shadow-1: 0 1px 2px rgba(24, 22, 18, 0.05);
+  --shadow-2: 0 8px 24px -12px rgba(24, 22, 18, 0.12);
+  --shadow-3: 0 18px 48px -18px rgba(24, 22, 18, 0.16);
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-mono: ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
   --prose-line: 1.9;
   --prose-para-gap: 14px;
 }
 * { box-sizing: border-box; }
-html, body { max-width: 100%; overflow-x: hidden; margin: 0; padding: 0; background: var(--canvas); background-image: radial-gradient(900px 520px at 78% -8%, rgba(232,173,94,.06), transparent 70%); background-attachment: fixed; color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+html, body { max-width: 100%; overflow-x: hidden; margin: 0; padding: 0; background: var(--canvas); background-image: radial-gradient(900px 520px at 78% -8%, rgba(178,124,34,.04), transparent 70%); background-attachment: fixed; color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 #root { max-width: 100%; overflow-x: hidden; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }

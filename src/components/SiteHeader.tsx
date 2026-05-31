@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type NavKey = "home" | "news" | "models" | "projects" | "skills" | "articles";
+export type NavKey = "home" | "models" | "projects" | "articles" | "podcast";
 
 interface Props {
   active: NavKey;
@@ -9,11 +9,10 @@ interface Props {
 
 const NAV_ITEMS: { key: NavKey; label: string; href: string }[] = [
   { key: "home", label: "Home", href: "#/" },
-  { key: "news", label: "News", href: "#/news" },
+  { key: "articles", label: "Articles", href: "#/articles" },
   { key: "models", label: "Models", href: "#/models" },
   { key: "projects", label: "Projects", href: "#/projects" },
-  { key: "skills", label: "Skills", href: "#/skills" },
-  { key: "articles", label: "Articles", href: "#/articles" },
+  { key: "podcast", label: "Podcast", href: "#/podcast" },
 ];
 
 export function SiteHeader({ active, meta }: Props) {

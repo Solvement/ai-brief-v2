@@ -4,17 +4,18 @@ import { Detail } from "./pages/Detail";
 import { Models } from "./pages/Models";
 import { Projects } from "./pages/Projects";
 import { Articles } from "./pages/Articles";
-import { SiteHeader, type NavKey } from "./components/SiteHeader";
+import { Podcast } from "./pages/Podcast";
 
 /**
  * Tiny hash-based router. No external dependency.
  * Routes:
- *   #/                       -> Home
+ *   #/                       -> Home (novelty radar landing)
  *   #/projects               -> Projects (GitHub Trending boards)
  *   #/models                 -> Models index
  *   #/models/<companyId>     -> Model company detail
- *   #/articles               -> Academic paper deep-reading workbench
+ *   #/articles               -> Academic radar + deep reading
  *   #/articles/<paperId>     -> Article detail
+ *   #/podcast                -> Podcast (future column placeholder)
  *   #/repo/<owner>/<name>    -> Project detail
  */
 type RouteState =
@@ -23,7 +24,7 @@ type RouteState =
   | { route: "models"; companyId?: string }
   | { route: "projects" }
   | { route: "articles"; paperId?: string }
-  | { route: "section"; section: Exclude<NavKey, "home" | "models" | "projects" | "articles"> };
+  | { route: "podcast" };
 
 function parseHash(): RouteState {
   const raw = window.location.hash.replace(/^#/, "") || "/";
@@ -34,8 +35,7 @@ function parseHash(): RouteState {
   const articles = raw.match(/^\/articles(?:\/([^/]+))?\/?$/);
   if (articles) return { route: "articles", paperId: articles[1] ? decodeURIComponent(articles[1]) : undefined };
   if (/^\/projects\/?$/.test(raw)) return { route: "projects" };
-  const section = raw.match(/^\/(news|skills)\/?$/);
-  if (section) return { route: "section", section: section[1] as Exclude<NavKey, "home" | "models" | "projects" | "articles"> };
+  if (/^\/podcast\/?$/.test(raw)) return { route: "podcast" };
   return { route: "home" };
 }
 
@@ -54,30 +54,9 @@ export function App() {
   if (state.route === "detail" && state.owner && state.name) {
     return <Detail owner={state.owner} name={state.name} />;
   }
-  if (state.route === "models") {
-    return <Models companyId={state.companyId} />;
-  }
-  if (state.route === "projects") {
-    return <Projects />;
-  }
-  if (state.route === "articles") {
-    return <Articles paperId={state.paperId} />;
-  }
-  if (state.route === "section") {
-    return <ComingSoon section={state.section} />;
-  }
+  if (state.route === "models") return <Models companyId={state.companyId} />;
+  if (state.route === "projects") return <Projects />;
+  if (state.route === "articles") return <Articles paperId={state.paperId} />;
+  if (state.route === "podcast") return <Podcast />;
   return <Home />;
-}
-
-function ComingSoon({ section }: { section: Exclude<NavKey, "home" | "models" | "projects" | "articles"> }) {
-  return (
-    <>
-      <SiteHeader active={section} />
-      <main className="page">
-        <div className="notice">
-          {section} 栏目还没有接入数据。当前可用栏目是 Models、Projects 和 Articles。
-        </div>
-      </main>
-    </>
-  );
 }
