@@ -1,10 +1,14 @@
 import { createDeepSeekClient } from "../../lib/llm.mjs";
 import { defaultSelect } from "../../lib/pipeline-kernel.mjs";
 
-const CORE_JOB_RE = /\b(agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|data preparation)\b/i;
+const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|data preparation)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/i;
 const NARROW_VERTICAL_RE = /\b(gaming|game|interior design|3D room|virtual reality|short-video|short video|bioinformatics|medical|protein|chemistry|robotics vertical)\b/i;
 
 const FOCUS_TOPICS = [
+  {
+    label: "Broad AI / ML",
+    patterns: [/\bAI\b/i, /\bartificial intelligence\b/i, /\bmachine learning\b/i, /\bdeep learning\b/i, /\bfoundation models?\b/i, /\blarge language models?\b/i, /\bLLMs?\b/i, /\btransformers?\b/i, /\bpost[- ]?training\b/i, /\balignment\b/i, /人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/],
+  },
   {
     label: "AI Agents",
     patterns: [/\bagents?\b/i, /\bautonomous\b/i, /\bweb agent\b/i, /\bcomputer use\b/i, /\bmulti-agent\b/i, /\bagentic\b/i],
@@ -69,9 +73,13 @@ const TOPIC_ORDER = [
   "AIGC Image/Video/Product Workflows",
   "LLM Security / Reliability",
   "Human-AI Interaction",
+  "Broad AI / ML",
 ];
 
 const TRUSTED_SOURCE_RULES = [
+  { key: "Best paper award", topOrOfficial: true, priority: "best_paper", pattern: /\b(best[_ -]?paper|best paper award|AI Best Paper Awards|Outstanding Paper|Honou?rable Mention|Best Main Track|最佳论文|杰出论文|优秀论文)\b/i },
+  { key: "Datawhale 科鲸", topOrOfficial: false, priority: "curated_platform", pattern: /\bDatawhale\b|科鲸/i },
+  { key: "机器之心", topOrOfficial: false, priority: "curated_platform", pattern: /机器之心|\bJiqizhixin\b|\bSynced\b|\bSyncedReview\b/i },
   { key: "OpenReview/top venue", topOrOfficial: true, pattern: /\b(OpenReview|ICLR|ICML|NeurIPS)\b/i },
   { key: "ACL Anthology", topOrOfficial: true, pattern: /\b(ACL Anthology|ACL|EMNLP|NAACL)\b/i },
   { key: "CVF Open Access", topOrOfficial: true, pattern: /\b(CVF|CVPR|ICCV)\b/i },
@@ -96,15 +104,16 @@ export async function evaluate(candidate, evidence, ctx = {}) {
   const model = cheapModel.get(paper.id || candidate?.id);
   const triage = applyModelAdjustment(baseTriage, model);
   const ideaSignal = ideaSignalFor(triage);
-  const selected = shouldSelect({ triage, convergence, track });
+  const priority = priorityForConvergence(convergence);
+  const selected = shouldSelect({ triage, convergence, track, priority });
   const evaluatedAt = nowIso(options);
   const result = {
     candidateId: candidate?.id || paper.id,
     decision: selected ? "select" : "archive",
     mode: "rank",
     score: triage.total_score,
-    reason: reasonForEval({ selected, triage, convergence, track, model }),
-    signals: evalSignals({ convergence, track, ideaSignal }),
+    reason: reasonForEval({ selected, triage, convergence, track, priority, model }),
+    signals: evalSignals({ convergence, track, priority, ideaSignal }),
     provenance: {
       evaluator: model ? "llm+heuristic-features" : "heuristic-offline",
       source: candidate?.source || paper.source || "papers",
@@ -117,6 +126,7 @@ export async function evaluate(candidate, evidence, ctx = {}) {
     selection: {
       convergence: convergence.map((item) => item.key),
       track,
+      priority,
       ideaSignal,
     },
     evaluatedAt,
@@ -165,7 +175,7 @@ function deterministicTriage(candidate) {
   const total = weightedTotal(scores);
   const days = ageDays(candidate);
   const freshnessSignal = days <= 14 ? "new" : days <= 90 ? "recent" : "archive";
-  const hotnessSignal = /Hugging Face|Papers with Code|OpenReview|OpenAI|Anthropic|DeepMind|Meta|Microsoft|NVIDIA/i.test(`${candidate.sourceName} ${candidate.sourceSignals.join(" ")}`) ? "high_signal_source" : "standard_source";
+  const hotnessSignal = /Hugging Face|Papers with Code|OpenReview|OpenAI|Anthropic|DeepMind|Meta|Microsoft|NVIDIA|Datawhale|科鲸|机器之心|Jiqizhixin|Synced|AI Best Paper|best paper|Outstanding Paper|最佳论文/i.test(`${candidate.sourceName} ${candidate.sourceSignals.join(" ")}`) ? "high_signal_source" : "standard_source";
   const matchedTopics = detectTopics(candidate).map((topic) => topic.label);
   const matchedAheSignals = detectAheSignals(candidate);
   const deterministicReason = deterministicReasonFor(candidate, scores, total);
@@ -312,11 +322,14 @@ function applyModelAdjustment(triage, model) {
   };
 }
 
-function shouldSelect({ triage, convergence, track }) {
+function shouldSelect({ triage, convergence, track, priority }) {
   if (track.length === 0) return false;
+  if (priority) return true;
   if (triage.decision === "ignore") return false;
   if (convergence.length >= 2) return true;
-  if (convergence.length === 1 && convergence[0].topOrOfficial && triage.total_score >= 64) return true;
+  if (convergence.length === 1 && convergence[0].topOrOfficial && triage.total_score >= 60) return true;
+  if (convergence.length >= 1 && triage.total_score >= 70) return true;
+  if (triage.total_score >= 84) return true;
   return false;
 }
 
@@ -326,9 +339,15 @@ function trustedConvergence(paper) {
     if (/^\s*arXiv metadata\s*$/i.test(text)) continue;
     const rule = TRUSTED_SOURCE_RULES.find((item) => item.pattern.test(text));
     if (!rule || byKey.has(rule.key)) continue;
-    byKey.set(rule.key, { key: rule.key, topOrOfficial: rule.topOrOfficial });
+    byKey.set(rule.key, { key: rule.key, topOrOfficial: rule.topOrOfficial, priority: rule.priority || "" });
   }
   return [...byKey.values()];
+}
+
+function priorityForConvergence(convergence) {
+  if (convergence.some((item) => item.priority === "best_paper")) return "best_paper";
+  if (convergence.some((item) => item.priority === "curated_platform")) return "curated_platform";
+  return "";
 }
 
 function sourceMentionTexts(paper) {
@@ -365,6 +384,8 @@ function sourceQuality(candidate) {
   if (/OpenReview|ICLR|ICML|NeurIPS/i.test(sourceText)) score += 24;
   if (/ACL Anthology|CVF|CVPR|ICCV|EMNLP|NAACL/i.test(sourceText)) score += 18;
   if (/OpenAI|Anthropic|DeepMind|Meta|Microsoft|NVIDIA/i.test(sourceText)) score += 22;
+  if (/AI Best Paper|best paper|Outstanding Paper|最佳论文/i.test(sourceText)) score += 26;
+  if (/Datawhale|科鲸|机器之心|Jiqizhixin|Synced/i.test(sourceText)) score += 20;
   if (/Hugging Face|Papers with Code/i.test(sourceText)) score += 12;
   if (/arXiv/i.test(sourceText)) score += 8;
   return Math.min(score, 35);
@@ -390,20 +411,22 @@ function deterministicReasonFor(candidate, scores, total) {
   return `${topics}; total ${total}; strongest signals: ${strengths || "none"}.${aheReason}`;
 }
 
-function reasonForEval({ selected, triage, convergence, track, model }) {
+function reasonForEval({ selected, triage, convergence, track, priority, model }) {
   const sourceReason = convergence.length >= 2
     ? `${convergence.length} independent trusted source mentions`
     : convergence.length === 1
       ? `single trusted source (${convergence[0].key}${convergence[0].topOrOfficial ? ", top/official" : ", not top/official"})`
       : "no independent trusted source convergence";
+  const priorityReason = priority ? `; priority=${priority}` : "";
   const trackReason = track.length ? `tracks: ${track.slice(0, 3).join(", ")}` : "off-track";
   const modelReason = model ? ` model adjustment ${model.model_adjustment}${model.reason ? `: ${model.reason}` : ""}.` : "";
-  return `${selected ? "select" : "archive"}: ${sourceReason}; ${trackReason}; idea=${ideaSignalFor(triage)}; score=${triage.total_score}.${modelReason}`;
+  return `${selected ? "select" : "archive"}: ${sourceReason}${priorityReason}; ${trackReason}; idea=${ideaSignalFor(triage)}; score=${triage.total_score}.${modelReason}`;
 }
 
-function evalSignals({ convergence, track, ideaSignal }) {
+function evalSignals({ convergence, track, priority, ideaSignal }) {
   return unique([
     `convergence:${convergence.length}`,
+    priority ? `priority:${priority}` : "",
     ...track.map((item) => `track:${item}`),
     `idea:${ideaSignal}`,
   ]);

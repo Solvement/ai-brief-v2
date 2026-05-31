@@ -68,6 +68,56 @@ test("single newsletter/recommendation source -> not auto-selected", async () =>
   assert.ok(r.signals.includes("convergence:0"));
 });
 
+test("single trusted curated platform feature -> select", async () => {
+  const cand = paperCandidate("paper:p-curated", {
+    title: "Datawhale feature on LLM evaluation and RAG memory systems",
+    abstract: "A curated AI article covering large language model evaluation, retrieval augmented generation, and production workflow reliability.",
+    source: "datawhale",
+    sourceName: "Datawhale 科鲸",
+    sourceSignals: ["Datawhale 科鲸"],
+    focusTopics: ["Evaluation / Benchmarks", "RAG / Knowledge Systems"],
+  });
+
+  const r = await evaluate(cand, { kind: "paper-text", content: "Datawhale curated AI article" }, ctx);
+
+  assert.equal(r.decision, "select");
+  assert.deepEqual(r.selection.convergence, ["Datawhale 科鲸"]);
+  assert.ok(r.signals.includes("priority:curated_platform"));
+});
+
+test("single best-paper award feature -> select", async () => {
+  const cand = paperCandidate("paper:p-award", {
+    title: "Outstanding Paper: Hardware-aware sparse attention for efficient LLM inference",
+    abstract: "An award paper on efficient large language model inference, sparse attention, benchmark evaluation, and production deployment.",
+    source: "best_paper",
+    sourceName: "最佳论文奖",
+    sourceSignals: ["AI Best Paper Awards", "best paper award", "ICLR 2025 Outstanding Paper"],
+    focusTopics: ["Evaluation / Benchmarks", "LLM Security / Reliability"],
+  });
+
+  const r = await evaluate(cand, { kind: "paper-text", content: "best paper award" }, ctx);
+
+  assert.equal(r.decision, "select");
+  assert.deepEqual(r.selection.convergence, ["Best paper award"]);
+  assert.ok(r.signals.includes("priority:best_paper"));
+});
+
+test("strong single trusted source can pass without multi-source convergence", async () => {
+  const cand = paperCandidate("paper:p-strong", {
+    title: "A benchmark framework for reliable RAG and LLM tool-use workflows",
+    abstract: "A novel benchmark and evaluation framework for retrieval augmented generation, tool-use agents, workflow reliability, code implementation, production observability, ablation metrics, and deployment infrastructure.",
+    source: "arxiv_filtered",
+    sourceName: "arXiv filtered search",
+    sourceSignals: ["arXiv"],
+    focusTopics: ["Evaluation / Benchmarks", "RAG / Knowledge Systems", "Tool Use"],
+  });
+
+  const r = await evaluate(cand, { kind: "paper-text", content: "arXiv benchmark framework" }, ctx);
+
+  assert.equal(r.decision, "select");
+  assert.deepEqual(r.selection.convergence, ["arXiv"]);
+});
+
 test("off-track single source -> archive", async () => {
   const cand = paperCandidate("paper:p3", {
     title: "Unrelated protein folding note",

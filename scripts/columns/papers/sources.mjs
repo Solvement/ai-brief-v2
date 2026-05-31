@@ -8,6 +8,25 @@ const DEFAULT_EVIDENCE_MAX_CHARS = 18000;
 const SOURCE_CONFIG = {
   huggingfaceDaily: { url: "https://huggingface.co/papers", limit: 45 },
   papersWithCodeTrending: { url: "https://paperswithcode.com/trending", limit: 45 },
+  datawhale: {
+    url: "https://backend.datawhale.cn/api/article/v2/list?page=1&size=18&type=AI_NEWS&sort=stickyPrior,createTime,desc&onShelve=true",
+    siteUrl: "https://www.datawhale.cn/article",
+    limit: 18,
+  },
+  jiqizhixin: {
+    urls: ["https://www.jiqizhixin.com/articles", "https://syncedreview.com/"],
+    limit: 24,
+  },
+  bestPaper: {
+    url: "https://aibestpape.rs/",
+    limit: 48,
+    conferencePages: [
+      { label: "ICLR 2025 Outstanding Paper Awards", url: "https://blog.iclr.cc/2025/04/22/announcing-the-outstanding-paper-awards-at-iclr-2025/" },
+      { label: "NeurIPS 2024 Best Paper Awards", url: "https://blog.neurips.cc/2024/12/10/announcing-the-neurips-2024-best-paper-awards/" },
+      { label: "ACL 2025 Awards", url: "https://2025.aclweb.org/program/awards/" },
+      { label: "NAACL 2025 Award Winners", url: "https://2025.naacl.org/blog/best-papers/" },
+    ],
+  },
   arxivMaxPerQuery: 18,
   openReviewVenues: [
     "ICLR.cc/2026/Conference",
@@ -79,6 +98,10 @@ const ARXIV_QUERIES = [
 
 const FOCUS_TOPICS = [
   {
+    label: "Broad AI / ML",
+    patterns: [/\bAI\b/i, /\bartificial intelligence\b/i, /\bmachine learning\b/i, /\bdeep learning\b/i, /\bfoundation models?\b/i, /\blarge language models?\b/i, /\bLLMs?\b/i, /\btransformers?\b/i, /\bpost[- ]?training\b/i, /\balignment\b/i, /人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/],
+  },
+  {
     label: "AI Agents",
     patterns: [/\bagents?\b/i, /\bautonomous\b/i, /\bweb agent\b/i, /\bcomputer use\b/i, /\bmulti-agent\b/i, /\bagentic\b/i],
   },
@@ -120,8 +143,9 @@ const FOCUS_TOPICS = [
   },
 ];
 
-const CORE_JOB_RE = /\b(agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|data preparation)\b/i;
+const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|data preparation)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/i;
 const GENERIC_COMPANY_PAGE_RE = /\b(security and compliance|inside claude security|claude security|experimental tools|human-computer interaction|search & information retrieval|programming languages & software engineering|microsoft security|safety & eco|trust center)\b/i;
+const CURATED_AI_RE = /\b(AI|artificial intelligence|machine learning|deep learning|LLMs?|large language models?|foundation models?|transformers?|agentic|agents?|RAG|retrieval|benchmark|evaluation|reasoning|alignment|post[- ]?training|diffusion|multimodal|robotics?|vision|language model|DeepSeek|OpenAI|Anthropic|NVIDIA|Google|DeepMind|Meta|Microsoft)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|论文|模型|智能体|多模态|生成式|生成|机器人|算法|评测|基准|推理/i;
 const AHE_STRONG_SIGNALS = [
   { label: "harness engineering", pattern: /\bharness engineering\b/i },
   { label: "agent harness", pattern: /\b(?:agent|agentic) harness(?:es)?\b/i },
@@ -175,6 +199,29 @@ export async function discover(ctx = {}) {
         sourceSignals: ["Papers with Code trending"],
       }, () => discoverPapersWithCodeTrending(options), ctx.logger),
     },
+    {
+      name: "Datawhale curated AI articles",
+      run: () => runDiscoveryTrace(discoveryTrace, {
+        source: "datawhale",
+        sourceName: "Datawhale 科鲸",
+        queryLabel: "recent AI articles",
+        query: SOURCE_CONFIG.datawhale.siteUrl,
+        requestedLimit: SOURCE_CONFIG.datawhale.limit,
+        sourceSignals: ["Datawhale 科鲸", "curated platform"],
+      }, () => discoverDatawhale(options), ctx.logger),
+    },
+    {
+      name: "机器之心 / Synced curated articles",
+      run: () => runDiscoveryTrace(discoveryTrace, {
+        source: "jiqizhixin",
+        sourceName: "机器之心",
+        queryLabel: "recent featured articles",
+        query: SOURCE_CONFIG.jiqizhixin.urls.join(" | "),
+        requestedLimit: SOURCE_CONFIG.jiqizhixin.limit,
+        sourceSignals: ["机器之心", "Synced", "curated platform"],
+      }, () => discoverJiqizhixin(options, ctx.logger), ctx.logger),
+    },
+    { name: "best paper awards", run: () => discoverBestPaperAwards(discoveryTrace, options, ctx.logger) },
     { name: "arXiv filtered search", run: () => discoverArxivFiltered(discoveryTrace, options, ctx.logger) },
     { name: "OpenReview selected venues", run: () => discoverOpenReview(discoveryTrace, options, ctx.logger) },
     { name: "ACL Anthology", run: () => discoverAclAnthology(discoveryTrace, options, ctx.logger) },
@@ -255,6 +302,85 @@ async function discoverHuggingFaceDaily(options) {
 async function discoverPapersWithCodeTrending(options) {
   const html = await fetchText(SOURCE_CONFIG.papersWithCodeTrending.url, { retries: 1, options });
   return parseHfStylePapers(html, "papers_with_code_trending", "Papers with Code trending", SOURCE_CONFIG.papersWithCodeTrending.url, SOURCE_CONFIG.papersWithCodeTrending.limit);
+}
+
+async function discoverDatawhale(options = {}) {
+  if (isOffline(options)) return [];
+  const json = JSON.parse(await fetchText(SOURCE_CONFIG.datawhale.url, {
+    retries: 1,
+    timeoutMs: numberOption(options.curatedSourceTimeoutMs, 20000),
+    options,
+    headers: {
+      accept: "application/json,text/plain,*/*",
+      origin: "https://www.datawhale.cn",
+      referer: SOURCE_CONFIG.datawhale.siteUrl,
+    },
+  }));
+  const rows = Array.isArray(json?.data?.rows) ? json.data.rows : [];
+  return rows
+    .slice(0, SOURCE_CONFIG.datawhale.limit)
+    .map(datawhaleArticleCandidate)
+    .filter((candidate) => candidate.title && focusMatches(candidate));
+}
+
+async function discoverJiqizhixin(options = {}, logger = console) {
+  if (isOffline(options)) return [];
+  const all = [];
+  for (const url of SOURCE_CONFIG.jiqizhixin.urls) {
+    try {
+      const html = await fetchText(url, {
+        retries: 1,
+        timeoutMs: numberOption(options.curatedSourceTimeoutMs, 20000),
+        options,
+        headers: {
+          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          referer: url,
+        },
+      });
+      all.push(...parseCuratedArticleLinks(html, url, {
+        source: "jiqizhixin",
+        sourceName: "机器之心",
+        limit: SOURCE_CONFIG.jiqizhixin.limit,
+        sourceSignals: ["机器之心", url.includes("syncedreview.com") ? "Synced" : "Jiqizhixin", "curated platform"],
+      }));
+    } catch (error) {
+      logger?.warn?.(`[papers:discover] 机器之心 source failed (${url}): ${error.message}`);
+    }
+  }
+  return mergeCandidates(all).slice(0, SOURCE_CONFIG.jiqizhixin.limit);
+}
+
+async function discoverBestPaperAwards(trace = [], options = {}, logger = console) {
+  if (isOffline(options)) return [];
+  const all = [];
+  const sources = [
+    { label: "AI Best Paper Awards", url: SOURCE_CONFIG.bestPaper.url, kind: "aibest" },
+    ...SOURCE_CONFIG.bestPaper.conferencePages.map((page) => ({ ...page, kind: "conference" })),
+  ];
+
+  for (const page of sources) {
+    const items = await runDiscoveryTrace(trace, {
+      source: "best_paper",
+      sourceName: "最佳论文奖",
+      queryLabel: page.label,
+      query: page.url,
+      requestedLimit: SOURCE_CONFIG.bestPaper.limit,
+      sourceSignals: ["AI Best Paper Awards", "best paper award", page.label],
+    }, async () => {
+      const html = await fetchText(page.url, {
+        retries: 1,
+        timeoutMs: numberOption(options.curatedSourceTimeoutMs, 22000),
+        options,
+      });
+      const parsed = page.kind === "aibest"
+        ? parseAiBestPaperAwards(html, page.url, SOURCE_CONFIG.bestPaper.limit)
+        : parseBestPaperAwardPage(html, page);
+      return { rawCandidateCount: parsed.length, items: parsed.filter(focusMatches) };
+    }, logger);
+    all.push(...items);
+  }
+
+  return mergeCandidates(all).slice(0, SOURCE_CONFIG.bestPaper.limit);
 }
 
 async function discoverArxivFiltered(trace = [], options = {}, logger = console) {
@@ -568,6 +694,143 @@ function parseAtomEntries(xml, source, sourceName) {
   }).filter((candidate) => candidate.title);
 }
 
+function datawhaleArticleCandidate(row = {}) {
+  const title = cleanTitle(row.title || "");
+  const sourceUrl = row.jumpUrl || (row.id ? `https://www.datawhale.cn/article/${row.id}` : SOURCE_CONFIG.datawhale.siteUrl);
+  return finalizeCandidate({
+    title,
+    abstract: cleanTitle(row.intro || ""),
+    source: "datawhale",
+    sourceName: "Datawhale 科鲸",
+    sourceUrl,
+    paperUrl: sourceUrl,
+    venue: "Datawhale 科鲸",
+    publishedAt: isoDate(row.createTime),
+    updatedAt: isoDate(row.updateTime || row.createTime),
+    version: row.id ? `datawhale-${row.id}` : sourceUrl,
+    tags: ["curated platform", row.type, row.author].filter(Boolean),
+    sourceSignals: ["Datawhale 科鲸", "curated platform", row.type].filter(Boolean),
+  });
+}
+
+function parseCuratedArticleLinks(html, baseUrl, { source, sourceName, limit, sourceSignals }) {
+  const out = [];
+  const seen = new Set();
+  const linkRe = /<a\b[^>]*href=(["'])(.*?)\1[^>]*>([\s\S]{0,900}?)<\/a>/gi;
+  let match;
+  while ((match = linkRe.exec(html)) && out.length < limit) {
+    const url = absoluteUrl(baseUrl, decodeEntities(match[2]).trim());
+    if (!isCuratedArticleUrl(url)) continue;
+    const title = cleanTitle(match[3]);
+    if (!title || title.length < 8 || title.length > 220) continue;
+    if (!CURATED_AI_RE.test(`${title} ${url}`)) continue;
+    const key = `${title.toLowerCase()}:${url.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const candidate = finalizeCandidate({
+      title,
+      source,
+      sourceName,
+      sourceUrl: url,
+      paperUrl: url,
+      venue: sourceName,
+      tags: ["curated platform"],
+      sourceSignals,
+    });
+    if (focusMatches(candidate)) out.push(candidate);
+  }
+  return out;
+}
+
+function parseAiBestPaperAwards(html, baseUrl, limit) {
+  const out = [];
+  const seen = new Set();
+  let currentVenue = "AI Best Paper Awards";
+  let currentAward = "Best paper award";
+  const tokenRe = /<a class="venue-title"[\s\S]*?>([\s\S]*?)<\/a>|<div class="award-title">[\s\S]*?<strong>([\s\S]*?)<\/strong>|<div class="paper-title">\s*<a href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  let match;
+  while ((match = tokenRe.exec(html)) && out.length < limit) {
+    if (match[1]) {
+      currentVenue = cleanTitle(match[1]);
+      continue;
+    }
+    if (match[2]) {
+      currentAward = cleanTitle(match[2]).replace(/:$/, "") || "Best paper award";
+      continue;
+    }
+    const title = cleanTitle(match[4]);
+    const url = absoluteUrl(baseUrl, match[3] || "");
+    if (!title || seen.has(`${title}:${url}`)) continue;
+    seen.add(`${title}:${url}`);
+    out.push(finalizeCandidate({
+      title,
+      source: "best_paper",
+      sourceName: "最佳论文奖",
+      sourceUrl: url,
+      paperUrl: url,
+      venue: `${currentVenue} ${currentAward}`,
+      tags: ["best paper award", currentVenue, currentAward],
+      sourceSignals: ["AI Best Paper Awards", "best paper award", currentVenue, currentAward],
+    }));
+  }
+  return out;
+}
+
+function parseBestPaperAwardPage(html, page) {
+  const linked = extractAwardPageLinks(html, page);
+  const listed = extractAwardListItems(html, page);
+  return mergeCandidates([...linked, ...listed]).slice(0, 24);
+}
+
+function extractAwardPageLinks(html, page) {
+  const out = [];
+  const seen = new Set();
+  const linkRe = /<a\b[^>]*href=(["'])(.*?)\1[^>]*>([\s\S]{0,900}?)<\/a>/gi;
+  let match;
+  while ((match = linkRe.exec(html)) && out.length < 24) {
+    const url = absoluteUrl(page.url, decodeEntities(match[2]).trim());
+    const title = cleanTitle(match[3]);
+    if (!isPaperLikeUrl(url) || !isAwardPaperTitle(title)) continue;
+    const key = `${title.toLowerCase()}:${url.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(bestPaperPageCandidate(title, url, page));
+  }
+  return out;
+}
+
+function extractAwardListItems(html, page) {
+  const out = [];
+  const seen = new Set();
+  const sectionRe = /<h[1-4][^>]*>([^<]*(?:Best|Outstanding|Honou?rable|Award|优秀|最佳|杰出)[^<]*)<\/h[1-4]>([\s\S]*?)(?=<h[1-4][^>]*>|$)/gi;
+  let section;
+  while ((section = sectionRe.exec(html)) && out.length < 24) {
+    const award = cleanTitle(section[1]);
+    const itemRe = /<li[^>]*>([\s\S]*?)<\/li>/gi;
+    let item;
+    while ((item = itemRe.exec(section[2])) && out.length < 24) {
+      const title = awardListTitle(item[1]);
+      if (!isAwardPaperTitle(title) || seen.has(title.toLowerCase())) continue;
+      seen.add(title.toLowerCase());
+      out.push(bestPaperPageCandidate(title, `${page.url}#${slug(title)}`, { ...page, label: `${page.label} ${award}` }));
+    }
+  }
+  return out;
+}
+
+function bestPaperPageCandidate(title, url, page) {
+  return finalizeCandidate({
+    title,
+    source: "best_paper",
+    sourceName: "最佳论文奖",
+    sourceUrl: url,
+    paperUrl: url,
+    venue: page.label,
+    tags: ["best paper award", page.label],
+    sourceSignals: ["AI Best Paper Awards", "best paper award", page.label],
+  });
+}
+
 function extractGenericLinks(html, baseUrl, source, sourceName, company) {
   const out = [];
   const seen = new Set();
@@ -851,7 +1114,7 @@ function pushDiscoveryTrace(trace, input) {
   trace.push(entry);
 }
 
-async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {} } = {}) {
+async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {}, headers = {} } = {}) {
   const fetchImpl = options.fetch || fetch;
   let lastError;
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -862,6 +1125,7 @@ async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {} } =
         headers: {
           "user-agent": options.userAgent || UA,
           accept: "text/html,application/atom+xml,application/json;q=0.9,*/*;q=0.8",
+          ...headers,
         },
         signal: controller.signal,
       });
@@ -910,6 +1174,40 @@ function absoluteUrl(base, href) {
 
 function cleanTitle(title) {
   return stripTags(title).replace(/\s+/g, " ").trim();
+}
+
+function isCuratedArticleUrl(url) {
+  return /jiqizhixin\.com\/articles\/[^/?#]+/i.test(url) ||
+    /syncedreview\.com\/20\d{2}\/\d{2}\/\d{2}\/[^/?#]+/i.test(url);
+}
+
+function isPaperLikeUrl(url) {
+  return /arxiv\.org\/abs\/|openreview\.net\/forum|aclanthology\.org\/|doi\.org\/|proceedings\.mlr\.press|papers\.nips\.cc|thecvf\.com\/content|ojs\.aaai\.org/i.test(url);
+}
+
+function isAwardPaperTitle(title) {
+  const text = cleanTitle(title);
+  if (text.length < 12 || text.length > 260) return false;
+  if (/^(home|menu|search|awards?|best paper|outstanding papers?|honou?rable mentions?|program|proceedings|committee|blog)$/i.test(text)) return false;
+  return CURATED_AI_RE.test(text) || /\b(LLM|language|model|learning|neural|vision|benchmark|dataset|alignment|inference|diffusion|reasoning|robot|sparse|attention)\b/i.test(text);
+}
+
+function awardListTitle(html) {
+  const text = cleanTitle(html)
+    .replace(/\s+/g, " ")
+    .replace(/^(best|outstanding|honou?rable mention|award winner)[:\s-]+/i, "")
+    .trim();
+  const sentence = text.split(/\s{2,}| Authors?: | by /i)[0].trim();
+  return sentence.length > 260 ? sentence.slice(0, 260).replace(/\s+\S*$/, "").trim() : sentence;
+}
+
+function isoDate(value) {
+  const parsed = Date.parse(value || "");
+  return Number.isFinite(parsed) ? new Date(parsed).toISOString() : "";
+}
+
+function slug(value) {
+  return cleanTitle(value).toLowerCase().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").slice(0, 80) || hash(value);
 }
 
 function normalizeArxivId(value = "") {
@@ -970,6 +1268,8 @@ function sourceQuality(candidate) {
   if (/OpenReview|ICLR|ICML|NeurIPS/i.test(sourceText)) score += 24;
   if (/ACL Anthology|CVF|CVPR|ICCV|EMNLP|NAACL/i.test(sourceText)) score += 18;
   if (/OpenAI|Anthropic|DeepMind|Meta|Microsoft|NVIDIA/i.test(sourceText)) score += 22;
+  if (/AI Best Paper|best paper|Outstanding Paper|最佳论文/i.test(sourceText)) score += 26;
+  if (/Datawhale|科鲸|机器之心|Jiqizhixin|Synced/i.test(sourceText)) score += 20;
   if (/Hugging Face|Papers with Code/i.test(sourceText)) score += 12;
   if (/arXiv/i.test(sourceText)) score += 8;
   return Math.min(score, 35);
