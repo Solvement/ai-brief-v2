@@ -1,8 +1,144 @@
 {
   "schemaVersion": 1,
   "surface": "papers",
-  "updatedAt": "2026-05-31T15:23:49.156Z",
+  "updatedAt": "2026-05-31T16:07:59.158Z",
   "runs": [
+    {
+      "id": "papers-2026-05-31-1780243679159",
+      "surface": "papers",
+      "date": "2026-05-31",
+      "generatedAt": "2026-05-31T16:07:59.158Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "15 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "6 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "6 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "6 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-05-31T16:07:59.156Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "6 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has section summaries",
+            "status": "pass",
+            "details": "6 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-24220",
+          "title": "Polar: Agentic RL on Any Harness at Scale",
+          "score": 92,
+          "reason": "Polar proposes a proxy-based rollout framework to enable RL training on arbitrary agent harnesses without modification."
+        },
+        {
+          "id": "paper:arxiv-2605-22794",
+          "title": "MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems",
+          "score": 92,
+          "reason": "MOSS argues that source-level rewriting is a fundamentally more general medium for agent self-evolution than text-mutable artifacts, and implements a production system achieving it with a deterministic pipeline and safe deployment."
+        },
+        {
+          "id": "paper:arxiv-2605-26546",
+          "title": "MobileExplorer: Accelerating On-Device Inference for Mobile GUI Agents via Online Exploration",
+          "score": 92,
+          "reason": "MobileExplorer proposes overlapping VLM inference with online UI exploration to reduce latency for on-device mobile GUI agents."
+        },
+        {
+          "id": "paper:arxiv-2605-27328",
+          "title": "Governed Evolution of Agent Runtimes through Executable Operational Cognition",
+          "score": 91,
+          "reason": "这篇论文为智能体运行时工件的演化提出了一个治理框架"
+        },
+        {
+          "id": "paper:arxiv-2605-27922",
+          "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
+          "score": 88,
+          "reason": "本文提出一个诊断性基准Harness-Bench，用于系统评估不同harness配置（而非仅基础模型）对LLM agent在真实工作流中性能的影响，并揭示执行对齐失败模式。"
+        },
+        {
+          "id": "paper:arxiv-2605-29341",
+          "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
+          "score": 87,
+          "reason": "WorldMemArena通过将多模态智能体记忆分解为写-维护-检索-使用四个阶段，提供了对记忆系统细粒度诊断的基准。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 6 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
     {
       "id": "papers-2026-05-31-1780241029158",
       "surface": "papers",
@@ -260,46 +396,76 @@
   ],
   "reusablePatterns": [
     {
+      "text": "Polar: Agentic RL on Any Harness at Scale: Polar proposes a proxy-based rollout framework to enable RL training on arbitrary agent harnesses without modification.",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T16:07:59.158Z",
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
+    },
+    {
+      "text": "MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems: MOSS argues that source-level rewriting is a fundamentally more general medium for agent self-evolution than text-mutable artifacts, and implements a production system achieving it with a deterministic pipeline and safe deployment.",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T16:07:59.158Z",
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
+    },
+    {
+      "text": "MobileExplorer: Accelerating On-Device Inference for Mobile GUI Agents via Online Exploration: MobileExplorer proposes overlapping VLM inference with online UI exploration to reduce latency for on-device mobile GUI agents.",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T16:07:59.158Z",
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
+    },
+    {
+      "text": "Governed Evolution of Agent Runtimes through Executable Operational Cognition: 这篇论文为智能体运行时工件的演化提出了一个治理框架",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T16:07:59.158Z",
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
+    },
+    {
+      "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 本文提出一个诊断性基准Harness-Bench，用于系统评估不同harness配置（而非仅基础模型）对LLM agent在真实工作流中性能的影响，并揭示执行对齐失败模式。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T16:07:59.158Z",
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
+    },
+    {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 该论文引入了Harness-Bench，一个诊断基准，用于量化不同模型-配置组合下的harness效应。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
     },
     {
       "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
     },
     {
       "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 本文提出通过三个可观测性支柱实现编码智能体套件的自动演化，将每一次编辑转化为可验证的合约。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
     },
     {
       "text": "Auditing Agent Harness Safety: 提出 HarnessAudit 框架，通过审计完整执行轨迹来评估 LLM agent 安全，而非仅检查最终输出。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
     },
     {
       "text": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction: WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T13:35:19.310Z",
-      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 提出一个多智能体系统Ptah，用于生成可验证、图文交织的多模态深度研究报告，并配以专门的评估协议PtahEval。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T13:35:19.310Z",
-      "lastSeenAt": "2026-05-31T15:23:49.156Z"
+      "lastSeenAt": "2026-05-31T16:07:59.158Z"
     }
   ]
 }

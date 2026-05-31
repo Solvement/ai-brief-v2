@@ -1,6 +1,1019 @@
 {
-  "generatedAt": "2026-05-31T15:23:49.147Z",
+  "generatedAt": "2026-05-31T16:07:59.153Z",
   "papers": [
+    {
+      "id": "paper:arxiv-2605-24220",
+      "title": "Polar: Agentic RL on Any Harness at Scale",
+      "authors": "Binfeng Xu, Hao Zhang, Shaokun Zhang, Songyang Han, Mingjie Liu, Jian Hu, Shizhe Diao, Zhenghui Jin, Yunheng Zou, Michael Demoret, Jan Kautz, Yi Dong",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv coding agents and SWE evals",
+      "sourceUrl": "https://arxiv.org/abs/2605.24220",
+      "verifiedAt": "2026-05-31T16:05:50.503Z",
+      "tier": "deep",
+      "leadJudgment": "Polar proposes a proxy-based rollout framework to enable RL training on arbitrary agent harnesses without modification.",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "强化学习用于语言代理越来越依赖自定义 harness，但将这些 harness 移植到 RL 环境接口困难且容易丢失训练信号。Polar 是一个可扩展的异步 RL 回滚框架，它将 agent harness 视为黑盒，通过代理 LLM API 调用、记录 token 级交互并重建 token 忠实轨迹来训练。它解耦了回滚节点，支持独立训练器，并在软件工程任务上用简单 GRPO 提升了 Qwen3.5-4B 的 SWE-Bench Verified 分数。",
+          "loadBearing": "核心主张：通过代理模型 API 边界，可以在不修改 harness 的情况下进行 RL 训练。",
+          "evidence": "摘要中给出了四个 harness 上的具体提升：Codex +22.6, Claude Code +4.8, Qwen Code +0.6, Pi +6.2，但未提供置信区间或多次运行统计。"
+        },
+        {
+          "heading": "1 引言",
+          "summary": "传统 RL 假设训练目标有简单标准化接口，但 agentic RL 的复杂软件系统（如代码仓库、浏览器）导致集成负担。现有系统如 SkyRL-Agent、PRIME-RL 要求适配 agent 到 RL 框架，而 Agent Lightning、rLLM 虽降低负担但仍需遵循接口。核心问题：能否不打开黑箱训练 agent？关键观察：所有基于 LLM 的 agent 必须与模型通信，模型 API 边界是共同接口。Polar 通过监听 LLM 调用来捕获提示、采样 token、对数概率和响应，转换为 RL 轨迹。贡献包括：基于代理的回滚和重建、回滚即服务架构、token 忠实轨迹重建、真实编码 harness 上的端到端验证。",
+          "loadBearing": "假设：任何基于 LLM 的 agent 的模型 API 调用足以提供训练所需的 token 级信息。",
+          "evidence": "论文声称这一假设成立，但仅通过后续实验间接验证，未提供理论证明或常见异常情况（如流式、缓存）的分析。",
+          "fold": "论文图 1 展示了 Polar 架构概览。"
+        },
+        {
+          "heading": "2 相关工作",
+          "summary": "对比了 ProRL Agent、SkyRL-Agent、PRIME-RL、Agent Lightning、rLLM、Harbor 等系统。ProRL Agent 引入了服务边界但要求内部适配；SkyRL-Agent 和 PRIME-RL 关注训练效率但依赖自定义环境；Agent Lightning 和 rLLM 提供低侵入式仪表但仍有接口要求。Harbor 是评估框架，但缺少模型代理和训练数据契约。Polar 的区别在于将集成边界设于模型端点，而非 agent 框架内部。同时讨论了 token 忠实性和重标记化漂移问题。",
+          "loadBearing": "主张：Polar 的最小集成点（模型 API 代理）比 SDK 回调图更可靠且鲁棒。",
+          "evidence": "论文指出许多编码和终端 agent 使用命令行、包管理工具或二进制，因此 SDK 接口不可用。但未提供具体实例来证明这种鲁棒性。"
+        },
+        {
+          "heading": "3 Polar",
+          "summary": "详细描述 Polar 架构。回滚服务协调任务和全局调度；网关节点执行会话、托管模型代理、构建轨迹并运行评估。代理捕获部分：检测并提供 API 类型（Anthropic、OpenAI、Google），标准化为 OpenAI Chat 格式，转发推理服务器并记录 token 级数据，返回原始格式。harness 适配器小而简单。运行时支持 Docker 和 Apptainer。异步回滚分级：网关内使用隔离工作池（INIT、READY、RUNNING、POSTRUN），允许运行时预热与 agent 执行并行。轨迹重建提供两种策略：per_request（每个 completion 一个轨迹）和 prefix_merging（合并追加对话链，保留 token 忠实性）。评估和奖励传播通过注册表自定义。",
+          "loadBearing": "关键设计：prefix_merging 重建策略通过严格 token 前缀检查确保训练 token 与行为策略一致。",
+          "evidence": "图 5(b) 显示 prefix_merging 将训练器更新从 1185 次降至 218 次，墙钟时间从 189.5 分钟降至 35.2 分钟（5.39×），同时回滚 GPU 利用率从 20.4% 提升至 87.7%。但该数据基于单一配置，未报告多次运行方差。",
+          "fold": "论文提供了轨迹重建的伪代码级描述（3.4.2），但未公开实现细节或代码。"
+        },
+        {
+          "heading": "4 实验",
+          "summary": "在两个场景验证：在线 RL 回滚和离线 SFT 数据生成。4.1 SWE-Gym GRPO 实验：对四个编码 harness（Codex、Claude Code、Qwen Code、Pi）使用相同 Qwen3.5-4B 基座，简单 GRPO 训练。结果表 1 显示在 SWE-Bench Verified 上均有提升，最大绝对增益在 Codex（+22.6）。训练曲线图 6 显示各 harness 奖励上升。轨迹重建消融：prefix_merging 相比 per_request 显著加速。4.2 离线数据生成：使用 Qwen3.5-122B-A10B 和 pi harness 在 1638 个实例上生成 SFT 轨迹，仅通过测试过滤器接受 504 条（30.8%），各仓库接受率不同。",
+          "loadBearing": "核心实验主张：Polar 可以在不修改 harness 的情况下通过 RL 显著提升 agent 性能，尤其在陌生执行路径上。",
+          "evidence": "表 1 的分数是单次运行结果（论文未报告多次运行或置信区间）。训练数据为 293 个 SWE-Gym 任务，评估为全 SWE-Bench Verified (300 个实例)。接受率数据（表 2）来自单次生成运行，未报告多次运行。",
+          "fold": "论文提到 per_request 策略结合结果奖励广播会导致奖励破坏，但未深入分析。"
+        },
+        {
+          "heading": "5 结论",
+          "summary": "Polar 将 agent 测试时环境视为 RL 系统的一等公民，而非需要移植的实现细节。关键设计是将集成边界移至模型端点，使回滚独立于训练和推理，同时保留非标准 harness 的行为。论文宣称 Polar 为现代 agentic RL 基础设施开辟了新范式。",
+          "loadBearing": "结论：Polar 的代理方法可推广到任意基于 LLM 的 agent harness。",
+          "evidence": "论文仅验证了编码 harness，其他领域（如浏览器、操作系统）未测试。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文指出 per_request 策略结合结果奖励广播可能导致奖励破坏，但不在本文范围内；未来工作包括会话归一化和 PRM 风格信用分配。另外，实验仅针对软件工程任务，其他类型 agent 未验证。",
+        "evidenceNotes": "实验证据强度中等：SWE-Bench 结果基于单次运行，无置信区间；训练数据仅 293 个任务；模型规模仅 4B 参数；仅测试了 GRPO 算法。代码和部分数据已公开，但 HuggingFace 数据集（SkyRL-v0-293-data 和 polar-swegym-trajectories）访问受限或不可用。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "AI Coding / SWE Agents",
+          "Agent Harness / Observability",
+          "Evaluation / Benchmarks"
+        ],
+        "ideaSignal": "deep_dive:92+ahe:agent harness"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.24220",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.24220v1",
+      "publishedAt": "2026-05-22T21:06:12Z",
+      "deepDive": {
+        "reframe": "一个通过代理模型 API 调用来捕获 token 级交互的系统，使得现有 agent harness 可直接用于 RL 训练，而无需修改 harness 代码或适配 RL 框架接口。其核心是“回滚即服务”架构和 token 忠实轨迹重建。",
+        "contributionLayers": [
+          {
+            "layer": "代理接口抽象",
+            "claim": "模型 API 边界是通用接口，可覆盖不同 harness 的 LLM 调用模式。",
+            "judgment": "理论上成立，但需要 proxy 能处理不同 API 格式（Anthropic、OpenAI、Google），论文论证了可行性但未展示极端情况（如自定义协议或非 HTTP 调用）。"
+          },
+          {
+            "layer": "异步回滚分级",
+            "claim": "通过工作池和就绪缓冲区，将运行时预热、执行、评估等阶段解耦，提升长尾任务的计算利用率。",
+            "judgment": "设计合理，prefix_merging 消融实验显著证明了利用率提升，但该实验仅在一组配置下进行，可能受其他因素影响。"
+          },
+          {
+            "layer": "token 忠实轨迹重建",
+            "claim": "prefix_merging 可合并连续对话链，同时通过严格前置检查确保训练 token 与行为策略一致。",
+            "judgment": "方法正确且必要，但实现复杂性较高，论文未与其他重建方法（如直接拼接）比较。"
+          }
+        ],
+        "mechanism": "Polar 在 LLM 调用路径上插入代理。当 harness 向模型发送请求时，代理接收请求，标准化为内部格式，转发至推理引擎，同时记录输入 token、输出 token、对数概率和元数据。harness 执行结束后，系统从这些记录中按时间顺序重建轨迹：要么每个请求独立成轨迹（per_request），要么通过检查 token 前缀将连续的请求合并成较长轨迹（prefix_merging）。合并时，仅将原始采样 token 标记为可训练，中间插入的规范文本标记为不可训练。最终轨迹与奖励一起提供给 RL 训练器。",
+        "evidenceChain": [
+          {
+            "component": "SWE-Bench Verified 评估（表1）",
+            "metrics": [
+              {
+                "label": "Codex 基座 pass@1",
+                "value": "3.8%",
+                "note": "无训练"
+              },
+              {
+                "label": "Codex Polar RL pass@1",
+                "value": "26.4%",
+                "note": "+22.6"
+              },
+              {
+                "label": "Claude Code 基座 pass@1",
+                "value": "29.8%"
+              },
+              {
+                "label": "Claude Code Polar RL pass@1",
+                "value": "34.6%",
+                "note": "+4.8"
+              },
+              {
+                "label": "Qwen Code 基座 pass@1",
+                "value": "34.6%"
+              },
+              {
+                "label": "Qwen Code Polar RL pass@1",
+                "value": "35.2%",
+                "note": "+0.6"
+              },
+              {
+                "label": "Pi 基座 pass@1",
+                "value": "34.2%"
+              },
+              {
+                "label": "Pi Polar RL pass@1",
+                "value": "40.4%",
+                "note": "+6.2"
+              }
+            ],
+            "reviewerNote": "所有结果来自单次训练运行，未报告置信区间或多次实验标准差。最大提升来自 Codex（陌生协议），但基座极低（3.8%）可能放大相对增益。"
+          },
+          {
+            "component": "轨迹重建消融（图5b）",
+            "metrics": [
+              {
+                "label": "per_request 训练器更新数（3步）",
+                "value": "1185"
+              },
+              {
+                "label": "prefix_merging 训练器更新数（3步）",
+                "value": "218",
+                "note": "减少81.6%"
+              },
+              {
+                "label": "per_request 墙钟时间",
+                "value": "189.5 min"
+              },
+              {
+                "label": "prefix_merging 墙钟时间",
+                "value": "35.2 min",
+                "note": "加速5.39×"
+              },
+              {
+                "label": "per_request 平均回滚 GPU 利用率",
+                "value": "20.4%"
+              },
+              {
+                "label": "prefix_merging 平均回滚 GPU 利用率",
+                "value": "87.7%",
+                "note": "提升明显"
+              }
+            ],
+            "reviewerNote": "结果直接支持 prefix_merging 的效率优势，但仅在单次试验（3步训练）中报告，可能受随机因素影响。使用了相同硬件和拓扑，但未提供方差信息。"
+          },
+          {
+            "component": "离线 SFT 数据生成（表2）",
+            "metrics": [
+              {
+                "label": "总尝试实例数",
+                "value": "1638"
+              },
+              {
+                "label": "接受轨迹数",
+                "value": "504",
+                "note": "30.8%接受率"
+              },
+              {
+                "label": "总 GPU 小时",
+                "value": "64",
+                "note": "8×H100, 交互分区"
+              },
+              {
+                "label": "平均每轨迹消息数",
+                "value": "104",
+                "note": "长尾>200"
+              }
+            ],
+            "reviewerNote": "仅用一个 harness (pi) 和一个模型，接受率因仓库而异。数据有用但代表性有限。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "Polar 重写了其前身 ProRL Agent，代码在 https://github.com/NVIDIA-NeMo/ProRL-Agent-Server",
+            "finding": "GitHub 仓库页面可达，无已归档或不可用指示。",
+            "source": "https://github.com/NVIDIA-NeMo/ProRL-Agent-Server"
+          },
+          {
+            "claim": "GRPO 训练使用 SkyRL-v0-293-data 数据集 (HuggingFace)",
+            "finding": "HuggingFace 页面返回 404/不可用。数据集可能未公开或链接错误。",
+            "source": "https://huggingface.co/datasets/NovaSky-AI/SkyRL-v0-293-data"
+          },
+          {
+            "claim": "SFT 轨迹数据集在 https://huggingface.co/datasets/nvidia/polar-swegym-pi-qwen35-122b-a10b-trajectories",
+            "finding": "HuggingFace 返回 HTTP 401 未授权，可能处于私有状态。",
+            "source": "https://huggingface.co/datasets/nvidia/polar-swegym-pi-qwen35-122b-a10b-trajectories"
+          },
+          {
+            "claim": "Polar rewrites its preceding work, ProRL Agent 1 1 1 Code available at https://github.com/NVIDIA-NeMo/ProRL-Agent-Server and has been registered as one of NeMo Gym environments.",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/NVIDIA-NeMo/ProRL-Agent-Server"
+          },
+          {
+            "claim": "5-4B base checkpoint, we run standard GRPO training on the SkyRL-v0-293-data SWE-Gym dataset, 2 2 2 https://huggingface.co/datasets/NovaSky-AI/SkyRL-v0-293-data with Polar and Slime.",
+            "finding": "huggingface.co is reachable, but the page content indicates not found/unavailable.",
+            "source": "https://huggingface.co/datasets/NovaSky-AI/SkyRL-v0-293-data"
+          },
+          {
+            "claim": "3 3 3 Available at https://huggingface.co/datasets/nvidia/polar-swegym-pi-qwen35-122b-a10b-trajectories .",
+            "finding": "huggingface.co returned HTTP 401 Unauthorized.",
+            "source": "https://huggingface.co/datasets/nvidia/polar-swegym-pi-qwen35-122b-a10b-trajectories"
+          }
+        ],
+        "loadBearingClaim": "通过代理模型 API 边界捕获的 token 级信息足以重建 RL 训练所需的忠实轨迹，且该过程适用于任意基于 LLM 的 agent harness。",
+        "strongestEvidence": [
+          "表1显示 Codex harness 上 22.6 个百分点的绝对提升",
+          "图5b显示 prefix_merging 相比 per_request 获得 5.39× 加速和显著 GPU 利用率提升"
+        ],
+        "limitations": [
+          "实验仅在软件工程编码任务上验证，未涉及其他 agent 域",
+          "仅测试了 Qwen3.5-4B 一个模型和 GRPO 一种算法",
+          "SWE-Bench 结果为单次运行，无统计显著性报告",
+          "部分数据集（SkyRL-v0-293-data 和生成轨迹）无法通过公开 URL 访问，影响可复现性",
+          "per_request 策略存在奖励破坏风险，未提供解决方案"
+        ],
+        "suggestedExperiments": [
+          "在更多 agent 域（如 web 导航、操作系统交互）和多种模型规模（7B、70B、Mixture-of-Experts）上验证",
+          "比较多种 RL 算法（PPO、DPO、REINFORCE）在 Polar 上的效果",
+          "提供多次运行结果和置信区间，建立统计显著性",
+          "公开所有必需数据集或提供清晰的复现指南"
+        ]
+      },
+      "scorecard": [
+        {
+          "dimension": "问题重要性",
+          "score": 8,
+          "reason": "将现有 agent harness 纳入 RL 训练是实际需求，尤其对于闭源或复杂系统，问题重要且及时。"
+        },
+        {
+          "dimension": "系统设计",
+          "score": 7,
+          "reason": "架构清晰，解耦回滚与训练，代理捕获通用。但部分组件（如多种 API 标准化）未提供鲁棒性证明，且轨迹重建策略的通用性有限。"
+        },
+        {
+          "dimension": "算法新颖性",
+          "score": 6,
+          "reason": "核心思想（模型 API 作为接口）虽非全新，但系统化实现并验证了可行性。相比现有系统（如 Agent Lightning、rLLM）有差异化，但新颖性中等。"
+        },
+        {
+          "dimension": "实验强度",
+          "score": 5,
+          "reason": "仅一个模型（4B）、一个基准（SWE-Bench）、一个 RL 算法（GRPO），缺乏跨任务、跨算法、跨模型规模的消融。单次运行无统计显著性报告。"
+        },
+        {
+          "dimension": "泛化",
+          "score": 4,
+          "reason": "仅验证编码 agent，声称泛化但未在其它域（浏览器、操作系统、GUI）测试。模型大小和任务类型受限。"
+        },
+        {
+          "dimension": "可复现性",
+          "score": 6,
+          "reason": "代码公开（GitHub），但依赖多个外部服务（Slime、SGLang、特定 harness），部分数据集访问受限。超参数和配置已提供，但实验环境复杂。"
+        },
+        {
+          "dimension": "影响",
+          "score": 7,
+          "reason": "可能降低 agentic RL 的集成门槛，吸引更多研究者和从业者将现有 harness 用于训练。但影响程度取决于其泛化能力和社区采纳。"
+        }
+      ]
+    },
+    {
+      "id": "paper:arxiv-2605-22794",
+      "title": "MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems",
+      "authors": "Qianshu Cai, Yonggang Zhang, Xianzhang Jia, Huajiang Zheng, Wei Xue, Jun Song, Xinmei Tian, Yike Guo",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv terminal agents observability",
+      "sourceUrl": "https://arxiv.org/abs/2605.22794",
+      "verifiedAt": "2026-05-31T16:05:00.200Z",
+      "tier": "deep",
+      "leadJudgment": "MOSS argues that source-level rewriting is a fundamentally more general medium for agent self-evolution than text-mutable artifacts, and implements a production system achieving it with a deterministic pipeline and safe deployment.",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "自主代理系统在部署后基本静态，不会从用户交互中学习，重复性故障持续存在直到人为更新。现有自演化代理仅能修改文本可变工件（技能文件、提示配置、记忆模式、工作流图），而无法触及代理框架（路由、钩子顺序、状态不变性、调度），这些存在于代码中。作者认为源代码级自适应是更通用的媒介：图灵完备、是文本可变范围的严格超集、效果确定性、不受长上下文漂移侵蚀。提出MOSS系统，在生产线代理基板上执行源代码级自重写，以自动组织的生产线故障证据批次为基础，通过确定性多阶段流水线进行，代码修改委托给可插拔外部编码代理CLI，候选版本通过重放批次验证，最终通过用户同意门控的就地容器替换和健康探测门控回滚部署。在OpenClaw上，单周期内将四个任务的平均评分从0.25提升到0.61，无需人工干预。",
+          "loadBearing": "源代码级自适应是比文本可变范围更通用的媒介，必须能触及框架层。",
+          "evidence": "论文通过论证和OpenClaw案例提供支持。论证指出编程语言是图灵完备的，因此源代码设计空间是通用搜索空间。案例中，MOSS的框架级修复（工具结果处理覆盖缺口和批处理shell模式禁用）将评分从0.25提升到0.61，且故障模式在文本可变工件层无法修复。"
+        },
+        {
+          "heading": "1. 引言",
+          "summary": "应用级自主代理系统（如OpenClaw）已投入生产，但部署后静态，不学习使用模式。现有自演化代理（Hermes Agent、SkillClaw等）仅能修改文本可变工件，忽略代理框架。框架级故障（误路由、钩子顺序错误、会话状态损坏）无法通过提示或技能更新修复。作者提出源代码级自适应的四个优势：图灵完备、超集、确定性、不易受长上下文漂移影响。学术工作（SICA、Darwin Gödel Machine等）已在最小化支架上实现源代码级自演化，但生产级环境有不同挑战：代码库大、无基准分数、实时用户流量必须保持不变。MOSS是首个在生产级框架上实现全面源代码级自演化的系统。",
+          "loadBearing": "框架级故障无法通过文本可变工件修复，因此必须进行源代码级修改。",
+          "evidence": "论文通过表1对比了现有系统与MOSS的演化范围。现有系统均未覆盖框架（Harness），而MOSS覆盖了技能、提示、记忆和框架。论文还引用学术工作（Robeyns et al., 2025等）证明源代码级自演化在最小化支架上可行，但生产级工程挑战不同。"
+        },
+        {
+          "heading": "2. 系统架构",
+          "summary": "MOSS由五个部分组成：主容器（运行用户面向代理）、控制面CLI（通过系统提示注入暴露演化生命周期）、可插拔外部编码代理CLI（宿主端子进程）、宿主守护进程（监督容器生命周期、自动扫描、交换）、临时试验工作者（验证候选版本）。MOSS基于OpenClaw构建，但设计可适配其他主流代理基板。控制面CLI通过moss evo命令暴露，异步通知通过Webhook传递。编码代理CLI通过四方法运行器接口抽象，可插拔。宿主守护进程负责容器交换、试验工作者管理和自动扫描。用户状态卷使得容器交换后状态保留。",
+          "loadBearing": "MOSS的模块化设计使得演化调度与代码修改分离，确保可扩展性和安全性。",
+          "evidence": "论文详细描述了每个组件的功能和交互，包括CLI命令、Webhook事件、宿主守护进程的职责。代码修改委托给外部编码代理，MOSS自身仅负责阶段排序和判定。"
+        },
+        {
+          "heading": "3. 演化过程",
+          "summary": "演化过程以生产线故障证据批次为基础，通过有界迭代循环进行。首先，自动扫描（通过catch-up）和用户标记（flag）收集故障片段，形成批次。然后，进行预循环基线评估，锁定关键点集。每个迭代包含七个阶段：定位（Locate）、规划（Plan）、规划审查（Plan-Review）、实施（Implement）、代码审查（Code-Review）、任务评估（Task-Evaluate）、判定（Verdict）。审查阶段有内部重试循环。验证通过临时试验工作者在候选镜像上重放批次任务进行，每个任务多次试验。收敛后，通过用户同意门控的就地容器替换部署，伴随健康探测和回滚。",
+          "loadBearing": "有界迭代循环和门控审查机制确保演化方向正确且安全。",
+          "evidence": "论文描述了阶段顺序和判定逻辑（收敛、需要更多工作、模型/架构根本限制），以及迭代深度拨盘（轻、标准、深）。容器交换使用文件轮询和健康探测，90秒窗口内三次通过提交，否则回滚。"
+        },
+        {
+          "heading": "4. 案例研究",
+          "summary": "使用OpenClaw（DeepSeek V3.2）进行案例研究，输入四个合规审计任务（来自claweval）。基线平均评分0.2526，在工具排序和信息提取上薄弱。MOSS通过定位框架级问题（工具结果处理覆盖缺口、批量shell模式），进行了两处源级修改：添加注释分支和预调用拒绝门，修改了三个文件共177行插入、1行删除。迭代1后，平均评分提升至0.6100，最大增益在T138（0.2090→0.9049）。SLA合规任务从半答案变为完整分类和摘要。",
+          "loadBearing": "框架级修改是评分提升的直接原因。",
+          "evidence": "表2展示了每个任务和平均评分。基线0.2526，迭代1 0.6100，提升0.3574。论文指出模型和任务定义不变，只有框架发生了变化。试验工作者重放批次确保结果可靠。"
+        },
+        {
+          "heading": "5. 相关工作",
+          "summary": "回顾了代理系统（从ReAct到OpenClaw）和自演化代理两个分支。学术分支（SICA、Darwin Gödel Machine、HyperAgents、Meta-Harness）在最小化支架上实现源代码级自演化。应用分支（Hermes Agent、SkillClaw等）仅修改文本可变工件。MOSS结合了两者：在应用级基板上进行源代码级演化，包含框架层，并使用生产线故障信号代替基准分数。",
+          "evidence": "论文引用相关文献并总结差异，表1已展示范围对比。"
+        },
+        {
+          "heading": "6. 结论",
+          "summary": "重申源代码级自适应是更通用的媒介，MOSS是首次在生产级代理基板上实现全面源代码级自演化的系统。通过自动故障批处理、确定性流水线、可插拔编码代理、临时试验工作者和安全的容器交换，MOSS将自演化从文本工件扩展到框架。在OpenClaw上单周期内将评分从0.25提升到0.61。",
+          "evidence": "论文总结系统组件和实验结果，但未提供进一步证据。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文未明确说明局限性，但提及案例研究仅使用四个任务和单次迭代，且基准批次为受控设置，可能不反映真实用户会话的复杂性；此外，仅测试了OpenClaw和DeepSeek V3.2模型。未来工作可能包括更多任务、多轮迭代、其他模型和基板。",
+        "evidenceNotes": "案例研究证据来自四个claw eval任务，单次迭代，仅OpenClaw和DeepSeek V3.2。评分提升0.3574，但未报告方差或统计显著性。代码修改量小（177行插入），但通用性未测试。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Tool Use",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems"
+        ],
+        "ideaSignal": "deep_dive:92+ahe:agent harness"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.22794",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.22794v2",
+      "publishedAt": "2026-05-21T17:48:33Z",
+      "deepDive": {
+        "reframe": "MOSS是一个生产级代理框架的自我修正系统，通过源代码级修改修复框架级故障，本质上是将代理演化从行为层面（提示、技能）延伸到执行层面（代码）。",
+        "contributionLayers": [
+          {
+            "layer": "问题定义",
+            "claim": "框架级故障无法通过文本可变工件修复，因此需要源代码级修改。",
+            "judgment": "合理且重要，但框架级故障的具体比例未量化。"
+          },
+          {
+            "layer": "系统架构",
+            "claim": "MOSS的模块化设计（可插拔编码代理、宿主守护进程、试验工作者）使得生产级源代码级自演化可行。",
+            "judgment": "设计合理，但复杂性可能引入新故障点。"
+          },
+          {
+            "layer": "演化流程",
+            "claim": "有界迭代循环和门控审查确保演化方向正确且安全。",
+            "judgment": "流程详细，但停止条件（如收敛判定）依赖于主观评分。"
+          },
+          {
+            "layer": "案例验证",
+            "claim": "单次迭代将四个任务平均评分从0.25提升到0.61。",
+            "judgment": "证据显示提升，但样本小且无统计检验，需更多实验。"
+          }
+        ],
+        "mechanism": "MOSS通过自动扫描收集生产线故障批次，然后进行有界迭代：每次迭代内，编码代理CLI在宿主守护进程管理下执行定位、规划、实现、审查、评估和判定。候选版本通过临时容器中重放批次任务验证，通过后由用户授权进行就地容器替换（健康探测门控回滚）。核心洞察是将代码修改委托给外部编码代理，而MOSS负责安全编排。",
+        "evidenceChain": [
+          {
+            "component": "预循环基线（四个claw eval任务）",
+            "metrics": [
+              {
+                "label": "T141zh_sla_compliance_audit",
+                "value": "0.3273",
+                "note": "来自表2"
+              },
+              {
+                "label": "T142_sla_compliance_audit",
+                "value": "0.2527",
+                "note": "来自表2"
+              },
+              {
+                "label": "T137zh_restock_chain_check",
+                "value": "0.2213",
+                "note": "来自表2"
+              },
+              {
+                "label": "T138_restock_chain_check",
+                "value": "0.2090",
+                "note": "来自表2"
+              },
+              {
+                "label": "mean",
+                "value": "0.2526",
+                "note": "来自表2"
+              }
+            ],
+            "reviewerNote": "基线分数低（0.21-0.33），显示框架级故障导致较差表现。"
+          },
+          {
+            "component": "迭代1结果（相同四个任务）",
+            "metrics": [
+              {
+                "label": "T141zh_sla_compliance_audit",
+                "value": "0.5330",
+                "note": "来自表2"
+              },
+              {
+                "label": "T142_sla_compliance_audit",
+                "value": "0.5453",
+                "note": "来自表2"
+              },
+              {
+                "label": "T137zh_restock_chain_check",
+                "value": "0.4567",
+                "note": "来自表2"
+              },
+              {
+                "label": "T138_restock_chain_check",
+                "value": "0.9049",
+                "note": "来自表2"
+              },
+              {
+                "label": "mean",
+                "value": "0.6100",
+                "note": "来自表2"
+              }
+            ],
+            "reviewerNote": "提升显著，尤其是T138。但T137zh仍低于0.5，表明某些任务需要更多迭代。没有提供置信区间或统计检验。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "GitHub: https://github.com/hkgai-official/Moss",
+            "finding": "仓库页面可访问，未发现关闭或归档警告。",
+            "source": "https://github.com/hkgai-official/Moss"
+          },
+          {
+            "claim": "Claude Code (Anthropic, 2025) 作为可插拔编码代理示例。",
+            "finding": "Anthropic项目页面可访问，描述匹配。",
+            "source": "https://www.anthropic.com/claude-code"
+          },
+          {
+            "claim": "DeepSeek-TUI 作为可插拔编码代理示例。",
+            "finding": "GitHub仓库可访问。",
+            "source": "https://github.com/Hmbown/DeepSeek-TUI"
+          },
+          {
+            "claim": "OpenAI Codex CLI 作为可插拔编码代理示例。",
+            "finding": "GitHub仓库可访问。",
+            "source": "https://github.com/openai/codex"
+          },
+          {
+            "claim": "OpenCode 作为可插拔编码代理示例。",
+            "finding": "项目页面可访问。",
+            "source": "https://opencode.ai"
+          },
+          {
+            "claim": "GitHub: https://github.com/hkgai-official/Moss .",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/hkgai-official/Moss"
+          },
+          {
+            "claim": "Note: https://www.anthropic.com/claude-code Anthropic’s command-line coding agent for the Claude model family.",
+            "finding": "www.anthropic.com project page is reachable: Claude Code by Anthropic | AI Coding Agent, Terminal, IDE Skip to main content Meet Claude Products Claude Claude Code Claude Cowork Claude Security Features Cl.",
+            "source": "https://www.anthropic.com/claude-code"
+          },
+          {
+            "claim": "Note: https://github.com/Hmbown/DeepSeek-TUI Terminal-UI coding agent for DeepSeek models.",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/Hmbown/DeepSeek-TUI"
+          },
+          {
+            "claim": "Note: https://github.com/openai/codex Open-source command-line coding agent backed by OpenAI models.",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/openai/codex"
+          },
+          {
+            "claim": "Note: https://opencode.ai Multi-provider open-source coding-agent CLI.",
+            "finding": "opencode.ai project page is reachable: OpenCode | The open source AI coding agent.",
+            "source": "https://opencode.ai"
+          }
+        ],
+        "loadBearingClaim": "源代码级修改可以修复框架级故障，且效果优于仅修改文本可变工件。",
+        "strongestEvidence": [
+          "表2中四任务平均评分从0.2526提升至0.6100",
+          "论文指出模型和任务不变，仅框架修改，从而隔离了原因"
+        ],
+        "limitations": [
+          "案例研究仅使用四个任务和单次迭代",
+          "仅测试了OpenClaw和DeepSeek V3.2",
+          "未提供多轮迭代或多模型对比实验",
+          "未报告方差或统计显著性",
+          "可复现性依赖于GitHub仓库，但未提供完整的人工制品（如Docker镜像、故障批次数据）"
+        ],
+        "suggestedExperiments": [
+          "在更多基板（如Claude助手）上重复实验",
+          "使用多个模型（如GPT-4、Gemini）测试通用性",
+          "进行多轮迭代（如5轮）以观察收敛行为",
+          "对比仅修改文本工件的基线系统（如Hermes Agent）",
+          "在真实用户会话上评估，不仅限于基准批次"
+        ]
+      },
+      "scorecard": [
+        {
+          "dimension": "问题重要性",
+          "score": 8,
+          "reason": "代理系统的自我演化是一个重要问题，尤其是框架级故障无法通过文本修改修复。MOSS直接解决了这一限制。"
+        },
+        {
+          "dimension": "系统设计",
+          "score": 9,
+          "reason": "系统设计清晰，模块化，包含控制面、可插拔编码代理、宿主守护进程、试验工作者等，确保了可扩展性和安全性。容器交换和回滚机制设计合理。"
+        },
+        {
+          "dimension": "算法新颖性",
+          "score": 7,
+          "reason": "源代码级自演化在学术支架上已有先例，但MOSS将其扩展到生产级系统，并设计了有界迭代循环和网关审查，提供了一定的新颖性。"
+        },
+        {
+          "dimension": "实验强度",
+          "score": 5,
+          "reason": "案例研究仅包含四个任务和单次迭代，未进行多轮或多模型实验，也未与基线系统（如仅文本修改的演化）对比。证据强度有限。"
+        },
+        {
+          "dimension": "泛化",
+          "score": 4,
+          "reason": "仅测试了OpenClaw和DeepSeek V3.2，且任务类型单一（合规审计）。泛化到其他基板、任务和模型的能力未验证。"
+        },
+        {
+          "dimension": "可复现性",
+          "score": 7,
+          "reason": "论文提供了GitHub仓库，外部审计显示可达；但未提供人工制品（如Docker镜像、数据集），且案例研究使用受控批次而非真实用户会话，可能影响复现。"
+        },
+        {
+          "dimension": "影响",
+          "score": 8,
+          "reason": "如果系统被业界采用，将改变代理自我演化的方式，尤其是框架级修复。但需要更多证据支持其通用性和稳定性。"
+        }
+      ]
+    },
+    {
+      "id": "paper:arxiv-2605-26546",
+      "title": "MobileExplorer: Accelerating On-Device Inference for Mobile GUI Agents via Online Exploration",
+      "authors": "Runxi Huang, Liyu Zhang, Shengzhong Liu, Xiaomin Ouyang",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv terminal agents observability",
+      "sourceUrl": "https://arxiv.org/abs/2605.26546",
+      "verifiedAt": "2026-05-31T16:04:20.327Z",
+      "tier": "deep",
+      "leadJudgment": "MobileExplorer proposes overlapping VLM inference with online UI exploration to reduce latency for on-device mobile GUI agents.",
+      "sections": [
+        {
+          "heading": "引言",
+          "summary": "移动GUI代理多依赖云端模型，带来隐私和延迟问题。视觉基础方法优于文本，但VLM推理计算量大、延迟高。现有加速方法（多步规划、验证器、剪枝）各有局限。MobileExplorer利用VLM推理空闲时间进行并行在线探索，收集UI上下文以减少后续步骤，从而降低整体延迟。",
+          "loadBearing": "移动GUI代理中VLM推理时间未被利用是效率低下的关键原因。",
+          "evidence": "论文通过测量MAI-UI-2B在Samsung Galaxy S24上每步延迟约40秒，指出推理时间远长于UI交互时间（1-2秒）。",
+          "fold": "文献[1,2]等提供背景，图2展示视觉模型主导基准但延迟高。"
+        },
+        {
+          "heading": "相关工作",
+          "summary": "回顾移动GUI代理系统（文本/视觉基础）、设备端部署方法（AutoDroid等）和离线知识库构建（GUI-explorer等）。指出现有方法要么依赖云推理，要么需要离线预计算，无法适应动态界面。MobileExplorer是首个在线探索方法。",
+          "loadBearing": "现有在线探索方法缺失。",
+          "evidence": "论文对比了AutoDroid、V-Droid、GUI-explorer等，指出它们或使用云端、或依赖离线预构建知识。"
+        },
+        {
+          "heading": "动机研究",
+          "summary": "通过实验量化设备端VLM推理延迟：在S24上，2B模型每步约10-20秒，8B模型约30秒。UI交互仅需1-2秒。任务需要多步（15-20步），总延迟高。因此，推理空闲时间是可利用的机会。",
+          "loadBearing": "推理空闲时间占主导，UI交互快，可并行探索。",
+          "evidence": "图3b显示不同模型延迟，图3a展示步骤数分布。论文实测：MAI-UI-2B在S24上单步推理约10-20秒。"
+        },
+        {
+          "heading": "系统概览",
+          "summary": "MobileExplorer将VLM推理与在线探索并行化。每步中，推理进行的同时，系统解析当前屏幕可交互元素，基于任务相关性选择少量元素进行轻量级点击探索，并通过两级回滚恢复初始状态。探索结果被总结为提示注入下一轮推理。所有处理本地进行。",
+          "loadBearing": "并行探索不增加额外延迟。",
+          "evidence": "论文声称探索在推理窗口内完成，且两级回滚保证状态一致。"
+        },
+        {
+          "heading": "设计细节",
+          "summary": "形式化问题：最大化任务成功概率，受延迟预算约束。探索策略：从无障碍树提取UI元素，用轻量嵌入计算与任务的相关性，并惩罚已探索元素。两级回滚：一级深度受限回溯（pHash验证），失败则回家重放动作序列。探索增强推理：只选择与后续屏幕匹配的探索观察，生成紧凑提示。",
+          "loadBearing": "任务相关性驱动的探索和两级回滚是保证有效性的关键设计。",
+          "evidence": "算法1描述了整个探索与回滚流程。论文提出公式(4)-(9)定义相关性、回滚验证和观察匹配。"
+        },
+        {
+          "heading": "评估",
+          "summary": "在AndroidWorld基准和真实场景上评估。使用S24、Jetson、MacBook三种设备。与M3A、T3A、输入剪枝、离线探索对比。主要结果：MobileExplorer成功率50.86%（最高），比M3A提高9.3%；平均步骤9.24（减少15.5%）；端到端延迟185.82秒（减少15.9%）。真实案例（复杂UI、中断、资源动态）也显示优势。消融研究验证各组件重要性。",
+          "loadBearing": "MobileExplorer在任务成功率和效率上均优于基线。",
+          "evidence": "表3：成功率50.86%（59/116），M3A 46.55%。图8a/b显示延迟和步骤。图12消融：移除回滚机制成功率降至39.7%。报告了具体数字：平均步骤9.24 vs 10.93，延迟185.82s vs 221.1s（估算）。",
+          "fold": "消融实验还显示随机探索降至42.2%，无对齐降至47.4%。模型大小和分辨率实验表明方法鲁棒。"
+        },
+        {
+          "heading": "结论与讨论",
+          "summary": "总结MobileExplorer通过在线探索利用推理空闲时间，减少交互步骤和延迟。未来工作包括自适应探索策略和更复杂的探索-推理交互。",
+          "loadBearing": "未来需要更自适应和复杂的探索策略。",
+          "evidence": "论文明确提及未来工作方向。"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "未来将探索自适应探索策略和更复杂的探索-推理交互。论文未明确讨论当前局限性。",
+        "evidenceNotes": "评估在AndroidWorld（116个任务）和自定义任务上进行，任务类型有限。硬件仅覆盖三款设备。模型仅用4B为主，偶用2B/8B。探索依赖于无障碍树，在非Android系统或无障碍树不完整的场景下可能受限。两级回滚在复杂页面的二级恢复可能增加延迟。代码尚未公开，可复现性受限。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Multimodal UI",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability"
+        ],
+        "ideaSignal": "deep_dive:92+ahe:observability"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.26546",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.26546v1",
+      "publishedAt": "2026-05-26T04:53:53Z",
+      "deepDive": {
+        "reframe": "MobileExplorer是一个通过在线UI探索来减少设备端VLM推理次数的系统，本质上是利用空闲时间进行推理结果增强，而非真正加速单次推理。",
+        "contributionLayers": [
+          {
+            "layer": "系统架构",
+            "claim": "将推理与探索并行化，不增加端到端延迟。",
+            "judgment": "合理且有效，但探索本身仍会消耗少量资源（<1秒），且回滚可能失败增加开销。"
+          },
+          {
+            "layer": "探索策略",
+            "claim": "任务相关性驱动选择，避免冗余探索。",
+            "judgment": "简单有效，但依赖文本嵌入质量，可能忽略图标语义。"
+          },
+          {
+            "layer": "回滚机制",
+            "claim": "两级回滚保证在动态环境中可靠恢复状态。",
+            "judgment": "稳健但二级恢复代价较高（回家重放），在深度探索时可能接近推理时间。"
+          }
+        ],
+        "mechanism": "在每步VLM推理期间，系统并行地解析当前屏幕的可交互元素，用轻量文本嵌入计算与任务的相关性，选择最高分的几个元素进行点击探索（深度≤d）。探索后通过pHash比较回溯，若失败则回Home并重放历史动作恢复原状态。探索结果（屏幕元素）被过滤对齐后，生成简洁提示加入下一步推理，使模型获得额外上下文，减少后续尝试次数。",
+        "evidenceChain": [
+          {
+            "component": "AndroidWorld 整体性能",
+            "metrics": [
+              {
+                "label": "成功率",
+                "value": "50.86%",
+                "note": "59/116 任务"
+              },
+              {
+                "label": "平均步骤数",
+                "value": "9.24",
+                "note": "M3A为10.93"
+              },
+              {
+                "label": "端到端延迟",
+                "value": "185.82s",
+                "note": "M3A为221.1s（估计）"
+              }
+            ],
+            "reviewerNote": "结果来自4B模型和特定硬件，改进幅度中等，但为一致改进。消融实验表明每组件都有贡献。"
+          },
+          {
+            "component": "消融实验",
+            "metrics": [
+              {
+                "label": "随机探索成功率",
+                "value": "42.2%"
+              },
+              {
+                "label": "无回滚成功率",
+                "value": "39.7%"
+              },
+              {
+                "label": "无对齐成功率",
+                "value": "47.4%"
+              }
+            ],
+            "reviewerNote": "回滚是最关键组件，移除后成功率降幅最大，表明状态恢复至关重要。"
+          },
+          {
+            "component": "真实案例实验",
+            "metrics": [
+              {
+                "label": "复杂UI成功率提升",
+                "value": "约5%"
+              }
+            ],
+            "reviewerNote": "仅展示有限任务，但表明方法在现实场景亦有收益。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "视频演示链接可访问",
+            "finding": "youtu.be链接可达，视频标题与论文一致。",
+            "source": "https://youtu.be/thK7MJmdlvM"
+          },
+          {
+            "claim": "代码将在论文接受后发布",
+            "finding": "论文声明代码将发布，但当前未提供。",
+            "source": "论文第1页脚注"
+          },
+          {
+            "claim": "A video demonstration of MobileExplorer performance in the real world is available at https://youtu.be/thK7MJmdlvM .",
+            "finding": "youtu.be project page is reachable: MobileExplorer: Accelerating On-Device Inference for Mobile GUI Agents via Online Exploration - YouTube About Press Copyright Contact us Creators Advertise Deve.",
+            "source": "https://youtu.be/thK7MJmdlvM"
+          }
+        ],
+        "loadBearingClaim": "在VLM推理期间进行在线探索可以缩短后续推理步骤，从而降低端到端延迟，且不损害任务成功率。",
+        "strongestEvidence": [
+          "AndroidWorld上成功率50.86%为所有对比方法最高",
+          "平均步骤减少15.5%（9.24 vs 10.93）",
+          "回滚机制消融实验显示移除后成功率从50.9%降至39.7%"
+        ],
+        "limitations": [
+          "代码未公开，可复现性受限",
+          "评估仅限Android平台，依赖无障碍树",
+          "任务数量有限（116个AndroidWorld任务），覆盖应用范围小",
+          "探索策略模型规模有限（2B/4B/8B），未测试更大模型",
+          "两级回滚在复杂导航中可能失败或延迟高",
+          "未与离线知识库方法（如GUI-Explorer）公平比较计算成本"
+        ],
+        "suggestedExperiments": [
+          "在更多样化的移动应用（如iOS）上评估泛化能力",
+          "与基于图构建的离线探索方法比较计算-收益比",
+          "测试探索深度d和惩罚系数λ的敏感度",
+          "在更长任务序列（>30步）上评估鲁棒性",
+          "在无无障碍树环境下使用纯视觉UI元素检测"
+        ]
+      },
+      "scorecard": [
+        {
+          "dimension": "问题重要性",
+          "score": 8,
+          "reason": "移动端AI代理的隐私和延迟是实际部署的关键瓶颈，论文直击痛点。但已有一些设备端工作（如AutoDroid），所以非完全空白。"
+        },
+        {
+          "dimension": "系统设计",
+          "score": 8,
+          "reason": "并行探索与两级回滚设计合理，模块清晰。但探索依赖于无障碍树且未考虑其不可用场景。"
+        },
+        {
+          "dimension": "算法新颖性",
+          "score": 7,
+          "reason": "利用推理空闲时间进行在线探索的想法新颖，但部分组件（如嵌入排序、回滚）来自现有技术组合。"
+        },
+        {
+          "dimension": "实验强度",
+          "score": 7,
+          "reason": "在AndroidWorld和真实场景评估，覆盖多种设备和模型。但任务数有限（116），且未与更多基线（如更近期的UI-TARS）比较。"
+        },
+        {
+          "dimension": "泛化",
+          "score": 5,
+          "reason": "仅评估Android平台和有限应用；探索策略依赖无障碍树，非通用。"
+        },
+        {
+          "dimension": "可复现性",
+          "score": 3,
+          "reason": "代码将在接受后发布，目前不可用；实验细节（如超参数、随机种子）未完全披露。"
+        },
+        {
+          "dimension": "影响",
+          "score": 7,
+          "reason": "对移动端GUI代理的实际部署有直接推动，但效果改进幅度中等（15-23%），且需要设备支持本地VLM。"
+        }
+      ]
+    },
+    {
+      "id": "paper:arxiv-2605-27328",
+      "title": "Governed Evolution of Agent Runtimes through Executable Operational Cognition",
+      "authors": "Mariano Garralda-Barrio",
+      "venue": "Venue not provided",
+      "sourceName": "arXiv terminal agents observability",
+      "sourceUrl": "https://arxiv.org/abs/2605.27328",
+      "verifiedAt": "2026-05-31T16:06:19.140Z",
+      "tier": "deep",
+      "leadJudgment": "这篇论文为智能体运行时工件的演化提出了一个治理框架",
+      "sections": [
+        {
+          "heading": "摘要",
+          "summary": "论文提出一个框架，用于多智能体系统中通过可执行操作认知进行受控运行时演化。将智能体生成的工件形式化为持久的运行时能力，并引入 HarnessMutation 作为受治理的变异机制，在显式验证、可追溯、评估和回滚约束下运行。",
+          "loadBearing": "智能体生成的工件应被视为持久的运行时能力，而非瞬态输出",
+          "evidence": "基于 Code as Agent Harness 观点，但无直接实验证据"
+        },
+        {
+          "heading": "1 引言",
+          "summary": "指出当前智能体系统中代码作为可执行操作基质，但治理和生命周期管理不足。提出三个概念层次：工件、能力、操作认知。贡献包括可执行操作认知、HarnessMutation、生命周期治理、知识图谱运行时图和治理导向架构。",
+          "loadBearing": "运行时演化应作为有界、可观察、可治理的优化过程",
+          "evidence": "引用了相关文献，但无实证数据"
+        },
+        {
+          "heading": "2 背景与相关工作",
+          "summary": "讨论 Code as Agent Harness、代码中心推理、技能优化、运行时基础设施和自适应系统。指出这些工作未解决工件演化治理问题。",
+          "loadBearing": "现有系统缺少对智能体生成工件治理的明确机制",
+          "evidence": "引用 Voyager、SkillOpt 等论文作为先例，但无本论文实验"
+        },
+        {
+          "heading": "3 工件演化问题",
+          "summary": "定义工件演化问题：智能体生成的工件可能在局部有用但全局不安全，需要决定其生命周期。该问题不能仅靠记忆或工具调用解决。",
+          "loadBearing": "工件演化是 harness 级别的优化问题",
+          "evidence": "论证逻辑清晰，但无定量证据"
+        },
+        {
+          "heading": "4 从智能体发起工件到可执行操作认知",
+          "summary": "定义可执行操作认知为持久操作表示，影响未来行为。区分三个层次：本地工件、反馈驱动执行、持久能力。图1展示这一转变。",
+          "loadBearing": "工件成为操作认知需要经历评估、治理和重用",
+          "evidence": "概念框架，无实验数据"
+        },
+        {
+          "heading": "5 面向 Harness 的操作模型",
+          "summary": "定义可执行 harness 的形式化模型，包含提示策略、工具、评估器、记忆、治理、工件和知识。引入多维度治理感知目标函数。",
+          "loadBearing": "harness 配置的价值不仅在于当前任务，还在于生成可重用工件",
+          "evidence": "形式化定义，无实证"
+        },
+        {
+          "heading": "6 受治理的工件演化",
+          "summary": "引入 HarnessMutation 作为受控变换，生命周期状态（实验、验证、信任、经典、弃用），以及生命周期治理选择。",
+          "loadBearing": "变异必须携带变更合约，且只通过治理的候选才能被采纳",
+          "evidence": "参考 SkillOpt 作为例子，但无本论文实验"
+        },
+        {
+          "heading": "7 知识导向的操作认知",
+          "summary": "引入知识导向运行时图（Runtime Graph），表示节点和关系，用于治理工件关联和组合。定义质量分数和组合操作。",
+          "loadBearing": "运行时图使得工件关系可检查、可治理",
+          "evidence": "架构描述，无实证"
+        },
+        {
+          "heading": "8 基于现代智能体运行时的原型架构",
+          "summary": "描述在 LangGraph 和 DeepAgents 上实现的原型架构，分离运行时和治理层。引用参考实现代码。",
+          "loadBearing": "原型展示了如何将治理层集成到现有运行时",
+          "evidence": "代码仓库存在，但未提供性能或有效性数据"
+        },
+        {
+          "heading": "9 示例操作场景",
+          "summary": "通过一个规范化脚本的例子说明工件如何进入候选、验证、提升或弃用生命周期。",
+          "loadBearing": "示例说明治理流程",
+          "evidence": "概念示例，无实证"
+        },
+        {
+          "heading": "10 治理与可观测性",
+          "summary": "强调治理感知可观测性、运行 lineage 的重要性，以及治理是运行时语义的一部分。",
+          "loadBearing": "持久工件相当于治理决策",
+          "evidence": "论证，无数据"
+        },
+        {
+          "heading": "11 分布式运行时含义",
+          "summary": "讨论在分布式环境中，工件成为协调结构，带来一致性、版本控制等挑战。",
+          "loadBearing": "分布式治理需要一致性、审计和回滚",
+          "evidence": "概念讨论"
+        },
+        {
+          "heading": "12 讨论",
+          "summary": "将框架定位为介于无限制自我修改和提示优化之间，指出开放挑战。",
+          "loadBearing": "框架聚焦于工件治理，而非全面自我改进",
+          "evidence": "元讨论，无新证据"
+        },
+        {
+          "heading": "13 局限与未来工作",
+          "summary": "论文是架构性贡献，无大规模基准测试。未来需评估具体实现、基准合成等。运行时图仍是抽象。",
+          "loadBearing": "论文本身不提供实证验证",
+          "evidence": "明确说明无实验"
+        },
+        {
+          "heading": "14 结论",
+          "summary": "总结可执行操作认知、HarnessMutation、生命周期治理、运行时图和可观测性的主要贡献。",
+          "loadBearing": "未来智能体系统可能通过工件的受控积累和变异演化",
+          "evidence": "结论性陈述"
+        }
+      ],
+      "limitsAndFuture": {
+        "paperStated": "论文明确声明是架构性和概念性贡献，未提供大规模基准测试，运行时图仍为抽象。未来需评估具体实现、回归感知变异策略、图指导组合等。",
+        "evidenceNotes": "论文无实证数据，所有机制均为概念设计。原型代码存在但未经过系统实验。引用文献中部分有实验，但本论文未复现或扩展。"
+      },
+      "selection": {
+        "convergence": [
+          "arXiv"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Agent Harness / Observability",
+          "RAG / Knowledge Systems",
+          "Evaluation / Benchmarks"
+        ],
+        "ideaSignal": "deep_dive:91+ahe:agent harness"
+      },
+      "provenance": {
+        "sourceUrl": "https://arxiv.org/abs/2605.27328",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.27328v1",
+      "publishedAt": "2026-05-26T17:36:48Z",
+      "deepDive": {
+        "reframe": "这篇论文不是提出一个可立即部署的算法或系统，而是为未来研究提供一个形式化的问题框架和架构蓝图，聚焦于如何让智能体生成的代码工件从临时输出转化为受治理的持久能力。",
+        "contributionLayers": [
+          {
+            "layer": "概念层",
+            "claim": "可执行操作认知：智能体生成的工件可以成为持久运行时能力。",
+            "judgment": "合理且及时的概念化，但并非全新观察，而是基于现有工作的明确形式化。"
+          },
+          {
+            "layer": "机制层",
+            "claim": "HarnessMutation：受治理的变异机制，包含变更合约和回滚条件。",
+            "judgment": "设计简洁，但缺乏对具体变异类型和约束的详细探讨。"
+          },
+          {
+            "layer": "架构层",
+            "claim": "知识导向运行时图：表示工件间关系以支持治理。",
+            "judgment": "架构完整，但实现复杂度和扩展性未讨论。"
+          },
+          {
+            "layer": "运营层",
+            "claim": "生命周期状态机和生命周期治理选择作为优化过程。",
+            "judgment": "将工件管理问题形式化为优化问题，但目标函数中的权重分配和实际效用未经验证。"
+          }
+        ],
+        "mechanism": "论文提出一个分层的治理框架：智能体在任务中生成工件（代码、测试等），这些工件通过评估、验证、生命周期状态转换和运行时图记录，最终只有经过治理审查的工件才能成为持久能力。HarnessMutation 作为受控的修改操作，必须携带变更合约，经过验证和回滚条件才能应用。运行时图记录所有工件、关系、变异历史，支持审计和组合。",
+        "evidenceChain": [
+          {
+            "component": "无实验组件",
+            "metrics": [],
+            "reviewerNote": "论文无任何数字结果或实验，所有主张均为概念性。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "参考实现代码仓库位于 https://github.com/mgarralda/governed-runtime",
+            "finding": "仓库页面可达，无归档或未找到警告，但未说明代码是否可运行或包含实验。",
+            "source": "https://github.com/mgarralda/governed-runtime"
+          },
+          {
+            "claim": "The reference implementation, governance specifications, evaluation pipelines, and observability integrations will be publicly released at: https://github.com/mgarralda/governed-runtime Acknowledgements The author acknowledges the Laboratorio de Innovación Aplicada (L2IA) at Minsait (Indra Group) for fostering exploration and research in AI systems, distribu",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/mgarralda/governed-runtime"
+          }
+        ],
+        "loadBearingClaim": "智能体生成的工件必须通过治理机制（验证、生命周期、变异控制、运行时图）才能持久化并影响未来行为，否则会导致能力漂移和不可审计性。",
+        "strongestEvidence": [
+          "参考实现代码仓库存在（外部审计确认可达）"
+        ],
+        "limitations": [
+          "无任何实验验证或基准测试",
+          "运行时图仅为架构抽象，未实现或评估",
+          "论文未讨论变异的具体实现复杂度",
+          "可复现性受限：只有代码，无数据或实验结果可复现"
+        ],
+        "suggestedExperiments": [
+          "在 SWE-bench 或类似基准上比较有治理与无治理的工件演化质量",
+          "测量不同生命周期策略对任务成功率、稳定性和可审计性的影响",
+          "评估运行时图大小对查询延迟和准确性的影响"
+        ]
+      },
+      "scorecard": [
+        {
+          "dimension": "问题重要性",
+          "score": 7,
+          "reason": "智能体运行时工件治理是重要且现实的问题，已有Code as Agent Harness等背景，但缺乏系统框架。"
+        },
+        {
+          "dimension": "系统设计",
+          "score": 6,
+          "reason": "提出了完整的架构组件（HarnessMutation、生命周期、运行时图），但缺乏实现细节和与现有系统的比较。"
+        },
+        {
+          "dimension": "算法新颖性",
+          "score": 5,
+          "reason": "概念新颖，将治理引入工件演化，但主要基于现有工作的形式化组合，没有全新算法。"
+        },
+        {
+          "dimension": "实验强度",
+          "score": 1,
+          "reason": "无任何实验或定量结果，仅提供概念示例和原型架构。"
+        },
+        {
+          "dimension": "泛化",
+          "score": 2,
+          "reason": "未展示跨领域或跨任务的有效性，泛化能力未验证。"
+        },
+        {
+          "dimension": "可复现性",
+          "score": 5,
+          "reason": "有参考实现代码仓库，但缺乏实验环境和数据，无法复现结果。"
+        },
+        {
+          "dimension": "影响",
+          "score": 6,
+          "reason": "概念可能影响未来智能体系统设计，但需后续实证工作验证。"
+        }
+      ]
+    },
     {
       "id": "paper:arxiv-2605-27922",
       "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
@@ -8,21 +1021,60 @@
       "venue": "Venue not provided",
       "sourceName": "arXiv terminal agents observability",
       "sourceUrl": "https://arxiv.org/abs/2605.27922",
-      "verifiedAt": "2026-05-31T15:23:13.405Z",
+      "verifiedAt": "2026-05-31T16:07:01.540Z",
       "tier": "deep",
-      "leadJudgment": "该论文引入了Harness-Bench，一个诊断基准，用于量化不同模型-配置组合下的harness效应。",
+      "leadJudgment": "本文提出一个诊断性基准Harness-Bench，用于系统评估不同harness配置（而非仅基础模型）对LLM agent在真实工作流中性能的影响，并揭示执行对齐失败模式。",
       "sections": [
         {
           "heading": "摘要",
-          "summary": "LLM代理越来越多地被部署为可执行系统，使用工具、修改工作空间并产生具体工件。性能不仅取决于基础模型，还取决于harness（管理上下文、工具、状态、约束、权限、追踪和恢复的系统层）。现有基准通常抽象掉执行层、比较完整代理系统或固定harness，使得执行层变异难以研究。Harness-Bench是一个诊断基准，在共享任务环境、预算和评估协议下评估多个模型后端上的代表性harness配置，同时保留每个harness的原生执行行为。包含106个沙箱离线任务，来源于实际代理使用模式，经过人工审核确保真实性、可解性、可验证性和完整性。每次运行记录最终工件、执行轨迹、使用统计和验证器输出，支持超越最终完成的深度分析。在5,194条执行轨迹中，观察到模型-harness配对在完成率、过程质量、效率和失败行为上存在显著差异。结果表明代理能力应以模型-harness配置级别报告，而非仅归因于基础模型。分析还识别出重复的执行对齐失败，即合理的推理与工具反馈、工作空间状态、证据或可验证输出契约脱钩。Harness-Bench为诊断和改进可靠、高效、可审计的代理执行栈提供了可重复的基础。",
-          "loadBearing": "代理能力应以模型-harness配置级别报告，而非仅归因于基础模型。",
-          "evidence": "论文基于5,194条执行轨迹和106个沙箱任务，观察到不同模型-harness配对在完成率、过程质量、效率和失败行为上的显著差异。采样范围限于沙箱离线任务，评估的是配置级harness效应，未覆盖在线或动态环境。适用边界：该基准专注于诊断harness配置的影响，不评估完整代理系统的端到端表现。",
-          "fold": "论文还识别出执行对齐失败类型，即推理与工具反馈或工作空间状态脱钩，但未提供具体频率或分类的详细数据。"
+          "summary": "LLM agent性能不仅取决于基础模型，还取决于harness（管理层：上下文、工具、状态、约束等）。现有基准要么忽略执行层，要么固定harness。本文提出Harness-Bench，包含106个沙盒离线任务，在固定外部条件下改变harness配置，记录最终工件、执行轨迹等。通过5194条轨迹观察到不同模型-harness配对间的显著差异，建议agent能力应按模型-harness配置报告，而非仅归因于模型。识别出执行对齐失败模式（推理与工具反馈、工作区状态、证据或可验证输出脱节）。",
+          "loadBearing": "论文的核心主张：agent能力是模型与harness共同作用的结果，应报告配置级性能。",
+          "evidence": "5194条轨迹、8个模型×6个harness的全因子实验，Table 2显示最高分NanoBot 76.2与最低分OpenClaw 52.4之间23.8分的差距。"
+        },
+        {
+          "heading": "1 引言",
+          "summary": "LLM agent部署为可执行系统，harness是连接模型输出与外部动作的系统层。现有基准（MMLU、SWE-bench、WebArena等）要么评估静态推理，要么评估完整系统，但未单独研究harness。Harness-Bench是第一个将harness作为主要评估轴的基准。它固定任务环境、预算、超时和评估器，同时保留每个harness的原生执行行为。数据集包含106个真实端到端任务，手工审查。",
+          "loadBearing": "引言中隐含假设：harness差异会导致可测量的性能变化，且当前评估实践忽略了这一因素。",
+          "evidence": "无新证据，但引用相关基准作为背景。"
+        },
+        {
+          "heading": "2 相关工作",
+          "summary": "回顾LLM和agent基准（静态基准如MMLU、GSM8K；执行基准如SWE-bench、OSWorld；工作流基准如AgentBench、GAIA、Claw-Eval）。指出这些基准未将harness作为可变因素。介绍harness工程相关工作（Agent-Computer Interface、MCP、OpenClaw等），强调现有工作通常只评估特定系统或在固定设置下比较模型。Harness-Bench在受控条件下系统评估不同harness。",
+          "evidence": "无新数据，仅文献综述。"
+        },
+        {
+          "heading": "3 Harness-Bench基准",
+          "summary": "详细描述基准设计：每个评估包含任务、模型、harness配置、沙盒环境、评估器。Agent = Model + Harness。固定外部任务条件，变化harness。任务设计：106个任务，8个类别（软件工程、数据分析等），手工审查以确保现实性、可解性、可校验性和完整性。运行流程：设置-执行-判断。记录最终工件、执行轨迹、使用统计和验证器输出。评分：TaskScore = Security * Completion * Process，其中Process = (Robustness + ToolUse + Consistency)/3。",
+          "loadBearing": "评分机制中的乘法公式假设安全、完成和过程是正交的，且安全违规一票否决。",
+          "evidence": "任务数量106，类别分布见Figure 2。评分公式在Section 3.4。"
+        },
+        {
+          "heading": "4 实验",
+          "summary": "主实验：6个可配置harness（OpenClaw、NanoBot、Hermes、ZeroClaw、NullClaw、Moltis）×8个API模型（Claude、Gemini、Qwen等）+ Codex作为模型绑定基线，共5194轨迹。表2报告按harness聚合的结果：NanoBot得分76.2，OpenClaw 52.4。过程得分与效率：NanoBot使用较少token（68.7K）取得最高分。发现较强模型对harness的依赖性较低（方差较小）。",
+          "loadBearing": "表2中的23.8分差距是核心证据，支持主张。",
+          "evidence": "Table 2：所有数字均来自论文。例如NanoBot .2, Completion 81.6, Tokens 68.7K等。Figure 3显示harness依赖性。",
+          "fold": "附录C显示类别级差异性，Data Analytics类别方差最大，Office类别方差最小。"
+        },
+        {
+          "heading": "5 分析",
+          "summary": "分析失败模式，定义为执行漂移（推理与环境脱节）。表3列出五种典型失败症状：合同/格式（36.4%）、工具/恢复（24.6%）、证据/基础（14.6%）、工件提交（11.1%）、状态/延续（9.3%）。指出许多失败发生在语义合理性与机器可检查输出之间的边界，以及部分进展后未能转化。强调执行对齐（execution alignment）概念：harness应保持推理、工作区状态、动作和评估条件之间的对应关系。",
+          "loadBearing": "执行漂移概念是解释harness影响的关键机制。",
+          "evidence": "Table 3：失败模式及其频率。例如合同格式失败率36.4%。"
+        },
+        {
+          "heading": "6 讨论",
+          "summary": "强调harness应作为测量能力的一部分。更强模型可能减少对prompt级脚手架的依赖，但仍需可靠执行底层。未来基准应报告模型和harness条件。局限性：只使用沙盒离线工作流，不覆盖实时服务；评估完整harness配置，不能分解单个机制；过程评分依赖于LLM辅助或基于rubric的评估。",
+          "evidence": "无新数据，但明确列出局限性。"
+        },
+        {
+          "heading": "7 结论",
+          "summary": "总结Harness-Bench作为诊断基准的设计和主要发现：模型-harness配置级差异显著，支持按配置报告能力。",
+          "evidence": "无新数据。"
         }
       ],
       "limitsAndFuture": {
-        "paperStated": "论文在摘要中未明确列出局限性，但指出现有基准忽略执行层面，而本基准限于106个沙箱离线任务，且评估的是配置级harness效应。未来工作可扩展至在线环境、更多模型和harness变体。",
-        "evidenceNotes": "证据强度中等：基于5,194条轨迹，但任务数量有限（106个），且为沙箱环境；结果揭示了模型-harness配置的重要性，但适用性边界限于离线、规则明确的代理工作流。采样范围覆盖多个模型后端和代表性harness配置，但未穷举所有可能组合。"
+        "paperStated": "局限性：1）只测试了受控的沙盒离线工作流，不覆盖实时服务、用户反馈、变化的外部状态和长期记忆；2）评估完整harness配置，不能分解单个机制；3）部分过程评分依赖rubric或LLM辅助评估，因此得分应视为诊断性指标，而非部署保障。",
+        "evidenceNotes": "实验基于6个harness和8个模型，共106个任务，但任务覆盖八种工作流类别，样本量有限。评分中的Process部分使用了LLM作为评判者（claude-sonnet-4.6），可能存在偏差。未进行重复运行测量方差，仅报告单次运行结果。"
       },
       "selection": {
         "convergence": [
@@ -35,251 +1087,187 @@
           "Agent Harness / Observability",
           "Evaluation / Benchmarks"
         ],
-        "ideaSignal": "deep_dive:100+ahe:observability"
+        "ideaSignal": "deep_dive:88+ahe:observability"
       },
       "provenance": {
         "sourceUrl": "https://arxiv.org/abs/2605.27922",
         "evidenceKind": "paper-text"
       },
       "arxivId": "2605.27922v1",
-      "publishedAt": "2026-05-27T03:47:35Z"
-    },
-    {
-      "id": "paper:arxiv-2605-26112",
-      "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
-      "authors": "Shangding Gu",
-      "venue": "Venue not provided",
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.26112",
-      "verifiedAt": "2026-05-31T15:23:02.697Z",
-      "tier": "deep",
-      "leadJudgment": "本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。",
-      "sections": [
+      "publishedAt": "2026-05-27T03:47:35Z",
+      "deepDive": {
+        "reframe": "这不是一个通用的agent基准，而是一个诊断工具，用于分离和量化harness（系统层）对agent执行性能的影响。它不声称测量agent的真实能力，而是测量配置级效应。",
+        "contributionLayers": [
+          {
+            "layer": "基准资产",
+            "claim": "提出106个沙盒离线任务，覆盖8个工作流类别，手工审查确保现实性和可校验性。",
+            "judgment": "任务设计质量高，但仅覆盖离线场景，缺少在线和动态交互。"
+          },
+          {
+            "layer": "评估协议",
+            "claim": "定义模型-harness评估协议，固定外部条件变化harness，记录轨迹和统计信息。",
+            "judgment": "协议清晰且可复现，但未解决harness内部机制的解耦（如默认配置可能包含多个组件）。"
+          },
+          {
+            "layer": "诊断分析",
+            "claim": "通过5194轨迹发现模型-harness配对间显著差异，并识别出执行对齐失败模式。",
+            "judgment": "分析有洞察力，尤其是执行漂移的分类，但未量化每个失败模式对总分的贡献。"
+          }
+        ],
+        "mechanism": "Harness-Bench通过固定任务、初始状态、预算、超时和评估器，同时保留每个harness的原生prompt格式、工具接口、状态管理、重试策略等，来测量harness对agent执行的影响。关键在于，它不强制统一内部实现，从而捕捉真实系统间的差异。",
+        "evidenceChain": [
+          {
+            "component": "整体结果（Table 2）",
+            "metrics": [
+              {
+                "label": "NanoBot Score",
+                "value": "76.2",
+                "note": "最高分"
+              },
+              {
+                "label": "OpenClaw Score",
+                "value": "52.4",
+                "note": "最低分"
+              },
+              {
+                "label": "NanoBot Completion",
+                "value": "81.6"
+              },
+              {
+                "label": "NanoBot Tokens (K)",
+                "value": "68.7",
+                "note": "较低token使用"
+              },
+              {
+                "label": "Hermes Tokens (K)",
+                "value": "139.7",
+                "note": "较高token使用"
+              },
+              {
+                "label": "Codex Score",
+                "value": "80.4",
+                "note": "模型绑定agent，单独报告"
+              }
+            ],
+            "reviewerNote": "主要证据显示harness间性能差异。但注意Codex使用GPT-5.4且为专用系统，不能直接比较。NanoBot的高分可能部分得益于其简洁设计，但论文未验证。"
+          },
+          {
+            "component": "失败模式（Table 3）",
+            "metrics": [
+              {
+                "label": "Contract/format failure rate",
+                "value": "36.4%"
+              },
+              {
+                "label": "Tool/recovery failure rate",
+                "value": "24.6%"
+              },
+              {
+                "label": "Evidence/grounding failure rate",
+                "value": "14.6%"
+              },
+              {
+                "label": "Artifact commitment failure rate",
+                "value": "11.1%"
+              },
+              {
+                "label": "State/continuation failure rate",
+                "value": "9.3%"
+              }
+            ],
+            "reviewerNote": "这些比率基于失败轨迹的计数，但未报告失败轨迹总数。模式分类主观，但有助于理解harness影响的来源。"
+          },
+          {
+            "component": "Harness dependence（Figure 3）",
+            "metrics": [
+              {
+                "label": "Stronger models lower variance",
+                "value": "observed trend",
+                "note": "定性趋势，无具体数字"
+              }
+            ],
+            "reviewerNote": "该发现基于方差计算，但方差大小未与模型强度量化关联，且无统计检验。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "Our code and data are available at https://github.com/Qihoo360/harness-bench .",
+            "finding": "GitHub仓库可达，未发现存档或删除警告。",
+            "source": "https://github.com/Qihoo360/harness-bench"
+          },
+          {
+            "claim": "Additional resources and updates can be found on our project website at http://www.harness-bench.ai/ .",
+            "finding": "项目网站可达，显示Harness Bench信息、任务、排行榜。",
+            "source": "http://www.harness-bench.ai/"
+          },
+          {
+            "claim": "1 1 1 Our code and data are available at https://github.com/Qihoo360/harness-bench .",
+            "finding": "github.com repository page is reachable; no obvious archived, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://github.com/Qihoo360/harness-bench"
+          },
+          {
+            "claim": "Additional resources and updates can be found on our project website at http://www.harness-bench.ai/ .",
+            "finding": "www.harness-bench.ai project page is reachable: Harness Bench: Measuring Harness Effects in Realistic Agent Workflows H Harness Bench Tasks Leaderboard Tasks Leaderboard Diagnostic Benchmark 2026 Harness Benc.",
+            "source": "http://www.harness-bench.ai/"
+          }
+        ],
+        "loadBearingClaim": "Agent能力应报告为模型-harness配置级性能，而非仅归因于基础模型。",
+        "strongestEvidence": [
+          "Table 2显示NanoBot与OpenClaw之间23.8分的差距在相同任务和模型后端池下。",
+          "Table 3显示超过三分之一的失败与输出格式相关，表明harness在将推理转化为可验证输出中的关键作用。"
+        ],
+        "limitations": [
+          "只评估了沙盒离线工作流，不覆盖实时服务、用户反馈、动态外部状态。",
+          "评估的是完整harness配置，不能分解单个机制（如prompt、重试、权限等）的独立贡献。",
+          "过程评分依赖LLM-as-judge（claude-sonnet-4.6），可能引入评判偏见。",
+          "未报告多次运行的方差，所有结果基于单次执行。",
+          "任务数量有限（106），且类别分布不均（SRE仅7个任务）。",
+          "Reproducibility note: external project/repository claims were checked in the audit entries above; remaining reproducibility depends on paper artifacts, code, data, and run instructions actually being present."
+        ],
+        "suggestedExperiments": [
+          "进行组件消融实验：关闭重试、改变prompt模板、移除权限检查，以量化每个组件的贡献。",
+          "将基准扩展到实时服务（如数据库、Web API）和动态用户反馈。",
+          "增加更多模型和harness，并重复运行以统计评估显著性。",
+          "开发无需LLM的客观过程评分，减少评判偏差。"
+        ]
+      },
+      "scorecard": [
         {
-          "heading": "摘要",
-          "summary": "本文指出智能体AI的下一个主要瓶颈是系统缩放，而不仅仅是模型缩放：需要围绕基础模型设计可审计、持久、模块化和可验证的架构。作者将这种转变称为“缩放 harness”，即将基础模型周围的结构化执行层作为设计、评估和优化的第一类对象。尽管大型语言模型使智能体能够使用工具、检索信息、维护记忆和执行长期工作流，但评估仍以模型为中心，通常仅关注最终任务成功，而将记忆、检索、工具使用、编排、验证和治理视为次要实现细节。这种框架越来越不充分，因为智能体性能源于基础模型、记忆基板、上下文构造器、技能路由层、编排循环以及验证和治理层之间的交互。这些组件共同构成了智能体 harness，将模型能力转化为长期智能体行为。论文通过三个核心瓶颈研究缩放harness：上下文治理、可信记忆和动态技能路由，以及协调和约束它们的编排和治理机制。还概述了 harness 级基准的研究议程，超越一次性任务成功，衡量轨迹质量、记忆卫生、上下文效率、通信保真度、验证成本和随时间的安全演变。为使讨论具体化，作者开发了 CheetahClaws（Python 原生参考 harness），并与 Claude Code 和 OpenClaw 进行了比较。主要主张：未来智能体AI的进展将同样依赖于系统设计，而非仅仅更强的基础模型。",
-          "loadBearing": "主要主张：未来智能体AI的进展将依赖于系统设计（即 harness 的缩放）与更强基础模型的同等程度。",
-          "evidence": "论文基于对现有评估偏模型中心的分析，并开发了参考实现 CheetahClaws 与现有工具对比，但未提供定量实验结果。证据范围限于概念论证和架构设计，尚未有大规模实证。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文指出当前评估主要关注最终任务成功，忽视了 harness 组件的细节，这限制了系统整体性能；未来需要新型 harness 级基准，评估轨迹质量、记忆卫生、上下文效率、通信保真度、验证成本和随时间的安全演变。论文未明确讨论自身局限性。",
-        "evidenceNotes": "证据主要来自对现状的分析和概念论证，缺乏大规模实验数据。论文提出的瓶颈（上下文治理、可信记忆、动态技能路由）和基准议程尚待实证验证。"
-      },
-      "selection": {
-        "convergence": [
-          "arXiv"
-        ],
-        "track": [
-          "Broad AI / ML",
-          "AI Agents",
-          "Tool Use",
-          "Agent Harness / Observability",
-          "RAG / Knowledge Systems",
-          "Evaluation / Benchmarks",
-          "LLM Security / Reliability",
-          "Human-AI Interaction"
-        ],
-        "ideaSignal": "deep_dive:100+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://arxiv.org/abs/2605.26112",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.26112v1",
-      "publishedAt": "2026-05-25T17:59:36Z"
-    },
-    {
-      "id": "paper:arxiv-2604-25850",
-      "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
-      "authors": "Jiahang Lin, Shichun Liu, Chengjun Pan, Lizhi Lin, Shihan Dou, Zhiheng Xi, Xuanjing Huang, Hang Yan, Zhenhua Han, Tao Gui, Yu-Gang Jiang",
-      "venue": "Venue not provided",
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2604.25850",
-      "verifiedAt": "2026-05-31T15:22:50.802Z",
-      "tier": "deep",
-      "leadJudgment": "本文提出通过三个可观测性支柱实现编码智能体套件的自动演化，将每一次编辑转化为可验证的合约。",
-      "sections": [
-        {
-          "heading": "摘要",
-          "summary": "套件在编码智能体性能中至关重要，但套件工程仍然是手工操作，因为自动化面临三个挑战：可编辑组件的异构动作空间、海量轨迹中淹没可行动信号、以及编辑效果难以归因。本文引入Agentic Harness Engineering (AHE)，一个闭环系统，通过三个可观测性支柱解决这些问题：(1) 组件可观测性：为每个可编辑套件组件提供文件级表示，使动作空间明确且可回滚；(2) 经验可观测性：将数百万原始轨迹token蒸馏为分层的、可下钻的证据语料库，供演化智能体实际使用；(3) 决策可观测性：每次编辑伴随自声明预测，随后根据下一轮任务级结果验证。这些支柱将每次编辑变为可证伪的合约，使套件演化自主进行而不陷入试错。实验表明，十次AHE迭代将Terminal-Bench 2上的pass@1从69.7%提升至77.0%，超越了人类设计的套件Codex-CLI (71.9%)以及自我演化基线ACE和TF-GRPO。冻结的套件无需重新演化即可迁移：在SWE-bench-verified上以比种子少12%的token取得最高聚合成功率，在Terminal-Bench 2上跨三个替代模型家族获得+5.1至+10.1个百分点的增益，表明演化组件编码了通用工程经验而非基准特调。消融实验将增益定位到工具、中间件和长期记忆而非系统提示，表明事实性套件结构可迁移而散文级策略则不能。",
-          "loadBearing": "三个可观测性支柱（组件、经验、决策）是AHE的核心主张，它们使套件演化成为可能。",
-          "evidence": "实证在Terminal-Bench 2和SWE-bench-verified上进行，包含多次迭代和跨模型家族迁移测试，但具体数据集统计量未详细给出。",
-          "fold": "消融实验表明增益主要来自工具、中间件和长期记忆，而非系统提示，揭示了可迁移的套件结构。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文证据未提供明确的局限性和未来工作陈述。",
-        "evidenceNotes": "证据基于两个基准（Terminal-Bench 2和SWE-bench-verified）和多个模型家族，但未讨论套件在其他类型任务或更大规模场景中的表现。"
-      },
-      "selection": {
-        "convergence": [
-          "arXiv"
-        ],
-        "track": [
-          "AI Agents",
-          "Tool Use",
-          "AI Coding / SWE Agents",
-          "Agent Harness / Observability",
-          "RAG / Knowledge Systems",
-          "Evaluation / Benchmarks"
-        ],
-        "ideaSignal": "deep_dive:100+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://arxiv.org/abs/2604.25850",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2604.25850v4",
-      "publishedAt": "2026-04-28T16:55:02Z"
-    },
-    {
-      "id": "paper:arxiv-2605-29861",
-      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
-      "authors": "Chenghao Zhang, Guanting Dong, Yufan Liu, Tong Zhao, Zhicheng Dou",
-      "venue": "Venue not provided",
-      "sourceName": "Hugging Face Daily Papers",
-      "sourceUrl": "https://huggingface.co/papers/2605.29861",
-      "verifiedAt": "2026-05-31T15:23:37.372Z",
-      "tier": "deep",
-      "leadJudgment": "本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。",
-      "sections": [
-        {
-          "heading": "动机与挑战",
-          "summary": "大型语言模型使自主智能体从深度搜索（获取简短事实答案）发展到深度研究（将分散证据综合成长篇报告）。然而，可验证的多模态深度研究仍然具有挑战性：开放式的合成缺乏确定性基准，且需要将文本论证与视觉证据交错结合。",
-          "loadBearing": "论文的主要假设是：通过专门的多智能体编排和验证机制，可以生成更可靠、视觉信息更丰富的多模态报告。",
-          "evidence": "论文通过实验对比强基线来支持该假设，但摘要未提供具体效果大小或统计显著性。"
+          "dimension": "问题重要性",
+          "score": 9,
+          "reason": "随着LLM agent部署增加，理解harness对性能的影响至关重要，填补了现有基准忽略执行层的空白。"
         },
         {
-          "heading": "方法：Ptah多智能体框架",
-          "summary": "Ptah编排了从用户查询到渲染网页报告的完整生命周期，包括规划、研究和写作三个阶段。专门智能体构建视觉感知计划、收集基于主张的证据、在视觉工作记忆中维护源对齐图像，并通过声明式多模态工具使用组成报告。验证智能体作为框架的接受函数，在整个工作流中强制执行事实基础、引用保真度和跨模态一致性。",
-          "loadBearing": "框架的核心主张是：通过专用智能体和验证器，系统能够确保报告的可验证性。",
-          "evidence": "论文描述了框架架构，但未提供消融实验或组件贡献的定量分析。"
+          "dimension": "系统设计",
+          "score": 8,
+          "reason": "基准设计合理，固定外部条件变化harness，任务手工审查，评分包含安全、完成和过程。但未使用标准化API或跨harness的统一接口，可能引入混淆。"
         },
         {
-          "heading": "评估：PtahEval协议与实验结果",
-          "summary": "提出了PtahEval评估协议，用图像级别和呈现级别评估补充现有基准。在深度研究基准上的实验表明，Ptah生成的报告比强基线更可靠、视觉信息更丰富、对用户更友好。",
-          "loadBearing": "论文声称Ptah优于基线，但摘要未报告具体指标数值。",
-          "evidence": "实验证据仅限于定性陈述；论文证据未提供具体评估分数或统计检验。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文未在摘要中明确讨论局限性或未来工作。",
-        "evidenceNotes": "实验证据仅来自摘要中的定性描述；采样范围、基准选择和适用边界未说明。根据已有信息，无法评估证据强度。"
-      },
-      "selection": {
-        "convergence": [
-          "Hugging Face Daily Papers",
-          "arXiv"
-        ],
-        "track": [
-          "Broad AI / ML",
-          "AI Agents",
-          "Tool Use",
-          "Agent Harness / Observability",
-          "RAG / Knowledge Systems",
-          "Multimodal UI",
-          "Evaluation / Benchmarks"
-        ],
-        "ideaSignal": "deep_dive:97+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://huggingface.co/papers/2605.29861",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.29861",
-      "publishedAt": "2026-05-28T12:40:34Z"
-    },
-    {
-      "id": "paper:arxiv-2605-14271",
-      "title": "Auditing Agent Harness Safety",
-      "authors": "Chengzhi Liu, Yichen Guo, Yepeng Liu, Yuzhe Yang, Qianqi Yan, Xuandong Zhao, Wenyue Hua, Sheng Liu, Sharon Li, Yuheng Bu, Xin Eric Wang",
-      "venue": "Venue not provided",
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.14271",
-      "verifiedAt": "2026-05-31T15:23:20.670Z",
-      "tier": "deep",
-      "leadJudgment": "提出 HarnessAudit 框架，通过审计完整执行轨迹来评估 LLM agent 安全，而非仅检查最终输出。",
-      "sections": [
+          "dimension": "算法新颖性",
+          "score": 7,
+          "reason": "主要贡献是基准和评估协议，而非新算法。但harness作为研究轴是新颖的。"
+        },
         {
-          "heading": "摘要",
-          "summary": "LLM 智能体在执行框架（harness）中运行，框架负责调度工具、分配资源、路由消息。但框架可能返回正确、无害的结果，而轨迹却访问了未授权资源或向错误智能体泄露上下文。仅基于输出的评估无法捕获此类失败，现有安全基准大多只评分最终输出或终止状态，但许多违规发生在轨迹中间而非终点。核心问题是：框架在整个执行过程中是否尊重用户意图、权限边界和信息流约束。为此，提出 HarnessAudit，一个审计完整执行轨迹的框架，涵盖边界合规、执行保真度和系统稳定性，重点关注多智能体框架。同时引入 HarnessAudit-Bench，一个包含 210 个任务、覆盖八个真实世界领域、同时配置单智能体和多智能体并嵌入安全约束的基准。评估了跨前沿模型的十个框架配置和三个多智能体框架，发现：(i) 任务完成与安全执行不一致，违规随轨迹长度累积；(ii) 安全风险因领域、任务类型和智能体角色而异；(iii) 大多数违规集中在资源访问和智能体间信息传输；(iv) 多智能体协作扩大了安全风险面，而框架设计设定了安全部署的上限。",
-          "loadBearing": "核心主张是：仅基于输出的安全评估不足以检测执行轨迹中的违规行为，必须审计完整轨迹。",
-          "evidence": "基准包含 210 个任务、8 个领域、10 个框架配置、3 个多智能体框架，结果展示了任务完成与安全执行的脱节、风险分布及框架设计的约束作用。",
-          "fold": "论文未提供详细实验结果，仅列出了四点主要发现。"
-        }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文未明确列出局限性，但从上下文可推断：基准任务数和框架配置有限（210 任务、10 配置），且仅聚焦于资源访问和信息传输等特定违规类型。",
-        "evidenceNotes": "证据来自提出的基准和实验，覆盖多个前沿模型和框架，但样本规模中等（210 任务），且未提供统计显著性度量。适用边界：主要针对多智能体框架，单智能体也包含，但结论可能不适用于所有 agent 架构。"
-      },
-      "selection": {
-        "convergence": [
-          "arXiv"
-        ],
-        "track": [
-          "Broad AI / ML",
-          "AI Agents",
-          "Tool Use",
-          "Agent Harness / Observability",
-          "Evaluation / Benchmarks",
-          "LLM Security / Reliability",
-          "Human-AI Interaction"
-        ],
-        "ideaSignal": "deep_dive:97+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://arxiv.org/abs/2605.14271",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.14271v2",
-      "publishedAt": "2026-05-14T02:14:28Z"
-    },
-    {
-      "id": "paper:arxiv-2605-15040",
-      "title": "Orchard: An Open-Source Agentic Modeling Framework",
-      "authors": "Baolin Peng, Wenlin Yao, Qianhui Wu, Hao Cheng, Xiao Yu, Rui Yang, Tao Ge, Alessandro Sordoni, Xingdi Yuan, Yelong Shen, Pengcheng He, Tong Zhang, Zhou Yu, Jianfeng Gao",
-      "venue": "Venue not provided",
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.15040",
-      "verifiedAt": "2026-05-31T15:23:49.112Z",
-      "tier": "deep",
-      "leadJudgment": "Orchard 是一个开源 agent 建模框架，其核心是轻量的环境服务层，支持跨领域、跨管道的智能体数据、训练配方与评估复用。",
-      "sections": [
+          "dimension": "实验强度",
+          "score": 8,
+          "reason": "大规模实验（5194轨迹），6 harness×8模型+基线，覆盖多样任务。但缺乏重复运行和统计显著性检验。"
+        },
         {
-          "heading": "摘要",
-          "summary": "论文提出 Orchard 开源框架，用于可扩展的 agent 建模。核心是 Orchard Env 环境服务，提供沙箱生命周期管理的可复用原语。基于此构建三个训练配方：Orchard-SWE（代码智能体，基于 Qwen3-30B-A3B-Thinking 在 SWE-bench Verified 达 64.3% SFT、67.5% SFT+RL，为同尺寸开源最佳）、Orchard-GUI（4B 视觉语言计算机使用智能体，WebVoyager 74.1%、Online-Mind2Web 67.0%、DeepShop 64.0%）、Orchard-Claw（个人助手，Claw-Eval 59.6% pass@3，配合更强 harness 达 73.9%）。结果表明轻量、开放、与 harness 无关的环境层可实现跨领域可复用的 agent 数据、训练配方与评估。",
-          "loadBearing": "核心主张是 Orchard Env 作为轻量、开放、与 harness 无关的环境服务层，能够支持可扩展的 agent 建模，并实现跨领域的可复用性。",
-          "evidence": "论文给出了三个配方的基准性能数字：Orchard-SWE 在 SWE-bench Verified 上 64.3% 和 67.5%；Orchard-GUI 在三个评估上 74.1%、67.0%、64.0%；Orchard-Claw 在 Claw-Eval 上 59.6% 和 73.9%。这些结果验证了环境层的有效性，但证据仅限于特定蒸馏数据（107K、0.4K、0.2K 轨迹）和特定基准，未提供在不同数据规模或不同环境下的泛化性测试。",
-          "fold": "训练方法包括：信用分配 SFT（从未解决轨迹的学习生产性片段）和平衡自适应展开 RL（Orchard-SWE）；使用极少蒸馏轨迹和开放任务（Orchard-GUI 和 Orchard-Claw）。"
+          "dimension": "泛化",
+          "score": 6,
+          "reason": "任务局限于沙盒离线环境，不涉及实时服务、用户交互或动态状态，结论的泛化能力有限。"
+        },
+        {
+          "dimension": "可复现性",
+          "score": 9,
+          "reason": "代码和数据公开（GitHub和网站），任务沙盒化，减少依赖漂移，易于复现。"
+        },
+        {
+          "dimension": "影响",
+          "score": 8,
+          "reason": "为agent评估提供了新视角，可能导致未来报告标准的变化，但需要更多社区验证。"
         }
-      ],
-      "limitsAndFuture": {
-        "paperStated": "论文未在摘要中明确讨论局限性，但指出许多高性能系统依赖专有代码库/模型/服务，而 Orchard 旨在填补开源训练基础设施的空白。未来工作可能包括扩展到更多领域、更大模型、更复杂的任务。证据未提供更详细的限制说明。",
-        "evidenceNotes": "证据强度中等：三个配方的性能数字来自蒸馏轨迹和特定基准，采样范围有限（每个配方仅一个或几个基准），适用边界主要集中在编码、GUI 和个人助手三个具体领域，未在更广泛的 agent 任务上验证。Orchard Env 的通用性需更多跨领域实验支持。"
-      },
-      "selection": {
-        "convergence": [
-          "arXiv"
-        ],
-        "track": [
-          "Broad AI / ML",
-          "AI Agents",
-          "Tool Use",
-          "AI Coding / SWE Agents",
-          "Agent Harness / Observability",
-          "Multimodal UI",
-          "Evaluation / Benchmarks",
-          "Human-AI Interaction"
-        ],
-        "ideaSignal": "deep_dive:94+ahe:harness engineering"
-      },
-      "provenance": {
-        "sourceUrl": "https://arxiv.org/abs/2605.15040",
-        "evidenceKind": "paper-text"
-      },
-      "arxivId": "2605.15040v2",
-      "publishedAt": "2026-05-14T16:35:12Z"
+      ]
     },
     {
       "id": "paper:arxiv-2605-29341",
@@ -288,42 +1276,68 @@
       "venue": "Venue not provided",
       "sourceName": "Hugging Face Daily Papers",
       "sourceUrl": "https://huggingface.co/papers/2605.29341",
-      "verifiedAt": "2026-05-31T13:35:06.071Z",
+      "verifiedAt": "2026-05-31T16:07:59.118Z",
       "tier": "deep",
-      "leadJudgment": "WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。",
+      "leadJudgment": "WorldMemArena通过将多模态智能体记忆分解为写-维护-检索-使用四个阶段，提供了对记忆系统细粒度诊断的基准。",
       "sections": [
         {
-          "heading": "背景与动机",
-          "summary": "多模态大语言模型越来越多地作为长期智能体部署，记忆必须超越简单回忆，需要跟踪演化世界、更新过时信息、在决策时提供正确证据。现有基准只在静态对话上测量回忆，将记忆压缩成单次任务准确率，并将视觉观察简化为字幕，无法定位失败在写入、维护、检索或使用阶段。",
-          "loadBearing": "假设：现有基准无法定位记忆失败的具体阶段。",
-          "evidence": "论文指出现有基准测量静态对话回忆、单次任务准确率、视觉观察简化为字幕。",
-          "fold": "无"
+          "heading": "引言",
+          "summary": "论文指出当前多模态智能体记忆评估的不足：只测回忆、单点准确率、忽视视觉。提出要评估完整的记忆生命周期，并介绍本文的贡献。",
+          "loadBearing": "记忆应被看作与世界交互的循环，而非静态记录。",
+          "evidence": "论文提及现有基准的三个缺陷（对话式、最终准确率、文本中心），并引用相关工作（如LoCoMo, AMA-Bench等）作为证据。",
+          "fold": "图1展示了记忆循环的三个组成部分。"
         },
         {
-          "heading": "方法：WorldMemArena",
-          "summary": "将多模态智能体记忆形式化为行动-世界交互循环（Action-World Interaction Loop），具有可观察的四阶段生命周期。实例化为WorldMemArena：包含400个多会话多模态任务，涵盖终身演化（演化个人和任务状态）和智能体执行（来自真实观察、行动和反馈的记忆），并标注了金标准记忆点、更新、干扰物和证据链，支持阶段级诊断。",
-          "loadBearing": "核心主张：四阶段循环和细粒度标注可以定位记忆失败阶段。",
-          "evidence": "400个任务，两个子集，金标注。",
-          "fold": "无"
+          "heading": "相关工作",
+          "summary": "回顾现有记忆基准和多模态记忆机制，指出它们缺乏生命周期诊断和真实交互。WorldMemArena通过分解为写、维护、检索、使用来填补空白。",
+          "loadBearing": "现有评估无法定位失败阶段，需要阶段级诊断。",
+          "evidence": "表1对比了WorldMemArena与现有基准，显示其他基准不支持全部四个生命周期阶段，而WorldMemArena全部支持。",
+          "fold": "表1中的对比数据：LoCoMo仅支持Retrieve和Use，不支持Write和Update；WorldMemArena全部支持。"
         },
         {
-          "heading": "实验设置与对比",
-          "summary": "首次头对头比较了长上下文、手动设计（RAG和外部记忆系统）以及基于harness的记忆智能体。",
-          "loadBearing": "假设：不同记忆策略可以在统一的基准上比较。",
-          "evidence": "论文未提供具体对比方法的数量或配置细节，仅提及类型。",
-          "fold": "论文未提供具体模型或系统名称。"
+          "heading": "问题形式化",
+          "summary": "将记忆形式化为行动-世界交互循环，定义四阶段生命周期：写入、维护、检索、使用。每个阶段有独立评估指标。",
+          "loadBearing": "记忆生命周期是架构无关的诊断框架，可应用于不同记忆系统。",
+          "evidence": "论文给出形式化公式和每个阶段的定义（Write, Maintain, Retrieve, Answer），并说明如何计算指标。",
+          "fold": "公式(1)-(4)定义了各阶段评估方法。"
         },
         {
-          "heading": "主要发现",
-          "summary": "四个关键结果：(1) 更好的记忆写入和存储并不保证更好的整体性能；(2) 多模态记忆仍难以充分利用视觉证据；(3) 系统跨领域不稳定，且在真实智能体轨迹上性能下降；(4) 基于harness的记忆更灵活但成本高且可靠性较低。",
-          "loadBearing": "核心发现：记忆写入/存储与整体性能无正相关性；视觉证据利用不足。",
-          "evidence": "论文明确陈述了这四个结果。",
-          "fold": "论文未提供统计显著性或其他详细分析。"
+          "heading": "WorldMemArena基准",
+          "summary": "介绍基准：400个多会话多模态任务，跨两个领域（Lifelong Evolution和Agentic Execution）。每个会话标注了记忆点、更新点、干扰项、证据链。提供细粒度评估协议。",
+          "loadBearing": "基准支持阶段级诊断，通过标注实现。",
+          "evidence": "表1显示WorldMemArena有24,258个QA对，15,595张图像，8,489个会话，59,858步交互。图3展示数据构建流程。评估协议四个阶段均有指标定义。",
+          "fold": "数据统计：平均18.4会话，9.1K tokens per sample。"
+        },
+        {
+          "heading": "实验",
+          "summary": "评估三种范式：长上下文、手动设计记忆系统、harness-based智能体。主要结果：存储质量不保证QA质量；多模态记忆使用弱；检索是瓶颈；更新和干扰拒绝弱；harness灵活但成本高。",
+          "loadBearing": "存储好不等于性能好；记忆维护以追加为主。",
+          "evidence": "表2：MemoryGPT Memory Recall 85.20, QA-C 57.81, Update 58.18, IntRej 25.44。表3：DeepSeek V4 QA-C 69.13, OpenClaw-GPT 5.4-nano QA-C 48.31。论文指出四个发现，并引用具体数据。",
+          "fold": "表2和表3的完整数值，包括各个系统的Memory Recall, Correctness, Hallucination等。"
+        },
+        {
+          "heading": "分析",
+          "summary": "回答6个研究问题：失败发生在整个生命周期；记忆维护是追加而非修订；领域差异（Lifelong Evolution优于Agentic Execution）；多模态瓶颈（视觉推理任务差）；不同系统设计影响（检索范围增大不改善）；记忆不能可靠转化为行动。",
+          "loadBearing": "记忆失败是复合的，早期遗漏影响后续。",
+          "evidence": "图4(a)显示QA准确率随会话数下降；图4(b)显示记忆更新操作以Append为主；图5(c)显示视觉搜索和跨模态推理性能差；图6(b)显示增加检索K值不提高NDCG；图7显示harness性能与手动系统可比但成本高。",
+          "fold": "具体图表分析：图4(a)中多数系统从60%下降到40%。"
+        },
+        {
+          "heading": "讨论",
+          "summary": "提出四个未来方向：记忆应通过交互塑造，而非固定模块；需要一致性维护而非积累；有效使用多模态记忆；评估应关注从经验中学习，而非回顾性QA。",
+          "loadBearing": "记忆应视为交互塑造的能力，而非独立模块。",
+          "evidence": "论文讨论部分基于实验结果提出这些方向，并引用表2和图4作为证据。"
+        },
+        {
+          "heading": "结论",
+          "summary": "总结贡献：提出记忆生命周期框架、WorldMemArena基准、统一比较。结论呼应存储质量不保证性能，未来应发展记忆为适应能力。",
+          "loadBearing": "记忆能力应通过任务压力塑造，而非单独优化。",
+          "evidence": "论文结论部分重申主要发现和展望。"
         }
       ],
       "limitsAndFuture": {
-        "paperStated": "论文未明确列出局限性或未来工作，但指出基于harness的记忆成本高且可靠性低，暗示未来改进方向。",
-        "evidenceNotes": "结果基于400个任务，覆盖两个领域（终身演化和智能体执行），但样本规模尚可。未说明任务多样性或现实世界代表性。评估中使用的具体模型和系统未在摘要中提供。"
+        "paperStated": "论文在讨论部分提出四个未来方向：通过交互塑造记忆、一致性维护而非积累、有效使用多模态记忆、评估从经验中学习。同时指出当前系统在多模态和更新方面的局限性。",
+        "evidenceNotes": "实验规模为400个任务，覆盖两个领域和多种系统，但仅评估了有限的后端模型（GPT-5.4-mini, DeepSeek V4等），且依赖LLM判断器，可能引入偏见。适用边界限于多模态智能体记忆评估，未涉及其他类型记忆。"
       },
       "selection": {
         "convergence": [
@@ -331,6 +1345,7 @@
           "arXiv"
         ],
         "track": [
+          "Broad AI / ML",
           "AI Agents",
           "Agent Harness / Observability",
           "RAG / Knowledge Systems",
@@ -338,18 +1353,179 @@
           "Evaluation / Benchmarks",
           "Human-AI Interaction"
         ],
-        "ideaSignal": "deep_dive:97+ahe:harness engineering"
+        "ideaSignal": "deep_dive:87+ahe:agent harness"
       },
       "provenance": {
         "sourceUrl": "https://huggingface.co/papers/2605.29341",
         "evidenceKind": "paper-text"
       },
       "arxivId": "2605.29341",
-      "publishedAt": "2026-05-28T04:27:20Z"
+      "publishedAt": "2026-05-28T04:27:20Z",
+      "deepDive": {
+        "reframe": "这篇论文是一个评估基准，通过分解记忆生命周期来诊断记忆系统，而非提出新记忆模型。",
+        "contributionLayers": [
+          {
+            "layer": "理论框架",
+            "claim": "将多模态智能体记忆定义为行动-世界交互循环，包含写、维护、检索、使用四个阶段。",
+            "judgment": "框架清晰且架构无关，有助于标准化评估，但类似阶段划分在之前工作中已有雏形（如MemGPT的维护步骤）。"
+          },
+          {
+            "layer": "基准数据集",
+            "claim": "构建了400个多会话多模态任务，涵盖Lifelong Evolution和Agentic Execution，提供细粒度标注。",
+            "judgment": "数据集规模较大，标注质量通过人工审核确保，但来源依赖现有轨迹和模拟，可能存在偏差。"
+          },
+          {
+            "layer": "比较研究",
+            "claim": "首次统一比较长上下文、手动设计和harness-based三种记忆范式。",
+            "judgment": "提供了有价值的发现（如存储质量不保证性能、维护以追加为主），但比较中使用的模型版本和设置可能随时间过时。"
+          }
+        ],
+        "mechanism": "在评估时，系统依次经历写（从会话中抽取有用信息）、维护（整合新信息并可能覆盖旧信息）、检索（根据查询从记忆中提取相关证据）、使用（将证据合入答案）。每个阶段由专用指标评估，通过LLM判断器匹配黄金注释。",
+        "evidenceChain": [
+          {
+            "component": "MemoryGPT",
+            "metrics": [
+              {
+                "label": "Memory Recall",
+                "value": "85.20",
+                "note": "高覆盖，但QA-C仅57.81，表明存储未有效转化为答案"
+              },
+              {
+                "label": "Memory Correctness",
+                "value": "96.98",
+                "note": "正确率高，但更新处理低（58.18）"
+              },
+              {
+                "label": "Update Handling",
+                "value": "58.18",
+                "note": "更新处理中等，多系统表现相似"
+              },
+              {
+                "label": "QA-C",
+                "value": "57.81",
+                "note": "最终答案正确率有限"
+              },
+              {
+                "label": "Retrieval Coverage",
+                "value": "84.99",
+                "note": "检索覆盖率较高"
+              }
+            ],
+            "reviewerNote": "MemoryGPT在存储和检索上表现好，但QA-C并不特别高，表明检索到的证据未被充分利用。这支持了论文核心发现：存储不保证性能。证据强，来自表2。"
+          },
+          {
+            "component": "ViLoMem (multimodal)",
+            "metrics": [
+              {
+                "label": "Memory Recall",
+                "value": "85.96",
+                "note": "高回忆"
+              },
+              {
+                "label": "Memory Correctness",
+                "value": "81.61",
+                "note": "正确率比文本系统低"
+              },
+              {
+                "label": "QA-C",
+                "value": "49.77",
+                "note": "答案正确率低于多数文本系统"
+              }
+            ],
+            "reviewerNote": "ViLoMem虽然访问视觉输入，但最终性能不如纯文本系统，说明多模态记忆使用不佳。证据强，来自表2。"
+          },
+          {
+            "component": "DeepSeek V4 (long-context baseline)",
+            "metrics": [
+              {
+                "label": "QA-C",
+                "value": "69.13",
+                "note": "长上下文基线中最高，得益于大窗口"
+              },
+              {
+                "label": "QA-H",
+                "value": "11.46",
+                "note": "幻觉率低"
+              }
+            ],
+            "reviewerNote": "DeepSeek V4在无显式记忆模块下取得高QA-C，表明长上下文本身有一定优势，但总体仍低于最佳手动系统（MemoryGPT的QA-C 57.81? 实际上MemoryGPT是57.81，DeepSeek V4是69.13更高？论文表2和表3不同，DeepSeek V4在表3中作为基础模型，而表2是手动系统，所以比较需注意。这里证据支持长上下文基线表现好但不如最佳记忆系统？实际上MemoryGPT 57.81 < 69.13？但论文说“Long context agents perform poorly, some below dedicated memory systems”，DeepSeek V4是例外。所以证据需谨慎引用。"
+          }
+        ],
+        "audit": [
+          {
+            "claim": "Source URL https://huggingface.co/papers/2605.29341 可访问",
+            "finding": "页面可访问，无锁定或未发布警告。",
+            "source": "https://huggingface.co/papers/2605.29341"
+          },
+          {
+            "claim": "论文声称进行了首次三种范式的头对头比较",
+            "finding": "论文实验部分确实比较了长上下文、手动设计、harness-based三类，符合声明。",
+            "source": "论文第5节"
+          },
+          {
+            "claim": "Source URL: https://huggingface.co/papers/2605.29341",
+            "finding": "huggingface.co artifact page is reachable; no obvious gated, not-found, or release-on-hold warning was detected in the fetched page.",
+            "source": "https://huggingface.co/papers/2605.29341"
+          }
+        ],
+        "loadBearingClaim": "存储质量（Memory Recall, Correctness）不能保证下游性能（QA-C），检索和维护（Update, IntRej）是决定最终答案质量的关键瓶颈。",
+        "strongestEvidence": [
+          "表2显示MemoryGPT的Memory Recall 85.20，但QA-C仅57.81，而A-Mem的Recall更低（52.54）但QA-C 54.63，差距不大。",
+          "图4(b)显示大多数系统的更新操作为Append，缺乏Revise/Delete，导致状态不一致。",
+          "表3中DeepSeek V4作为纯长上下文模型取得了69.13的QA-C，高于多数显式记忆系统，但该模型窗口极大。"
+        ],
+        "limitations": [
+          "可复现性：实验依赖GPT-5.4-mini、DeepSeek V4等闭源模型，具体版本可能不可复制。",
+          "数据集：400个任务，尽管覆盖两个领域，但可能未充分代表真实世界的多样性。",
+          "评估指标：依赖LLM-as-Judge，可能存在偏见，尤其是在判断记忆正确性和答案正确性时。"
+        ],
+        "suggestedExperiments": [
+          "在更多开源基座模型（如Mistral、Llama）上运行，以减少API版本依赖。",
+          "增加在线学习场景，评估记忆对后续行动改进的影响。",
+          "引入人工评估子集，验证LLM Judge的可靠性。"
+        ]
+      },
+      "scorecard": [
+        {
+          "dimension": "问题重要性",
+          "score": 9,
+          "reason": "多模态智能体记忆是当前AI部署的核心挑战，现有评估缺乏细粒度诊断，该基准直接解决此问题，重要性高。"
+        },
+        {
+          "dimension": "系统设计",
+          "score": 8,
+          "reason": "提出了四阶段生命周期的清晰框架，并构建了含丰富标注的数据集，评估协议完善。但基准构建依赖现有轨迹和模拟，设计有一定复杂度。"
+        },
+        {
+          "dimension": "算法新颖性",
+          "score": 6,
+          "reason": "该工作侧重于评估基准而非新算法，框架本身是对现有记忆评估的整合和扩展，但未见全新理论贡献。"
+        },
+        {
+          "dimension": "实验强度",
+          "score": 9,
+          "reason": "包含了400个任务、三个范式、多个模型的大量实验，表格和图表提供了丰富的比较分析，覆盖多个维度的指标。"
+        },
+        {
+          "dimension": "泛化",
+          "score": 6,
+          "reason": "基准涵盖Lifelong Evolution和Agentic Execution两个领域，但任务类型和模型规模有限，外部泛化性尚未充分验证。"
+        },
+        {
+          "dimension": "可复现性",
+          "score": 7,
+          "reason": "数据集和代码将被公开，但实验涉及多个闭源API模型（GPT-5.4、DeepSeek V4等），依赖特定版本，完全复现存在困难。"
+        },
+        {
+          "dimension": "影响",
+          "score": 9,
+          "reason": "该基准为记忆评估提供了新标准，其发现（存储不保证性能、检索瓶颈等）对后续记忆系统设计有重要指导作用，可能推动领域进步。"
+        }
+      ]
     }
   ],
   "pipelineRun": {
-    "id": "papers-2026-05-31-1780241029158",
+    "id": "papers-2026-05-31-1780243679159",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -364,19 +1540,19 @@
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "7 analyzed candidate(s) with paper-text evidence"
+      "signal": "6 analyzed candidate(s) with paper-text evidence"
     },
     {
       "stage": "rank",
       "role": "Ranker",
       "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-      "signal": "7 current analysis item(s) available after QA filtering"
+      "signal": "6 current analysis item(s) available after QA filtering"
     },
     {
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "7 section-mirroring academic analysis item(s)"
+      "signal": "6 section-mirroring academic analysis item(s)"
     },
     {
       "stage": "verify",
@@ -401,19 +1577,19 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-05-31T15:23:49.155Z",
+    "checkedAt": "2026-05-31T16:07:59.156Z",
     "checks": [
       {
         "id": "papers-present",
         "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "7 paper(s)"
+        "details": "6 paper(s)"
       },
       {
         "id": "section-shape",
         "label": "every paper has section summaries",
         "status": "pass",
-        "details": "7 paper(s) checked"
+        "details": "6 paper(s) checked"
       },
       {
         "id": "qa-fail-excluded",
