@@ -82,7 +82,7 @@ test("deep FDE-relevant analysis adds grounded fdeTakeaways fallback", () => {
   assert.ok(out.deepDive.fdeTakeaways);
   assert.equal(out.deepDive.fdeTakeaways.questions.length, 5);
   assert.ok(out.deepDive.fdeTakeaways.checklist.some((item) => /Endpoint|input schema|response schema/.test(item)));
-  assert.ok(out.deepDive.fdeTakeaways.artifactsToAudit.includes("OpenAPI specs"));
+  assert.ok(out.deepDive.fdeTakeaways.artifactsToAudit.some((item) => item.includes("OpenAPI specs")));
   assert.match(out.deepDive.fdeTakeaways.roiRisk, /readiness and risk-reduction/);
 });
 
@@ -124,6 +124,152 @@ test("pure algorithm papers omit fdeTakeaways", () => {
   });
 
   assert.equal(out.deepDive.fdeTakeaways, undefined);
+});
+
+test("deep analysis normalizes iteration-2 workbench credibility fields", () => {
+  const scorecard = [
+    "FDE relevance",
+    "engineering realism",
+    "problem importance",
+    "method novelty",
+    "evidence strength",
+    "reproducibility",
+    "deployability",
+    "security governance",
+    "roi explainability",
+    "career training value",
+  ].map((dimension) => ({
+    dimension,
+    score: 7,
+    reason: "The paper has useful system evidence.",
+  }));
+
+  const out = normalizeAnalysis({
+    ...raw,
+    paperType: "benchmark",
+    venueStatus: "verified",
+    scorecard,
+    deepDive: {
+      reframe: "The paper is a benchmark for production workflow reliability.",
+      contributionLayers: [
+        {
+          layer: "Benchmark result",
+          claim: "The system reports a measured pass@1 result.",
+          evidence: "Table 1 reports pass@1.",
+          judgment: "The result is useful but benchmark-bound.",
+          fdeMeaning: "Use it as a pilot eval pattern, not as a customer ROI proof.",
+        },
+      ],
+      mechanism: "It connects API workflow traces to benchmark outcomes.",
+      evidenceChain: [],
+      audit: [
+        {
+          claim: "The paper uses https://github.com/vendor/baseline as a baseline implementation.",
+          finding: "github.com repository page is reachable; no obvious archived warning was detected.",
+          source: "https://github.com/vendor/baseline",
+        },
+      ],
+      claimLedger: [
+        {
+          claim: "The system reports 42% pass@1 on the benchmark.",
+          claimType: "empirical",
+          evidencePointer: "Table 1",
+          evidenceStrength: "high",
+          threat: "The result may be benchmark-bound.",
+          fdeTransfer: "Use the metric shape for customer golden tasks.",
+        },
+        {
+          claim: "The result implies fewer customer incidents.",
+          claimType: "fde_extrapolation",
+          evidencePointer: "Figure 99",
+          evidenceStrength: "high",
+          threat: "This is not directly proven by the paper.",
+          fdeTransfer: "Validate in a pilot before using it as a delivery claim.",
+        },
+      ],
+      evidenceMatrix: [
+        {
+          experiment: "Main benchmark",
+          sampleSize: "128 tasks",
+          modelBackend: "Tool-calling LLM",
+          metric: "pass@1",
+          result: "42%",
+          exactness: "exact",
+          limitation: "Only the benchmark distribution is measured.",
+        },
+        {
+          experiment: "Unsupported row",
+          metric: "success",
+          result: "99%",
+          exactness: "exact",
+          limitation: "This number is not in fetched text.",
+        },
+      ],
+      artifactAudit: {
+        officialCode: "verified",
+        data: "available",
+        reproducibility: "full",
+        notes: ["Repository page is reachable."],
+      },
+      loadBearingClaim: "Benchmark gains must transfer to workflow reliability.",
+      strongestEvidence: [],
+      limitations: ["Artifact availability is stated by the paper."],
+      suggestedExperiments: [],
+      fdeTakeaways: {
+        customerProblem: "Customers need reliable production workflow automation.",
+        customerQuestions: [
+          "Which workflow owns the output?",
+          "Which endpoint can fail?",
+          "Who approves exceptions?",
+          "Which traces are retained?",
+          "Which policy blocks launch?",
+        ],
+        artifactsToAudit: ["OpenAPI specs"],
+        implementationChecklist: ["Map endpoints and error states."],
+        evalPlan: ["Run an A/B test on golden workflow tasks."],
+        rolloutPlan: ["Pilot with human approval before limited production."],
+        riskRegister: ["Cost and latency may erase the value."],
+        roiHypothesis: "This can improve task success by 50% and reduce cost by 20%.",
+        interviewStory: "Translate the benchmark into a customer eval and rollout story.",
+      },
+    },
+  }, {
+    candidate: {
+      id: "iteration-2",
+      raw: {
+        ...cand.raw,
+        title: "Production Workflow Reliability Benchmark",
+        abstract: "A production workflow API endpoint observability deployment benchmark.",
+      },
+    },
+    tier: "deep",
+    evidence: {
+      kind: "paper-text",
+      content: "Section 3 Experiments. Table 1 reports pass@1 = 42% on 128 tasks. The paper uses https://github.com/vendor/baseline as a baseline implementation. The setup covers production workflow API endpoint observability deployment.",
+    },
+    evaluation: {
+      decision: "deep_dive",
+      score: 85,
+      selection: { track: ["AI Application Engineering / FDE"] },
+    },
+    now: () => "2026-05-30T00:00:00Z",
+  });
+
+  assert.equal(out.paperType, "benchmark");
+  assert.equal(out.venueStatus, "verified");
+  assert.equal(out.deepDive.verdict.readDecision, "must_read");
+  assert.equal(out.deepDive.claimLedger[0].evidencePointer, "Table 1");
+  assert.equal(out.deepDive.claimLedger[1].claimType, "fde_extrapolation");
+  assert.equal(out.deepDive.claimLedger[1].evidencePointer, "not specified in fetched text");
+  assert.equal(out.deepDive.evidenceMatrix.length, 1);
+  assert.equal(out.deepDive.evidenceMatrix[0].exactness, "exact");
+  assert.equal(out.deepDive.artifactAudit.officialCode, "third_party_only");
+  assert.equal(out.deepDive.artifactAudit.reproducibility, "third_party_only");
+  assert.ok(out.deepDive.artifactAudit.notes.some((note) => /not treated as the authors' official code release/.test(note)));
+  assert.ok(out.deepDive.whatWouldInvalidate.length >= 3);
+  assert.doesNotMatch(out.deepDive.fdeTakeaways.roiHypothesis, /50%|20%/);
+  assert.match(out.deepDive.fdeTakeaways.roiHypothesis, /A\/B test/);
+  assert.ok(out.scorecard.every((item) => /Not higher because/.test(item.reason)));
 });
 
 test("audit normalization dedupes by URL and drops garbled or cut-off text", () => {

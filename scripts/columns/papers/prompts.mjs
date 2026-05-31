@@ -6,6 +6,16 @@ export function analysisSystem(tier = "deep") {
 - sections[] should also include loadBearing, evidence, and fold when the paper evidence supports them.
 - You must also produce deepDive and scorecard.
 - deepDive.reframe: what the paper REALLY is, not the paper's self-description.
+- Iteration-2 workbench fields are required inside deepDive: verdict, claimLedger[], evidenceMatrix[], artifactAudit, and whatWouldInvalidate[].
+- deepDive.verdict must use readDecision(must_read|read|skim|watch|skip), fdeFit(high|medium|low), evidenceStrength(strong|medium|weak), artifactStatus(official|partial|third_party_only|none), oneLineJudgment, whyNow[], and whyNotOverclaim[].
+- deepDive.claimLedger[] supersedes contributionLayers: each row must distinguish paper-proved claims from FDE extrapolation with claimType(theoretical|empirical|engineering|fde_extrapolation), evidencePointer, evidenceStrength(high|medium|low), threat, and fdeTransfer.
+- claimLedger.evidencePointer must be an exact Sec/Fig/Table/Appendix/repo location from fetched evidence, or exactly "not specified in fetched text". Do not invent pointers.
+- deepDive.evidenceMatrix[] must include experiment, sampleSize if available, modelBackend if available, metric, result, exactness(exact|estimated_from_figure|author_claim), limitation. Every number must be tagged exact vs figure-estimate vs author-claim.
+- deepDive.artifactAudit must split official/referenced/dependency/third-party artifacts. officialCode=verified ONLY when the fetched text clearly identifies the authors' own code release for THIS paper. A reachable GitHub/HF dependency or referenced repo is not official reproducibility.
+- deepDive.whatWouldInvalidate[] lists results that would overturn the engineering conclusion.
+- Prefix each fdeTakeaways item with one of [论文支持], [推论], [待验证假设], [面试故事]. roiHypothesis must be a hypothesis plus the A/B test and metrics needed to validate it; do not invent improvement percentages.
+- scorecard[] reasons must say why the score is not higher.
+- Top-level paperType must be one of survey|theory|system|benchmark|dataset|industry_case|evaluation_audit|tooling|position_roadmap; venueStatus must be verified|unverified|not_provided.
 - deepDive.contributionLayers[] is a four-column contribution table: layer, claim (论文主张), evidence (证据), judgment (我的判断), fdeMeaning (FDE 意义). Keep claim, evidence, judgment, and FDE meaning separate.
 - deepDive.mechanism gives the key insight in precise but plain language.
 - deepDive.evidenceChain[] uses only metrics/numbers found verbatim in the fetched paper text. If a number/result/experiment is not present in evidence.content, omit that metric; never infer or invent it.
@@ -24,6 +34,29 @@ export function analysisSystem(tier = "deep") {
   "deepDive": {
     "reframe": "what the paper really is",
     "contributionLayers": [{ "layer": "layer name", "claim": "论文主张", "evidence": "证据", "judgment": "我的判断", "fdeMeaning": "FDE 意义" }],
+    "verdict": {
+      "readDecision": "read",
+      "fdeFit": "medium",
+      "evidenceStrength": "medium",
+      "artifactStatus": "partial",
+      "oneLineJudgment": "one bounded judgment",
+      "whyNow": ["current reason"],
+      "whyNotOverclaim": ["overclaim guardrail"]
+    },
+    "claimLedger": [
+      { "claim": "paper claim or FDE extrapolation", "claimType": "empirical", "evidencePointer": "Sec. 4.2 / Figure 3 / Table 1 / Appendix A / repo README, or not specified in fetched text", "evidenceStrength": "medium", "threat": "validity threat", "fdeTransfer": "bounded FDE transfer" }
+    ],
+    "evidenceMatrix": [
+      { "experiment": "experiment name", "sampleSize": "if specified", "modelBackend": "if specified", "metric": "metric", "result": "result", "exactness": "exact", "limitation": "limitation" }
+    ],
+    "artifactAudit": {
+      "officialCode": "not_found",
+      "data": "not_found",
+      "repoStatus": "repo/readme status if checked",
+      "reproducibility": "paper_only",
+      "notes": ["official vs referenced/dependency/third-party distinction"]
+    },
+    "whatWouldInvalidate": ["result that would overturn the engineering conclusion"],
     "mechanism": "precise + plain mechanism",
     "evidenceChain": [
       {
@@ -45,7 +78,7 @@ export function analysisSystem(tier = "deep") {
       "evalPlan": ["offline / online / golden tasks / human review / latency-cost-error budget item"],
       "rolloutPlan": ["PoC -> pilot -> limited prod -> full step with acceptance criteria"],
       "riskRegister": ["技术/数据/权限/安全/成本/采用 risk grounded by the paper"],
-      "roiHypothesis": "what it saves / which failure-rate it reduces / which business metric it affects / evidence needed",
+      "roiHypothesis": "[待验证假设] what it might save / which business metric it might affect / which A/B test and metrics would validate it, without invented percentages",
       "interviewStory": "FDE interview narrative blending technical depth and business impact"
     }
   }`
@@ -60,6 +93,8 @@ Voice and discipline:
 - 绝不输出好坏判决，绝不打分，绝不写“值得/不值得读”“推荐/不推荐”这类结论。
 - 不加“想一想”“你可以思考”之类互动机关。
 - RULES §6: 不编造数据或论文没有的事实；没有证据时明确写“论文证据未提供”，不要补数字、实验、作者动机或结果。
+
+Structured verdict and scorecard fields are allowed because the schema requires them; keep them bounded and evidence-based.
 
 Return strict JSON only. The JSON matches AcademicPaperAnalysis, except the server fills id/title/authors/venue/sourceName/sourceUrl/arxivId/publishedAt/verifiedAt/tier/provenance.
 
@@ -79,6 +114,8 @@ Required output shape:
     "paperStated": "limitations/future work stated by the paper, or evidence-missing note",
     "evidenceNotes": "objective notes on evidence strength, sampling scope, and applicability boundary"
   },
+  "paperType": "system",
+  "venueStatus": "verified",
   "selection": {
     "convergence": ["trusted sources if provided by triage/evidence"],
     "track": ["focus tracks if provided by triage/evidence"],
