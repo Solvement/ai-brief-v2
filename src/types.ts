@@ -326,6 +326,52 @@ export interface AcademicPaperSelection {
   ideaSignal: string;
 }
 
+// ---- Reviewer-style deep dive (2026-05-31): the "审稿式" deep tier ----
+/** One contribution layer: what the paper claims vs the analyst's judgment (kept separate). */
+export interface ContributionLayer {
+  layer: string;       // e.g. 基础设施层 / 训练方法层 / 通用性层
+  claim: string;       // 论文主张
+  judgment: string;    // 我的判断 (assessment, not a bare verdict)
+}
+/** A real metric pulled from the full text (with provenance note). */
+export interface EvidenceMetric {
+  label: string;
+  value: string;       // keep as string to preserve units / ranges
+  note?: string;       // what it means / caveat
+}
+/** One component of the evidence chain: real numbers + a reviewer point. */
+export interface EvidenceChainItem {
+  component: string;   // e.g. Orchard Env / SWE / BAR / GUI / Claw
+  metrics: EvidenceMetric[];
+  reviewerNote: string; // strong / weak / confounded — distinguish headline vs driver
+}
+/** An external claim audited against reality (e.g. open-source / reproducibility / "latest"). */
+export interface ClaimAudit {
+  claim: string;       // what the paper/source asserts
+  finding: string;     // what verification actually found
+  source?: string;     // url checked
+}
+/** Reasoned reviewer score (NOT a black-box pill): dimension + /10 + justification. */
+export interface ScoreCardItem {
+  dimension: string;   // 问题重要性 / 系统设计 / 算法新颖性 / 实验强度 / 泛化 / 可复现性 / 影响
+  score: number;       // 0-10
+  reason: string;
+}
+export interface PaperDeepDive {
+  /** 重判定位 — what the paper REALLY is, not its self-description. */
+  reframe: string;
+  contributionLayers: ContributionLayer[];
+  /** Key mechanism: why it might work (precise + plain). */
+  mechanism: string;
+  evidenceChain: EvidenceChainItem[];
+  /** External-claim audit (reproducibility / repo status / "latest"). May be empty. */
+  audit: ClaimAudit[];
+  loadBearingClaim: string;
+  strongestEvidence: string[];
+  limitations: string[];
+  suggestedExperiments: string[];
+}
+
 export interface AcademicPaperAnalysis {
   id: string;
   title: string;
@@ -344,6 +390,10 @@ export interface AcademicPaperAnalysis {
   limitsAndFuture: AcademicPaperLimits;
   selection: AcademicPaperSelection;
   provenance: { sourceUrl: string; evidenceKind: string };
+  /** Reasoned reviewer scorecard (deep tier) — dimensions with /10 + justification. */
+  scorecard?: ScoreCardItem[];
+  /** Reviewer-style deep dive (deep tier only). */
+  deepDive?: PaperDeepDive;
 }
 
 export interface ArticlesData {

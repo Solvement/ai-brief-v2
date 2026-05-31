@@ -3690,3 +3690,37 @@ button { font-family: inherit; cursor: pointer; }
 .radar-more[open] summary::before { content: "▾"; }
 .radar-more summary:hover { color: var(--accent); }
 .radar-more .paper-radar-flow { margin-top: 14px; }
+
+/* ---- 审稿式 deep dive (2026-05-31) ---- */
+.deep-dive { margin: 30px 0 0; display: flex; flex-direction: column; gap: 30px; }
+.dd-reframe { font-size: 17px; line-height: 1.7; color: var(--ink); font-weight: 550; margin: 8px 0 0; max-width: 68ch; border-left: 3px solid var(--accent); padding-left: 14px; }
+.dd-layers { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.dd-layer { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.dd-layer > b { color: var(--accent); font-size: 14px; }
+.dd-layer-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 10px; }
+.dd-layer-cols span { font-size: 11.5px; font-weight: 700; color: var(--ink-3); letter-spacing: .04em; }
+.dd-layer-cols p { margin: 4px 0 0; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.dd-layer-cols > div:last-child p { color: var(--ink); }
+.dd-evidence { margin-top: 14px; }
+.dd-evidence > b { color: var(--ink); font-size: 15px; }
+.dd-metrics { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13.5px; }
+.dd-metrics td { padding: 6px 10px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; }
+.dd-metric-val { font-family: var(--font-mono); color: var(--accent); white-space: nowrap; font-weight: 600; }
+.dd-review { margin: 4px 0 0; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.dd-audit-block .dd-audit { background: var(--accent-soft); border-left: 2px solid var(--accent); border-radius: 0 10px 10px 0; padding: 12px 16px; margin-top: 10px; }
+.dd-audit p { margin: 2px 0; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.dd-audit b { color: var(--accent); margin-right: 6px; }
+.dd-audit a { font-size: 12.5px; color: var(--accent); word-break: break-all; }
+.dd-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.dd-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.dd-card > span { font-size: 12px; font-weight: 700; color: var(--accent); }
+.dd-card p { margin: 8px 0 0; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.dd-card ul { margin: 8px 0 0; padding-left: 18px; }
+.dd-card li { font-size: 14px; line-height: 1.7; color: var(--ink-2); margin: 4px 0; }
+.dd-scorecard { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.dd-score { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 16px; }
+.dd-score-head { display: flex; justify-content: space-between; align-items: baseline; }
+.dd-score-head b { font-size: 13.5px; color: var(--ink); }
+.dd-score-head span { font-family: var(--font-mono); font-weight: 700; color: var(--accent); }
+.dd-score p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: var(--ink-3); }
+@media (max-width: 720px) { .dd-layer-cols, .dd-cards, .dd-scorecard { grid-template-columns: 1fr; } }

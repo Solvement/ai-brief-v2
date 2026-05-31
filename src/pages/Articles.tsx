@@ -3,7 +3,9 @@ import type {
   AcademicPaperAnalysis,
   ArticlesData,
   PaperAnalysisSection,
+  PaperDeepDive,
   PaperRadarPublicData,
+  ScoreCardItem,
 } from "../types";
 import { loadArticles, loadPaperRadar } from "../lib/data";
 import { SiteHeader } from "../components/SiteHeader";
@@ -328,11 +330,15 @@ function ArticleDetail({ paper, generatedAt }: { paper: AcademicPaperAnalysis; g
           ) : null}
         </section>
 
-        <section className="paper-sections">
-          {paper.sections.map((section, i) => <PaperSection key={`${section.heading}-${i}`} section={section} />)}
-        </section>
+        {paper.deepDive ? (
+          <DeepDiveView dive={paper.deepDive} scorecard={paper.scorecard} />
+        ) : (
+          <section className="paper-sections">
+            {paper.sections.map((section, i) => <PaperSection key={`${section.heading}-${i}`} section={section} />)}
+          </section>
+        )}
 
-        {paper.limitsAndFuture ? (
+        {!paper.deepDive && paper.limitsAndFuture ? (
           <section className="paper-limits">
             <div className="section-kicker">局限 & 未来</div>
             {paper.limitsAndFuture.paperStated ? (
@@ -358,6 +364,96 @@ function ArticleDetail({ paper, generatedAt }: { paper: AcademicPaperAnalysis; g
         </section>
       </main>
     </>
+  );
+}
+
+function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: ScoreCardItem[] }) {
+  return (
+    <div className="deep-dive">
+      {dive.reframe ? (
+        <section className="dd-block">
+          <div className="section-kicker">重判定位</div>
+          <p className="dd-reframe">{dive.reframe}</p>
+        </section>
+      ) : null}
+
+      {dive.contributionLayers?.length ? (
+        <section className="dd-block">
+          <div className="section-kicker">真正的贡献 · 主张 vs 判断</div>
+          <div className="dd-layers">
+            {dive.contributionLayers.map((l, i) => (
+              <div className="dd-layer" key={i}>
+                <b>{l.layer}</b>
+                <div className="dd-layer-cols">
+                  <div><span>论文主张</span><p>{l.claim}</p></div>
+                  <div><span>我的判断</span><p>{l.judgment}</p></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {dive.mechanism ? (
+        <section className="dd-block">
+          <div className="section-kicker">关键机制 · 为什么可能有效</div>
+          <p className="section-summary">{dive.mechanism}</p>
+        </section>
+      ) : null}
+
+      {dive.evidenceChain?.length ? (
+        <section className="dd-block">
+          <div className="section-kicker">证据链</div>
+          {dive.evidenceChain.map((e, i) => (
+            <div className="dd-evidence" key={i}>
+              <b>{e.component}</b>
+              {e.metrics?.length ? (
+                <table className="dd-metrics"><tbody>
+                  {e.metrics.map((m, j) => (
+                    <tr key={j}><td>{m.label}</td><td className="dd-metric-val">{m.value}</td><td>{m.note}</td></tr>
+                  ))}
+                </tbody></table>
+              ) : null}
+              <p className="dd-review">{e.reviewerNote}</p>
+            </div>
+          ))}
+        </section>
+      ) : null}
+
+      {dive.audit?.length ? (
+        <section className="dd-block dd-audit-block">
+          <div className="section-kicker">外部核验 · 声明 vs 现实</div>
+          {dive.audit.map((a, i) => (
+            <div className="dd-audit" key={i}>
+              <p><b>声明</b> {a.claim}</p>
+              <p><b>核验</b> {a.finding}</p>
+              {a.source ? <a href={a.source} target="_blank" rel="noreferrer">{a.source}</a> : null}
+            </div>
+          ))}
+        </section>
+      ) : null}
+
+      <section className="dd-cards">
+        {dive.loadBearingClaim ? <div className="dd-card"><span>承重主张</span><p>{dive.loadBearingClaim}</p></div> : null}
+        {dive.strongestEvidence?.length ? <div className="dd-card"><span>最强证据</span><ul>{dive.strongestEvidence.map((s, i) => <li key={i}>{s}</li>)}</ul></div> : null}
+        {dive.limitations?.length ? <div className="dd-card"><span>最大局限</span><ul>{dive.limitations.map((s, i) => <li key={i}>{s}</li>)}</ul></div> : null}
+        {dive.suggestedExperiments?.length ? <div className="dd-card"><span>该补的实验</span><ul>{dive.suggestedExperiments.map((s, i) => <li key={i}>{s}</li>)}</ul></div> : null}
+      </section>
+
+      {scorecard?.length ? (
+        <section className="dd-block">
+          <div className="section-kicker">审稿式评分</div>
+          <div className="dd-scorecard">
+            {scorecard.map((s, i) => (
+              <div className="dd-score" key={i}>
+                <div className="dd-score-head"><b>{s.dimension}</b><span>{s.score}/10</span></div>
+                <p>{s.reason}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </div>
   );
 }
 
