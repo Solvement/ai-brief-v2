@@ -68,3 +68,25 @@ API/MCP/tool-use readiness · RAG/enterprise search/data integration · evaluati
 - 审稿式 critique = `deepDive`(types.ts:PaperDeepDive)+ 10 维 `scorecard`。
 - FDE memo = `deepDive.fdeTakeaways`(types.ts:FdeTakeaways)——需扩到上面 §7 的富结构。
 - 贡献分层需扩到四列(claim/evidence/judgment/fdeMeaning)。
+
+---
+
+## 迭代 2 (2026-05-31 晚):研究工作台 + claim ledger
+
+前端:漂亮卡片流 → **研究工作台**。深析:文章解读 → **claim ledger + evidence audit + FDE 转译包**。每段 = `主张 → 证据(source pointer)→ 威胁 → 置信度 → FDE迁移 → 如何验证`。
+
+**三层 IA**:Radar 发现页(选择逻辑 + 权重 + why-not-selected)→ Paper Detail(顶部 Verdict Bar)→ FDE Memo(项目化,默认展示 paper-specific,通用 checklist 折叠)。
+
+**深析新一级模块(`PaperDeepDive` 扩展)**:
+- `verdict`:readDecision(must_read/read/skim/watch/skip)+ fdeFit + evidenceStrength + artifactStatus + oneLineJudgment + whyNow[] + whyNotOverclaim[]。
+- `claimLedger[]`:{claim, claimType(theoretical/empirical/engineering/**fde_extrapolation**), evidencePointer(Sec/Fig/Table/Appendix/repo), evidenceStrength, threat, fdeTransfer} —— **强制区分论文证明了什么 / 暗示什么 / 我作为 FDE 推论什么**。
+- `evidenceMatrix[]`:{experiment, sampleSize?, modelBackend?, metric, result, **exactness(exact/estimated_from_figure/author_claim)**, limitation} —— 防伪精确。
+- `artifactAudit`:{officialCode(verified/not_found/partial/third_party_only), data, repoStatus?, reproducibility(full/partial/artifact_light/paper_only/third_party_only), notes[]} —— **区分 official / referenced / dependency / third-party**。
+- `fdeTakeaways`:paper-specific 默认展示;每条标 `[论文支持]/[推论]/[待验证假设]/[面试故事]`;ROI 只能是 hypothesis,**禁编造百分比**。
+- `scores`:每维加"为什么不是更高"的校准句。
+- meta 加 `paperType`(survey/theory/system/benchmark/dataset/industry_case/evaluation_audit/tooling/position_roadmap)+ `venueStatus`。
+- 新增 "What would invalidate this?"(falsification)模块。
+
+**视觉**:语义色(research=浅青 / warning=琥珀 / risk=红棕 / evidence=绿 / FDE=蓝灰),别全米色;正文 72ch;sticky TOC 带 section 状态。
+
+**P0(立刻做)**:① artifact 核验拆 official/referenced/dependency/third-party(可信度 bug);② 每条证据带 source pointer;③ FDE memo 标来源类型;④ 删无支撑 ROI 数字→hypothesis;⑤ 评分加"为什么不是更高"。
