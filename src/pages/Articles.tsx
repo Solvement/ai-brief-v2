@@ -503,12 +503,21 @@ function PaperSection({ section }: { section: PaperAnalysisSection }) {
 
 function FdeRow({ label, items, text }: { label: string; items?: string[]; text?: string }) {
   if (!text && !(items && items.length)) return null;
-  return (
-    <div className="dd-fde-row">
-      <span>{label}</span>
-      {text ? <p>{text}</p> : <ul>{(items || []).map((s, i) => <li key={i}>{s}</li>)}</ul>}
-    </div>
-  );
+  if (text) {
+    return <div className="dd-fde-row"><span>{label}</span><p>{text}</p></div>;
+  }
+  const list = items || [];
+  const ul = <ul>{list.map((s, i) => <li key={i}>{s}</li>)}</ul>;
+  // Long lists fold by default (progressive disclosure — keep the memo scannable).
+  if (list.length > 3) {
+    return (
+      <details className="dd-fde-fold">
+        <summary>{label} · {list.length}</summary>
+        {ul}
+      </details>
+    );
+  }
+  return <div className="dd-fde-row"><span>{label}</span>{ul}</div>;
 }
 
 function InfoMini({ label, value }: { label: string; value: string }) {
