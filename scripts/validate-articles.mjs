@@ -24,8 +24,76 @@ for (const [i, p] of data.papers.entries()) {
   if (typeof p?.limitsAndFuture?.paperStated !== "string") fail(`${where}: limitsAndFuture.paperStated`);
   if (typeof p?.limitsAndFuture?.evidenceNotes !== "string") fail(`${where}: limitsAndFuture.evidenceNotes`);
   if (!p?.provenance?.sourceUrl) fail(`${where}: provenance.sourceUrl`);
+  validateOptionalScorecard(p.scorecard, where);
+  validateOptionalDeepDive(p.deepDive, where);
   const blob = JSON.stringify(p);
   if (REPLACEMENT.test(blob)) fail(`${where}: mojibake (U+FFFD)`);
   if (PLACEHOLDER.test(blob)) fail(`${where}: placeholder text`);
 }
 console.log(`articles.json validation passed (${data.papers.length} papers)`);
+
+function validateOptionalScorecard(value, where) {
+  if (value === undefined) return;
+  if (!Array.isArray(value)) fail(`${where}: scorecard must be an array`);
+  for (const [i, item] of value.entries()) {
+    const path = `${where}.scorecard[${i}]`;
+    requireString(item?.dimension, `${path}.dimension`);
+    if (typeof item?.score !== "number" || item.score < 0 || item.score > 10) fail(`${path}.score must be number 0-10`);
+    requireString(item?.reason, `${path}.reason`);
+  }
+}
+
+function validateOptionalDeepDive(value, where) {
+  if (value === undefined) return;
+  if (!value || typeof value !== "object" || Array.isArray(value)) fail(`${where}: deepDive must be an object`);
+  requireString(value.reframe, `${where}.deepDive.reframe`);
+  requireString(value.mechanism, `${where}.deepDive.mechanism`);
+  requireString(value.loadBearingClaim, `${where}.deepDive.loadBearingClaim`);
+  validateContributionLayers(value.contributionLayers, `${where}.deepDive.contributionLayers`);
+  validateEvidenceChain(value.evidenceChain, `${where}.deepDive.evidenceChain`);
+  validateAudit(value.audit, `${where}.deepDive.audit`);
+  validateStringArray(value.strongestEvidence, `${where}.deepDive.strongestEvidence`);
+  validateStringArray(value.limitations, `${where}.deepDive.limitations`);
+  validateStringArray(value.suggestedExperiments, `${where}.deepDive.suggestedExperiments`);
+}
+
+function validateContributionLayers(value, path) {
+  if (!Array.isArray(value)) fail(`${path} must be an array`);
+  for (const [i, item] of value.entries()) {
+    requireString(item?.layer, `${path}[${i}].layer`);
+    requireString(item?.claim, `${path}[${i}].claim`);
+    requireString(item?.judgment, `${path}[${i}].judgment`);
+  }
+}
+
+function validateEvidenceChain(value, path) {
+  if (!Array.isArray(value)) fail(`${path} must be an array`);
+  for (const [i, item] of value.entries()) {
+    requireString(item?.component, `${path}[${i}].component`);
+    if (!Array.isArray(item?.metrics)) fail(`${path}[${i}].metrics must be an array`);
+    for (const [j, metric] of item.metrics.entries()) {
+      requireString(metric?.label, `${path}[${i}].metrics[${j}].label`);
+      requireString(metric?.value, `${path}[${i}].metrics[${j}].value`);
+      if (metric.note !== undefined) requireString(metric.note, `${path}[${i}].metrics[${j}].note`);
+    }
+    requireString(item?.reviewerNote, `${path}[${i}].reviewerNote`);
+  }
+}
+
+function validateAudit(value, path) {
+  if (!Array.isArray(value)) fail(`${path} must be an array`);
+  for (const [i, item] of value.entries()) {
+    requireString(item?.claim, `${path}[${i}].claim`);
+    requireString(item?.finding, `${path}[${i}].finding`);
+    if (item.source !== undefined) requireString(item.source, `${path}[${i}].source`);
+  }
+}
+
+function validateStringArray(value, path) {
+  if (!Array.isArray(value)) fail(`${path} must be an array`);
+  for (const [i, item] of value.entries()) requireString(item, `${path}[${i}]`);
+}
+
+function requireString(value, path) {
+  if (typeof value !== "string" || !value) fail(`${path}: missing string`);
+}

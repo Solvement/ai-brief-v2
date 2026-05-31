@@ -1,9 +1,11 @@
 import crypto from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { inflateSync } from "node:zlib";
 
 const UA = "ai-brief-papers-column/0.1 (kernel papers discovery)";
 const DEFAULT_DISCOVER_LIMIT = 140;
 const DEFAULT_EVIDENCE_MAX_CHARS = 18000;
+const DEFAULT_DEEP_EVIDENCE_MAX_CHARS = 120000;
 
 const SOURCE_CONFIG = {
   huggingfaceDaily: { url: "https://huggingface.co/papers", limit: 45 },
@@ -252,6 +254,7 @@ export async function discover(ctx = {}) {
 export async function collectEvidence(candidate, ctx = {}) {
   const options = ctx.options || {};
   const offline = isOffline(options);
+  const tier = normalizeTier(options.paperAnalysisTier || options.analysisTier || "deep");
   const cached = cachedEvidence(options.db, candidate?.id);
   if (offline && cached) return cached;
 
@@ -266,7 +269,16 @@ export async function collectEvidence(candidate, ctx = {}) {
   }
 
   let sourceText = "";
-  if (!offline && shouldFetchSourcePage(paper)) {
+  let fullText = null;
+  if (!offline && tier === "deep") {
+    try {
+      fullText = await fetchFullPaperText(paper, options);
+    } catch (error) {
+      ctx.logger?.warn?.(`full paper fetch failed ${paper.sourceUrl || paper.paperUrl || paper.pdfUrl}: ${error.message}`);
+    }
+  }
+
+  if (!offline && !fullText?.text && shouldFetchSourcePage(paper)) {
     try {
       sourceText = await fetchSourcePageText(paper.sourceUrl || paper.paperUrl, options);
     } catch (error) {
@@ -276,8 +288,9 @@ export async function collectEvidence(candidate, ctx = {}) {
 
   const evidence = paperEvidence(candidate?.id || kernelPaperId(paper), paper, {
     sourceText,
+    fullText,
     fetchedAt: nowIso(options),
-    maxChars: numberOption(options.paperTextMaxChars, DEFAULT_EVIDENCE_MAX_CHARS),
+    maxChars: numberOption(options.paperTextMaxChars, tier === "deep" ? DEFAULT_DEEP_EVIDENCE_MAX_CHARS : DEFAULT_EVIDENCE_MAX_CHARS),
   });
 
   if (!evidence.content && cached) return cached;
@@ -960,7 +973,7 @@ function finalizeCandidate(input = {}) {
   return candidate;
 }
 
-function paperEvidence(candidateId, paper, { sourceText, fetchedAt, maxChars }) {
+function paperEvidence(candidateId, paper, { sourceText, fullText, fetchedAt, maxChars }) {
   const sections = [];
   const lines = [];
 
@@ -981,6 +994,13 @@ function paperEvidence(candidateId, paper, { sourceText, fetchedAt, maxChars }) 
   if (paper.abstract) appendSection(lines, sections, "Abstract", paper.abstract);
   if (Array.isArray(paper.evidence?.sections) && paper.evidence.sections.length) {
     appendSection(lines, sections, "Paper section list", paper.evidence.sections.join("\n"));
+  }
+  if (fullText?.text) {
+    appendSection(lines, sections, "Full paper text", [
+      fullText.url ? `Fetched from: ${fullText.url}` : "",
+      fullText.kind ? `Fetch kind: ${fullText.kind}` : "",
+      fullText.text,
+    ].filter(Boolean).join("\n\n"));
   }
   if (sourceText) appendSection(lines, sections, "Source page text", sourceText);
 
@@ -1010,6 +1030,210 @@ async function fetchSourcePageText(url, options = {}) {
   });
   if (html.startsWith("%PDF")) return "";
   return stripTags(html).slice(0, numberOption(options.sourcePageMaxChars, 12000));
+}
+
+async function fetchFullPaperText(paper, options = {}) {
+  for (const candidate of fullTextUrlCandidates(paper)) {
+    try {
+      const fetched = candidate.kind === "pdf"
+        ? await fetchPdfText(candidate.url, options)
+        : await fetchHtmlPaperText(candidate.url, options);
+      if (!isFullPaperLike(fetched, paper)) continue;
+      return {
+        url: candidate.url,
+        kind: candidate.kind,
+        text: fetched,
+      };
+    } catch {
+      // Full-text fetch is best effort; try the next representation.
+    }
+  }
+  return null;
+}
+
+function fullTextUrlCandidates(paper = {}) {
+  const urls = [];
+  const add = (kind, url) => {
+    if (!url || urls.some((item) => item.url === url)) return;
+    urls.push({ kind, url });
+  };
+  const arxivId = normalizeArxivId(paper.arxivId || paper.paperUrl || paper.sourceUrl || "");
+  const baseId = baseArxivId(arxivId || "");
+  if (arxivId) add("html", `https://arxiv.org/html/${arxivId}`);
+  if (baseId && baseId !== arxivId) add("html", `https://arxiv.org/html/${baseId}`);
+  if (paper.paperUrl && /arxiv\.org\/html\//i.test(paper.paperUrl)) add("html", paper.paperUrl);
+  if (paper.sourceUrl && /arxiv\.org\/html\//i.test(paper.sourceUrl)) add("html", paper.sourceUrl);
+  for (const url of [paper.paperUrl, paper.sourceUrl]) {
+    if (url && !/arxiv\.org\/abs\//i.test(url) && !/\.pdf(?:[?#]|$)/i.test(url)) add("html", url);
+  }
+  for (const url of [paper.pdfUrl, paper.paperUrl, paper.sourceUrl]) {
+    if (url && /\.pdf(?:[?#]|$)/i.test(url)) add("pdf", url);
+  }
+  if (arxivId) add("pdf", `https://arxiv.org/pdf/${arxivId}`);
+  if (baseId && baseId !== arxivId) add("pdf", `https://arxiv.org/pdf/${baseId}`);
+  return urls;
+}
+
+async function fetchHtmlPaperText(url, options = {}) {
+  const html = await fetchText(url, {
+    timeoutMs: numberOption(options.fullTextTimeoutMs, 30000),
+    retries: 1,
+    options,
+    headers: {
+      accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    },
+  });
+  if (html.startsWith("%PDF")) return extractPdfText(Buffer.from(html, "latin1"));
+  return htmlToReadableText(html);
+}
+
+async function fetchPdfText(url, options = {}) {
+  const bytes = await fetchBinary(url, {
+    timeoutMs: numberOption(options.fullTextTimeoutMs, 45000),
+    retries: 1,
+    options,
+    headers: {
+      accept: "application/pdf,*/*;q=0.8",
+    },
+  });
+  return extractPdfText(bytes);
+}
+
+function htmlToReadableText(html = "") {
+  return stripTags(String(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+    .replace(/<header[\s\S]*?<\/header>/gi, " ")
+    .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+    .replace(/<(?:h[1-6]|p|li|tr|section|article|div|br)\b[^>]*>/gi, "\n"));
+}
+
+function isFullPaperLike(text = "", paper = {}) {
+  const clean = stripTags(text);
+  if (clean.length < 1800) return false;
+  const abstract = cleanString(paper.abstract || "");
+  if (abstract && clean.length < Math.max(2600, abstract.length * 2)) return false;
+  const sectionHits = countMatches(clean, [
+    /\bintroduction\b/i,
+    /\bmethod(?:s|ology)?\b/i,
+    /\bexperiment(?:s|al)?\b/i,
+    /\bevaluation\b/i,
+    /\bresults?\b/i,
+    /\blimitations?\b/i,
+    /\breferences\b/i,
+    /\bconclusion\b/i,
+  ]);
+  return sectionHits >= 2 || clean.length >= 6000;
+}
+
+function extractPdfText(bytes) {
+  if (!bytes?.length) return "";
+  const source = Buffer.isBuffer(bytes) ? bytes.toString("latin1") : Buffer.from(bytes).toString("latin1");
+  const chunks = [];
+  const streamRe = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
+  let match;
+  while ((match = streamRe.exec(source)) && chunks.length < 600) {
+    const dict = source.slice(Math.max(0, match.index - 2000), match.index);
+    let stream = Buffer.from(match[1], "latin1");
+    stream = trimPdfStreamBytes(stream);
+    if (/\/FlateDecode\b/i.test(dict)) {
+      try {
+        stream = inflateSync(stream);
+      } catch {
+        continue;
+      }
+    }
+    const text = extractPdfTextStream(stream.toString("latin1"));
+    if (text) chunks.push(text);
+  }
+  const direct = extractPdfTextStream(source);
+  if (direct) chunks.push(direct);
+  return cleanPdfText(chunks.join("\n"));
+}
+
+function trimPdfStreamBytes(buffer) {
+  let start = 0;
+  let end = buffer.length;
+  while (start < end && (buffer[start] === 0x0a || buffer[start] === 0x0d)) start += 1;
+  while (end > start && (buffer[end - 1] === 0x0a || buffer[end - 1] === 0x0d)) end -= 1;
+  return buffer.subarray(start, end);
+}
+
+function extractPdfTextStream(stream = "") {
+  const out = [];
+  for (const value of pdfLiteralStrings(stream)) {
+    const text = decodePdfLiteral(value);
+    if (hasReadableLetters(text)) out.push(text);
+  }
+  for (const match of stream.matchAll(/<([0-9A-Fa-f\s]{4,})>\s*(?:Tj|'|"|TJ)?/g)) {
+    const text = decodePdfHex(match[1]);
+    if (hasReadableLetters(text)) out.push(text);
+  }
+  return out.join(" ");
+}
+
+function* pdfLiteralStrings(stream = "") {
+  for (let index = 0; index < stream.length; index += 1) {
+    if (stream[index] !== "(") continue;
+    let depth = 1;
+    let value = "";
+    index += 1;
+    for (; index < stream.length; index += 1) {
+      const char = stream[index];
+      if (char === "\\") {
+        value += char + (stream[index + 1] || "");
+        index += 1;
+        continue;
+      }
+      if (char === "(") depth += 1;
+      if (char === ")") {
+        depth -= 1;
+        if (depth === 0) break;
+      }
+      value += char;
+    }
+    if (value.length >= 2) yield value;
+  }
+}
+
+function decodePdfLiteral(value = "") {
+  return value
+    .replace(/\\([nrtbf()\\])/g, (_, code) => ({
+      n: "\n",
+      r: "\r",
+      t: "\t",
+      b: "\b",
+      f: "\f",
+      "(": "(",
+      ")": ")",
+      "\\": "\\",
+    })[code] || code)
+    .replace(/\\([0-7]{1,3})/g, (_, octal) => String.fromCharCode(parseInt(octal, 8)))
+    .replace(/\\\r?\n/g, "");
+}
+
+function decodePdfHex(value = "") {
+  const bytes = (value.replace(/\s+/g, "").match(/[0-9A-Fa-f]{2}/g) || []).map((hex) => parseInt(hex, 16));
+  if (bytes.length < 2) return "";
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) {
+    let out = "";
+    for (let i = 2; i + 1 < bytes.length; i += 2) out += String.fromCharCode(bytes[i] * 256 + bytes[i + 1]);
+    return out;
+  }
+  return Buffer.from(bytes).toString("utf8");
+}
+
+function cleanPdfText(text = "") {
+  return cleanString(text)
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/([a-z])-\s+([a-z])/gi, "$1$2")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function hasReadableLetters(text = "") {
+  return /[A-Za-z\u4e00-\u9fff]{2}/.test(text) && !/^[A-Z]{1,3}$/.test(text.trim());
 }
 
 function shouldFetchSourcePage(paper) {
@@ -1141,6 +1365,33 @@ async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {}, he
   throw lastError;
 }
 
+async function fetchBinary(url, { timeoutMs = 20000, retries = 1, options = {}, headers = {} } = {}) {
+  const fetchImpl = options.fetch || fetch;
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetchImpl(url, {
+        headers: {
+          "user-agent": options.userAgent || UA,
+          accept: "application/pdf,*/*;q=0.8",
+          ...headers,
+        },
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return Buffer.from(await res.arrayBuffer());
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) await sleep(700 * (attempt + 1));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastError;
+}
+
 function getTag(text, tag) {
   const match = text.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, "i"));
   return match ? decodeEntities(match[1].replace(/<!\[CDATA\[|\]\]>/g, "")).trim() : "";
@@ -1174,6 +1425,14 @@ function absoluteUrl(base, href) {
 
 function cleanTitle(title) {
   return stripTags(title).replace(/\s+/g, " ").trim();
+}
+
+function cleanString(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function countMatches(text, patterns) {
+  return patterns.reduce((sum, pattern) => sum + (pattern.test(text) ? 1 : 0), 0);
 }
 
 function isCuratedArticleUrl(url) {
@@ -1325,6 +1584,10 @@ function nowIso(options = {}) {
 function numberOption(value, fallback) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
+}
+
+function normalizeTier(value) {
+  return value === "light" ? "light" : "deep";
 }
 
 function sleep(ms) {

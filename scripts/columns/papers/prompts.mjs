@@ -1,8 +1,41 @@
 export function analysisSystem(tier = "deep") {
   const normalizedTier = tier === "light" ? "light" : "deep";
   const sectionRule = normalizedTier === "light"
-    ? "Light tier: sections[] must contain only heading and summary. Do not include loadBearing, evidence, or fold."
-    : "Deep tier: sections[] should also include loadBearing, evidence, and fold when the paper evidence supports them.";
+    ? "Light tier: sections[] must contain only heading and summary. Do not include loadBearing, evidence, fold, scorecard, or deepDive."
+    : `Deep tier:
+- sections[] should also include loadBearing, evidence, and fold when the paper evidence supports them.
+- You must also produce deepDive and scorecard.
+- deepDive.reframe: what the paper REALLY is, not the paper's self-description.
+- deepDive.contributionLayers[] separates layer, claim (论文主张), and judgment (我的判断).
+- deepDive.mechanism gives the key insight in precise but plain language.
+- deepDive.evidenceChain[] uses only metrics/numbers found verbatim in the fetched paper text. If a number/result/experiment is not present in evidence.content, omit that metric; never infer or invent it.
+- Each evidenceChain item needs reviewerNote that distinguishes the headline number from what actually drove it, and marks strong/weak/confounded evidence.
+- deepDive.audit[] should include supplied externalAudit entries and any paper claims you can audit from the fetched text; if nothing was auditable, use [].
+- deepDive.limitations[] must include reproducibility/artifact availability.
+- scorecard[] must cover exactly these dimensions with score 0-10 and reason: 问题重要性, 系统设计, 算法新颖性, 实验强度, 泛化, 可复现性, 影响.`;
+  const deepShape = normalizedTier === "deep"
+    ? `,
+  "scorecard": [
+    { "dimension": "问题重要性", "score": 0, "reason": "why this reviewer score is justified" }
+  ],
+  "deepDive": {
+    "reframe": "what the paper really is",
+    "contributionLayers": [{ "layer": "layer name", "claim": "论文主张", "judgment": "我的判断" }],
+    "mechanism": "precise + plain mechanism",
+    "evidenceChain": [
+      {
+        "component": "experiment/component/dataset",
+        "metrics": [{ "label": "metric name", "value": "number exactly from fetched text", "note": "optional caveat" }],
+        "reviewerNote": "what actually drove the result; strong/weak/confounded"
+      }
+    ],
+    "audit": [{ "claim": "paper/source claim", "finding": "verification result", "source": "url checked" }],
+    "loadBearingClaim": "the claim that must hold for the paper to matter",
+    "strongestEvidence": ["strong evidence item"],
+    "limitations": ["must include reproducibility/artifact availability"],
+    "suggestedExperiments": ["reviewer experiment request"]
+  }`
+    : "";
 
   return `You write AcademicPaperAnalysis JSON for AI Brief.
 
@@ -36,14 +69,15 @@ Required output shape:
     "convergence": ["trusted sources if provided by triage/evidence"],
     "track": ["focus tracks if provided by triage/evidence"],
     "ideaSignal": "short factual triage signal, not a score verdict"
-  }
+  }${deepShape}
 }
 
 ${sectionRule}`;
 }
 
-export function analysisUser(candidate, evidence, evaluation = {}) {
+export function analysisUser(candidate, evidence, evaluation = {}, tier = "deep", externalAudit = []) {
   const paper = candidate?.raw || candidate || {};
+  const normalizedTier = tier === "light" ? "light" : "deep";
   return JSON.stringify({
     paper: publicPaper(paper),
     triage: {
@@ -56,8 +90,9 @@ export function analysisUser(candidate, evidence, evaluation = {}) {
     evidence: {
       kind: evidence?.kind || "paper-text",
       sections: Array.isArray(evidence?.sections) ? evidence.sections : [],
-      content: String(evidence?.content || "").slice(0, 16000),
+      content: String(evidence?.content || "").slice(0, normalizedTier === "deep" ? 65000 : 16000),
     },
+    externalAudit: normalizedTier === "deep" ? externalAudit : [],
   });
 }
 
