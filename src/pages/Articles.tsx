@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   AcademicPaperAnalysis,
+  ArtifactAudit,
   ArticlesData,
+  ClaimLedgerItem,
+  EvidenceMatrixItem,
   PaperAnalysisSection,
   PaperDeepDive,
   PaperRadarPublicData,
+  PaperVerdict,
   ScoreCardItem,
 } from "../types";
 import { loadArticles, loadPaperRadar } from "../lib/data";
@@ -370,6 +374,7 @@ function ArticleDetail({ paper, generatedAt }: { paper: AcademicPaperAnalysis; g
 function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: ScoreCardItem[] }) {
   return (
     <div className="deep-dive">
+      {dive.verdict ? <VerdictBar v={dive.verdict} /> : null}
       {dive.reframe ? (
         <section className="dd-block">
           <div className="section-kicker">重判定位</div>
@@ -377,7 +382,8 @@ function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: Sc
         </section>
       ) : null}
 
-      {dive.contributionLayers?.length ? (
+      {dive.claimLedger?.length ? <ClaimLedger items={dive.claimLedger} /> : null}
+      {!dive.claimLedger?.length && dive.contributionLayers?.length ? (
         <section className="dd-block">
           <div className="section-kicker">真正的贡献 · 主张 vs 判断</div>
           <div className="dd-layers">
@@ -403,7 +409,8 @@ function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: Sc
         </section>
       ) : null}
 
-      {dive.evidenceChain?.length ? (
+      {dive.evidenceMatrix?.length ? <EvidenceMatrix items={dive.evidenceMatrix} /> : null}
+      {!dive.evidenceMatrix?.length && dive.evidenceChain?.length ? (
         <section className="dd-block">
           <div className="section-kicker">证据链</div>
           {dive.evidenceChain.map((e, i) => (
@@ -422,7 +429,8 @@ function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: Sc
         </section>
       ) : null}
 
-      {dive.audit?.length ? (
+      {dive.artifactAudit ? <ArtifactPanel a={dive.artifactAudit} /> : null}
+      {!dive.artifactAudit && dive.audit?.length ? (
         <section className="dd-block dd-audit-block">
           <div className="section-kicker">外部核验 · 声明 vs 现实</div>
           {dive.audit.map((a, i) => (
@@ -454,6 +462,13 @@ function DeepDiveView({ dive, scorecard }: { dive: PaperDeepDive; scorecard?: Sc
           <FdeRow label="风险登记" items={dive.fdeTakeaways.riskRegister} />
           {dive.fdeTakeaways.roiHypothesis ? <FdeRow label="ROI 假设" text={dive.fdeTakeaways.roiHypothesis} /> : null}
           {dive.fdeTakeaways.interviewStory ? <FdeRow label="面试故事" text={dive.fdeTakeaways.interviewStory} /> : null}
+        </section>
+      ) : null}
+
+      {dive.whatWouldInvalidate?.length ? (
+        <section className="dd-block dd-falsify">
+          <div className="section-kicker">什么会推翻它 · Falsification</div>
+          <ul>{dive.whatWouldInvalidate.map((s, i) => <li key={i}>{s}</li>)}</ul>
         </section>
       ) : null}
 
@@ -498,6 +513,92 @@ function PaperSection({ section }: { section: PaperAnalysisSection }) {
         </details>
       ) : null}
     </article>
+  );
+}
+
+const RD_LABEL: Record<string, string> = { must_read: "必读", read: "值得读", skim: "略读", watch: "观望", skip: "跳过" };
+const EXACT_LABEL: Record<string, string> = { exact: "精确", estimated_from_figure: "图中估读", author_claim: "作者声称" };
+const CT_LABEL: Record<string, string> = { theoretical: "理论", empirical: "实验", engineering: "工程", fde_extrapolation: "FDE 推论" };
+function strengthKind(s: string) { return s === "strong" || s === "high" || s === "official" || s === "full" ? "high" : s === "weak" || s === "low" || s === "none" || s === "paper_only" ? "low" : "medium"; }
+
+function VerdictBar({ v }: { v: PaperVerdict }) {
+  return (
+    <section className="verdict-bar">
+      <div className="vb-pills">
+        <span className={`vb-pill vb-${v.readDecision === "skip" ? "low" : v.readDecision === "must_read" ? "high" : "medium"}`}><i>决策</i>{RD_LABEL[v.readDecision] || v.readDecision}</span>
+        <span className={`vb-pill vb-${strengthKind(v.fdeFit)}`}><i>FDE</i>{v.fdeFit}</span>
+        <span className={`vb-pill vb-${strengthKind(v.evidenceStrength)}`}><i>证据</i>{v.evidenceStrength}</span>
+        <span className={`vb-pill vb-${strengthKind(v.artifactStatus)}`}><i>Artifact</i>{v.artifactStatus.replace(/_/g, " ")}</span>
+      </div>
+      {v.oneLineJudgment ? <p className="vb-judgment">{v.oneLineJudgment}</p> : null}
+      {(v.whyNow?.length || v.whyNotOverclaim?.length) ? (
+        <div className="vb-why">
+          {v.whyNow?.length ? <div><span>为什么现在看</span><ul>{v.whyNow.map((s, i) => <li key={i}>{s}</li>)}</ul></div> : null}
+          {v.whyNotOverclaim?.length ? <div className="vb-caution"><span>别过度解读</span><ul>{v.whyNotOverclaim.map((s, i) => <li key={i}>{s}</li>)}</ul></div> : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function ClaimLedger({ items }: { items: ClaimLedgerItem[] }) {
+  return (
+    <section className="dd-block">
+      <div className="section-kicker">Claim Ledger · 主张台账(证明 / 暗示 / FDE 推论)</div>
+      <div className="claim-ledger">
+        {items.map((c, i) => (
+          <div className="claim-row" key={i}>
+            <div className="claim-head">
+              <span className={`claim-type ct-${c.claimType}`}>{CT_LABEL[c.claimType] || c.claimType}</span>
+              <b className={`evi-${strengthKind(c.evidenceStrength)}`}>证据 {c.evidenceStrength}</b>
+            </div>
+            <p className="claim-text">{c.claim}</p>
+            <div className="claim-meta">
+              <span><i>证据位置</i>{c.evidencePointer}</span>
+              <span><i>最大威胁</i>{c.threat}</span>
+              <span><i>FDE 迁移</i>{c.fdeTransfer}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function EvidenceMatrix({ items }: { items: EvidenceMatrixItem[] }) {
+  return (
+    <section className="dd-block">
+      <div className="section-kicker">Evidence Matrix · 证据矩阵</div>
+      <table className="evidence-matrix">
+        <thead><tr><th>实验</th><th>指标</th><th>结果</th><th>来源</th><th>局限</th></tr></thead>
+        <tbody>
+          {items.map((e, i) => (
+            <tr key={i}>
+              <td>{e.experiment}{e.modelBackend ? <small> · {e.modelBackend}</small> : null}{e.sampleSize ? <small> · n={e.sampleSize}</small> : null}</td>
+              <td>{e.metric}</td>
+              <td className="em-result">{e.result}</td>
+              <td><span className={`em-exact em-${e.exactness}`}>{EXACT_LABEL[e.exactness] || e.exactness}</span></td>
+              <td className="em-limit">{e.limitation}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function ArtifactPanel({ a }: { a: ArtifactAudit }) {
+  return (
+    <section className="dd-block dd-audit-block">
+      <div className="section-kicker">外部核验 · Artifact Audit(官方 vs 引用/依赖)</div>
+      <div className="artifact-grid">
+        <div><span>官方代码</span><b className={`art-${strengthKind(a.officialCode)}`}>{a.officialCode.replace(/_/g, " ")}</b></div>
+        <div><span>数据</span><b>{a.data.replace(/_/g, " ")}</b></div>
+        <div><span>可复现</span><b className={`art-${strengthKind(a.reproducibility)}`}>{a.reproducibility.replace(/_/g, " ")}</b></div>
+        {a.repoStatus ? <div><span>repo</span><b>{a.repoStatus}</b></div> : null}
+      </div>
+      {a.notes?.length ? <ul className="artifact-notes">{a.notes.map((n, i) => <li key={i}>{n}</li>)}</ul> : null}
+    </section>
   );
 }
 
