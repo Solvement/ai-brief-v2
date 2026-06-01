@@ -5,8 +5,13 @@
   "description": "Chinese-first AI briefings for GitHub projects, model evolution, product updates, and actionable AI learning.",
   "license": "MIT",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "brief:lint": "node scripts/brief/lint.mjs brief-wiki",
+    "brief:build": "node scripts/brief/build.mjs brief-wiki",
+    "brief:init": "node scripts/brief/wiki.mjs init brief-wiki",
     "predev": "node --no-warnings scripts/maybe-ingest.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "npm run typecheck && vite build",
@@ -28,7 +33,8 @@
   },
   "dependencies": {
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@types/node": "^25.6.2",

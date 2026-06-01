@@ -1,0 +1,321 @@
+# entities.yaml — BriefMem node contract (AutoSci-faithful, adapted to AI Brief).
+#
+# Parallel to AutoSci runtime/schema/entities.yaml. Same field-attribute
+# vocabulary so loader.mjs can be a near-port of runtime/loader.py.
+#
+# Field attributes:
+#   type           str | int | float | bool | date | enum | object | link
+#                  | list_str | list_int | list_link | list_object
+#   required       boolean, default false
+#   default        literal value used by `lint --fix`
+#   range          [min, max] for int / float
+#   values         [...] for enum
+#   to             entity kind (or list of kinds) for link / list_link
+#   required_when  { other_field: value } for conditional required
+#   fields         nested schema for object
+#   item           per-element schema for list_object
+#
+# `terminal: true` means the entity writes no outward links (xref-exempt).
+# `singleton: true` means exactly one instance (slug fixed); used by taste.
+#
+# Two families:
+#   FUNNEL  (content, source-pack, evidence-pack, deep-dive) — per-item,
+#           transient, the path one content flows through. Archivable.
+#   KNOWLEDGE (concept, method, system-component, claim, evidence, artifact,
+#           design-principle) — cross-content, compounding, reusable memory.
+#   SELF    (taste) — who the user is.
+
+# ===========================================================================
+# FUNNEL
+# ===========================================================================
+
+content:
+  dir: brief-wiki/content/
+  fields:
+    title:            { type: str, required: true }
+    slug:             { type: str, required: true }
+    type:             { type: enum, values: [paper, project, model, podcast], required: true }   # blog/tool removed; podcast deferred
+    source:           { type: str, required: true }   # discovery channel, e.g. arxiv / github-trending:daily|weekly|monthly
+    url:              { type: str, required: true }
+    authors_or_creators: { type: list_str, default: [] }
+    date:             { type: str }                    # publish/release date (str: repos vary)
+    discovered_at:    { type: date, required: true }
+    content_track:    { type: str }                    # AI PM / FDE / AI Engineer direction tag — SELECTION ONLY, never deep-dive structure
+    # type=project sub-kind, assigned at triage; routes the deep-dive shape (skill→install only,
+    # finance_agent→how the agent is built, functional_software→how/use/use-cases,
+    # teaching→learning roadmap, research→highlights+impl+problem). Non-skill judged by core architecture.
+    project_kind:     { type: enum, values: [skill, finance_agent, functional_software, teaching, research] }
+    # type=model only: open_source→detailed technical analysis; closed_source→faithful changelog translation.
+    model_access:     { type: enum, values: [open_source, closed_source] }
+    status:
+      type: enum
+      values: [discovered, shortlisted, source_packed, evidence_packed, deep_dived, archived, watchlisted]
+      required: true
+      default: discovered
+    why_discovered:   { type: str }
+    why_selected:     { type: str }
+    why_rejected:     { type: str }
+    relation_to_existing_memory:
+      type: enum
+      values: [duplicate, extends_existing, contradicts_existing, fills_gap, creates_new_track]
+    tags:             { type: list_str, required: true, default: [] }
+    importance:       { type: int, range: [1, 5], required: true, default: 3 }
+  lifecycle:
+    transitions:
+      discovered:      [shortlisted, archived, watchlisted]
+      shortlisted:     [source_packed, archived]
+      source_packed:   [evidence_packed]
+      evidence_packed: [deep_dived]
+      deep_dived:      [archived]
+      watchlisted:     [shortlisted, archived]
+
+source-pack:
+  dir: brief-wiki/source-packs/
+  fields:
+    content:          { type: link, to: content, required: true }   # 1:1, slug == content slug
+    fetched_materials:
+      type: object
+      fields:
+        abs:           { type: str }
+        pdf:           { type: str }
+        html:          { type: str }
+        appendix:      { type: str }
+        repo:          { type: str }
+        readme:        { type: str }
+        docs:          { type: str }
+        website:       { type: str }
+        transcript:    { type: str }
+        release_notes: { type: str }
+        benchmark_page: { type: str }
+    primary_sources:   { type: list_str, default: [] }   # one-hand sources (the artifact itself)
+    discovery_sources: { type: list_str, default: [] }   # how it was found (NEVER usable as evidence — guard)
+    source_reliability: { type: enum, values: [high, medium, low] }
+    missing_sources:   { type: list_str, default: [] }
+    last_checked:      { type: date }
+
+evidence-pack:
+  dir: brief-wiki/evidence-packs/
+  fields:
+    content:          { type: link, to: content, required: true }
+    technical_objects:
+      type: list_object
+      default: []
+      item:
+        name:          { type: str, required: true }
+        type:
+          type: enum
+          values: [component, method, model, dataset, benchmark, tool, API,
+                   memory, evaluator, planner, retriever, router, sandbox, schema]
+          required: true
+        input:         { type: str }
+        output:        { type: str }
+        role:          { type: str }
+        internal_logic: { type: str }
+        failure_mode:  { type: str }
+        source_pointer: { type: str, required: true }
+    pipeline_steps:    { type: list_str, default: [] }
+    experiments:       { type: list_str, default: [] }
+    claims:            { type: list_str, default: [] }
+    artifacts:         { type: list_str, default: [] }
+    metrics:           { type: list_str, default: [] }
+    baselines:         { type: list_str, default: [] }
+    failure_modes:     { type: list_str, default: [] }
+    missing_details:   { type: list_str, default: [] }
+    source_pointers:   { type: list_str, default: [] }
+
+deep-dive:
+  dir: brief-wiki/deep-dives/
+  fields:
+    content:          { type: link, to: content, required: true }
+    # shape = the universal renderer/section switch (drives which body sections + which
+    # workbench modules dominate). Derived from content.type (+ project_kind / model_access):
+    #   paper→paper, model open→model-open, model closed→model-changelog,
+    #   project skill→install, finance_agent→agent-build, functional_software→howto-use,
+    #   teaching→roadmap, research→research-impl.
+    shape:
+      type: enum
+      values: [paper, model-open, model-changelog, install, agent-build, howto-use, roadmap, research-impl]
+      required: true
+    paper_type:
+      type: enum
+      values: [system, benchmark, method, theory, survey, position, application]
+    claim_ledger:
+      type: list_object
+      default: []
+      item:
+        claim:           { type: str, required: true }
+        source:          { type: str, required: true }
+        evidence_strength: { type: enum, values: [high, medium, low, none], required: true }
+        supports:        { type: str }
+        does_not_support: { type: str }
+        threat:          { type: str }
+    evidence_matrix:
+      type: list_object
+      default: []
+      item:
+        experiment:  { type: str, required: true }
+        dataset:     { type: str }
+        baseline:    { type: str }
+        metric:      { type: str }
+        result:      { type: str }
+        sample_size: { type: str }
+        exactness:   { type: enum, values: [exact, approximate, vague] }
+        source:      { type: str, required: true }
+        limitation:  { type: str }
+    artifact_audit:
+      type: object
+      fields:
+        official_repo:          { type: str }
+        official_data:          { type: str }
+        evaluation_code:        { type: str }
+        prompts_or_rubrics:     { type: str }
+        benchmark_tasks:        { type: str }
+        model_checkpoints:      { type: str }
+        appendix:               { type: str }
+        license:                { type: str }
+        minimal_demo:           { type: str }
+        closed_dependencies:    { type: list_str }
+        third_party_dependencies: { type: list_str }
+        broken_links:           { type: list_str }
+        reproducibility_status: { type: enum, values: [reproducible, partial, paper_only, unverifiable] }
+    quality_report:
+      type: object
+      fields:
+        verdict:        { type: enum, values: [pass, warn, block] }
+        flags:          { type: list_str }
+        grounded_score: { type: float, range: [0, 1] }
+  # Body sections (templates/deep-dive.md.tmpl): Technical reading /
+  # Terminology / Architecture / Mechanisms / Highlights / Defects /
+  # AI after-analysis. Ledgers/matrix/audit above are structured for the
+  # frontend workbench components (verdict bar / claim ledger / evidence
+  # matrix / artifact audit — already built in iteration-2).
+
+# ===========================================================================
+# KNOWLEDGE (compounding, reusable)
+# ===========================================================================
+
+concept:
+  dir: brief-wiki/concepts/
+  fields:
+    name:             { type: str, required: true }
+    slug:             { type: str, required: true }
+    explanation:      { type: str }
+    tags:             { type: list_str, required: true, default: [] }
+    maturity:         { type: enum, values: [stable, active, emerging, deprecated], required: true, default: active }
+    first_seen_in:    { type: link, to: content }
+    related_content:  { type: list_link, to: content, default: [] }
+    related_concepts: { type: list_link, to: concept, default: [] }
+    common_misunderstandings: { type: list_str, default: [] }
+    examples:         { type: list_str, default: [] }
+    open_questions:   { type: list_str, default: [] }    # feeds graph/gap-map.md
+
+method:
+  dir: brief-wiki/methods/
+  fields:
+    name:             { type: str, required: true }
+    slug:             { type: str, required: true }
+    type:
+      type: enum
+      values: [architecture, training, inference, evaluation, data, benchmark,
+               system, optimization, prompting, protocol, retrieval, memory,
+               orchestration, other]
+      required: true
+      default: other
+    tags:             { type: list_str, required: true, default: [] }
+    problem_solved:   { type: str }
+    naive_baseline:   { type: str }
+    how_it_works:     { type: str }
+    input:            { type: str }
+    output:           { type: str }
+    tradeoff:         { type: str }
+    evidence_strength: { type: enum, values: [high, medium, low] }
+    used_by_content:  { type: list_link, to: content, default: [] }
+    realizes_concepts: { type: list_link, to: concept, default: [] }
+    reusable_pattern: { type: str }
+
+system-component:
+  dir: brief-wiki/system-components/
+  fields:
+    name:             { type: str, required: true }
+    slug:             { type: str, required: true }
+    tags:             { type: list_str, required: true, default: [] }
+    role:             { type: str }
+    input:            { type: str }
+    output:           { type: str }
+    internal_logic:   { type: str }
+    failure_modes:    { type: list_str, default: [] }
+    seen_in:          { type: list_link, to: content, default: [] }
+    replaceable_by:   { type: list_link, to: system-component, default: [] }
+    design_notes:     { type: str }
+
+claim:
+  dir: brief-wiki/claims/
+  fields:
+    text:             { type: str, required: true }
+    slug:             { type: str, required: true }
+    content:          { type: link, to: content, required: true }
+    source_pointer:   { type: str }
+    evidence_strength: { type: enum, values: [high, medium, low, none], required: true, default: none }
+    supports:         { type: list_link, to: [concept, method], default: [] }
+    contradicts:      { type: list_link, to: claim, default: [] }
+    open_challenges:  { type: list_str, default: [] }
+    status:           { type: enum, values: [supported, contested, refuted, untested], required: true, default: untested }
+
+evidence:
+  dir: brief-wiki/evidence/
+  fields:
+    slug:             { type: str, required: true }
+    content:          { type: link, to: content, required: true }
+    experiment_or_case: { type: str, required: true }
+    dataset:          { type: str }
+    baseline:         { type: str }
+    metric:           { type: str }
+    result:           { type: str }
+    exactness:        { type: enum, values: [exact, approximate, vague], required: true, default: approximate }
+    sample_size:      { type: str }
+    limitations:      { type: str }
+    source_pointer:   { type: str, required: true }   # guard: every number needs a pointer
+
+artifact:
+  dir: brief-wiki/artifacts/
+  fields:
+    slug:             { type: str, required: true }
+    content:          { type: link, to: content, required: true }
+    artifact_type:    { type: enum, values: [repo, dataset, model, benchmark, demo, prompt, eval_code], required: true }
+    url:              { type: str }
+    official_or_third_party: { type: enum, values: [official, third_party, referenced], required: true }
+    status:           { type: enum, values: [available, partial, on_hold, missing, broken], required: true }
+    license:          { type: str }
+    runnable:         { type: enum, values: [yes, no, unknown], required: true, default: unknown }
+    missing_parts:    { type: list_str, default: [] }
+    last_checked:     { type: date }
+
+design-principle:
+  dir: brief-wiki/design-principles/
+  fields:
+    principle:        { type: str, required: true }
+    slug:             { type: str, required: true }
+    tags:             { type: list_str, required: true, default: [] }
+    derived_from:     { type: list_link, to: content, default: [] }
+    examples:         { type: list_str, default: [] }
+    counter_examples: { type: list_str, default: [] }
+    when_to_use:      { type: str }
+    when_not_to_use:  { type: str }
+    confidence:       { type: enum, values: [high, medium, low], required: true, default: medium }
+
+# ===========================================================================
+# SELF
+# ===========================================================================
+
+taste:
+  dir: brief-wiki/taste/
+  singleton: true
+  terminal: true
+  fields:
+    likes:            { type: list_str, default: [] }
+    dislikes:         { type: list_str, default: [] }
+    preferred_tracks: { type: list_str, default: [] }
+    skipped_tracks:   { type: list_str, default: [] }
+    preferred_depth:  { type: str }
+    preferred_output_style: { type: str }
+    last_updated:     { type: date }

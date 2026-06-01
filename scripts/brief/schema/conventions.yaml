@@ -1,0 +1,47 @@
+# conventions.yaml — System-level constants (parallel to AutoSci conventions.yaml).
+
+# Slug shape: lowercase keywords, hyphen-joined. Generated from title; this
+# regex validates the result.
+slug_rule: "^[a-z0-9]+(-[a-z0-9]+)*$"
+
+# Where an entity page lives, given its kind and slug.
+path_pattern: "brief-wiki/{kind}/{slug}.md"
+
+# Wikilink resolution: [[slug]] tries each entity dir until {slug}.md is found.
+wikilink_syntax: "[[slug]]"
+
+# All schema dates are ISO 8601 calendar dates.
+date_format: "YYYY-MM-DD"
+
+# Append-only log line grammar.
+log_grammar: "## [{date}] {skill} | {details}"
+
+# Funnel 1:1 join: source-pack / evidence-pack / deep-dive each carry their own
+# UNIQUE slug and link back to the content item via the `content` field (the join
+# key). They are NOT slug-identical to the content (that would make bare-slug
+# wiki references ambiguous). Separate files still enable module-level repair:
+# regenerate one pack without touching the others. Convention: prefix the content
+# slug, e.g. content `lora` -> deep-dive `lora-deep-dive`, source-pack `lora-source-pack`.
+funnel_join_field: content
+
+# File-system ownership rules.
+ownership:
+  tools_only:  [brief-wiki/graph]   # only via scripts/brief/wiki.mjs
+  append_only: [brief-wiki/log.md]  # never rewritten in place
+  derived:     [public/data]        # compiled from brief-wiki/ by the build step; never hand-edited
+
+# Singleton entities use a fixed slug.
+singleton_slug:
+  taste: me
+
+# Where each edge type is physically stored.
+edge_storage:
+  default: brief-wiki/graph/edges.jsonl
+
+# Derived active-memory artifacts (rebuilt after each memory-write).
+derived_artifacts:
+  context_brief: brief-wiki/graph/context-brief.md   # current research context summary
+  gap_map:       brief-wiki/graph/gap-map.md          # all open_questions aggregated (gap-driven discovery)
+
+# Build target: brief-wiki/ compiles to these JSON mirrors for the React frontend.
+frontend_mirror_dir: public/data

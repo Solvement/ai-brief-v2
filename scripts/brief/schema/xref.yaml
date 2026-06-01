@@ -1,0 +1,62 @@
+# xref.yaml — Bidirectional link contract (parallel to AutoSci xref.yaml).
+#
+# When entity A writes a forward link to B, the reverse update on B is required.
+# loader.mjs + lint.mjs enforce this (the bidirectional invariant).
+#
+#   forward.kind / (frontmatter_field | body_section | edge_type) / target
+#   reverse.kind / (frontmatter_field | body_section) / action(append_slug|append_record)
+#
+# Funnel 1:1 links (source-pack.content, evidence-pack.content, deep-dive.content)
+# are slug-identity links (pack slug == content slug) and are NOT listed here —
+# they are derivable, not stored reverse. Only cross-content KNOWLEDGE links
+# carry reverse obligations.
+#
+# `taste` is terminal — never a reverse target.
+
+rules:
+
+  # method.realizes_concepts → concept ## Realized by
+  - forward: { kind: method,  frontmatter_field: realizes_concepts, target: concept }
+    reverse: { kind: concept, body_section: "Realized by", action: append_slug }
+
+  # method.used_by_content → content ## Methods
+  - forward: { kind: method,  frontmatter_field: used_by_content, target: content }
+    reverse: { kind: content, body_section: "Methods", action: append_slug }
+
+  # concept.related_content → content ## Concepts
+  - forward: { kind: concept, frontmatter_field: related_content, target: content }
+    reverse: { kind: content, body_section: "Concepts", action: append_slug }
+
+  # concept.related_concepts ↔ concept.related_concepts (reciprocity)
+  - forward: { kind: concept, frontmatter_field: related_concepts, target: concept }
+    reverse: { kind: concept, frontmatter_field: related_concepts, action: append_slug }
+
+  # system-component.seen_in → content ## Components
+  - forward: { kind: system-component, frontmatter_field: seen_in, target: content }
+    reverse: { kind: content, body_section: "Components", action: append_slug }
+
+  # system-component.replaceable_by ↔ system-component.replaceable_by (reciprocity)
+  - forward: { kind: system-component, frontmatter_field: replaceable_by, target: system-component }
+    reverse: { kind: system-component, frontmatter_field: replaceable_by, action: append_slug }
+
+  # claim.content → content ## Claims
+  - forward: { kind: claim,   frontmatter_field: content, target: content }
+    reverse: { kind: content, body_section: "Claims", action: append_slug }
+
+  # claim.supports → concept/method ## Supported by
+  - forward: { kind: claim,   frontmatter_field: supports, target: [concept, method] }
+    reverse: { kind: [concept, method], body_section: "Supported by", action: append_slug }
+
+  # evidence.content → content ## Evidence
+  - forward: { kind: evidence, frontmatter_field: content, target: content }
+    reverse: { kind: content,  body_section: "Evidence", action: append_slug }
+
+  # artifact.content → content ## Artifacts
+  - forward: { kind: artifact, frontmatter_field: content, target: content }
+    reverse: { kind: content,  body_section: "Artifacts", action: append_slug }
+
+  # design-principle.derived_from → content ## Principles
+  - forward: { kind: design-principle, frontmatter_field: derived_from, target: content }
+    reverse: { kind: content, body_section: "Principles", action: append_slug }
+
+terminal_targets: [taste]

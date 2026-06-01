@@ -1,0 +1,114 @@
+# edges.yaml — BriefGraph relation contract (parallel to AutoSci edges.yaml).
+#
+# Each edge type declares:
+#   endpoints   { from: <kind>, to: <kind> }  -- '*' means any kind
+#   direction   directed | symmetric           -- symmetric stored once, endpoints sorted
+#   workflow    which BriefFlow stage owns this edge (rank | memory-write | guard)
+#   attributes  schema for edge-record fields beyond from/to/type
+#
+# Storage: brief-wiki/graph/edges.jsonl (see conventions.yaml::edge_storage).
+# Faithful to AutoSci: semantic edges MUST carry confidence + evidence.
+# Kept to a small irreducible set — prefer merging over edge-type sprawl.
+
+# ---------------------------------------------------------------------------
+# Content ↔ Content (written by /brief-rank, /brief-memory-write)
+# ---------------------------------------------------------------------------
+
+duplicate_of:
+  endpoints: { from: content, to: content }
+  direction: symmetric
+  workflow:  rank
+  attributes:
+    confidence: { type: enum, values: [high, medium, low], required: true }
+    evidence:   { type: str, required: true }
+
+same_track_as:
+  endpoints: { from: content, to: content }
+  direction: symmetric
+  workflow:  rank
+  attributes:
+    confidence: { type: enum, values: [high, medium, low], required: true }
+    evidence:   { type: str, required: true }
+
+# ---------------------------------------------------------------------------
+# Content → Knowledge (written by /brief-memory-write)
+# ---------------------------------------------------------------------------
+
+extends:
+  endpoints: { from: content, to: [concept, method] }
+  direction: directed
+  workflow:  memory-write
+  attributes:
+    confidence: { type: enum, values: [high, medium, low], required: true }
+    evidence:   { type: str, required: true }
+
+uses_method:
+  endpoints: { from: content, to: method }
+  direction: directed
+  workflow:  memory-write
+  attributes:
+    confidence: { type: enum, values: [high, medium, low], required: true }
+    evidence:   { type: str, required: true }
+
+has_component:
+  endpoints: { from: content, to: system-component }
+  direction: directed
+  workflow:  memory-write
+  attributes:
+    confidence: { type: enum, values: [high, medium, low], required: true }
+    evidence:   { type: str, required: true }
+
+# ---------------------------------------------------------------------------
+# Knowledge ↔ Knowledge
+# ---------------------------------------------------------------------------
+
+realizes_concept:
+  endpoints: { from: method, to: concept }
+  direction: directed
+  workflow:  memory-write
+  attributes:
+    confidence: { type: enum, values: [high, medium, low], required: true }
+    evidence:   { type: str, required: true }
+
+# ---------------------------------------------------------------------------
+# Evidence / Claim (the audit layer — written by /brief-critique, /brief-guard)
+# ---------------------------------------------------------------------------
+
+supports_claim:
+  endpoints: { from: evidence, to: claim }
+  direction: directed
+  workflow:  guard
+  attributes:
+    evidence: { type: str, required: true }
+
+refutes_claim:
+  endpoints: { from: evidence, to: claim }
+  direction: directed
+  workflow:  guard
+  attributes:
+    evidence: { type: str, required: true }
+
+contradicts:
+  endpoints: { from: '*', to: '*' }
+  direction: directed
+  workflow:  memory-write
+  attributes:
+    evidence: { type: str, required: true }
+
+# ---------------------------------------------------------------------------
+# Provenance / self-evolution
+# ---------------------------------------------------------------------------
+
+fills_gap:
+  endpoints: { from: content, to: '*' }   # content fills an open_question / concept gap
+  direction: directed
+  workflow:  rank
+  attributes:
+    evidence: { type: str, required: true }
+
+derived_from:
+  endpoints: { from: design-principle, to: content }
+  direction: directed
+  workflow:  memory-write
+  attributes:
+    evidence: { type: str }
