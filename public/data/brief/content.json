@@ -1,7 +1,112 @@
 {
-  "generatedAt": "2026-06-01T18:49:07.496Z",
+  "generatedAt": "2026-06-01T23:55:35.057Z",
   "entity": "content",
   "directory": "content",
-  "count": 0,
-  "items": []
+  "count": 1,
+  "items": [
+    {
+      "id": "content/agemem",
+      "type": "content",
+      "slug": "agemem",
+      "title": "Agentic Memory: Learning Unified Long-Term and Short-Term Memory Management for Large Language Model Agents",
+      "file": "content/agemem.md",
+      "directory": "content",
+      "meta": {
+        "title": "Agentic Memory: Learning Unified Long-Term and Short-Term Memory Management for Large Language Model Agents",
+        "slug": "agemem",
+        "kind": "content",
+        "type": "paper",
+        "source": "arxiv",
+        "url": "https://arxiv.org/abs/2601.01885",
+        "authors_or_creators": [
+          "Yi Yu",
+          "Liuyi Yao",
+          "Yuexiang Xie",
+          "Qingquan Tan",
+          "Jiaqi Feng",
+          "Yaliang Li",
+          "Libing Wu"
+        ],
+        "date": "2026-01-05",
+        "discovered_at": "2026-06-01",
+        "content_track": "AI Engineer",
+        "status": "deep_dived",
+        "tags": [
+          "agent-memory",
+          "llm-agents",
+          "reinforcement-learning"
+        ],
+        "importance": 4,
+        "why_discovered": "契合口味(agent-memory 架构);回答了 gap-map 里那个悬而未决的问题——研究型智能体如何持久化长期状态。",
+        "why_selected": "一篇有具体机制的 system/method 论文(把记忆操作做成一等公民的策略动作)+ 一套 RL 训练配方 + 5 个基准的证据。可复用范式价值高。",
+        "relation_to_existing_memory": "creates_new_track"
+      },
+      "body": "\n## Summary\n\nAgeMem 把长期记忆(LTM)和短期记忆(STM)的管理折叠进 LLM 智能体自己的策略里:不再有独立的启发式控制器,智能体把记忆操作当作工具动作来调用,并用 RL 端到端训练,自己决定「何时、把什么」存储、检索、更新、摘要或丢弃。出处:arxiv:2601.01885(abstract)。\n\n## Pipeline\n- [[source-packs/agemem-source-pack]]\n- [[evidence-packs/agemem-evidence-pack]]\n- [[deep-dives/agemem-deep-dive]]\n\n## Methods\n- [[methods/step-wise-grpo]]\n\n## Concepts\n- [[concepts/agentic-memory]]\n\n## Claims\n- [[claims/agemem-unified-beats-modular]]\n\n## Evidence\n- [[evidence/agemem-main-results]]\n\n## Artifacts\n- [[artifacts/agemem-code]]\n",
+      "excerpt": "AgeMem 把长期记忆(LTM)和短期记忆(STM)的管理折叠进 LLM 智能体自己的策略里:不再有独立的启发式控制器,智能体把记忆操作当作工具动作来调用,并用 RL 端到端训练,自己决定「何时、把什么」存储、检索、更新、摘要或丢弃。出处:arxiv:2601.01885(abstract)。",
+      "links": [
+        {
+          "target": "source-packs/agemem-source-pack",
+          "raw": "[[source-packs/agemem-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/agemem-evidence-pack",
+          "raw": "[[evidence-packs/agemem-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/agemem-deep-dive",
+          "raw": "[[deep-dives/agemem-deep-dive]]"
+        },
+        {
+          "target": "methods/step-wise-grpo",
+          "raw": "[[methods/step-wise-grpo]]"
+        },
+        {
+          "target": "concepts/agentic-memory",
+          "raw": "[[concepts/agentic-memory]]"
+        },
+        {
+          "target": "claims/agemem-unified-beats-modular",
+          "raw": "[[claims/agemem-unified-beats-modular]]"
+        },
+        {
+          "target": "evidence/agemem-main-results",
+          "raw": "[[evidence/agemem-main-results]]"
+        },
+        {
+          "target": "artifacts/agemem-code",
+          "raw": "[[artifacts/agemem-code]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Methods"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
+        },
+        {
+          "depth": 2,
+          "text": "Evidence"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    }
+  ]
 }

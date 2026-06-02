@@ -1,7 +1,46 @@
 {
-  "generatedAt": "2026-06-01T18:49:07.496Z",
+  "generatedAt": "2026-06-01T23:55:35.057Z",
   "entity": "source-pack",
   "directory": "source-packs",
-  "count": 0,
-  "items": []
+  "count": 1,
+  "items": [
+    {
+      "id": "source-pack/agemem-source-pack",
+      "type": "source-pack",
+      "slug": "agemem-source-pack",
+      "title": "AgeMem — Source Pack",
+      "file": "source-packs/agemem-source-pack.md",
+      "directory": "source-packs",
+      "meta": {
+        "content": "agemem",
+        "kind": "source-pack",
+        "title": "AgeMem — Source Pack",
+        "fetched_materials": {
+          "abs": "https://arxiv.org/abs/2601.01885",
+          "html": "https://arxiv.org/html/2601.01885v2"
+        },
+        "primary_sources": [
+          "arxiv:2601.01885 abstract",
+          "arxiv:2601.01885v2 full text (method + experiments)"
+        ],
+        "discovery_sources": [
+          "web search: arXiv 2026 LLM agent long-term memory"
+        ],
+        "source_reliability": "high",
+        "missing_sources": [
+          "official code repository (none located)"
+        ],
+        "last_checked": "2026-06-01"
+      },
+      "body": "\n## Notes\n\nPrimary text fetched from arXiv abstract + v2 HTML (method, RL recipe, experiments). No code/data release statement located in the fetched text — tracked under missing_sources and reflected in the artifact audit.\n",
+      "excerpt": "Primary text fetched from arXiv abstract + v2 HTML (method, RL recipe, experiments). No code/data release statement located in the fetched text — tracked under missing_sources and reflected in the artifact audit.",
+      "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    }
+  ]
 }

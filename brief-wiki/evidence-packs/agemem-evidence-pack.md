@@ -1,0 +1,56 @@
+---
+content: agemem
+kind: evidence-pack
+title: "AgeMem — Evidence Pack"
+technical_objects:
+  - name: "LTM store ℳ_t"
+    type: memory
+    input: "memory entries {content string + metadata}"
+    output: "top-k retrieved entries into active context"
+    role: "persistent long-term store the agent edits via Add/Update/Delete"
+    source_pointer: "arxiv:2601.01885v2 §method (state s_t = (C_t, ℳ_t, 𝒯))"
+  - name: "Memory tool-actions (Add/Update/Delete/Retrieve/Summary/Filter)"
+    type: tool
+    input: "structured JSON {name, arguments}"
+    output: "mutated memory state / refreshed context"
+    role: "exposes memory ops as first-class policy actions in a hybrid action space"
+    source_pointer: "arxiv:2601.01885v2 §method (operations list)"
+  - name: "Step-wise GRPO"
+    type: method
+    input: "multi-stage trajectory τ = (τ1,τ2,τ3) + terminal reward"
+    output: "advantage broadcast to all preceding steps"
+    role: "credit assignment across sparse, discontinuous memory rewards"
+    source_pointer: "arxiv:2601.01885v2 §training"
+pipeline_steps:
+  - "Stage 1: LTM construction from conversational context"
+  - "Stage 2: STM control under distractors (LTM retained, context reset)"
+  - "Stage 3: integrated reasoning over a formal query"
+experiments:
+  - "5 long-horizon benchmarks × multiple LLM backbones (Qwen2.5-7B, Qwen3-4B)"
+claims:
+  - "Unified policy-integrated memory beats modular memory-augmented baselines"
+artifacts:
+  - "No official code/data release located in fetched text"
+metrics:
+  - "average task score (%)"
+  - "memory-quality (MQ)"
+  - "active-context token usage"
+baselines:
+  - LangMem
+  - A-Mem
+  - Mem0
+  - "Mem0^g (graph)"
+  - "AgeMem-noRL (ablation)"
+failure_modes:
+  - "fixed tool set limits fine-grained control"
+  - "training trajectories sourced only from HotpotQA"
+missing_details:
+  - "per-benchmark breakdown beyond the reported averages"
+  - "absolute compute/training cost"
+source_pointers:
+  - "arxiv:2601.01885v2 Table 2 / Fig 2-4 / Table 4 / Limitations"
+---
+
+## Notes
+
+Evidence extracted before synthesis (evidence-first). Benchmarks: ALFWorld, SciWorld, PDDL, BabyAI, HotpotQA (arxiv:2601.01885v2 §experiments).

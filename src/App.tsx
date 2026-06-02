@@ -5,6 +5,7 @@ import { Models } from "./pages/Models";
 import { Projects } from "./pages/Projects";
 import { Articles } from "./pages/Articles";
 import { Podcast } from "./pages/Podcast";
+import { BriefDeepDive } from "./pages/BriefDeepDive";
 
 /**
  * Tiny hash-based router. No external dependency.
@@ -24,6 +25,7 @@ type RouteState =
   | { route: "models"; companyId?: string }
   | { route: "projects" }
   | { route: "articles"; paperId?: string }
+  | { route: "brief"; slug?: string }
   | { route: "podcast" };
 
 function parseHash(): RouteState {
@@ -34,6 +36,8 @@ function parseHash(): RouteState {
   if (models) return { route: "models", companyId: models[1] ? decodeURIComponent(models[1]) : undefined };
   const articles = raw.match(/^\/articles(?:\/([^/]+))?\/?$/);
   if (articles) return { route: "articles", paperId: articles[1] ? decodeURIComponent(articles[1]) : undefined };
+  const brief = raw.match(/^\/brief(?:\/([^/]+))?\/?$/);
+  if (brief) return { route: "brief", slug: brief[1] ? decodeURIComponent(brief[1]) : undefined };
   if (/^\/projects\/?$/.test(raw)) return { route: "projects" };
   if (/^\/podcast\/?$/.test(raw)) return { route: "podcast" };
   return { route: "home" };
@@ -57,6 +61,7 @@ export function App() {
   if (state.route === "models") return <Models companyId={state.companyId} />;
   if (state.route === "projects") return <Projects />;
   if (state.route === "articles") return <Articles paperId={state.paperId} />;
+  if (state.route === "brief") return <BriefDeepDive slug={state.slug} />;
   if (state.route === "podcast") return <Podcast />;
   return <Home />;
 }

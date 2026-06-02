@@ -1,7 +1,44 @@
 {
-  "generatedAt": "2026-06-01T18:49:07.496Z",
+  "generatedAt": "2026-06-01T23:55:35.057Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 0,
-  "items": []
+  "count": 1,
+  "items": [
+    {
+      "id": "artifact/agemem-code",
+      "type": "artifact",
+      "slug": "agemem-code",
+      "title": "Agemem Code",
+      "file": "artifacts/agemem-code.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "agemem-code",
+        "kind": "artifact",
+        "content": "agemem",
+        "artifact_type": "repo",
+        "official_or_third_party": "referenced",
+        "status": "missing",
+        "runnable": "no",
+        "missing_parts": [
+          "no code repository located in the fetched text",
+          "training trajectory data / reward model not released"
+        ],
+        "last_checked": "2026-06-01"
+      },
+      "body": "\n## Artifact audit\n\nNo official code or data release statement was found in the fetched arXiv abstract or v2 HTML. Reproducing the three-stage RL + step-wise GRPO recipe from the paper alone is non-trivial. Status: paper-only. Source: arxiv:2601.01885 (no release statement located 2026-06-01). See [[content/agemem]].\n",
+      "excerpt": "No official code or data release statement was found in the fetched arXiv abstract or v2 HTML. Reproducing the three-stage RL + step-wise GRPO recipe from the paper alone is non-trivial. Status: paper-only. Source: arxiv:2601.01885 (no release statement located 2026-06-01). See [",
+      "links": [
+        {
+          "target": "content/agemem",
+          "raw": "[[content/agemem]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    }
+  ]
 }

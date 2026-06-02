@@ -177,7 +177,11 @@ deep-dive:
         closed_dependencies:    { type: list_str }
         third_party_dependencies: { type: list_str }
         broken_links:           { type: list_str }
-        reproducibility_status: { type: enum, values: [reproducible, partial, paper_only, unverifiable] }
+        hardware:               { type: str }
+        # reproducibility ladder: reproducible (turnkey) > code_available_but_heavy
+        # (code exists but needs heavy data/compute/keys, not turnkey) > partial
+        # (some artifacts) > paper_only (nothing released) > unverifiable.
+        reproducibility_status: { type: enum, values: [reproducible, code_available_but_heavy, partial, paper_only, unverifiable] }
     quality_report:
       type: object
       fields:

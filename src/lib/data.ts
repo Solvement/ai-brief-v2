@@ -80,6 +80,32 @@ export function loadPaperRadar(): Promise<PaperRadarPublicData | null> {
   return inflightPaperRadar;
 }
 
+/**
+ * Generic loader for a BriefMem entity mirror produced by `npm run brief:build`.
+ * Files live in /public/data/brief and are served at /data/brief/<name>.json.
+ * Shape: { generatedAt, entity, directory, count, items: [...] }.
+ */
+export interface BriefEntityFile<T = Record<string, unknown>> {
+  generatedAt: string;
+  entity: string;
+  directory: string;
+  count: number;
+  items: T[];
+}
+
+const briefCache = new Map<string, BriefEntityFile>();
+
+export function loadBriefEntity<T = Record<string, unknown>>(name: string): Promise<BriefEntityFile<T>> {
+  const cached = briefCache.get(name);
+  if (cached) return Promise.resolve(cached as BriefEntityFile<T>);
+  return fetch(`./data/brief/${name}.json`, { cache: "no-cache" }).then(async (res) => {
+    if (!res.ok) throw new Error(`加载 brief/${name}.json 失败：HTTP ${res.status}`);
+    const data = (await res.json()) as BriefEntityFile<T>;
+    briefCache.set(name, data as BriefEntityFile);
+    return data;
+  });
+}
+
 export function loadPipelineStatus(): Promise<PipelineStatusData | null> {
   if (cachedPipelineStatus) return Promise.resolve(cachedPipelineStatus);
   if (inflightPipelineStatus) return inflightPipelineStatus;

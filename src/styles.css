@@ -3795,3 +3795,125 @@ button { font-family: inherit; cursor: pointer; }
 .dd-fde-fold[open] summary::before { content: "▾"; }
 .dd-fde-fold ul { margin: 8px 0 0; padding-left: 18px; }
 .dd-fde-fold li { font-size: 14px; line-height: 1.7; color: var(--ink); margin: 5px 0; }
+
+/* ---- iteration-2: decision badges on the radar list card (GPT §3.1 / §6.2) ---- */
+.article-card-verdict { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.ac-type { font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-soft); }
+.ac-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-2); }
+.ac-pill i { font-style: normal; font-size: 10px; font-weight: 600; color: var(--ink-3); opacity: .8; }
+.ac-high { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+.ac-medium { background: var(--accent-soft); border-color: var(--accent-2); color: var(--gold-deep); }
+.ac-low { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.ac-high i, .ac-medium i, .ac-low i { color: inherit; opacity: .65; }
+
+/* ---- iteration-2: deep-dive sticky TOC / research-workbench rail (GPT §4 / §13) ---- */
+.dd-layout { display: grid; grid-template-columns: minmax(0,1fr) 188px; gap: 36px; align-items: start; }
+.dd-main { min-width: 0; }
+.dd-toc { position: sticky; top: 88px; align-self: start; }
+.dd-toc-inner { border-left: 1px solid var(--line); padding-left: 16px; }
+.dd-toc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 12px; }
+.dd-toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.dd-toc a { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; font-size: 12.5px; color: var(--ink-3); }
+.dd-toc a:hover { color: var(--ink); text-decoration: none; }
+.dd-toc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-5); flex-shrink: 0; align-self: center; }
+.dd-toc-high { background: var(--green); }
+.dd-toc-medium { background: var(--accent); }
+.dd-toc-low { background: var(--red); }
+.dd-toc-label { flex: 1; }
+.dd-toc-status { font-size: 10px; color: var(--ink-4); white-space: nowrap; }
+.deep-dive [id] { scroll-margin-top: 84px; }
+@media (max-width: 900px) { .dd-layout { grid-template-columns: 1fr; gap: 0; } .dd-toc { display: none; } }
+
+/* ===== Academic 精读伴读 two-stage detail (2026-06-01 rebuild) ===== */
+.reading-stage { margin: 0 0 28px; }
+.stage-tag { display: flex; align-items: baseline; gap: 10px; font-size: 13px; font-weight: 750; letter-spacing: -0.01em; color: var(--ink); padding: 0 0 12px; border-bottom: 1px solid var(--line); margin: 0 0 18px; }
+.stage-tag small { font-weight: 500; color: var(--ink-3); font-size: 12px; letter-spacing: 0; }
+.stage-tag-original { color: var(--ink); }
+.stage-tag-analyst { color: var(--accent); }
+.stage-tag-analyst small { color: var(--accent-2); }
+
+/* key results listed as text under each section */
+.key-results { margin: 14px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.key-result { display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: 8px 10px; padding: 10px 12px; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.kr-tag { font-size: 11px; font-weight: 750; padding: 2px 7px; border-radius: 999px; color: #fff; white-space: nowrap; }
+.kr-figure { background: #6b73c9; }
+.kr-table { background: #4a9a7c; }
+.kr-result { background: var(--accent); }
+.kr-ref { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.kr-finding { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+
+/* the visual wall between original reading and AI commentary */
+.analysis-divider { display: flex; align-items: center; gap: 14px; margin: 34px 0 30px; scroll-margin-top: 84px; }
+.analysis-divider::before, .analysis-divider::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-2), transparent); }
+.analysis-divider span { font-size: 12.5px; font-weight: 750; letter-spacing: 0.02em; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-soft-2); padding: 6px 16px; border-radius: 999px; white-space: nowrap; }
+
+/* free-form analyst notes (markdown-lite) */
+.analyst-notes { font-size: 15px; line-height: 1.85; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow-1); }
+.analyst-notes p { margin: 0 0 14px; }
+.analyst-notes p:last-child { margin-bottom: 0; }
+.analyst-notes strong { color: var(--ink); font-weight: 700; }
+.analyst-notes .an-h { font-size: 14.5px; font-weight: 750; color: var(--ink); margin: 18px 0 8px; }
+.analyst-notes .an-list { margin: 0 0 14px; padding-left: 20px; }
+.analyst-notes .an-list li { margin: 0 0 7px; }
+
+/* list-card + hero badges */
+.article-card-badges, .paper-hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+.paper-hero-badges { margin: 14px 0 0; }
+.ac-venue { font-size: 11.5px; font-weight: 650; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-2); background: var(--canvas); }
+.ac-venue-verified { color: #2f7d5b; border-color: rgba(47,125,91,.3); background: rgba(47,125,91,.08); }
+.ac-venue-unverified { color: var(--ink-3); }
+.ac-venue-not_provided { color: var(--ink-4); }
+.ac-converge { font-size: 11.5px; font-weight: 650; padding: 3px 9px; border-radius: 999px; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-soft-2); }
+.ac-disc { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; color: var(--ink-3); background: var(--canvas); border: 1px solid var(--line); }
+
+/* article-detail: tighten the reading column so text fills it instead of hugging the left.
+   (the 70ch cap inside a 1fr column left a big empty gutter before the TOC) */
+@media (min-width: 901px) {
+  .article-detail { max-width: 1060px; }
+  .article-detail .dd-layout { grid-template-columns: minmax(0, 1fr) 188px; gap: 40px; }
+}
+.article-detail .section-summary,
+.article-detail .paper-lead,
+.article-detail .analyst-notes { max-width: none; }
+
+/* ── BriefMem deep-dive page ─────────────────────────────────────────── */
+.brief-deepdive { max-width: 880px; margin: 0 auto; padding: 28px 24px 80px; }
+.brief-back { display: inline-block; margin-bottom: 18px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
+.brief-back:hover { color: var(--ink-1); }
+.brief-head { border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+.brief-kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.brief-h1 { font-size: 26px; line-height: 1.25; margin: 8px 0 10px; color: var(--ink-1); }
+.brief-h3 { font-size: 15px; font-weight: 700; color: var(--ink-1); margin: 4px 0 0; }
+.brief-authors { font-size: 13.5px; color: var(--ink-2); margin-bottom: 12px; }
+.brief-meta-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.brief-source { font-size: 13px; font-weight: 600; color: var(--accent, #b45309); text-decoration: none; }
+.brief-why { font-size: 14px; color: var(--ink-2); margin: 14px 0 0; line-height: 1.6; }
+.chip { display: inline-block; font-size: 11.5px; font-weight: 600; color: var(--ink-2); background: var(--paper); border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 10px; }
+.brief-verdict { font-weight: 800; letter-spacing: .04em; padding: 2px 10px; border-radius: 6px; font-size: 12px; }
+.brief-verdict--pass { background: #e7f5ec; color: #1b6b3a; }
+.brief-verdict--warn { background: #fdf3e3; color: #92600b; }
+.brief-verdict--block { background: #fbe9e9; color: #97241f; }
+.brief-verdict--na { background: var(--paper); color: var(--ink-3); }
+.verdict-bar .chip { margin-left: 8px; }
+.brief-flags { margin-left: 8px; font-size: 12px; color: #97241f; }
+.brief-body { font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+.brief-body h4 { font-size: 16px; color: var(--ink-1); margin: 22px 0 6px; }
+.claim-text { font-weight: 600; color: var(--ink-1); margin: 0 0 8px; line-height: 1.5; }
+.claim-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+.claim-source { font-size: 12px; color: var(--ink-3); }
+.claim-sub { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; line-height: 1.55; }
+.claim-threat { color: #97241f; }
+.brief-audit { margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.brief-audit-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid var(--line); }
+.brief-audit-row:last-child { border-bottom: none; }
+.brief-audit-row dt { padding: 8px 14px; font-size: 12.5px; font-weight: 600; color: var(--ink-3); background: var(--paper); }
+.brief-audit-row dd { padding: 8px 14px; margin: 0; font-size: 13px; color: var(--ink-2); }
+.brief-loading, .brief-error, .brief-list { padding: 40px 24px; }
+.brief-error { color: #97241f; }
+.brief-body .md-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+.brief-body .md-table th { text-align: left; font-size: 12px; font-weight: 700; color: var(--ink-3); padding: 7px 10px; border-bottom: 1px solid var(--line-strong); background: var(--paper); vertical-align: top; }
+.brief-body .md-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; line-height: 1.55; }
+.brief-body .md-table tr:last-child td { border-bottom: none; }
+.brief-body .md-table code { font-size: 12.5px; }
+.brief-body .md-pre { background: #0f1115; color: #e6e6e6; border-radius: 10px; padding: 14px 16px; margin: 12px 0; overflow-x: auto; font-size: 12.5px; line-height: 1.6; }
+.brief-body .md-pre code { background: none; color: inherit; padding: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }

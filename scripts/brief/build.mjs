@@ -3,6 +3,7 @@
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import YAML from 'yaml';
 
 import { ENTITIES, ENTITY_DIRS } from './loader.mjs';
 
@@ -122,8 +123,19 @@ function parseMarkdown(raw) {
     };
   }
 
+  let meta;
+  try {
+    // Use the real YAML parser (consistent with wiki.mjs/loader.mjs) so nested
+    // objects + list_object fields (claim_ledger, evidence_matrix, artifact_audit)
+    // survive intact for the frontend. Fall back to the subset parser on error.
+    meta = YAML.parse(match[1]) ?? {};
+    if (typeof meta !== 'object' || Array.isArray(meta)) meta = parseYamlSubset(match[1]);
+  } catch {
+    meta = parseYamlSubset(match[1]);
+  }
+
   return {
-    meta: parseYamlSubset(match[1]),
+    meta,
     body: match[2],
     frontmatter: match[1],
   };

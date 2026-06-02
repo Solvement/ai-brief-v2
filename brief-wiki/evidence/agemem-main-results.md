@@ -1,0 +1,18 @@
+---
+slug: agemem-main-results
+kind: evidence
+content: agemem
+experiment_or_case: "Main results across 5 long-horizon benchmarks (ALFWorld, SciWorld, PDDL, BabyAI, HotpotQA) on Qwen2.5-7B and Qwen3-4B"
+dataset: "ALFWorld / SciWorld / PDDL / BabyAI / HotpotQA"
+baseline: "LangMem, A-Mem, Mem0, Mem0^g, AgeMem-noRL"
+metric: "average task score (%), memory-quality MQ, active-context tokens"
+result: "Qwen2.5-7B 41.96% vs Mem0 37.14% (+4.82pp); Qwen3-4B 54.31% vs A-Mem 45.74% (+8.57pp); RL adds +8.53/+8.72pp over noRL; MQ 0.533/0.605; context tokens 2117 vs 2186 (-3.1%) and 2191 vs 2310 (-5.1%)"
+exactness: exact
+sample_size: "5 benchmarks × 2 backbones"
+limitations: "No per-benchmark variance reported in fetched text; absolute compute cost not given."
+source_pointer: "arxiv:2601.01885v2 Table 2 / Fig 2 / Fig 3"
+---
+
+## Evidence
+
+Numbers extracted verbatim from the v2 tables/figures. See [[content/agemem]] and [[claims/agemem-unified-beats-modular]].
