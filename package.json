@@ -13,14 +13,15 @@
     "brief:build": "node scripts/brief/build.mjs brief-wiki",
     "brief:init": "node scripts/brief/wiki.mjs init brief-wiki",
     "predev": "node --no-warnings scripts/maybe-ingest.mjs",
-    "dev": "vite --host 127.0.0.1",
-    "build": "npm run typecheck && vite build",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "node scripts/lint.mjs",
     "verify": "npm run lint && npm run test && npm run build",
     "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs",
     "test": "node --test scripts/__tests__/*.test.mjs && npm run validate",
-    "preview": "vite preview --host 127.0.0.1",
+    "preview": "next start",
     "ingest": "node --no-warnings scripts/ingest.mjs",
     "ingest:force": "node --no-warnings scripts/ingest.mjs --no-cache",
     "ingest:dry": "node --no-warnings scripts/ingest.mjs --dry-run",
@@ -46,8 +47,6 @@
     "@types/node": "^25.6.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "typescript": "^5.9.3",
-    "vite": "^7.2.7"
+    "typescript": "^5.9.3"
   }
 }
