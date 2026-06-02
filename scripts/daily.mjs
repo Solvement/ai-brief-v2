@@ -1,0 +1,167 @@
+#!/usr/bin/env node
+
+import { spawn } from "node:child_process";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { main as runModelsDaily } from "./columns/models/daily.mjs";
+import { main as runProjectsDaily } from "./columns/projects/daily.mjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
+
+export async function main(argv = process.argv.slice(2)) {
+  const options = parseArgs(argv);
+
+  if (options.help) {
+    printUsage();
+    return null;
+  }
+
+  const results = [];
+  results.push(await runColumn("papers", () => runPapersDaily(passThroughArgs(options, "papers"))));
+  results.push(await runColumn("projects", () => runProjectsDaily(passThroughArgs(options, "projects"))));
+  results.push(await runColumn("models", () => runModelsDaily(passThroughArgs(options, "models"))));
+
+  printCombinedSummary(results);
+
+  if (results.every((result) => result.status === "failed")) {
+    const error = new Error("daily: all columns failed");
+    error.results = results;
+    throw error;
+  }
+
+  return results;
+}
+
+export function parseArgs(argv = []) {
+  const options = {
+    offline: false,
+    dryRun: false,
+    cap: 0,
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    const nextValue = () => {
+      if (index + 1 >= argv.length) throw new Error(`Missing value for ${arg}`);
+      return argv[++index];
+    };
+
+    if (arg === "--help" || arg === "-h") {
+      options.help = true;
+    } else if (arg === "--offline" || arg === "--no-llm") {
+      options.offline = true;
+    } else if (arg === "--dry-run") {
+      options.dryRun = true;
+    } else if (arg === "--cap") {
+      options.cap = numberOption(nextValue(), options.cap);
+    } else if (arg.startsWith("--cap=")) {
+      options.cap = numberOption(valueAfterEquals(arg), options.cap);
+    } else {
+      throw new Error(`Unexpected argument: ${arg}`);
+    }
+  }
+
+  return options;
+}
+
+async function runColumn(name, fn) {
+  console.log(`[daily] ${name}: starting`);
+  const startedMs = Date.now();
+  try {
+    const result = await fn();
+    const durationMs = Date.now() - startedMs;
+    console.log(`[daily] ${name}: ok (${durationMs}ms)`);
+    return { name, status: "ok", durationMs, result };
+  } catch (error) {
+    const durationMs = Date.now() - startedMs;
+    console.warn(`[daily] ${name}: failed (${error.message || String(error)})`);
+    return { name, status: "failed", durationMs, error };
+  }
+}
+
+async function runPapersDaily(args = []) {
+  const commandArgs = ["--no-warnings", path.join(ROOT, "scripts", "papers-radar.mjs"), "daily", ...args];
+  await spawnNode(commandArgs);
+  return { command: `node ${commandArgs.join(" ")}` };
+}
+
+function spawnNode(args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, args, {
+      cwd: ROOT,
+      env: process.env,
+      stdio: "inherit",
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`node exited with ${code}`));
+    });
+  });
+}
+
+function passThroughArgs(options = {}, column) {
+  const args = [];
+  if (options.offline) {
+    args.push("--offline");
+    if (column === "papers") args.push("--no-model");
+  }
+  if (options.dryRun) args.push("--dry-run");
+  if (options.cap) args.push("--cap", String(options.cap));
+  return args;
+}
+
+function printCombinedSummary(results) {
+  const ok = results.filter((result) => result.status === "ok").length;
+  const failed = results.length - ok;
+  console.log(`daily: ${ok}/${results.length} columns succeeded, ${failed} failed`);
+  for (const result of results) {
+    const detail = result.status === "ok"
+      ? summarizeResult(result.result)
+      : result.error?.message || "failed";
+    console.log(`daily: ${result.name} ${result.status}${detail ? ` - ${detail}` : ""}`);
+  }
+}
+
+function summarizeResult(result) {
+  if (!result) return "";
+  if (result.command) return result.command;
+  if (typeof result === "object" && "checked" in result && "newVersions" in result) {
+    return `${result.checked} checked, ${result.newVersions} new versions, ${result.regenerated} regenerated`;
+  }
+  if (typeof result === "object" && result.runId) return result.runId;
+  return "";
+}
+
+function valueAfterEquals(arg) {
+  return arg.slice(arg.indexOf("=") + 1);
+}
+
+function numberOption(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function printUsage() {
+  console.log(`Usage:
+  node scripts/daily.mjs [--offline] [--dry-run] [--cap N]
+
+Runs daily checks in sequence:
+  papers   -> scripts/papers-radar.mjs daily
+  projects -> scripts/columns/projects/daily.mjs
+  models   -> scripts/columns/models/daily.mjs
+
+Flags:
+  --offline  Pass offline/no-model mode through to columns that support it
+  --dry-run  Pass dry-run mode through to columns that support it
+  --cap N    Pass cap through to projects/models and through to papers for compatibility
+`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.stack || error.message);
+    process.exitCode = 1;
+  });
+}

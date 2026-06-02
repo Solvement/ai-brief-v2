@@ -1,0 +1,56 @@
+name: Daily Content Refresh
+
+on:
+  schedule:
+    # Run daily at about 16:00 UTC after morning source updates have usually landed.
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Required repo secrets:
+# - DEEPSEEK_API_KEY
+# - HF_TOKEN
+# - GITHUB_TOKEN
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run daily refresh
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run daily
+
+      - name: Commit data changes
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(git status --porcelain -- public/data data)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/data data
+            DATE="$(date -u +'%Y-%m-%d')"
+            git commit -m "chore(daily): refresh content ${DATE}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          else
+            echo "No daily data changes under public/data or data."
+          fi
