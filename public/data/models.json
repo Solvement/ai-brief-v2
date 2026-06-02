@@ -1,6 +1,274 @@
 {
-  "generatedAt": "2026-06-02T00:00:00.000Z",
+  "generatedAt": "2026-06-02T20:59:07.928Z",
   "models": [
+    {
+      "id": "anthropic-claude",
+      "name": "Claude",
+      "vendor": "Anthropic",
+      "country": "美国",
+      "kind": "closed",
+      "latestVersion": "Claude Opus 4.8",
+      "latestReleasedAt": "2026-05-28",
+      "latestReleasedAtPrecision": "day",
+      "isOpen": false,
+      "license": "closed",
+      "hasEvalData": false,
+      "evalSources": [],
+      "hasChangelog": true,
+      "changelogUrl": "https://docs.claude.com/en/release-notes/overview",
+      "lastCheckedAt": "2026-06-02T20:54:48.400Z",
+      "analysisGeneratedAt": "2026-06-02T20:54:51.268Z",
+      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "changelog": {
+        "oneLineTakeaway": "Claude Opus 4.8 为 AI 应用构建者带来最长上下文和更强推理，支持中途动态指令更新，拒绝响应可编程处理，以及 Claude Code 的自动化工作流，大大提升了构建长时间 Agent、自适应对话和合规应用的灵活性。",
+        "newFeatures": [
+          {
+            "feature": "Mid-conversation system messages",
+            "whatItIs": "在 Claude Opus 4.8 中，你可以在一次对话的 messages 数组里，在用户消息之后插入 role: 'system' 的新系统指令消息，动态修改对话指引。",
+            "forYou": "构建长时间运行的 Agent 对话时，可以在不重置对话历史、不丢失 prompt cache 的情况下更新指令，显著降低 token 成本和延迟。",
+            "howToUse": "在 Messages API 请求中，按 placement rules 在 user 消息后添加 system 角色消息，无需额外 beta 头。",
+            "whenToUse": "当你的应用需要根据对话进展改变 Agent 行为（如多步骤任务中的步骤切换），且希望保持缓存命中以降低成本时使用。"
+          },
+          {
+            "feature": "stop_details on refusal responses",
+            "whatItIs": "当模型因安全原因拒绝回答时，API 响应中新增 stop_details 字段，包含拒绝对应的类别（如网络风险 cyber、生物风险 bio）和人类可读的解释。",
+            "forYou": "你可以根据拒绝的具体类别在应用中定制处理逻辑，例如将网络攻击相关问题转给安全审核流程，或向用户展示更有意义的反馈。",
+            "howToUse": "检查 API 返回的 message.stop_details 对象，提取 category 和 explanation，实现程序化路由。",
+            "whenToUse": "在需要精细控制内容安全的场景，如企业级合规、科研辅助工具，需要区分不同风险类型并采取不同后续动作时。"
+          },
+          {
+            "feature": "effort parameter defaults to high",
+            "whatItIs": "Claude Opus 4.8 的 effort 参数默认值设为 'high'，使模型默认进行更深入的思考，以获得更高质量的结果。",
+            "forYou": "默认即可获得 Opus 4.7 在手动设置高 effort 下的智能水平，无需额外配置，但如果追求速度或成本，你可以手动调低。",
+            "howToUse": "直接使用模型，系统默认 effort 为 high；如需降低 token 消耗或延迟，设置 effort: 'medium' 或 'low'。",
+            "whenToUse": "在复杂推理任务中，默认高 effort 能提供最佳结果；在简单任务或成本敏感场景下，可显式降低 effort。"
+          },
+          {
+            "feature": "Minimum cacheable prompt length lowered to 1024 tokens",
+            "whatItIs": "prompt caching 的最小可缓存提示长度从之前的较长值（可能数千）降低到 1024 tokens。",
+            "forYou": "较短的常用提示片段也能被缓存，让你的应用在短交互中也能享受缓存带来的成本和延迟优势。",
+            "howToUse": "无需额外操作，只要提示长度达到 1024 tokens，系统自动尝试缓存。",
+            "whenToUse": "当你的应用包含大量短提示（如 FAQ、简单查询），且希望利用缓存降低开支时。"
+          },
+          {
+            "feature": "Adaptive thinking reduces wasted thinking tokens",
+            "whatItIs": "启用 adaptive thinking 时，Claude Opus 4.8 仅在当前轮次需要深度推理时才触发思考过程，避免不必要的 token 消耗。",
+            "forYou": "相比 Opus 4.7，在相同 effort 下能减少 thinking token 浪费，从而降低成本，尤其适合混合简单和复杂任务的 Agent。",
+            "howToUse": "使用模型时确保 thinking 模式为 adaptive（通常为默认），不必手动控制思考深度。",
+            "whenToUse": "当你的工作流中既有简单动作（如格式化输出）又有复杂推理（如代码审查）时，adaptive thinking 能自动优化资源使用。"
+          },
+          {
+            "feature": "Fast mode (research preview) for Claude Opus 4.8",
+            "whatItIs": "在 Claude API 上，通过 speed: 'fast' 参数启用快速模式，输出生成速度大幅提升，但价格更高。",
+            "forYou": "适合对延迟敏感的实时应用，例如交互式聊天、在线编码辅助，牺牲一些智能换来更流畅的体验。",
+            "howToUse": "在请求中设置 speed: 'fast' 并包含 fast-mode beta 头；需要加入等待名单获取权限。",
+            "whenToUse": "当你的应用要求极低响应时间，且用户愿意承担溢价成本时考虑使用。"
+          },
+          {
+            "feature": "Claude Code: Expanded Auto mode",
+            "whatItIs": "Claude Code 的 Auto 模式向更多用户开放，适用于长时间运行的任务。",
+            "forYou": "开发者可以使用 Auto 模式让 Claude Code 自动化完成多步骤编码任务，减少人工干预。",
+            "howToUse": "在 Claude Code 中使用 Auto 模式命令，根据文档操作。",
+            "whenToUse": "当需要 Claude Code 自主执行复杂的、多文件的代码修改或项目管理时。"
+          },
+          {
+            "feature": "Claude Code: Max plan defaults to fast mode",
+            "whatItIs": "对于 Max 计划用户，Claude Code 在 Opus 4.8 上默认启用 fast mode。",
+            "forYou": "Max 用户无需配置即可获得更快的响应，提升日常编码效率。",
+            "howToUse": "如果你是 Max 计划，在 Claude Code 中直接使用 Opus 4.8，系统自动采用 fast mode。",
+            "whenToUse": "当你希望在使用 Claude Code 进行编码任务时获得接近实时的交互体验。"
+          },
+          {
+            "feature": "Claude Code: Workflows (research preview)",
+            "whatItIs": "Claude Code 新增研究预览功能 Workflows，允许定义和执行多步骤的自动化计划。",
+            "forYou": "可以将复杂的、多阶段的编码任务标准化为工作流，让 Claude Code 自动按步骤执行，提高自动化程度。",
+            "howToUse": "根据 Claude Code 文档，定义 Workflows 配置并运行。",
+            "whenToUse": "在需要自动化执行一系列连续编码任务（如初始化项目、生成测试、部署检查）时使用。"
+          }
+        ],
+        "limitations": "设置 temperature、top_p、top_k 为非默认值会返回 400 错误，迁移时必须遵守。Fast mode 对 Opus 4.6 已弃用，30 天后移除，需迁移至 Opus 4.8 或 4.7 的 fast mode。Fast mode 为研究预览，访问受限，需加入等候名单。模型功能与其他平台功能（如任务预算、advisor 工具、计算机使用）已支持，无额外限制说明。",
+        "sources": [
+          {
+            "name": "Anthropic official changelog",
+            "url": "https://docs.claude.com/en/release-notes/overview"
+          }
+        ]
+      }
+    },
+    {
+      "id": "openai-gpt",
+      "name": "OpenAI GPT",
+      "vendor": "OpenAI",
+      "country": "美国",
+      "kind": "closed",
+      "latestVersion": "GPT-5.5",
+      "latestReleasedAt": "",
+      "latestReleasedAtPrecision": "not_found",
+      "isOpen": false,
+      "license": "closed",
+      "hasEvalData": false,
+      "evalSources": [],
+      "hasChangelog": true,
+      "changelogUrl": "https://platform.openai.com/docs/changelog",
+      "lastCheckedAt": "2026-06-02T20:53:09.038Z",
+      "analysisGeneratedAt": "2026-06-02T20:53:09.643Z",
+      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "changelog": {
+        "oneLineTakeaway": "GPT-5.5 为复杂专业任务带来更强的推理、更大的上下文窗口和内置工具支持，同时优化了计费与安全控制，适合构建需要深度分析、多工具调用和安全部署的企业级应用。",
+        "newFeatures": [
+          {
+            "feature": "GPT-5.5",
+            "whatItIs": "最新前沿模型，支持1M token上下文窗口，内置多种工具（计算机使用、托管Shell、代码修补、技能、MCP、网页搜索），推理能力增强，默认为中等推理力度，支持结构化输出、函数调用、提示缓存、批处理等。",
+            "forYou": "可构建需要超长上下文、复杂工具调用和深度推理的专业级应用，如代码代理、自动化研究助手等。",
+            "howToUse": "通过Chat Completions或Responses API调用gpt-5.5模型；利用内置工具函数或Responses API工具参数启用相应功能。",
+            "whenToUse": "当应用需要处理大量文本、执行多步骤工具链或进行深度分析时使用，替代旧版GPT-5.4以获得更好性能。"
+          },
+          {
+            "feature": "GPT-5.5 Pro",
+            "whatItIs": "GPT-5.5的计算增强版，用于响应API，为难度更高的任务分配更多计算资源，提供更可靠的答案。",
+            "forYou": "应对要求极高的推理或生成任务，如金融建模、科学计算、复杂代码生成，确保输出质量。",
+            "howToUse": "在Responses API中指定模型为gpt-5.5-pro。",
+            "whenToUse": "当质量优先于速度和成本，且普通GPT-5.5无法满足需求时使用。"
+          },
+          {
+            "feature": "Secure MCP Tunnel",
+            "whatItIs": "允许支持的 OpenAI 产品通过客户托管的隧道客户端连接私有或本地 MCP 服务器，无需暴露到公共互联网。",
+            "forYou": "企业可将内部数据源（如数据库、API）安全集成到 ChatGPT Web、Codex、Responses API 和 AgentKit 中，满足数据驻留和安全合规要求。",
+            "howToUse": "部署隧道客户端，配置企业账户，然后在相关产品中引用私有 MCP 服务器。参考官方安全 MCP 隧道文档。",
+            "whenToUse": "当需要模型访问公司内部工具或数据且无法通过公共网络暴露时使用。"
+          },
+          {
+            "feature": "Realtime 2",
+            "whatItIs": "新一代实时语音模型，支持可配置推理的语音到语音代理，还有 Realtime Translate（流式语音翻译）和 Realtime Whisper（流式语音转文本）。",
+            "forYou": "可构建低延迟、智能推理的语音对话应用，如实时翻译助手、语音客服、语音驱动代理。",
+            "howToUse": "使用 Realtime API 调用 gpt-realtime-2 模型，通过 WebRTC、WebSocket 或 SIP 连接。利用新的 Realtime 翻译和转录功能构建多语言应用。",
+            "whenToUse": "需要自然语音交互且对延迟敏感的场景，取代旧版 Realtime API Beta。"
+          },
+          {
+            "feature": "Agents SDK TypeScript 更新与沙盒代理",
+            "whatItIs": "Agents SDK 新增 TypeScript 支持，内置沙盒代理运行环境和开源测试框架，允许自定义记忆创建时机和存储。",
+            "forYou": "方便 TypeScript 开发者构建和测试 AI 代理，沙盒环境确保安全执行，开源框架便于定制和观察。",
+            "howToUse": "安装最新 Agents SDK for TypeScript，使用沙盒功能运行代理，参考更新文档。",
+            "whenToUse": "用 TypeScript 开发多步骤、工具调用型代理应用时使用，提升开发效率和安全性。"
+          },
+          {
+            "feature": "chat-latest 快照",
+            "whatItIs": "指向 ChatGPT 当前使用的最新 Instant 模型的动态别名，定期更新。",
+            "forYou": "无需指定具体版本即可测试 ChatGPT 最新聊天优化，快速评估模型效果。",
+            "howToUse": "在 API 请求中使用模型名 chat-latest。",
+            "whenToUse": "非生产测试、原型验证，或希望始终保持与 ChatGPT 体验一致时使用。"
+          },
+          {
+            "feature": "多 IP 白名单管理",
+            "whatItIs": "支持创建多个 IP 白名单，并可按项目或整个组织应用。",
+            "forYou": "灵活控制不同环境或团队的 API 访问，增强安全性，防止未授权使用。",
+            "howToUse": "在平台 Dashboard 的 Settings > Security > IP allowlist 中配置。",
+            "whenToUse": "多团队、多环境部署时，需要细粒度访问控制。"
+          },
+          {
+            "feature": "容器会话按分钟计费（5分钟最低）",
+            "whatItIs": "从2026年6月2日起，符合条件的容器会话将从固定20分钟计费改为按分钟计费（最低5分钟），费率不变。",
+            "forYou": "减少短时间工具会话（如代码解释器、计算机使用）的成本，尤其适合交互频繁但单次执行短的场景。",
+            "howToUse": "无需配置，自动适用。关注官方定价页面了解准确价格。",
+            "whenToUse": "使用需要容器环境的工具时自动生效，可在成本敏感的应用中降低开销。"
+          },
+          {
+            "feature": "return_token_budget for web search",
+            "whatItIs": "Responses API 网页搜索工具新增 return_token_budget 参数，允许为高工作量研究和评估任务启用更长的 GPT-5+ 推理搜索。",
+            "forYou": "控制搜索深度和消耗，让模型在需要时进行更深入的多轮搜索和推理，提高研究质量。",
+            "howToUse": "在调用 Responses API 的网页搜索工具时，设置 return_token_budget 参数为非零值。",
+            "whenToUse": "执行需要大量信息检索和综合的研究任务、自动化评估时使用。"
+          },
+          {
+            "feature": "GPT Image 2",
+            "whatItIs": "最新图像生成模型，支持灵活图像尺寸、高保真图像输入、基于token的图像定价，并支持批处理（50%折扣）。",
+            "forYou": "按需生成高质量图像，成本可控，可批量处理大量图像生成/编辑任务。",
+            "howToUse": "通过 gpt-image-2 模型调用 /v1/images/generations 或 /v1/images/edits 端点，使用token定价。",
+            "whenToUse": "需要生成专业级图像，或需要批量处理图像内容的场景，如设计、营销、数据增强。"
+          }
+        ],
+        "limitations": "GPT-5.5 不支持内存内提示缓存，仅支持扩展提示缓存；图像细节默认行为变化；GPT-5.5 Pro 仅限 Responses API；Secure MCP Tunnel 仅面向企业客户；官方更新日志未说明具体速率或配额限制，请参考官方定价页面了解最新价格。",
+        "sources": [
+          {
+            "name": "OpenAI official changelog",
+            "url": "https://platform.openai.com/docs/changelog"
+          }
+        ]
+      }
+    },
+    {
+      "id": "google-gemini",
+      "name": "Gemini",
+      "vendor": "Google DeepMind",
+      "country": "美国",
+      "kind": "closed",
+      "latestVersion": "Gemini 3.5",
+      "latestReleasedAt": "",
+      "latestReleasedAtPrecision": "not_found",
+      "isOpen": false,
+      "license": "closed",
+      "hasEvalData": false,
+      "evalSources": [],
+      "hasChangelog": true,
+      "changelogUrl": "https://ai.google.dev/gemini-api/docs/changelog",
+      "lastCheckedAt": "2026-06-02T20:56:35.768Z",
+      "analysisGeneratedAt": "2026-06-02T20:56:36.296Z",
+      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "changelog": {
+        "oneLineTakeaway": "Gemini 3.5 Flash GA 带来持久的前沿性能（尤其 Agent 与编码任务），同时上线托管式 Agent（Managed Agents）预览与 Antigravity 通用 Agent，让开发者能构建自托管、有状态的自动化 Agent，无需自己维护运行环境。",
+        "newFeatures": [
+          {
+            "feature": "Gemini 3.5 Flash GA",
+            "whatItIs": "Gemini 3.5 Flash 是 Gemini 系列中针对高吞吐、低延迟场景优化的正式版模型，在 Agent 与编码任务上提供稳定的前沿性能。",
+            "forYou": "适合需要持续高负载处理 Agent 工作流或代码生成的应用，可放心用于生产环境。相比预览版，可靠性和 SLA 更高，不必担心突然下线。",
+            "howToUse": "调用模型名 gemini-3.5-flash，可直接替换原先的 flash 模型。搭配函数调用、代码执行等内置工具，构建如自动编码助手、长时间运行的任务代理。",
+            "whenToUse": "当你需要稳定版本支撑核心业务，且工作负载主要是长时间运行的多步推理或编码任务时。"
+          },
+          {
+            "feature": "Managed Agents（托管式 Agent）公开预览",
+            "whatItIs": "一种运行在 Google 安全隔离的 Linux 沙箱环境中的自治、有状态 Agent 服务。Agent 可以长时间运行，自主规划、调用工具、读写文件，甚至浏览网页。",
+            "forYou": "无需自己搭建和维护 Agent 运行时的基础设施，直接在 API 层创建和管理 Agent。能让你的 AI 应用赋予长期自主性，适合搭建研究助手、自动化工作流等。",
+            "howToUse": "通过 Gemini API 创建 Managed Agent 实例，配置工具（如代码执行、文件搜索、网页浏览），然后在应用中通过任务请求与 Agent 交互。详情参考 Agents overview 和 Quickstart 指南。",
+            "whenToUse": "当需要构建长时间运行的自主 Agent（如自动整理报告、持续监控数据源）时，且希望 Google 托管运行环境以减少运维负担。"
+          },
+          {
+            "feature": "Antigravity Agent（antigravity-preview-05-2026）",
+            "whatItIs": "一个预构建的通用托管式 Agent，能够自主规划、推理、编写并执行代码、管理文件、浏览网页，全部在沙箱内进行。",
+            "forYou": "开箱即用的全自主 Agent，适合快速搭建需要复杂多步骤任务的应用，如自动生成数据分析报告、代码补全并测试等。",
+            "howToUse": "使用模型名 antigravity-preview-05-2026，通过 API 发送任务描述即可。Agent 会自动分解步骤并执行。可配合 Managed Agents 框架做更多定制。",
+            "whenToUse": "当你需要快速验证 Agent 工作流，或不想从头定义工具链时，用它作为原型或直接集成。"
+          },
+          {
+            "feature": "文件搜索支持多模态（File Search multimodal）",
+            "whatItIs": "文件搜索工具现在能原生嵌入和搜索图片，使用 gemini-embedding-2 模型，返回结果中附带媒体引用和页码。",
+            "forYou": "构建知识库问答应用时，如果知识库包含大量截图、图表、照片等图像，现在可以混合文字和图像搜索，提升检索召回率和答案准确度。",
+            "howToUse": "在上传文件到 File Search 存储后，查询时自动包括图像内容。返回的 grounding metadata 中含 media_id 和 page_numbers，可用来在 UI 中高亮原图位置。",
+            "whenToUse": "当你的应用需要从 PDF 报告、幻灯片或图片中找到信息时，比如医疗影像报告、技术图纸查询。"
+          },
+          {
+            "feature": "事件驱动 Webhooks 支持",
+            "whatItIs": "批量 API 和长时间运行操作现在支持 Webhook 回调，代替轮询检查状态。",
+            "forYou": "构建异步处理系统时不用再写循环查询状态的代码，降低延迟和服务器资源消耗，实现真正的事件驱动架构。",
+            "howToUse": "在 Batch API 请求中配置 webhook URL，完成后系统自动 POST 结果到你的端点。确保端点可公开访问，能验证签名。",
+            "whenToUse": "当你需要处理大量批量任务，并要求结果实时推送时，例如定时大批量文本生成、翻译或数据提取。"
+          },
+          {
+            "feature": "内置工具与自定义函数调用组合使用",
+            "whatItIs": "单个 API 调用中可同时使用 Gemini 内置工具（如 Google 搜索、代码执行）和你自己定义的函数。",
+            "forYou": "以前内置工具和自定义工具只能二选一，现在可以组合，让模型在需要时查网络或运行代码，同时也调用你的内部 API，构建更复杂的 Agent 行为。",
+            "howToUse": "在 tool_config 中同时列出 built_in_tools 和 function_declarations 即可。模型会根据上下文选择调用哪个工具。",
+            "whenToUse": "当你的应用既需要实时外部信息（搜索），又需要执行代码或访问内部系统时，例如客服机器人需要搜索文档并查询订单状态。"
+          }
+        ],
+        "limitations": "Managed Agents、Antigravity Agent 当前为公开预览，稳定性与 SLA 未承诺；价格/配额等细节见官方定价页（changelog 未列出）。Webhooks 仅限 Batch API 和长时间操作。文件搜索多模态功能需要 gemini-embedding-2 模型。",
+        "sources": [
+          {
+            "name": "Google DeepMind official changelog",
+            "url": "https://ai.google.dev/gemini-api/docs/changelog"
+          }
+        ]
+      }
+    },
     {
       "id": "deepseek-v4",
       "name": "DeepSeek-V4",
@@ -179,6 +447,288 @@
       },
       "analysisGeneratedAt": "2026-06-02",
       "analysisAuthor": "Claude (gold standard, applied-builder angle, /browse-verified)"
+    },
+    {
+      "id": "qwen",
+      "name": "Qwen3.6",
+      "vendor": "Alibaba",
+      "country": "中国",
+      "kind": "open",
+      "latestVersion": "Qwen3.6 35B A3B",
+      "latestReleasedAt": "2026-04-24",
+      "latestReleasedAtPrecision": "approx (HuggingFace lastModified, not guaranteed release date)",
+      "isOpen": true,
+      "license": "apache-2.0",
+      "hasEvalData": true,
+      "evalSources": [
+        "HuggingFace model card"
+      ],
+      "evalThirdPartyPending": [
+        "LMArena",
+        "OpenLLM Leaderboard"
+      ],
+      "hasChangelog": true,
+      "changelogUrl": "https://huggingface.co/Qwen/Qwen3.6-27B",
+      "lastCheckedAt": "2026-06-02T20:47:03.458Z",
+      "latestVersionVariants": [
+        "Qwen3.6 35B A3B",
+        "Qwen3.6 35B A3B FP8",
+        "Qwen3.6 27B FP8",
+        "Qwen3.6 27B"
+      ],
+      "analysisGeneratedAt": "2026-06-02T20:47:04.046Z",
+      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "analysis": {
+        "oneLineTakeaway": "Qwen3.6-35B-A3B 是一个专为效率优化的 MoE 模型,在 agent 编程任务上比前代 Qwen3.5-27B 有明显提升,且开源 Apache 2.0——适合需要自部署、追求成本可控的编程 agent 构建者。",
+        "whatItUnlocks": [
+          {
+            "point": "Agent 编程能力提升",
+            "forYou": "Terminal-Bench 2.0 等 agent 任务得分大幅超过前代 Qwen3.5-27B,意味着你可以用它在终端环境中做自动化运维、软件部署等复杂 agent 任务,效果更好。",
+            "evidence": "模型卡 Terminal-Bench 2.0: 51.5 vs Qwen3.5-27B 的 41.6",
+            "confidence": "high(源自官方模型卡评测表)"
+          },
+          {
+            "point": "历史推理上下文保留 (Thinking Preservation)",
+            "forYou": "新增保留历史推理上下文的功能,可在多轮 agent 对话中避免重新生成思考过程,节省 token 和延迟,让迭代式编程 agent 体验更流畅。",
+            "evidence": "模型卡介绍: 'we've introduced a new option to retain reasoning context from historical messages'",
+            "confidence": "low(厂商自评功能,实际效果待第三方验证)"
+          },
+          {
+            "point": "超长上下文支持",
+            "forYou": "原生支持 262,144 tokens,可扩展至 1,010,000 tokens,适合塞入整个代码仓库或超长文档进行理解和操作。",
+            "evidence": "模型卡: 'Context Length: 262,144 natively and extensible up to 1,010,000 tokens'",
+            "confidence": "high(官方规格)"
+          },
+          {
+            "point": "开源 Apache 2.0 与高效 MoE 架构",
+            "forYou": "可自部署、微调,完全掌控数据和成本;MoE 设计(35B 总参,3B 激活)意味着推理效率高,适合在有限硬件上运行。",
+            "evidence": "模型卡: license apache-2.0,架构描述中 MoE 格式 (A3B 可能表示激活参数约 3B)",
+            "confidence": "high(许可证明确;效率为架构推断,具体性能需实测)"
+          }
+        ],
+        "benchmark": {
+          "headline": "Qwen3.6-35B-A3B 在终端 agent 任务上比前代 Qwen3.5-27B 提升 24%,但整体编程得分不及同门密度版本 Qwen3.6-27B;所有数据均为官方自评,需第三方验证。",
+          "professorNote": "你对 agent 编程看得最重,注意:35B-A3B 的 Terminal-Bench 2.0 得分 (51.5) 虽然比老 Qwen 高,但同系 27B 密度模型更高 (59.3),而且接近 Claude 4.5 Opus (59.3)。如果你追求最强能力,可能 27B 更合适;如果追求效率,35B-A3B 更有吸引力。Agentic 指标很多都是官方自报,选型前务必等 LMArena 等第三方验证。",
+          "charts": [
+            {
+              "title": "Terminal-Bench 2.0 (终端 agent 任务)",
+              "metric": "得分 (经过 5 次运行平均)",
+              "unit": "分",
+              "higherIsBetter": true,
+              "sourceType": "official",
+              "maxValue": 100,
+              "bars": [
+                {
+                  "label": "Qwen3.5-27B",
+                  "display": "41.6",
+                  "value": 41.6
+                },
+                {
+                  "label": "Qwen3.6-35B-A3B",
+                  "display": "51.5",
+                  "value": 51.5,
+                  "highlight": true
+                },
+                {
+                  "label": "Claude 4.5 Opus",
+                  "display": "59.3",
+                  "value": 59.3
+                }
+              ]
+            }
+          ],
+          "items": [
+            {
+              "label": "SWE-bench Verified (代码修复 agent)",
+              "score": "73.4",
+              "comparator": "vs Qwen3.5-27B 75.0, Claude 4.5 Opus 80.9",
+              "interpretation": "在软件工程问题修复上略低于前代,但仍是可用水平;此分数为官方自评。",
+              "sourceType": "official"
+            },
+            {
+              "label": "Terminal-Bench 2.0",
+              "score": "51.5",
+              "comparator": "vs Qwen3.5-27B 41.6, Claude 4.5 Opus 59.3",
+              "interpretation": "终端操作任务大幅提升,接近闭源旗舰,对自动化运维 agent 利好。",
+              "sourceType": "official"
+            },
+            {
+              "label": "MMLU-Pro (高难知识问答)",
+              "score": "85.2",
+              "comparator": "vs Qwen3.5-27B 86.1, Claude 4.5 Opus 89.5",
+              "interpretation": "知识水平上乘,但未超越自家前代,说明 MoE 可能牺牲了少许知识密集性能。",
+              "sourceType": "official"
+            }
+          ],
+          "caveats": [
+            "所有 benchmark 数字均来自官方模型卡,未经过第三方独立验证 (LMArena/OpenLLM Leaderboard 待跟进)。",
+            "与闭源模型 (Claude 4.5 Opus) 的比较数据由厂商提供,可能存在评测条件不一致,谨慎参考。"
+          ]
+        },
+        "openSourceMeaning": "Apache 2.0 开源意味着你可以自由部署、微调、商用,无需担心许可证限制;这对于做商业化 AI 应用构建者来说是核心优势,你可以完全掌控模型行为和数据隐私。",
+        "whenToUse": "如果你在开发一个重视效率的编程 agent,且硬件资源有限,35B-A3B 的 MoE 架构可能让你在消费级 GPU 上运行;若追求极致 agent 能力,建议同时评估同系的 Qwen3.6-27B 密度模型。",
+        "cost_caveats": "总参数 35B,激活 3B,意味着推理时只需 3B 左右的计算量,但需要足够显存放全部参数 (如 FP16 约需 70GB 显存,四卡 RTX 3090? 量化版 FP8 可降低)。自部署成本需根据硬件评估,也可使用 Alibaba 提供 API 试用。",
+        "sources": [
+          {
+            "name": "HuggingFace Qwen3.6-27B 模型卡 (包含 35B-A3B 评测数据)",
+            "url": "https://huggingface.co/Qwen/Qwen3.6-27B"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mistral",
+      "name": "Mistral Large 3",
+      "vendor": "Mistral AI",
+      "country": "法国",
+      "kind": "open",
+      "latestVersion": "Mistral Large 3 675B Instruct 2512 NVFP4",
+      "latestReleasedAt": "2026-01-29",
+      "latestReleasedAtPrecision": "approx (HuggingFace lastModified, not guaranteed release date)",
+      "isOpen": true,
+      "license": "apache-2.0",
+      "hasEvalData": false,
+      "evalSources": [],
+      "evalThirdPartyPending": [
+        "LMArena",
+        "OpenLLM Leaderboard"
+      ],
+      "hasChangelog": true,
+      "changelogUrl": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512",
+      "lastCheckedAt": "2026-06-02T20:51:19.609Z",
+      "latestVersionVariants": [
+        "Mistral Large 3 675B Instruct 2512 NVFP4",
+        "Mistral Large 3 675B Instruct 2512",
+        "Mistral Large 3 675B Instruct 2512 BF16",
+        "Mistral Large 3 675B Instruct 2512 Eagle",
+        "Mistral Large 3 675B Base 2512"
+      ],
+      "analysisGeneratedAt": "2026-06-02T20:51:20.395Z",
+      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "analysis": {
+        "oneLineTakeaway": "开源 675B 多模态 MoE 模型，41B 激活，带视觉、原生函数调用和 256k 上下文，Apache 2.0 许可可自由商用。适合打造需要理解图文、调用工具和长文档处理的企业级 AI 应用。",
+        "whatItUnlocks": [
+          {
+            "point": "多模态视觉理解",
+            "forYou": "构建能同时处理图像和文本的应用，如智能客服看截图回答问题、产品图片质检等。",
+            "evidence": "model card：\"Vision: Enables the model to analyze images and provide insights based on visual content\"",
+            "confidence": "high（明示功能）"
+          },
+          {
+            "point": "原生函数调用与 JSON 输出",
+            "forYou": "轻松搭建工具链 agent，让模型自主调用 API 执行任务（如查询数据库、控制外部设备），无需复杂的工作流编排。",
+            "evidence": "model card：\"Agentic: Offers best-in-class agentic capabilities with native function calling and JSON outputting.\"",
+            "confidence": "medium（功能描述为 high，但“best-in-class”为 self-claim，待第三方验证）"
+          },
+          {
+            "point": "256k 上下文窗口",
+            "forYou": "一次输入整部书籍、长代码库或超长对话历史，实现端到端理解，省去分段拼接的麻烦。",
+            "evidence": "model card：\"Large Context Window: Supports a 256k context window.\"",
+            "confidence": "high"
+          },
+          {
+            "point": "Apache 2.0 开源许可",
+            "forYou": "可商用、可修改、可私有化部署，无需公开衍生代码，兼顾合规与灵活性，彻底摆脱 API 厂商锁定。",
+            "evidence": "model card：\"Apache 2.0 License\"",
+            "confidence": "high"
+          },
+          {
+            "point": "MoE 架构（41B 激活参数）降低推理成本",
+            "forYou": "总参数 675B 但每次推理仅激活 41B，结合 NVFP4 量化，单节点 H100/A100 即可部署，自建成本相对可控。",
+            "evidence": "model card：\"FP8 on a single node of B200s or H200s... NVFP4 on a single node of H100s or A100s.\"",
+            "confidence": "high（部署可行性明确）"
+          }
+        ],
+        "benchmark": {
+          "headline": "官方仅提供对比图表，无具体分数，暂无任何第三方评测，性能待验证。",
+          "professorNote": "目前没有任何可核验的基准分数。所有“前沿”“最佳”等声明均来自厂商自评。落地前务必等待 LMArena（大模型竞技场）和 OpenLLM Leaderboard 的独立评测，否则相当于盲选。",
+          "charts": [],
+          "items": [],
+          "caveats": [
+            "所有性能声明来自厂商自评，无第三方核验。",
+            "模型卡片中的基准结果仅为图片，无法提取数字。",
+            "实际应用能力须等 LMArena / OpenLLM 等社区评测后再做判断。"
+          ]
+        },
+        "openSourceMeaning": "Apache 2.0 许可：可自由使用、修改、分发，包括商用，无需公开修改后的代码。这意味着你可以将模型定制为行业专用版本、嵌入自有产品，并且不受厂商 API 调价或服务中断的影响。当然，你需要自己负责部署和运维。",
+        "whenToUse": "需要多模态理解、工具调用和超长上下文的企业级应用。建议先用 Mistral 的 API 试用，如果性能满足需求且成本可接受，再考虑自部署。个人开发者如需开箱即用的强 agent 能力，也可直接接入 API。",
+        "cost_caveats": "675B 总参数，即使激活仅 41B，自部署仍需至少 1 个 8xH100/A100 节点的算力，硬件投入高。NVFP4 量化版本可在更便宜的卡上跑，但可能牺牲一些精度。对个人或小团队，使用 Mistral 的 API 是最实际的选择。",
+        "sources": [
+          {
+            "name": "HuggingFace · mistralai/Mistral-Large-3-675B-Instruct-2512",
+            "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512"
+          }
+        ]
+      }
+    },
+    {
+      "id": "llama",
+      "name": "Llama 4",
+      "vendor": "Meta",
+      "country": "美国",
+      "kind": "open",
+      "latestVersion": "Llama 4 Maverick 17B 128E Instruct",
+      "latestReleasedAt": "2025-05-22",
+      "latestReleasedAtPrecision": "approx (HuggingFace lastModified, not guaranteed release date)",
+      "isOpen": true,
+      "license": "other",
+      "hasEvalData": true,
+      "evalSources": [
+        "HuggingFace model card"
+      ],
+      "evalThirdPartyPending": [
+        "LMArena",
+        "OpenLLM Leaderboard"
+      ],
+      "hasChangelog": true,
+      "changelogUrl": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+      "lastCheckedAt": "2026-06-02T20:50:25.425Z",
+      "latestVersionVariants": [
+        "Llama 4 Maverick 17B 128E Instruct",
+        "Llama 4 Maverick 17B 128E Instruct FP8",
+        "Llama 4 Scout 17B 16E Instruct",
+        "Llama 4 Maverick 17B 128E Instruct Original",
+        "Llama 4 Maverick 17B 128E",
+        "Llama 4 Scout 17B 16E"
+      ],
+      "analysisGeneratedAt": "2026-06-02T20:50:25.938Z",
+      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "analysis": {
+        "oneLineTakeaway": "Meta 开源的多模态对话模型,图片+文字都能理解,输出是文字;适合想做多模态应用但不想被绑在闭源 API 上的构建者。",
+        "whatItUnlocks": [
+          {
+            "point": "原生多模态(图像+文本)对话",
+            "forYou": "可以直接把图片扔给模型,让它描述、问答、提取信息;对要做图库搜索、视觉客服、AI 配文等产品是开箱即用。不用再串联单独的图像理解组件。",
+            "evidence": "HuggingFace model card 标签: image-text-to-text, conversational",
+            "confidence": "medium (基于标签推断,无官方评测数字)"
+          },
+          {
+            "point": "可自部署的开源权重",
+            "forYou": "跟闭源 API 不同,你能自己租卡部署,做数据不出门的私有化多模态应用;也能微调成你业务的特化版。",
+            "evidence": "HuggingFace model card 提供 safetensors 权重下载,支持 transformers 等库加载",
+            "confidence": "high"
+          }
+        ],
+        "benchmark": {
+          "headline": "该模型在 HuggingFace model card 上有 eval-results 标签,但未公布具体评分,无法给出任何数字;落地前必须等第三方评测。",
+          "professorNote": "没有评测数字就意味着『现在不知道它有多强』。作为应用开发者,别光信厂商宣传,一定要等 LMArena、OpenLLM Leaderboard 这类第三方跑出成绩,再对比你要做的任务去选。",
+          "charts": [],
+          "items": [],
+          "caveats": [
+            "无任何可核验的 benchmark 数字,模型能力完全未知;厂商未公开自评,亦无第三方交叉验证。",
+            "所谓『多模态』仅有标签支持,实际能力(准确率、幻觉程度等)未测试。"
+          ]
+        },
+        "openSourceMeaning": "开源(权重开放,但许可证为 other,具体条款需查阅 Llama 4 Community License)让你可以自部署、微调、控制数据,不被厂商锁定;成本上省去 API 调用费,但要自行承担 GPU 硬件和运维。",
+        "whenToUse": "当你急需一个多模态对话模型,又想自己折腾部署,或数据绝对不能外传时,可以尝试用它打底。但因为没有性能数据,更适合先玩起来、验证原型,不要直接押注到生产线。怎么开始:从 HuggingFace 下载模型,用 transformers 加载,或用 vLLM 部署后接个前端试验。",
+        "cost_caveats": "模型名含 17B,可能为 MoE 架构(128E 可能指专家数),总参数可能远大于 17B,自部署需可观显存(预估单卡 A100 80G 起步,视量化情况)。若有 FP8 量化版可降低要求。",
+        "sources": [
+          {
+            "name": "HuggingFace · meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+            "url": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct"
+          }
+        ]
+      }
     }
   ]
 }

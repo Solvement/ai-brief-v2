@@ -62,7 +62,10 @@ function validateStatusCard(model, path) {
   if (model?.latestVersionVariants !== undefined) {
     validateStringArray(model.latestVersionVariants, `${path}.latestVersionVariants`);
   }
-  validateDate(model?.latestReleasedAt, `${path}.latestReleasedAt`);
+  // latestReleasedAt may be "" when the official source gives no parseable date (precision: not_found) — honest unknown, not fabricated.
+  if (isNonEmptyString(model?.latestReleasedAt)) {
+    validateDate(model.latestReleasedAt, `${path}.latestReleasedAt`);
+  }
   if (model?.latestReleasedAtPrecision !== undefined) {
     validateString(model.latestReleasedAtPrecision, `${path}.latestReleasedAtPrecision`);
   }

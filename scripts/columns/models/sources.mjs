@@ -28,12 +28,13 @@ export async function fetchOpenModelStatus(model, options = {}) {
   if (!model.hfId) throw new Error(`open model ${model.id} requires hfId`);
 
   const checkedAt = nowIso(options);
-  const [modelInfo, orgListing] = await Promise.all([
+  const [modelInfo, orgListing, readme] = await Promise.all([
     fetchHuggingFaceModel(model.hfId, options),
     fetchHuggingFaceOrgListing(model, options).catch((error) => {
       options.logger?.warn?.(`HF org listing failed for ${model.id}: ${error.message}`);
       return [];
     }),
+    fetchHuggingFaceReadme(model.hfId, options),
   ]);
 
   const relatedModels = relatedHfModels(model, modelInfo, orgListing);
@@ -68,7 +69,7 @@ export async function fetchOpenModelStatus(model, options = {}) {
     sources: [
       { name: `HuggingFace · ${model.hfId}`, url: changelogUrl },
     ],
-    modelCardText: extractModelCardText(modelInfo).slice(0, SOURCE_TEXT_LIMIT),
+    modelCardText: buildModelCardText(modelInfo, readme).slice(0, SOURCE_TEXT_LIMIT),
     metadata: {
       downloads: Number(modelInfo?.downloads) || 0,
       likes: Number(modelInfo?.likes) || 0,
@@ -170,6 +171,32 @@ export function buildOfflineModelStatus(model, options = {}) {
 
 async function fetchHuggingFaceModel(hfId, options = {}) {
   return fetchJson(`${HF_API_BASE}/models/${encodeHfRepoId(hfId)}`, options);
+}
+
+async function fetchHuggingFaceReadme(hfId, options = {}) {
+  for (const branch of ["main", "master"]) {
+    const url = `${HF_WEB_BASE}/${encodeHfRepoId(hfId)}/raw/${branch}/README.md`;
+    try {
+      const text = await fetchText(url, { ...options, accept: "text/plain, text/markdown, */*" });
+      if (text && text.trim()) return stripFrontMatter(text);
+    } catch (error) {
+      options.logger?.warn?.(`HF README fetch failed for ${hfId}@${branch}: ${error.message}`);
+    }
+  }
+  return "";
+}
+
+function stripFrontMatter(text) {
+  // HF README starts with a YAML front-matter block (---\n...\n---); the prose body is what we want.
+  const match = String(text || "").match(/^---\n[\s\S]*?\n---\n?([\s\S]*)$/);
+  return (match ? match[1] : String(text || "")).trim();
+}
+
+function buildModelCardText(modelInfo, readme = "") {
+  const meta = extractModelCardText(modelInfo);
+  const body = String(readme || "").trim();
+  if (!body) return meta;
+  return `${meta}\n\n=== MODEL CARD README ===\n${body}`;
 }
 
 async function fetchHuggingFaceOrgListing(model, options = {}) {
