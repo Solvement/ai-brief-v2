@@ -22,7 +22,7 @@ import { BriefDeepDive } from "./pages/BriefDeepDive";
 type RouteState =
   | { route: "home" }
   | { route: "detail"; owner: string; name: string }
-  | { route: "models"; companyId?: string }
+  | { route: "models"; modelId?: string }
   | { route: "projects" }
   | { route: "articles"; paperId?: string }
   | { route: "brief"; slug?: string }
@@ -33,7 +33,7 @@ function parseHash(): RouteState {
   const m = raw.match(/^\/repo\/([^/]+)\/([^/]+)\/?$/);
   if (m) return { route: "detail", owner: decodeURIComponent(m[1]), name: decodeURIComponent(m[2]) };
   const models = raw.match(/^\/models(?:\/([^/]+))?\/?$/);
-  if (models) return { route: "models", companyId: models[1] ? decodeURIComponent(models[1]) : undefined };
+  if (models) return { route: "models", modelId: models[1] ? decodeURIComponent(models[1]) : undefined };
   const articles = raw.match(/^\/articles(?:\/([^/]+))?\/?$/);
   if (articles) return { route: "articles", paperId: articles[1] ? decodeURIComponent(articles[1]) : undefined };
   const brief = raw.match(/^\/brief(?:\/([^/]+))?\/?$/);
@@ -58,7 +58,7 @@ export function App() {
   if (state.route === "detail" && state.owner && state.name) {
     return <Detail owner={state.owner} name={state.name} />;
   }
-  if (state.route === "models") return <Models companyId={state.companyId} />;
+  if (state.route === "models") return <Models modelId={state.modelId} />;
   if (state.route === "projects") return <Projects />;
   if (state.route === "articles") return <Articles paperId={state.paperId} />;
   if (state.route === "brief") return <BriefDeepDive slug={state.slug} />;

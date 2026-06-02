@@ -1,0 +1,116 @@
+{
+  "_note": "开源模型金标准 (gold standard) — DeepSeek-V4-Pro。视角=做 AI 应用的人(AI PM/FDE/vibe coding),只讲『对我做 AI 应用有什么用/能做什么/要不要用』,不挖内部机制。grounding 来自 HF deepseek-ai/DeepSeek-V4-Pro model card(/browse 实核),每条标来源+confidence,厂商自夸标 low+待第三方核实。这是 codex stage-2 开源生成器的对齐样板 + 初始 seed。见 [[user-goal-applied-ai-builder]]。",
+  "id": "deepseek-v4",
+  "name": "DeepSeek-V4",
+  "vendor": "DeepSeek",
+  "country": "中国",
+  "kind": "open",
+
+  "latestVersion": "DeepSeek-V4-Pro (preview)",
+  "latestVersionVariants": ["DeepSeek-V4-Pro (1.6T/49B激活)", "DeepSeek-V4-Flash (284B/13B激活)"],
+  "latestReleasedAt": "2026-05-06",
+  "latestReleasedAtPrecision": "approx (HF 显示'Updated 27 days ago',非精确发布日)",
+  "isOpen": true,
+  "license": "MIT",
+  "hasEvalData": true,
+  "evalSources": ["DeepSeek 官方 model card 评测表", "DeepSeek-V4 Technical Report (DeepSeek_V4.pdf)"],
+  "evalThirdPartyPending": ["LMArena", "OpenLLM Leaderboard"],
+  "hasChangelog": true,
+  "changelogUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+  "lastCheckedAt": "2026-06-02",
+
+  "analysis": {
+    "oneLineTakeaway": "DeepSeek 开源了一个能一次吞 100 万 token 上下文、还便宜的强模型,而且 MIT 开源——你能自己部署、不被 API 厂商绑死。对要做 AI 产品的你,等于『长上下文 + 控成本 + 不锁定』三件事一起到位。",
+
+    "whatItUnlocks": [
+      {
+        "point": "超长上下文还便宜 → 解锁新做法",
+        "forYou": "100 万 token 上下文,而且这次把长上下文的成本砍到老版的零头。意味着:做代码 agent 时可以把『整个仓库』一股脑喂进去让它通盘理解,不用费劲切片拼接;做文档问答 / RAG 能塞超长材料。以前因为『上下文不够 / 太烧钱』做不了的产品,现在能做了。",
+        "evidence": "model card:支持 1M token 上下文;1M 设定下单 token 推理仅需 V3.2 的 27% FLOPs、10% KV cache",
+        "confidence": "high(card 明示)"
+      },
+      {
+        "point": "开源 + MIT → 成本和数据你说了算",
+        "forYou": "能自己租卡部署、能微调成你产品专用的版本、数据不出门。对要做商业 AI 应用的人,这是『不被 API 涨价绑架 + 好做数据合规 + 不被厂商锁定』。闭源旗舰给不了这个。",
+        "evidence": "model card:License MIT,权重开放下载(safetensors,可 vLLM/SGLang 自部署)",
+        "confidence": "high"
+      },
+      {
+        "point": "代码 / agent 能力强",
+        "forYou": "如果属实,它有可能当你 IDE/agent 里那个『真能改大项目』的引擎,而且开源可自托管。",
+        "evidence": "model card 自述『当前最强开源模型,top-tier coding,在推理/agentic 上显著缩小与闭源旗舰差距』",
+        "confidence": "low(厂商自夸,需 LMArena / OpenLLM 等第三方榜单核实后才当真)"
+      }
+    ],
+
+    "benchmark": {
+      "headline": "硬指标确实涨:知识/事实性相对老版 V3.2 明显跳升,事实问答近翻倍",
+      "professorNote": "对你只需记一件事:这些是『它到底强不强』的证据。下面是官方 model card 的 Base 模型对比(V3.2 → V4-Flash → V4-Pro),知识/事实性涨幅实打实;但代码/agentic 那些跟你最相关的招牌分在技术报告里、本卡未核实,且都是厂商自评,落地前等第三方榜单。",
+      "charts": [
+        {
+          "title": "MMLU-Pro(高难知识问答)",
+          "metric": "EM,5-shot",
+          "unit": "分",
+          "higherIsBetter": true,
+          "sourceType": "official",
+          "maxValue": 100,
+          "bars": [
+            {"label": "V3.2-Base", "display": "65.5", "value": 65.5},
+            {"label": "V4-Flash-Base", "display": "68.3", "value": 68.3},
+            {"label": "V4-Pro-Base", "display": "73.5", "value": 73.5, "highlight": true}
+          ]
+        },
+        {
+          "title": "FACTS(事实准确度,越高越少胡说)",
+          "metric": "EM,25-shot",
+          "unit": "分",
+          "higherIsBetter": true,
+          "sourceType": "official",
+          "maxValue": 100,
+          "bars": [
+            {"label": "V3.2-Base", "display": "27.1", "value": 27.1},
+            {"label": "V4-Flash-Base", "display": "33.9", "value": 33.9},
+            {"label": "V4-Pro-Base", "display": "62.6", "value": 62.6, "highlight": true}
+          ]
+        },
+        {
+          "title": "长上下文成本(1M token,相对老版,越低越省钱)",
+          "metric": "相对 V3.2 的比值",
+          "unit": "%",
+          "higherIsBetter": false,
+          "sourceType": "official",
+          "maxValue": 100,
+          "bars": [
+            {"label": "V3.2 显存(KV)", "display": "100%", "value": 100},
+            {"label": "V4-Pro 显存(KV)", "display": "10%", "value": 10, "highlight": true},
+            {"label": "V4-Pro 算力(FLOPs)", "display": "27%", "value": 27, "highlight": true}
+          ]
+        }
+      ],
+      "items": [
+        {"label": "MMLU-Pro", "score": "73.5", "comparator": "vs 老版 65.5", "interpretation": "高难知识问答更准", "sourceType": "official"},
+        {"label": "事实准确度 FACTS", "score": "62.6", "comparator": "vs 老版 27.1", "interpretation": "胡说八道大幅减少,对做问答类应用很重要", "sourceType": "official"},
+        {"label": "长上下文成本", "score": "27% 算力 / 10% 显存", "comparator": "相对老版 V3.2", "interpretation": "长上下文从『跑不起』变『跑得起』的关键", "sourceType": "official"}
+      ],
+      "caveats": [
+        "以上为 Base 模型、DeepSeek 官方自报;跟你最相关的代码/agentic 招牌分在技术报告 PDF,本卡未核实,不臆造。",
+        "『最强开源』为自评,落地决策前等 LMArena / OpenLLM 第三方交叉验证。",
+        "成本比值是相对自家 V3.2,不是与别家横评。"
+      ]
+    },
+
+    "openSourceMeaning": "开源(MIT)对做 AI 应用的你 = 可自部署 / 可微调成产品专用 / 可控成本与数据 / 不被厂商锁定;代价是你得自己扛部署、运维和硬件。这正是开源相对闭源旗舰最大的产品价值。",
+
+    "whenToUse": "做需要『长上下文 + 想控成本/数据』的 AI 应用(代码 agent 吃整库、长文档 RAG、私有化部署)→ 值得接它的 API 试,或评估自部署/微调。只是日常 vibe coding → 先用托管 API 体验它的代码能力,够强再深用。",
+
+    "cost_caveats": "1.6T 总参数(MoE 激活 49B),自部署硬件门槛很高,个人现实是走 API 或租卡,别想塞进笔记本;Flash 版(284B/13B)更轻但纯知识和复杂 agentic 弱于 Pro。",
+
+    "sources": [
+      {"name": "HuggingFace · deepseek-ai/DeepSeek-V4-Pro (model card)", "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro"},
+      {"name": "DeepSeek-V4 Technical Report (DeepSeek_V4.pdf,代码/agentic 招牌分待此核实)", "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf"}
+    ]
+  },
+
+  "analysisGeneratedAt": "2026-06-02",
+  "analysisAuthor": "Claude (gold standard, applied-builder angle, /browse-verified)"
+}

@@ -18,7 +18,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "node scripts/lint.mjs",
     "verify": "npm run lint && npm run test && npm run build",
-    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-model-workbench.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs",
+    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs",
     "test": "node --test scripts/__tests__/*.test.mjs && npm run validate",
     "preview": "vite preview --host 127.0.0.1",
     "ingest": "node --no-warnings scripts/ingest.mjs",
@@ -30,6 +30,9 @@
     "papers:daily": "node --no-warnings scripts/papers-radar.mjs daily",
     "papers:run": "node --no-warnings scripts/papers-radar.mjs run",
     "projects:daily": "node --no-warnings scripts/columns/projects/daily.mjs",
+    "models:check": "node --no-warnings scripts/columns/models/sources.mjs",
+    "models:generate": "node --no-warnings scripts/columns/models/generate.mjs",
+    "models:daily": "node --no-warnings scripts/columns/models/daily.mjs",
     "pipeline:sync": "node --no-warnings scripts/sync-pipeline-status.mjs"
   },
   "dependencies": {

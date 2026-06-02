@@ -149,29 +149,14 @@ export interface ModelSource {
   url: string;
 }
 
-export interface ModelApiInfo {
-  modelNames: string[];
-  contextWindow: string;
-  maxOutput: string;
-  modes: string[];
-}
-
-export interface ModelNextRelation {
-  toReleaseId: string;
-  summary: string;
-  inherits: string;
-  changes: string;
-  why: string;
-  solvedBy: string;
-  teacherNote: string;
-}
+export type ModelKind = "open" | "closed";
 
 export type ModelBenchmarkSourceType = "official" | "third-party" | "derived";
 
 export interface ModelBenchmarkChartBar {
   label: string;
-  value: number;
   display: string;
+  value: number;
   highlight?: boolean;
 }
 
@@ -193,127 +178,124 @@ export interface ModelBenchmarkItem {
   sourceType: ModelBenchmarkSourceType;
 }
 
-export interface ModelBenchmarkLens {
+export interface ModelBenchmark {
   headline: string;
   professorNote: string;
-  caveats: string[];
   charts: ModelBenchmarkChart[];
   items: ModelBenchmarkItem[];
+  caveats: string[];
 }
 
-export interface ModelAnalysisSection {
-  headline: string;
-  professorNote: string;
-  bullets: string[];
+export interface ModelStatusCard {
+  latestVersion: string;
+  latestVersionVariants?: string[];
+  latestReleasedAt: string;
+  latestReleasedAtPrecision?: string;
+  isOpen: boolean;
+  license: string;
+  hasEvalData: boolean;
+  evalSources: string[];
+  evalThirdPartyPending?: string[];
+  hasChangelog: boolean;
+  changelogUrl: string;
+  lastCheckedAt: string;
 }
 
-export interface ModelAnalysis {
-  benchmark: ModelBenchmarkLens;
-  architecture: ModelAnalysisSection;
-  designLineage: ModelAnalysisSection;
-  trainingData: ModelAnalysisSection;
-  innovation: ModelAnalysisSection;
-  limitations: ModelAnalysisSection;
-  professorLens: ModelAnalysisSection;
-}
-
-export interface ModelRelease {
+export interface ModelIdentity {
   id: string;
   name: string;
-  kind: string;
-  publishedAt: string;
-  positioning: string;
-  oneSentenceTakeaway: string;
-  problemSolved: string;
-  keyChanges: string[];
-  whyChanged: string;
-  howSolved: string;
-  tradeoffs: string[];
-  studentTakeaways: string[];
-  experiments: string[];
-  api?: ModelApiInfo;
-  modelAnalysis: ModelAnalysis;
-  teacherNote: string;
-  sources: ModelSource[];
-  nextRelation?: ModelNextRelation;
-}
-
-export interface ModelSeries {
-  id: string;
-  title: string;
-  summary: string;
-  teacherNote: string;
-  releases: ModelRelease[];
-}
-
-export interface ModelLearningItem {
-  title: string;
-  body: string;
-}
-
-export interface ModelUpdate {
-  id: string;
-  title: string;
-  kind: string;
-  publishedAt: string;
-  summary: string;
-  whyItMatters: string;
-  studentTakeaway: string;
-  sources: ModelSource[];
-}
-
-export interface ModelCompany {
-  id: string;
-  name: string;
-  shortName: string;
+  vendor: string;
   country: string;
-  updatedAt: string;
-  publishedAt: string;
-  oneSentenceTakeaway: string;
-  whyItMatters: string;
-  contentType: "model";
-  targetAudience: string[];
-  readingTime: string;
-  actionLabel: string;
-  impactScore: number;
-  readabilityScore: number;
-  actionabilityScore: number;
-  confidenceScore: number;
-  difficulty: string;
-  recommendedAction: string;
-  sourceName: string;
-  sourceUrl: string;
-  tags: string[];
-  nextSteps: string[];
-  sources: ModelSource[];
-  learningPath: ModelLearningItem[];
-  series: ModelSeries[];
-  updates: ModelUpdate[];
+  kind: ModelKind;
 }
+
+export interface ModelUnlock {
+  point: string;
+  forYou: string;
+  evidence: string;
+  confidence: string;
+}
+
+export interface ModelOpenAnalysis {
+  oneLineTakeaway: string;
+  whatItUnlocks: ModelUnlock[];
+  benchmark: ModelBenchmark;
+  openSourceMeaning: string;
+  whenToUse: string;
+  cost_caveats: string;
+  sources: ModelSource[];
+}
+
+export interface ModelClosedFeature {
+  feature: string;
+  whatItIs: string;
+  forYou: string;
+  howToUse: string;
+  whenToUse: string;
+}
+
+export interface ModelClosedChangelog {
+  oneLineTakeaway: string;
+  newFeatures: ModelClosedFeature[];
+  limitations: string;
+  sources: ModelSource[];
+}
+
+export interface ModelEntryBase extends ModelIdentity, ModelStatusCard {
+  analysisGeneratedAt: string;
+  analysisAuthor: string;
+}
+
+export interface ModelOpenEntry extends ModelEntryBase {
+  kind: "open";
+  isOpen: true;
+  analysis: ModelOpenAnalysis;
+  changelog?: never;
+}
+
+export interface ModelClosedEntry extends ModelEntryBase {
+  kind: "closed";
+  isOpen: false;
+  changelog: ModelClosedChangelog;
+  analysis?: never;
+}
+
+export type ModelEntry = ModelOpenEntry | ModelClosedEntry;
 
 export interface ModelsData {
   generatedAt: string;
-  companies: ModelCompany[];
+  models: ModelEntry[];
 }
 
-// ---- Academic analysis (2026-05-30 redesign): mirrors the paper's own sections ----
-export interface PaperAnalysisSection {
-  /** The paper's own section, heading translated to plain Chinese (顺着论文版块走). */
+// ---- Academic 精读伴读 / reading-companion schema (2026-06-01 rebuild) ----
+// Core UX = "先让我自己想，再看 AI 的": a faithful first stage, then free-form AI notes.
+// Deleted entirely: verdict / scorecard / FDE memo / claimLedger / evidenceMatrix /
+// artifactAudit / falsification. Academic papers have ONE tier: deep.
+
+export type PaperType = "survey" | "theory" | "system" | "benchmark" | "dataset" | "industry_case" | "evaluation_audit" | "tooling" | "position_roadmap";
+export type VenueStatus = "verified" | "unverified" | "not_provided";
+
+/** One key figure/table/result listed as TEXT (no real images this round). Factual only. */
+export interface PaperKeyResult {
+  kind: "figure" | "table" | "result";
+  ref: string;        // "Figure 3" / "Table 1" / "Result"
+  finding: string;    // factual finding, numbers from the paper — NO evaluation words
+}
+
+/** Stage 1 · 原文: one section of the paper, faithful translate + summarize. No AI judgment. */
+export interface PaperReadingSection {
+  /** The paper's own section heading, translated to plain Chinese. */
   heading: string;
-  /** Plain-language translate + summarize of that section. */
+  /** Faithful translate + summarize of that section. NO evaluative language. */
   summary: string;
-  /** Optional: locates the load-bearing claim/assumption — LOCATE only, no verdict. */
-  loadBearing?: string;
-  /** Optional: objective facts about evidence strength / scope — facts, no verdict. */
-  evidence?: string;
-  /** Optional deep-tier material folded behind a 线头. */
-  fold?: string;
+  /** Up to ~5 key figures/tables/results across the whole paper, listed as text. */
+  keyResults?: PaperKeyResult[];
 }
 
 export interface AcademicPaperLimits {
   /** What the paper itself states as limitations / future work (faithful). */
   paperStated: string;
-  /** AI's objective notes on evidence strength / sampling scope (facts, not a verdict). */
+  /** Objective notes on evidence strength / sampling scope (facts, not a verdict). */
   evidenceNotes: string;
 }
 
@@ -326,114 +308,52 @@ export interface AcademicPaperSelection {
   ideaSignal: string;
 }
 
-// ---- Reviewer-style deep dive (2026-05-31): the "审稿式" deep tier ----
-/** One contribution layer: what the paper claims vs the analyst's judgment (kept separate). */
-export interface ContributionLayer {
-  layer: string;        // e.g. 基础设施层 / 训练方法层 / 通用性层
-  claim: string;        // 论文主张
-  evidence?: string;    // 证据 (what actually supports it)
-  judgment: string;     // 我的判断 (assessment, not a bare verdict)
-  fdeMeaning?: string;  // FDE 意义 (what this means for AI-application delivery)
+/** Where the paper was found vs whether facts were verified against the primary source. */
+export interface PaperSourceReliability {
+  /** Discovery channel only (Papers with Code / HF Daily / OpenReview / newsletter…). */
+  discoverySource: string;
+  /** Whether facts/numbers/venue were checked against a primary source. */
+  primarySourceVerified: boolean;
+  paperHtmlFetched: boolean;
+  pdfFetched: boolean;
+  repoFetched: boolean;
+  appendixFetched: boolean;
 }
-/** A real metric pulled from the full text (with provenance note). */
-export interface EvidenceMetric {
-  label: string;
-  value: string;       // keep as string to preserve units / ranges
-  note?: string;       // what it means / caveat
-}
-/** One component of the evidence chain: real numbers + a reviewer point. */
-export interface EvidenceChainItem {
-  component: string;   // e.g. Orchard Env / SWE / BAR / GUI / Claw
-  metrics: EvidenceMetric[];
-  reviewerNote: string; // strong / weak / confounded — distinguish headline vs driver
-}
-/** An external claim audited against reality (e.g. open-source / reproducibility / "latest"). */
-export interface ClaimAudit {
-  claim: string;       // what the paper/source asserts
-  finding: string;     // what verification actually found
-  source?: string;     // url checked
-}
-/** Reasoned reviewer score (NOT a black-box pill): dimension + /10 + justification. */
-export interface ScoreCardItem {
-  dimension: string;   // 问题重要性 / 系统设计 / 算法新颖性 / 实验强度 / 泛化 / 可复现性 / 影响
-  score: number;       // 0-10
-  reason: string;
-}
-/** FDE / AI-application-delivery memo (the stable career lens). Populated only for FDE-relevant papers. All optional. */
-export interface FdeTakeaways {
-  customerProblem?: string;          // the customer pain this paper maps to
-  customerQuestions?: string[];      // 5-10 discovery questions to ask the customer
-  artifactsToAudit?: string[];       // API spec / db schema / logs / prompts / eval set / workflow / auth-RBAC / monitoring / SLAs / human-approval
-  implementationChecklist?: string[];
-  evalPlan?: string[];               // offline / online / golden tasks / human review / latency-cost-error budget
-  rolloutPlan?: string[];            // PoC -> pilot -> limited prod -> full, each with acceptance criteria
-  riskRegister?: string[];           // 技术 / 数据 / 权限 / 安全 / 成本 / 采用
-  roiHypothesis?: string;            // what it saves / failure-rate reduced / business metric / evidence needed
-  interviewStory?: string;           // FDE interview narrative: technical depth + business impact
-}
-// ---- Iteration 2 (2026-05-31): research-workbench schema ----
-export type PaperType = "survey" | "theory" | "system" | "benchmark" | "dataset" | "industry_case" | "evaluation_audit" | "tooling" | "position_roadmap";
-export type VenueStatus = "verified" | "unverified" | "not_provided";
 
-/** Decision layer shown at the top of the detail page. */
-export interface PaperVerdict {
-  readDecision: "must_read" | "read" | "skim" | "watch" | "skip";
-  fdeFit: "high" | "medium" | "low";
-  evidenceStrength: "strong" | "medium" | "weak";
-  artifactStatus: "official" | "partial" | "third_party_only" | "none";
-  oneLineJudgment: string;
-  whyNow: string[];
-  whyNotOverclaim: string[];
+export interface PaperMeta {
+  paperType: PaperType;
+  venueStatus: VenueStatus;
+  sourceReliability: PaperSourceReliability;
+  tags: string[];
 }
-/** A claim with auditable provenance + FDE transfer — distinguishes proven / implied / FDE-extrapolation. */
-export interface ClaimLedgerItem {
-  claim: string;
-  claimType: "theoretical" | "empirical" | "engineering" | "fde_extrapolation";
-  evidencePointer: string;   // Sec / Fig / Table / Appendix / repo
-  evidenceStrength: "high" | "medium" | "low";
-  threat: string;
-  fdeTransfer: string;
+
+/** A weighting factor: a 0-100 number, or "unknown" before deep-stage backfill. */
+export type SelectionFactor = number | "unknown";
+
+/** Academic selection-gate factors (NOT shown to the user as a score — audit/debug only). */
+export interface SelectionAuditFactors {
+  venuePrestige: SelectionFactor;
+  citationConvergence: SelectionFactor;
+  novelty: SelectionFactor;
+  recency: SelectionFactor;
+  /** Backfilled after deep analysis (CONTEXT「合成方式 A」). "unknown" until then. */
+  evidenceStrength: SelectionFactor;
+  /** Backfilled after deep analysis. "unknown" until then. */
+  reproducibility: SelectionFactor;
 }
-/** One experiment row with source exactness (guards against false precision). */
-export interface EvidenceMatrixItem {
-  experiment: string;
-  sampleSize?: string;
-  modelBackend?: string;
-  metric: string;
-  result: string;
-  exactness: "exact" | "estimated_from_figure" | "author_claim";
-  limitation: string;
-}
-/** Reproducibility audit — splits official vs referenced/dependency/third-party artifacts. */
-export interface ArtifactAudit {
-  officialCode: "verified" | "not_found" | "partial" | "third_party_only";
-  data: "available" | "not_found" | "restricted" | "not_applicable";
-  repoStatus?: string;
-  reproducibility: "full" | "partial" | "artifact_light" | "paper_only" | "third_party_only";
-  notes: string[];
-}
-export interface PaperDeepDive {
-  /** 重判定位 — what the paper REALLY is, not its self-description. */
-  reframe: string;
-  contributionLayers: ContributionLayer[];
-  /** Key mechanism: why it might work (precise + plain). */
-  mechanism: string;
-  evidenceChain: EvidenceChainItem[];
-  /** External-claim audit (reproducibility / repo status / "latest"). May be empty. */
-  audit: ClaimAudit[];
-  loadBearingClaim: string;
-  strongestEvidence: string[];
-  limitations: string[];
-  suggestedExperiments: string[];
-  /** FDE methodology extraction (the career lens) — present only for FDE-relevant papers. */
-  fdeTakeaways?: FdeTakeaways;
-  // ---- Iteration 2 workbench fields (preferred over the flatter fields above when present) ----
-  verdict?: PaperVerdict;
-  claimLedger?: ClaimLedgerItem[];
-  evidenceMatrix?: EvidenceMatrixItem[];
-  artifactAudit?: ArtifactAudit;
-  /** Falsification: what results would overturn the engineering conclusion. */
-  whatWouldInvalidate?: string[];
+
+/** Selection-gate audit trail. Composed at selection + backfilled post-deep. Not user-facing. */
+export interface SelectionAudit {
+  candidateCount: number;
+  selectedCount: number;
+  selectionScore: number;
+  selectedReason: string;
+  rejectedReasonIfAny: string;       // empty when selected
+  weightedFactors: SelectionAuditFactors;
+  /** Discovery channel (must differ from primaryEvidenceSource). */
+  discoverySource: string;
+  /** The primary source the facts were read from (paper full text / PDF / repo). */
+  primaryEvidenceSource: string;
 }
 
 export interface AcademicPaperAnalysis {
@@ -446,20 +366,18 @@ export interface AcademicPaperAnalysis {
   arxivId?: string;
   publishedAt?: string;
   verifiedAt: string;         // RULES §6
-  tier: "light" | "deep";
-  /** 定调 — one framing judgment line (framing, NOT good/bad). */
+  tier: "deep";               // academic papers only ever produce deep
+  /** 定调 — one framing line (framing, NOT good/bad). */
   leadJudgment: string;
-  /** Mirrors the paper's own sections, in order. */
-  sections: PaperAnalysisSection[];
+  meta: PaperMeta;
+  /** Stage 1 · 原文: faithful, follows the paper's own section order. No AI judgment. */
+  originalReading: PaperReadingSection[];
+  /** Stage 2 · AI 分析: free-form critical commentary. The ONLY place judgment is allowed. */
+  analystNotes: string;
   limitsAndFuture: AcademicPaperLimits;
   selection: AcademicPaperSelection;
+  selectionAudit: SelectionAudit;
   provenance: { sourceUrl: string; evidenceKind: string };
-  paperType?: PaperType;
-  venueStatus?: VenueStatus;
-  /** Reasoned reviewer scorecard (deep tier) — dimensions with /10 + justification. */
-  scorecard?: ScoreCardItem[];
-  /** Reviewer-style deep dive (deep tier only). */
-  deepDive?: PaperDeepDive;
 }
 
 export interface ArticlesData {

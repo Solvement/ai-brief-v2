@@ -5,27 +5,34 @@ const raw = await readFile(file, "utf8");
 const data = JSON.parse(raw);
 const errors = [];
 
+const MODEL_KINDS = new Set(["open", "closed"]);
+const SOURCE_TYPES = new Set(["official", "third-party", "derived"]);
+
 function fail(path, message) {
   errors.push(`${path}: ${message}`);
 }
 
-function isIso(value) {
-  return typeof value === "string" && !Number.isNaN(Date.parse(value));
+function isDateish(value) {
+  return typeof value === "string" && value.trim() !== "" && !Number.isNaN(Date.parse(value));
 }
 
 function isNonEmptyString(value) {
   return typeof value === "string" && value.trim() !== "";
 }
 
-function isScore(value) {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 100;
+function isHttpsUrl(value) {
+  return typeof value === "string" && /^https:\/\/\S+$/i.test(value);
 }
 
 function validateString(value, path) {
   if (!isNonEmptyString(value)) fail(path, "must be a non-empty string");
 }
 
-function validateStringArray(value, path, min = 1) {
+function validateDate(value, path) {
+  if (!isDateish(value)) fail(path, "must be a parseable date/ISO string");
+}
+
+function validateStringArray(value, path, { min = 0 } = {}) {
   if (!Array.isArray(value)) {
     fail(path, "must be an array");
     return;
@@ -34,17 +41,64 @@ function validateStringArray(value, path, min = 1) {
   value.forEach((item, index) => validateString(item, `${path}[${index}]`));
 }
 
-function validateSources(sources, path) {
-  if (!Array.isArray(sources) || sources.length === 0) {
-    fail(path, "must include at least one source");
+function validateSources(sources, path, { min = 1 } = {}) {
+  if (!Array.isArray(sources)) {
+    fail(path, "must be an array");
     return;
   }
+  if (sources.length < min) fail(path, `must have at least ${min} source(s)`);
   sources.forEach((source, index) => {
     const sourcePath = `${path}[${index}]`;
     validateString(source?.name, `${sourcePath}.name`);
     validateString(source?.url, `${sourcePath}.url`);
-    if (isNonEmptyString(source?.url) && !/^https:\/\/.+/.test(source.url)) {
+    if (isNonEmptyString(source?.url) && !isHttpsUrl(source.url)) {
       fail(`${sourcePath}.url`, "must be an https URL");
+    }
+  });
+}
+
+function validateStatusCard(model, path) {
+  validateString(model?.latestVersion, `${path}.latestVersion`);
+  if (model?.latestVersionVariants !== undefined) {
+    validateStringArray(model.latestVersionVariants, `${path}.latestVersionVariants`);
+  }
+  validateDate(model?.latestReleasedAt, `${path}.latestReleasedAt`);
+  if (model?.latestReleasedAtPrecision !== undefined) {
+    validateString(model.latestReleasedAtPrecision, `${path}.latestReleasedAtPrecision`);
+  }
+  if (typeof model?.isOpen !== "boolean") fail(`${path}.isOpen`, "must be a boolean");
+  validateString(model?.license, `${path}.license`);
+  if (typeof model?.hasEvalData !== "boolean") fail(`${path}.hasEvalData`, "must be a boolean");
+  validateStringArray(model?.evalSources, `${path}.evalSources`, { min: model?.hasEvalData ? 1 : 0 });
+  if (model?.evalThirdPartyPending !== undefined) {
+    validateStringArray(model.evalThirdPartyPending, `${path}.evalThirdPartyPending`);
+  }
+  if (typeof model?.hasChangelog !== "boolean") fail(`${path}.hasChangelog`, "must be a boolean");
+  validateString(model?.changelogUrl, `${path}.changelogUrl`);
+  if (isNonEmptyString(model?.changelogUrl) && !isHttpsUrl(model.changelogUrl)) {
+    fail(`${path}.changelogUrl`, "must be an https URL");
+  }
+  validateDate(model?.lastCheckedAt, `${path}.lastCheckedAt`);
+}
+
+function validateBenchmarkChart(chart, path) {
+  for (const key of ["title", "metric", "unit"]) validateString(chart?.[key], `${path}.${key}`);
+  if (typeof chart?.higherIsBetter !== "boolean") fail(`${path}.higherIsBetter`, "must be a boolean");
+  if (!SOURCE_TYPES.has(chart?.sourceType)) fail(`${path}.sourceType`, "must be official, third-party, or derived");
+  if (chart?.maxValue !== undefined && (!Number.isFinite(chart.maxValue) || chart.maxValue <= 0)) {
+    fail(`${path}.maxValue`, "must be a positive number when present");
+  }
+  if (!Array.isArray(chart?.bars)) {
+    fail(`${path}.bars`, "must be an array");
+    return;
+  }
+  chart.bars.forEach((bar, index) => {
+    const barPath = `${path}.bars[${index}]`;
+    validateString(bar?.label, `${barPath}.label`);
+    validateString(bar?.display, `${barPath}.display`);
+    if (!Number.isFinite(bar?.value) || bar.value < 0) fail(`${barPath}.value`, "must be a non-negative number");
+    if (bar?.highlight !== undefined && typeof bar.highlight !== "boolean") {
+      fail(`${barPath}.highlight`, "must be a boolean when present");
     }
   });
 }
@@ -53,206 +107,104 @@ function validateBenchmarkItem(item, path) {
   for (const key of ["label", "score", "comparator", "interpretation"]) {
     validateString(item?.[key], `${path}.${key}`);
   }
-  if (!["official", "third-party", "derived"].includes(item?.sourceType)) {
-    fail(`${path}.sourceType`, "must be official, third-party, or derived");
-  }
+  if (!SOURCE_TYPES.has(item?.sourceType)) fail(`${path}.sourceType`, "must be official, third-party, or derived");
 }
 
-function validateBenchmarkChart(chart, path) {
-  for (const key of ["title", "metric", "unit"]) {
-    validateString(chart?.[key], `${path}.${key}`);
-  }
-  if (typeof chart?.higherIsBetter !== "boolean") {
-    fail(`${path}.higherIsBetter`, "must be a boolean");
-  }
-  if (!["official", "third-party", "derived"].includes(chart?.sourceType)) {
-    fail(`${path}.sourceType`, "must be official, third-party, or derived");
-  }
-  if (chart?.maxValue !== undefined && (!Number.isFinite(chart.maxValue) || chart.maxValue <= 0)) {
-    fail(`${path}.maxValue`, "must be a positive number when present");
-  }
-  if (!Array.isArray(chart?.bars) || chart.bars.length < 2) {
-    fail(`${path}.bars`, "must have at least 2 item(s)");
+function validateBenchmark(benchmark, path) {
+  if (!benchmark || typeof benchmark !== "object") {
+    fail(path, "must be an object");
     return;
   }
-  chart.bars.forEach((bar, index) => {
-    const barPath = `${path}.bars[${index}]`;
-    validateString(bar?.label, `${barPath}.label`);
-    validateString(bar?.display, `${barPath}.display`);
-    if (!Number.isFinite(bar?.value) || bar.value < 0) {
-      fail(`${barPath}.value`, "must be a non-negative number");
-    }
-    if (bar?.highlight !== undefined && typeof bar.highlight !== "boolean") {
-      fail(`${barPath}.highlight`, "must be a boolean when present");
-    }
-  });
+  validateString(benchmark.headline, `${path}.headline`);
+  validateString(benchmark.professorNote, `${path}.professorNote`);
+  if (!Array.isArray(benchmark.charts)) {
+    fail(`${path}.charts`, "must be an array");
+  } else {
+    benchmark.charts.forEach((chart, index) => validateBenchmarkChart(chart, `${path}.charts[${index}]`));
+  }
+  if (!Array.isArray(benchmark.items)) {
+    fail(`${path}.items`, "must be an array");
+  } else {
+    benchmark.items.forEach((item, index) => validateBenchmarkItem(item, `${path}.items[${index}]`));
+  }
+  validateStringArray(benchmark.caveats, `${path}.caveats`, { min: 1 });
 }
 
-function validateAnalysisSection(section, path, minBullets = 2) {
-  validateString(section?.headline, `${path}.headline`);
-  validateString(section?.professorNote, `${path}.professorNote`);
-  validateStringArray(section?.bullets, `${path}.bullets`, minBullets);
-}
-
-function validateModelAnalysis(analysis, path) {
+function validateOpenAnalysis(analysis, path) {
   if (!analysis || typeof analysis !== "object") {
     fail(path, "must be an object");
     return;
   }
-
-  validateString(analysis.benchmark?.headline, `${path}.benchmark.headline`);
-  validateString(analysis.benchmark?.professorNote, `${path}.benchmark.professorNote`);
-  validateStringArray(analysis.benchmark?.caveats, `${path}.benchmark.caveats`, 1);
-  if (!Array.isArray(analysis.benchmark?.charts) || analysis.benchmark.charts.length < 1) {
-    fail(`${path}.benchmark.charts`, "must have at least 1 item(s)");
+  validateString(analysis.oneLineTakeaway, `${path}.oneLineTakeaway`);
+  if (!Array.isArray(analysis.whatItUnlocks) || analysis.whatItUnlocks.length === 0) {
+    fail(`${path}.whatItUnlocks`, "must have at least one item");
   } else {
-    analysis.benchmark.charts.forEach((chart, index) => {
-      validateBenchmarkChart(chart, `${path}.benchmark.charts[${index}]`);
+    analysis.whatItUnlocks.forEach((item, index) => {
+      const itemPath = `${path}.whatItUnlocks[${index}]`;
+      for (const key of ["point", "forYou", "evidence", "confidence"]) {
+        validateString(item?.[key], `${itemPath}.${key}`);
+      }
     });
   }
-  if (!Array.isArray(analysis.benchmark?.items) || analysis.benchmark.items.length < 2) {
-    fail(`${path}.benchmark.items`, "must have at least 2 item(s)");
-  } else {
-    analysis.benchmark.items.forEach((item, index) => {
-      validateBenchmarkItem(item, `${path}.benchmark.items[${index}]`);
-    });
+  validateBenchmark(analysis.benchmark, `${path}.benchmark`);
+  for (const key of ["openSourceMeaning", "whenToUse", "cost_caveats"]) {
+    validateString(analysis[key], `${path}.${key}`);
   }
-
-  for (const key of [
-    "architecture",
-    "designLineage",
-    "trainingData",
-    "innovation",
-    "limitations",
-    "professorLens",
-  ]) {
-    validateAnalysisSection(analysis[key], `${path}.${key}`);
-  }
+  validateSources(analysis.sources, `${path}.sources`);
 }
 
-function validateRelease(release, path, releaseIds) {
-  for (const key of [
-    "id",
-    "name",
-    "kind",
-    "positioning",
-    "oneSentenceTakeaway",
-    "problemSolved",
-    "whyChanged",
-    "howSolved",
-    "teacherNote",
-  ]) {
-    validateString(release?.[key], `${path}.${key}`);
+function validateClosedChangelog(changelog, path) {
+  if (!changelog || typeof changelog !== "object") {
+    fail(path, "must be an object");
+    return;
   }
-  if (!isIso(release?.publishedAt)) fail(`${path}.publishedAt`, "must be an ISO date");
-  validateStringArray(release?.keyChanges, `${path}.keyChanges`, 2);
-  validateStringArray(release?.tradeoffs, `${path}.tradeoffs`, 1);
-  validateStringArray(release?.studentTakeaways, `${path}.studentTakeaways`, 1);
-  validateStringArray(release?.experiments, `${path}.experiments`, 1);
-  validateSources(release?.sources, `${path}.sources`);
-  validateModelAnalysis(release?.modelAnalysis, `${path}.modelAnalysis`);
-
-  if (release?.api) {
-    validateStringArray(release.api.modelNames, `${path}.api.modelNames`, 1);
-    validateString(release.api.contextWindow, `${path}.api.contextWindow`);
-    validateString(release.api.maxOutput, `${path}.api.maxOutput`);
-    validateStringArray(release.api.modes, `${path}.api.modes`, 1);
+  validateString(changelog.oneLineTakeaway, `${path}.oneLineTakeaway`);
+  if (!Array.isArray(changelog.newFeatures) || changelog.newFeatures.length === 0) {
+    fail(`${path}.newFeatures`, "must have at least one item");
+  } else {
+    changelog.newFeatures.forEach((item, index) => {
+      const itemPath = `${path}.newFeatures[${index}]`;
+      for (const key of ["feature", "whatItIs", "forYou", "howToUse", "whenToUse"]) {
+        validateString(item?.[key], `${itemPath}.${key}`);
+      }
+    });
   }
-
-  if (release?.nextRelation) {
-    const rel = release.nextRelation;
-    validateString(rel.toReleaseId, `${path}.nextRelation.toReleaseId`);
-    if (isNonEmptyString(rel.toReleaseId) && !releaseIds.has(rel.toReleaseId)) {
-      fail(`${path}.nextRelation.toReleaseId`, "must point to a release in the same series");
-    }
-    for (const key of ["summary", "inherits", "changes", "why", "solvedBy", "teacherNote"]) {
-      validateString(rel[key], `${path}.nextRelation.${key}`);
-    }
-  }
+  validateString(changelog.limitations, `${path}.limitations`);
+  validateSources(changelog.sources, `${path}.sources`);
 }
 
-function validateCompany(company, path) {
-  for (const key of [
-    "id",
-    "name",
-    "shortName",
-    "country",
-    "oneSentenceTakeaway",
-    "whyItMatters",
-    "contentType",
-    "readingTime",
-    "actionLabel",
-    "difficulty",
-    "recommendedAction",
-    "sourceName",
-    "sourceUrl",
-  ]) {
-    validateString(company?.[key], `${path}.${key}`);
-  }
-  if (!isIso(company?.updatedAt)) fail(`${path}.updatedAt`, "must be an ISO date");
-  if (!isIso(company?.publishedAt)) fail(`${path}.publishedAt`, "must be an ISO date");
-  for (const key of ["impactScore", "readabilityScore", "actionabilityScore", "confidenceScore"]) {
-    if (!isScore(company?.[key])) fail(`${path}.${key}`, "must be a number from 0 to 100");
-  }
-  validateStringArray(company?.targetAudience, `${path}.targetAudience`, 1);
-  validateStringArray(company?.tags, `${path}.tags`, 1);
-  validateStringArray(company?.nextSteps, `${path}.nextSteps`, 1);
-  validateSources(company?.sources, `${path}.sources`);
+function validateModel(model, path) {
+  for (const key of ["id", "name", "vendor", "country"]) validateString(model?.[key], `${path}.${key}`);
+  if (!MODEL_KINDS.has(model?.kind)) fail(`${path}.kind`, "must be open or closed");
+  validateStatusCard(model, path);
+  validateDate(model?.analysisGeneratedAt, `${path}.analysisGeneratedAt`);
+  validateString(model?.analysisAuthor, `${path}.analysisAuthor`);
 
-  if (!Array.isArray(company?.learningPath) || company.learningPath.length === 0) {
-    fail(`${path}.learningPath`, "must have items");
-  } else {
-    company.learningPath.forEach((item, index) => {
-      validateString(item?.title, `${path}.learningPath[${index}].title`);
-      validateString(item?.body, `${path}.learningPath[${index}].body`);
-    });
+  if (model?.kind === "open") {
+    if (model.isOpen !== true) fail(`${path}.isOpen`, "open models must have isOpen=true");
+    if (model.changelog !== undefined) fail(`${path}.changelog`, "open models must not include changelog");
+    validateOpenAnalysis(model.analysis, `${path}.analysis`);
   }
 
-  if (!Array.isArray(company?.series) || company.series.length === 0) {
-    fail(`${path}.series`, "must have items");
-  } else {
-    company.series.forEach((series, index) => {
-      const seriesPath = `${path}.series[${index}]`;
-      validateString(series?.id, `${seriesPath}.id`);
-      validateString(series?.title, `${seriesPath}.title`);
-      validateString(series?.summary, `${seriesPath}.summary`);
-      validateString(series?.teacherNote, `${seriesPath}.teacherNote`);
-      if (!Array.isArray(series?.releases) || series.releases.length === 0) {
-        fail(`${seriesPath}.releases`, "must have items");
-        return;
-      }
-      const releaseIds = new Set(series.releases.map((release) => release?.id).filter(isNonEmptyString));
-      series.releases.forEach((release, releaseIndex) => {
-        validateRelease(release, `${seriesPath}.releases[${releaseIndex}]`, releaseIds);
-      });
-    });
-  }
-
-  if (!Array.isArray(company?.updates)) {
-    fail(`${path}.updates`, "must be an array");
-  } else {
-    company.updates.forEach((update, index) => {
-      const updatePath = `${path}.updates[${index}]`;
-      for (const key of ["id", "title", "kind", "summary", "whyItMatters", "studentTakeaway"]) {
-        validateString(update?.[key], `${updatePath}.${key}`);
-      }
-      if (!isIso(update?.publishedAt)) fail(`${updatePath}.publishedAt`, "must be an ISO date");
-      validateSources(update?.sources, `${updatePath}.sources`);
-    });
+  if (model?.kind === "closed") {
+    if (model.isOpen !== false) fail(`${path}.isOpen`, "closed models must have isOpen=false");
+    if (model.analysis !== undefined) fail(`${path}.analysis`, "closed models must not include analysis");
+    validateClosedChangelog(model.changelog, `${path}.changelog`);
   }
 }
 
 if (!data || typeof data !== "object") fail("$", "must be an object");
-if (!isIso(data?.generatedAt)) fail("$.generatedAt", "must be an ISO date");
-if (!Array.isArray(data?.companies) || data.companies.length === 0) {
-  fail("$.companies", "must have at least one company");
+validateDate(data?.generatedAt, "$.generatedAt");
+if (data?.companies !== undefined) fail("$.companies", "old companies shape is retired; use $.models");
+if (!Array.isArray(data?.models) || data.models.length === 0) {
+  fail("$.models", "must have at least one model");
 } else {
   const seen = new Set();
-  data.companies.forEach((company, index) => {
-    const path = `$.companies[${index}]`;
-    if (seen.has(company?.id)) fail(`${path}.id`, "must be unique");
-    seen.add(company?.id);
-    validateCompany(company, path);
+  data.models.forEach((model, index) => {
+    const path = `$.models[${index}]`;
+    if (seen.has(model?.id)) fail(`${path}.id`, "must be unique");
+    if (isNonEmptyString(model?.id)) seen.add(model.id);
+    validateModel(model, path);
   });
 }
 

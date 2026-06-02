@@ -31,10 +31,15 @@ export function loadTrending(): Promise<TrendingData> {
   return inflight;
 }
 
-export function loadModels(): Promise<ModelsData> {
+export function loadModels(opts?: { force?: boolean }): Promise<ModelsData> {
+  if (opts?.force) {
+    cachedModels = null;
+    inflightModels = null;
+  }
   if (cachedModels) return Promise.resolve(cachedModels);
   if (inflightModels) return inflightModels;
-  inflightModels = fetch("./data/models.json", { cache: "no-cache" })
+  const url = opts?.force ? `./data/models.json?t=${Date.now()}` : "./data/models.json";
+  inflightModels = fetch(url, { cache: "no-cache" })
     .then(async (res) => {
       if (!res.ok) throw new Error(`加载 models.json 失败：HTTP ${res.status}`);
       const data = (await res.json()) as ModelsData;
