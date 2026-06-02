@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T23:55:35.057Z",
+  "generatedAt": "2026-06-02T02:00:35.982Z",
   "entity": "evidence",
   "directory": "evidence",
-  "count": 1,
+  "count": 3,
   "items": [
     {
       "id": "evidence/agemem-main-results",
@@ -35,6 +35,86 @@
         {
           "target": "claims/agemem-unified-beats-modular",
           "raw": "[[claims/agemem-unified-beats-modular]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Evidence"
+        }
+      ]
+    },
+    {
+      "id": "evidence/memoryagentbench-results",
+      "type": "evidence",
+      "slug": "memoryagentbench-results",
+      "title": "Memoryagentbench Results",
+      "file": "evidence/memoryagentbench-results.md",
+      "directory": "evidence",
+      "meta": {
+        "slug": "memoryagentbench-results",
+        "kind": "evidence",
+        "content": "memoryagentbench",
+        "experiment_or_case": "记忆四维(AR/TTL/LRU/CR)横向压测:长上下文 / RAG / 结构增强 RAG / 商用记忆 agent",
+        "dataset": "RULER-QA / NIAH-MQ / ∞-Bench-QA / EventQA / 分类×5 / Movie Recom / ∞-Bench-Sum / FactConsolidation",
+        "baseline": "GPT-4o/4.1-mini, Gemini-2.0-Flash, Claude-3.7; BM25/Contriever/NV-Embed-v2; RAPTOR/GraphRAG/HippoRAG-v2/Mem0/Cognee; Self-RAG/MemGPT",
+        "metric": "SubEM / Recall / ROUGE-F1 / Accuracy / Recall@5 / model-based F1",
+        "result": "AR: NV-Embed RULER-QA 83.0%, BM25 NIAH 100%, GPT-4.1-mini EventQA 82.6%。TTL: GPT-4o 87.6% vs Mem0 3.4%。LRU: Claude-3.7 52.5% vs RAG/agentic 0.4–20.7%。CR: 单跳 GPT-4o 60.0%,多跳全体 ≤6%(o4-mini@32K 14.0%)。",
+        "exactness": "exact",
+        "sample_size": "EventQA 500 QA / 534K avg;FactConsolidation 32K-262K",
+        "limitations": "数据集主要为合成(作者自承);开放题用 GPT-4o judge;硬件成本未给。",
+        "source_pointer": "arxiv:2507.05257v1 Table 2 / Table 3 / §4.2 / A.1-A.4"
+      },
+      "body": "\n## Evidence\n\n数字逐项摘自 v1 正文表格。See [[content/memoryagentbench]] 与 [[claims/memory-no-single-winner]]。\n",
+      "excerpt": "数字逐项摘自 v1 正文表格。See [[content/memoryagentbench]] 与 [[claims/memory-no-single-winner]]。",
+      "links": [
+        {
+          "target": "content/memoryagentbench",
+          "raw": "[[content/memoryagentbench]]"
+        },
+        {
+          "target": "claims/memory-no-single-winner",
+          "raw": "[[claims/memory-no-single-winner]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Evidence"
+        }
+      ]
+    },
+    {
+      "id": "evidence/qwen3-coder-next-results",
+      "type": "evidence",
+      "slug": "qwen3-coder-next-results",
+      "title": "Qwen3 Coder Next Results",
+      "file": "evidence/qwen3-coder-next-results.md",
+      "directory": "evidence",
+      "meta": {
+        "slug": "qwen3-coder-next-results",
+        "kind": "evidence",
+        "content": "qwen3-coder-next",
+        "experiment_or_case": "coding/agentic 基准横向对比(80A3 vs 开源大模型与前沿闭源)",
+        "dataset": "SWE-Bench Verified/Multilingual/Pro、Terminal-Bench 2.0、EvalPlus、MultiPL-E、CRUXEval、LiveCodeBench v6、Codeforces",
+        "baseline": "Claude-Opus-4.5 / Sonnet-4.5、DeepSeek-V3.2(671A37)、GLM-4.7(358A32)、MiniMax-M2.1(230A10)、Kimi-K2.5(1000A32)",
+        "metric": "解决率(%) / pass / rating",
+        "result": "SWE-Bench Verified 70.6–71.3%(三 scaffold);Multilingual 62.8%;Pro 56.2%;EvalPlus 86.56%;MultiPL-E 88.23%;CRUXEval 95.88%;LiveCodeBench v6 58.93%;Codeforces 2100;Terminal-Bench 2.0 34.2–36.2%。对照 Claude-Opus-4.5 78.2%。",
+        "exactness": "exact",
+        "sample_size": "80A3(激活 3B);max 300 turns",
+        "limitations": "作者侧复现(已做去泄漏+统一 scaffold);训练数据/算力未公开。",
+        "source_pointer": "arxiv:2603.00729 Table 3-6 / §5.1"
+      },
+      "body": "\n## Evidence\n\n数字逐项摘自 v1 正文表格;§5.1 记录了 baseline 公平性做法(同 scaffold 复现、去 commit 泄漏、统一 turn 上限)。See [[content/qwen3-coder-next]] 与 [[claims/qwen3-coder-next-training-over-size]]。\n",
+      "excerpt": "数字逐项摘自 v1 正文表格;§5.1 记录了 baseline 公平性做法(同 scaffold 复现、去 commit 泄漏、统一 turn 上限)。See [[content/qwen3-coder-next]] 与 [[claims/qwen3-coder-next-training-over-size]]。",
+      "links": [
+        {
+          "target": "content/qwen3-coder-next",
+          "raw": "[[content/qwen3-coder-next]]"
+        },
+        {
+          "target": "claims/qwen3-coder-next-training-over-size",
+          "raw": "[[claims/qwen3-coder-next-training-over-size]]"
         }
       ],
       "headings": [

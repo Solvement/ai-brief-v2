@@ -3898,7 +3898,8 @@ button { font-family: inherit; cursor: pointer; }
 .brief-flags { margin-left: 8px; font-size: 12px; color: #97241f; }
 .brief-body { font-size: 15px; line-height: 1.7; color: var(--ink-2); }
 .brief-body h4 { font-size: 16px; color: var(--ink-1); margin: 22px 0 6px; }
-.claim-text { font-weight: 600; color: var(--ink-1); margin: 0 0 8px; line-height: 1.5; }
+.claim-text { font-weight: 600; color: var(--ink-1); margin: 0 0 6px; line-height: 1.5; }
+.claim-plain { margin: 0 0 8px; font-size: 13px; color: var(--ink-2); line-height: 1.55; background: var(--paper); border-left: 3px solid var(--accent, #b45309); padding: 4px 10px; border-radius: 0 6px 6px 0; }
 .claim-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
 .claim-source { font-size: 12px; color: var(--ink-3); }
 .claim-sub { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; line-height: 1.55; }
@@ -3917,3 +3918,12 @@ button { font-family: inherit; cursor: pointer; }
 .brief-body .md-table code { font-size: 12.5px; }
 .brief-body .md-pre { background: #0f1115; color: #e6e6e6; border-radius: 10px; padding: 14px 16px; margin: 12px 0; overflow-x: auto; font-size: 12.5px; line-height: 1.6; }
 .brief-body .md-pre code { background: none; color: inherit; padding: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
+.brief-mainrisk { margin: 8px 0 0; font-size: 13px; color: #97241f; line-height: 1.55; }
+.brief-trace { margin: 14px 0; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.brief-trace summary { cursor: pointer; padding: 10px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); letter-spacing: .02em; }
+.brief-trace[open] summary { border-bottom: 1px solid var(--line); }
+.brief-trace-dl { display: grid; grid-template-columns: 110px 1fr; gap: 0; margin: 0; }
+.brief-trace-dl dt { padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.brief-trace-dl dd { padding: 8px 14px; margin: 0; font-size: 13px; color: var(--ink-2); border-bottom: 1px solid var(--line); line-height: 1.55; }
+.brief-trace-dl dd ol, .brief-trace-dl dd ul { margin: 0; padding-left: 18px; }
+.brief-trace-dl dd:last-of-type, .brief-trace-dl dt:last-of-type { border-bottom: none; }

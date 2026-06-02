@@ -1,9 +1,103 @@
 {
-  "generatedAt": "2026-06-01T23:55:35.057Z",
+  "generatedAt": "2026-06-02T02:00:35.982Z",
   "entity": "method",
   "directory": "methods",
-  "count": 1,
+  "count": 3,
   "items": [
+    {
+      "id": "method/agentic-rl-from-execution",
+      "type": "method",
+      "slug": "agentic-rl-from-execution",
+      "title": "Agentic Rl From Execution",
+      "file": "methods/agentic-rl-from-execution.md",
+      "directory": "methods",
+      "meta": {
+        "name": "执行反馈的 agentic RL(领域专家→蒸馏)",
+        "slug": "agentic-rl-from-execution",
+        "kind": "method",
+        "type": "training",
+        "tags": [
+          "reinforcement-learning",
+          "coding-agent",
+          "agentic-rl"
+        ],
+        "used_by_content": [
+          "qwen3-coder-next"
+        ],
+        "realizes_concepts": [
+          "verifiable-task-synthesis"
+        ],
+        "problem_solved": "coding agent 的多轮工具使用难以用静态监督训练;奖励既稀疏又易被钻空子。",
+        "naive_baseline": "纯 SFT 模仿轨迹,或用 LLM 自评当奖励。",
+        "how_it_works": "用可验证任务的执行结果当客观奖励;分领域训练专家(Web/UX/单轮QA/软件工程),软件工程专家用多轮 RL + 奖励塑形(未完成轨迹惩罚、轮级工具格式惩罚),最后把各专家蒸馏回单一统一模型。",
+        "input": "agentic 轨迹 + 可执行环境",
+        "output": "单一统一的 coding-agent 模型",
+        "tradeoff": "依赖大规模可验证任务与执行基础设施(MegaFlow);训练数据/算力门槛极高且专有。",
+        "evidence_strength": "medium",
+        "reusable_pattern": "当能为目标行为构造『可执行的正确性判据』时,用执行反馈代替 LLM 自评做奖励/过滤;分领域专家再蒸馏,兼顾专精与统一。"
+      },
+      "body": "\n## Mechanism\n\n执行验证(Mini-SWE-Agent 过滤)+ 多轮 RL + 专家蒸馏。可复用点是『执行反馈 > LLM 自评』。出处:arxiv:2603.00729 §4.2。See [[content/qwen3-coder-next]]。\n",
+      "excerpt": "执行验证(Mini-SWE-Agent 过滤)+ 多轮 RL + 专家蒸馏。可复用点是『执行反馈 > LLM 自评』。出处:arxiv:2603.00729 §4.2。See [[content/qwen3-coder-next]]。",
+      "links": [
+        {
+          "target": "content/qwen3-coder-next",
+          "raw": "[[content/qwen3-coder-next]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Mechanism"
+        }
+      ]
+    },
+    {
+      "id": "method/incremental-multiturn-eval",
+      "type": "method",
+      "slug": "incremental-multiturn-eval",
+      "title": "Incremental Multiturn Eval",
+      "file": "methods/incremental-multiturn-eval.md",
+      "directory": "methods",
+      "meta": {
+        "name": "增量多轮记忆评测协议",
+        "slug": "incremental-multiturn-eval",
+        "kind": "method",
+        "type": "evaluation",
+        "tags": [
+          "evaluation",
+          "agent-memory",
+          "benchmark"
+        ],
+        "used_by_content": [
+          "memoryagentbench"
+        ],
+        "realizes_concepts": [
+          "memory-competencies"
+        ],
+        "problem_solved": "一次性长上下文评测无法反映 agent『逐块吸收、读完再问』的真实记忆流程,导致记忆能力被高估或测不准。",
+        "naive_baseline": "把全文一次性塞进 context,再问问题(LongBench/∞-Bench 式)。",
+        "how_it_works": "把语料切成有序 chunk,逐块喂入并附『请记忆』指令,模型必须自行决定保留什么;读完后再按四维(AR/TTL/LRU/CR)提问。客观题用 SubEM/Recall/F1,开放题用 LLM-judge。",
+        "input": "有序 chunks c_1..c_n + 多个 query q_1..q_m",
+        "output": "按记忆四维分别给出的分数",
+        "tradeoff": "更贴近真实记忆流程,但开放题依赖 LLM-judge,且需要专门构造超长/反事实数据集。",
+        "evidence_strength": "high",
+        "reusable_pattern": "评测一个有状态系统时,按真实使用时序增量喂入、再正交拆解能力维度,而不是一次性给全量输入测单一指标。"
+      },
+      "body": "\n## Mechanism\n\n增量喂入 + 四维正交拆解,是把『记忆』当有状态过程来测的关键。出处:arxiv:2507.05257v1 §3.4 + §3.1。See [[content/memoryagentbench]]。\n",
+      "excerpt": "增量喂入 + 四维正交拆解,是把『记忆』当有状态过程来测的关键。出处:arxiv:2507.05257v1 §3.4 + §3.1。See [[content/memoryagentbench]]。",
+      "links": [
+        {
+          "target": "content/memoryagentbench",
+          "raw": "[[content/memoryagentbench]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Mechanism"
+        }
+      ]
+    },
     {
       "id": "method/step-wise-grpo",
       "type": "method",

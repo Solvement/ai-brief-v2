@@ -13,6 +13,7 @@ interface BriefItem {
 
 interface ClaimLedgerEntry {
   claim: string;
+  plain_english?: string;
   source: string;
   evidence_strength?: string;
   supports?: string;
@@ -72,6 +73,8 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
   const m = dive.meta ?? {};
   const quality = m.quality_report ?? {};
   const audit = m.artifact_audit ?? {};
+  const trace = m.reasoning_trace ?? {};
+  const typeLabel = [m.paper_type, m.secondary_type].filter(Boolean).join(" + ");
   const claims: ClaimLedgerEntry[] = Array.isArray(m.claim_ledger) ? m.claim_ledger : [];
   const matrix: EvidenceRow[] = Array.isArray(m.evidence_matrix) ? m.evidence_matrix : [];
   const authors: string[] = Array.isArray(pm.authors_or_creators) ? pm.authors_or_creators : [];
@@ -81,7 +84,7 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
       <a className="brief-back" href="#/brief">← 所有 deep dive</a>
 
       <header className="brief-head">
-        <div className="brief-kicker">{pm.type ?? "paper"} · {m.shape ?? "paper"}{m.paper_type ? ` · ${m.paper_type}` : ""}</div>
+        <div className="brief-kicker">{pm.type ?? "paper"}{typeLabel ? ` · ${typeLabel}` : ""}</div>
         <h1 className="brief-h1">{pm.title ?? dive.title ?? dive.slug}</h1>
         {authors.length > 0 && <div className="brief-authors">{authors.join(", ")}</div>}
         <div className="brief-meta-row">
@@ -99,12 +102,38 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
           <span className={`brief-verdict brief-verdict--${quality.verdict ?? "na"}`}>{(quality.verdict ?? "n/a").toUpperCase()}</span>
           {typeof quality.grounded_score !== "undefined" && <span className="chip">grounding {quality.grounded_score}</span>}
           {audit.reproducibility_status && <span className="chip">复现: {audit.reproducibility_status}</span>}
+          {quality.transfer_value && <span className="chip">迁移价值: {quality.transfer_value}</span>}
           {Array.isArray(quality.flags) && quality.flags.length > 0 && (
             <span className="brief-flags">flags: {quality.flags.join(", ")}</span>
           )}
         </div>
+        {quality.main_risk && <p className="brief-mainrisk"><strong>主要风险：</strong>{quality.main_risk}</p>}
 
-        {/* Technical reading + mechanisms + highlights + defects + after-analysis (the body) */}
+        {/* Compressed reasoning trace — the analyst's auditable work (collapsed by default) */}
+        {Object.keys(trace).length > 0 && (
+          <details className="brief-trace">
+            <summary>分析推理轨迹 (reasoning trace)</summary>
+            <dl className="brief-trace-dl">
+              {trace.paper_type_decision && <><dt>类型判定</dt><dd>{trace.paper_type_decision}</dd></>}
+              {trace.central_contribution && <><dt>贡献对象</dt><dd>{trace.central_contribution}</dd></>}
+              {Array.isArray(trace.inspected) && trace.inspected.length > 0 && (
+                <><dt>查阅</dt><dd>{trace.inspected.join("；")}</dd></>
+              )}
+              {Array.isArray(trace.top_claims) && trace.top_claims.length > 0 && (
+                <><dt>Top claims</dt><dd><ol>{trace.top_claims.map((c: string, i: number) => <li key={i}>{c}</li>)}</ol></dd></>
+              )}
+              {Array.isArray(trace.evidence_needed) && trace.evidence_needed.length > 0 && (
+                <><dt>需要的证据</dt><dd><ul>{trace.evidence_needed.map((c: string, i: number) => <li key={i}>{c}</li>)}</ul></dd></>
+              )}
+              {Array.isArray(trace.main_threats) && trace.main_threats.length > 0 && (
+                <><dt>主要威胁</dt><dd><ul>{trace.main_threats.map((c: string, i: number) => <li key={i}>{c}</li>)}</ul></dd></>
+              )}
+              {trace.transfer_decision && <><dt>迁移决定</dt><dd>{trace.transfer_decision}</dd></>}
+            </dl>
+          </details>
+        )}
+
+        {/* Type-specific analysis body */}
         {dive.body && (
           <div className="brief-body">
             <Markdown text={dive.body} />
@@ -119,6 +148,7 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
               {claims.map((c, i) => (
                 <div className="claim-row" key={i}>
                   <p className="claim-text">{c.claim}</p>
+                  {c.plain_english && <p className="claim-plain">大白话：{c.plain_english}</p>}
                   <div className="claim-meta">
                     <span className="chip">{c.evidence_strength ?? "?"}</span>
                     <span className="claim-source">{c.source}</span>

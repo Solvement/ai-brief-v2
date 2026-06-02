@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T23:55:35.057Z",
+  "generatedAt": "2026-06-02T02:00:35.982Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 1,
+  "count": 3,
   "items": [
     {
       "id": "claim/agemem-unified-beats-modular",
@@ -34,6 +34,91 @@
         {
           "target": "evidence/agemem-main-results",
           "raw": "[[evidence/agemem-main-results]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/memory-no-single-winner",
+      "type": "claim",
+      "slug": "memory-no-single-winner",
+      "title": "Memory No Single Winner",
+      "file": "claims/memory-no-single-winner.md",
+      "directory": "claims",
+      "meta": {
+        "text": "在记忆四维能力上没有单一系统全面领先,且多跳冲突消解是所有方法的普遍盲区。",
+        "slug": "memory-no-single-winner",
+        "kind": "claim",
+        "content": "memoryagentbench",
+        "source_pointer": "arxiv:2507.05257v1 Table 2 / Table 3 / §4.2",
+        "evidence_strength": "high",
+        "supports": [
+          "memory-competencies"
+        ],
+        "open_challenges": [
+          "多跳冲突消解全体 ≤6%,究竟是 FactConsolidation 合成构造所致,还是当前记忆范式的根本短板,尚不可分辨。",
+          "开放题由 GPT-4o 评判,排名可能受评判模型偏好影响。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\nRAG 赢精确检索(NV-Embed RULER-QA 83.0%)却输长程理解(0.4–20.7%);长上下文赢 TTL/LRU(GPT-4o 87.6%、Claude-3.7 52.5%)但贵;商用 Mem0 在 Movie Recom 仅 3.4%。多跳冲突消解全体 ≤6%(GPT-4o 5.0%、Contriever 7.0%),连 o4-mini@32K 也只 14.0%。出处:arxiv:2507.05257v1 Table 2/3。See [[content/memoryagentbench]] 与 [[evidence/memoryagentbench-results]]。\n",
+      "excerpt": "RAG 赢精确检索(NV-Embed RULER-QA 83.0%)却输长程理解(0.4–20.7%);长上下文赢 TTL/LRU(GPT-4o 87.6%、Claude-3.7 52.5%)但贵;商用 Mem0 在 Movie Recom 仅 3.4%。多跳冲突消解全体 ≤6%(GPT-4o 5.0%、Contriever 7.0%),连 o4-mini@32K 也只 14.0%。出处:arxiv:2507.05257v1 Table 2/3。See [[content/memoryagentbench]] 与 [[evidence/memoryage",
+      "links": [
+        {
+          "target": "content/memoryagentbench",
+          "raw": "[[content/memoryagentbench]]"
+        },
+        {
+          "target": "evidence/memoryagentbench-results",
+          "raw": "[[evidence/memoryagentbench-results]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/qwen3-coder-next-training-over-size",
+      "type": "claim",
+      "slug": "qwen3-coder-next-training-over-size",
+      "title": "Qwen3 Coder Next Training Over Size",
+      "file": "claims/qwen3-coder-next-training-over-size.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Qwen3-Coder-Next 的 coding 能力主要来自 agentic 训练栈与激活参数效率,而非参数规模或评测取巧。",
+        "slug": "qwen3-coder-next-training-over-size",
+        "kind": "claim",
+        "content": "qwen3-coder-next",
+        "source_pointer": "arxiv:2603.00729 Table 3 / §2.1 / §5.1",
+        "evidence_strength": "medium",
+        "supports": [
+          "verifiable-task-synthesis",
+          "agentic-rl-from-execution"
+        ],
+        "open_challenges": [
+          "训练数据与合成流程专有,增益归因无法外部独立复核。",
+          "硬件/算力未公开,『性价比/效率』主张缺成本面证据。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n80A3(激活 3B)SWE-Bench Verified 达 71.3%,逼近 DeepSeek-V3.2 671A37 的 70.2%;baseline 全部同 scaffold 复现 + 去 commit 泄漏(§5.1)压低了『评测取巧』嫌疑;作者坦承落后 Claude-Opus-4.5(78.2%)。增益更可信地归于训练栈 + MoE 效率,但归因不可外部验证。出处:arxiv:2603.00729 Table 3 / §5.1。See [[content/qwen3-coder-next]] 与 [[evidence/qwen3-coder-next-results]]。\n",
+      "excerpt": "80A3(激活 3B)SWE-Bench Verified 达 71.3%,逼近 DeepSeek-V3.2 671A37 的 70.2%;baseline 全部同 scaffold 复现 + 去 commit 泄漏(§5.1)压低了『评测取巧』嫌疑;作者坦承落后 Claude-Opus-4.5(78.2%)。增益更可信地归于训练栈 + MoE 效率,但归因不可外部验证。出处:arxiv:2603.00729 Table 3 / §5.1。See [[content/qwen3-coder-next]] 与 [[evidence/qwen3-coder-",
+      "links": [
+        {
+          "target": "content/qwen3-coder-next",
+          "raw": "[[content/qwen3-coder-next]]"
+        },
+        {
+          "target": "evidence/qwen3-coder-next-results",
+          "raw": "[[evidence/qwen3-coder-next-results]]"
         }
       ],
       "headings": [

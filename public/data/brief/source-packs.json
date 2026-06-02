@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T23:55:35.057Z",
+  "generatedAt": "2026-06-02T02:00:35.982Z",
   "entity": "source-pack",
   "directory": "source-packs",
-  "count": 1,
+  "count": 3,
   "items": [
     {
       "id": "source-pack/agemem-source-pack",
@@ -34,6 +34,87 @@
       },
       "body": "\n## Notes\n\nPrimary text fetched from arXiv abstract + v2 HTML (method, RL recipe, experiments). No code/data release statement located in the fetched text — tracked under missing_sources and reflected in the artifact audit.\n",
       "excerpt": "Primary text fetched from arXiv abstract + v2 HTML (method, RL recipe, experiments). No code/data release statement located in the fetched text — tracked under missing_sources and reflected in the artifact audit.",
+      "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "source-pack/memoryagentbench-source-pack",
+      "type": "source-pack",
+      "slug": "memoryagentbench-source-pack",
+      "title": "MemoryAgentBench — Source Pack",
+      "file": "source-packs/memoryagentbench-source-pack.md",
+      "directory": "source-packs",
+      "meta": {
+        "content": "memoryagentbench",
+        "kind": "source-pack",
+        "title": "MemoryAgentBench — Source Pack",
+        "fetched_materials": {
+          "abs": "https://arxiv.org/abs/2507.05257",
+          "html": "https://arxiv.org/html/2507.05257v1",
+          "repo": "https://github.com/HUST-AI-HYZ/MemoryAgentBench"
+        },
+        "primary_sources": [
+          "arxiv:2507.05257 abstract",
+          "arxiv:2507.05257v1 full text (§3 construction + §4 results + appendix A.1-A.4)",
+          "github.com/HUST-AI-HYZ/MemoryAgentBench (README, MIT)",
+          "HuggingFace datasets/ai-hyz/MemoryAgentBench"
+        ],
+        "discovery_sources": [
+          "web search: ICLR 2026 LLM agent memory evaluation benchmark"
+        ],
+        "source_reliability": "high",
+        "missing_sources": [
+          "training/eval hardware spec (not stated in fetched text)"
+        ],
+        "last_checked": "2026-06-01"
+      },
+      "body": "\n## Notes\n\n一手核验:arXiv abstract + v1 HTML(评测协议、四维定义、主结果表、附录指标)+ GitHub README(MIT、代码+数据)+ HuggingFace 数据集。出身已核实:ICLR 2026 收录,作者含 Julian McAuley(UC San Diego)。硬件/算力正文未提及,记入 missing_sources。\n",
+      "excerpt": "一手核验:arXiv abstract + v1 HTML(评测协议、四维定义、主结果表、附录指标)+ GitHub README(MIT、代码+数据)+ HuggingFace 数据集。出身已核实:ICLR 2026 收录,作者含 Julian McAuley(UC San Diego)。硬件/算力正文未提及,记入 missing_sources。",
+      "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "source-pack/qwen3-coder-next-source-pack",
+      "type": "source-pack",
+      "slug": "qwen3-coder-next-source-pack",
+      "title": "Qwen3-Coder-Next — Source Pack",
+      "file": "source-packs/qwen3-coder-next-source-pack.md",
+      "directory": "source-packs",
+      "meta": {
+        "content": "qwen3-coder-next",
+        "kind": "source-pack",
+        "title": "Qwen3-Coder-Next — Source Pack",
+        "fetched_materials": {
+          "abs": "https://arxiv.org/abs/2603.00729",
+          "html": "https://arxiv.org/html/2603.00729v1"
+        },
+        "primary_sources": [
+          "arxiv:2603.00729 abstract",
+          "arxiv:2603.00729v1 full text (§2 任务合成/§3 架构预训练/§4 后训练/§5 评测/§6 局限/Table 3-11)"
+        ],
+        "discovery_sources": [
+          "web search: arXiv 2026 open model technical report training recipe"
+        ],
+        "source_reliability": "high",
+        "missing_sources": [
+          "official HuggingFace/repo weight links (not in fetched text)",
+          "training hardware / compute / cost",
+          "explicit license statement"
+        ],
+        "last_checked": "2026-06-01"
+      },
+      "body": "\n## Notes\n\n一手核验:arXiv abstract + v1 HTML(架构/训练配方/后训练/基准/baseline 公平性/局限)。出身:作者 20 人(Ruisheng Cao … Fan Zhou),正文未直列机构,但模型名 Qwen3 + §2.2 Alibaba Cloud Kubernetes 指向 Alibaba Qwen 团队。权重链接、硬件成本、license 正文未给,记入 missing_sources(对应 artifact_audit 的 ❓ 项)。\n",
+      "excerpt": "一手核验:arXiv abstract + v1 HTML(架构/训练配方/后训练/基准/baseline 公平性/局限)。出身:作者 20 人(Ruisheng Cao … Fan Zhou),正文未直列机构,但模型名 Qwen3 + §2.2 Alibaba Cloud Kubernetes 指向 Alibaba Qwen 团队。权重链接、硬件成本、license 正文未给,记入 missing_sources(对应 artifact_audit 的 ❓ 项)。",
       "links": [],
       "headings": [
         {

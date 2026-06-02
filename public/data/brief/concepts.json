@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T23:55:35.057Z",
+  "generatedAt": "2026-06-02T02:00:35.982Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 1,
+  "count": 3,
   "items": [
     {
       "id": "concept/agentic-memory",
@@ -35,6 +35,99 @@
       "body": "\n## Explanation\n\nMemory becomes part of the action space. Instead of a heuristic deciding when to write/read memory, the agent learns those decisions jointly with reasoning, so memory policy is end-to-end optimizable. Source: arxiv:2601.01885 (abstract) + v2 §method.\n",
       "excerpt": "Memory becomes part of the action space. Instead of a heuristic deciding when to write/read memory, the agent learns those decisions jointly with reasoning, so memory policy is end-to-end optimizable. Source: arxiv:2601.01885 (abstract) + v2 §method.",
       "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/memory-competencies",
+      "type": "concept",
+      "slug": "memory-competencies",
+      "title": "Memory Competencies",
+      "file": "concepts/memory-competencies.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "记忆四维能力 (AR/TTL/LRU/CR)",
+        "slug": "memory-competencies",
+        "kind": "concept",
+        "tags": [
+          "agent-memory",
+          "evaluation"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "memoryagentbench",
+        "related_content": [
+          "memoryagentbench"
+        ],
+        "explanation": "把 agent『记忆好坏』拆成四个正交能力:精确检索(AR)、测试时学习(TTL)、长程理解(LRU)、冲突消解(CR)。任一系统可能赢某维而输另一维,故不存在单一『最佳记忆系统』。",
+        "examples": [
+          "MemoryAgentBench 用增量多轮协议分别度量这四维:RAG 强 AR 弱 LRU,长上下文反之。出处:arxiv:2507.05257v1 §3.1。"
+        ],
+        "common_misunderstandings": [
+          "记忆≠检索:AR 只是其一;TTL/LRU/CR 衡量的是『用记忆做事』而非『取回片段』。"
+        ],
+        "open_questions": [
+          "多跳冲突消解为何全行业 ≤6%?是评测构造问题,还是当前记忆范式的根本短板?"
+        ]
+      },
+      "body": "\n## Explanation\n\n四维把模糊的『记忆能力』变成可分别度量的正交轴,从而能定位某系统具体弱在哪一维,而不是给一个笼统排名。其中冲突消解(CR)直接对应知识图谱里的矛盾检测。出处:arxiv:2507.05257v1 §3.1。See [[content/memoryagentbench]]。\n",
+      "excerpt": "四维把模糊的『记忆能力』变成可分别度量的正交轴,从而能定位某系统具体弱在哪一维,而不是给一个笼统排名。其中冲突消解(CR)直接对应知识图谱里的矛盾检测。出处:arxiv:2507.05257v1 §3.1。See [[content/memoryagentbench]]。",
+      "links": [
+        {
+          "target": "content/memoryagentbench",
+          "raw": "[[content/memoryagentbench]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/verifiable-task-synthesis",
+      "type": "concept",
+      "slug": "verifiable-task-synthesis",
+      "title": "Verifiable Task Synthesis",
+      "file": "concepts/verifiable-task-synthesis.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "可验证任务合成 (verifiable task synthesis)",
+        "slug": "verifiable-task-synthesis",
+        "kind": "concept",
+        "tags": [
+          "agentic-rl",
+          "coding-agent",
+          "evaluation"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "qwen3-coder-next",
+        "related_content": [
+          "qwen3-coder-next"
+        ],
+        "explanation": "大规模合成『带可执行环境、能由执行结果自动判分』的任务,把训练/评测信号从『人标或 LLM 自评』换成『环境客观反馈』。是 agentic RL 可规模化的前提。",
+        "examples": [
+          "Qwen3-Coder-Next 跨 9 语言 bug 合成 ~800K 可验证 SWE 任务,模型直接从执行反馈学习。出处:arxiv:2603.00729 §2.1。"
+        ],
+        "common_misunderstandings": [
+          "不是『更多数据』:关键是任务自带可执行的正确性判据,而非数量。"
+        ],
+        "open_questions": [
+          "可验证任务能否覆盖 UI / 安全 / 模糊需求这类难以自动判分的真实场景?"
+        ]
+      },
+      "body": "\n## Explanation\n\n可验证 = 任务带可执行环境,正确与否由运行结果客观决定。这把 agentic RL 从『奖励难定义』里解放出来,也是把『LLM 自评』替换成『执行验证』的基础——对 BriefMem 的 evaluator 设计有直接启发。出处:arxiv:2603.00729 §2.1。See [[content/qwen3-coder-next]]。\n",
+      "excerpt": "可验证 = 任务带可执行环境,正确与否由运行结果客观决定。这把 agentic RL 从『奖励难定义』里解放出来,也是把『LLM 自评』替换成『执行验证』的基础——对 BriefMem 的 evaluator 设计有直接启发。出处:arxiv:2603.00729 §2.1。See [[content/qwen3-coder-next]]。",
+      "links": [
+        {
+          "target": "content/qwen3-coder-next",
+          "raw": "[[content/qwen3-coder-next]]"
+        }
+      ],
       "headings": [
         {
           "depth": 2,

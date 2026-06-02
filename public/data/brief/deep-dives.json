@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T23:55:35.057Z",
+  "generatedAt": "2026-06-02T02:00:35.982Z",
   "entity": "deep-dive",
   "directory": "deep-dives",
-  "count": 1,
+  "count": 3,
   "items": [
     {
       "id": "deep-dive/agemem-deep-dive",
@@ -15,11 +15,37 @@
         "content": "agemem",
         "kind": "deep-dive",
         "shape": "paper",
-        "paper_type": "system",
+        "paper_type": "method",
+        "secondary_type": "system",
         "title": "AgeMem — 深度拆解",
+        "reasoning_trace": {
+          "paper_type_decision": "primary = method(把记忆管理变成可学习的策略动作 + RL 训练配方);secondary = system(配套三阶段课程与工具接口)。",
+          "central_contribution": "让记忆操作成为一等 policy action,用 step-wise GRPO 端到端学『何时』存取改删。",
+          "inspected": [
+            "§method 状态/动作空间 / §training 三阶段 + step-wise GRPO",
+            "Table 2 主结果与 noRL 消融 / Table 4 奖励消融 / Fig 2-3 / Limitations",
+            "搜 repo:github.com/y1y5/AgeMem(Trinity-RFT,核到代码)"
+          ],
+          "top_claims": [
+            "策略内置记忆 > 模块化记忆基线",
+            "增益主要来自 RL 阶段(+8.5pp)",
+            "非简单堆 STM/RL 模块(增强基线仍落后)"
+          ],
+          "evidence_needed": [
+            "主结果两 backbone 五基准均分(Table 2)",
+            "AgeMem vs noRL 差值(Table 2)",
+            "增强基线对比(App D.3)"
+          ],
+          "main_threats": [
+            "RL 轨迹全来自 HotpotQA → 泛化未证",
+            "终局优势广播 → 信用分配粗糙"
+          ],
+          "transfer_decision": "复用『记忆操作即动作』的接口抽象 + step-wise GRPO 范式;短期不复现 RL,先把 backend 设计成未来可训练的 memory controller。"
+        },
         "claim_ledger": [
           {
             "claim": "AgeMem 在长程 agent 任务上胜过传统记忆基线(Mem0 / A-Mem / LangMem)。",
+            "plain_english": "让 AI 自己学着管记忆,比外挂一个固定的『记忆助手』更能办长任务。",
             "source": "arxiv:2601.01885v2 Table 2",
             "evidence_strength": "high",
             "supports": "两个 backbone、五个基准均分都最高:Qwen2.5-7B 41.96% vs Mem0 37.14%;Qwen3-4B 54.31% vs 最强基线 45.74%。",
@@ -28,6 +54,7 @@
           },
           {
             "claim": "真正承重的是 RL 阶段,而不仅是统一的记忆接口。",
+            "plain_english": "光给它『存取改删』这些按钮还不够,关键是用强化学习教会它『什么时候按哪个』。",
             "source": "arxiv:2601.01885v2 Table 2(AgeMem vs AgeMem-noRL)",
             "evidence_strength": "high",
             "supports": "去掉 RL 后均分从 41.96→33.43(Qwen2.5)、54.31→45.59(Qwen3),即 RL 贡献 +8.53 / +8.72pp。",
@@ -36,6 +63,7 @@
           },
           {
             "claim": "增益不是『给旧基线随便加 STM/RL 模块』就能追上的。",
+            "plain_english": "不是把同样的零件拼到旧方法上就行——一体化地学才是关键。",
             "source": "arxiv:2601.01885v2 Appendix D.3(Augmented Baseline Comparison)",
             "evidence_strength": "medium",
             "supports": "v2 专门给 LangMem/A-Mem/Mem0 加同样的短期管理/RL 后比较,AgeMem 仍领先——支撑『统一策略 ≠ 模块叠加』。",
@@ -44,6 +72,7 @@
           },
           {
             "claim": "学到的长期记忆质量更高(不只是任务分更高)。",
+            "plain_english": "它记下来的『笔记』本身更靠谱,不只是最后答对题。",
             "source": "arxiv:2601.01885v2 Figure 2(HotpotQA MQ)",
             "evidence_strength": "medium",
             "supports": "Memory Quality:AgeMem 0.533(Qwen2.5)、0.605(Qwen3),均为最高。",
@@ -52,6 +81,7 @@
           },
           {
             "claim": "面向记忆的奖励(All-Returns)优于只看答案的奖励(Answer-Only)。",
+            "plain_english": "训练时不光看『最后答对没』,还奖励『中间记得好不好』,效果更佳。",
             "source": "arxiv:2601.01885v2 Table 4(reward ablation, HotpotQA)",
             "evidence_strength": "high",
             "supports": "Judge 0.544 vs 0.509、MQ 0.533 vs 0.479——证明 memory-aware reward 是设计要点,不是可有可无。",
@@ -60,6 +90,7 @@
           },
           {
             "claim": "短期上下文管理更省 token。",
+            "plain_english": "顺带还省点上下文开销,但省得不多,不是卖点。",
             "source": "arxiv:2601.01885v2 Figure 3(HotpotQA)",
             "evidence_strength": "low",
             "supports": "活跃上下文 2117 vs RAG 2186(-3.1%)、2191 vs 2310(-5.1%)。",
@@ -134,12 +165,18 @@
             "hotpotqa-only-curriculum:三阶段轨迹全来自 HotpotQA",
             "repro-heavy-not-turnkey:需 HotpotQA fullwiki + Qwen + DashScope key + Trinity-RFT"
           ],
-          "grounded_score": 0.82
+          "grounded_score": 0.82,
+          "transfer_value": "high",
+          "main_risk": "增益高度依赖 HotpotQA 三阶段合成课程 + 终局奖励广播;跨域迁移与开放部署未验证。"
         }
       },
-      "body": "\n## 一句话定位\n\n这不是一篇「更复杂的记忆数据库/记忆结构」论文,而是一篇 **agent memory *policy learning*** 论文:它把长期记忆(LTM)和短期上下文(STM)的管理,从外部规则/触发器/单独 memory manager,**改造成 LLM agent 动作空间里的一等动作**,再用三阶段 RL 学会「何时」写入、检索、压缩、过滤、更新、删除。出处:arxiv:2601.01885v2 §method。\n\n> 核心一句:**Memory should be a policy, not only a storage layer.**\n\n## 问题拆解\n\n| 子问题 | 传统做法 | AgeMem 做法 |\n| --- | --- | --- |\n| LTM 写入/更新 | 规则、触发器、外部 memory manager | `Add` / `Update` / `Delete` 变成 policy action |\n| STM 上下文管理 | RAG、固定 summary、手动压缩 | `Retrieve` / `Summary` / `Filter` 变成 policy action |\n| 延迟信用分配 | 最终答案对早期记忆动作没有直接监督 | step-wise GRPO 把终局优势广播回每一步 |\n\n一眼结论:**它发明的不是新数据库,而是新控制方式。**\n\n## 机制图\n\n```text\nState:\n  C_t = 当前短期上下文\n  M_t = 长期记忆库\n  T   = 当前任务规格\nAction:\n  普通文本生成\n  LTM tools: Add / Update / Delete\n  STM tools: Retrieve / Summary / Filter   (Filter 丢弃相似度 > θ_f 的上下文)\nTraining (三阶段课程):\n  Stage 1: 从上下文构建长期记忆\n  Stage 2: 在干扰信息下管理短期上下文(学会忽略 distractor)\n  Stage 3: 检索已存记忆并完成最终任务\nReward:\n  task completion + context management + long-term memory quality\n  penalty: 上下文溢出 / 轮数过多\nOptimization:\n  step-wise GRPO —— 终局优势广播到每一步,给跨阶段记忆动作延迟监督\n```\n\n详见 [[methods/step-wise-grpo]]。\n\n## 消融与因果\n\n增益到底来自哪里,论文给了三层证据,逐层排除替代解释:\n\n- **不是接口本身。** AgeMem-noRL 均分只有 33.43 / 45.59;加上 RL 才到 41.96 / 54.31(+8.53 / +8.72pp,Table 2)→ 承重的是训练,不是那个统一接口。\n- **不是单纯堆模块。** App D.3 给旧基线补齐短期管理/RL 后,AgeMem 仍领先 → 统一策略 ≠ 模块叠加。\n- **奖励设计有因果作用。** All-Returns vs Answer-Only:MQ 0.533 vs 0.479、Judge 0.544 vs 0.509(Table 4)→ memory-aware reward 真的改善了记忆质量,而非顺带产物。\n\n## 复现审计\n\n| 维度 | 状态 |\n| --- | --- |\n| 代码仓库 | ✅ `github.com/y1y5/AgeMem`(基于 Trinity-RFT) |\n| 训练/评测代码 | ✅ `train_hotpotQA.py` / `eval_hotpotQA.py` / `my_reward.py` + `agemem_{train,eval}.yaml` |\n| 数据 | ⚠️ HotpotQA fullwiki,需自行准备(外部) |\n| 闭源依赖 | ⚠️ DashScope API key(distractor 生成 + LLM-as-judge,二者必需) |\n| 第三方依赖 | Trinity-RFT、AgentScope、Qwen2.5-7B / Qwen3-4B、flash-attn(可选) |\n| 硬件/算力 | ❓ 论文与 repo 公开正文均未说明(无法证实) |\n| License | ❓ repo README 未标明 |\n| 结论 | **code_available_but_heavy** —— 能复现,但不是 turnkey,门槛在数据+Qwen+DashScope+RL 框架 |\n\n(更正:此前我误标为 `paper_only / repo 未找到`——当时只读了 abstract 未搜 repo,违反可追溯铁律,已改正。)\n\n## 局限与威胁模型\n\n- **课程单一栽培:** 三阶段轨迹全来自 HotpotQA,*学到的*记忆策略跨域泛化未证明(作者自己承认)。\n- **LLM-judge 偏差:** distractor 生成与记忆质量 MQ 评分都走 DashScope/Qwen;MQ 不是人工评估也不是 exact match,主结果与奖励消融共享同一评判模型偏差。\n- **信用分配粗糙:** 一个终局优势广播给所有步骤,会在「运气好」的 rollout 上奖励到无关动作。\n- **工具集固定:** 六个记忆操作没有更细粒度/可组合版本,作者列为未来工作。\n- **工程成本:** 复现需 RL 框架 + Qwen + 付费 API,非即取即用。\n\n## 迁移到我们的 agent\n\n对 AI-Brief / 自我进化研究 agent,最值得借鉴的**不是 RL 代码,而是它的「可训练记忆接口」设计**:\n\n| AgeMem 概念 | 迁移到 AI-Brief |\n| --- | --- |\n| Add Memory | 保存一篇文章的 claim / 机制 / 证据 / 风险 / 可复用范式 |\n| Update Memory | 后续论文推翻或补充旧结论时,更新旧卡片 |\n| Delete Memory | 删除过时、错误、重复、低价值信息 |\n| Retrieve Memory | 写 deep-dive 时检索相关旧论文/项目/方法卡 |\n| Summary Context | 把一组相关论文压成专题综述 |\n| Filter Context | 滤掉新闻噪音、重复宣传稿、低质 benchmark |\n\n**路线建议(先学接口、后学算法):**\n\n```text\nPhase 1: 手写 typed memory actions + schema          ← 我们已在做(brief-wiki)\nPhase 2: 用 judge/evaluator 给每次 memory action 打分\nPhase 3: 保存 action trace,积累训练数据\nPhase 4: 再考虑 preference learning / offline RL / GRPO\n```\n\n短期**不要**直接复现 GRPO;先把 backend 设计成「未来可训练的 memory controller」。\n\n## Memory card\n\n```text\nproblem_pattern:       记忆生命周期(写入/检索/更新/删除/压缩/过滤)缺乏端到端监督\nmechanism_pattern:     把记忆操作做成一等 policy action,统一 LTM+STM 控制\nevidence_pattern:      消融分层排除替代解释(去 RL / 增强基线 / 奖励对照)\nimplementation_pattern: 三阶段课程 + step-wise GRPO(终局优势广播)做延迟信用分配\nrisk_pattern:          单数据源课程 + LLM-as-judge 自评 → 泛化与评测偏差双风险\n```\n\n可复用范式落库:[[methods/step-wise-grpo]](当决策摊在多个阶段时,把终局优势广播下去)。另见 [[content/agemem]]、[[concepts/agentic-memory]]。\n",
-      "excerpt": "这不是一篇「更复杂的记忆数据库/记忆结构」论文,而是一篇 **agent memory *policy learning*** 论文:它把长期记忆(LTM)和短期上下文(STM)的管理,从外部规则/触发器/单独 memory manager,**改造成 LLM agent 动作空间里的一等动作**,再用三阶段 RL 学会「何时」写入、检索、压缩、过滤、更新、删除。出处:arxiv:2601.01885v2 §method。",
+      "body": "\n## 一句话定位\n\n**这篇让 AI 自己学会『管理自己的记忆』,而不是外挂一个写死规则的记忆助手。** 把『存、取、改、删、压缩、过滤』变成 AI 能随时调用的「工具按钮」,再用强化学习教它什么时候按哪个。出处:arxiv:2601.01885v2 §method。\n\n> 一句话:**记忆不该是旁边一个管家替你记;而该是你大脑的一部分,边想边记。**(论文原话:Memory should be a policy, not only a storage layer.)\n\n## 为什么值得看\n\n这正是 BriefMem 的核心命题。我们也在做『带类型的记忆』,迟早要决定:**记什么、何时更新、何时删旧的**。AgeMem 给的范式是『把这些动作做成 AI 能调用的接口,再训练它用好』——短期我们不必上强化学习,但**它的「记忆即动作」接口抽象**可直接借来设计 BriefMem 的写入/更新/删除接口。它跟 [[content/memoryagentbench]] 是一对:这篇提方法,那篇负责考这类方法。\n\n## 大白话带读\n\n- **它反对什么?** 反对把记忆当『管道』——固定规则决定『每轮检索一次』『满了就摘要』。规则是死的,跟不上任务变化。\n- **它提出什么?** 把记忆操作变成 AI 的**动作选项**:长期记忆的『新增/更新/删除』+ 短期上下文的『检索/摘要/过滤』,像调工具一样由 AI 自己决定何时用。\n- **它怎么做?** 分三阶段『带练』(先学记、再学在干扰下管上下文、最后学用记忆答题);并用一个叫 **step-wise GRPO** 的技巧,把『最后答对了』这个奖励**回传给前面每一步**,好让早期『存了什么、删了什么』的决定也能领到功劳(这类问题叫**信用分配**)。\n- **它测出什么?** 比 Mem0/A-Mem/LangMem 这些『外挂记忆』强(均分高约 5–9 个百分点);消融显示**主要功劳在那套强化学习训练,不只是接口本身**。\n- **它哪里不可靠?** 训练数据全来自一个问答数据集(HotpotQA),**换领域还灵不灵没验证**;记忆质量是另一个大模型打的分,不是人工。\n\n## 问题拆解(机制)\n\n| 子问题 | 传统做法 | AgeMem 做法 |\n| --- | --- | --- |\n| LTM 写入/更新 | 规则、触发器、外部 memory manager | `Add` / `Update` / `Delete` 变成 policy action |\n| STM 上下文管理 | RAG、固定 summary、手动压缩 | `Retrieve` / `Summary` / `Filter` 变成 policy action |\n| 延迟信用分配 | 最终答案对早期记忆动作没有直接监督 | step-wise GRPO 把终局优势广播回每一步 |\n\n一眼结论:**它发明的不是新数据库,而是新控制方式。**\n\n## 机制图\n\n```text\nState:\n  C_t = 当前短期上下文\n  M_t = 长期记忆库\n  T   = 当前任务规格\nAction:\n  普通文本生成\n  LTM tools: Add / Update / Delete\n  STM tools: Retrieve / Summary / Filter   (Filter 丢弃相似度 > θ_f 的上下文)\nTraining (三阶段课程):\n  Stage 1: 从上下文构建长期记忆\n  Stage 2: 在干扰信息下管理短期上下文(学会忽略 distractor)\n  Stage 3: 检索已存记忆并完成最终任务\nReward:\n  task completion + context management + long-term memory quality\n  penalty: 上下文溢出 / 轮数过多\nOptimization:\n  step-wise GRPO —— 终局优势广播到每一步,给跨阶段记忆动作延迟监督\n```\n\n详见 [[methods/step-wise-grpo]]。\n\n## 消融与因果\n\n增益到底来自哪里,论文给了三层证据,逐层排除替代解释:\n\n- **不是接口本身。** AgeMem-noRL 均分只有 33.43 / 45.59;加上 RL 才到 41.96 / 54.31(+8.53 / +8.72pp,Table 2)→ 承重的是训练,不是那个统一接口。\n- **不是单纯堆模块。** App D.3 给旧基线补齐短期管理/RL 后,AgeMem 仍领先 → 统一策略 ≠ 模块叠加。\n- **奖励设计有因果作用。** All-Returns vs Answer-Only:MQ 0.533 vs 0.479、Judge 0.544 vs 0.509(Table 4)→ memory-aware reward 真的改善了记忆质量,而非顺带产物。\n\n## 复现审计\n\n| 维度 | 状态 |\n| --- | --- |\n| 代码仓库 | ✅ `github.com/y1y5/AgeMem`(基于 Trinity-RFT) |\n| 训练/评测代码 | ✅ `train_hotpotQA.py` / `eval_hotpotQA.py` / `my_reward.py` + `agemem_{train,eval}.yaml` |\n| 数据 | ⚠️ HotpotQA fullwiki,需自行准备(外部) |\n| 闭源依赖 | ⚠️ DashScope API key(distractor 生成 + LLM-as-judge,二者必需) |\n| 第三方依赖 | Trinity-RFT、AgentScope、Qwen2.5-7B / Qwen3-4B、flash-attn(可选) |\n| 硬件/算力 | ❓ 论文与 repo 公开正文均未说明(无法证实) |\n| License | ❓ repo README 未标明 |\n| 结论 | **code_available_but_heavy** —— 能复现,但不是 turnkey,门槛在数据+Qwen+DashScope+RL 框架 |\n\n(更正:此前我误标为 `paper_only / repo 未找到`——当时只读了 abstract 未搜 repo,违反可追溯铁律,已改正。)\n\n## 局限与威胁模型\n\n- **课程单一栽培:** 三阶段轨迹全来自 HotpotQA,*学到的*记忆策略跨域泛化未证明(作者自己承认)。\n- **LLM-judge 偏差:** distractor 生成与记忆质量 MQ 评分都走 DashScope/Qwen;MQ 不是人工评估也不是 exact match,主结果与奖励消融共享同一评判模型偏差。\n- **信用分配粗糙:** 一个终局优势广播给所有步骤,会在「运气好」的 rollout 上奖励到无关动作。\n- **工具集固定:** 六个记忆操作没有更细粒度/可组合版本,作者列为未来工作。\n- **工程成本:** 复现需 RL 框架 + Qwen + 付费 API,非即取即用。\n\n## 迁移到我们的 agent\n\n对 AI-Brief / 自我进化研究 agent,最值得借鉴的**不是 RL 代码,而是它的「可训练记忆接口」设计**:\n\n| AgeMem 概念 | 迁移到 AI-Brief |\n| --- | --- |\n| Add Memory | 保存一篇文章的 claim / 机制 / 证据 / 风险 / 可复用范式 |\n| Update Memory | 后续论文推翻或补充旧结论时,更新旧卡片 |\n| Delete Memory | 删除过时、错误、重复、低价值信息 |\n| Retrieve Memory | 写 deep-dive 时检索相关旧论文/项目/方法卡 |\n| Summary Context | 把一组相关论文压成专题综述 |\n| Filter Context | 滤掉新闻噪音、重复宣传稿、低质 benchmark |\n\n**路线建议(先学接口、后学算法):**\n\n```text\nPhase 1: 手写 typed memory actions + schema          ← 我们已在做(brief-wiki)\nPhase 2: 用 judge/evaluator 给每次 memory action 打分\nPhase 3: 保存 action trace,积累训练数据\nPhase 4: 再考虑 preference learning / offline RL / GRPO\n```\n\n短期**不要**直接复现 GRPO;先把 backend 设计成「未来可训练的 memory controller」。\n\n## Memory card\n\n```text\nproblem_pattern:       记忆生命周期(写入/检索/更新/删除/压缩/过滤)缺乏端到端监督\nmechanism_pattern:     把记忆操作做成一等 policy action,统一 LTM+STM 控制\nevidence_pattern:      消融分层排除替代解释(去 RL / 增强基线 / 奖励对照)\nimplementation_pattern: 三阶段课程 + step-wise GRPO(终局优势广播)做延迟信用分配\nrisk_pattern:          单数据源课程 + LLM-as-judge 自评 → 泛化与评测偏差双风险\n```\n\n可复用范式落库:[[methods/step-wise-grpo]](当决策摊在多个阶段时,把终局优势广播下去)。另见 [[content/agemem]]、[[concepts/agentic-memory]]。\n",
+      "excerpt": "**这篇让 AI 自己学会『管理自己的记忆』,而不是外挂一个写死规则的记忆助手。** 把『存、取、改、删、压缩、过滤』变成 AI 能随时调用的「工具按钮」,再用强化学习教它什么时候按哪个。出处:arxiv:2601.01885v2 §method。",
       "links": [
+        {
+          "target": "content/memoryagentbench",
+          "raw": "[[content/memoryagentbench]]"
+        },
         {
           "target": "methods/step-wise-grpo",
           "raw": "[[methods/step-wise-grpo]]"
@@ -164,7 +201,15 @@
         },
         {
           "depth": 2,
-          "text": "问题拆解"
+          "text": "为什么值得看"
+        },
+        {
+          "depth": 2,
+          "text": "大白话带读"
+        },
+        {
+          "depth": 2,
+          "text": "问题拆解(机制)"
         },
         {
           "depth": 2,
@@ -185,6 +230,463 @@
         {
           "depth": 2,
           "text": "迁移到我们的 agent"
+        },
+        {
+          "depth": 2,
+          "text": "Memory card"
+        }
+      ]
+    },
+    {
+      "id": "deep-dive/memoryagentbench-deep-dive",
+      "type": "deep-dive",
+      "slug": "memoryagentbench-deep-dive",
+      "title": "MemoryAgentBench — 深度拆解",
+      "file": "deep-dives/memoryagentbench-deep-dive.md",
+      "directory": "deep-dives",
+      "meta": {
+        "content": "memoryagentbench",
+        "kind": "deep-dive",
+        "shape": "paper",
+        "paper_type": "benchmark",
+        "title": "MemoryAgentBench — 深度拆解",
+        "reasoning_trace": {
+          "paper_type_decision": "primary = benchmark/evaluation:核心产出是评测协议 + 两套数据集 + 横向压测结论,不提新记忆方法。无 secondary。",
+          "central_contribution": "一套『增量多轮 + 四维能力(AR/TTL/LRU/CR)』的记忆评测协议,及其暴露的系统性短板。",
+          "inspected": [
+            "§1 动机 / §3.1 四维定义 / §3.4 协议 / §3.2 EventQA·FactConsolidation 构造",
+            "Table 2 主结果 / Table 3 冲突消解 / §4.2 发现 / A.1-A.4 指标 / §5 局限",
+            "repo github.com/HUST-AI-HYZ/MemoryAgentBench(README/MIT)+ HF 数据集"
+          ],
+          "top_claims": [
+            "现有『一次性长上下文』评测测不出真实记忆",
+            "无单一方法全面领先,赢家随维度切换",
+            "多跳冲突消解是全行业盲区(≤6%)"
+          ],
+          "evidence_needed": [
+            "协议差异:对比 LongBench/LOCOMO 的供给方式与规模(§1/§3.4)",
+            "各维赢家+具体分数(Table 2/3)",
+            "多跳 CR 全体分数 + 推理模型对照 o4-mini(Table 3)"
+          ],
+          "main_threats": [
+            "数据集主要合成(作者自承)→ 构念效度",
+            "开放题 GPT-4o 当 judge → 评判效度"
+          ],
+          "transfer_decision": "复用其『四维 + 增量协议』当 BriefMem 自测尺;不复用其数据集;把多跳冲突消解列为我们记忆系统的红线指标。"
+        },
+        "claim_ledger": [
+          {
+            "claim": "现有评测无法反映 agent『增量逐块吸收』的真实记忆场景,因此记忆能力被严重低估。",
+            "plain_english": "旧考试是把整本书摊开让你翻着答;这测的是『会不会翻书』,不是『记不记得住』。",
+            "source": "arxiv:2507.05257 §1",
+            "evidence_strength": "high",
+            "supports": "长上下文基准(LongBench/∞-Bench)一次性给全文;LOCOMO 仅约 9k token、LongMemEval 偏合成——都不测『边读边记』。",
+            "does_not_support": "这是动机论断,本身不含对比数字。",
+            "threat": "『真实场景』的定义仍由作者界定。"
+          },
+          {
+            "claim": "没有单一记忆方法全面领先;不同能力维度的赢家完全不同。",
+            "plain_english": "没有全能选手:有的擅长『查得准』,有的擅长『读懂全局』,换道就翻车。",
+            "source": "arxiv:2507.05257 Table 2 / §4.2",
+            "evidence_strength": "high",
+            "supports": "RAG 强在精确检索(NV-Embed RULER-QA 83.0%)却在长程理解塌方(0.4–20.7%);长上下文模型强在 TTL/LRU(GPT-4o BANKING 87.6%、Claude-3.7 摘要 52.5%)但成本高。",
+            "does_not_support": "不能据此排出『最佳记忆系统』——取决于任务维度。",
+            "threat": "开放题用 GPT-4o 当 judge;部分数据集为合成。"
+          },
+          {
+            "claim": "多跳冲突消解是所有记忆系统的普遍盲区。",
+            "plain_english": "你告诉它『刚才那条过时了』,它还得顺着改好几步推理——这一关几乎全员不及格。",
+            "source": "arxiv:2507.05257 Table 3 / §4.2",
+            "evidence_strength": "high",
+            "supports": "FactConsolidation 多跳:所有方法 ≤6%(GPT-4o 5.0%、Contriever 7.0%);连推理模型 o4-mini 在 32K 也只 14.0%。",
+            "does_not_support": "单跳冲突尚可(GPT-4o 60.0%)——盲区集中在『多跳推理 + 冲突』叠加。",
+            "threat": "FactConsolidation 由 MQUAKE 反事实编辑对拼接,合成性强。"
+          },
+          {
+            "claim": "商用记忆产品(Mem0 / MemGPT)在密集内容与检索任务上明显不足。",
+            "plain_english": "市面上现成的『记忆产品』并不是万能,信息一密就掉链子。",
+            "source": "arxiv:2507.05257 §4.2",
+            "evidence_strength": "medium",
+            "supports": "Mem0 在 Movie Recom 仅 3.4%、在 RULER/∞-Bench 因过度抽取事实而失败;MemGPT 在 NIAH 仅 8.8%(嵌入检索不足)。",
+            "does_not_support": "不代表这些产品在其设计场景(多会话对话记忆)无用。",
+            "threat": "对商用系统的配置/版本敏感,结果可能随产品迭代变化。"
+          }
+        ],
+        "evidence_matrix": [
+          {
+            "experiment": "精确检索 AR",
+            "dataset": "RULER-QA / NIAH-MQ / ∞-Bench-QA / EventQA",
+            "baseline": "长上下文 vs RAG",
+            "metric": "SubEM / Recall / ROUGE-F1",
+            "result": "NV-Embed RULER-QA 83.0%;BM25 NIAH-MQ 100%;GPT-4.1-mini EventQA 82.6%",
+            "sample_size": "EventQA 500 QA / 平均 534K token",
+            "exactness": "exact",
+            "source": "arxiv:2507.05257 Table 2",
+            "limitation": "RAG 在需 >10 个 chunk 的检索上明显退化"
+          },
+          {
+            "experiment": "测试时学习 TTL",
+            "dataset": "分类×5 + Movie Recom",
+            "baseline": "长上下文 vs RAG vs 商用",
+            "metric": "Accuracy / Recall@5",
+            "result": "GPT-4o 87.6%(BANKING)vs Mem0 3.4%(Movie Recom 崩盘)",
+            "exactness": "exact",
+            "source": "arxiv:2507.05257 Table 2",
+            "limitation": "RAG 缺整体理解,难以『学到新行为』"
+          },
+          {
+            "experiment": "长程理解 LRU",
+            "dataset": "∞-Bench-Sum",
+            "baseline": "长上下文 vs RAG/agentic",
+            "metric": "Model-based F1 + fluency",
+            "result": "Claude-3.7 52.5% / GPT-4.1-mini 41.9%;RAG 与 agentic 全线 0.4–20.7%",
+            "exactness": "exact",
+            "source": "arxiv:2507.05257 Table 2",
+            "limitation": "分块检索丢失全局,无法形成高层理解"
+          },
+          {
+            "experiment": "冲突消解 CR",
+            "dataset": "FactConsolidation(SH / MH,32K-262K)",
+            "baseline": "全体方法",
+            "metric": "SubEM",
+            "result": "单跳 GPT-4o 60.0%;多跳全体 ≤6%(GPT-4o 5.0%、Contriever 7.0%);o4-mini MH@32K 14.0%",
+            "exactness": "exact",
+            "source": "arxiv:2507.05257 Table 3",
+            "limitation": "数据来自 MQUAKE 反事实拼接,合成性强"
+          }
+        ],
+        "artifact_audit": {
+          "official_repo": "https://github.com/HUST-AI-HYZ/MemoryAgentBench",
+          "official_data": "HuggingFace datasets/ai-hyz/MemoryAgentBench(含自建 EventQA / FactConsolidation)",
+          "evaluation_code": "开源评测套件 + 数据构建脚本(增量多轮协议)",
+          "prompts_or_rubrics": "GPT-4o LLM-judge 评分提示(开放题)",
+          "appendix": "A.1–A.4 各维度数据集构造与指标",
+          "license": "MIT",
+          "closed_dependencies": [
+            "GPT-4o(LLM-as-judge,开放题评分)",
+            "商用 agent 评测对象:GPT-4o/4.1-mini、Gemini-2.0-Flash、Claude-3.7-Sonnet、Mem0、Cognee、MemGPT"
+          ],
+          "third_party_dependencies": [
+            "嵌入模型:NV-Embed-v2 / Contriever / Text-Embed-3 / Qwen 等",
+            "结构增强 RAG:RAPTOR / GraphRAG / HippoRAG-v2"
+          ],
+          "hardware": "抓取正文未说明 GPU/算力(无法证实)",
+          "broken_links": [],
+          "reproducibility_status": "code_available_but_heavy"
+        },
+        "quality_report": {
+          "verdict": "pass",
+          "flags": [
+            "llm-judge-gpt4o:开放题由 GPT-4o 评分,引入评判模型偏差",
+            "synthetic-datasets:作者自承数据主要为合成,未必反映真实对话",
+            "api-cost-heavy:复现需付费 OpenAI API(judge + 商用 agent 对象)"
+          ],
+          "grounded_score": 0.85,
+          "transfer_value": "high",
+          "main_risk": "结论的强度受限于合成数据 + GPT-4o 自评:多跳冲突消解全体≤6% 究竟是范式短板还是 FactConsolidation 构造所致,尚不可分辨。"
+        }
+      },
+      "body": "\n## 一句话定位\n\n**这篇是给『有记忆的 AI agent』设计的一场更真实的考试。** 它不提新方法,而是造了一套考法 + 两套考题,把现有各种记忆系统拉来逐一压测,看谁在哪儿露馅。出处:arxiv:2507.05257 §1。\n\n> 一句话:**别再用『把整本书摊开让它翻』来假装测记忆——真记忆是边读边记、书收走了只能看自己的笔记答题。**\n\n## 为什么值得看\n\n对我们(AI-Brief / BriefMem)它特别对口:我们正在攒「带类型的长期记忆」,迟早要回答一个问题——**它到底有没有越来越懂我?** 这篇给了一把现成的体检尺(四个能力维度),可以直接拿来验收我们自己的记忆系统,而不用从零设计评测。它还跟我们已收的 [[content/agemem]] 是一对:AgeMem 提『可学习的记忆方法』,这篇负责『考这些方法到底行不行』(连 Mem0 都是两篇共同的对象)。\n\n## 大白话带读\n\n- **它反对什么?** 反对用「长上下文基准」冒充「记忆测试」。把整本书一次性塞给模型再提问,测的是『能不能在一大段文字里翻到答案』,跟『记没记住』是两回事。\n- **它提出什么?** 一种更像真人学习的考法:**老师每天给你几页材料、让你自己记笔记;几天后把原文收走,只允许你看笔记答题;中途还会通知你『前面那条信息作废了』,你得记新忘旧。** 论文里管这叫 **incremental multi-turn evaluation(增量多轮评测)**。\n- **它怎么做?** 把这场考试拆成**四门课**(下节『能力地图』细讲),再造两套专门的难题(超长书籍事件链、反事实编辑对)去戳薄弱环节。\n- **它测出什么?** 没有全能选手——RAG 类『查得准但读不懂全局』,长上下文类『读得懂但贵』;而**『改了旧结论还要顺着多推几步』这一门几乎全军覆没**。\n- **它哪里不可靠?** 题目大多是**人工合成**的(作者自己也承认),而且开放题是用 **GPT-4o 当判卷老师**——判卷老师自己的偏好会渗进分数。所以『全员不及格』有几分是真短板、几分是题出得偏,得留个保留。\n\n## 评测缺口(benchmark gap)\n\n| 维度 | 旧评测做法 | 为何不够 | 本文做法 |\n| --- | --- | --- | --- |\n| 上下文供给 | 一次性塞全文(LongBench/∞-Bench) | 不反映 agent『逐块吸收』 | 增量逐块喂入,每块附『请记住』 |\n| 能力覆盖 | 单一事实 recall | 测不出『用记忆做事』 | 四维正交能力 |\n| 规模/真实度 | LOCOMO ~9k token、LongMemEval 偏合成 | 太短、太假 | 534K 长文 + 反事实拼接(32K-262K) |\n\n一眼结论:**它发明的不是记忆系统,而是『怎样才算公平地测记忆』。**\n\n## 能力地图(capability map)\n\n四个**正交**维度(§3.1)——任一系统可能赢某维输另一维,故不存在『最佳记忆系统』:\n\n| 维度 | 测什么 |\n| --- | --- |\n| **AR** 精确检索 | 从长对话里定位并取回关键信息 |\n| **TTL** 测试时学习 | 部署中即时获得新行为/技能,无需再训练 |\n| **LRU** 长程理解 | 对超长对话形成高层、抽象的整体理解 |\n| **CR** 冲突消解 | 检测并消解矛盾,使 agent 与最新事实对齐 |\n\n## 评测协议(evaluation protocol)\n\n```text\n输入序列(增量,不是一次性):\n  chunks  c_1, c_2, ..., c_n   (每块附\"请记忆\"指令,顺序喂入)\n  queries q_1, q_2, ..., q_m   (读完后提问)\n评判:\n  客观题 → SubEM / Recall / ROUGE-F1 / Acc / Recall@5\n  开放题 → GPT-4o 当 judge(LongMemEval / ∞-Bench-Sum)\n```\n\n详见 [[methods/incremental-multiturn-eval]]。\n\n## 数据集构造(dataset construction)\n\n- **EventQA**(测 AR 的序列事件推理):5 本书、每本 >390K token,抽取 101 事件构造 6 选 1,给最多前 5 个事件;平均 534K token / 500 QA。(§3.2.1 / A.1.5)\n- **FactConsolidation**(显式测 CR):取 MQUAKE 反事实编辑对拼接成 32K/64K/262K 长上下文,分单跳(直接回忆)/多跳(推理)。(§3.2.4 / A.4)\n- 复用基准:RULER-QA、NIAH-MQ、∞-Bench-QA/Sum、分类×5、Movie Recom。\n\n## 受测系统家族(compared systems)\n\n| 家族 | 代表 |\n| --- | --- |\n| 长上下文模型 | GPT-4o / 4.1-mini、Gemini-2.0-Flash、Claude-3.7-Sonnet |\n| 简单/嵌入 RAG | BM25、Contriever、NV-Embed-v2、Text-Embed-3 |\n| 结构增强 RAG | RAPTOR、GraphRAG、HippoRAG-v2、Mem0、Cognee |\n| agentic 记忆 | Self-RAG、MemGPT |\n\n## 按能力维度的结果(result by competency)\n\n| 维度 | 最强 | 最弱/塌方 |\n| --- | --- | --- |\n| AR 精确检索 | NV-Embed RULER-QA 83.0%、BM25 NIAH 100%、GPT-4.1-mini EventQA 82.6% | RAG 在需 >10 chunk 时退化 |\n| TTL 测试时学习 | GPT-4o 87.6%(BANKING) | **Mem0 3.4%**(Movie Recom 崩盘) |\n| LRU 长程理解 | Claude-3.7 52.5% | **RAG/agentic 全线 0.4–20.7%** |\n| CR 冲突消解 | 单跳 GPT-4o 60.0% | **多跳全体 ≤6%**(GPT-4o 5.0%、Contriever 7.0%;o4-mini@32K 仅 14.0%) |\n\n## 失效模式(failure modes)\n\n把系统按维度拆开,因果很清楚:\n\n- **RAG 擅长定位、却缺整体。** top-k chunk 让它精确检索强(83.0%),但长程理解需全局综合时塌方(0.4–20.7%)——它从不读全局。\n- **长上下文整体强、但贵。** TTL/LRU 最好,代价是成本随上下文线性增长。\n- **过度抽取毁掉密集内容。** Mem0 把输入压成事实条目,在 RULER/∞-Bench 与 Movie Recom(3.4%)崩盘——『激进总结』是双刃剑。\n- **多跳+冲突是系统性盲区。** 不是某系统差,而是**全体** ≤6%(多跳),连推理模型 o4-mini 也只 14% → 当前记忆范式的共同短板,而非实现 bug。\n\n## 效度威胁(validity threats —— 这个 benchmark 自己可信吗?)\n\n- **构念效度(合成数据):** §5 自承数据集『primarily synthetic, may not fully reflect real-world conversations』。所以『多跳 CR 全体≤6%』有可能部分来自 FactConsolidation 的反事实拼接方式,而非纯粹的系统短板——这是判读该结论时最大的保留。\n- **评判效度(LLM-judge):** 开放题由 GPT-4o 评分,评判模型偏好会渗入排名;非人工、非 exact match。\n- **可及性/成本:** 复现门槛是 API 预算(judge + 多个商用 agent),非算力。\n- **快照时效:** Mem0/MemGPT 随产品版本漂移,结论有保鲜期。\n- **语言/领域:** 主要英文,跨语言/领域泛化未讨论。\n\n## 复现审计\n\n| 维度 | 状态 |\n| --- | --- |\n| 代码仓库 | ✅ `github.com/HUST-AI-HYZ/MemoryAgentBench` |\n| 数据 | ✅ HuggingFace `datasets/ai-hyz/MemoryAgentBench`(含自建 EventQA/FactConsolidation) |\n| 评测套件 | ✅ 开源,含增量多轮协议与数据构建脚本 |\n| 闭源依赖 | ⚠️ GPT-4o 当 judge + 商用 agent 评测对象(Mem0/MemGPT/Gemini/Claude) |\n| 第三方依赖 | 嵌入模型(NV-Embed-v2 等)、RAPTOR/GraphRAG/HippoRAG-v2 |\n| 硬件/算力 | ❓ 抓取正文未说明(无法证实) |\n| License | ✅ MIT |\n| 结论 | **code_available_but_heavy** —— 代码+数据齐全开放,但跑全评测要付费 API,非零成本 turnkey |\n\n## 迁移到 AI-Brief / BriefMem\n\n这套**四维能力**几乎是为 AI-Brief 自己的记忆(BriefMem)量身定做的体检表——我们正在攒 typed memory,迟早要回答『它到底有没有越来越懂我』:\n\n| MemoryAgentBench 维度 | 用来体检 BriefMem |\n| --- | --- |\n| 精确检索 AR | 写 deep-dive 时能否准确取回相关旧论文/方法卡(不漏不串) |\n| 测试时学习 TTL | 新论文推翻旧结论时,能否即时纳入并改变后续选择 |\n| 长程理解 LRU | 跨多篇论文形成专题综述/赛道判断,而非孤立卡片 |\n| 冲突消解 CR | 检测矛盾结论——正好对应 BriefMem 图谱里的 `contradicts` 边 |\n\n**路线建议:**\n\n```text\nPhase 1: 先把 contradicts / supports 边在 schema 里立住(已有)        ← 我们已在做\nPhase 2: 用本基准的『增量多轮 + 四维』思路,做一套 BriefMem 自测集\nPhase 3: 把『多跳冲突消解』当红线指标盯住(这是全行业盲区,也是我们最易踩的坑)\n```\n\n**别复刻它的数据集;复用它的『四维 + 增量协议』当我们记忆系统的验收尺。**\n\n## Memory card\n\n```text\nproblem_pattern:       记忆评测用『一次性长上下文』冒充,测不出『边读边记』的真实能力\nmechanism_pattern:     增量多轮协议 + 四维能力(AR/TTL/LRU/CR)正交拆解\nevidence_pattern:      按维度横扫各类系统,用『谁赢哪维』暴露范式短板而非排名\nimplementation_pattern: 自建数据集(超长书籍事件链 + 反事实编辑对)定向压测薄弱维度\nrisk_pattern:          合成数据 + LLM-as-judge 自评 → 真实度与评判偏差双风险\n```\n\n可复用范式落库:[[concepts/memory-competencies]](四维记忆能力)、[[methods/incremental-multiturn-eval]](增量多轮评测协议)。另见 [[content/memoryagentbench]]、[[claims/memory-no-single-winner]]。\n",
+      "excerpt": "**这篇是给『有记忆的 AI agent』设计的一场更真实的考试。** 它不提新方法,而是造了一套考法 + 两套考题,把现有各种记忆系统拉来逐一压测,看谁在哪儿露馅。出处:arxiv:2507.05257 §1。",
+      "links": [
+        {
+          "target": "content/agemem",
+          "raw": "[[content/agemem]]"
+        },
+        {
+          "target": "methods/incremental-multiturn-eval",
+          "raw": "[[methods/incremental-multiturn-eval]]"
+        },
+        {
+          "target": "concepts/memory-competencies",
+          "raw": "[[concepts/memory-competencies]]"
+        },
+        {
+          "target": "methods/incremental-multiturn-eval",
+          "raw": "[[methods/incremental-multiturn-eval]]"
+        },
+        {
+          "target": "content/memoryagentbench",
+          "raw": "[[content/memoryagentbench]]"
+        },
+        {
+          "target": "claims/memory-no-single-winner",
+          "raw": "[[claims/memory-no-single-winner]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "一句话定位"
+        },
+        {
+          "depth": 2,
+          "text": "为什么值得看"
+        },
+        {
+          "depth": 2,
+          "text": "大白话带读"
+        },
+        {
+          "depth": 2,
+          "text": "评测缺口(benchmark gap)"
+        },
+        {
+          "depth": 2,
+          "text": "能力地图(capability map)"
+        },
+        {
+          "depth": 2,
+          "text": "评测协议(evaluation protocol)"
+        },
+        {
+          "depth": 2,
+          "text": "数据集构造(dataset construction)"
+        },
+        {
+          "depth": 2,
+          "text": "受测系统家族(compared systems)"
+        },
+        {
+          "depth": 2,
+          "text": "按能力维度的结果(result by competency)"
+        },
+        {
+          "depth": 2,
+          "text": "失效模式(failure modes)"
+        },
+        {
+          "depth": 2,
+          "text": "效度威胁(validity threats —— 这个 benchmark 自己可信吗?)"
+        },
+        {
+          "depth": 2,
+          "text": "复现审计"
+        },
+        {
+          "depth": 2,
+          "text": "迁移到 AI-Brief / BriefMem"
+        },
+        {
+          "depth": 2,
+          "text": "Memory card"
+        }
+      ]
+    },
+    {
+      "id": "deep-dive/qwen3-coder-next-deep-dive",
+      "type": "deep-dive",
+      "slug": "qwen3-coder-next-deep-dive",
+      "title": "Qwen3-Coder-Next — 深度拆解",
+      "file": "deep-dives/qwen3-coder-next-deep-dive.md",
+      "directory": "deep-dives",
+      "meta": {
+        "content": "qwen3-coder-next",
+        "kind": "deep-dive",
+        "shape": "paper",
+        "paper_type": "model",
+        "title": "Qwen3-Coder-Next — 深度拆解",
+        "reasoning_trace": {
+          "paper_type_decision": "primary = model(技术报告:引入模型 + 完整训练配方 + 基准对比)。无 secondary。",
+          "central_contribution": "agentic 训练栈——可验证编码任务合成 + 可执行环境反馈——让 80A3 以小激活足迹逼近更大对手。",
+          "inspected": [
+            "§3 架构/预训练(80A3、262K、FIM、370语言、600B 仓库代码)",
+            "§2.1 任务合成(~800K)/§4 后训练(SFT+4专家+RL+蒸馏)",
+            "Table 3-6 基准 / §5.1 baseline 公平性 / §6 局限"
+          ],
+          "top_claims": [
+            "80A3 以小激活足迹达 SWE-Bench Verified ~71%",
+            "增益来自 agentic 训练栈,非评测取巧",
+            "与前沿闭源仍有明确差距(自承)"
+          ],
+          "evidence_needed": [
+            "SWE-Bench 三 scaffold 分数 + 对手激活参数(Table 3)",
+            "baseline 复现方式是否公平(§5.1)",
+            "与 Claude-Opus-4.5 的差距数字(Table 3/§6)"
+          ],
+          "main_threats": [
+            "训练数据/合成细节专有 → 无法独立复核增益归因",
+            "硬件/算力/license 未明示"
+          ],
+          "transfer_decision": "作为 FDE coding-agent 选型候选(80A3 可本地部署);借鉴『可验证任务+执行反馈』范式到 BriefMem 的 evaluator;不复现训练。"
+        },
+        "claim_ledger": [
+          {
+            "claim": "80A3(仅激活 3B)在 SWE-Bench Verified 达 ~71%,相对激活参数足迹效率很高。",
+            "plain_english": "每次干活只点亮 3B 参数,却能逼近那些每次点亮几百亿的大模型——以小博大。",
+            "source": "arxiv:2603.00729 Table 3",
+            "evidence_strength": "high",
+            "supports": "71.3%(OpenHands scaffold)逼近 DeepSeek-V3.2 671A37 的 70.2%、GLM-4.7 358A32 的 74.2%,而激活参数小一个量级。",
+            "does_not_support": "总参仍 80B;『激活小』不等于部署便宜(需载入全部专家)。",
+            "threat": "active≠total,显存与吞吐成本要看实际部署。"
+          },
+          {
+            "claim": "性能增益主要来自 agentic 训练栈(可验证任务合成 + 执行反馈),而非评测取巧。",
+            "plain_english": "它强,主要是因为拿『能自动判对错的真实编程任务』反复练,而不是把考题挑软的。",
+            "source": "arxiv:2603.00729 §1 / §2.1 / §5.1",
+            "evidence_strength": "medium",
+            "supports": "~800K 可验证 SWE 任务 + 多框架 agentic 轨迹;且 §5.1 对所有 baseline 同 scaffold 复现、hacking-free、去 commit 泄漏。",
+            "does_not_support": "无法把增益单独归到『训练栈』而非数据规模/退火等其他因素。",
+            "threat": "训练数据与合成流程专有,外部无法独立复核归因。"
+          },
+          {
+            "claim": "与前沿闭源模型仍有明确、被作者坦承的差距。",
+            "plain_english": "它没赢 Claude-Opus-4.5,作者也大方承认——但它的主场是『能自托管、便宜』。",
+            "source": "arxiv:2603.00729 Table 3 / §6",
+            "evidence_strength": "high",
+            "supports": "Claude-Opus-4.5 78.2% > 本模型 71.3%;作者自承复杂任务、UI、安全场景弱,且常需更多交互轮次。",
+            "does_not_support": "不代表在『性价比/可自托管』维度上输——那是它的主场。",
+            "threat": "差距随对手迭代变化,结论有时效。"
+          },
+          {
+            "claim": "baseline 公平性做得比多数模型报告更干净。",
+            "plain_english": "它没抄别人论文里的分数,而是把对手放进同一套环境重新跑、还堵了作弊空间。",
+            "source": "arxiv:2603.00729 §5.1",
+            "evidence_strength": "medium",
+            "supports": "同 scaffold 复现所有 baseline、统一 max 300 turns、移除 remote/branch/tag 防 commit 泄漏。",
+            "does_not_support": "仍是作者自评环境,无第三方仲裁。",
+            "threat": "评测仍在作者侧执行,存在未察觉的实现偏差。"
+          }
+        ],
+        "evidence_matrix": [
+          {
+            "experiment": "SWE-Bench Verified(三 scaffold)",
+            "dataset": "SWE-Bench Verified",
+            "baseline": "Claude-Opus-4.5 78.2% / DeepSeek-V3.2(671A37) 70.2% / GLM-4.7(358A32) 74.2%",
+            "metric": "解决率(%)",
+            "result": "70.6%(SWE-Agent)/ 71.1%(MiniSWE)/ 71.3%(OpenHands)",
+            "sample_size": "80A3 激活 3B",
+            "exactness": "exact",
+            "source": "arxiv:2603.00729 Table 3",
+            "limitation": "低于前沿闭源;作者侧复现环境"
+          },
+          {
+            "experiment": "SWE-Bench 扩展",
+            "dataset": "Multilingual / Pro",
+            "baseline": "同表",
+            "metric": "解决率(%)",
+            "result": "Multilingual 62.8% / Pro 56.2%(SWE-Agent)",
+            "exactness": "exact",
+            "source": "arxiv:2603.00729 Table 4",
+            "limitation": "Pro 难度高,绝对值偏低"
+          },
+          {
+            "experiment": "函数级 / 竞赛",
+            "dataset": "EvalPlus / MultiPL-E / CRUXEval / LiveCodeBench v6 / Codeforces",
+            "baseline": "—",
+            "metric": "pass / rating",
+            "result": "86.56% / 88.23% / 95.88% / 58.93% / 2100",
+            "exactness": "exact",
+            "source": "arxiv:2603.00729 Table 6",
+            "limitation": "函数级强,真实仓库级仍是难点"
+          },
+          {
+            "experiment": "终端/CLI",
+            "dataset": "Terminal-Bench 2.0",
+            "baseline": "多 scaffold",
+            "metric": "解决率(%)",
+            "result": "34.2–36.2%",
+            "exactness": "exact",
+            "source": "arxiv:2603.00729 Table 5",
+            "limitation": "终端 agentic 任务普遍偏低"
+          }
+        ],
+        "artifact_audit": {
+          "official_repo": "开源权重发布(base + instruct);抓取正文未给出具体 HF/repo 链接",
+          "official_data": "训练数据未发布(专有语料 + 合成任务)",
+          "evaluation_code": "标准基准(SWE-Bench/Terminal-Bench 等)+ Mini-SWE-Agent 执行验证",
+          "prompts_or_rubrics": "21 套工具 chat 模板(§4.2.2)",
+          "appendix": "Table 10/11 任务规模;§2.2 MegaFlow 编排",
+          "license": "正文未明示(arXiv 许可;Qwen 系列通常 Apache-2.0,待核实)",
+          "closed_dependencies": [],
+          "third_party_dependencies": [
+            "agentic 轨迹来源:SWE-Agent / OpenHands / Claude-Code / Qwen-Code",
+            "Alibaba Cloud Kubernetes(训练编排,§2.2)"
+          ],
+          "hardware": "GPU 数量/算力/FLOPs/成本均未在正文给出(无法证实)",
+          "broken_links": [],
+          "reproducibility_status": "partial"
+        },
+        "quality_report": {
+          "verdict": "pass",
+          "flags": [
+            "proprietary-training-data:数据与合成流程未公开,增益归因无法独立复核",
+            "compute-undisclosed:算力/硬件/成本未给",
+            "self-run-eval:基准在作者侧复现(虽已做去泄漏与统一 scaffold)"
+          ],
+          "grounded_score": 0.85,
+          "transfer_value": "high",
+          "main_risk": "开源的是权重而非训练数据/算力;『增益来自训练栈』这一核心归因只能采信作者方法描述,无法外部验证。"
+        }
+      },
+      "body": "\n## 一句话定位\n\n这是一篇**模型技术报告**:80B 总参、仅激活 3B(80A3)的 MoE coding 模型。真正的卖点**不是参数规模,而是一套 agentic 训练栈**——大规模合成『可验证编码任务 + 可执行环境』,让模型直接从环境反馈学;并坦诚地把 baseline 复现做干净。出处:arxiv:2603.00729 §1。\n\n> 核心问题(model 论文必答):**它为什么强?来自架构、数据、训练,还是评测选择?** 这篇的答案是『训练栈 + 激活参数效率』,且作者用干净的 baseline 复现压低了『评测选择』的嫌疑。\n\n## 为什么值得看\n\n直接砸中你的 **FDE 北极星**(把 AI 接进真实软件工程)。它是个**能自托管、开源权重**的 coding 模型,是『不想全靠闭源 API』那条路线的现实候选。更值钱的是它的两个工程范式:**用『能自动判对错的任务』来训练**、以及**把对手放进同一环境公平重测**——这两点都能直接搬进 BriefMem 的评测设计。\n\n## 大白话带读\n\n- **它反对什么?** 反对『靠堆参数和挑软考题刷榜』。它走的是小激活 + 真实任务训练的路子,还主动把 baseline 重测干净。\n- **它提出什么?** 一个 80B 总参、**每次只点亮 3B**(论文叫 80A3,A=activated 激活)的稀疏模型;配一套『**可验证任务**』训练栈——任务自带可运行的判分环境,对错由程序说了算,不靠人或大模型猜。\n- **它怎么做?** 海量爬代码(370 种语言)+ 合成约 80 万个『能自动判分』的修 bug 任务 + 收集多个编程 agent 的操作轨迹;再分『网页/UX/单轮问答/软件工程』四个方向各练一个专家,最后**蒸馏**(把几个专家的本事压回一个模型)。\n- **它测出什么?** 在 SWE-Bench(真实改 GitHub issue 的考试)上约 71%,逼近激活参数大它十几倍的开源对手;但没追上 Claude-Opus-4.5(78.2%)。\n- **它哪里不可靠?** **训练数据和算力都没公开**,所以『强是因为训练栈』这个说法只能信作者的描述,外人没法独立验证;复杂大任务、前端 UI、安全场景它也承认偏弱。\n\n## 架构\n\n- **80A3 MoE**:80B 总参、3B 激活,基于 Qwen3-Next 的 hybrid attention。(§3)\n- **262K 上下文**:支撑多轮 agentic 轨迹与仓库级代码。(§3.2)\n- **FIM + Best-Fit Packing**:支持中间填充补全;BFP 打包避免上下文幻觉。(§3.1.4 / §3.2)\n\n## 训练数据与配方\n\n- **继续预训练**:trillions token;GitHub 覆盖 **370 种语言**(Qwen2.5-Coder 为 92)+ ~**600B 仓库级**代码;Common Crawl 文本-代码对齐数据自动重排(Table 1:EvalPlus +8.7、MultiPL-E +12.3)。(§3.1.1)\n- **可验证任务合成**:跨 9 种语言 bug 合成,~**800K** 可验证 SWE 任务;~807.7K 真实 GitHub PR + ~851.9K 合成(Table 10/11)。(§2.1)\n- **agentic 轨迹**:来自 SWE-Agent / OpenHands / Claude-Code / Qwen-Code 等多框架。(§3.1.2)\n\n## 后训练\n\n```text\nSFT:        执行验证过滤(Mini-SWE-Agent)+ 文档接地 QA + 成对偏好建模\n专家模型:    Web 开发(VLM+浏览器验证)/ UX(21 套工具模板)/\n            单轮 QA(可执行 RL,含安全场景)/ 软件工程(多轮 RL+奖励塑形)\n蒸馏:        把各领域专家合并回单一统一模型\n编排:        MegaFlow 系统(§2.2)\n```\n\n承重点:**软件工程专家用多轮 RL + 奖励塑形(未完成轨迹惩罚、轮级工具格式惩罚)**——这是 coding agent 能力的主要来源。(§4.2)\n\n## 基准结果\n\n| 基准 | 分数 |\n| --- | --- |\n| SWE-Bench Verified | 70.6 / 71.1 / 71.3%(三 scaffold) |\n| SWE-Bench Multilingual / Pro | 62.8% / 56.2% |\n| EvalPlus / MultiPL-E / CRUXEval | 86.56 / 88.23 / 95.88% |\n| LiveCodeBench v6 / Codeforces | 58.93% / 2100 |\n| Terminal-Bench 2.0 | 34.2–36.2% |\n\n## baseline 公平性(model 论文核心审稿点)\n\n这是评判一篇模型报告\"强得是否诚实\"的关键,而这篇做得**比多数模型报告干净**:\n\n- **同 scaffold 复现所有 baseline**,不是抄别人论文里的分数。(§5.1)\n- **hacking-free + 统一 max 300 turns**:消除 turn 预算不公平。\n- **移除 remote/branch/tag 防 commit 泄漏**:堵住 SWE-Bench 常见的『偷看答案』漏洞。(§5.1 / §4.2.4)\n\n对照诚实:**Claude-Opus-4.5 78.2% > 本模型 71.3%**,作者主动把差距摆出来。→ 『强来自评测选择』的嫌疑被有效压低;增益更可信地归于训练栈 + 激活效率。\n\n## 强从哪来(因果)\n\n- **不是评测取巧**:baseline 复现干净(见上),排除了这条替代解释。\n- **不是单纯堆参数**:激活仅 3B,却逼近 671A37 的 DeepSeek-V3.2——效率来自 MoE + 训练,而非规模。\n- **主要是训练栈**:可验证任务 + 执行反馈 + 多轮 RL,是作者反复强调、也最自洽的归因。**但**:训练数据/合成流程专有,这条归因只能采信方法描述,无法外部独立复核(见威胁)。\n\n## 发布与复现审计\n\n| 维度 | 状态 |\n| --- | --- |\n| 权重 | ✅ 开源 base + instruct(正文未给具体链接) |\n| 训练数据 | ❌ 未发布(专有 + 合成) |\n| 评测 | ✅ 标准基准 + Mini-SWE-Agent 执行验证 |\n| 硬件/算力/成本 | ❓ 未给(无法证实) |\n| License | ❓ 正文未明示(Qwen 系列通常 Apache-2.0,待核) |\n| 结论 | **partial** —— 权重可用于部署,但训练不可复现(数据+算力未放) |\n\n## 局限与威胁模型\n\n- **归因不可外部验证:** 增益归于训练栈,但训练数据/合成专有 → 无法独立复核(最大保留)。\n- **与前沿仍有差距(自承):** 复杂大规模 SWE、UI、安全场景弱,常需更多交互轮次。(§6)\n- **成本不透明:** 算力/硬件未公开,『性价比』主张缺成本面证据。\n- **自评环境:** 基准虽做了去泄漏与统一 scaffold,仍在作者侧执行。\n- **active≠部署便宜:** 激活 3B 不代表显存小,80B 专家需全载入。\n\n## 迁移到 AI-Brief / BriefMem\n\n这篇最直接砸中你的 **FDE 北极星**(把 AI 接进真实软件工程):\n\n| 这篇的东西 | 怎么用 |\n| --- | --- |\n| 80A3 开源 coding 模型 | FDE coding-agent **选型候选**:可自托管、性价比路线;真实复杂任务前先验证差距 |\n| 可验证任务 + 执行反馈范式 | 借鉴到 **BriefMem 的 evaluator**:给『记忆动作/分析结论』配可执行/可验证的检查,而非纯 LLM 自评 |\n| baseline 公平性清单 | 直接变成我们评测任何系统的**反作弊检查表**(同 scaffold / 去泄漏 / 统一预算) |\n\n**路线建议:**\n\n```text\n可直接复用:   baseline 公平性清单(去泄漏/同 scaffold/统一 turn 预算)→ BriefMem 自测铁律\n不可直接复用: 训练栈本身(数据/算力门槛太高)\n落成:        一个『可验证检查 > LLM 自评』的 evaluator 原则,写进 schema\n下一步:      选型时把它和闭源前沿做一次 FDE 场景实测对照(成本 vs 能力)\n```\n\n## Memory card\n\n```text\nproblem_pattern:        小激活足迹要逼近大模型的 coding 能力\nmechanism_or_protocol_pattern: 可验证任务合成 + 可执行环境反馈 + 多轮 RL(领域专家→蒸馏)\nevidence_pattern:       同 scaffold 复现所有 baseline + 去 commit 泄漏 + 坦承与前沿差距\nimplementation_pattern: MoE(80A3)+ 262K + FIM + 领域专家蒸馏成单模型\nrisk_pattern:           训练数据/算力专有 → 增益归因不可外部复核;自评环境\n```\n\n可复用范式落库:[[concepts/verifiable-task-synthesis]](可验证任务合成)、[[methods/agentic-rl-from-execution]](执行反馈的 agentic RL)。另见 [[content/qwen3-coder-next]]、[[claims/qwen3-coder-next-training-over-size]]。\n",
+      "excerpt": "这是一篇**模型技术报告**:80B 总参、仅激活 3B(80A3)的 MoE coding 模型。真正的卖点**不是参数规模,而是一套 agentic 训练栈**——大规模合成『可验证编码任务 + 可执行环境』,让模型直接从环境反馈学;并坦诚地把 baseline 复现做干净。出处:arxiv:2603.00729 §1。",
+      "links": [
+        {
+          "target": "concepts/verifiable-task-synthesis",
+          "raw": "[[concepts/verifiable-task-synthesis]]"
+        },
+        {
+          "target": "methods/agentic-rl-from-execution",
+          "raw": "[[methods/agentic-rl-from-execution]]"
+        },
+        {
+          "target": "content/qwen3-coder-next",
+          "raw": "[[content/qwen3-coder-next]]"
+        },
+        {
+          "target": "claims/qwen3-coder-next-training-over-size",
+          "raw": "[[claims/qwen3-coder-next-training-over-size]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "一句话定位"
+        },
+        {
+          "depth": 2,
+          "text": "为什么值得看"
+        },
+        {
+          "depth": 2,
+          "text": "大白话带读"
+        },
+        {
+          "depth": 2,
+          "text": "架构"
+        },
+        {
+          "depth": 2,
+          "text": "训练数据与配方"
+        },
+        {
+          "depth": 2,
+          "text": "后训练"
+        },
+        {
+          "depth": 2,
+          "text": "基准结果"
+        },
+        {
+          "depth": 2,
+          "text": "baseline 公平性(model 论文核心审稿点)"
+        },
+        {
+          "depth": 2,
+          "text": "强从哪来(因果)"
+        },
+        {
+          "depth": 2,
+          "text": "发布与复现审计"
+        },
+        {
+          "depth": 2,
+          "text": "局限与威胁模型"
+        },
+        {
+          "depth": 2,
+          "text": "迁移到 AI-Brief / BriefMem"
         },
         {
           "depth": 2,

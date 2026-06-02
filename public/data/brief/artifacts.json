@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T23:55:35.057Z",
+  "generatedAt": "2026-06-02T02:00:35.982Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 1,
+  "count": 3,
   "items": [
     {
       "id": "artifact/agemem-code",
@@ -31,6 +31,81 @@
         {
           "target": "content/agemem",
           "raw": "[[content/agemem]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/memoryagentbench-code",
+      "type": "artifact",
+      "slug": "memoryagentbench-code",
+      "title": "Memoryagentbench Code",
+      "file": "artifacts/memoryagentbench-code.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "memoryagentbench-code",
+        "kind": "artifact",
+        "content": "memoryagentbench",
+        "artifact_type": "benchmark",
+        "url": "https://github.com/HUST-AI-HYZ/MemoryAgentBench",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "跑全评测需付费 OpenAI API(GPT-4o judge + 商用 agent 对象)",
+          "评测硬件/算力未在正文说明"
+        ],
+        "last_checked": "2026-06-01"
+      },
+      "body": "\n## Artifact audit\n\n官方开源:MIT 协议,代码 + 数据(HuggingFace `datasets/ai-hyz/MemoryAgentBench`,含自建 EventQA / FactConsolidation)齐全,有五步 quickstart。可运行,但非零成本——开放题评分与商用 agent 评测都依赖付费 API。综合判定 code_available_but_heavy。出处:github.com/HUST-AI-HYZ/MemoryAgentBench(2026-06-01 核验)。See [[content/memoryagentbench]]。\n",
+      "excerpt": "官方开源:MIT 协议,代码 + 数据(HuggingFace `datasets/ai-hyz/MemoryAgentBench`,含自建 EventQA / FactConsolidation)齐全,有五步 quickstart。可运行,但非零成本——开放题评分与商用 agent 评测都依赖付费 API。综合判定 code_available_but_heavy。出处:github.com/HUST-AI-HYZ/MemoryAgentBench(2026-06-01 核验)。See [[content/memoryagentbench]]。",
+      "links": [
+        {
+          "target": "content/memoryagentbench",
+          "raw": "[[content/memoryagentbench]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/qwen3-coder-next-weights",
+      "type": "artifact",
+      "slug": "qwen3-coder-next-weights",
+      "title": "Qwen3 Coder Next Weights",
+      "file": "artifacts/qwen3-coder-next-weights.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "qwen3-coder-next-weights",
+        "kind": "artifact",
+        "content": "qwen3-coder-next",
+        "artifact_type": "model",
+        "official_or_third_party": "official",
+        "status": "partial",
+        "runnable": "yes",
+        "missing_parts": [
+          "训练数据未发布(专有 + 合成任务)",
+          "硬件/算力/成本未公开",
+          "正文未给出具体 HF/repo 链接;license 未明示"
+        ],
+        "last_checked": "2026-06-01"
+      },
+      "body": "\n## Artifact audit\n\n官方发布 **base + instruct 开源权重**(可用于部署/推理),但**训练不可复现**:数据与合成流程专有,算力未公开,正文也未给具体权重链接与 license(Qwen 系列通常 Apache-2.0,需到官方 HF 核实)。故判定 **partial**——权重可用 ≠ 训练可复现。出处:arxiv:2603.00729(abstract『open-weight versions』+ §6)。See [[content/qwen3-coder-next]]。\n",
+      "excerpt": "官方发布 **base + instruct 开源权重**(可用于部署/推理),但**训练不可复现**:数据与合成流程专有,算力未公开,正文也未给具体权重链接与 license(Qwen 系列通常 Apache-2.0,需到官方 HF 核实)。故判定 **partial**——权重可用 ≠ 训练可复现。出处:arxiv:2603.00729(abstract『open-weight versions』+ §6)。See [[content/qwen3-coder-next]]。",
+      "links": [
+        {
+          "target": "content/qwen3-coder-next",
+          "raw": "[[content/qwen3-coder-next]]"
         }
       ],
       "headings": [

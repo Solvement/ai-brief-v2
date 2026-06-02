@@ -136,14 +136,39 @@ deep-dive:
       type: enum
       values: [paper, model-open, model-changelog, install, agent-build, howto-use, roadmap, research-impl]
       required: true
+    # paper_type = the ANALYSIS-PARADIGM dispatch key (within shape=paper). It decides
+    # the extraction focus AND the type-specific body sections — NOT one template for all.
+    #   method/system → mechanism + ablation + transfer-pattern
+    #   benchmark     → protocol + validity + result-by-competency
+    #   dataset       → construction + leakage/bias + reuse value
+    #   model         → training recipe + baseline fairness + release/deploy value
+    #   agent_framework → interface/state + safety + engineering maturity
+    #   survey/position → taxonomy + research gaps + actionable agenda
+    #   case_study    → real constraints + outcome + transferable methodology
     paper_type:
       type: enum
-      values: [system, benchmark, method, theory, survey, position, application]
+      values: [method, system, benchmark, dataset, model, agent_framework, survey, position, case_study, theory, application]
+    secondary_type:   # for mixed papers; paper_type holds the primary
+      type: enum
+      values: [method, system, benchmark, dataset, model, agent_framework, survey, position, case_study, theory, application]
+    # Compressed reasoning trace (Step 3): the analyst's auditable work, NOT long prose.
+    # Doubles as the generator's self-check contract (guard reads it).
+    reasoning_trace:
+      type: object
+      fields:
+        paper_type_decision:  { type: str }   # why this primary (+secondary) type
+        central_contribution: { type: str }   # the one contribution object
+        inspected:            { type: list_str, default: [] }  # sections/tables/artifacts actually read
+        top_claims:           { type: list_str, default: [] }  # top 3
+        evidence_needed:      { type: list_str, default: [] }  # per claim, what evidence settles it
+        main_threats:         { type: list_str, default: [] }
+        transfer_decision:    { type: str }
     claim_ledger:
       type: list_object
       default: []
       item:
         claim:           { type: str, required: true }
+        plain_english:   { type: str }   # 大白话翻译这条 claim(双层表达:先人话)
         source:          { type: str, required: true }
         evidence_strength: { type: enum, values: [high, medium, low, none], required: true }
         supports:        { type: str }
@@ -188,6 +213,8 @@ deep-dive:
         verdict:        { type: enum, values: [pass, warn, block] }
         flags:          { type: list_str }
         grounded_score: { type: float, range: [0, 1] }
+        transfer_value: { type: enum, values: [high, medium, low] }
+        main_risk:      { type: str }
   # Body sections (templates/deep-dive.md.tmpl): Technical reading /
   # Terminology / Architecture / Mechanisms / Highlights / Defects /
   # AI after-analysis. Ledgers/matrix/audit above are structured for the
