@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useMemo, useState } from "react";
 import type { AnalyzedRepo, ScoreBreakdown, TrendingData, TrendingWindow, LimitationItem, TryStep } from "../types";
 import { loadTrending } from "../lib/data";
@@ -84,7 +85,7 @@ export function Detail({ owner, name }: Props) {
       <>
         <Header />
         <div className="detail">
-          <div className="breadcrumb"><a href="#/projects">← 返回项目榜单</a></div>
+          <div className="breadcrumb"><a href="/projects">← 返回项目榜单</a></div>
           <div className="notice">没找到 <b>{owner}/{name}</b>。可能不在当前的日 / 周 / 月榜上。</div>
         </div>
       </>
@@ -99,8 +100,8 @@ export function Detail({ owner, name }: Props) {
       <Header />
       <div className="detail">
         <div className="breadcrumb">
-          <a href="#/projects">Projects</a><span className="sep">/</span>
-          <a href="#/projects">{BOARD_LABEL[win]}</a><span className="sep">/</span>
+          <a href="/projects">Projects</a><span className="sep">/</span>
+          <a href="/projects">{BOARD_LABEL[win]}</a><span className="sep">/</span>
           <span>{repo.fullName}</span>
         </div>
 

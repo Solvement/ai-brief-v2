@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "../components/SiteHeader";
 import { Markdown } from "../components/Markdown";
@@ -59,7 +60,7 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
         <ul className="brief-list">
           {deepDives.map((d) => (
             <li key={d.slug}>
-              <a href={`#/brief/${d.meta?.content ?? d.slug}`}>{d.title ?? d.slug}</a>
+              <a href={`/brief/${d.meta?.content ?? d.slug}`}>{d.title ?? d.slug}</a>
             </li>
           ))}
           {deepDives.length === 0 && <li>暂无 deep dive。</li>}
@@ -83,7 +84,7 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
 
   return (
     <Shell>
-      <a className="brief-back" href="#/brief">← 所有 deep dive</a>
+      <a className="brief-back" href="/brief">← 所有 deep dive</a>
 
       <header className="brief-head">
         <div className="brief-kicker">{pm.type ?? "paper"}{typeLabel ? ` · ${typeLabel}` : ""}</div>

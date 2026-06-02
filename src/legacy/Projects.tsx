@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef, useState } from "react";
 import type { Board, TrendingData, TrendingWindow } from "../types";
 import { loadTrending } from "../lib/data";
@@ -106,7 +107,7 @@ export function Projects() {
             深度解读会把 Overview、How it works、Try it 和自测标准放到默认路径里。
           </div>
           <div style={{ marginTop: 10, color: "var(--ink-3)", fontSize: 13 }}>
-            <b>新增栏目</b>：<a href="#/models">Models</a> 先用 DeepSeek 做公司级模型演进样板。
+            <b>新增栏目</b>：<a href="/models">Models</a> 先用 DeepSeek 做公司级模型演进样板。
           </div>
         </div>
 

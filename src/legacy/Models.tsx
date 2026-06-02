@@ -1,3 +1,4 @@
+"use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   ModelBenchmark,
@@ -86,7 +87,7 @@ export function Models({ modelId }: Props) {
       <>
         <SiteHeader active="models" />
         <main className="page">
-          <div className="breadcrumb"><a href="#/models">Models</a><span className="sep">/</span><span>{modelId}</span></div>
+          <div className="breadcrumb"><a href="/models">Models</a><span className="sep">/</span><span>{modelId}</span></div>
           <div className="notice">还没有这个模型的档案。点刷新或换一个。</div>
         </main>
       </>
@@ -138,7 +139,7 @@ function ModelsIndex({ data, onRefresh, refreshing }: { data: ModelsData; onRefr
 
         <div className="models-grid">
           {data.models.map((entry) => (
-            <a key={entry.id} className={`model-card ${entry.kind}`} href={`#/models/${entry.id}`}>
+            <a key={entry.id} className={`model-card ${entry.kind}`} href={`/models/${entry.id}`}>
               <div className="model-card-head">
                 <div>
                   <div className="model-card-vendor">{entry.vendor} · {entry.country}</div>
@@ -177,7 +178,7 @@ function ModelDetail({ entry, generatedAt, onRefresh, refreshing }: { entry: Mod
     <>
       <SiteHeader active="models" meta={`Models 更新于 ${formatDate(generatedAt)}`} />
       <main className="detail model-detail">
-        <div className="breadcrumb"><a href="#/models">Models</a><span className="sep">/</span><span>{entry.name}</span></div>
+        <div className="breadcrumb"><a href="/models">Models</a><span className="sep">/</span><span>{entry.name}</span></div>
 
         <section className="model-hero">
           <div>

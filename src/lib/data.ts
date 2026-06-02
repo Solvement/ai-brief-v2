@@ -18,7 +18,7 @@ let inflightPipelineStatus: Promise<PipelineStatusData | null> | null = null;
 export function loadTrending(): Promise<TrendingData> {
   if (cached) return Promise.resolve(cached);
   if (inflight) return inflight;
-  inflight = fetch("./data/trending.json", { cache: "no-cache" })
+  inflight = fetch("/data/trending.json", { cache: "no-cache" })
     .then(async (res) => {
       if (!res.ok) throw new Error(`加载 trending.json 失败：HTTP ${res.status}`);
       const data = (await res.json()) as TrendingData;
@@ -38,7 +38,7 @@ export function loadModels(opts?: { force?: boolean }): Promise<ModelsData> {
   }
   if (cachedModels) return Promise.resolve(cachedModels);
   if (inflightModels) return inflightModels;
-  const url = opts?.force ? `./data/models.json?t=${Date.now()}` : "./data/models.json";
+  const url = opts?.force ? `/data/models.json?t=${Date.now()}` : "/data/models.json";
   inflightModels = fetch(url, { cache: "no-cache" })
     .then(async (res) => {
       if (!res.ok) throw new Error(`加载 models.json 失败：HTTP ${res.status}`);
@@ -55,7 +55,7 @@ export function loadModels(opts?: { force?: boolean }): Promise<ModelsData> {
 export function loadArticles(): Promise<ArticlesData> {
   if (cachedArticles) return Promise.resolve(cachedArticles);
   if (inflightArticles) return inflightArticles;
-  inflightArticles = fetch("./data/articles.json", { cache: "no-cache" })
+  inflightArticles = fetch("/data/articles.json", { cache: "no-cache" })
     .then(async (res) => {
       if (!res.ok) throw new Error(`加载 articles.json 失败：HTTP ${res.status}`);
       const data = (await res.json()) as ArticlesData;
@@ -71,7 +71,7 @@ export function loadArticles(): Promise<ArticlesData> {
 export function loadPaperRadar(): Promise<PaperRadarPublicData | null> {
   if (cachedPaperRadar) return Promise.resolve(cachedPaperRadar);
   if (inflightPaperRadar) return inflightPaperRadar;
-  inflightPaperRadar = fetch("./data/paper-radar.json", { cache: "no-cache" })
+  inflightPaperRadar = fetch("/data/paper-radar.json", { cache: "no-cache" })
     .then(async (res) => {
       if (res.status === 404) return null;
       if (!res.ok) throw new Error(`加载 paper-radar.json 失败：HTTP ${res.status}`);
@@ -103,7 +103,7 @@ const briefCache = new Map<string, BriefEntityFile>();
 export function loadBriefEntity<T = Record<string, unknown>>(name: string): Promise<BriefEntityFile<T>> {
   const cached = briefCache.get(name);
   if (cached) return Promise.resolve(cached as BriefEntityFile<T>);
-  return fetch(`./data/brief/${name}.json`, { cache: "no-cache" }).then(async (res) => {
+  return fetch(`/data/brief/${name}.json`, { cache: "no-cache" }).then(async (res) => {
     if (!res.ok) throw new Error(`加载 brief/${name}.json 失败：HTTP ${res.status}`);
     const data = (await res.json()) as BriefEntityFile<T>;
     briefCache.set(name, data as BriefEntityFile);
@@ -114,7 +114,7 @@ export function loadBriefEntity<T = Record<string, unknown>>(name: string): Prom
 export function loadPipelineStatus(): Promise<PipelineStatusData | null> {
   if (cachedPipelineStatus) return Promise.resolve(cachedPipelineStatus);
   if (inflightPipelineStatus) return inflightPipelineStatus;
-  inflightPipelineStatus = fetch("./data/pipeline-status.json", { cache: "no-cache" })
+  inflightPipelineStatus = fetch("/data/pipeline-status.json", { cache: "no-cache" })
     .then(async (res) => {
       if (res.status === 404) return null;
       if (!res.ok) throw new Error(`加载 pipeline-status.json 失败：HTTP ${res.status}`);

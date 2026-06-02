@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "../components/SiteHeader";
 import { loadPipelineStatus } from "../lib/data";
@@ -6,28 +7,28 @@ import type { PipelineStatusData } from "../types";
 const HOME_SECTIONS = [
   {
     title: "Articles",
-    href: "#/articles",
+    href: "/articles",
     label: "学术文章深读",
     body: "顺着论文自己的思路，用大白话讲清是什么、为什么是进展；想深了一键看对照原文的精读。",
     state: "已接入",
   },
   {
     title: "Models",
-    href: "#/models",
+    href: "/models",
     label: "模型档案",
     body: "按公司和版本理解模型架构、benchmark、训练路线和产品化变化。",
     state: "已接入",
   },
   {
     title: "Projects",
-    href: "#/projects",
+    href: "/projects",
     label: "GitHub 项目",
     body: "高收藏 + 快速攀升 + AI 相关的项目，一句话讲清做什么、为什么值得看。",
     state: "已接入",
   },
   {
     title: "Podcast",
-    href: "#/podcast",
+    href: "/podcast",
     label: "播客蒸馏",
     body: "把一两小时的 AI 播客蒸馏成能刷的洞见，转录稿只作内部证据。",
     state: "待建",
