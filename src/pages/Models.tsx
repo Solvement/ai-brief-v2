@@ -138,7 +138,7 @@ function ModelsIndex({ data, onRefresh, refreshing }: { data: ModelsData; onRefr
 
         <div className="models-grid">
           {data.models.map((entry) => (
-            <a key={entry.id} className="model-card" href={`#/models/${entry.id}`}>
+            <a key={entry.id} className={`model-card ${entry.kind}`} href={`#/models/${entry.id}`}>
               <div className="model-card-head">
                 <div>
                   <div className="model-card-vendor">{entry.vendor} · {entry.country}</div>
