@@ -4,7 +4,9 @@ import path from "node:path";
 const errors = [];
 const suspiciousPatterns = [
   { label: "unicode replacement character", regex: /\uFFFD/g },
-  { label: "double question marks", regex: /\?{2,}/g },
+  // `??` is the JS/TS nullish-coalescing operator — legit in code. Only treat a
+  // double-question-mark run as mojibake in data files, not in .ts/.tsx source.
+  { label: "double question marks", regex: /\?{2,}/g, skipExtensions: [".ts", ".tsx"] },
   { label: "common UTF-8 mojibake sequence (Ã)", regex: /Ã[A-Za-z0-9]/g },
   { label: "common UTF-8 mojibake sequence (â)", regex: /â[€œ\`\“]/g },
   { label: "common UTF-8 mojibake sequence (Â)", regex: /Â(?:\u00a0|[A-Za-z])/g },
@@ -44,7 +46,9 @@ for (const root of scanRoots) {
 for (const filePath of files) {
   const raw = await readFile(filePath, "utf8");
 
+  const ext = path.extname(filePath);
   for (const entry of suspiciousPatterns) {
+    if (entry.skipExtensions?.includes(ext)) continue;
     const matches = [...raw.matchAll(entry.regex)];
     if (matches.length === 0) continue;
     for (const match of matches.slice(0, 10)) {

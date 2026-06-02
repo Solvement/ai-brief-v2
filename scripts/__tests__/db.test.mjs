@@ -29,9 +29,11 @@ test("db schema roundtrips candidate evidence eval analysis qa and run rows", as
       candidateId: "cand-1",
       kind: "readme",
       content: "# Repo\nUseful AI engineer project.",
+      artifactAudit: { license_spdx_id: "MIT", has_tests: true },
       fetchedAt: "2026-05-29T01:00:00.000Z",
     });
     assert.equal(evidence.kind, "readme");
+    assert.deepEqual(evidence.artifactAudit, { license_spdx_id: "MIT", has_tests: true });
     assert.equal(db.listEvidence("cand-1").length, 1);
 
     const evaluation = db.upsertEval({

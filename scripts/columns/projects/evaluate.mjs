@@ -3,6 +3,12 @@ import { createDeepSeekClient, projectDeepModel, projectLightModel } from "../..
 import { deepSystem, deepUser, LIGHT_SYS, lightUser } from "./prompts.mjs";
 
 const INTENTS = new Set(["understanding", "teaching", "tool"]);
+const PROJECT_TYPES = new Set(["ai_app", "agent_framework", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
+const VERDICTS = new Set(["skip", "watch", "L1", "deep_dive", "clone_and_run"]);
+const DEEP_DIVE_VERDICTS = new Set(["deep_dive", "clone_and_run"]);
+const RATING_KEYS = ["relevance_to_ai_engineer", "engineering_depth", "reuse_value", "maturity"];
+const NOT_FOUND = "not_found";
+const AI_RE = /\b(ai|agent|agents|rag|retrieval|mcp|a2a|memory|llm|multimodal|model|eval|benchmark|embedding|vector|prompt|tool use|function calling|coding agent|generative)\b/i;
 const TOOL_RE = /\b(cli|sdk|api|server|plugin|app|framework|library|package|install|usage|quickstart|deploy|docker|npm|pip|run|command|configure|integration|workflow)\b/i;
 const TEACHING_RE = /\b(course|lesson|tutorial|workshop|curriculum|exercise|notebook|learn|learning|roadmap|class|chapter|hands-on)\b/i;
 const UNDERSTANDING_RE = /\b(understand|understanding|explain|explaining|visual|graph|map|architecture|concept|internals|deep dive|guide|notes|analysis|codebase)\b/i;
@@ -12,6 +18,7 @@ export async function evaluate(candidate, evidence, ctx = {}) {
   const options = ctx.options || {};
   const repo = candidate.raw || candidate;
   const offline = options.noLlm || options.dryRun || process.env.NO_LLM === "1";
+  const projectRanking = projectRankingInputSignals(repo, evidence);
   let light = null;
 
   if (!offline) {
@@ -19,7 +26,7 @@ export async function evaluate(candidate, evidence, ctx = {}) {
       const chatJson = options.chatJson || createDeepSeekClient({ apiTimeoutMs: options.apiTimeoutMs }).chatJson;
       light = await chatJson({
         system: LIGHT_SYS,
-        user: lightUser(repo, evidence),
+        user: lightUser(repo, evidence, projectRanking),
         model: options.projectLightModel || projectLightModel(),
         maxTokens: options.lightMaxTokens || Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200,
       });
@@ -30,14 +37,19 @@ export async function evaluate(candidate, evidence, ctx = {}) {
 
   const normalized = normalizeLightResult(light, repo, evidence);
   const scored = scoreProjectTriage(repo, evidence, normalized);
+  const selectedByVerdict = DEEP_DIVE_VERDICTS.has(normalized.verdict);
   const result = {
     candidateId: candidate.id,
-    decision: scored.score >= numberOption(options.worthThreshold, 60) ? "select" : "archive",
+    decision: selectedByVerdict ? "select" : "skip",
     mode: "rank",
     score: scored.score,
     worthDeepDive: scored.score,
     reason: normalized.reason || scored.rankingReason.explanation,
-    signals: scored.signals,
+    signals: unique([
+      ...scored.signals,
+      `project_type:${normalized.project_type}`,
+      `verdict:${normalized.verdict}`,
+    ]),
     provenance: {
       evaluator: offline ? "heuristic-offline" : "llm+heuristic-features",
       source: candidate.source,
@@ -46,6 +58,9 @@ export async function evaluate(candidate, evidence, ctx = {}) {
     tags: normalized.tags,
     light: normalized.light,
     intent: normalized.intent,
+    project_type: normalized.project_type,
+    verdict: normalized.verdict,
+    ratings: normalized.ratings,
     rankingReason: scored.rankingReason,
     evaluatedAt: nowIso(options),
   };
@@ -69,6 +84,9 @@ export async function evaluate(candidate, evidence, ctx = {}) {
         light: result.light,
         worthDeepDive: result.worthDeepDive,
         intent: result.intent,
+        project_type: result.project_type,
+        verdict: result.verdict,
+        ratings: result.ratings,
         rankingReason: result.rankingReason,
         provenance: result.provenance,
       },
@@ -126,13 +144,23 @@ export function normalizeLightResult(input, repo = {}, evidence = {}) {
     light: input?.light || repo.light,
     tags: input?.tags || repo.tags,
   }));
+  const projectType = normalizeProjectType(input?.project_type ?? input?.projectType ?? repo.project_type, fallback.project_type);
+  const ratings = normalizeRatings(input?.ratings ?? input?.project_verdict ?? repo.ratings, fallback.ratings);
+  const worthDeepDive = clampScore(input?.worthDeepDive ?? repo.worthDeepDive ?? fallback.worthDeepDive);
+  const verdict = normalizeVerdict(
+    input?.verdict ?? input?.project_verdict?.verdict ?? repo.verdict,
+    inferVerdict({ worthDeepDive, project_type: projectType, ratings, intent }),
+  );
 
   return {
     tldr: cleanString(input?.tldr || repo.tldr || fallback.tldr),
     tags: normalizeTags(input?.tags || repo.tags || fallback.tags),
     light: cleanString(input?.light || repo.light || fallback.light),
-    worthDeepDive: clampScore(input?.worthDeepDive ?? repo.worthDeepDive ?? fallback.worthDeepDive),
+    worthDeepDive,
     intent,
+    project_type: projectType,
+    verdict,
+    ratings,
     reason: cleanString(input?.reason || ""),
   };
 }
@@ -168,6 +196,18 @@ export function scoreProjectTriage(repo = {}, evidence = {}, light = {}) {
   };
 }
 
+export function projectRankingInputSignals(repo = {}, evidence = {}) {
+  const text = projectSignalText(repo, evidence?.content, {});
+  const publicText = projectSignalText(repo, "", {});
+  return {
+    boostTerms: matchedTerms(text, BOOST_TERMS),
+    capTerms: matchedTerms(publicText, CAP_TERMS),
+    sourceTerms: Array.isArray(repo.sourceTerms) ? repo.sourceTerms : [],
+    popularityBoost: popularityBoost(repo),
+    note: "Cheap keyword/popularity signal only; final triage should follow AI-engineering value.",
+  };
+}
+
 export function classifyProjectIntent(input = {}) {
   const repo = input.repo || input;
   const text = [
@@ -193,6 +233,29 @@ export function classifyProjectIntent(input = {}) {
   return "understanding";
 }
 
+export function classifyProjectType(input = {}) {
+  const repo = input.repo || input;
+  const text = [
+    repo.fullName,
+    repo.name,
+    repo.description,
+    repo.language,
+    input.readme,
+    input.light,
+    ...(Array.isArray(input.tags) ? input.tags : []),
+  ].filter(Boolean).join("\n");
+
+  if (!AI_RE.test(text)) return "non_ai_eng";
+  if (/\b(coding agent|devtool|developer tool|cli|command line|terminal|shell|codemod|code assistant)\b/i.test(text)) return "devtool_cli";
+  if (/\b(dataset|benchmark|eval|evaluation|leaderboard|arena|test set|harness)\b/i.test(text)) return "dataset_benchmark";
+  if (/\b(agent framework|agent runtime|agent infrastructure|agent toolkit|multi-agent|orchestration|planner|tool calling|workflow engine|memory framework)\b/i.test(text)) return "agent_framework";
+  if (/\b(model infra|serving|inference|fine-tun|finetun|training|checkpoint|quantization|vllm|lora|embedding service)\b/i.test(text)) return "model_infra";
+  if (/\b(frontend|ui|react|vue|svelte|dashboard|component|chat ui|web app)\b/i.test(text)) return "frontend_ui";
+  if (/\b(sdk|library|package|api client|framework|client library)\b/i.test(text)) return "library_sdk";
+  if (/\b(template|boilerplate|starter|scaffold|example app)\b/i.test(text)) return "template_boilerplate";
+  return "ai_app";
+}
+
 export function normalizeIntent(value, fallback = "understanding") {
   const raw = String(value || "").trim().toLowerCase();
   const mapped = {
@@ -207,6 +270,68 @@ export function normalizeIntent(value, fallback = "understanding") {
     "utility": "tool",
   }[raw];
   return INTENTS.has(mapped) ? mapped : INTENTS.has(fallback) ? fallback : "understanding";
+}
+
+export function normalizeProjectType(value, fallback = "non_ai_eng") {
+  const raw = String(value || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+  const mapped = {
+    ai_app: "ai_app",
+    app: "ai_app",
+    agent_framework: "agent_framework",
+    agent_runtime: "agent_framework",
+    framework: "agent_framework",
+    devtool: "devtool_cli",
+    devtool_cli: "devtool_cli",
+    cli: "devtool_cli",
+    coding_agent: "devtool_cli",
+    model_infra: "model_infra",
+    infra: "model_infra",
+    frontend: "frontend_ui",
+    frontend_ui: "frontend_ui",
+    ui: "frontend_ui",
+    dataset: "dataset_benchmark",
+    benchmark: "dataset_benchmark",
+    dataset_benchmark: "dataset_benchmark",
+    library: "library_sdk",
+    sdk: "library_sdk",
+    library_sdk: "library_sdk",
+    template: "template_boilerplate",
+    boilerplate: "template_boilerplate",
+    template_boilerplate: "template_boilerplate",
+    non_ai: "non_ai_eng",
+    non_ai_eng: "non_ai_eng",
+  }[raw];
+  if (PROJECT_TYPES.has(mapped)) return mapped;
+  return PROJECT_TYPES.has(fallback) ? fallback : "non_ai_eng";
+}
+
+export function normalizeVerdict(value, fallback = "watch") {
+  const raw = String(value || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+  const mapped = {
+    skip: "skip",
+    watch: "watch",
+    watchlist: "watch",
+    watchlisted: "watch",
+    l1: "L1",
+    light: "L1",
+    light_read: "L1",
+    deep: "deep_dive",
+    deep_dive: "deep_dive",
+    deepdive: "deep_dive",
+    clone: "clone_and_run",
+    clone_run: "clone_and_run",
+    clone_and_run: "clone_and_run",
+    run: "clone_and_run",
+  }[raw];
+  if (VERDICTS.has(mapped)) return mapped;
+  return VERDICTS.has(fallback) ? fallback : "watch";
+}
+
+export function normalizeRatings(value, fallback = {}) {
+  const source = value && typeof value === "object" ? value : {};
+  const out = {};
+  for (const key of RATING_KEYS) out[key] = clampRating(source[key] ?? fallback[key] ?? 3);
+  return out;
 }
 
 export function normalizeDeepAnalysis(input, { repo = {}, evidence = {}, intent = "understanding", options = {} } = {}) {
@@ -250,13 +375,88 @@ export function publicDeep(payload = {}) {
 function offlineLight(repo, evidence) {
   const description = cleanString(repo.description || evidence?.content || "Open-source AI engineering project.");
   const intent = classifyProjectIntent({ repo, readme: evidence?.content });
+  const project_type = classifyProjectType({ repo, readme: evidence?.content, light: repo.light, tags: repo.tags });
+  const worthDeepDive = clampScore(repo.worthDeepDive ?? heuristicWorth(repo, evidence));
+  const ratings = inferRatings(repo, evidence, { intent, project_type, worthDeepDive });
   return {
     tldr: cleanString(repo.tldr || `${repo.fullName || repo.name || "This repo"} focuses on ${description.slice(0, 72)}.`),
     tags: normalizeTags(repo.tags || [repo.language, intent, "AI engineering"]),
     light: cleanString(repo.light || `${description.slice(0, 220)}${repo.starsGained ? ` It gained ${repo.starsGained} stars in the current discovery window.` : ""}`),
-    worthDeepDive: clampScore(repo.worthDeepDive ?? heuristicWorth(repo, evidence)),
+    worthDeepDive,
     intent,
+    project_type,
+    verdict: inferVerdict({ worthDeepDive, project_type, ratings, intent }),
+    ratings,
   };
+}
+
+function inferRatings(repo = {}, evidence = {}, light = {}) {
+  const audit = evidence?.artifactAudit || evidence?.metadata?.artifactAudit || {};
+  const text = projectSignalText(repo, evidence?.content, light);
+  const boostCount = matchedTerms(text, BOOST_TERMS).length;
+  const projectType = normalizeProjectType(light.project_type, classifyProjectType({
+    repo,
+    readme: evidence?.content,
+    light: light.light,
+    tags: light.tags,
+  }));
+  const relevance = projectType === "non_ai_eng"
+    ? 1
+    : clampRating(2 + Math.min(2, boostCount) + (AI_RE.test(text) ? 1 : 0));
+  const engineeringDepth = clampRating(
+    1 +
+    boolPoint(audit.has_src) +
+    boolPoint(audit.has_tests) +
+    boolPoint(audit.has_ci) +
+    boolPoint(audit.has_packages) +
+    (["agent_framework", "devtool_cli", "model_infra", "library_sdk"].includes(projectType) ? 1 : 0),
+  );
+  const reuseValue = clampRating(
+    1 +
+    Math.min(2, boostCount) +
+    boolPoint(audit.has_docs) +
+    boolPoint(audit.has_examples) +
+    (["agent_framework", "devtool_cli", "library_sdk", "model_infra", "dataset_benchmark"].includes(projectType) ? 1 : 0),
+  );
+  const maturity = clampRating(
+    1 +
+    foundPoint(audit.license_spdx_id) +
+    foundPoint(audit.pushed_at) +
+    foundPoint(audit.latest_release_tag_name) +
+    boolPoint(audit.has_tests) +
+    boolPoint(audit.has_ci) +
+    (Number(repo.stars) >= 2000 ? 1 : 0) -
+    (audit.archived === true ? 2 : 0),
+  );
+
+  return {
+    relevance_to_ai_engineer: relevance,
+    engineering_depth: engineeringDepth,
+    reuse_value: reuseValue,
+    maturity,
+  };
+}
+
+function inferVerdict({ worthDeepDive = 50, project_type = "non_ai_eng", ratings = {}, intent = "understanding" } = {}) {
+  const normalizedRatings = normalizeRatings(ratings);
+  if (project_type === "non_ai_eng" || normalizedRatings.relevance_to_ai_engineer <= 1) return "skip";
+  if (
+    worthDeepDive >= 82 &&
+    intent === "tool" &&
+    normalizedRatings.relevance_to_ai_engineer >= 4 &&
+    normalizedRatings.engineering_depth >= 4 &&
+    normalizedRatings.reuse_value >= 4 &&
+    normalizedRatings.maturity >= 3
+  ) return "clone_and_run";
+  if (
+    worthDeepDive >= 70 &&
+    normalizedRatings.relevance_to_ai_engineer >= 4 &&
+    normalizedRatings.engineering_depth >= 3 &&
+    normalizedRatings.reuse_value >= 4
+  ) return "deep_dive";
+  if (worthDeepDive >= 55) return "L1";
+  if (worthDeepDive >= 35) return "watch";
+  return "skip";
 }
 
 function offlineDeep(repo, intent) {
@@ -427,6 +627,19 @@ function clampScore(value) {
 function clampPart(value) {
   const number = Math.round(Number(value));
   return Math.max(0, Math.min(25, Number.isFinite(number) ? number : 0));
+}
+
+function clampRating(value) {
+  const number = Math.round(Number(value));
+  return Math.max(1, Math.min(5, Number.isFinite(number) ? number : 3));
+}
+
+function boolPoint(value) {
+  return value === true ? 1 : 0;
+}
+
+function foundPoint(value) {
+  return value !== undefined && value !== null && value !== "" && value !== NOT_FOUND ? 1 : 0;
 }
 
 function numberOption(value, fallback) {

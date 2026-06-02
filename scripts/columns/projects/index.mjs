@@ -222,6 +222,9 @@ function repoForBoard(item, window, rank) {
     light: String(light.light || repo.light || repo.description || repo.fullName),
     worthDeepDive: Number(light.worthDeepDive ?? item.eval?.score ?? repo.worthDeepDive ?? 0),
   };
+  if (light.project_type) out.project_type = light.project_type;
+  if (light.verdict) out.verdict = light.verdict;
+  if (light.ratings) out.ratings = light.ratings;
   if (light.rankingReason) out.rankingReason = publicRankingReason(light.rankingReason);
   if (item.deep) out.deep = item.deep;
   return out;

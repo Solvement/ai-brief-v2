@@ -9,19 +9,34 @@ Return strict JSON:
   "light": "80-160 Chinese chars, one paragraph",
   "worthDeepDive": 0-100,
   "intent": "understanding|teaching|tool",
-  "reason": "short selection reason"
+  "reason": "short selection reason",
+  "project_type": "ai_app|agent_framework|devtool_cli|model_infra|frontend_ui|dataset_benchmark|library_sdk|template_boilerplate|non_ai_eng",
+  "verdict": "skip|watch|L1|deep_dive|clone_and_run",
+  "ratings": {
+    "relevance_to_ai_engineer": 1-5,
+    "engineering_depth": 1-5,
+    "reuse_value": 1-5,
+    "maturity": 1-5
+  }
 }
 
 Scoring focus:
+- Judge value to an AI engineer, agent developer, and AI Brief. Do not judge popularity alone.
+- Use artifactAudit signals for engineering_depth and maturity: tests, CI, license, release/activity, source tree, docs, examples, packages, archived status.
+- Use projectRanking keyword signals as cheap input signals only. They can raise attention, but the final verdict must follow reusable engineering value.
+- verdict meaning: skip = not relevant; watch = interesting but too thin/immature; L1 = light read only; deep_dive = worth a written technical analysis; clone_and_run = worth hands-on reproduction or tool adoption.
+- Write plain-language Chinese. Explain technical terms when needed. Do not invent missing facts; if audit/README lacks evidence, say so.
 - Strong positives: agents, RAG, MCP, A2A, memory, evals, AI coding, tool use, workflows, multimodal AI systems.
 - Finance/trading/course/tutorial/awesome-list words are only scoring features. Do not hard-cap a repo when it contains reusable AI-agent infrastructure.
 - intent=understanding for concept/architecture/codebase comprehension repos.
 - intent=teaching for courses, lessons, tutorials, notebooks, curricula.
 - intent=tool for runnable CLIs, SDKs, services, plugins, apps, or frameworks.`;
 
-export function lightUser(repo, evidence) {
+export function lightUser(repo, evidence, projectRanking = {}) {
   return JSON.stringify({
     repo: publicRepo(repo),
+    artifactAudit: evidence?.artifactAudit || evidence?.metadata?.artifactAudit || null,
+    projectRanking,
     evidence: String(evidence?.content || "").slice(0, 9000),
   });
 }

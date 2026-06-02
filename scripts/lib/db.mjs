@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
 
 export const DEFAULT_DB_PATH = path.join(ROOT, "data", "ai-brief.db");
-export const SQLITE_SCHEMA_VERSION = 1;
+export const SQLITE_SCHEMA_VERSION = 2;
 
 export const SQLITE_SCHEMA = `
 PRAGMA foreign_keys = ON;
@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS evidence (
   candidate_id TEXT NOT NULL REFERENCES candidates(id) ON DELETE CASCADE,
   kind TEXT NOT NULL,
   content TEXT NOT NULL,
+  metadata TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
   fetched_at TEXT NOT NULL,
   PRIMARY KEY (candidate_id, kind)
 );
@@ -117,7 +118,16 @@ export class AiBriefDb {
 
   initSchema() {
     this.connection.exec(SQLITE_SCHEMA);
+    this.ensureSchemaCompatibility();
     return this;
+  }
+
+  ensureSchemaCompatibility() {
+    const evidenceColumns = new Set(this.connection.prepare("PRAGMA table_info(evidence)").all().map((row) => row.name));
+    if (!evidenceColumns.has("metadata")) {
+      this.connection.exec("ALTER TABLE evidence ADD COLUMN metadata TEXT CHECK (metadata IS NULL OR json_valid(metadata))");
+    }
+    this.connection.exec(`PRAGMA user_version = ${SQLITE_SCHEMA_VERSION}`);
   }
 
   close() {
@@ -191,26 +201,33 @@ export class AiBriefDb {
   }
 
   upsertEvidence(evidence) {
+    const metadata = evidence.metadata !== undefined
+      ? evidence.metadata
+      : evidence.artifactAudit !== undefined
+        ? { artifactAudit: evidence.artifactAudit }
+        : null;
     const row = {
       candidateId: evidence.candidateId || evidence.candidate_id,
       kind: evidence.kind,
       content: evidence.content,
+      metadata: metadata == null ? null : encodeJson(metadata),
       fetchedAt: evidence.fetchedAt || evidence.fetched_at || nowIso(),
     };
     requireFields(row, ["candidateId", "kind", "content", "fetchedAt"], "evidence");
     this.connection.prepare(`
-      INSERT INTO evidence (candidate_id, kind, content, fetched_at)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO evidence (candidate_id, kind, content, metadata, fetched_at)
+      VALUES (?, ?, ?, ?, ?)
       ON CONFLICT(candidate_id, kind) DO UPDATE SET
         content = excluded.content,
+        metadata = excluded.metadata,
         fetched_at = excluded.fetched_at
-    `).run(row.candidateId, row.kind, row.content, row.fetchedAt);
+    `).run(row.candidateId, row.kind, row.content, row.metadata, row.fetchedAt);
     return this.getEvidence(row.candidateId, row.kind);
   }
 
   getEvidence(candidateId, kind) {
     return decodeEvidence(this.connection.prepare(`
-      SELECT candidate_id, kind, content, fetched_at
+      SELECT candidate_id, kind, content, metadata, fetched_at
       FROM evidence
       WHERE candidate_id = ? AND kind = ?
     `).get(candidateId, kind));
@@ -218,7 +235,7 @@ export class AiBriefDb {
 
   listEvidence(candidateId) {
     return this.connection.prepare(`
-      SELECT candidate_id, kind, content, fetched_at
+      SELECT candidate_id, kind, content, metadata, fetched_at
       FROM evidence
       WHERE candidate_id = ?
       ORDER BY kind
@@ -399,10 +416,13 @@ function decodeCandidate(row) {
 
 function decodeEvidence(row) {
   if (!row) return null;
+  const metadata = decodeJson(row.metadata, null);
   return {
     candidateId: row.candidate_id,
     kind: row.kind,
     content: row.content,
+    ...(metadata == null ? {} : { metadata }),
+    ...(metadata?.artifactAudit ? { artifactAudit: metadata.artifactAudit } : {}),
     fetchedAt: row.fetched_at,
   };
 }
