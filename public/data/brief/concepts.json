@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-02T02:32:29.927Z",
+  "generatedAt": "2026-06-02T03:41:39.783Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 5,
+  "count": 7,
   "items": [
     {
       "id": "concept/agentic-memory",
@@ -39,6 +39,119 @@
         {
           "depth": 2,
           "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/agentic-tree-search",
+      "type": "concept",
+      "slug": "agentic-tree-search",
+      "title": "Agentic Tree Search",
+      "file": "concepts/agentic-tree-search.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Agentic Tree Search",
+        "slug": "agentic-tree-search",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "tree-search",
+          "best-first",
+          "scientific-discovery"
+        ],
+        "maturity": "active",
+        "first_seen_in": "ai-scientist-v2",
+        "related_content": [
+          "ai-scientist-v2"
+        ],
+        "related_concepts": [],
+        "explanation": "一种由 LLM agent 驱动的最优优先搜索，动态决定探索路径，在每个节点进行实验、评估并生成子节点。",
+        "examples": [
+          "AI Scientist-v2 使用此方法探索 ML 研究假设，从根节点开始，由 experiment manager 选择下一个最有希望的实验。"
+        ],
+        "common_misunderstandings": [
+          "它不是简单的蒙特卡洛树搜索，而是由 LLM 作为启发式函数和动作生成器。"
+        ],
+        "open_questions": [
+          "如何保证搜索树的多样性？如何处理实验失败节点的回溯？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种由 LLM agent 驱动的最优优先搜索，动态决定探索路径，在每个节点进行实验、评估并生成子节点。 出处:https://github.com/sakanaai/ai-scientist-v2。See [[content/ai-scientist-v2]]。\n\n## Supported by\n- [[claims/ai-scientist-v2-main-claim]]\n",
+      "excerpt": "一种由 LLM agent 驱动的最优优先搜索，动态决定探索路径，在每个节点进行实验、评估并生成子节点。 出处:https://github.com/sakanaai/ai-scientist-v2。See [[content/ai-scientist-v2]]。",
+      "links": [
+        {
+          "target": "content/ai-scientist-v2",
+          "raw": "[[content/ai-scientist-v2]]"
+        },
+        {
+          "target": "claims/ai-scientist-v2-main-claim",
+          "raw": "[[claims/ai-scientist-v2-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/experiment-manager-agent",
+      "type": "concept",
+      "slug": "experiment-manager-agent",
+      "title": "Experiment Manager Agent",
+      "file": "concepts/experiment-manager-agent.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Experiment Manager Agent",
+        "slug": "experiment-manager-agent",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "manager",
+          "planner"
+        ],
+        "maturity": "active",
+        "first_seen_in": "ai-scientist-v2",
+        "related_content": [
+          "ai-scientist-v2"
+        ],
+        "related_concepts": [],
+        "explanation": "在树搜索中扮演类似 critic 的角色，评估实验节点并决定下一步方向（如继续实验、修改代码或终止）。",
+        "examples": [
+          "AI Scientist-v2 的 experiment manager 分析当前实验结果，生成代码变体或停止搜索。"
+        ],
+        "common_misunderstandings": [
+          "它不是一个简单的固定策略，而是通过 LLM 语义理解实验结果的 agent。"
+        ],
+        "open_questions": [
+          "如何训练或微调 experiment manager 以提高决策质量？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在树搜索中扮演类似 critic 的角色，评估实验节点并决定下一步方向（如继续实验、修改代码或终止）。 出处:https://github.com/sakanaai/ai-scientist-v2。See [[content/ai-scientist-v2]]。\n\n## Supported by\n- [[claims/ai-scientist-v2-main-claim]]\n",
+      "excerpt": "在树搜索中扮演类似 critic 的角色，评估实验节点并决定下一步方向（如继续实验、修改代码或终止）。 出处:https://github.com/sakanaai/ai-scientist-v2。See [[content/ai-scientist-v2]]。",
+      "links": [
+        {
+          "target": "content/ai-scientist-v2",
+          "raw": "[[content/ai-scientist-v2]]"
+        },
+        {
+          "target": "claims/ai-scientist-v2-main-claim",
+          "raw": "[[claims/ai-scientist-v2-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
         }
       ]
     },

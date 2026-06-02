@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-02T02:32:29.927Z",
+  "generatedAt": "2026-06-02T03:41:39.783Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 4,
+  "count": 5,
   "items": [
     {
       "id": "claim/agemem-unified-beats-modular",
@@ -34,6 +34,46 @@
         {
           "target": "evidence/agemem-main-results",
           "raw": "[[evidence/agemem-main-results]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/ai-scientist-v2-main-claim",
+      "type": "claim",
+      "slug": "ai-scientist-v2-main-claim",
+      "title": "Ai Scientist V2 Main Claim",
+      "file": "claims/ai-scientist-v2-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "已生成第一篇完全由 AI 撰写并被同行评审接受的 workshop 论文。",
+        "slug": "ai-scientist-v2-main-claim",
+        "kind": "claim",
+        "content": "ai-scientist-v2",
+        "source_pointer": "README 首段 & 指向 ICLR2025 Workshop 实验的链接。",
+        "evidence_strength": "medium",
+        "supports": [
+          "agentic-tree-search",
+          "experiment-manager-agent"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供直接的会议接收通知或评审意见。",
+          "可能只是被 workshop 接收而非主会，且可能在其他任务上成功率低。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n系统产出的论文通过了正式学术会议（ICLR Workshop）的同行评审并被接受发表。\n\n证据:提供了外部链接可查看实验记录和论文副本。。边界:未提供直接的会议接收通知或评审意见。。风险:可能只是被 workshop 接收而非主会，且可能在其他任务上成功率低。。See [[content/ai-scientist-v2]]。\n",
+      "excerpt": "系统产出的论文通过了正式学术会议（ICLR Workshop）的同行评审并被接受发表。",
+      "links": [
+        {
+          "target": "content/ai-scientist-v2",
+          "raw": "[[content/ai-scientist-v2]]"
         }
       ],
       "headings": [

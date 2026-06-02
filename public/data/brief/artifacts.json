@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-02T02:32:29.927Z",
+  "generatedAt": "2026-06-02T03:41:39.783Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 4,
+  "count": 5,
   "items": [
     {
       "id": "artifact/agemem-code",
@@ -31,6 +31,46 @@
         {
           "target": "content/agemem",
           "raw": "[[content/agemem]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/ai-scientist-v2-repo",
+      "type": "artifact",
+      "slug": "ai-scientist-v2-repo",
+      "title": "Ai Scientist V2 Repo",
+      "file": "artifacts/ai-scientist-v2-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "ai-scientist-v2-repo",
+        "kind": "artifact",
+        "content": "ai-scientist-v2",
+        "artifact_type": "repo",
+        "url": "https://github.com/sakanaai/ai-scientist-v2",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "custom (The AI Scientist Source Code License, derivative of Responsible AI License; SPDX: NOASSERTION)",
+        "runnable": "yes",
+        "missing_parts": [
+          "tests",
+          "CI/CD",
+          "standard src/ layout",
+          "detailed docs beyond README"
+        ],
+        "last_checked": "2025-12-19"
+      },
+      "body": "\n## Artifact audit\n\n仓库包含可运行的自主科研 agent 代码，配备 README、配置文件，但缺失测试与 CI，需要 Linux + GPU + Docker 环境。\n\n出处:https://github.com/sakanaai/ai-scientist-v2。See [[content/ai-scientist-v2]]。\n",
+      "excerpt": "仓库包含可运行的自主科研 agent 代码，配备 README、配置文件，但缺失测试与 CI，需要 Linux + GPU + Docker 环境。",
+      "links": [
+        {
+          "target": "content/ai-scientist-v2",
+          "raw": "[[content/ai-scientist-v2]]"
         }
       ],
       "headings": [
