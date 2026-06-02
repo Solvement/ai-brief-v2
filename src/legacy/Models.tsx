@@ -44,15 +44,23 @@ export function Models({ modelId }: Props) {
   const [err, setErr] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     setRefreshing(true);
-    return loadModels({ force: true })
-      .then((d) => {
-        setData(d);
-        setErr(null);
-      })
-      .catch((e) => setErr(e?.message || String(e)))
-      .finally(() => setRefreshing(false));
+    try {
+      // stage-1 cheap version check (no LLM); best-effort, ignore failures
+      await fetch("/api/models/refresh", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+      }).catch(() => {});
+      const d = await loadModels({ force: true });
+      setData(d);
+      setErr(null);
+    } catch (e) {
+      setErr((e as Error)?.message || String(e));
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
 
   useEffect(() => {
