@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-02T02:00:35.982Z",
+  "generatedAt": "2026-06-02T02:32:29.927Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 3,
+  "count": 5,
   "items": [
     {
       "id": "concept/agentic-memory",
@@ -79,6 +79,98 @@
         {
           "target": "content/memoryagentbench",
           "raw": "[[content/memoryagentbench]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/supply-chain-hardening",
+      "type": "concept",
+      "slug": "supply-chain-hardening",
+      "title": "Supply Chain Hardening",
+      "file": "concepts/supply-chain-hardening.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "供应链加固 (supply-chain hardening)",
+        "slug": "supply-chain-hardening",
+        "kind": "concept",
+        "tags": [
+          "security",
+          "dependency-management"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "pi-agent",
+        "related_content": [
+          "pi-agent"
+        ],
+        "explanation": "通过依赖精确锁版本、锁文件锁定传递依赖(如 npm-shrinkwrap)、预提交锁文件校验、定时漏洞审计(npm audit)、隔离发布冒烟测试,降低『依赖被投毒/被篡改』的供应链风险。",
+        "examples": [
+          "pi:exact pinning + npm-shrinkwrap + scheduled npm audit + isolated release smoke test。出处:github.com/badlogic/pi-mono README。"
+        ],
+        "common_misunderstandings": [
+          "锁版本 ≠ 绝对安全:仍需定时审计与升级;且执行不可信代码的 agent 另有运行时风险。"
+        ],
+        "open_questions": [
+          "AI-Brief(目前仅依赖 react/yaml 等少量包)要不要也上 shrinkwrap + 定时 audit 作为基线纪律?"
+        ]
+      },
+      "body": "\n## Explanation\n\n对一个会执行代码、还可能引入大量依赖的 AI 项目,供应链加固是基线安全纪律。pi 把它做成了个人项目里少见的一等公民,值得 AI-Brief 借鉴(尤其当我们引入更多 npm 依赖时)。出处:github.com/badlogic/pi-mono。See [[content/pi-agent]]。\n",
+      "excerpt": "对一个会执行代码、还可能引入大量依赖的 AI 项目,供应链加固是基线安全纪律。pi 把它做成了个人项目里少见的一等公民,值得 AI-Brief 借鉴(尤其当我们引入更多 npm 依赖时)。出处:github.com/badlogic/pi-mono。See [[content/pi-agent]]。",
+      "links": [
+        {
+          "target": "content/pi-agent",
+          "raw": "[[content/pi-agent]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/unified-llm-api",
+      "type": "concept",
+      "slug": "unified-llm-api",
+      "title": "Unified Llm Api",
+      "file": "concepts/unified-llm-api.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "统一 LLM API 抽象 (unified multi-provider LLM API)",
+        "slug": "unified-llm-api",
+        "kind": "concept",
+        "tags": [
+          "llm-api",
+          "architecture"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "pi-agent",
+        "related_content": [
+          "pi-agent"
+        ],
+        "explanation": "用一层接口抹平不同厂商(OpenAI/Anthropic/Google…)模型的调用差异,业务/agent 逻辑只对接这一层,从而能自由换模型、比模型,而不改上层代码。",
+        "examples": [
+          "pi 的 pi-ai 包:统一多 provider LLM API。出处:github.com/badlogic/pi-mono(@earendil-works/pi-ai)。"
+        ],
+        "common_misunderstandings": [
+          "统一抽象常以『最小公约数』为代价——各家高级/独有能力可能在抽象层丢失或需特例。"
+        ],
+        "open_questions": [
+          "AI-Brief 调用各家模型时,自建薄封装 vs 直接用 pi-ai / LiteLLM 这类现成统一层,哪个更省心?"
+        ]
+      },
+      "body": "\n## Explanation\n\n把 provider 差异收敛到一层,是任何要『换模型/比模型/防供应商锁定』的系统的基础件——对 AI-Brief 的模型调用层直接适用。代价是边角能力的损耗。出处:github.com/badlogic/pi-mono。See [[content/pi-agent]]。\n",
+      "excerpt": "把 provider 差异收敛到一层,是任何要『换模型/比模型/防供应商锁定』的系统的基础件——对 AI-Brief 的模型调用层直接适用。代价是边角能力的损耗。出处:github.com/badlogic/pi-mono。See [[content/pi-agent]]。",
+      "links": [
+        {
+          "target": "content/pi-agent",
+          "raw": "[[content/pi-agent]]"
         }
       ],
       "headings": [

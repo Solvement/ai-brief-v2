@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-02T02:00:35.982Z",
+  "generatedAt": "2026-06-02T02:32:29.927Z",
   "entity": "content",
   "directory": "content",
-  "count": 3,
+  "count": 4,
   "items": [
     {
       "id": "content/agemem",
@@ -206,6 +206,95 @@
         {
           "depth": 2,
           "text": "Evidence"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    },
+    {
+      "id": "content/pi-agent",
+      "type": "content",
+      "slug": "pi-agent",
+      "title": "pi — 程序员的命令行 AI 编程 agent + 统一 LLM 工具箱",
+      "file": "content/pi-agent.md",
+      "directory": "content",
+      "meta": {
+        "title": "pi — 程序员的命令行 AI 编程 agent + 统一 LLM 工具箱",
+        "slug": "pi-agent",
+        "kind": "content",
+        "type": "project",
+        "source": "github-trending:weekly",
+        "url": "https://github.com/badlogic/pi-mono",
+        "authors_or_creators": [
+          "Mario Zechner (badlogic, libGDX 作者)",
+          "earendil-works"
+        ],
+        "date": "2026-05-29",
+        "discovered_at": "2026-06-01",
+        "content_track": "FDE",
+        "status": "deep_dived",
+        "project_kind": "functional_software",
+        "tags": [
+          "coding-agent",
+          "llm-api",
+          "cli",
+          "supply-chain-security"
+        ],
+        "importance": 5,
+        "why_discovered": "GitHub trending 本周在涨(58.7k star,最新 release v0.78.0 = 2026-05-29,3 天前);coding agent 工具箱,贴 FDE。",
+        "why_selected": "过 triage + 够新:不是 demo——monorepo 分层(CLI/runtime/统一 LLM API/TUI)、225 releases、4387 commits、MIT、有测试与 CI。两个稀缺亮点:①统一多 provider LLM API 抽象 ②供应链安全硬功夫(exact pinning + shrinkwrap + 定时 npm audit)。作者 badlogic(libGDX 作者)。验证 project_type=devtool_cli 分诊,且是『现抓最新』的示范。",
+        "relation_to_existing_memory": "extends_existing"
+      },
+      "body": "\n## Summary\n\npi 是一套**给程序员的 AI 工具箱**,旗舰是一个交互式命令行 coding agent(能调工具、带状态、可自我扩展写新技能),底下是一个 monorepo:`pi-coding-agent`(CLI)/`pi-agent-core`(runtime,tool calling + 状态)/`pi-ai`(**统一多 provider LLM API**,一套接口调 OpenAI/Anthropic/Google 等)/`pi-tui`(终端 UI 库)。工程上以**供应链安全**著称:依赖精确锁定 + npm-shrinkwrap + 预提交锁文件校验 + 隔离 release smoke test + 定时 npm audit。TypeScript,MIT,225 releases(v0.78.0 @ 2026-05-29),4387 commits,7k forks。出处:github.com/badlogic/pi-mono(earendil-works/pi,2026-06-01 核验)。\n\n## Pipeline\n- [[source-packs/pi-agent-source-pack]]\n- [[evidence-packs/pi-agent-evidence-pack]]\n- [[deep-dives/pi-agent-deep-dive]]\n\n## Concepts\n- [[concepts/unified-llm-api]]\n- [[concepts/supply-chain-hardening]]\n\n## Claims\n- [[claims/pi-agent-depth-in-plumbing]]\n\n## Artifacts\n- [[artifacts/pi-agent-repo]]\n",
+      "excerpt": "pi 是一套**给程序员的 AI 工具箱**,旗舰是一个交互式命令行 coding agent(能调工具、带状态、可自我扩展写新技能),底下是一个 monorepo:`pi-coding-agent`(CLI)/`pi-agent-core`(runtime,tool calling + 状态)/`pi-ai`(**统一多 provider LLM API**,一套接口调 OpenAI/Anthropic/Google 等)/`pi-tui`(终端 UI 库)。工程上以**供应链安全**著称:依赖精确锁定 + npm-shrinkwrap + 预提交锁文",
+      "links": [
+        {
+          "target": "source-packs/pi-agent-source-pack",
+          "raw": "[[source-packs/pi-agent-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/pi-agent-evidence-pack",
+          "raw": "[[evidence-packs/pi-agent-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/pi-agent-deep-dive",
+          "raw": "[[deep-dives/pi-agent-deep-dive]]"
+        },
+        {
+          "target": "concepts/unified-llm-api",
+          "raw": "[[concepts/unified-llm-api]]"
+        },
+        {
+          "target": "concepts/supply-chain-hardening",
+          "raw": "[[concepts/supply-chain-hardening]]"
+        },
+        {
+          "target": "claims/pi-agent-depth-in-plumbing",
+          "raw": "[[claims/pi-agent-depth-in-plumbing]]"
+        },
+        {
+          "target": "artifacts/pi-agent-repo",
+          "raw": "[[artifacts/pi-agent-repo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
         },
         {
           "depth": 2,

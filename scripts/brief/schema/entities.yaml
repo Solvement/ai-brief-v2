@@ -215,6 +215,21 @@ deep-dive:
         grounded_score: { type: float, range: [0, 1] }
         transfer_value: { type: enum, values: [high, medium, low] }
         main_risk:      { type: str }
+    # ---- PROJECT deep-dive (content.type=project) — analysis dispatched by project_type ----
+    # project_type切换『技术拆解』重点;其余段固定。verdict 自成一套(行动导向),不混用 quality_report。
+    project_type:
+      type: enum
+      values: [ai_app, agent_framework, devtool_cli, model_infra, frontend_ui, dataset_benchmark, library_sdk, template_boilerplate, non_ai_eng]
+    project_verdict:
+      type: object
+      fields:
+        verdict: { type: enum, values: [skip, watch, L1, deep_dive, clone_and_run] }
+        relevance_to_ai_engineer: { type: int, range: [1, 5] }
+        engineering_depth:        { type: int, range: [1, 5] }
+        reuse_value:              { type: int, range: [1, 5] }
+        maturity:                 { type: int, range: [1, 5] }
+        main_risk:                { type: str }
+    next_actions:   { type: list_str, default: [] }   # skip / star / read-docs / clone-and-run / write-deepdive / extract-pattern
   # Body sections (templates/deep-dive.md.tmpl): Technical reading /
   # Terminology / Architecture / Mechanisms / Highlights / Defects /
   # AI after-analysis. Ledgers/matrix/audit above are structured for the

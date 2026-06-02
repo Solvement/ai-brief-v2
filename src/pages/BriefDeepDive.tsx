@@ -74,7 +74,9 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
   const quality = m.quality_report ?? {};
   const audit = m.artifact_audit ?? {};
   const trace = m.reasoning_trace ?? {};
-  const typeLabel = [m.paper_type, m.secondary_type].filter(Boolean).join(" + ");
+  const pv = m.project_verdict ?? null;
+  const nextActions: string[] = Array.isArray(m.next_actions) ? m.next_actions : [];
+  const typeLabel = pv ? m.project_type : [m.paper_type, m.secondary_type].filter(Boolean).join(" + ");
   const claims: ClaimLedgerEntry[] = Array.isArray(m.claim_ledger) ? m.claim_ledger : [];
   const matrix: EvidenceRow[] = Array.isArray(m.evidence_matrix) ? m.evidence_matrix : [];
   const authors: string[] = Array.isArray(pm.authors_or_creators) ? pm.authors_or_creators : [];
@@ -96,18 +98,37 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
       </header>
 
       <section className="deep-dive">
-        {/* Verdict bar */}
-        <div className="verdict-bar">
-          <strong>判定</strong>{" "}
-          <span className={`brief-verdict brief-verdict--${quality.verdict ?? "na"}`}>{(quality.verdict ?? "n/a").toUpperCase()}</span>
-          {typeof quality.grounded_score !== "undefined" && <span className="chip">grounding {quality.grounded_score}</span>}
-          {audit.reproducibility_status && <span className="chip">复现: {audit.reproducibility_status}</span>}
-          {quality.transfer_value && <span className="chip">迁移价值: {quality.transfer_value}</span>}
-          {Array.isArray(quality.flags) && quality.flags.length > 0 && (
-            <span className="brief-flags">flags: {quality.flags.join(", ")}</span>
-          )}
-        </div>
-        {quality.main_risk && <p className="brief-mainrisk"><strong>主要风险：</strong>{quality.main_risk}</p>}
+        {/* Verdict bar — project (action-oriented) vs paper */}
+        {pv ? (
+          <>
+            <div className="verdict-bar">
+              <strong>判定</strong>{" "}
+              <span className={`brief-verdict brief-verdict--proj brief-verdict--${pv.verdict ?? "na"}`}>{(pv.verdict ?? "n/a").toUpperCase()}</span>
+              {typeof pv.relevance_to_ai_engineer !== "undefined" && <span className="chip">AI工程相关 {pv.relevance_to_ai_engineer}/5</span>}
+              {typeof pv.engineering_depth !== "undefined" && <span className="chip">工程深度 {pv.engineering_depth}/5</span>}
+              {typeof pv.reuse_value !== "undefined" && <span className="chip">复用价值 {pv.reuse_value}/5</span>}
+              {typeof pv.maturity !== "undefined" && <span className="chip">成熟度 {pv.maturity}/5</span>}
+            </div>
+            {pv.main_risk && <p className="brief-mainrisk"><strong>主要风险：</strong>{pv.main_risk}</p>}
+            {nextActions.length > 0 && (
+              <p className="brief-actions"><strong>下一步：</strong>{nextActions.map((a, i) => <span className="chip" key={i}>{a}</span>)}</p>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="verdict-bar">
+              <strong>判定</strong>{" "}
+              <span className={`brief-verdict brief-verdict--${quality.verdict ?? "na"}`}>{(quality.verdict ?? "n/a").toUpperCase()}</span>
+              {typeof quality.grounded_score !== "undefined" && <span className="chip">grounding {quality.grounded_score}</span>}
+              {audit.reproducibility_status && <span className="chip">复现: {audit.reproducibility_status}</span>}
+              {quality.transfer_value && <span className="chip">迁移价值: {quality.transfer_value}</span>}
+              {Array.isArray(quality.flags) && quality.flags.length > 0 && (
+                <span className="brief-flags">flags: {quality.flags.join(", ")}</span>
+              )}
+            </div>
+            {quality.main_risk && <p className="brief-mainrisk"><strong>主要风险：</strong>{quality.main_risk}</p>}
+          </>
+        )}
 
         {/* Compressed reasoning trace — the analyst's auditable work (collapsed by default) */}
         {Object.keys(trace).length > 0 && (
