@@ -13,12 +13,26 @@ function validAnalysis(overrides = {}) {
     verifiedAt: "2026-05-30T00:00:00.000Z",
     tier: "deep",
     leadJudgment: "The paper frames harness engineering as the reliability bottleneck.",
-    sections: [
+    meta: {
+      paperType: "survey",
+      venueStatus: "unverified",
+      sourceReliability: {
+        discoverySource: "OpenReview",
+        primarySourceVerified: false,
+        paperHtmlFetched: true,
+        pdfFetched: false,
+        repoFetched: false,
+        appendixFetched: false,
+      },
+      tags: ["agent harness", "observability"],
+    },
+    originalReading: [
       {
         heading: "Abstract",
         summary: "The paper surveys agent harness components and their reliability role.",
       },
     ],
+    analystNotes: "The survey's load-bearing claim is that the harness, not the model, caps reliability; it cites three works but runs no controlled experiment.",
     limitsAndFuture: {
       paperStated: "The paper calls out observability and governance gaps.",
       evidenceNotes: "The evidence is survey-style and should not be read as a benchmark result.",
@@ -27,6 +41,16 @@ function validAnalysis(overrides = {}) {
       convergence: ["OpenReview"],
       track: ["Agent Harness / Observability"],
       ideaSignal: "review:75",
+    },
+    selectionAudit: {
+      candidateCount: 10,
+      selectedCount: 3,
+      selectionScore: 78,
+      selectedReason: "top-venue single-source academic survey",
+      rejectedReasonIfAny: "",
+      weightedFactors: { venuePrestige: 60, citationConvergence: 34, novelty: 78, recency: 100, evidenceStrength: 40, reproducibility: 15 },
+      discoverySource: "OpenReview",
+      primaryEvidenceSource: "paper full text (openreview.net)",
     },
     provenance: {
       sourceUrl: "https://openreview.net/pdf?id=3hXEPbG0dh",
@@ -43,7 +67,7 @@ const evidence = {
 
 test("placeholder text fails QA", async () => {
   const result = await qaGate(validAnalysis({
-    sections: [{ heading: "Abstract", summary: "Needs rewrite [\u5360\u4f4d]." }],
+    originalReading: [{ heading: "Abstract", summary: "Needs rewrite [\u5360\u4f4d]." }],
   }), evidence, { options: {} });
 
   assert.equal(result.structuralPass, false);

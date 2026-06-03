@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -9,7 +9,7 @@ import {
   rememberPipelineRun,
   summarizeSelection,
 } from "../../lib/agentic-pipeline.mjs";
-import { analyze } from "./analyze.mjs";
+import { analyze, backfillSelectionAudit } from "./analyze.mjs";
 import { evaluate, select } from "./evaluate.mjs";
 import { qaGate } from "./qa.mjs";
 import { collectEvidence, discover } from "./sources.mjs";
@@ -17,8 +17,12 @@ import { collectEvidence, discover } from "./sources.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
 const ARTICLES_FILE = path.join(ROOT, "public", "data", "articles.json");
+const ARTICLES_ARCHIVE_FILE = path.join(ROOT, "public", "data", "articles-archive.json");
 const RADAR_FILE = path.join(ROOT, "public", "data", "paper-radar.json");
+const RADAR_ARCHIVE_FILE = path.join(ROOT, "data", "papers", "paper-radar-archive.json");
 const ALLOWED_RADAR_DECISIONS = new Set(["ignore", "skim", "read", "review", "deep_dive", "implement"]);
+const DEFAULT_ACTIVE_ARTICLES_LIMIT = 12;
+const DEFAULT_RADAR_ARCHIVE_LIMIT = 90;
 
 export const papersColumnModule = {
   id: "papers",
@@ -49,24 +53,36 @@ export async function publish(qaItems = [], ctx = {}) {
   const publishable = enriched
     .filter((item) => item.qa?.verdict !== "fail")
     .sort(sortForPublish);
-  const papers = publishable.map((item) => publicAnalysis(item.analysis));
+  // Backfill selectionAudit evidenceStrength/reproducibility post-deep (CONTEXT「合成方式 A」).
+  const currentPapers = publishable.map((item) => backfillSelectionAudit(
+    publicAnalysis(item.analysis),
+    { candidateCount: candidateRows.length, selectedCount: publishable.length },
+  ));
+  const retention = await applyArticleRetention({
+    generatedAt,
+    newPapers: currentPapers,
+    options,
+  });
+  const papers = retention.activePapers;
 
   const agentFlow = buildAgentFlow("papers", {
     discover: `${candidateRows.length} paper candidate(s) from the papers kernel`,
     evidence: `${enriched.length} analyzed candidate(s) with paper-text evidence`,
-    rank: `${publishable.length} current analysis item(s) available after QA filtering`,
-    review: `${papers.length} section-mirroring academic analysis item(s)`,
+    rank: `${publishable.length} current analysis item(s) available after QA and reviewer filtering`,
+    review: `${papers.length} recent deep article(s), ${retention.archiveCount} total archived deep item(s)`,
     verify: `${failed.length} QA failure(s) excluded before publish`,
     publish: "public/data/articles.json and public/data/paper-radar.json",
-    archive: "SQLite runs table",
+    archive: "public/data/articles-archive.json, data/agent-memory, and SQLite runs table",
   });
 
   const qualityGate = createQualityGate({
     surface: "papers",
     checks: [
       gateCheck("papers-present", "articles.json contains at least one paper", papers.length > 0, `${papers.length} paper(s)`),
-      gateCheck("section-shape", "every paper has section summaries", papers.every((paper) => Array.isArray(paper.sections) && paper.sections.length > 0), `${papers.length} paper(s) checked`),
+      gateCheck("section-shape", "every paper has originalReading summaries", papers.every((paper) => Array.isArray(paper.originalReading) && paper.originalReading.length > 0), `${papers.length} paper(s) checked`),
+      gateCheck("analyst-notes", "every paper has analystNotes", papers.every((paper) => typeof paper.analystNotes === "string" && paper.analystNotes.trim().length > 0), `${papers.length} paper(s) checked`),
       gateCheck("qa-fail-excluded", "QA fail verdicts are not published", !publishable.some((item) => item.qa?.verdict === "fail"), `${failed.length} failed item(s) excluded`),
+      gateWarning("current-run-deep", "current run produced at least one new deep analysis", currentPapers.length > 0, `${currentPapers.length} current-run paper(s)`),
       gateWarning("qa-warnings", "published papers have no QA warnings", publishable.every((item) => item.qa?.verdict !== "warn"), `${publishable.filter((item) => item.qa?.verdict === "warn").length} warning(s)`),
     ],
   });
@@ -83,6 +99,13 @@ export async function publish(qaItems = [], ctx = {}) {
 
   const articles = {
     generatedAt,
+    archiveCount: retention.archiveCount,
+    retention: {
+      activeLimit: retention.activeLimit,
+      archiveFile: "public/data/articles-archive.json",
+      newPaperCount: currentPapers.length,
+      archiveCount: retention.archiveCount,
+    },
     papers,
     pipelineRun,
     agentFlow,
@@ -90,17 +113,101 @@ export async function publish(qaItems = [], ctx = {}) {
   };
 
   await writeJson(ARTICLES_FILE, articles);
-  await publishRadarForFrontend(
-    buildDailyRadarData({ publishable, agentFlow, qualityGate, pipelineRun, generatedAt }),
-    buildTriageData({ publishable, failed }),
-  );
+  if (publishable.length) {
+    await publishRadarForFrontend(
+      buildDailyRadarData({ publishable, agentFlow, qualityGate, pipelineRun, generatedAt }),
+      buildTriageData({ publishable, failed }),
+      options,
+    );
+  } else {
+    ctx.logger?.warn?.("[papers:publish] no current publishable papers; kept existing paper-radar.json");
+  }
 
   return {
     file: ARTICLES_FILE,
+    archiveFile: ARTICLES_ARCHIVE_FILE,
     radarFile: RADAR_FILE,
-    paperCount: papers.length,
+    paperCount: currentPapers.length,
+    activePaperCount: papers.length,
+    archiveCount: retention.archiveCount,
     excludedQaFailCount: failed.length,
   };
+}
+
+async function applyArticleRetention({ generatedAt, newPapers = [], options = {} } = {}) {
+  const activeLimit = numberOption(options.activeArticlesLimit ?? process.env.PAPERS_ARTICLES_ACTIVE_LIMIT, DEFAULT_ACTIVE_ARTICLES_LIMIT);
+  const existingActive = await readJsonIfExists(ARTICLES_FILE, { papers: [] });
+  const existingArchive = await readJsonIfExists(ARTICLES_ARCHIVE_FILE, { papers: [] });
+  const archivePapers = mergeArticlePapers([
+    ...newPapers,
+    ...asArray(existingActive?.papers),
+    ...asArray(existingArchive?.papers),
+  ]);
+  const activePapers = archivePapers
+    .filter(isCurrentDeepArticle)
+    .slice(0, activeLimit);
+
+  await writeJson(ARTICLES_ARCHIVE_FILE, {
+    generatedAt,
+    archiveCount: archivePapers.length,
+    retention: {
+      policy: "dedupe-by-paper-id-or-source; current deep articles are preserved, active feed is bounded",
+      activeLimit,
+    },
+    papers: archivePapers,
+  });
+
+  return {
+    activePapers,
+    activeLimit,
+    archiveCount: archivePapers.length,
+  };
+}
+
+function mergeArticlePapers(papers = []) {
+  const byKey = new Map();
+  for (const paper of papers) {
+    if (!paper || typeof paper !== "object" || Array.isArray(paper)) continue;
+    const key = articleDedupeKey(paper);
+    if (!key) continue;
+    const existing = byKey.get(key);
+    if (!existing || preferArticle(paper, existing)) byKey.set(key, paper);
+  }
+  return [...byKey.values()].sort(sortArticlesByRecency);
+}
+
+function preferArticle(candidate, existing) {
+  const candidateCurrent = isCurrentDeepArticle(candidate);
+  const existingCurrent = isCurrentDeepArticle(existing);
+  if (candidateCurrent !== existingCurrent) return candidateCurrent;
+  return articleTime(candidate) >= articleTime(existing);
+}
+
+function articleDedupeKey(paper = {}) {
+  return cleanString(paper.id)
+    || cleanString(paper.sourceUrl && paper.title ? `${paper.sourceUrl}::${paper.title}` : "")
+    || cleanString(paper.title).toLowerCase();
+}
+
+function sortArticlesByRecency(left, right) {
+  return articleTime(right) - articleTime(left) || cleanString(left.title).localeCompare(cleanString(right.title));
+}
+
+function articleTime(paper = {}) {
+  const parsed = Date.parse(paper.verifiedAt || paper.generatedAt || paper.updatedAt || paper.publishedAt || "");
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isCurrentDeepArticle(paper = {}) {
+  return paper
+    && paper.tier === "deep"
+    && typeof paper.id === "string"
+    && typeof paper.title === "string"
+    && typeof paper.leadJudgment === "string"
+    && typeof paper.analystNotes === "string"
+    && Array.isArray(paper.originalReading)
+    && paper.originalReading.length > 0
+    && paper.originalReading.every((section) => typeof section?.heading === "string" && typeof section?.summary === "string");
 }
 
 export async function archive(result, ctx = {}) {
@@ -196,7 +303,9 @@ async function pipelineRunRef({ ctx, options, generatedAt, agentFlow, qualityGat
     date: generatedAt.slice(0, 10),
     sourceFiles: {
       articles: "public/data/articles.json",
+      articlesArchive: "public/data/articles-archive.json",
       radar: "public/data/paper-radar.json",
+      radarArchive: "data/papers/paper-radar-archive.json",
       db: "data/ai-brief.db",
     },
     agentFlow,
@@ -285,7 +394,8 @@ function buildTriageData({ publishable, failed }) {
   };
 }
 
-async function publishRadarForFrontend(dailyData, triageData) {
+async function publishRadarForFrontend(dailyData, triageData, options = {}) {
+  await archiveRadarSnapshot(await readJsonIfExists(RADAR_FILE, null), options);
   const top = triageData.top || [];
   const items = triageData.items || top;
   const out = {
@@ -327,6 +437,29 @@ async function publishRadarForFrontend(dailyData, triageData) {
     })),
   };
   await writeJson(RADAR_FILE, out);
+}
+
+async function archiveRadarSnapshot(previous, options = {}) {
+  if (!previous || typeof previous !== "object" || !previous.generatedAt) return null;
+  const limit = numberOption(options.radarArchiveLimit ?? process.env.PAPERS_RADAR_ARCHIVE_LIMIT, DEFAULT_RADAR_ARCHIVE_LIMIT);
+  const archive = await readJsonIfExists(RADAR_ARCHIVE_FILE, { snapshots: [] });
+  const snapshots = [
+    {
+      date: previous.date || String(previous.generatedAt).slice(0, 10),
+      generatedAt: previous.generatedAt,
+      radar: previous,
+    },
+    ...asArray(archive?.snapshots).filter((snapshot) => snapshot?.generatedAt !== previous.generatedAt),
+  ].slice(0, limit);
+
+  await writeJson(RADAR_ARCHIVE_FILE, {
+    schemaVersion: 1,
+    generatedAt: nowIso(options),
+    retentionLimit: limit,
+    snapshotCount: snapshots.length,
+    snapshots,
+  });
+  return { snapshotCount: snapshots.length };
 }
 
 function summarizePaper(item, dailyAction) {
@@ -384,18 +517,25 @@ function normalizeRadarTriage(item) {
 
 function radarNarrative(item) {
   const analysis = item?.analysis || {};
-  const section = Array.isArray(analysis.sections) ? analysis.sections[0] || {} : {};
+  const reading = Array.isArray(analysis.originalReading) ? analysis.originalReading : [];
+  const firstSection = reading[0] || {};
+  const lastSection = reading[reading.length - 1] || {};
   const selection = analysis.selection || {};
   return {
-    professorLesson: cleanString(analysis.leadJudgment || "The paper needs to be read through its own section structure, not as a verdict card."),
-    goodIdeaToSteal: cleanString(section.loadBearing || section.summary || "Use the paper's own headings as the reading map before adding interpretation."),
+    professorLesson: cleanString(analysis.leadJudgment || "The paper should be read through its own section structure first, then through the analyst notes."),
+    goodIdeaToSteal: cleanString(firstSection.summary || "Use the paper's own headings as the reading map before adding interpretation."),
     badIdeaOrRisk: cleanString(analysis.limitsAndFuture?.evidenceNotes || "Keep evidence boundaries visible and avoid adding facts outside collected paper text."),
-    transferablePattern: cleanString(section.evidence || "Separate discovery, evidence, ranking, analysis, and QA so paper selection remains auditable."),
+    transferablePattern: cleanString(firstChars(analysis.analystNotes, 320) || "Separate the faithful reading from the AI commentary so the reader judges first."),
     futureWorkApplication: cleanString(analysis.limitsAndFuture?.paperStated || "Track future work from the paper separately from external commentary."),
-    architectureTakeaway: cleanString(section.evidence || section.summary || "A paper analysis should expose the claim, the supporting evidence, and the boundary."),
+    architectureTakeaway: cleanString(lastSection.summary || firstSection.summary || "A paper reading should expose the structure, the key results, and the boundary."),
     interviewTalkingPoint: cleanString(selection.ideaSignal || "Explain why this paper entered the feed using convergence, track fit, and idea signal."),
-    projectIdea: cleanString(`Build a grounded checklist from ${analysis.title || "the selected paper"} and test it against one agent workflow.`),
+    projectIdea: cleanString(`Read 《${analysis.title || "the selected paper"}》 against your own questions before opening the analyst notes.`),
   };
+}
+
+function firstChars(value, limit) {
+  const text = cleanString(value);
+  return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
 }
 
 function normalizeRadarDecision(value) {
@@ -420,6 +560,15 @@ function freshnessSignal(raw = {}) {
   return "archive";
 }
 
+async function readJsonIfExists(file, fallback) {
+  try {
+    return JSON.parse(await readFile(file, "utf8"));
+  } catch (error) {
+    if (error?.code === "ENOENT") return fallback;
+    return fallback;
+  }
+}
+
 async function writeJson(file, data) {
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, `${JSON.stringify(data, null, 2)}\n`, "utf8");
@@ -432,6 +581,11 @@ function cleanString(value) {
 function normalizeArray(value) {
   if (value == null) return [];
   return (Array.isArray(value) ? value : [value]).map(cleanString).filter(Boolean);
+}
+
+function asArray(value) {
+  if (value == null) return [];
+  return Array.isArray(value) ? value : [value];
 }
 
 function clampScore(value) {

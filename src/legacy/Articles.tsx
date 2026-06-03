@@ -186,7 +186,7 @@ function ArticleCard({ paper }: { paper: AcademicPaperAnalysis }) {
   const meta = paper.meta;
   const sectionCount = paper.originalReading?.length || 0;
   return (
-    <a className="article-card" href={`/articles/${paper.id}`}>
+    <a className="article-card" href={`/articles/${encodeURIComponent(paper.id)}`}>
       <div className="article-card-top">
         <div className="article-card-source">
           <span>{paper.venue || paper.sourceName}</span>

@@ -118,24 +118,29 @@ test("strong single trusted source can pass without multi-source convergence", a
   assert.deepEqual(r.selection.convergence, ["arXiv"]);
 });
 
-test("FDE systems signals are boosted over pure scaling papers", async () => {
-  const fde = paperCandidate("paper:fde", {
-    title: "Production RAG workflow evaluation for API tool-calling systems",
-    abstract: "A framework for customer production RAG deployment with API endpoints, tool calls, permission checks, observability traces, workflow gates, eval harnesses, and rollback runbooks.",
-    sourceSignals: ["arXiv"],
+test("9C reweight: top-venue academic work outranks engineering-heavy deployment paper", async () => {
+  const academic = paperCandidate("paper:academic", {
+    title: "Novel generalization bounds for in-context learning: a theoretical analysis",
+    abstract: "A novel theoretical framework giving new generalization bounds and formal analysis for in-context learning in large language models, with benchmark evaluation and ablation studies.",
+    source: "openreview",
+    sourceName: "OpenReview",
+    venue: "ICLR 2026 Oral",
+    sourceSignals: ["OpenReview", "ICLR 2026 Outstanding Paper", "best paper award"],
+    focusTopics: ["Evaluation / Benchmarks", "Broad AI / ML"],
   });
-  const pure = paperCandidate("paper:pure-scaling", {
-    title: "Sparse attention scaling law for transformer pre-training",
-    abstract: "A pure model-scaling paper on sparse attention, optimizer changes, parameter count, pre-training recipe, SOTA leaderboard results, and benchmark accuracy.",
+  const engineering = paperCandidate("paper:eng", {
+    title: "Deploying a customer production RAG workflow with API tools",
+    abstract: "An engineering report on customer production deployment with API endpoints, tool calls, workflow gates, rollback runbooks, observability, and permission checks.",
+    source: "arxiv_filtered",
+    sourceName: "arXiv filtered search",
     sourceSignals: ["arXiv"],
+    focusTopics: ["AI Application Engineering / FDE"],
   });
 
-  const fdeResult = await evaluate(fde, { kind: "paper-text", content: "production RAG API workflow observability deployment" }, ctx);
-  const pureResult = await evaluate(pure, { kind: "paper-text", content: "scaling law pre-training sparse attention leaderboard" }, ctx);
+  const academicResult = await evaluate(academic, { kind: "paper-text", content: "theoretical generalization bounds in-context learning benchmark" }, ctx);
+  const engineeringResult = await evaluate(engineering, { kind: "paper-text", content: "customer production RAG API workflow observability deployment" }, ctx);
 
-  assert.ok(fdeResult.score > pureResult.score, `${fdeResult.score} should beat ${pureResult.score}`);
-  assert.ok(fdeResult.signals.some((signal) => signal.startsWith("fde:")));
-  assert.ok(fdeResult.selection.track.includes("AI Application Engineering / FDE"));
+  assert.ok(academicResult.score > engineeringResult.score, `${academicResult.score} should beat ${engineeringResult.score}`);
 });
 
 test("off-track single source -> archive", async () => {

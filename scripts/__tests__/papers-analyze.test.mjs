@@ -1,326 +1,138 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { normalizeAnalysis } from "../columns/papers/analyze.mjs";
-
-const raw = {
-  leadJudgment: "可靠性的瓶颈是 harness，不是模型。",
-  sections: [{ heading: "它赌的那句话", summary: "harness 决定上限。", loadBearing: "归因推论是承重墙" }],
-  limitsAndFuture: { paperStated: "可观测/治理研究薄", evidenceNotes: "综述无实验，靠3个引用" },
-};
+import { normalizeAnalysis, backfillSelectionAudit, maxTokens } from "../columns/papers/analyze.mjs";
 
 const cand = {
   id: "h",
   raw: {
     title: "Agent Harness Engineering: A Survey",
     authors: "双盲匿名",
-    venue: "TMLR · 在审",
+    venue: "ICLR 2026 Oral",
     sourceUrl: "https://openreview.net/pdf?id=3hXEPbG0dh",
     sourceName: "OpenReview",
+    publishedAt: "2026-05-25T00:00:00.000Z",
+    updatedAt: "2026-05-25T00:00:00.000Z",
+    tags: ["agent harness", "observability"],
   },
 };
 
-test("normalize fills server fields + tier + provenance, strips verdicts", () => {
-  const out = normalizeAnalysis(raw, {
-    candidate: cand,
-    tier: "deep",
-    evidence: { kind: "paper-text" },
-    now: () => "2026-05-30T00:00:00Z",
-  });
+const baseOpts = (overrides = {}) => ({
+  candidate: cand,
+  evidence: { kind: "paper-text", content: "" },
+  now: () => "2026-06-01T00:00:00Z",
+  ...overrides,
+});
+
+test("normalizeAnalysis emits the two-stage schema with server fields", () => {
+  const out = normalizeAnalysis({
+    leadJudgment: "本文把可靠性瓶颈定位在 harness 而非模型。",
+    meta: { paperType: "survey", venueStatus: "verified", tags: ["harness"] },
+    originalReading: [
+      { heading: "引言", summary: "作者综述了智能体 harness 的组成与其在可靠性中的角色。" },
+    ],
+    analystNotes: "这篇综述的承重主张是 harness 决定上限，但缺少对照实验，证据偏弱。",
+    limitsAndFuture: { paperStated: "可观测/治理研究薄", evidenceNotes: "综述无实验" },
+  }, baseOpts({ evidence: { kind: "paper-text", content: "agent harness reliability survey" } }));
 
   assert.equal(out.tier, "deep");
-  assert.equal(out.verifiedAt, "2026-05-30T00:00:00Z");
-  assert.equal(out.provenance.sourceUrl, cand.raw.sourceUrl);
-  assert.ok(out.sections.length >= 1 && out.sections[0].heading && out.sections[0].summary);
+  assert.equal(out.verifiedAt, "2026-06-01T00:00:00Z");
   assert.equal(out.title, cand.raw.title);
+  assert.equal(out.provenance.sourceUrl, cand.raw.sourceUrl);
+  assert.ok(out.originalReading.length >= 1 && out.originalReading[0].heading && out.originalReading[0].summary);
+  assert.ok(typeof out.analystNotes === "string" && out.analystNotes.length > 0);
+  assert.equal(out.meta.paperType, "survey");
+  assert.equal(out.meta.venueStatus, "verified");
+  // No removed-module fields leak through.
+  assert.equal(out.deepDive, undefined);
+  assert.equal(out.scorecard, undefined);
+  assert.equal(out.verdict, undefined);
 });
 
-test("offline fallback yields a valid shape from evidence only", () => {
-  const out = normalizeAnalysis(null, {
-    candidate: cand,
-    tier: "light",
-    evidence: { kind: "paper-text", content: "abstract..." },
-    now: () => "2026-05-30T00:00:00Z",
-  });
-
-  assert.ok(out.leadJudgment && out.sections.length >= 1);
-  assert.equal(out.tier, "light");
-});
-
-test("deep FDE-relevant analysis adds grounded fdeTakeaways fallback", () => {
+test("Stage-1 strips score/verdict language from summaries (faithful)", () => {
   const out = normalizeAnalysis({
-    ...raw,
-    deepDive: {
-      reframe: "The paper is about production RAG workflow reliability.",
-      contributionLayers: [],
-      mechanism: "It treats retrieval, tool calls, and observability as system components.",
-      evidenceChain: [],
-      audit: [],
-      loadBearingClaim: "Production RAG systems need workflow-level evaluation.",
-      strongestEvidence: [],
-      limitations: ["Artifact availability is stated by the paper."],
-      suggestedExperiments: [],
-    },
-  }, {
-    candidate: {
-      id: "fde",
-      raw: {
-        ...cand.raw,
-        abstract: "A production RAG workflow paper covering API endpoints, tool calls, permissions, observability, and deployment.",
-      },
-    },
-    tier: "deep",
-    evidence: {
-      kind: "paper-text",
-      content: "The evidence discusses production RAG workflow integration, API endpoints, tool calls, permission checks, observability traces, and deployment gates.",
-    },
-    evaluation: {
-      selection: { track: ["AI Application Engineering / FDE"] },
-    },
-    now: () => "2026-05-30T00:00:00Z",
-  });
-
-  assert.ok(out.deepDive.fdeTakeaways);
-  assert.equal(out.deepDive.fdeTakeaways.questions.length, 5);
-  assert.ok(out.deepDive.fdeTakeaways.checklist.some((item) => /Endpoint|input schema|response schema/.test(item)));
-  assert.ok(out.deepDive.fdeTakeaways.artifactsToAudit.some((item) => item.includes("OpenAPI specs")));
-  assert.match(out.deepDive.fdeTakeaways.roiRisk, /readiness and risk-reduction/);
+    originalReading: [{ heading: "结论", summary: "值得一读。本文给出方法对比，打分：88 分。" }],
+    analystNotes: "ok",
+  }, baseOpts({ evidence: { kind: "paper-text", content: "method comparison" } }));
+  const summary = out.originalReading[0].summary;
+  assert.doesNotMatch(summary, /值得一读/);
+  assert.doesNotMatch(summary, /打分/);
 });
 
-test("pure algorithm papers omit fdeTakeaways", () => {
+test("keyResults are capped at 5 across the whole paper", () => {
+  const letter = "abcdefgh";
+  const mkResults = (n) => Array.from({ length: n }, (_, k) => ({ kind: "result", ref: `R-${letter[k]}`, finding: `finding ${letter[k]} no-number` }));
   const out = normalizeAnalysis({
-    ...raw,
-    deepDive: {
-      reframe: "The paper studies a transformer scaling law.",
-      contributionLayers: [],
-      mechanism: "It changes a pre-training optimizer and reports leaderboard movement.",
-      evidenceChain: [],
-      audit: [],
-      loadBearingClaim: "The scaling law must transfer across model sizes.",
-      strongestEvidence: [],
-      limitations: ["Artifact availability is stated by the paper."],
-      suggestedExperiments: [],
-      fdeTakeaways: {
-        questions: ["Which customer workflow should use it?"],
-        checklist: ["Workflow readiness is checked."],
-        artifactsToAudit: ["customer tickets"],
-        roiRisk: "This would reduce deployment risk.",
-      },
-    },
-  }, {
-    candidate: {
-      id: "algo",
-      raw: {
-        ...cand.raw,
-        title: "A Scaling Law for Sparse Attention Pre-Training",
-        abstract: "A pure model-scaling paper about sparse attention, optimizer changes, parameter count, and state-of-the-art leaderboard results.",
-      },
-    },
-    tier: "deep",
-    evidence: {
-      kind: "paper-text",
-      content: "The paper discusses scaling law, pre-training recipe, sparse attention, optimizer changes, parameter count, SOTA, and leaderboard results.",
-    },
-    now: () => "2026-05-30T00:00:00Z",
-  });
-
-  assert.equal(out.deepDive.fdeTakeaways, undefined);
+    originalReading: [
+      { heading: "A", summary: "节 A", keyResults: mkResults(4) },
+      { heading: "B", summary: "节 B", keyResults: mkResults(4) },
+    ],
+    analystNotes: "ok",
+  }, baseOpts({ evidence: { kind: "paper-text", content: "x" } }));
+  const total = out.originalReading.reduce((s, sec) => s + (sec.keyResults?.length || 0), 0);
+  assert.equal(total, 5);
 });
 
-test("deep analysis normalizes iteration-2 workbench credibility fields", () => {
-  const scorecard = [
-    "FDE relevance",
-    "engineering realism",
-    "problem importance",
-    "method novelty",
-    "evidence strength",
-    "reproducibility",
-    "deployability",
-    "security governance",
-    "roi explainability",
-    "career training value",
-  ].map((dimension) => ({
-    dimension,
-    score: 7,
-    reason: "The paper has useful system evidence.",
-  }));
-
+test("keyResults with unsupported numbers are dropped (RULES §6)", () => {
   const out = normalizeAnalysis({
-    ...raw,
-    paperType: "benchmark",
-    venueStatus: "verified",
-    scorecard,
-    deepDive: {
-      reframe: "The paper is a benchmark for production workflow reliability.",
-      contributionLayers: [
-        {
-          layer: "Benchmark result",
-          claim: "The system reports a measured pass@1 result.",
-          evidence: "Table 1 reports pass@1.",
-          judgment: "The result is useful but benchmark-bound.",
-          fdeMeaning: "Use it as a pilot eval pattern, not as a customer ROI proof.",
-        },
+    originalReading: [{
+      heading: "实验",
+      summary: "实验小节。",
+      keyResults: [
+        { kind: "table", ref: "Table 1", finding: "pass rate 达到 66%" },     // supported
+        { kind: "result", ref: "Result", finding: "准确率高达 99.9%" },         // 99.9 not in evidence
       ],
-      mechanism: "It connects API workflow traces to benchmark outcomes.",
-      evidenceChain: [],
-      audit: [
-        {
-          claim: "The paper uses https://github.com/vendor/baseline as a baseline implementation.",
-          finding: "github.com repository page is reachable; no obvious archived warning was detected.",
-          source: "https://github.com/vendor/baseline",
-        },
-      ],
-      claimLedger: [
-        {
-          claim: "The system reports 42% pass@1 on the benchmark.",
-          claimType: "empirical",
-          evidencePointer: "Table 1",
-          evidenceStrength: "high",
-          threat: "The result may be benchmark-bound.",
-          fdeTransfer: "Use the metric shape for customer golden tasks.",
-        },
-        {
-          claim: "The result implies fewer customer incidents.",
-          claimType: "fde_extrapolation",
-          evidencePointer: "Figure 99",
-          evidenceStrength: "high",
-          threat: "This is not directly proven by the paper.",
-          fdeTransfer: "Validate in a pilot before using it as a delivery claim.",
-        },
-      ],
-      evidenceMatrix: [
-        {
-          experiment: "Main benchmark",
-          sampleSize: "128 tasks",
-          modelBackend: "Tool-calling LLM",
-          metric: "pass@1",
-          result: "42%",
-          exactness: "exact",
-          limitation: "Only the benchmark distribution is measured.",
-        },
-        {
-          experiment: "Unsupported row",
-          metric: "success",
-          result: "99%",
-          exactness: "exact",
-          limitation: "This number is not in fetched text.",
-        },
-      ],
-      artifactAudit: {
-        officialCode: "verified",
-        data: "available",
-        reproducibility: "full",
-        notes: ["Repository page is reachable."],
-      },
-      loadBearingClaim: "Benchmark gains must transfer to workflow reliability.",
-      strongestEvidence: [],
-      limitations: ["Artifact availability is stated by the paper."],
-      suggestedExperiments: [],
-      fdeTakeaways: {
-        customerProblem: "Customers need reliable production workflow automation.",
-        customerQuestions: [
-          "Which workflow owns the output?",
-          "Which endpoint can fail?",
-          "Who approves exceptions?",
-          "Which traces are retained?",
-          "Which policy blocks launch?",
-        ],
-        artifactsToAudit: ["OpenAPI specs"],
-        implementationChecklist: ["Map endpoints and error states."],
-        evalPlan: ["Run an A/B test on golden workflow tasks."],
-        rolloutPlan: ["Pilot with human approval before limited production."],
-        riskRegister: ["Cost and latency may erase the value."],
-        roiHypothesis: "This can improve task success by 50% and reduce cost by 20%.",
-        interviewStory: "Translate the benchmark into a customer eval and rollout story.",
-      },
-    },
-  }, {
-    candidate: {
-      id: "iteration-2",
-      raw: {
-        ...cand.raw,
-        title: "Production Workflow Reliability Benchmark",
-        abstract: "A production workflow API endpoint observability deployment benchmark.",
-      },
-    },
-    tier: "deep",
-    evidence: {
-      kind: "paper-text",
-      content: "Section 3 Experiments. Table 1 reports pass@1 = 42% on 128 tasks. The paper uses https://github.com/vendor/baseline as a baseline implementation. The setup covers production workflow API endpoint observability deployment.",
-    },
-    evaluation: {
-      decision: "deep_dive",
-      score: 85,
-      selection: { track: ["AI Application Engineering / FDE"] },
-    },
-    now: () => "2026-05-30T00:00:00Z",
-  });
-
-  assert.equal(out.paperType, "benchmark");
-  assert.equal(out.venueStatus, "verified");
-  assert.equal(out.deepDive.verdict.readDecision, "must_read");
-  assert.equal(out.deepDive.claimLedger[0].evidencePointer, "Table 1");
-  assert.equal(out.deepDive.claimLedger[1].claimType, "fde_extrapolation");
-  assert.equal(out.deepDive.claimLedger[1].evidencePointer, "not specified in fetched text");
-  assert.equal(out.deepDive.evidenceMatrix.length, 1);
-  assert.equal(out.deepDive.evidenceMatrix[0].exactness, "exact");
-  assert.equal(out.deepDive.artifactAudit.officialCode, "third_party_only");
-  assert.equal(out.deepDive.artifactAudit.reproducibility, "third_party_only");
-  assert.ok(out.deepDive.artifactAudit.notes.some((note) => /not treated as the authors' official code release/.test(note)));
-  assert.ok(out.deepDive.whatWouldInvalidate.length >= 3);
-  assert.doesNotMatch(out.deepDive.fdeTakeaways.roiHypothesis, /50%|20%/);
-  assert.match(out.deepDive.fdeTakeaways.roiHypothesis, /A\/B test/);
-  assert.ok(out.scorecard.every((item) => /Not higher because/.test(item.reason)));
+    }],
+    analystNotes: "ok",
+  }, baseOpts({ evidence: { kind: "paper-text", content: "Table 1 reports pass rate 66% on the benchmark." } }));
+  const refs = out.originalReading[0].keyResults.map((k) => k.ref);
+  assert.deepEqual(refs, ["Table 1"]);
 });
 
-test("audit normalization dedupes by URL and drops garbled or cut-off text", () => {
+test("analystNotes is required — missing input yields a grounded fallback", () => {
   const out = normalizeAnalysis({
-    ...raw,
-    deepDive: {
-      reframe: "The paper is about production RAG workflow reliability.",
-      contributionLayers: [],
-      mechanism: "It treats retrieval, tool calls, and observability as system components.",
-      evidenceChain: [],
-      audit: [
-        {
-          claim: "1 1 1 Broken extracted claim.",
-          finding: "github.com repository page is reachable.",
-          source: "https://github.com/example/repo",
-        },
-        {
-          claim: "Paper releases a code repository at https://github.com/example/repo.",
-          finding: "github.com repository page is reachable; no obvious archived warning was detected.",
-          source: "https://github.com/example/repo/",
-        },
-        {
-          claim: "The paper names a customer workflow artifact.",
-          finding: "The artifact claim is present in the fetched text.",
-        },
-        {
-          claim: "This audit claim is cut off...",
-          finding: "The finding is otherwise complete.",
-          source: "https://example.com/cut",
-        },
-      ],
-      loadBearingClaim: "Production RAG systems need workflow-level evaluation.",
-      strongestEvidence: [],
-      limitations: ["This limitation is cut off...", "Artifact availability is stated by the paper."],
-      suggestedExperiments: [],
-    },
-  }, {
-    candidate: {
-      id: "audit",
-      raw: {
-        ...cand.raw,
-        abstract: "A production RAG workflow paper covering API endpoints, permissions, observability, and deployment.",
-      },
-    },
-    tier: "deep",
-    evidence: { kind: "paper-text", content: "production RAG workflow API observability deployment" },
-    now: () => "2026-05-30T00:00:00Z",
-  });
+    originalReading: [{ heading: "A", summary: "节 A。" }],
+  }, baseOpts({ evidence: { kind: "paper-text", content: "x" } }));
+  assert.ok(typeof out.analystNotes === "string" && out.analystNotes.length > 0);
+});
 
-  assert.equal(out.deepDive.audit.length, 2);
-  assert.ok(out.deepDive.audit.every((item) => !/^1 1 1/.test(item.claim)));
-  assert.equal(out.deepDive.audit.filter((item) => item.source?.startsWith("https://github.com/example/repo")).length, 1);
-  assert.deepEqual(out.deepDive.limitations, ["Artifact availability is stated by the paper."]);
+test("selectionAudit: discoverySource differs from primaryEvidenceSource", () => {
+  const out = normalizeAnalysis({ originalReading: [{ heading: "A", summary: "节 A。" }], analystNotes: "ok" },
+    baseOpts({ evaluation: { score: 82, reason: "selected", selection: { convergence: ["OpenReview"] } } }));
+  const audit = out.selectionAudit;
+  assert.notEqual(audit.discoverySource.toLowerCase(), audit.primaryEvidenceSource.toLowerCase());
+  for (const f of ["venuePrestige", "citationConvergence", "novelty", "recency", "evidenceStrength", "reproducibility"]) {
+    assert.ok(f in audit.weightedFactors, `missing factor ${f}`);
+  }
+  // evidenceStrength/reproducibility start unknown at analyze time.
+  assert.equal(audit.weightedFactors.evidenceStrength, "unknown");
+  assert.equal(audit.weightedFactors.reproducibility, "unknown");
+});
+
+test("backfillSelectionAudit fills evidenceStrength/reproducibility post-deep", () => {
+  const out = normalizeAnalysis({
+    originalReading: [{
+      heading: "实验", summary: "实验小节。",
+      keyResults: [{ kind: "table", ref: "Table 1", finding: "pass rate 66%" }],
+    }],
+    analystNotes: "代码已开源在 github 上。",
+    meta: { paperType: "benchmark", venueStatus: "verified" },
+  }, baseOpts({ evidence: { kind: "paper-text", content: "Table 1 pass rate 66% github.com/x/y" } }));
+
+  backfillSelectionAudit(out, { candidateCount: 12, selectedCount: 3 });
+  assert.notEqual(out.selectionAudit.weightedFactors.evidenceStrength, "unknown");
+  assert.notEqual(out.selectionAudit.weightedFactors.reproducibility, "unknown");
+  assert.equal(out.selectionAudit.candidateCount, 12);
+  assert.equal(out.selectionAudit.selectedCount, 3);
+});
+
+test("offline fallback yields a valid two-stage shape from evidence only", () => {
+  const out = normalizeAnalysis(null, baseOpts({ evidence: { kind: "paper-text", content: "abstract about agent harness reliability" } }));
+  assert.ok(out.leadJudgment && out.originalReading.length >= 1);
+  assert.ok(out.analystNotes.length > 0);
+  assert.equal(out.tier, "deep");
+  assert.ok(out.meta.paperType);
+});
+
+test("deep maxTokens floor is at least 12000", () => {
+  assert.ok(maxTokens({}, {}) >= 12000);
 });

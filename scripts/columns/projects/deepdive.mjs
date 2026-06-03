@@ -7,8 +7,14 @@ import { collectEvidence, isOffline } from "./sources.mjs";
 import { evaluate } from "./evaluate.mjs";
 import { projectDeepDiveSystemPrompt, projectDeepDiveUser } from "./deepdive-prompts.mjs";
 import { writeProjectBriefWikiEntities } from "./brief-writer.mjs";
+import { depthAtLeast, isBriefDepth } from "./project-ranking.mjs";
+import {
+  applyReviewToDepthDecision,
+  downgradedDepth,
+  isReviewableDepth,
+  reviewProjectAnalysis,
+} from "./review.mjs";
 
-const DEEP_DIVE_VERDICTS = new Set(["deep_dive", "clone_and_run"]);
 const NOT_FOUND = "not_found";
 const NOT_EXPLAINED = "未在 README/artifact 说明";
 
@@ -26,30 +32,139 @@ export async function generateProjectDeepDive({
   const offline = isOffline(options) || options.offline === true;
   const repo = candidate.raw || candidate;
   const model = options.projectDeepModel || projectDeepModel();
+  let depthDecision = triage.depth_decision || {
+    ranking_score: triage.ranking_score || triage.score || 0,
+    max_allowed_depth: triage.max_allowed_depth || "list_only",
+    final_depth: triage.final_depth || "list_only",
+    ranking_reasons: triage.ranking_reasons || [],
+    rejection_reasons: triage.rejection_reasons || [],
+    recommended_action: triage.recommended_action || "monitor",
+    needs_enrichment: Boolean(triage.needs_enrichment),
+  };
+  let finalDepth = triage.final_depth || depthDecision.final_depth || "list_only";
+  const maxAllowedDepth = triage.max_allowed_depth || depthDecision.max_allowed_depth || "list_only";
   let payload = options.deepDivePayload || null;
+  let review = null;
+
+  if (!isBriefDepth(finalDepth) || !depthAtLeast(maxAllowedDepth, finalDepth)) {
+    return {
+      tier: "brief-wiki",
+      status: "skipped",
+      skipped: true,
+      generated: false,
+      repo: repo.fullName || repo.name || "",
+      final_depth: finalDepth,
+      max_allowed_depth: maxAllowedDepth,
+      depth_decision: depthDecision,
+      reason: "deterministic depth gate does not allow brief generation",
+      offline,
+      model: "deterministic-depth-gate",
+    };
+  }
 
   if (!payload && offline) {
     payload = buildOfflineProjectDeepDiveStub({ candidate, evidence, triage, options });
   }
 
+  let chatJson = null;
   if (!payload) {
-    const chatJson = options.chatJson || createDeepSeekClient({
+    chatJson = options.chatJson || createDeepSeekClient({
       apiTimeoutMs: options.apiTimeoutMs,
       logger,
     }).chatJson;
 
     payload = await chatJson({
-      system: projectDeepDiveSystemPrompt(triage.project_type),
+      system: projectDeepDiveSystemPrompt(triage.project_type, finalDepth),
       user: projectDeepDiveUser(candidate, evidence, triage, options),
       model,
       maxTokens: options.deepDiveMaxTokens || options.deepMaxTokens || Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 12000,
     });
   }
 
+  if (isReviewableDepth(finalDepth)) {
+    review = await reviewProjectAnalysis({
+      candidate,
+      evidence,
+      triage: { ...triage, depth_decision: depthDecision, final_depth: finalDepth },
+      analysis: payload,
+      options,
+      logger,
+    });
+
+    if (review.verdict === "revise" && !offline) {
+      chatJson = chatJson || options.chatJson || createDeepSeekClient({
+        apiTimeoutMs: options.apiTimeoutMs,
+        logger,
+      }).chatJson;
+      payload = await chatJson({
+        system: projectDeepDiveSystemPrompt(triage.project_type, finalDepth),
+        user: projectDeepDiveUser(candidate, evidence, triage, { ...options, reviewIssues: review.issues }),
+        model,
+        maxTokens: options.deepDiveMaxTokens || options.deepMaxTokens || Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 12000,
+      });
+      const secondReview = await reviewProjectAnalysis({
+        candidate,
+        evidence,
+        triage: { ...triage, depth_decision: depthDecision, final_depth: finalDepth },
+        analysis: payload,
+        options,
+        logger,
+      });
+      review = {
+        ...secondReview,
+        first_pass: {
+          verdict: review.verdict,
+          issues: review.issues,
+          rationale: review.rationale,
+          model: review.model,
+        },
+      };
+    }
+
+    if (review.verdict === "revise") {
+      review = {
+        ...review,
+        verdict: "downgrade",
+        issues: ["review_still_requested_revision_after_one_allowed_pass", ...(review.issues || [])],
+      };
+    }
+
+    if (review.verdict === "downgrade") {
+      finalDepth = downgradedDepth(finalDepth);
+    }
+    depthDecision = applyReviewToDepthDecision(depthDecision, review, finalDepth);
+  }
+
+  if (!isBriefDepth(finalDepth)) {
+    return {
+      tier: "brief-wiki",
+      status: "downgraded",
+      skipped: true,
+      generated: false,
+      repo: repo.fullName || repo.name || "",
+      final_depth: finalDepth,
+      max_allowed_depth: maxAllowedDepth,
+      depth_decision: depthDecision,
+      reason: "review_downgraded_below_brief_depth",
+      review,
+      offline,
+      model: offline ? "offline-project-deepdive-stub" : model,
+    };
+  }
+
+  const triageForWrite = {
+    ...triage,
+    final_depth: finalDepth,
+    verdict: legacyVerdictForDepth(finalDepth),
+    depth_decision: depthDecision,
+    review_verdict: review?.verdict || triage.review_verdict,
+    review_issues: review?.issues || triage.review_issues || [],
+  };
+  payload = alignPayloadWithFinalDepth(payload, finalDepth);
   const written = await writeProjectBriefWikiEntities({
     candidate,
     evidence,
-    triage,
+    triage: triageForWrite,
     deepDive: payload,
     options,
     logger,
@@ -58,12 +173,34 @@ export async function generateProjectDeepDive({
   return {
     ...written,
     repo: repo.fullName || repo.name || "",
+    final_depth: finalDepth,
+    depth_decision: depthDecision,
+    review,
     offline,
     model: offline ? "offline-project-deepdive-stub" : model,
   };
 }
 
+function alignPayloadWithFinalDepth(payload = {}, finalDepth = "analysis") {
+  const verdict = legacyVerdictForDepth(finalDepth);
+  return {
+    ...payload,
+    project_verdict: {
+      ...(payload.project_verdict || {}),
+      verdict,
+    },
+  };
+}
+
+function legacyVerdictForDepth(depth) {
+  if (depth === "deep") return "clone_and_run";
+  if (depth === "analysis") return "deep_dive";
+  if (depth === "light") return "L1";
+  return "skip";
+}
+
 export function buildOfflineProjectDeepDiveStub({ candidate, evidence, triage, options = {} } = {}) {
+  throw new Error("Offline project deep-dive stubs are disabled by the Projects Radar paradigm; use --offline for deterministic radar cards only.");
   const repo = candidate?.raw || candidate || {};
   const audit = evidence?.artifactAudit || evidence?.metadata?.artifactAudit || {};
   const checkedDate = dateOnly(options.checkedDate || evidence?.fetchedAt || candidate?.discoveredAt || new Date().toISOString());
@@ -173,8 +310,8 @@ async function cli(argv) {
   const evidence = await collectEvidence(candidate, { options, logger });
   const triage = await evaluate(candidate, evidence, { options, logger });
 
-  if (!DEEP_DIVE_VERDICTS.has(triage.verdict)) {
-    logger.warn(`triage verdict is ${triage.verdict}; generating anyway because CLI was called directly`);
+  if (!isBriefDepth(triage.final_depth || triage.depth_decision?.final_depth)) {
+    logger.warn(`deterministic final_depth is ${triage.final_depth || triage.depth_decision?.final_depth || "unknown"}; brief generation will be skipped`);
   }
 
   const result = await generateProjectDeepDive({ candidate, evidence, triage, options, logger });
@@ -185,8 +322,10 @@ async function cli(argv) {
     model: result.model,
     triage: {
       project_type: triage.project_type,
-      verdict: triage.verdict,
-      ratings: triage.ratings,
+      final_depth: triage.final_depth,
+      max_allowed_depth: triage.max_allowed_depth,
+      ranking_score: triage.ranking_score,
+      recommended_action: triage.recommended_action,
     },
     paths: result.paths,
   }, null, 2));
@@ -259,8 +398,8 @@ function printUsage() {
   console.log(`Usage:
   node scripts/columns/projects/deepdive.mjs <owner/name> [--offline] [--wiki-root brief-wiki] [--source github-trending:weekly]
 
-Online mode runs collectEvidence + evaluate + project deep-dive LLM.
-Offline mode sets noLlm/offline and writes a deterministic stub for writer/lint verification.`);
+Online mode runs collectEvidence + deterministic evaluate + analyst LLM + separate reviewer LLM.
+Offline mode sets noLlm/offline and writes the deterministic offline stub shape for analysis/deep when the gate allows it.`);
 }
 
 function normalizeProjectType(value) {

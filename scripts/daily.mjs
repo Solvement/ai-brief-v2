@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 
-import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { main as runModelsDaily } from "./columns/models/daily.mjs";
+import { main as runPapersColumnDaily } from "./columns/papers/daily.mjs";
 import { main as runProjectsDaily } from "./columns/projects/daily.mjs";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, "..");
 
 export async function main(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
@@ -18,9 +15,9 @@ export async function main(argv = process.argv.slice(2)) {
   }
 
   const results = [];
-  results.push(await runColumn("papers", () => runPapersDaily(passThroughArgs(options, "papers"))));
-  results.push(await runColumn("projects", () => runProjectsDaily(passThroughArgs(options, "projects"))));
-  results.push(await runColumn("models", () => runModelsDaily(passThroughArgs(options, "models"))));
+  results.push(await runColumn("papers", () => runPapersColumnDaily(passThroughArgs(options))));
+  results.push(await runColumn("projects", () => runProjectsDaily(passThroughArgs(options))));
+  results.push(await runColumn("models", () => runModelsDaily(passThroughArgs(options))));
 
   printCombinedSummary(results);
 
@@ -80,32 +77,10 @@ async function runColumn(name, fn) {
   }
 }
 
-async function runPapersDaily(args = []) {
-  const commandArgs = ["--no-warnings", path.join(ROOT, "scripts", "papers-radar.mjs"), "daily", ...args];
-  await spawnNode(commandArgs);
-  return { command: `node ${commandArgs.join(" ")}` };
-}
-
-function spawnNode(args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, args, {
-      cwd: ROOT,
-      env: process.env,
-      stdio: "inherit",
-    });
-    child.on("error", reject);
-    child.on("close", (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`node exited with ${code}`));
-    });
-  });
-}
-
-function passThroughArgs(options = {}, column) {
+function passThroughArgs(options = {}) {
   const args = [];
   if (options.offline) {
     args.push("--offline");
-    if (column === "papers") args.push("--no-model");
   }
   if (options.dryRun) args.push("--dry-run");
   if (options.cap) args.push("--cap", String(options.cap));
@@ -148,14 +123,14 @@ function printUsage() {
   node scripts/daily.mjs [--offline] [--dry-run] [--cap N]
 
 Runs daily checks in sequence:
-  papers   -> scripts/papers-radar.mjs daily
+  papers   -> scripts/columns/papers/daily.mjs
   projects -> scripts/columns/projects/daily.mjs
   models   -> scripts/columns/models/daily.mjs
 
 Flags:
-  --offline  Pass offline/no-model mode through to columns that support it
+  --offline  Pass offline/no-LLM mode through to columns that support it
   --dry-run  Pass dry-run mode through to columns that support it
-  --cap N    Pass cap through to projects/models and through to papers for compatibility
+  --cap N    Pass cap through to columns that support it
 `);
 }
 

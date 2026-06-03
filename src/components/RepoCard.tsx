@@ -1,69 +1,59 @@
-import type { AnalyzedRepo } from "../types";
+"use client";
+import Link from "next/link";
+import type { AnalyzedRepo, ProjectDepth } from "../types";
 
 function fmt(n: number): string {
   if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "k";
   return String(n);
 }
-function totalScore(s: NonNullable<AnalyzedRepo["deep"]>["score"]): number {
-  return s.novelty + s.engineering + s.reproducibility + s.timeToValue;
+
+const DEPTH_LABEL: Record<ProjectDepth, string> = {
+  deep: "深扒",
+  analysis: "分析",
+  light: "速读",
+  list_only: "雷达",
+  needs_enrichment: "待补全",
+};
+const DEPTH_CLS: Record<ProjectDepth, string> = {
+  deep: "depth-deep",
+  analysis: "depth-analysis",
+  light: "depth-light",
+  list_only: "depth-list",
+  needs_enrichment: "depth-needs",
+};
+const ACTION_LABEL: Record<string, string> = {
+  ignore: "忽略", monitor: "观望", try: "可一试", analyze: "值得分析",
+  deep_dive: "值得深扒", clone_and_run: "克隆来跑", extract: "提炼复用",
+};
+
+function depthOf(repo: AnalyzedRepo): ProjectDepth {
+  return repo.final_depth || (repo.deep ? "deep" : "list_only");
 }
-function scoreCls(total: number): string {
-  if (total >= 80) return "good";
-  if (total >= 60) return "ok";
-  return "low";
-}
-function worthCls(w: number): string {
-  if (w >= 80) return "good";
-  if (w >= 60) return "ok";
-  return "low";
+function slugOf(repo: AnalyzedRepo): string {
+  return repo.briefSlug || repo.brief_slug || "";
 }
 function firstSentence(text: string): string {
-  const trimmed = text.replace(/\s+/g, " ").trim();
-  const match = trimmed.match(/^(.+?[。！？.!?])\s*/);
-  const sentence = match ? match[1] : trimmed;
-  return sentence.length > 92 ? sentence.slice(0, 90) + "…" : sentence;
-}
-function audienceHint(repo: AnalyzedRepo): string {
-  if (repo.tags.length > 0) return `你在关注 ${repo.tags.slice(0, 2).join(" / ")}`;
-  if (repo.language) return `你想找 ${repo.language} 项目练手`;
-  return "你想快速判断一个新项目值不值得试";
-}
-function actionHint(repo: AnalyzedRepo): string {
-  if (repo.deep) return "打开 Deep Dive，先看 Overview 和 Try it";
-  if (repo.worthDeepDive >= 60) return "先速读，再决定是否深挖";
-  return "速读即可，暂时不必投入太久";
+  const t = (text || "").replace(/\s+/g, " ").trim();
+  const m = t.match(/^(.+?[。！？.!?])\s*/);
+  const s = m ? m[1] : t;
+  return s.length > 92 ? s.slice(0, 90) + "…" : s;
 }
 
 interface Props { repo: AnalyzedRepo }
 
 export function RepoCard({ repo }: Props) {
-  const hasDeep = !!repo.deep;
-  const detailUrl = `#/repo/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.name)}`;
-  const total = repo.deep ? totalScore(repo.deep.score) : 0;
-  // Badge shows deep dive total if available, else the AI's worth verdict.
-  const badgeValue = hasDeep ? total : repo.worthDeepDive;
-  const badgeCls = hasDeep ? scoreCls(total) : worthCls(repo.worthDeepDive);
-  const badgeLabel = hasDeep ? "总分" : "价值";
+  const depth = depthOf(repo);
+  const slug = slugOf(repo);
+  const hasBrief = (depth === "deep" || depth === "analysis") && Boolean(slug);
+  const score = typeof repo.ranking_score === "number" ? repo.ranking_score : repo.worthDeepDive;
+  const action = repo.recommended_action ? (ACTION_LABEL[repo.recommended_action] || repo.recommended_action) : null;
+  const whyNot = !hasBrief ? (repo.rejection_reasons?.[0] || (repo.needs_enrichment ? "证据不足，待补全后再判" : "")) : "";
 
-  const goDetail = () => { window.location.hash = detailUrl; };
-  const onCardClick = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest("a.external")) return;
-    goDetail();
-  };
-
-  return (
-    <div
-      className={`card clickable${hasDeep ? " has-deep" : ""}`}
-      onClick={onCardClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goDetail(); }
-      }}
-    >
-      <div className={`score-badge labeled ${badgeCls}`} title={hasDeep ? `综合分 ${total}/100` : `worthDeepDive ${repo.worthDeepDive}/100`}>
-        <span>{badgeLabel}</span>
-        <b>{badgeValue}</b>
+  const inner = (
+    <>
+      <div className={`depth-badge ${DEPTH_CLS[depth]}`} title={`ranking ${score}`}>
+        <span>{DEPTH_LABEL[depth]}</span>
+        <b>{score}</b>
       </div>
 
       <div className="card-row">
@@ -77,39 +67,35 @@ export function RepoCard({ repo }: Props) {
         </div>
       </div>
 
-      {repo.tags.length > 0 && (
-        <div className="tag-row">
-          {repo.tags.slice(0, 5).map((t) => <span className="tag" key={t}>{t}</span>)}
-        </div>
+      {repo.tags?.length > 0 && (
+        <div className="tag-row">{repo.tags.slice(0, 5).map((t) => <span className="tag" key={t}>{t}</span>)}</div>
       )}
 
       <div className="repo-decision-grid">
-        <div><span>为什么重要</span><b>{firstSentence(repo.deep?.atGlance || repo.light)}</b></div>
-        <div><span>适合你如果</span><b>{audienceHint(repo)}</b></div>
-        <div><span>建议动作</span><b>{actionHint(repo)}</b></div>
+        <div><span>为什么重要</span><b>{firstSentence(repo.deep?.atGlance || repo.light || repo.description || "")}</b></div>
+        {action && <div><span>建议动作</span><b>{action}</b></div>}
+        {whyNot && <div><span>为何未深扒</span><b>{whyNot}</b></div>}
       </div>
 
       <div className="card-foot-row">
         <div className="meta-row">
           {repo.language && (
-            <span>
-              <span className="lang-dot" style={{ background: repo.languageColor || "var(--line-strong)" }} />
-              {repo.language}
-            </span>
+            <span><span className="lang-dot" style={{ background: repo.languageColor || "var(--line-strong)" }} />{repo.language}</span>
           )}
           <span>★ {fmt(repo.stars)}</span>
           {repo.starsGained > 0 && <span className="gain">+{fmt(repo.starsGained)} ★</span>}
         </div>
-        {hasDeep ? (
-          <button className="deep-btn" onClick={(e) => { e.stopPropagation(); goDetail(); }}>
-            Deep Dive →
-          </button>
-        ) : (
-          <button className="read-btn" onClick={(e) => { e.stopPropagation(); goDetail(); }}>
-            速读 →
-          </button>
-        )}
+        <span className={`repo-cta ${hasBrief ? "deep" : ""}`}>
+          {hasBrief ? `${DEPTH_LABEL[depth]} →` : "看仓库 →"}
+        </span>
       </div>
-    </div>
+    </>
+  );
+
+  if (hasBrief) {
+    return <Link className={`card clickable has-deep ${DEPTH_CLS[depth]}`} href={`/brief/${encodeURIComponent(slug)}`}>{inner}</Link>;
+  }
+  return (
+    <a className={`card clickable ${DEPTH_CLS[depth]}`} href={repo.url} target="_blank" rel="noreferrer">{inner}</a>
   );
 }

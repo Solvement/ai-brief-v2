@@ -41,6 +41,8 @@ export interface DeepDive {
   score: ScoreBreakdown;
 }
 
+export type ProjectDepth = "list_only" | "light" | "analysis" | "deep" | "needs_enrichment";
+
 export interface AnalyzedRepo extends RepoSummary {
   rank: number;
   tldr: string;
@@ -48,6 +50,20 @@ export interface AnalyzedRepo extends RepoSummary {
   light: string;
   worthDeepDive: number;
   deep?: DeepDive;
+  // ---- 2026-06-03 deterministic radar fields (project-radar-paradigm) ----
+  final_depth?: ProjectDepth;
+  ranking_score?: number;
+  max_allowed_depth?: ProjectDepth;
+  recommended_action?: string;
+  needs_enrichment?: boolean;
+  ranking_reasons?: string[];
+  rejection_reasons?: string[];
+  review_verdict?: string;
+  review_issues?: string[];
+  evidence_summary?: string | Record<string, unknown>;
+  depth_decision?: Record<string, unknown>;
+  briefSlug?: string;
+  brief_slug?: string;
 }
 
 export interface Board {

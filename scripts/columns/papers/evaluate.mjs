@@ -1,7 +1,7 @@
 import { createDeepSeekClient } from "../../lib/llm.mjs";
 import { defaultSelect } from "../../lib/pipeline-kernel.mjs";
 
-const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|customer|enterprise|API|endpoint|MCP|deployment|governance|permission|codebase|data schema|data preparation)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/i;
+const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|customer|enterprise|API|endpoint|MCP|deployment|governance|permission|codebase|data schema|data preparation|serving|inference|KV cache|vLLM|quantization|distributed training|MLSys|throughput|reasoning|chain[- ]of[- ]thought|RLHF|fine[- ]?tuning|reward model|diffusion|world model|prompt engineering|orchestration|copilot|mixture of experts|MoE)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态|推理|扩散|生成式|强化学习|微调|蒸馏/i;
 const NARROW_VERTICAL_RE = /\b(gaming|game|interior design|3D room|virtual reality|short-video|short video|bioinformatics|medical|protein|chemistry|robotics vertical)\b/i;
 
 const FOCUS_TOPICS = [
@@ -52,6 +52,18 @@ const FOCUS_TOPICS = [
   {
     label: "Human-AI Interaction",
     patterns: [/\bhuman[- ]?AI\b/i, /\binteraction\b/i, /\buser study\b/i, /\bUX\b/i, /\bcollaboration\b/i],
+  },
+  {
+    label: "AI Infrastructure / Systems",
+    patterns: [/\bserving\b/i, /\binference\b/i, /\bKV cache\b/i, /\bvLLM\b/i, /\bspeculative decoding\b/i, /\bdistributed training\b/i, /\bMLSys\b/i, /\bquantization\b/i, /\bthroughput\b/i, /\bmixture of experts\b/i, /\bMoE\b/i],
+  },
+  {
+    label: "AI Application Development",
+    patterns: [/\bLLM application\b/i, /\bagent framework\b/i, /\borchestrat/i, /\bprompt engineering\b/i, /\bcontext engineering\b/i, /\bcompound AI\b/i, /\bcopilot\b/i, /\bagentic workflow\b/i],
+  },
+  {
+    label: "Reasoning / Post-training",
+    patterns: [/\breasoning\b/i, /\bchain[- ]of[- ]thought\b/i, /\btest[- ]time compute\b/i, /\bRLHF\b/i, /\breward model\b/i, /\bpost[- ]?training\b/i, /\bfine[- ]?tuning\b/i, /\breinforcement learning\b/i],
   },
 ];
 
@@ -200,8 +212,14 @@ export function select(items, ctx = {}) {
     keepDecisions: ["select"],
     dropDecisions: ["archive", "reject", "drop", "skip", "fail"],
   });
-  const cap = numberOption(ctx.options?.cap ?? ctx.options?.papersCap, null);
-  return cap === null ? selected : selectDiverseTop(selected, cap);
+  // 宁缺毋滥: configurable score floor — drop below-threshold papers (allow empty days).
+  const minScore = numberOption(ctx.options?.minScore ?? ctx.options?.papersMinScore ?? process.env.PAPERS_MIN_SCORE, null);
+  const gated = minScore === null
+    ? selected
+    : selected.filter((item) => Number(item?.eval?.score ?? 0) >= minScore);
+  // 每天 1–3 篇精品: configurable cap (default unbounded here; run.mjs passes its own).
+  const cap = numberOption(ctx.options?.cap ?? ctx.options?.papersCap ?? process.env.PAPERS_DEEP_CAP, null);
+  return cap === null ? gated : selectDiverseTop(gated, cap);
 }
 
 function deterministicTriage(candidate) {
@@ -265,14 +283,18 @@ function deterministicScores(candidate) {
   const verticalPenalty = isNarrowVertical ? 10 : 0;
   const stalePenalty = ageDays(candidate) > 365 ? 18 : ageDays(candidate) > 180 ? 8 : 0;
 
+  // Selection gate 9C (2026-06-01): reweight, don't rewrite. Academic prestige (source_quality,
+  // convergence, novelty) is UP-weighted; FDE/customer/production/workflow/deployment signals are
+  // DOWN-weighted so the gate leans toward top-venue / multi-source academic work.
   return {
-    role_relevance: clamp(18 + topicCount * 10 + agentHits * 8 + codingHits * 10 + harnessHits * 12 + aheSignalCount * 9 + fdeSignalCount * 7 + fdeHits["customer/production system"] * 8 + fdeHits["API/tool/MCP integration"] * 7 + ragHits * 7 + multimodalHits * 5 + securityHits * 5 + sourceBoost * 0.2 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
-    architecture_value: clamp(18 + designWords * 10 + agentHits * 8 + harnessHits * 12 + aheSignalCount * 11 + fdeSignalCount * 6 + fdeHits["API/tool/MCP integration"] * 10 + fdeHits["workflow readiness"] * 8 + fdeHits["governance/permissions"] * 8 + fdeHits["artifact-level diagnosis"] * 7 + ragHits * 6 + hasAbstract + sourceBoost * 0.2 + coreBoost - verticalPenalty * 0.5 - stalePenalty - pureAlgorithmPenalty * 0.7),
-    practicality: clamp(15 + productWords * 9 + hasCode + codingHits * 8 + harnessHits * 10 + aheSignalCount * 7 + fdeSignalCount * 8 + fdeHits["customer/production system"] * 12 + fdeHits["deployment/runbook"] * 10 + fdeHits["artifact-level diagnosis"] * 8 + recencyBoost + sourceBoost * 0.15 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
-    novelty: clamp(18 + noveltyWords * 8 + harnessHits * 5 + aheSignalCount * 6 + fdeSignalCount * 2 + recencyBoost + sourceBoost * 0.25 - verticalPenalty * 0.4 - stalePenalty - pureAlgorithmPenalty * 0.6),
-    evaluation_quality: clamp(12 + evalWords * 12 + benchmarkHits * 10 + harnessHits * 4 + aheSignalCount * 4 + fdeHits["evaluation/reliability gate"] * 10 + fdeHits["observability/debugging"] * 6 + fdeHits["artifact-level diagnosis"] * 4 + sourceBoost * 0.25 + (benchmarkHits ? 4 : 0) - stalePenalty * 0.4 - pureAlgorithmPenalty * 0.35),
-    interview_value: clamp(20 + codingHits * 10 + agentHits * 8 + harnessHits * 12 + aheSignalCount * 9 + fdeSignalCount * 7 + fdeHits["workflow readiness"] * 7 + fdeHits["governance/permissions"] * 6 + benchmarkHits * 8 + ragHits * 6 + sourceBoost * 0.25 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
-    build_potential: clamp(15 + productWords * 8 + designWords * 6 + hasCode + agentHits * 7 + codingHits * 8 + harnessHits * 12 + aheSignalCount * 8 + fdeSignalCount * 10 + fdeHits["API/tool/MCP integration"] * 9 + fdeHits["deployment/runbook"] * 9 + fdeHits["artifact-level diagnosis"] * 8 + ragHits * 5 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    role_relevance: clamp(18 + topicCount * 10 + agentHits * 8 + codingHits * 9 + harnessHits * 9 + aheSignalCount * 7 + fdeSignalCount * 3 + fdeHits["customer/production system"] * 3 + fdeHits["API/tool/MCP integration"] * 3 + ragHits * 6 + multimodalHits * 5 + securityHits * 5 + sourceBoost * 0.5 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    architecture_value: clamp(18 + designWords * 8 + agentHits * 7 + harnessHits * 9 + aheSignalCount * 9 + fdeSignalCount * 3 + fdeHits["API/tool/MCP integration"] * 4 + fdeHits["workflow readiness"] * 3 + fdeHits["governance/permissions"] * 3 + fdeHits["artifact-level diagnosis"] * 3 + ragHits * 6 + hasAbstract + sourceBoost * 0.5 + coreBoost - verticalPenalty * 0.5 - stalePenalty - pureAlgorithmPenalty * 0.7),
+    practicality: clamp(15 + productWords * 4 + hasCode + codingHits * 6 + harnessHits * 7 + aheSignalCount * 5 + fdeSignalCount * 3 + fdeHits["customer/production system"] * 4 + fdeHits["deployment/runbook"] * 3 + fdeHits["artifact-level diagnosis"] * 3 + recencyBoost + sourceBoost * 0.3 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    novelty: clamp(20 + noveltyWords * 9 + harnessHits * 6 + aheSignalCount * 7 + recencyBoost + sourceBoost * 0.6 - verticalPenalty * 0.4 - stalePenalty - pureAlgorithmPenalty * 0.6),
+    evaluation_quality: clamp(12 + evalWords * 12 + benchmarkHits * 10 + harnessHits * 4 + aheSignalCount * 4 + fdeHits["evaluation/reliability gate"] * 6 + fdeHits["observability/debugging"] * 3 + sourceBoost * 0.5 + (benchmarkHits ? 4 : 0) - stalePenalty * 0.4 - pureAlgorithmPenalty * 0.35),
+    interview_value: clamp(20 + codingHits * 9 + agentHits * 7 + harnessHits * 10 + aheSignalCount * 8 + fdeSignalCount * 3 + benchmarkHits * 7 + ragHits * 5 + sourceBoost * 0.4 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    build_potential: clamp(15 + productWords * 4 + designWords * 5 + hasCode + agentHits * 6 + codingHits * 7 + harnessHits * 10 + aheSignalCount * 7 + fdeSignalCount * 4 + fdeHits["API/tool/MCP integration"] * 4 + fdeHits["deployment/runbook"] * 3 + fdeHits["artifact-level diagnosis"] * 3 + ragHits * 5 + coreBoost - verticalPenalty - stalePenalty - pureAlgorithmPenalty),
+    source_quality: sourceBoost,
   };
 }
 
@@ -459,14 +481,17 @@ function sourceQuality(candidate) {
 }
 
 function weightedTotal(scores) {
+  // 9C reweight: novelty + a strong academic-prestige term (source_quality, 0-35) carry more;
+  // the FDE-leaning practicality/interview/build dims carry less.
   return clamp(
-    scores.role_relevance * 0.22 +
-    scores.architecture_value * 0.18 +
-    scores.practicality * 0.14 +
-    scores.novelty * 0.12 +
+    scores.role_relevance * 0.16 +
+    scores.architecture_value * 0.12 +
+    scores.practicality * 0.08 +
+    scores.novelty * 0.18 +
     scores.evaluation_quality * 0.12 +
-    scores.interview_value * 0.14 +
-    scores.build_potential * 0.08,
+    scores.interview_value * 0.08 +
+    scores.build_potential * 0.06 +
+    (Number(scores.source_quality) || 0) * 0.6,
   );
 }
 
