@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-03T01:23:14.371Z",
+  "generatedAt": "2026-06-03T17:58:05.246Z",
   "principle": "discover -> evidence -> rank -> review -> verify -> publish -> archive",
   "surfaces": [
     {
@@ -128,63 +128,63 @@
     },
     {
       "surface": "papers",
-      "updatedAt": "2026-05-31T19:21:56.526Z",
+      "updatedAt": "2026-06-03T17:58:05.236Z",
       "latestRun": {
-        "id": "papers-2026-05-31-1780255316528",
+        "id": "papers-2026-06-03-1780509485237",
         "surface": "papers",
-        "date": "2026-05-31",
-        "generatedAt": "2026-05-31T19:21:56.526Z",
+        "date": "2026-06-03",
+        "generatedAt": "2026-06-03T17:58:05.236Z",
         "qualityStatus": "pass",
-        "selectedCount": 10,
-        "archivedCount": 0,
+        "selectedCount": 2,
+        "archivedCount": 1,
         "traceSummary": null,
         "reflectionSummary": "",
         "highlights": [
-          "Papers published 10 article analysis item(s).",
-          "0 QA failure(s) were excluded."
+          "Papers published 2 article analysis item(s).",
+          "1 QA failure(s) were excluded."
         ],
         "nextActions": [
           "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
           "Run node scripts/validate-papers-radar.mjs after publishing radar data."
         ]
       },
-      "runCount": 5,
+      "runCount": 6,
       "reusablePatterns": [
+        {
+          "text": "BraveGuard: From Open-World Threats to Safer Computer-Use Agents: 这是一篇提出 BraveGuard 自适应防御框架的论文，旨在通过从现实世界威胁信号和真实计算机操作代理轨迹中学习，提升对计算机使用代理的安全监控能力。",
+          "source": "papers",
+          "firstSeenAt": "2026-06-03T17:58:05.236Z",
+          "lastSeenAt": "2026-06-03T17:58:05.236Z"
+        },
+        {
+          "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 这篇论文提出了一个诊断基准 Harness-Bench，用于在真实的智能体工作流中系统性地衡量执行框架（harness）配置对模型性能的影响，将 agent 能力评估从只看底层模型扩展到模型–框架配对。",
+          "source": "papers",
+          "firstSeenAt": "2026-06-03T17:58:05.236Z",
+          "lastSeenAt": "2026-06-03T17:58:05.236Z"
+        },
         {
           "text": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems: 该论文提出Agent Lifespan Engineering (ALE)框架和AgingBench基准，将长生命周期AI代理的可靠性问题从单点快照评估转向纵向退化测量与诊断。",
           "source": "papers",
           "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+          "lastSeenAt": "2026-06-03T17:58:05.236Z"
         },
         {
           "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文重新定义了智能体AI的瓶颈，从模型扩展转向系统扩展，强调围绕基础模型的执行架构（harness）是下一个关键挑战。",
           "source": "papers",
           "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+          "lastSeenAt": "2026-06-03T17:58:05.236Z"
         },
         {
           "text": "Code as Agent Harness: A survey that reframes code as the operational substrate for agent AI, organizing the field into three layers.",
           "source": "papers",
           "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+          "lastSeenAt": "2026-06-03T17:58:05.236Z"
         },
         {
           "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 离线模式下只根据已收集证据保留《Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses》的基础脉络。",
           "source": "papers",
           "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-05-31T19:21:56.526Z"
-        },
-        {
-          "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 离线模式下只根据已收集证据保留《Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation》的基础脉络。",
-          "source": "papers",
-          "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-05-31T19:21:56.526Z"
-        },
-        {
-          "text": "Code as Agent Harness: 一份系统性综述，将代码从生成产物重新定义为智能体系统可执行、可检查、有状态的操作基础，并提供三层分类框架。",
-          "source": "papers",
-          "firstSeenAt": "2026-05-31T16:53:47.066Z",
-          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+          "lastSeenAt": "2026-06-03T17:58:05.236Z"
         }
       ]
     },
@@ -253,6 +253,25 @@
   ],
   "recentRuns": [
     {
+      "id": "papers-2026-06-03-1780509485237",
+      "surface": "papers",
+      "date": "2026-06-03",
+      "generatedAt": "2026-06-03T17:58:05.236Z",
+      "qualityStatus": "pass",
+      "selectedCount": 2,
+      "archivedCount": 1,
+      "traceSummary": null,
+      "reflectionSummary": "",
+      "highlights": [
+        "Papers published 2 article analysis item(s).",
+        "1 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
+    {
       "id": "paper_radar-2026-06-03-1780449794363",
       "surface": "paper_radar",
       "date": "2026-06-03",
@@ -276,25 +295,6 @@
       "nextActions": [
         "Review the must-read paper before promoting it into Articles.",
         "Run npm run validate after publishing radar data."
-      ]
-    },
-    {
-      "id": "papers-2026-05-31-1780255316528",
-      "surface": "papers",
-      "date": "2026-05-31",
-      "generatedAt": "2026-05-31T19:21:56.526Z",
-      "qualityStatus": "pass",
-      "selectedCount": 10,
-      "archivedCount": 0,
-      "traceSummary": null,
-      "reflectionSummary": "",
-      "highlights": [
-        "Papers published 10 article analysis item(s).",
-        "0 QA failure(s) were excluded."
-      ],
-      "nextActions": [
-        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
-        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
       ]
     },
     {
