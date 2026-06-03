@@ -4,7 +4,7 @@ import { classifyProjectIntent, evaluate } from "../columns/projects/evaluate.mj
 
 function candidate(overrides = {}) {
   return {
-    id: "owner/repo",
+    id: "project:owner/repo",
     column: "projects",
     source: "github-topic:agent",
     dedupeKey: "owner/repo",
@@ -18,98 +18,113 @@ function candidate(overrides = {}) {
       stars: 1200,
       forks: 80,
       starsGained: 180,
+      windows: ["daily"],
+      ranksByWindow: { daily: 1 },
       ...overrides.raw,
     },
     ...overrides,
   };
 }
 
-test("project evaluate treats finance keywords as score features, not a hard cap", async () => {
-  const result = await evaluate(candidate(), {
+function evidence(overrides = {}) {
+  const rawReadme = `
+This repository builds reusable agent infrastructure for finance workflows with MCP connectors,
+RAG memory, evals, skills, commands, installation docs, examples, demos, and tests.
+It is a vertical agent workflow rather than only finance content.
+`.repeat(8);
+  return {
     kind: "readme",
-    content: "This repo builds reusable agent infrastructure for finance workflows with MCP, RAG, memory, evals, and tool-use orchestration.",
-    artifactAudit: {
-      has_src: true,
-      has_tests: true,
+    content: rawReadme,
+    evidenceSignals: {
+      owner: "owner",
+      repo: "repo",
+      url: "https://github.com/owner/repo",
+      trend_sources: ["github-trending:daily"],
+      stars: 1200,
+      forks: 80,
+      stars_today: 180,
+      language: "TypeScript",
+      topics: ["agent", "mcp", "finance"],
+      description: "finance agent infrastructure with MCP tools and RAG memory",
+      raw_readme: rawReadme,
+      readme_found: true,
+      readme_fetch_failed: false,
+      readme_empty: false,
+      readme_length: rawReadme.length,
+      top_level_dirs: ["agents", "mcp", "skills", "docs", "examples", "tests"],
+      key_files: ["package.json", "README.md"],
       has_docs: true,
       has_examples: true,
-      has_packages: true,
-      has_ci: true,
-      license_spdx_id: "MIT",
-      pushed_at: "2026-05-29T00:00:00Z",
-      latest_release_tag_name: "v1.0.0",
-      archived: false,
+      has_tests: true,
+      has_install: true,
+      has_docker: false,
+      has_cli: true,
+      has_agents: true,
+      has_mcp: true,
+      has_skills: true,
+      has_models: true,
+      has_demo: true,
+      package_files: {
+        package_json: true,
+        pyproject_toml: false,
+        cargo_toml: false,
+        requirements_txt: false,
+        docker_compose_yml: false,
+        dockerfile: false,
+      },
+      ...overrides.evidenceSignals,
     },
-  }, {
+    ...overrides,
+  };
+}
+
+test("project evaluate is deterministic and does not call the LLM", async () => {
+  let called = false;
+  const result = await evaluate(candidate(), evidence(), {
     options: {
       noLlm: false,
-      chatJson: async () => ({
-        worthDeepDive: 82,
-        tags: ["agent", "MCP", "finance"],
-        tldr: "Reusable agent infrastructure for financial workflows.",
-        light: "Shows how to wire MCP tools, retrieval memory, and eval loops into finance agents.",
-        intent: "tool",
-        reason: "The finance domain is incidental; the reusable agent architecture is the learning value.",
-        project_type: "agent_framework",
-        verdict: "deep_dive",
-        ratings: {
-          relevance_to_ai_engineer: 5,
-          engineering_depth: 4,
-          reuse_value: 5,
-          maturity: 4,
-        },
-      }),
+      chatJson: async () => {
+        called = true;
+        throw new Error("evaluate must not call chatJson");
+      },
     },
   });
 
-  assert.equal(result.mode, "rank");
-  assert.equal(result.decision, "select");
-  assert.ok(result.score >= 70, `expected score >= 70, got ${result.score}`);
-  assert.equal(result.intent, "tool");
-  assert.equal(result.project_type, "agent_framework");
-  assert.equal(result.verdict, "deep_dive");
-  assert.deepEqual(result.ratings, {
-    relevance_to_ai_engineer: 5,
-    engineering_depth: 4,
-    reuse_value: 5,
-    maturity: 4,
-  });
-  assert.ok(result.signals.includes("finance"));
-  assert.ok(result.signals.includes("agent"));
-  assert.ok(result.signals.includes("project_type:agent_framework"));
-  assert.ok(result.signals.includes("verdict:deep_dive"));
-  assert.notEqual(result.rankingReason.decision, "cap-low-priority");
+  assert.equal(called, false);
+  assert.equal(result.mode, "deterministic-radar");
+  assert.ok(result.ranking_score >= 60, `expected score >= 60, got ${result.ranking_score}`);
+  assert.ok(["analysis", "deep"].includes(result.final_depth));
+  assert.equal(result.needs_enrichment, false);
+  assert.ok(result.ranking_reasons.length > 0);
+  assert.equal(result.evidence_signals.readme_fetch_failed, false);
 });
 
-test("project evaluate gates deep selection by verdict", async () => {
-  const result = await evaluate(candidate(), {
-    kind: "readme",
-    content: "Reusable MCP and RAG project with strong keywords but thin artifacts.",
-  }, {
-    options: {
-      noLlm: false,
-      chatJson: async () => ({
-        worthDeepDive: 95,
-        tags: ["agent", "MCP"],
-        tldr: "Agent idea with thin implementation signals.",
-        light: "Keyword-relevant, but the available artifact evidence is too thin for a deep dive.",
-        intent: "tool",
-        reason: "Watch only until implementation depth is clearer.",
-        project_type: "agent_framework",
-        verdict: "watch",
-        ratings: {
-          relevance_to_ai_engineer: 5,
-          engineering_depth: 2,
-          reuse_value: 3,
-          maturity: 2,
-        },
-      }),
-    },
-  });
+test("project evaluate treats finance as vertical agent evidence, not a hard cap", async () => {
+  const result = await evaluate(candidate(), evidence(), { options: { noLlm: true } });
 
-  assert.equal(result.verdict, "watch");
-  assert.equal(result.decision, "skip");
-  assert.ok(result.score >= 70, `expected score >= 70, got ${result.score}`);
+  assert.equal(result.project_type, "agent_framework");
+  assert.ok(["analysis", "deep"].includes(result.final_depth));
+  assert.ok(result.tags.includes("mcp"));
+  assert.ok(result.ranking_reasons.some((reason) => /MCP|agent/i.test(reason)));
+  assert.ok(!result.rejection_reasons.includes("awesome_course_tutorial_or_resource_list"));
+});
+
+test("project evaluate marks README fetch failure as needs_enrichment, not empty README", async () => {
+  const result = await evaluate(candidate(), evidence({
+    content: "",
+    evidenceSignals: {
+      raw_readme: "",
+      readme_found: false,
+      readme_fetch_failed: true,
+      readme_empty: false,
+      readme_length: 0,
+    },
+  }), { options: { noLlm: true } });
+
+  assert.equal(result.needs_enrichment, true);
+  assert.equal(result.final_depth, "needs_enrichment");
+  assert.equal(result.evidence_signals.readme_empty, false);
+  assert.equal(result.evidence_signals.readme_fetch_failed, true);
 });
 
 test("project intent classification separates understanding teaching and tool repos", () => {

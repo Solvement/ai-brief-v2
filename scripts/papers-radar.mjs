@@ -9,8 +9,8 @@
  *   node scripts/papers-radar.mjs discover
  *   node scripts/papers-radar.mjs triage
  *   node scripts/papers-radar.mjs review
- *   node scripts/papers-radar.mjs daily
- *   node scripts/papers-radar.mjs run
+ *   node scripts/papers-radar.mjs daily  # delegates to scripts/columns/papers/daily.mjs
+ *   node scripts/papers-radar.mjs run    # delegates to scripts/columns/papers/daily.mjs
  */
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -48,6 +48,7 @@ function flag(name, fallback = null) {
 }
 
 const DATE = String(flag("date", today()));
+const OFFLINE = Boolean(flag("offline", false));
 const NO_MODEL = Boolean(flag("no-model", false));
 const DRY_RUN = Boolean(flag("dry-run", false));
 const FORCE_REVIEW = Boolean(flag("force", false) || flag("force-review", false));
@@ -2058,10 +2059,24 @@ function fallbackProjectIdea(item) {
 }
 
 async function run() {
-  await discover();
-  await triage();
-  await review();
-  await daily();
+  return runCanonicalPapersDaily();
+}
+
+async function runCanonicalPapersDaily() {
+  const { main: canonicalDaily } = await import("./columns/papers/daily.mjs");
+  return canonicalDaily(canonicalDailyArgs());
+}
+
+function canonicalDailyArgs() {
+  const args = [];
+  if (DRY_RUN) args.push("--dry-run");
+  else if (NO_MODEL || OFFLINE) args.push("--offline");
+  const cap = flag("cap", null);
+  if (cap && cap !== true) args.push(`--cap=${cap}`);
+  const limit = flag("limit", null);
+  if (limit && limit !== true) args.push(`--limit=${limit}`);
+  if (flag("no-cache", false)) args.push("--no-cache");
+  return args;
 }
 
 async function main() {
@@ -2069,7 +2084,7 @@ async function main() {
   if (command === "discover") await discover();
   else if (command === "triage") await triage();
   else if (command === "review") await review();
-  else if (command === "daily") await daily();
+  else if (command === "daily") await runCanonicalPapersDaily();
   else if (command === "run") await run();
   else {
     throw new Error(`Unknown command: ${command}. Use discover | triage | review | daily | run`);

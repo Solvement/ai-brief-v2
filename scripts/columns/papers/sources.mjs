@@ -92,9 +92,24 @@ const ARXIV_QUERIES = [
     query: 'all:"LLM evaluation" OR all:"benchmark" OR all:"reliability" OR all:"LLM security"',
   },
   {
-    label: "AIGC workflows",
-    maxResults: 18,
-    query: 'all:"video generation" OR all:"image generation" OR all:"AIGC workflow"',
+    label: "AIGC and generative media",
+    maxResults: 28,
+    query: 'all:"video generation" OR all:"image generation" OR all:"AIGC" OR all:"diffusion model" OR all:"text-to-image" OR all:"text-to-video" OR all:"world model" OR all:"3D generation" OR all:"audio generation" OR all:"music generation"',
+  },
+  {
+    label: "AI infrastructure and LLM systems",
+    maxResults: 32,
+    query: 'all:"LLM serving" OR all:"model serving" OR all:"inference optimization" OR all:"KV cache" OR all:"speculative decoding" OR all:"distributed training" OR all:"MLSys" OR all:"vLLM" OR all:"quantization" OR all:"mixture of experts" OR all:"long context inference"',
+  },
+  {
+    label: "AI application development and agent frameworks",
+    maxResults: 28,
+    query: 'all:"LLM application" OR all:"agent framework" OR all:"LLM agent" OR all:"prompt engineering" OR all:"context engineering" OR all:"LLM orchestration" OR all:"compound AI system" OR all:"agentic workflow"',
+  },
+  {
+    label: "reasoning and post-training",
+    maxResults: 28,
+    query: 'all:"reasoning model" OR all:"chain-of-thought" OR all:"test-time compute" OR all:"reinforcement learning from human feedback" OR all:"RLHF" OR all:"reward model" OR all:"post-training" OR all:"process reward"',
   },
 ];
 
@@ -143,9 +158,21 @@ const FOCUS_TOPICS = [
     label: "Human-AI Interaction",
     patterns: [/\bhuman[- ]?AI\b/i, /\binteraction\b/i, /\buser study\b/i, /\bUX\b/i, /\bcollaboration\b/i],
   },
+  {
+    label: "AI Infrastructure / Systems",
+    patterns: [/\bserving\b/i, /\binference\b/i, /\bKV cache\b/i, /\bvLLM\b/i, /\bspeculative decoding\b/i, /\bdistributed training\b/i, /\bMLSys\b/i, /\bquantization\b/i, /\bthroughput\b/i, /\blatency\b/i, /\bmixture of experts\b/i, /\bMoE\b/i, /\bGPU\b/i, /\bkernel\b/i, /\bscheduler\b/i],
+  },
+  {
+    label: "AI Application Development",
+    patterns: [/\bLLM application\b/i, /\bagent framework\b/i, /\borchestrat/i, /\bprompt engineering\b/i, /\bcontext engineering\b/i, /\bcompound AI\b/i, /\bcopilot\b/i, /\bassistant\b/i, /\bagentic workflow\b/i],
+  },
+  {
+    label: "Reasoning / Post-training",
+    patterns: [/\breasoning\b/i, /\bchain[- ]of[- ]thought\b/i, /\btest[- ]time compute\b/i, /\bRLHF\b/i, /\breward model\b/i, /\bpost[- ]?training\b/i, /\bfine[- ]?tuning\b/i, /\breinforcement learning\b/i],
+  },
 ];
 
-const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|data preparation)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态/i;
+const CORE_JOB_RE = /\b(AI|artificial intelligence|machine learning|deep learning|foundation models?|large language models?|LLMs?|transformers?|post[- ]?training|alignment|agentic|agent|harness|observability|trajectory|execution trace|middleware|rollback|self[- ]?improv|tool[- ]?use|function calling|coding agent|SWE[- ]?Bench|Terminal[- ]?Bench|software engineering|debugging|program repair|RAG|retrieval|memory|benchmark|evaluation|eval|security|reliability|workflow|pipeline|infrastructure|production|data preparation|serving|inference|KV cache|vLLM|quantization|distributed training|MLSys|throughput|reasoning|chain[- ]of[- ]thought|RLHF|fine[- ]?tuning|reward model|diffusion|world model|prompt engineering|orchestration|copilot|mixture of experts|MoE)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|智能体|多模态|推理|扩散|生成式|强化学习|微调|蒸馏/i;
 const GENERIC_COMPANY_PAGE_RE = /\b(security and compliance|inside claude security|claude security|experimental tools|human-computer interaction|search & information retrieval|programming languages & software engineering|microsoft security|safety & eco|trust center)\b/i;
 const CURATED_AI_RE = /\b(AI|artificial intelligence|machine learning|deep learning|LLMs?|large language models?|foundation models?|transformers?|agentic|agents?|RAG|retrieval|benchmark|evaluation|reasoning|alignment|post[- ]?training|diffusion|multimodal|robotics?|vision|language model|DeepSeek|OpenAI|Anthropic|NVIDIA|Google|DeepMind|Meta|Microsoft)\b|人工智能|机器学习|深度学习|大模型|大语言模型|基础模型|论文|模型|智能体|多模态|生成式|生成|机器人|算法|评测|基准|推理/i;
 const AHE_STRONG_SIGNALS = [
@@ -257,6 +284,10 @@ export async function collectEvidence(candidate, ctx = {}) {
   const tier = normalizeTier(options.paperAnalysisTier || options.analysisTier || "deep");
   const cached = cachedEvidence(options.db, candidate?.id);
   if (offline && cached) return cached;
+  // Reuse a recent full-text fetch instead of re-hitting arXiv on every run (avoids 429 bursts).
+  if (!offline && !options.noCache && cached && cachedHasFullText(cached) && evidenceIsFresh(cached, options)) {
+    return cached;
+  }
 
   let paper = finalizeCandidate(candidate?.raw || candidate || {});
   if (!offline && paper.arxivId) {
@@ -410,7 +441,7 @@ async function discoverArxivFiltered(trace = [], options = {}, logger = console)
       requestedLimit: maxResults,
       sourceSignals: ["arXiv", `arXiv query:${label}`],
     }, () => fetchArxivQuery(query, maxResults, label, options), logger));
-    await sleep(numberOption(options.arxivDelayMs, 1300));
+    await sleep(numberOption(options.arxivDelayMs, 3000));
   }
   return all;
 }
@@ -440,7 +471,7 @@ async function enrichArxivCandidates(candidates, { options = {}, logger = consol
       for (const item of parseAtomEntries(xml, "arxiv_metadata", "arXiv metadata")) {
         byId.set(baseArxivId(item.arxivId), item);
       }
-      await sleep(numberOption(options.arxivDelayMs, 1300));
+      await sleep(numberOption(options.arxivDelayMs, 3000));
     } catch (error) {
       logger?.warn?.(`[papers:discover] arXiv metadata failed: ${error.message}`);
     }
@@ -1261,6 +1292,19 @@ function cachedEvidence(db, candidateId) {
   }
 }
 
+function cachedHasFullText(evidence) {
+  if (!evidence) return false;
+  const sections = Array.isArray(evidence.sections) ? evidence.sections : [];
+  return sections.includes("Full paper text") || String(evidence.content || "").length > 6000;
+}
+
+function evidenceIsFresh(evidence, options = {}) {
+  const fetchedAt = Date.parse(evidence?.fetchedAt || "");
+  if (!Number.isFinite(fetchedAt)) return false;
+  const maxAgeDays = numberOption(options.evidenceMaxAgeDays ?? process.env.PAPERS_EVIDENCE_MAX_AGE_DAYS, 14);
+  return (Date.now() - fetchedAt) / 86400000 <= maxAgeDays;
+}
+
 async function dryRunSeedCandidates({ discoveredAt, limit }) {
   const fixtureUrl = new URL("../../__tests__/fixtures/papers-harness-survey.json", import.meta.url);
   const fixture = JSON.parse(await readFile(fixtureUrl, "utf8"));
@@ -1338,7 +1382,27 @@ function pushDiscoveryTrace(trace, input) {
   trace.push(entry);
 }
 
-async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {}, headers = {} } = {}) {
+// Rate-limit aware: arXiv (and most academic hosts) answer 429/503 under bursts. Honor
+// Retry-After and back off exponentially instead of hammering with a fixed 700ms delay.
+function isRetryableStatus(status) {
+  return status === 429 || status === 502 || status === 503 || status === 504;
+}
+
+function retryAfterMs(res) {
+  const header = res?.headers?.get?.("retry-after");
+  if (!header) return null;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds)) return Math.min(seconds * 1000, 30000);
+  const date = Date.parse(header);
+  return Number.isFinite(date) ? Math.min(Math.max(0, date - Date.now()), 30000) : null;
+}
+
+function backoffMs(attempt, status = 0) {
+  const base = isRetryableStatus(status) && status !== 0 ? 3000 : 700;
+  return Math.min(base * 2 ** attempt, 20000);
+}
+
+async function fetchResponse(url, { timeoutMs = 20000, retries = 1, options = {}, headers = {}, accept }) {
   const fetchImpl = options.fetch || fetch;
   let lastError;
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -1346,18 +1410,21 @@ async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {}, he
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const res = await fetchImpl(url, {
-        headers: {
-          "user-agent": options.userAgent || UA,
-          accept: "text/html,application/atom+xml,application/json;q=0.9,*/*;q=0.8",
-          ...headers,
-        },
+        headers: { "user-agent": options.userAgent || UA, accept, ...headers },
         signal: controller.signal,
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.text();
+      if (res.ok) return res;
+      if (isRetryableStatus(res.status) && attempt < retries) {
+        await sleep(retryAfterMs(res) ?? backoffMs(attempt, res.status));
+        continue; // finally clears the timer
+      }
+      throw new Error(`HTTP ${res.status}`);
     } catch (error) {
       lastError = error;
-      if (attempt < retries) await sleep(700 * (attempt + 1));
+      // HTTP-status errors already decided above (non-retryable or out of retries); don't loop.
+      const isHttpError = error instanceof Error && /^HTTP \d/.test(error.message);
+      if (isHttpError || attempt >= retries) throw error;
+      await sleep(backoffMs(attempt)); // network/abort error — back off and retry
     } finally {
       clearTimeout(timer);
     }
@@ -1365,31 +1432,26 @@ async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {}, he
   throw lastError;
 }
 
+async function fetchText(url, { timeoutMs = 20000, retries = 1, options = {}, headers = {} } = {}) {
+  const res = await fetchResponse(url, {
+    timeoutMs,
+    retries,
+    options,
+    headers,
+    accept: "text/html,application/atom+xml,application/json;q=0.9,*/*;q=0.8",
+  });
+  return res.text();
+}
+
 async function fetchBinary(url, { timeoutMs = 20000, retries = 1, options = {}, headers = {} } = {}) {
-  const fetchImpl = options.fetch || fetch;
-  let lastError;
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetchImpl(url, {
-        headers: {
-          "user-agent": options.userAgent || UA,
-          accept: "application/pdf,*/*;q=0.8",
-          ...headers,
-        },
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return Buffer.from(await res.arrayBuffer());
-    } catch (error) {
-      lastError = error;
-      if (attempt < retries) await sleep(700 * (attempt + 1));
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-  throw lastError;
+  const res = await fetchResponse(url, {
+    timeoutMs,
+    retries,
+    options,
+    headers,
+    accept: "application/pdf,*/*;q=0.8",
+  });
+  return Buffer.from(await res.arrayBuffer());
 }
 
 function getTag(text, tag) {

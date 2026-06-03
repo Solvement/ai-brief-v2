@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { openAiBriefDb } from "../../lib/db.mjs";
 import { runColumnPipeline } from "../../lib/pipeline-kernel.mjs";
-import projectsColumnModule from "./index.mjs";
+import papersColumnModule from "./index.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -24,20 +24,21 @@ export async function main(argv = process.argv.slice(2)) {
   options.db = db;
 
   try {
-    const result = await runColumnPipeline(projectsColumnModule, {
+    const result = await runColumnPipeline(papersColumnModule, {
       ...options,
       runId: options.runId || dailyRunId(options),
       logger: console,
+      paperAnalysisTier: "deep",
       concurrency: {
-        evidence: numberOption(options.evidenceConcurrency, 5),
-        evaluate: numberOption(options.evaluateConcurrency, 3),
+        evidence: numberOption(options.evidenceConcurrency, 2),
+        evaluate: numberOption(options.evaluateConcurrency, 2),
         analyze: numberOption(options.analyzeConcurrency, 1),
         qaGate: numberOption(options.qaConcurrency, 1),
       },
     });
 
     console.log(
-      `projects daily ${result.runId}: ${result.candidates.length} candidates, ${result.selected.length} selected, ${result.analyses.length} analyzed`,
+      `papers daily ${result.runId}: ${result.candidates.length} candidates, ${result.selected.length} selected, ${result.analyses.length} analyzed`,
     );
     return result;
   } finally {
@@ -47,18 +48,15 @@ export async function main(argv = process.argv.slice(2)) {
 
 export function parseArgs(argv = []) {
   const options = {
-    projectBriefWiki: true,
-    briefWikiDaily: true,
-    dailyDeepDive: true,
-    cap: null,
-    limit: 30,
-    radarLimit: 30,
-    topicLimit: 0,
-    worthThreshold: 60,
-    readmeMaxChars: 14000,
-    lightMaxTokens: Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200,
-    deepDiveMaxTokens: Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 12000,
-    apiTimeoutMs: Number(process.env.DEEPSEEK_TIMEOUT_MS) || 180000,
+    cap: numberOption(process.env.PAPERS_DEEP_CAP, 3),
+    limit: numberOption(process.env.PAPERS_DISCOVER_LIMIT, 140),
+    minScore: numberOption(process.env.PAPERS_MIN_SCORE, null),
+    paperTextMaxChars: numberOption(process.env.PAPERS_TEXT_MAX_CHARS, 120000),
+    paperLightMaxTokens: numberOption(process.env.PAPERS_LIGHT_MAX_TOKENS, 2600),
+    paperDeepMaxTokens: numberOption(process.env.PAPERS_DEEP_MAX_TOKENS, 16000),
+    apiTimeoutMs: numberOption(process.env.DEEPSEEK_TIMEOUT_MS, 180000),
+    activeArticlesLimit: numberOption(process.env.PAPERS_ARTICLES_ACTIVE_LIMIT, 12),
+    radarArchiveLimit: numberOption(process.env.PAPERS_RADAR_ARCHIVE_LIMIT, 90),
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -77,50 +75,36 @@ export function parseArgs(argv = []) {
       options.dryRun = true;
       options.offline = true;
       options.noLlm = true;
-    } else if (arg === "--no-readme") {
-      options.noReadme = true;
     } else if (arg === "--no-cache") {
       options.noCache = true;
     } else if (arg === "--cap") {
       options.cap = numberOption(nextValue(), options.cap);
     } else if (arg.startsWith("--cap=")) {
       options.cap = numberOption(valueAfterEquals(arg), options.cap);
-    } else if (arg === "--radar-limit") {
-      options.radarLimit = numberOption(nextValue(), options.radarLimit);
-    } else if (arg.startsWith("--radar-limit=")) {
-      options.radarLimit = numberOption(valueAfterEquals(arg), options.radarLimit);
     } else if (arg === "--limit") {
       options.limit = numberOption(nextValue(), options.limit);
     } else if (arg.startsWith("--limit=")) {
       options.limit = numberOption(valueAfterEquals(arg), options.limit);
-    } else if (arg === "--topic-limit") {
-      options.topicLimit = numberOption(nextValue(), options.topicLimit);
-    } else if (arg.startsWith("--topic-limit=")) {
-      options.topicLimit = numberOption(valueAfterEquals(arg), options.topicLimit);
-    } else if (arg === "--readme-max-chars") {
-      options.readmeMaxChars = numberOption(nextValue(), options.readmeMaxChars);
-    } else if (arg.startsWith("--readme-max-chars=")) {
-      options.readmeMaxChars = numberOption(valueAfterEquals(arg), options.readmeMaxChars);
-    } else if (arg === "--light-max-tokens") {
-      options.lightMaxTokens = numberOption(nextValue(), options.lightMaxTokens);
-    } else if (arg.startsWith("--light-max-tokens=")) {
-      options.lightMaxTokens = numberOption(valueAfterEquals(arg), options.lightMaxTokens);
-    } else if (arg === "--deep-max-tokens" || arg === "--deep-dive-max-tokens") {
-      options.deepDiveMaxTokens = numberOption(nextValue(), options.deepDiveMaxTokens);
-    } else if (arg.startsWith("--deep-max-tokens=") || arg.startsWith("--deep-dive-max-tokens=")) {
-      options.deepDiveMaxTokens = numberOption(valueAfterEquals(arg), options.deepDiveMaxTokens);
+    } else if (arg === "--min-score") {
+      options.minScore = numberOption(nextValue(), options.minScore);
+    } else if (arg.startsWith("--min-score=")) {
+      options.minScore = numberOption(valueAfterEquals(arg), options.minScore);
     } else if (arg === "--api-timeout-ms") {
       options.apiTimeoutMs = numberOption(nextValue(), options.apiTimeoutMs);
     } else if (arg.startsWith("--api-timeout-ms=")) {
       options.apiTimeoutMs = numberOption(valueAfterEquals(arg), options.apiTimeoutMs);
+    } else if (arg === "--active-limit") {
+      options.activeArticlesLimit = numberOption(nextValue(), options.activeArticlesLimit);
+    } else if (arg.startsWith("--active-limit=")) {
+      options.activeArticlesLimit = numberOption(valueAfterEquals(arg), options.activeArticlesLimit);
+    } else if (arg === "--radar-archive-limit") {
+      options.radarArchiveLimit = numberOption(nextValue(), options.radarArchiveLimit);
+    } else if (arg.startsWith("--radar-archive-limit=")) {
+      options.radarArchiveLimit = numberOption(valueAfterEquals(arg), options.radarArchiveLimit);
     } else if (arg === "--db") {
       options.dbPath = nextValue();
     } else if (arg.startsWith("--db=")) {
       options.dbPath = valueAfterEquals(arg);
-    } else if (arg === "--wiki-root") {
-      options.wikiRoot = nextValue();
-    } else if (arg.startsWith("--wiki-root=")) {
-      options.wikiRoot = valueAfterEquals(arg);
     } else if (arg === "--run-id") {
       options.runId = nextValue();
     } else if (arg.startsWith("--run-id=")) {
@@ -153,7 +137,7 @@ async function loadEnv() {
 
 function dailyRunId(options = {}) {
   const mode = options.offline || options.dryRun ? "offline" : "online";
-  return `projects-daily-${mode}-${new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14)}`;
+  return `papers-daily-${mode}-${new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14)}`;
 }
 
 function valueAfterEquals(arg) {
@@ -161,23 +145,22 @@ function valueAfterEquals(arg) {
 }
 
 function numberOption(value, fallback) {
+  if (value === null || value === undefined || value === "") return fallback;
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
 }
 
 function printUsage() {
   console.log(`Usage:
-  node scripts/columns/projects/daily.mjs [--cap N] [--offline] [--dry-run]
+  node scripts/columns/papers/daily.mjs [--cap N] [--offline] [--dry-run]
 
-Runs the project daily chain:
-  discover -> enrichment(evidence) -> deterministic ranking/depth -> tier analysis -> brief:lint -> brief:build -> trending.json
+Runs the canonical papers chain:
+  discover -> evidence -> evaluate -> select -> analyze -> qa -> publish articles.json + paper-radar.json
 
 Flags:
-  --cap N          Debug candidate cap before ranking. Default: no cap
-  --radar-limit N  Max merged radar cards. Default: 30
-  --offline        No LLM calls; deterministic radar plus offline stub brief shape where selected
-  --dry-run        Offline/no-LLM path for cheap shape verification
-  --wiki-root DIR  Brief wiki root. Default: brief-wiki
+  --cap N          Max selected deep-analysis papers. Default: 3
+  --offline        No LLM/network deep analysis; use cached/offline data where available
+  --dry-run        Offline/no-LLM fixture path for cheap shape verification
   --db PATH        SQLite DB path override
 `);
 }

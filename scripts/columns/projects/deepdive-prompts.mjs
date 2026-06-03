@@ -83,10 +83,15 @@ export const PROJECT_TYPE_TECH_FOCUS = {
 
 const OUTPUT_SCHEMA_TEXT = JSON.stringify(PROJECT_DEEP_DIVE_OUTPUT_SCHEMA, null, 2);
 
-export function projectDeepDiveSystemPrompt(projectType = "") {
+export function projectDeepDiveSystemPrompt(projectType = "", finalDepth = "deep") {
   const focus = PROJECT_TYPE_TECH_FOCUS[projectType] || "先按 project_type 判断技术拆解重点;不能确定时写 未在 README/artifact 说明。";
+  const depthContract = finalDepth === "analysis"
+    ? "Depth contract: deterministic final_depth=analysis. Do not upgrade to deep. Write 600-1000 Chinese characters total. Include: problem solved, core functions, directory/tree signals, usage scenario, toolbox fit, a 30-minute test plan, risks/gaps, and recommended_action=analyze/try/extract. Keep the brief-wiki JSON shape, but keep each field concise and grounded."
+    : "Depth contract: deterministic final_depth=deep. Deep is quality-gated, not quota-gated. Write 1500-3000 Chinese characters total, grounded in README/docs/tree/examples/config. Include the full deep section list: one-sentence judgment, real engineering problem, why now, architecture breakdown, key modules, similar-project comparison, deploy/try path, risks/limits, what I can learn, interview/project talking points, 60-second interview pitch, and whether it can become my project or playbook.";
 
   return `你是 AI-Brief 的 project-analyst,负责把 GitHub 项目写成 brief-wiki typed memory。
+
+${depthContract}
 
 必须使用中文,而且是「大白话两层写法」:
 - 第一层先说人话:它解决什么痛点、像什么、为什么有用。
@@ -96,6 +101,7 @@ export function projectDeepDiveSystemPrompt(projectType = "") {
 - README/artifact 没写的内容,统一写「未在 README/artifact 说明」。
 - 不要编造 stars、license、benchmark、硬件、数据规模、API key、安装命令、测试命令或内部源码细节。
 - discovery/trending 只能解释为什么被发现,不能当技术证据。
+- LLM must not exceed deterministic max_allowed_depth or final_depth. If evidence is thin, stay thin.
 - 每个关键结论都必须进入 claim_ledger:claim + plain_english + source + evidence_strength + supports + does_not_support + threat。
 - one_line_positioning 是描述性定位;one_line_punchline 是单独的短句 punchline,不能复制 one_line_positioning。
 - tech_breakdown_md 只能使用 ### / #### 小标题和加粗,绝不能使用 # 或 ## 标题。
@@ -129,8 +135,11 @@ export function projectDeepDiveUser(candidate, evidence, triage, options = {}) {
     },
     triage: publicTriage(triage),
     artifactAudit: evidence?.artifactAudit || evidence?.metadata?.artifactAudit || null,
+    depth_decision: triage?.depth_decision || triage || null,
+    evidence_signals: evidence?.evidenceSignals || evidence?.evidence_signals || evidence?.metadata?.evidenceSignals || evidence?.metadata?.evidence_signals || null,
     readme: String(evidence?.content || "").slice(0, maxReadmeChars),
-    instruction: "按 pi-agent gold standard 的项目深度拆解范式生成 JSON;所有缺失事实写 未在 README/artifact 说明。",
+    review_issues_to_fix: Array.isArray(options.reviewIssues) ? options.reviewIssues : [],
+    instruction: "按 deterministic final_depth 生成 JSON;所有缺失事实写 未在 README/artifact 说明;不准超过 max_allowed_depth。",
   });
 }
 
@@ -162,5 +171,12 @@ function publicTriage(triage = {}) {
     verdict: triage.verdict,
     ratings: triage.ratings,
     rankingReason: triage.rankingReason,
+    ranking_score: triage.ranking_score,
+    max_allowed_depth: triage.max_allowed_depth,
+    final_depth: triage.final_depth,
+    recommended_action: triage.recommended_action,
+    needs_enrichment: triage.needs_enrichment,
+    ranking_reasons: triage.ranking_reasons || [],
+    rejection_reasons: triage.rejection_reasons || [],
   };
 }

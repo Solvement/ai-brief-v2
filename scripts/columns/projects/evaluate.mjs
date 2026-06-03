@@ -1,133 +1,139 @@
-import { BOOST_TERMS, CAP_TERMS } from "../../lib/project-ranking.mjs";
 import { createDeepSeekClient, projectDeepModel, projectLightModel } from "../../lib/llm.mjs";
 import { deepSystem, deepUser, LIGHT_SYS, lightUser } from "./prompts.mjs";
+import {
+  decideProjectDepth,
+  evidenceSummary,
+  isBriefDepth,
+  normalizeEvidenceSignals,
+  scoreProject,
+} from "./project-ranking.mjs";
 
 const INTENTS = new Set(["understanding", "teaching", "tool"]);
 const PROJECT_TYPES = new Set(["ai_app", "agent_framework", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
-const VERDICTS = new Set(["skip", "watch", "L1", "deep_dive", "clone_and_run"]);
-const DEEP_DIVE_VERDICTS = new Set(["deep_dive", "clone_and_run"]);
-const RATING_KEYS = ["relevance_to_ai_engineer", "engineering_depth", "reuse_value", "maturity"];
-const NOT_FOUND = "not_found";
 const AI_RE = /\b(ai|agent|agents|rag|retrieval|mcp|a2a|memory|llm|multimodal|model|eval|benchmark|embedding|vector|prompt|tool use|function calling|coding agent|generative)\b/i;
 const TOOL_RE = /\b(cli|sdk|api|server|plugin|app|framework|library|package|install|usage|quickstart|deploy|docker|npm|pip|run|command|configure|integration|workflow)\b/i;
-const TEACHING_RE = /\b(course|lesson|tutorial|workshop|curriculum|exercise|notebook|learn|learning|roadmap|class|chapter|hands-on)\b/i;
+const TEACHING_RE = /\b(course|lesson|tutorial|workshop|curriculum|exercise|notebook|learn|learning|roadmap|class|chapter|hands-on|awesome|resource list)\b/i;
 const UNDERSTANDING_RE = /\b(understand|understanding|explain|explaining|visual|graph|map|architecture|concept|internals|deep dive|guide|notes|analysis|codebase)\b/i;
 const COMMAND_RE = /^\s*(?:npm|pnpm|yarn|npx|pip|uv|python|node|docker|git|go|cargo|bun|deno|curl|wget|claude|codex)\b/i;
 
 export async function evaluate(candidate, evidence, ctx = {}) {
   const options = ctx.options || {};
   const repo = candidate.raw || candidate;
-  const offline = options.noLlm || options.dryRun || process.env.NO_LLM === "1";
-  const projectRanking = projectRankingInputSignals(repo, evidence);
-  let light = null;
+  const evidence_signals = evidenceSignalsFrom(repo, evidence);
+  const ranking = scoreProject(evidence_signals);
+  const depth_decision = decideProjectDepth({ ranking, evidence_signals });
+  const evaluatedAt = nowIso(options);
+  const result = evaluationFromDecision({ candidate, repo, evidence, evidence_signals, ranking, depth_decision, evaluatedAt });
 
-  if (!offline) {
+  persistRadarEvaluation(options.db, candidate, result, evaluatedAt, "deterministic-project-radar");
+  return result;
+}
+
+export async function generateProjectLightAnalysis({ candidate, evidence, triage, options = {}, logger = console } = {}) {
+  const repo = candidate?.raw || candidate || {};
+  const finalDepth = triage?.final_depth || triage?.depth_decision?.final_depth;
+  if (finalDepth !== "light") {
+    return skippedAnalysis("light", "final_depth is not light", { candidate, triage, options });
+  }
+
+  const offline = isOffline(options);
+  if (offline && !options.lightPayload) {
+    return skippedAnalysis("light", "offline_no_llm", { candidate, triage, options });
+  }
+
+  const model = options.projectLightModel || projectLightModel();
+  let payload = options.lightPayload || null;
+
+  if (!payload) {
     try {
-      const chatJson = options.chatJson || createDeepSeekClient({ apiTimeoutMs: options.apiTimeoutMs }).chatJson;
-      light = await chatJson({
+      const chatJson = options.chatJson || createDeepSeekClient({ apiTimeoutMs: options.apiTimeoutMs, logger }).chatJson;
+      payload = await chatJson({
         system: LIGHT_SYS,
-        user: lightUser(repo, evidence, projectRanking),
-        model: options.projectLightModel || projectLightModel(),
+        user: lightUser(repo, evidence, triage),
+        model,
         maxTokens: options.lightMaxTokens || Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200,
       });
     } catch (error) {
-      ctx.logger?.warn?.(`light evaluate failed ${repo.fullName}: ${error.message}`);
+      logger?.warn?.(`project light analysis failed ${repo.fullName || repo.name || candidate?.id}: ${error.message}`);
+      return skippedAnalysis("light", "llm_failed", { candidate, triage, options, error });
     }
   }
 
-  const normalized = normalizeLightResult(light, repo, evidence);
-  const scored = scoreProjectTriage(repo, evidence, normalized);
-  const selectedByVerdict = DEEP_DIVE_VERDICTS.has(normalized.verdict);
-  const result = {
-    candidateId: candidate.id,
-    decision: selectedByVerdict ? "select" : "skip",
-    mode: "rank",
-    score: scored.score,
-    worthDeepDive: scored.score,
-    reason: normalized.reason || scored.rankingReason.explanation,
-    signals: unique([
-      ...scored.signals,
-      `project_type:${normalized.project_type}`,
-      `verdict:${normalized.verdict}`,
-    ]),
-    provenance: {
-      evaluator: offline ? "heuristic-offline" : "llm+heuristic-features",
-      source: candidate.source,
-    },
-    tldr: normalized.tldr,
-    tags: normalized.tags,
-    light: normalized.light,
-    intent: normalized.intent,
-    project_type: normalized.project_type,
-    verdict: normalized.verdict,
-    ratings: normalized.ratings,
-    rankingReason: scored.rankingReason,
-    evaluatedAt: nowIso(options),
+  const normalized = normalizeLightResult(payload, repo, evidence, triage);
+  const generatedAt = nowIso(options);
+  const merged = {
+    ...radarCardPayload(triage),
+    ...normalized,
+    final_depth: "light",
+    generated_by: "PROJECT_LIGHT_MODEL",
   };
 
+  let analysisId = null;
   if (options.db) {
-    options.db.upsertEval({
-      candidateId: candidate.id,
-      decision: result.decision,
-      mode: result.mode,
-      score: result.score,
-      signals: result.signals,
-      reason: result.reason,
-      evaluatedAt: result.evaluatedAt,
-    });
-    options.db.insertAnalysis({
+    const row = options.db.insertAnalysis({
       candidateId: candidate.id,
       tier: "light",
-      payload: {
-        tldr: result.tldr,
-        tags: result.tags,
-        light: result.light,
-        worthDeepDive: result.worthDeepDive,
-        intent: result.intent,
-        project_type: result.project_type,
-        verdict: result.verdict,
-        ratings: result.ratings,
-        rankingReason: result.rankingReason,
-        provenance: result.provenance,
-      },
-      model: result.provenance.evaluator,
-      generatedAt: result.evaluatedAt,
+      payload: merged,
+      model,
+      generatedAt,
     });
+    analysisId = row.id;
   }
 
-  return result;
+  return {
+    tier: "light",
+    status: "generated",
+    generated: true,
+    candidateId: candidate?.id,
+    repo: repo.fullName || repo.name || "",
+    model,
+    payload: merged,
+    _analysisId: analysisId,
+  };
 }
 
 export async function analyze(item, evidence, ctx = {}) {
   const options = ctx.options || {};
-  const repo = item.candidate?.raw || item.raw || {};
+  const candidate = item.candidate || item;
+  const repo = candidate?.raw || candidate || {};
   const evaluation = item.eval || {};
-  const intent = normalizeIntent(evaluation.intent, classifyProjectIntent({ repo, readme: evidence?.content, light: evaluation.light, tags: evaluation.tags }));
-  const offline = options.noLlm || options.dryRun || process.env.NO_LLM === "1";
-  let payload = null;
-  let model = options.projectDeepModel || projectDeepModel();
+  const finalDepth = evaluation.final_depth || evaluation.depth_decision?.final_depth;
 
-  if (!offline) {
-    try {
-      const chatJson = options.chatJson || createDeepSeekClient({ apiTimeoutMs: options.apiTimeoutMs }).chatJson;
-      payload = await chatJson({
-        system: deepSystem(intent),
-        user: deepUser(repo, evidence, evaluation),
-        model,
-        maxTokens: options.deepMaxTokens || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 8000,
-      });
-    } catch (error) {
-      ctx.logger?.warn?.(`deep analyze failed ${repo.fullName}: ${error.message}`);
-    }
+  if (finalDepth === "light") {
+    return generateProjectLightAnalysis({ candidate, evidence, triage: evaluation, options, logger: ctx.logger || console });
   }
 
-  const normalized = normalizeDeepAnalysis(payload || repo.deep || offlineDeep(repo, intent), { repo, evidence, intent, options });
+  if (!isBriefDepth(finalDepth)) {
+    return skippedAnalysis("deep", "final_depth is not analysis/deep", { candidate, triage: evaluation, options });
+  }
+
+  const offline = isOffline(options);
+  if (offline) return skippedAnalysis(finalDepth, "offline_no_llm", { candidate, triage: evaluation, options });
+
+  const intent = normalizeIntent(evaluation.intent, classifyProjectIntent({ repo, readme: evidence?.content, light: evaluation.light, tags: evaluation.tags }));
+  const model = options.projectDeepModel || projectDeepModel();
+  let payload = null;
+
+  try {
+    const chatJson = options.chatJson || createDeepSeekClient({ apiTimeoutMs: options.apiTimeoutMs }).chatJson;
+    payload = await chatJson({
+      system: deepSystem(intent),
+      user: deepUser(repo, evidence, evaluation),
+      model,
+      maxTokens: options.deepMaxTokens || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 8000,
+    });
+  } catch (error) {
+    ctx.logger?.warn?.(`project ${finalDepth} analysis failed ${repo.fullName}: ${error.message}`);
+    return skippedAnalysis(finalDepth, "llm_failed", { candidate, triage: evaluation, options, error });
+  }
+
+  const normalized = normalizeDeepAnalysis(payload, { repo, evidence, intent, options });
   if (options.db) {
     const row = options.db.insertAnalysis({
-      candidateId: item.candidate.id,
+      candidateId: candidate.id,
       tier: "deep",
       payload: normalized,
-      model: offline ? "offline-projects" : model,
+      model,
       generatedAt: normalized.generatedAt,
     });
     normalized._analysisId = row.id;
@@ -136,75 +142,79 @@ export async function analyze(item, evidence, ctx = {}) {
   return normalized;
 }
 
-export function normalizeLightResult(input, repo = {}, evidence = {}) {
-  const fallback = offlineLight(repo, evidence);
-  const intent = normalizeIntent(input?.intent, classifyProjectIntent({
-    repo,
-    readme: evidence?.content,
-    light: input?.light || repo.light,
-    tags: input?.tags || repo.tags,
-  }));
-  const projectType = normalizeProjectType(input?.project_type ?? input?.projectType ?? repo.project_type, fallback.project_type);
-  const ratings = normalizeRatings(input?.ratings ?? input?.project_verdict ?? repo.ratings, fallback.ratings);
-  const worthDeepDive = clampScore(input?.worthDeepDive ?? repo.worthDeepDive ?? fallback.worthDeepDive);
-  const verdict = normalizeVerdict(
-    input?.verdict ?? input?.project_verdict?.verdict ?? repo.verdict,
-    inferVerdict({ worthDeepDive, project_type: projectType, ratings, intent }),
-  );
-
+export function radarCardPayload(evaluation = {}) {
+  const decision = evaluation.depth_decision || evaluation;
+  const evidence_signals = decision.evidence_signals || evaluation.evidence_signals || {};
   return {
-    tldr: cleanString(input?.tldr || repo.tldr || fallback.tldr),
-    tags: normalizeTags(input?.tags || repo.tags || fallback.tags),
-    light: cleanString(input?.light || repo.light || fallback.light),
-    worthDeepDive,
+    tldr: evaluation.tldr || deterministicTldr(evaluation.repo || {}, decision),
+    tags: evaluation.tags || tagsFromDecision(decision),
+    light: evaluation.light || deterministicRadarText(evaluation.repo || {}, decision),
+    worthDeepDive: Number(evaluation.worthDeepDive ?? decision.ranking_score ?? evaluation.score ?? 0),
+    intent: evaluation.intent || "understanding",
+    project_type: evaluation.project_type || "non_ai_eng",
+    verdict: evaluation.verdict || legacyVerdictForDepth(decision.final_depth),
+    ratings: evaluation.ratings || ratingsFromRanking(decision.ranking || {}),
+    rankingReason: publicRankingReason(decision),
+    ranking_score: Number(decision.ranking_score ?? evaluation.score ?? 0),
+    max_allowed_depth: decision.max_allowed_depth || "list_only",
+    final_depth: decision.final_depth || "list_only",
+    ranking_reasons: decision.ranking_reasons || [],
+    rejection_reasons: decision.rejection_reasons || [],
+    recommended_action: decision.recommended_action || "monitor",
+    needs_enrichment: Boolean(decision.needs_enrichment),
+    evidence_summary: evidenceSummary(evidence_signals),
+    depth_decision: publicDepthDecision(decision),
+  };
+}
+
+export function normalizeLightResult(input = {}, repo = {}, evidence = {}, triage = {}) {
+  const fallback = radarCardPayload(triage);
+  return {
+    tldr: cleanString(input?.tldr || fallback.tldr || deterministicTldr(repo, triage)).slice(0, 120),
+    tags: normalizeTags(input?.tags || fallback.tags || tagsFromDecision(triage)),
+    light: cleanString(input?.light || input?.summary || fallback.light || deterministicRadarText(repo, triage)),
+    worthDeepDive: Number(triage?.ranking_score ?? triage?.score ?? fallback.worthDeepDive ?? 0),
+    intent: normalizeIntent(input?.intent, triage?.intent || classifyProjectIntent({ repo, readme: evidence?.content, light: input?.light, tags: input?.tags })),
+    project_type: normalizeProjectType(input?.project_type ?? input?.projectType, triage?.project_type || classifyProjectType({ repo, readme: evidence?.content, light: input?.light, tags: input?.tags })),
+    verdict: legacyVerdictForDepth(triage?.final_depth || triage?.depth_decision?.final_depth),
+    ratings: triage?.ratings || ratingsFromRanking(triage?.ranking || triage?.depth_decision?.ranking || {}),
+  };
+}
+
+export function normalizeDeepAnalysis(input, { repo = {}, evidence = {}, intent = "understanding", options = {} } = {}) {
+  const generatedAt = nowIso(options);
+  return {
+    atGlance: cleanString(input?.atGlance || input?.at_glance || ""),
+    whyItMatters: normalizeWhyItMatters(input?.whyItMatters || input?.why_it_matters),
+    keyConcepts: normalizeKeyConcepts(input?.keyConcepts || input?.key_concepts),
+    howItWorks: cleanString(input?.howItWorks || input?.how_it_works || ""),
+    novelty: cleanString(input?.novelty || ""),
+    ecosystem: cleanString(input?.ecosystem || ""),
+    limitations: normalizeLimitations(input?.limitations),
+    tryIt: normalizeTryIt(input?.tryIt || input?.try_it, intent),
+    score: normalizeScore(input?.score),
     intent,
-    project_type: projectType,
-    verdict,
-    ratings,
-    reason: cleanString(input?.reason || ""),
-  };
-}
-
-export function scoreProjectTriage(repo = {}, evidence = {}, light = {}) {
-  const text = projectSignalText(repo, evidence?.content, light);
-  const publicText = projectSignalText(repo, "", light);
-  const matchedBoostTerms = matchedTerms(text, BOOST_TERMS);
-  const matchedCapTerms = matchedTerms(publicText, CAP_TERMS);
-  const rawScore = clampScore(light.worthDeepDive);
-  const boost = Math.min(22, matchedBoostTerms.length * 4);
-  const penalty = Math.min(20, matchedCapTerms.length * 4);
-  const popularity = popularityBoost(repo);
-  const intentAdjustment = light.intent === "tool" ? 4 : light.intent === "understanding" ? 2 : 0;
-  const finalScore = clampScore(rawScore + boost + popularity + intentAdjustment - penalty);
-
-  return {
-    score: finalScore,
-    signals: unique([
-      ...matchedBoostTerms,
-      ...matchedCapTerms,
-      ...(repo.sourceTerms || []),
-      `intent:${light.intent}`,
-    ]),
-    rankingReason: {
-      decision: finalScore > rawScore ? "boost" : "no-change",
-      rawScore,
-      finalScore,
-      matchedBoostTerms,
-      matchedCapTerms,
-      explanation: featureExplanation({ rawScore, finalScore, matchedBoostTerms, matchedCapTerms, popularity, intent: light.intent }),
+    provenance: {
+      sourceUrl: repo.url || `https://github.com/${repo.fullName || ""}`,
+      evidenceKind: evidence?.kind || "readme",
+      candidate: repo.fullName || "",
     },
+    verifiedAt: generatedAt,
+    generatedAt,
   };
 }
 
-export function projectRankingInputSignals(repo = {}, evidence = {}) {
-  const text = projectSignalText(repo, evidence?.content, {});
-  const publicText = projectSignalText(repo, "", {});
+export function publicDeep(payload = {}) {
   return {
-    boostTerms: matchedTerms(text, BOOST_TERMS),
-    capTerms: matchedTerms(publicText, CAP_TERMS),
-    sourceTerms: Array.isArray(repo.sourceTerms) ? repo.sourceTerms : [],
-    popularityBoost: popularityBoost(repo),
-    note: "Cheap keyword/popularity signal only; final triage should follow AI-engineering value.",
+    atGlance: payload.atGlance,
+    whyItMatters: payload.whyItMatters || [],
+    keyConcepts: payload.keyConcepts || [],
+    howItWorks: payload.howItWorks,
+    novelty: payload.novelty,
+    ecosystem: payload.ecosystem,
+    limitations: payload.limitations || [],
+    tryIt: payload.tryIt || [],
+    score: payload.score || { novelty: 0, engineering: 0, reproducibility: 0, timeToValue: 0 },
   };
 }
 
@@ -248,7 +258,7 @@ export function classifyProjectType(input = {}) {
   if (!AI_RE.test(text)) return "non_ai_eng";
   if (/\b(coding agent|devtool|developer tool|cli|command line|terminal|shell|codemod|code assistant)\b/i.test(text)) return "devtool_cli";
   if (/\b(dataset|benchmark|eval|evaluation|leaderboard|arena|test set|harness)\b/i.test(text)) return "dataset_benchmark";
-  if (/\b(agent framework|agent runtime|agent infrastructure|agent toolkit|multi-agent|orchestration|planner|tool calling|workflow engine|memory framework)\b/i.test(text)) return "agent_framework";
+  if (/\b(agent framework|agent runtime|agent infrastructure|agent toolkit|multi-agent|orchestration|planner|tool calling|workflow engine|memory framework|mcp)\b/i.test(text)) return "agent_framework";
   if (/\b(model infra|serving|inference|fine-tun|finetun|training|checkpoint|quantization|vllm|lora|embedding service)\b/i.test(text)) return "model_infra";
   if (/\b(frontend|ui|react|vue|svelte|dashboard|component|chat ui|web app)\b/i.test(text)) return "frontend_ui";
   if (/\b(sdk|library|package|api client|framework|client library)\b/i.test(text)) return "library_sdk";
@@ -259,15 +269,12 @@ export function classifyProjectType(input = {}) {
 export function normalizeIntent(value, fallback = "understanding") {
   const raw = String(value || "").trim().toLowerCase();
   const mapped = {
-    "理解型": "understanding",
-    "understanding": "understanding",
-    "concept": "understanding",
-    "teaching": "teaching",
-    "教学型": "teaching",
-    "tutorial": "teaching",
-    "tool": "tool",
-    "工具型": "tool",
-    "utility": "tool",
+    understanding: "understanding",
+    concept: "understanding",
+    teaching: "teaching",
+    tutorial: "teaching",
+    tool: "tool",
+    utility: "tool",
   }[raw];
   return INTENTS.has(mapped) ? mapped : INTENTS.has(fallback) ? fallback : "understanding";
 }
@@ -305,209 +312,259 @@ export function normalizeProjectType(value, fallback = "non_ai_eng") {
   return PROJECT_TYPES.has(fallback) ? fallback : "non_ai_eng";
 }
 
-export function normalizeVerdict(value, fallback = "watch") {
-  const raw = String(value || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
-  const mapped = {
-    skip: "skip",
-    watch: "watch",
-    watchlist: "watch",
-    watchlisted: "watch",
-    l1: "L1",
-    light: "L1",
-    light_read: "L1",
-    deep: "deep_dive",
-    deep_dive: "deep_dive",
-    deepdive: "deep_dive",
-    clone: "clone_and_run",
-    clone_run: "clone_and_run",
-    clone_and_run: "clone_and_run",
-    run: "clone_and_run",
-  }[raw];
-  if (VERDICTS.has(mapped)) return mapped;
-  return VERDICTS.has(fallback) ? fallback : "watch";
+export function persistRadarEvaluation(db, candidate, evaluation, evaluatedAt = nowIso(), model = "deterministic-project-radar") {
+  if (!db || !candidate?.id) return null;
+  db.upsertEval({
+    candidateId: candidate.id,
+    decision: evaluation.decision,
+    mode: evaluation.mode,
+    score: evaluation.score,
+    signals: evaluation.signals,
+    reason: evaluation.reason,
+    evaluatedAt,
+  });
+  const row = db.insertAnalysis({
+    candidateId: candidate.id,
+    tier: "light",
+    payload: radarCardPayload(evaluation),
+    model,
+    generatedAt: evaluatedAt,
+  });
+  return row;
 }
 
-export function normalizeRatings(value, fallback = {}) {
-  const source = value && typeof value === "object" ? value : {};
-  const out = {};
-  for (const key of RATING_KEYS) out[key] = clampRating(source[key] ?? fallback[key] ?? 3);
-  return out;
-}
+function evaluationFromDecision({ candidate, repo, evidence_signals, ranking, depth_decision, evaluatedAt }) {
+  const project_type = projectTypeFromSignals(evidence_signals);
+  const intent = intentFromSignals(evidence_signals);
+  const tldr = deterministicTldr(repo, depth_decision);
+  const light = deterministicRadarText(repo, depth_decision);
+  const tags = tagsFromDecision(depth_decision);
+  const reason = depth_decision.rejection_reasons.length
+    ? `${depth_decision.final_depth}: ${depth_decision.rejection_reasons.join(", ")}`
+    : `${depth_decision.final_depth}: ${depth_decision.ranking_reasons.slice(0, 3).join(", ")}`;
 
-export function normalizeDeepAnalysis(input, { repo = {}, evidence = {}, intent = "understanding", options = {} } = {}) {
-  const fallback = offlineDeep(repo, intent);
-  const generatedAt = nowIso(options);
   return {
-    atGlance: cleanString(input?.atGlance || fallback.atGlance),
-    whyItMatters: normalizeWhyItMatters(input?.whyItMatters || fallback.whyItMatters),
-    keyConcepts: normalizeKeyConcepts(input?.keyConcepts || fallback.keyConcepts),
-    howItWorks: cleanString(input?.howItWorks || fallback.howItWorks),
-    novelty: cleanString(input?.novelty || fallback.novelty),
-    ecosystem: cleanString(input?.ecosystem || fallback.ecosystem),
-    limitations: normalizeLimitations(input?.limitations || fallback.limitations),
-    tryIt: normalizeTryIt(input?.tryIt || fallback.tryIt, intent),
-    score: normalizeScore(input?.score || fallback.score),
-    intent,
+    candidateId: candidate.id,
+    decision: depth_decision.final_depth === "needs_enrichment" ? "needs_enrichment" : "radar",
+    mode: "deterministic-radar",
+    score: depth_decision.ranking_score,
+    worthDeepDive: depth_decision.ranking_score,
+    reason,
+    signals: unique([
+      `tier:${ranking.tier}`,
+      `final_depth:${depth_decision.final_depth}`,
+      `max_allowed_depth:${depth_decision.max_allowed_depth}`,
+      `recommended_action:${depth_decision.recommended_action}`,
+      ...depth_decision.ranking_reasons,
+      ...depth_decision.rejection_reasons,
+    ]),
     provenance: {
-      sourceUrl: repo.url || `https://github.com/${repo.fullName || ""}`,
-      evidenceKind: evidence?.kind || "readme",
-      candidate: repo.fullName || "",
+      evaluator: "deterministic-project-radar",
+      source: candidate.source,
     },
-    verifiedAt: generatedAt,
-    generatedAt,
-  };
-}
-
-export function publicDeep(payload = {}) {
-  return {
-    atGlance: payload.atGlance,
-    whyItMatters: payload.whyItMatters || [],
-    keyConcepts: payload.keyConcepts || [],
-    howItWorks: payload.howItWorks,
-    novelty: payload.novelty,
-    ecosystem: payload.ecosystem,
-    limitations: payload.limitations || [],
-    tryIt: payload.tryIt || [],
-    score: payload.score || { novelty: 0, engineering: 0, reproducibility: 0, timeToValue: 0 },
-  };
-}
-
-function offlineLight(repo, evidence) {
-  const description = cleanString(repo.description || evidence?.content || "Open-source AI engineering project.");
-  const intent = classifyProjectIntent({ repo, readme: evidence?.content });
-  const project_type = classifyProjectType({ repo, readme: evidence?.content, light: repo.light, tags: repo.tags });
-  const worthDeepDive = clampScore(repo.worthDeepDive ?? heuristicWorth(repo, evidence));
-  const ratings = inferRatings(repo, evidence, { intent, project_type, worthDeepDive });
-  return {
-    tldr: cleanString(repo.tldr || `${repo.fullName || repo.name || "This repo"} focuses on ${description.slice(0, 72)}.`),
-    tags: normalizeTags(repo.tags || [repo.language, intent, "AI engineering"]),
-    light: cleanString(repo.light || `${description.slice(0, 220)}${repo.starsGained ? ` It gained ${repo.starsGained} stars in the current discovery window.` : ""}`),
-    worthDeepDive,
+    repo,
+    tldr,
+    tags,
+    light,
     intent,
     project_type,
-    verdict: inferVerdict({ worthDeepDive, project_type, ratings, intent }),
-    ratings,
+    verdict: legacyVerdictForDepth(depth_decision.final_depth),
+    ratings: ratingsFromRanking(ranking),
+    rankingReason: publicRankingReason(depth_decision),
+    ranking,
+    ranking_score: depth_decision.ranking_score,
+    max_allowed_depth: depth_decision.max_allowed_depth,
+    final_depth: depth_decision.final_depth,
+    ranking_reasons: depth_decision.ranking_reasons,
+    rejection_reasons: depth_decision.rejection_reasons,
+    recommended_action: depth_decision.recommended_action,
+    needs_enrichment: depth_decision.needs_enrichment,
+    evidence_signals,
+    evidence_summary: evidenceSummary(evidence_signals),
+    depth_decision,
+    evaluatedAt,
   };
 }
 
-function inferRatings(repo = {}, evidence = {}, light = {}) {
+function evidenceSignalsFrom(repo = {}, evidence = {}) {
+  const fromEvidence = evidence?.evidenceSignals
+    || evidence?.evidence_signals
+    || evidence?.metadata?.evidenceSignals
+    || evidence?.metadata?.evidence_signals;
+  if (fromEvidence) return normalizeEvidenceSignals(fromEvidence);
+
   const audit = evidence?.artifactAudit || evidence?.metadata?.artifactAudit || {};
-  const text = projectSignalText(repo, evidence?.content, light);
-  const boostCount = matchedTerms(text, BOOST_TERMS).length;
-  const projectType = normalizeProjectType(light.project_type, classifyProjectType({
-    repo,
-    readme: evidence?.content,
-    light: light.light,
-    tags: light.tags,
-  }));
-  const relevance = projectType === "non_ai_eng"
-    ? 1
-    : clampRating(2 + Math.min(2, boostCount) + (AI_RE.test(text) ? 1 : 0));
-  const engineeringDepth = clampRating(
-    1 +
-    boolPoint(audit.has_src) +
-    boolPoint(audit.has_tests) +
-    boolPoint(audit.has_ci) +
-    boolPoint(audit.has_packages) +
-    (["agent_framework", "devtool_cli", "model_infra", "library_sdk"].includes(projectType) ? 1 : 0),
-  );
-  const reuseValue = clampRating(
-    1 +
-    Math.min(2, boostCount) +
-    boolPoint(audit.has_docs) +
-    boolPoint(audit.has_examples) +
-    (["agent_framework", "devtool_cli", "library_sdk", "model_infra", "dataset_benchmark"].includes(projectType) ? 1 : 0),
-  );
-  const maturity = clampRating(
-    1 +
-    foundPoint(audit.license_spdx_id) +
-    foundPoint(audit.pushed_at) +
-    foundPoint(audit.latest_release_tag_name) +
-    boolPoint(audit.has_tests) +
-    boolPoint(audit.has_ci) +
-    (Number(repo.stars) >= 2000 ? 1 : 0) -
-    (audit.archived === true ? 2 : 0),
-  );
+  const rawReadme = String(evidence?.content || "");
+  return normalizeEvidenceSignals({
+    owner: repo.owner,
+    repo: repo.name,
+    url: repo.url,
+    trend_sources: repo.windows?.map((window) => `github-trending:${window}`) || [],
+    stars: repo.stars,
+    forks: repo.forks,
+    stars_today: repo.starsGained,
+    language: repo.language,
+    topics: Array.isArray(audit.topics) ? audit.topics : repo.topics || [],
+    description: repo.description,
+    created_at: audit.created_at || repo.createdAt,
+    updated_at: audit.updated_at || repo.updatedAt || audit.pushed_at,
+    license: audit.license_spdx_id || repo.license,
+    raw_readme: rawReadme,
+    readme_found: Boolean(rawReadme),
+    readme_fetch_failed: false,
+    readme_empty: Boolean(rawReadme) && rawReadme.trim().length === 0,
+    readme_length: rawReadme.length,
+    top_level_dirs: audit.top_level_dirs || [],
+    key_files: audit.key_files || [],
+    has_docs: audit.has_docs === true,
+    has_examples: audit.has_examples === true,
+    has_tests: audit.has_tests === true,
+    has_install: audit.has_install === true,
+    has_docker: audit.has_docker === true,
+    has_cli: audit.has_cli === true,
+    has_agents: audit.has_agents === true,
+    has_mcp: audit.has_mcp === true,
+    has_skills: audit.has_skills === true,
+    has_models: audit.has_models === true,
+    has_demo: audit.has_demo === true,
+    package_files: audit.package_files || {},
+  });
+}
 
+function deterministicTldr(repo = {}, decision = {}) {
+  const name = repo.fullName || repo.name || decision.evidence_signals?.repo || "project";
+  const depth = decision.final_depth || "list_only";
+  if (depth === "needs_enrichment") return `${name}: README fetch failed; needs enrichment before analysis`;
+  if (depth === "deep") return `${name}: deep radar candidate with agent/tooling evidence`;
+  if (depth === "analysis") return `${name}: analysis candidate with enough repo evidence`;
+  if (depth === "light") return `${name}: light radar item; useful but hard-gated`;
+  return `${name}: radar mention only`;
+}
+
+function deterministicRadarText(repo = {}, decision = {}) {
+  const name = repo.fullName || repo.name || decision.evidence_signals?.repo || "project";
+  const score = Number(decision.ranking_score || 0);
+  const reasons = (decision.ranking_reasons || []).slice(0, 2).join(", ") || "trend signal";
+  const rejection = (decision.rejection_reasons || [])[0];
+  if (decision.final_depth === "needs_enrichment") {
+    return `${name} 进入 Radar，但 README 抓取失败，不能当作空 README 处理；先补抓 README/tree，再决定是否分析。`;
+  }
+  if (rejection) {
+    return `${name} 得分 ${score}，信号是 ${reasons}；暂不深挖，因为 ${rejection}。建议 ${decision.recommended_action || "monitor"}。`;
+  }
+  return `${name} 得分 ${score}，信号是 ${reasons}。按确定性深度门控进入 ${decision.final_depth || "list_only"}，建议 ${decision.recommended_action || "monitor"}。`;
+}
+
+function tagsFromDecision(decision = {}) {
+  const signals = decision.evidence_signals || {};
+  return unique([
+    signals.has_agents ? "agents" : "",
+    signals.has_mcp ? "mcp" : "",
+    signals.has_skills ? "skills" : "",
+    signals.has_models ? "models" : "",
+    signals.has_cli ? "cli" : "",
+    signals.has_docs ? "docs" : "",
+    decision.final_depth,
+  ]).slice(0, 5);
+}
+
+function intentFromSignals(signals = {}) {
+  if (signals.has_install || signals.has_cli || signals.has_demo) return "tool";
+  if (/\b(course|tutorial|lesson|curriculum|awesome|resource list)\b/i.test(`${signals.description}\n${signals.raw_readme}`)) return "teaching";
+  return "understanding";
+}
+
+function projectTypeFromSignals(signals = {}) {
+  const text = `${signals.raw_readme || ""}\n${signals.description || ""}\n${(signals.topics || []).join(" ")}`;
+  if (!AI_RE.test(text) && !signals.has_agents && !signals.has_mcp && !signals.has_models) return "non_ai_eng";
+  if (signals.has_agents || signals.has_mcp || signals.has_skills) return "agent_framework";
+  if (signals.has_cli) return "devtool_cli";
+  if (/\b(eval|benchmark|dataset|leaderboard)\b/i.test(text)) return "dataset_benchmark";
+  if (signals.has_models) return "model_infra";
+  if (/\b(frontend|ui|react|vue|dashboard|chat ui)\b/i.test(text)) return "frontend_ui";
+  if (signals.package_files?.package_json || signals.package_files?.pyproject_toml || signals.package_files?.cargo_toml) return "library_sdk";
+  return "ai_app";
+}
+
+function ratingsFromRanking(ranking = {}) {
   return {
-    relevance_to_ai_engineer: relevance,
-    engineering_depth: engineeringDepth,
-    reuse_value: reuseValue,
-    maturity,
+    relevance_to_ai_engineer: partToRating(ranking.ai_relevance, 20),
+    engineering_depth: partToRating(ranking.architecture_value, 20),
+    reuse_value: partToRating((Number(ranking.usability) || 0) + (Number(ranking.evidence_sufficiency) || 0), 35),
+    maturity: partToRating((Number(ranking.evidence_sufficiency) || 0) + (Number(ranking.trend_signal) || 0), 30),
   };
 }
 
-function inferVerdict({ worthDeepDive = 50, project_type = "non_ai_eng", ratings = {}, intent = "understanding" } = {}) {
-  const normalizedRatings = normalizeRatings(ratings);
-  if (project_type === "non_ai_eng" || normalizedRatings.relevance_to_ai_engineer <= 1) return "skip";
-  if (
-    worthDeepDive >= 82 &&
-    intent === "tool" &&
-    normalizedRatings.relevance_to_ai_engineer >= 4 &&
-    normalizedRatings.engineering_depth >= 4 &&
-    normalizedRatings.reuse_value >= 4 &&
-    normalizedRatings.maturity >= 3
-  ) return "clone_and_run";
-  if (
-    worthDeepDive >= 70 &&
-    normalizedRatings.relevance_to_ai_engineer >= 4 &&
-    normalizedRatings.engineering_depth >= 3 &&
-    normalizedRatings.reuse_value >= 4
-  ) return "deep_dive";
-  if (worthDeepDive >= 55) return "L1";
-  if (worthDeepDive >= 35) return "watch";
+function partToRating(value, max) {
+  const ratio = Math.max(0, Math.min(1, (Number(value) || 0) / max));
+  return Math.max(1, Math.min(5, Math.ceil(ratio * 5)));
+}
+
+function legacyVerdictForDepth(depth) {
+  if (depth === "deep") return "clone_and_run";
+  if (depth === "analysis") return "deep_dive";
+  if (depth === "light") return "L1";
   return "skip";
 }
 
-function offlineDeep(repo, intent) {
-  const name = repo.fullName || repo.name || "This project";
-  const description = cleanString(repo.description || "The README gives limited detail, so this offline analysis stays conservative.");
-  const conceptualTryIt = [
-    { step: "Identify the core problem the project is trying to solve and the AI system boundary it assumes." },
-    { step: "Trace the main data or context flow from input to model/tool call to output." },
-    { step: "Extract one reusable pattern and compare it with your own agent or RAG workflow." },
-  ];
-  const toolTryIt = [
-    { step: "Read the README quickstart and verify the required runtime, API keys, and integration points." },
-    { step: "Run the smallest documented example, then inspect which model, tool, or retrieval path it exercises." },
-    { step: "Extend one input, tool, or eval case so the project teaches a reusable workflow rather than a demo only." },
-  ];
-
+function publicRankingReason(decision = {}) {
   return {
-    atGlance: `${name} is worth a closer look if you care about ${description.slice(0, 90)}.`,
-    whyItMatters: [
-      { title: "Reusable idea", body: "The useful part is the system pattern: how context, tools, memory, or evaluation are wired together." },
-      { title: "Engineering signal", body: "Stars and recent discovery are treated as signals, but the deep value comes from transferable implementation choices." },
-      { title: "Reading path", body: "Start from the README architecture or quickstart, then map the pieces to your own AI workflow." },
-    ],
-    keyConcepts: [
-      { term: "System boundary", explain: "The point where the project turns user input, repository state, or external data into model-ready context." },
-      { term: "Transferable pattern", explain: "A design move that can be reused outside this repository, such as memory retrieval, tool routing, or eval loops." },
-    ],
-    howItWorks: `## One-sentence model\n${description}\n\n## Workflow\nRead the README as an input-to-output path: what enters the system, what components transform it, and where model calls or tools appear.\n\n## Verification point\nThe project is most valuable when the README shows a concrete path you can adapt, not only a feature list.`,
-    novelty: "The offline path cannot verify all implementation details, so it focuses on conservative transfer value. Look for whether the project combines familiar pieces in a way that reduces integration work or exposes a clearer mental model.\n\nIf the README shows only marketing language, keep it as a light read. If it exposes architecture, evals, memory, or tool boundaries, it may deserve a deeper manual pass.",
-    ecosystem: "Treat this repository as one node in the agent/RAG/tooling ecosystem. Compare its abstractions with LangChain, AutoGen, MCP servers, vector stores, or coding-agent workflows depending on the README scope.",
-    limitations: [
-      { title: "Evidence bound", body: "Offline analysis only uses cached metadata or README text. Claims about internals should be rechecked against source files before publication." },
-      { title: "Popularity bias", body: "Trending and stars can overrate demos. The selection score therefore also looks for reusable AI engineering signals." },
-    ],
-    tryIt: intent === "tool" ? toolTryIt : conceptualTryIt,
-    score: { novelty: 12, engineering: 12, reproducibility: intent === "tool" ? 14 : 8, timeToValue: 10 },
+    decision: decision.rejection_reasons?.length ? "gated" : "deterministic",
+    rawScore: Number(decision.ranking_score || 0),
+    finalScore: Number(decision.ranking_score || 0),
+    matchedBoostTerms: decision.ranking_reasons || [],
+    matchedCapTerms: decision.rejection_reasons || [],
+    explanation: [
+      `score=${Number(decision.ranking_score || 0)}`,
+      `max=${decision.max_allowed_depth || "list_only"}`,
+      `final=${decision.final_depth || "list_only"}`,
+    ].join("; "),
   };
 }
 
-function heuristicWorth(repo, evidence) {
-  const text = projectSignalText(repo, evidence?.content, {});
-  const boosts = matchedTerms(text, BOOST_TERMS).length;
-  const caps = matchedTerms(projectSignalText(repo, "", {}), CAP_TERMS).length;
-  const score = 45 + boosts * 8 + popularityBoost(repo) - caps * 4;
-  return clampScore(score);
+function publicDepthDecision(decision = {}) {
+  return {
+    ranking_score: Number(decision.ranking_score || 0),
+    max_allowed_depth: decision.max_allowed_depth || "list_only",
+    final_depth: decision.final_depth || "list_only",
+    ranking_reasons: decision.ranking_reasons || [],
+    rejection_reasons: decision.rejection_reasons || [],
+    recommended_action: decision.recommended_action || "monitor",
+    needs_enrichment: Boolean(decision.needs_enrichment),
+    review_verdict: decision.review_verdict || "not_applicable",
+    review_issues: decision.review_issues || [],
+    evidence_summary: evidenceSummary(decision.evidence_signals || {}),
+  };
+}
+
+function skippedAnalysis(tier, reason, { candidate = {}, triage = {}, options = {}, error = null } = {}) {
+  return {
+    tier,
+    status: "skipped",
+    skipped: true,
+    reason,
+    candidateId: candidate?.id,
+    repo: candidate?.raw?.fullName || candidate?.raw?.name || candidate?.id || "",
+    final_depth: triage?.final_depth || triage?.depth_decision?.final_depth || tier,
+    offline: isOffline(options),
+    ...(error ? { error: error.message || String(error) } : {}),
+  };
+}
+
+function isOffline(options = {}, env = process.env) {
+  return Boolean(
+    options.dryRun
+      || options.noLlm
+      || options.offline
+      || env.NO_LLM === "1"
+      || env.AI_BRIEF_OFFLINE === "1",
+  );
 }
 
 function normalizeWhyItMatters(value) {
   return asArray(value).slice(0, 3).map((item) => ({
     title: cleanString(item?.title || "Why it matters").slice(0, 24),
-    body: cleanString(item?.body || item || "The README does not give enough detail."),
+    body: cleanString(item?.body || item || ""),
   })).filter((item) => item.body);
 }
 
@@ -532,7 +589,7 @@ function normalizeTryIt(value, intent) {
     const cmd = cleanString(item?.cmd || "");
     const note = cleanString(item?.note || "");
     const out = { step };
-    if (intent === "tool" && cmd && !isDangerousOrInventedCommand(cmd)) out.cmd = cmd;
+    if (intent === "tool" && cmd && commandLike(cmd)) out.cmd = cmd;
     if (note) out.note = note;
     return out;
   }).filter((item) => item.step);
@@ -546,7 +603,7 @@ function normalizeTryIt(value, intent) {
   return steps;
 }
 
-function normalizeScore(value) {
+function normalizeScore(value = {}) {
   return {
     novelty: clampPart(value?.novelty),
     engineering: clampPart(value?.engineering),
@@ -555,59 +612,17 @@ function normalizeScore(value) {
   };
 }
 
-function projectSignalText(repo, readme, light) {
-  return [
-    repo.fullName,
-    repo.name,
-    repo.description,
-    repo.language,
-    light?.tldr,
-    light?.light,
-    ...(Array.isArray(light?.tags) ? light.tags : []),
-    readme ? String(readme).slice(0, 5000) : "",
-  ].filter(Boolean).join("\n").toLowerCase();
-}
-
-function matchedTerms(text, terms) {
-  const out = [];
-  const normalized = String(text || "").toLowerCase();
-  for (const term of terms) {
-    const pattern = new RegExp(`\\b${escapeRegex(term).replace(/\\ /g, "\\s+")}\\b`, "i");
-    if (pattern.test(normalized)) out.push(term);
-  }
-  return out;
-}
-
-function featureExplanation({ rawScore, finalScore, matchedBoostTerms, matchedCapTerms, popularity, intent }) {
-  const parts = [`raw ${rawScore}`, `final ${finalScore}`, `intent ${intent}`];
-  if (matchedBoostTerms.length) parts.push(`boost: ${matchedBoostTerms.join(", ")}`);
-  if (matchedCapTerms.length) parts.push(`penalty features: ${matchedCapTerms.join(", ")}`);
-  if (popularity) parts.push(`popularity +${popularity}`);
-  return parts.join("; ");
-}
-
-function popularityBoost(repo) {
-  const gained = Number(repo.starsGained) || 0;
-  const stars = Number(repo.stars) || 0;
-  if (gained >= 1000) return 8;
-  if (gained >= 300) return 6;
-  if (gained >= 100) return 4;
-  if (stars >= 10000) return 4;
-  if (stars >= 2000) return 2;
-  return 0;
-}
-
 function scoreRegex(text, regex) {
   const matches = String(text || "").match(new RegExp(regex.source, "gi"));
   return matches ? matches.length : 0;
 }
 
-function cleanString(value) {
-  return String(value || "").replace(/\s+/g, " ").trim();
-}
-
 function normalizeTags(value) {
   return asArray(value).map((tag) => cleanString(tag)).filter(Boolean).slice(0, 5);
+}
+
+function cleanString(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
 }
 
 function asArray(value) {
@@ -619,44 +634,13 @@ function unique(items) {
   return [...new Set(items.filter(Boolean))];
 }
 
-function clampScore(value) {
-  const number = Math.round(Number(value));
-  return Math.max(0, Math.min(100, Number.isFinite(number) ? number : 50));
+function commandLike(value) {
+  return COMMAND_RE.test(String(value || ""));
 }
 
 function clampPart(value) {
   const number = Math.round(Number(value));
   return Math.max(0, Math.min(25, Number.isFinite(number) ? number : 0));
-}
-
-function clampRating(value) {
-  const number = Math.round(Number(value));
-  return Math.max(1, Math.min(5, Number.isFinite(number) ? number : 3));
-}
-
-function boolPoint(value) {
-  return value === true ? 1 : 0;
-}
-
-function foundPoint(value) {
-  return value !== undefined && value !== null && value !== "" && value !== NOT_FOUND ? 1 : 0;
-}
-
-function numberOption(value, fallback) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : fallback;
-}
-
-function isDangerousOrInventedCommand(cmd) {
-  return !commandLike(cmd);
-}
-
-function commandLike(value) {
-  return COMMAND_RE.test(String(value || ""));
-}
-
-function escapeRegex(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function nowIso(options = {}) {

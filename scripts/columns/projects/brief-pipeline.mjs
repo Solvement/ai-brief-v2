@@ -8,14 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
 const DEFAULT_WIKI_ROOT = "brief-wiki";
 
-export const DEEP_DIVE_VERDICTS = new Set(["deep_dive", "clone_and_run"]);
-
 export function isBriefWikiProjectPipeline(options = {}) {
   return Boolean(options.projectBriefWiki || options.briefWikiDaily || options.dailyDeepDive);
-}
-
-export function isProjectDeepDiveVerdict(verdict) {
-  return DEEP_DIVE_VERDICTS.has(String(verdict || ""));
 }
 
 export function isProjectAlreadyDeepDived(candidate, options = {}) {

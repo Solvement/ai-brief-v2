@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { BOOST_TERMS } from "../../lib/project-ranking.mjs";
-import { fetchGitHubReadme, scrapeTrendingBoard } from "../../lib/github-trending.mjs";
+import { scrapeTrendingBoard } from "../../lib/github-trending.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -20,6 +20,8 @@ const ARTIFACT_AUDIT_FIELDS = [
   "stargazers_count",
   "forks_count",
   "license_spdx_id",
+  "created_at",
+  "updated_at",
   "pushed_at",
   "open_issues_count",
   "default_branch",
@@ -27,20 +29,59 @@ const ARTIFACT_AUDIT_FIELDS = [
   "archived",
   "homepage",
   "top_level_entries",
+  "top_level_dirs",
+  "key_files",
+  "package_files",
   "has_src",
   "has_tests",
   "has_docs",
   "has_examples",
   "has_packages",
+  "has_install",
+  "has_docker",
+  "has_cli",
+  "has_agents",
+  "has_mcp",
+  "has_skills",
+  "has_models",
+  "has_demo",
   "has_ci",
   "latest_release_tag_name",
   "latest_release_published_at",
 ];
 
+const README_BRANCHES = ["main", "master"];
+const README_FILES = ["README.md", "README", "readme.md"];
+const KEY_FILE_NAMES = new Set([
+  "README.md",
+  "README",
+  "readme.md",
+  "package.json",
+  "pyproject.toml",
+  "Cargo.toml",
+  "requirements.txt",
+  "docker-compose.yml",
+  "docker-compose.yaml",
+  "Dockerfile",
+  "go.mod",
+  "setup.py",
+  "tsconfig.json",
+  "vite.config.ts",
+  "next.config.js",
+  "pnpm-workspace.yaml",
+  "Makefile",
+]);
+const INSTALL_RE = /\b(install|installation|quickstart|getting started|setup|npm install|pnpm install|pip install|uv pip|cargo install|docker run|docker compose)\b/i;
+const CLI_RE = /\b(cli|command line|terminal|npx|console_scripts|entry_points|bin\/|commander|click|typer)\b/i;
+const AGENT_RE = /\b(agent|agents|agentic|multi-agent|planner|tool calling|tool use|function calling|workflow|orchestration|coding agent|computer use|browser agent)\b/i;
+const MCP_RE = /\b(mcp|model context protocol)\b/i;
+const SKILLS_RE = /\b(skill|skills|commands?|hooks?|workflow pack|playbook)\b/i;
+const MODEL_RE = /\b(model|models|llm|embedding|vector|checkpoint|hugging ?face|openai|anthropic|gemini|claude|inference|rag|retrieval)\b/i;
+
 export async function discover(ctx = {}) {
   const options = ctx.options || {};
-  const limit = numberOption(options.limit, 15);
-  const topicLimit = numberOption(options.topicLimit, 4);
+  const limit = numberOption(options.limit, 30);
+  const topicLimit = numberOption(options.topicLimit, 0);
   const offline = isOffline(options);
   const discoveredAt = nowIso(options);
   const rows = [];
@@ -49,14 +90,18 @@ export async function discover(ctx = {}) {
     rows.push(...await loadOfflineTrending({ limit, discoveredAt }));
   } else {
     rows.push(...await discoverTrending({ limit, discoveredAt, logger: ctx.logger }));
-    rows.push(...await discoverTopicSearch({ topicLimit, discoveredAt, logger: ctx.logger, options }));
+    if (topicLimit > 0) rows.push(...await discoverTopicSearch({ topicLimit, discoveredAt, logger: ctx.logger, options }));
   }
 
   const mergedCandidates = mergeCandidates(rows);
   const deepDivedRepos = readBriefWikiDeepDivedProjectRepos(options.briefWikiContentDir || BRIEF_WIKI_CONTENT);
-  const candidates = mergedCandidates.filter((candidate) => !matchesKnownRepo(candidate.raw, deepDivedRepos));
-  const skipped = mergedCandidates.length - candidates.length;
+  const discoveryCap = options.cap == null ? null : numberOption(options.cap, null);
+  const notDeepDived = mergedCandidates.filter((candidate) => !matchesKnownRepo(candidate.raw, deepDivedRepos));
+  const candidates = notDeepDived.slice(0, discoveryCap || undefined);
+  const skipped = mergedCandidates.length - notDeepDived.length;
+  const capped = notDeepDived.length - candidates.length;
   if (skipped) ctx.logger?.info?.(`projects discover skipped ${skipped} already deep-dived repo(s) from brief-wiki`);
+  if (capped) ctx.logger?.info?.(`projects discover capped ${capped} repo(s) by --cap debug limit`);
   if (options.db) {
     for (const candidate of candidates) options.db.upsertCandidate(candidate);
   }
@@ -67,11 +112,15 @@ export async function collectEvidence(candidate, ctx = {}) {
   const options = ctx.options || {};
   const repo = candidate.raw || {};
   const offline = isOffline(options);
-  let content = repo.readme || repo.cachedReadme || "";
-
-  if (!content && repo.deep?.howItWorks) content = repo.deep.howItWorks;
-  if (!content && repo.light) content = repo.light;
-  if (!content && repo.description) content = repo.description;
+  const hasCachedReadme = typeof repo.readme === "string" || typeof repo.cachedReadme === "string";
+  const cachedReadme = firstString(repo.readme, repo.cachedReadme);
+  let readme = cachedReadme;
+  let readmeState = {
+    source: hasCachedReadme ? "candidate_cache" : "none",
+    readme_found: hasCachedReadme,
+    readme_fetch_failed: false,
+    readme_empty: hasCachedReadme && cachedReadme.trim().length === 0,
+  };
 
   const repoIdentity = repoIdentityForApi(repo);
   const artifactAudit = offline || !repoIdentity
@@ -79,22 +128,59 @@ export async function collectEvidence(candidate, ctx = {}) {
     : await fetchArtifactAudit(repoIdentity.owner, repoIdentity.name, { options, logger: ctx.logger, repo });
 
   if (!offline && !options.noReadme && repoIdentity) {
-    try {
-      content = await fetchGitHubReadme(repoIdentity.owner, repoIdentity.name, {
-        githubToken: options.githubToken || process.env.GITHUB_TOKEN,
-        maxChars: numberOption(options.readmeMaxChars, 14000),
-      }) || content;
-    } catch (error) {
-      ctx.logger?.warn?.(`README failed ${repo.fullName}: ${error.message}`);
+    const result = await fetchGitHubRawReadme(repoIdentity.owner, repoIdentity.name, {
+      githubToken: options.githubToken || process.env.GITHUB_TOKEN,
+      maxChars: numberOption(options.readmeMaxChars, 14000),
+      userAgent: options.userAgent || DEFAULT_USER_AGENT,
+    });
+
+    if (result.ok) {
+      readme = result.content;
+      readmeState = {
+        source: result.source,
+        readme_found: true,
+        readme_fetch_failed: false,
+        readme_empty: result.content.trim().length === 0,
+      };
+    } else if (result.readme_fetch_failed) {
+      readmeState = {
+        source: result.source || readmeState.source,
+        readme_found: Boolean(readme),
+        readme_fetch_failed: true,
+        readme_empty: false,
+      };
+      ctx.logger?.warn?.(`README failed ${repo.fullName}: ${result.error?.message || result.status || "fetch failed"}`);
+    } else if (!readme) {
+      readmeState = {
+        source: "not_found",
+        readme_found: false,
+        readme_fetch_failed: false,
+        readme_empty: false,
+      };
     }
   }
 
+  const content = String(readme || "").slice(0, numberOption(options.readmeMaxChars, 14000))
+    || "[no README content fetched — see evidence_signals flags (offline / fetch_failed / empty)]";
+  const evidenceSignals = buildEvidenceSignals(repo, {
+    artifactAudit,
+    rawReadme: content,
+    readmeState,
+    source: candidate.source,
+  });
   const evidence = {
     candidateId: candidate.id,
     kind: "readme",
-    content: String(content || repo.description || repo.fullName || "").slice(0, numberOption(options.readmeMaxChars, 14000)),
+    content,
     artifactAudit,
-    metadata: { artifactAudit },
+    evidenceSignals,
+    evidence_signals: evidenceSignals,
+    metadata: {
+      artifactAudit,
+      evidenceSignals,
+      evidence_signals: evidenceSignals,
+      readmeSource: readmeState.source,
+    },
     fetchedAt: nowIso(options),
   };
   if (options.db) options.db.upsertEvidence(evidence);
@@ -158,6 +244,8 @@ async function fetchArtifactAudit(owner, name, { options = {}, logger, repo = {}
     audit.stargazers_count = valueOrNotFound(data.stargazers_count);
     audit.forks_count = valueOrNotFound(data.forks_count);
     audit.license_spdx_id = valueOrNotFound(data.license?.spdx_id);
+    audit.created_at = valueOrNotFound(data.created_at);
+    audit.updated_at = valueOrNotFound(data.updated_at);
     audit.pushed_at = valueOrNotFound(data.pushed_at);
     audit.open_issues_count = valueOrNotFound(data.open_issues_count);
     audit.default_branch = valueOrNotFound(data.default_branch);
@@ -173,7 +261,9 @@ async function fetchArtifactAudit(owner, name, { options = {}, logger, repo = {}
       label: `repo tree ${owner}/${name}@${audit.default_branch}`,
     });
     if (treeResult.ok && Array.isArray(treeResult.data?.tree)) {
-      const entries = treeResult.data.tree.map((entry) => entry?.path).filter(Boolean);
+      const entries = treeResult.data.tree
+        .map((entry) => ({ path: entry?.path, type: entry?.type }))
+        .filter((entry) => entry.path);
       Object.assign(audit, treeAudit(entries));
     }
   }
@@ -213,26 +303,263 @@ async function fetchGitHubApiJson(pathname, { options = {}, logger, label = path
   }
 }
 
-function emptyArtifactAudit() {
-  return Object.fromEntries(ARTIFACT_AUDIT_FIELDS.map((field) => [field, NOT_FOUND]));
+function emptyArtifactAudit(repo = {}) {
+  const fullName = normalizeRepoFullName(repo.fullName) || parseGitHubFullName(repo.url);
+  return {
+    ...Object.fromEntries(ARTIFACT_AUDIT_FIELDS.map((field) => [field, NOT_FOUND])),
+    repo_full_name: fullName || NOT_FOUND,
+    repo_url: normalizeGitHubRepoUrl(repo.url) || (fullName ? `https://github.com/${fullName}` : NOT_FOUND),
+    stargazers_count: valueOrNotFound(repo.stars),
+    forks_count: valueOrNotFound(repo.forks),
+    topics: Array.isArray(repo.topics) ? repo.topics : NOT_FOUND,
+    top_level_entries: [],
+    top_level_dirs: [],
+    key_files: [],
+    package_files: emptyPackageFiles(),
+  };
 }
 
 function treeAudit(entries) {
-  const names = entries.map((entry) => String(entry || "")).filter(Boolean);
+  const normalized = entries.map((entry) => {
+    if (typeof entry === "string") return { path: entry, type: "" };
+    return { path: String(entry?.path || ""), type: String(entry?.type || "") };
+  }).filter((entry) => entry.path);
+  const names = normalized.map((entry) => entry.path);
   const lower = new Set(names.map((entry) => entry.toLowerCase()));
+  const topLevelDirs = normalized
+    .filter((entry) => entry.type === "tree" || (!entry.type && !entry.path.includes("/") && !entry.path.includes(".")))
+    .map((entry) => entry.path)
+    .filter((entry) => !entry.includes("/"));
+  const keyFiles = normalized
+    .filter((entry) => entry.type !== "tree")
+    .map((entry) => entry.path)
+    .filter((entry) => KEY_FILE_NAMES.has(path.basename(entry)) || KEY_FILE_NAMES.has(entry));
+  const packageFiles = packageFilesFromNames(lower);
   return {
     top_level_entries: names,
+    top_level_dirs: topLevelDirs,
+    key_files: keyFiles,
+    package_files: packageFiles,
     has_src: hasAny(lower, ["src", "source", "lib"]),
     has_tests: hasAny(lower, ["test", "tests", "__tests__", "spec", "specs"]),
     has_docs: hasAny(lower, ["doc", "docs", "documentation"]),
     has_examples: hasAny(lower, ["example", "examples", "sample", "samples", "demo", "demos"]),
     has_packages: hasAny(lower, ["packages", "package.json", "pyproject.toml", "setup.py", "cargo.toml", "go.mod", "pom.xml"]),
+    has_install: hasAny(lower, ["install.md", "installation.md", "setup.py", "package.json", "pyproject.toml", "requirements.txt", "cargo.toml", "go.mod"]),
+    has_docker: packageFiles.dockerfile || packageFiles.docker_compose_yml,
+    has_cli: hasAny(lower, ["cli", "cmd", "bin", "commands"]),
+    has_agents: hasAny(lower, ["agent", "agents"]),
+    has_mcp: hasAny(lower, ["mcp", "mcp-server", "mcp_servers"]),
+    has_skills: hasAny(lower, ["skill", "skills", "commands", "hooks"]),
+    has_models: hasAny(lower, ["model", "models", "checkpoints"]),
+    has_demo: hasAny(lower, ["demo", "demos", "example", "examples"]),
     has_ci: lower.has(".github"),
   };
 }
 
+export function buildEvidenceSignals(repo = {}, {
+  artifactAudit = {},
+  rawReadme = "",
+  readmeState = {},
+  source = "",
+} = {}) {
+  const raw = String(rawReadme || "");
+  const readmeText = raw.toLowerCase();
+  const treeText = [
+    ...arrayValue(artifactAudit.top_level_entries),
+    ...arrayValue(artifactAudit.top_level_dirs),
+    ...arrayValue(artifactAudit.key_files),
+  ].join("\n").toLowerCase();
+  const topics = arrayValue(artifactAudit.topics === NOT_FOUND ? repo.topics : artifactAudit.topics);
+  const packageFiles = {
+    ...emptyPackageFiles(),
+    ...packageFilesFromAudit(artifactAudit),
+  };
+
+  const readmeFound = Boolean(readmeState.readme_found);
+  const readmeFetchFailed = Boolean(readmeState.readme_fetch_failed);
+  const readmeEmpty = readmeFetchFailed ? false : Boolean(readmeState.readme_empty);
+  const hasDocs = boolAudit(artifactAudit.has_docs) || /\b(docs?|documentation)\b/i.test(treeText);
+  const hasExamples = boolAudit(artifactAudit.has_examples) || /\b(examples?|samples?)\b/i.test(treeText);
+  const hasDemo = boolAudit(artifactAudit.has_demo) || hasExamples || /\b(demo|demos)\b/i.test(`${readmeText}\n${treeText}`);
+  const hasInstall = boolAudit(artifactAudit.has_install)
+    || INSTALL_RE.test(readmeText)
+    || packageFiles.package_json
+    || packageFiles.pyproject_toml
+    || packageFiles.cargo_toml
+    || packageFiles.requirements_txt
+    || packageFiles.docker_compose_yml
+    || packageFiles.dockerfile;
+  const hasDocker = boolAudit(artifactAudit.has_docker)
+    || packageFiles.docker_compose_yml
+    || packageFiles.dockerfile
+    || /\b(docker|container)\b/i.test(readmeText);
+  const hasCli = boolAudit(artifactAudit.has_cli) || CLI_RE.test(`${readmeText}\n${treeText}`);
+  const hasAgents = boolAudit(artifactAudit.has_agents) || AGENT_RE.test(`${readmeText}\n${treeText}\n${topics.join(" ")}`);
+  const hasMcp = boolAudit(artifactAudit.has_mcp) || MCP_RE.test(`${readmeText}\n${treeText}\n${topics.join(" ")}`);
+  const hasSkills = boolAudit(artifactAudit.has_skills) || SKILLS_RE.test(`${readmeText}\n${treeText}`);
+  const hasModels = boolAudit(artifactAudit.has_models) || MODEL_RE.test(`${readmeText}\n${treeText}\n${topics.join(" ")}`);
+
+  return {
+    owner: repo.owner || ownerFromFullName(repo.fullName),
+    repo: repo.name || nameFromFullName(repo.fullName),
+    url: repo.url || artifactAudit.repo_url || "",
+    trend_sources: trendSourcesForRepo(repo, source),
+    stars: Number(repo.stars ?? artifactAudit.stargazers_count) || 0,
+    forks: Number(repo.forks ?? artifactAudit.forks_count) || 0,
+    stars_today: Number(repo.starsGained ?? repo.stars_today ?? repo.starsToday) || 0,
+    language: repo.language || "",
+    topics,
+    description: repo.description || "",
+    created_at: firstFound(artifactAudit.created_at, repo.createdAt, repo.created_at),
+    updated_at: firstFound(artifactAudit.updated_at, repo.updatedAt, repo.updated_at, artifactAudit.pushed_at),
+    license: firstFound(artifactAudit.license_spdx_id, repo.license),
+    raw_readme: raw,
+    readme_found: readmeFound,
+    readme_fetch_failed: readmeFetchFailed,
+    readme_empty: readmeEmpty,
+    readme_length: raw.length,
+    top_level_dirs: arrayValue(artifactAudit.top_level_dirs),
+    key_files: arrayValue(artifactAudit.key_files),
+    has_docs: hasDocs,
+    has_examples: hasExamples,
+    has_tests: boolAudit(artifactAudit.has_tests),
+    has_install: hasInstall,
+    has_docker: hasDocker,
+    has_cli: hasCli,
+    has_agents: hasAgents,
+    has_mcp: hasMcp,
+    has_skills: hasSkills,
+    has_models: hasModels,
+    has_demo: hasDemo,
+    package_files: packageFiles,
+    needs_enrichment: readmeFetchFailed || (!readmeFound && !raw),
+    evidence_basis: evidenceBasis({ raw, artifactAudit, readmeFetchFailed, readmeFound }),
+  };
+}
+
+async function fetchGitHubRawReadme(owner, name, {
+  githubToken = process.env.GITHUB_TOKEN,
+  userAgent = DEFAULT_USER_AGENT,
+  maxChars = 14000,
+} = {}) {
+  const headers = {
+    accept: "text/plain",
+    "user-agent": userAgent,
+  };
+  if (githubToken) headers.authorization = `Bearer ${githubToken}`;
+
+  for (const branch of README_BRANCHES) {
+    for (const fileName of README_FILES) {
+      const source = `${branch}/${fileName}`;
+      const url = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(name)}/${encodeURIComponent(branch)}/${fileName}`;
+      try {
+        const response = await fetch(url, { headers });
+        if (response.status === 404) continue;
+        if (!response.ok) {
+          return { ok: false, source, status: response.status, readme_fetch_failed: true };
+        }
+        return {
+          ok: true,
+          source,
+          status: response.status,
+          content: (await response.text()).slice(0, maxChars),
+        };
+      } catch (error) {
+        return { ok: false, source, error, readme_fetch_failed: true };
+      }
+    }
+  }
+
+  return { ok: false, source: "main/master", status: 404, notFound: true };
+}
+
 function hasAny(set, names) {
   return names.some((name) => set.has(name));
+}
+
+function packageFilesFromNames(lowerNames) {
+  return {
+    package_json: lowerNames.has("package.json"),
+    pyproject_toml: lowerNames.has("pyproject.toml"),
+    cargo_toml: lowerNames.has("cargo.toml"),
+    requirements_txt: lowerNames.has("requirements.txt"),
+    docker_compose_yml: lowerNames.has("docker-compose.yml") || lowerNames.has("docker-compose.yaml"),
+    dockerfile: lowerNames.has("dockerfile"),
+  };
+}
+
+function packageFilesFromAudit(audit = {}) {
+  const packageFiles = audit.package_files && typeof audit.package_files === "object"
+    ? audit.package_files
+    : {};
+  const packageNames = [
+    ...arrayValue(audit.top_level_entries),
+    ...arrayValue(audit.key_files),
+  ].map((entry) => String(entry || "").toLowerCase());
+  const fromNames = packageFilesFromNames(new Set(packageNames));
+  return {
+    ...emptyPackageFiles(),
+    ...fromNames,
+    ...packageFiles,
+  };
+}
+
+function emptyPackageFiles() {
+  return {
+    package_json: false,
+    pyproject_toml: false,
+    cargo_toml: false,
+    requirements_txt: false,
+    docker_compose_yml: false,
+    dockerfile: false,
+  };
+}
+
+function boolAudit(value) {
+  return value === true;
+}
+
+function arrayValue(value) {
+  return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+
+function firstFound(...values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== "" && value !== NOT_FOUND) return value;
+  }
+  return "";
+}
+
+function trendSourcesForRepo(repo = {}, source = "") {
+  return unique([
+    ...(Array.isArray(repo.windows) ? repo.windows.map((window) => `github-trending:${window}`) : []),
+    ...String(source || "").split("+").filter(Boolean),
+  ]);
+}
+
+function evidenceBasis({ raw, artifactAudit, readmeFetchFailed, readmeFound }) {
+  const basis = [];
+  if (readmeFetchFailed) basis.push("readme_fetch_failed");
+  if (readmeFound && raw) basis.push("readme");
+  if (arrayValue(artifactAudit.top_level_dirs).length || arrayValue(artifactAudit.key_files).length) basis.push("tree");
+  if (arrayValue(artifactAudit.topics).length) basis.push("topics");
+  return basis.length ? basis : ["metadata_only"];
+}
+
+function ownerFromFullName(fullName) {
+  return String(fullName || "").split("/")[0] || "";
+}
+
+function nameFromFullName(fullName) {
+  return String(fullName || "").split("/")[1] || "";
+}
+
+function firstString(...values) {
+  for (const value of values) {
+    if (typeof value === "string") return value;
+  }
+  return "";
 }
 
 function repoApiPath(owner, name) {
@@ -453,6 +780,10 @@ function normalizeRepo(repo) {
     worthDeepDive: repo.worthDeepDive,
     rankingReason: repo.rankingReason,
     deep: repo.deep,
+    topics: Array.isArray(repo.topics) ? repo.topics : [],
+    createdAt: repo.createdAt || repo.created_at || null,
+    updatedAt: repo.updatedAt || repo.updated_at || null,
+    license: repo.license || repo.license_spdx_id || null,
     windows: repo.windows || [],
     ranksByWindow: repo.ranksByWindow || {},
     sourceTerms: repo.sourceTerms || [],

@@ -4,14 +4,15 @@ const REQUIRED_FIELDS = [
   "id",
   "title",
   "leadJudgment",
-  "sections",
+  "originalReading",
+  "analystNotes",
   "limitsAndFuture",
   "provenance",
   "verifiedAt",
 ];
 
 const REQUIRED_ARRAY_FIELDS = [
-  { path: "sections", nonEmpty: true },
+  { path: "originalReading", nonEmpty: true },
 ];
 
 const OPTIONAL_ARRAY_FIELDS = [
@@ -29,6 +30,7 @@ export async function qaGate(analysis, evidence, ctx = {}) {
   const structuralFlags = [
     ...structural.flags,
     ...paperShapeFlags(analysis),
+    ...reviewAuditFlags(analysis),
   ];
   const structuralPass = structuralFlags.length === 0;
 
@@ -68,6 +70,32 @@ export async function qaGate(analysis, evidence, ctx = {}) {
   return result;
 }
 
+function reviewAuditFlags(analysis) {
+  const audit = analysis?._reviewAudit;
+  if (!audit) return [];
+  const verdict = String(audit.verdict || "").trim().toLowerCase();
+  if (verdict === "pass") return [];
+  if (verdict === "revise") {
+    return [{
+      id: "reviewer-revision-open",
+      path: "_reviewAudit",
+      message: "independent reviewer still requested revision after analyze stage",
+    }];
+  }
+  if (verdict === "downgrade") {
+    return [{
+      id: "reviewer-downgrade",
+      path: "_reviewAudit",
+      message: "independent reviewer downgraded this item out of deep publication",
+    }];
+  }
+  return [{
+    id: "reviewer-invalid",
+    path: "_reviewAudit",
+    message: "independent reviewer audit has an invalid verdict",
+  }];
+}
+
 function paperShapeFlags(analysis) {
   const flags = [];
   for (const { path, nonEmpty } of REQUIRED_ARRAY_FIELDS) {
@@ -93,16 +121,20 @@ function paperShapeFlags(analysis) {
     }
   }
 
-  const sections = getPath(analysis, "sections");
+  const sections = getPath(analysis, "originalReading");
   if (Array.isArray(sections)) {
     sections.forEach((section, index) => {
       for (const key of ["heading", "summary"]) {
-        const path = `sections.${index}.${key}`;
+        const path = `originalReading.${index}.${key}`;
         if (!isPresentString(section?.[key])) {
           flags.push({ id: "required-field", path, message: "required field missing" });
         }
       }
     });
+  }
+
+  if (!isPresentString(getPath(analysis, "analystNotes"))) {
+    flags.push({ id: "required-field", path: "analystNotes", message: "required field missing" });
   }
 
   const replacementHits = collectStrings(analysis).filter(({ value }) => value.includes("\uFFFD"));
