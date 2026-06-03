@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-30T02:33:06.231Z",
+  "generatedAt": "2026-06-03T01:23:14.371Z",
   "principle": "discover -> evidence -> rank -> review -> verify -> publish -> archive",
   "surfaces": [
     {
@@ -59,24 +59,24 @@
     },
     {
       "surface": "paper_radar",
-      "updatedAt": "2026-05-21T01:19:09.951Z",
+      "updatedAt": "2026-06-03T01:23:14.362Z",
       "latestRun": {
-        "id": "paper_radar-2026-05-20-1779326349951",
+        "id": "paper_radar-2026-06-03-1780449794363",
         "surface": "paper_radar",
-        "date": "2026-05-20",
-        "generatedAt": "2026-05-21T01:19:09.951Z",
-        "qualityStatus": "pass",
+        "date": "2026-06-03",
+        "generatedAt": "2026-06-03T01:23:14.362Z",
+        "qualityStatus": "warning",
         "selectedCount": 4,
         "archivedCount": 6,
         "traceSummary": {
           "candidateCount": 160,
           "selectedCount": 4,
-          "reviewedCount": 2,
+          "reviewedCount": 0,
           "sourceFailureCount": 0,
           "modelCalls": 0,
           "totalTokens": 0
         },
-        "reflectionSummary": "Reflection found 1 watch item(s); keep the feed small and evidence-led.",
+        "reflectionSummary": "Reflection found 4 watch item(s); keep the feed small and evidence-led.",
         "highlights": [
           "Must-read paper: Auditing Agent Harness Safety",
           "160 candidates passed through radar triage."
@@ -86,43 +86,105 @@
           "Run npm run validate after publishing radar data."
         ]
       },
-      "runCount": 6,
+      "runCount": 7,
       "reusablePatterns": [
         {
           "text": "Auditing Agent Harness Safety: Selected as top 1 after score and diversity ranking: AI Agents, Tool Use, Agent Harness / Observability; AHE signals: agent harness, trajectory; freshness=new; hotness=high_signal_source; score=97.",
           "source": "paper_radar",
           "firstSeenAt": "2026-05-21T00:50:08.312Z",
-          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+          "lastSeenAt": "2026-06-03T01:23:14.362Z"
         },
         {
           "text": "Code as Agent Harness: Selected as top 2 after score and diversity ranking: AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: harness engineering, agent harness, rollback; freshness=new; hotness=high_signal_source; score=93.",
           "source": "paper_radar",
           "firstSeenAt": "2026-05-21T00:50:08.312Z",
-          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+          "lastSeenAt": "2026-06-03T01:23:14.362Z"
         },
         {
           "text": "Clover: A Neural-Symbolic Agentic Harness with Stochastic Tree-of-Thoughts for Verified RTL Repair: Selected as top 3 after score and diversity ranking: AI Agents, AI Coding / SWE Agents, Agent Harness / Observability; AHE signals: agent harness; freshness=new; hotness=high_signal_source; score=93.",
           "source": "paper_radar",
           "firstSeenAt": "2026-05-21T00:50:08.312Z",
-          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+          "lastSeenAt": "2026-06-03T01:23:14.362Z"
         },
         {
           "text": "TwinRouterBench: Fast Static and Live Dynamic Evaluation for Realistic Agentic LLM Routing: Selected as top 4 after score and diversity ranking: AI Agents, Tool Use, AI Coding / SWE Agents; AHE signals: trajectory; freshness=new; hotness=standard_source; score=93.",
           "source": "paper_radar",
           "firstSeenAt": "2026-05-21T00:50:08.312Z",
-          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+          "lastSeenAt": "2026-06-03T01:23:14.362Z"
         },
         {
           "text": "Auditing Agent Harness Safety: AI Agents, Tool Use, Agent Harness / Observability; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: agent harness, trajectory.",
           "source": "paper_radar",
           "firstSeenAt": "2026-05-21T00:50:08.814Z",
-          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+          "lastSeenAt": "2026-06-03T01:23:14.362Z"
         },
         {
           "text": "Code as Agent Harness: AI Agents, Tool Use, AI Coding / SWE Agents; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, rollback.",
           "source": "paper_radar",
           "firstSeenAt": "2026-05-21T00:50:08.814Z",
-          "lastSeenAt": "2026-05-21T01:19:09.951Z"
+          "lastSeenAt": "2026-06-03T01:23:14.362Z"
+        }
+      ]
+    },
+    {
+      "surface": "papers",
+      "updatedAt": "2026-05-31T19:21:56.526Z",
+      "latestRun": {
+        "id": "papers-2026-05-31-1780255316528",
+        "surface": "papers",
+        "date": "2026-05-31",
+        "generatedAt": "2026-05-31T19:21:56.526Z",
+        "qualityStatus": "pass",
+        "selectedCount": 10,
+        "archivedCount": 0,
+        "traceSummary": null,
+        "reflectionSummary": "",
+        "highlights": [
+          "Papers published 10 article analysis item(s).",
+          "0 QA failure(s) were excluded."
+        ],
+        "nextActions": [
+          "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+          "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+        ]
+      },
+      "runCount": 5,
+      "reusablePatterns": [
+        {
+          "text": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems: 该论文提出Agent Lifespan Engineering (ALE)框架和AgingBench基准，将长生命周期AI代理的可靠性问题从单点快照评估转向纵向退化测量与诊断。",
+          "source": "papers",
+          "firstSeenAt": "2026-05-31T19:21:56.526Z",
+          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+        },
+        {
+          "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文重新定义了智能体AI的瓶颈，从模型扩展转向系统扩展，强调围绕基础模型的执行架构（harness）是下一个关键挑战。",
+          "source": "papers",
+          "firstSeenAt": "2026-05-31T19:21:56.526Z",
+          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+        },
+        {
+          "text": "Code as Agent Harness: A survey that reframes code as the operational substrate for agent AI, organizing the field into three layers.",
+          "source": "papers",
+          "firstSeenAt": "2026-05-31T19:21:56.526Z",
+          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+        },
+        {
+          "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 离线模式下只根据已收集证据保留《Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses》的基础脉络。",
+          "source": "papers",
+          "firstSeenAt": "2026-05-31T19:21:56.526Z",
+          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+        },
+        {
+          "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 离线模式下只根据已收集证据保留《Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation》的基础脉络。",
+          "source": "papers",
+          "firstSeenAt": "2026-05-31T19:21:56.526Z",
+          "lastSeenAt": "2026-05-31T19:21:56.526Z"
+        },
+        {
+          "text": "Code as Agent Harness: 一份系统性综述，将代码从生成产物重新定义为智能体系统可执行、可检查、有状态的操作基础，并提供三层分类框架。",
+          "source": "papers",
+          "firstSeenAt": "2026-05-31T16:53:47.066Z",
+          "lastSeenAt": "2026-05-31T19:21:56.526Z"
         }
       ]
     },
@@ -191,6 +253,51 @@
   ],
   "recentRuns": [
     {
+      "id": "paper_radar-2026-06-03-1780449794363",
+      "surface": "paper_radar",
+      "date": "2026-06-03",
+      "generatedAt": "2026-06-03T01:23:14.362Z",
+      "qualityStatus": "warning",
+      "selectedCount": 4,
+      "archivedCount": 6,
+      "traceSummary": {
+        "candidateCount": 160,
+        "selectedCount": 4,
+        "reviewedCount": 0,
+        "sourceFailureCount": 0,
+        "modelCalls": 0,
+        "totalTokens": 0
+      },
+      "reflectionSummary": "Reflection found 4 watch item(s); keep the feed small and evidence-led.",
+      "highlights": [
+        "Must-read paper: Auditing Agent Harness Safety",
+        "160 candidates passed through radar triage."
+      ],
+      "nextActions": [
+        "Review the must-read paper before promoting it into Articles.",
+        "Run npm run validate after publishing radar data."
+      ]
+    },
+    {
+      "id": "papers-2026-05-31-1780255316528",
+      "surface": "papers",
+      "date": "2026-05-31",
+      "generatedAt": "2026-05-31T19:21:56.526Z",
+      "qualityStatus": "pass",
+      "selectedCount": 10,
+      "archivedCount": 0,
+      "traceSummary": null,
+      "reflectionSummary": "",
+      "highlights": [
+        "Papers published 10 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
+    {
       "id": "projects-2026-05-30-1780108386210",
       "surface": "projects",
       "date": "2026-05-30",
@@ -207,32 +314,6 @@
       "nextActions": [
         "Run npm run validate before treating the refresh as published.",
         "Spot-check Projects detail pages for the selected deep dives."
-      ]
-    },
-    {
-      "id": "paper_radar-2026-05-20-1779326349951",
-      "surface": "paper_radar",
-      "date": "2026-05-20",
-      "generatedAt": "2026-05-21T01:19:09.951Z",
-      "qualityStatus": "pass",
-      "selectedCount": 4,
-      "archivedCount": 6,
-      "traceSummary": {
-        "candidateCount": 160,
-        "selectedCount": 4,
-        "reviewedCount": 2,
-        "sourceFailureCount": 0,
-        "modelCalls": 0,
-        "totalTokens": 0
-      },
-      "reflectionSummary": "Reflection found 1 watch item(s); keep the feed small and evidence-led.",
-      "highlights": [
-        "Must-read paper: Auditing Agent Harness Safety",
-        "160 candidates passed through radar triage."
-      ],
-      "nextActions": [
-        "Review the must-read paper before promoting it into Articles.",
-        "Run npm run validate after publishing radar data."
       ]
     },
     {
