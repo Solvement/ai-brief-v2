@@ -3,7 +3,7 @@ name: Daily Content Refresh
 on:
   schedule:
     # Run daily at about 16:00 UTC after morning source updates have usually landed.
-    - cron: "0 16 * * *"
+    - cron: "0 12 * * *"
   workflow_dispatch:
 
 permissions:
