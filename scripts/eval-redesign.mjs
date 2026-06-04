@@ -46,38 +46,37 @@ else {
   });
   if (mediaWorthy.length) ok(`Tier2/3 媒体卡 ${mediaWorthy.length} 个（视觉层级可呈现）`);
   else warn("projects:no-media-tier", "没有 Tier2/3，项目页全是紧凑卡、无媒体层级");
-  // 1A：高 star 的周/月榜应进深度
-  const highStarWM = [...new Map(
-    [...(trending.weekly?.repos || []), ...(trending.monthly?.repos || [])].map((r) => [r.fullName, r]),
-  ).values()].filter((r) => Number(r.stars) >= 5000);
-  const highStarDeep = highStarWM.filter((r) => ["deep", "analysis"].includes(r.final_depth) || (r.project_tier ?? 0) >= 2);
-  if (highStarWM.length === 0) ok("周/月榜暂无 ≥5k star 项目（1A 无需触发）");
-  else if (highStarDeep.length === highStarWM.length) ok(`高star周/月榜 ${highStarWM.length} 个全部进深度（1A）`);
-  else warn("projects:1A-highstar-shallow", `高star周/月榜 ${highStarWM.length} 个，仅 ${highStarDeep.length} 个进深度（1A 未达）`);
+  // 1A(2026-06-04 修订规则): 深扒=质量门(架构型 ∧ 月增star≥3000 ∧ 分≥80, 或 分≥90 精英直通)，
+  // 不是"所有高star都深扒"。这里只检查深扒集存在且数量合理(精选, 不泛滥)。
+  const deep = [...uniq.values()].filter((r) => r.final_depth === "deep" || r.project_tier === 3);
+  if (deep.length === 0) warn("projects:no-deep", "没有任何深扒项目");
+  else if (deep.length > 24) warn("projects:deep-too-many", `深扒 ${deep.length} 个, 门太松(应精选)`);
+  else ok(`深扒 ${deep.length} 个(质量门精选, 月增star≥3000 或 分≥90)`);
   if (!isToday(trending.generatedAt)) flags.push("projects:stale");
 }
 
 // ───────────────────────── 论文 (2A/2B) ─────────────────────────
-lines.push("\n## 论文（HF 日/周/月榜）");
-const board = await readJson("public/data/papers-board.json");
-if (!board) warn("papers:board-missing", "papers-board.json 缺失（2A 未建）");
+lines.push("\n## 论文（HF 日/周/月榜 + 深读）");
+const idx = await readJson("public/data/papers-index.json");
+if (!idx) warn("papers:index-missing", "papers-index.json 缺失（运行 build-index.mjs）");
 else {
-  lines.push(`- 更新于 ${freshLabel(board.generatedAt)}`);
+  lines.push(`- 更新于 ${freshLabel(idx.generatedAt)}`);
   const wins = ["daily", "weekly", "monthly"];
   let sample = null;
   for (const w of wins) {
-    const n = board[w]?.papers?.length || 0;
-    if (n > 0) { ok(`${w} 榜 ${n} 篇`); sample = sample || board[w].papers[0]; }
+    const n = idx.board?.[w]?.length || 0;
+    if (n > 0) { ok(`${w} 榜 ${n} 篇`); sample = sample || idx.board[w][0]; }
     else warn(`papers:${w}-empty`, `${w} 榜为空`);
   }
   if (sample) {
     const fieldOk = (cond, name) => cond ? ok(`字段 ${name} ✅`) : warn(`papers:field-${name}`, `缺字段 ${name}`);
-    fieldOk(Boolean(sample.arxivId), "arxivId");
+    fieldOk(Boolean(sample.arxiv_id), "arxiv_id");
     fieldOk(Number.isFinite(Number(sample.upvotes)), "upvotes(number)");
-    fieldOk(/cdn-thumbnails\.huggingface\.co/.test(String(sample.thumbnailUrl || "")), "thumbnailUrl(HF)");
-    fieldOk(Array.isArray(sample.authors), "authors[]");
+    fieldOk(/cdn-thumbnails\.huggingface\.co/.test(String(sample.thumbnail_url || "")), "thumbnail_url(HF)");
   }
-  if (!isToday(board.generatedAt)) flags.push("papers:stale");
+  if ((idx.deepReads?.length || 0) > 0) ok(`深读 ${idx.deepReads.length} 篇(两-tab 页可看)`);
+  else warn("papers:no-deepread", "无深读");
+  if (!isToday(idx.generatedAt)) flags.push("papers:stale");
 }
 
 // ───────────────────────── 新闻 (3A/3B) ─────────────────────────
