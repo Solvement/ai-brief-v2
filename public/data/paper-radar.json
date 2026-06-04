@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
-  "date": "2026-06-03",
-  "generatedAt": "2026-06-03T17:58:05.211Z",
+  "date": "2026-06-04",
+  "generatedAt": "2026-06-04T16:16:29.241Z",
   "sourceFiles": {
-    "daily": "data/papers/daily-2026-06-03.json",
-    "triage": "data/papers/triage-2026-06-03.json"
+    "daily": "data/papers/daily-2026-06-04.json",
+    "triage": "data/papers/triage-2026-06-04.json"
   },
   "pipelineRun": {
-    "id": "papers-2026-06-03-1780509485237",
+    "id": "papers-2026-06-04-1780589789265",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -15,37 +15,37 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-06-03T17:58:05.236Z",
+    "checkedAt": "2026-06-04T16:16:29.264Z",
     "checks": [
       {
         "id": "papers-present",
         "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "2 paper(s)"
+        "details": "3 paper(s)"
       },
       {
         "id": "section-shape",
         "label": "every paper has originalReading summaries",
         "status": "pass",
-        "details": "2 paper(s) checked"
+        "details": "3 paper(s) checked"
       },
       {
         "id": "analyst-notes",
         "label": "every paper has analystNotes",
         "status": "pass",
-        "details": "2 paper(s) checked"
+        "details": "3 paper(s) checked"
       },
       {
         "id": "qa-fail-excluded",
         "label": "QA fail verdicts are not published",
         "status": "pass",
-        "details": "1 failed item(s) excluded"
+        "details": "2 failed item(s) excluded"
       },
       {
         "id": "current-run-deep",
         "label": "current run produced at least one new deep analysis",
         "status": "pass",
-        "details": "2 current-run paper(s)"
+        "details": "1 current-run paper(s)"
       },
       {
         "id": "qa-warnings",
@@ -60,9 +60,9 @@
   "memoryVersion": 1,
   "triageSummary": {
     "candidateCount": 3,
-    "selectedCount": 2,
-    "rejectedCount": 1,
-    "cutoffScore": 80
+    "selectedCount": 1,
+    "rejectedCount": 2,
+    "cutoffScore": 74
   },
   "agentFlow": [
     {
@@ -81,19 +81,19 @@
       "stage": "rank",
       "role": "Ranker",
       "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-      "signal": "2 current analysis item(s) available after QA and reviewer filtering"
+      "signal": "1 current analysis item(s) available after QA and reviewer filtering"
     },
     {
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "2 recent deep article(s), 23 total archived deep item(s)"
+      "signal": "3 recent deep article(s), 24 total archived deep item(s)"
     },
     {
       "stage": "verify",
       "role": "Verifier",
       "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
-      "signal": "1 QA failure(s) excluded before publish"
+      "signal": "2 QA failure(s) excluded before publish"
     },
     {
       "stage": "publish",
@@ -109,141 +109,91 @@
     }
   ],
   "mustRead": {
-    "id": "paper:arxiv-2606-01166",
-    "title": "BraveGuard: From Open-World Threats to Safer Computer-Use Agents",
+    "id": "paper:arxiv-2605-31148",
+    "title": "SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes",
     "daily_action": "must_read",
-    "triage_decision": "deep_dive",
-    "total_score": 84,
-    "sourceName": "arXiv terminal agents observability",
-    "sourceUrl": "https://arxiv.org/abs/2606.01166",
+    "triage_decision": "skim",
+    "total_score": 74,
+    "sourceName": "Hugging Face Daily Papers",
+    "sourceUrl": "https://huggingface.co/papers/2605.31148",
     "matched_topics": [
+      "Broad AI / ML",
       "AI Agents",
-      "Tool Use",
-      "Agent Harness / Observability",
+      "Multimodal UI",
       "Evaluation / Benchmarks",
       "LLM Security / Reliability",
-      "Human-AI Interaction"
+      "Reasoning / Post-training"
     ],
     "freshness_signal": "new",
-    "hotness_signal": "standard_source",
-    "reason": "AI Agents, Tool Use, Agent Harness / Observability; high relevance and practicality for agent safety."
+    "hotness_signal": "high_signal_source",
+    "reason": "Relevant to agents and evaluation but lacks concrete application or system building insights; primarily a benchmark."
   },
-  "skim": [
-    {
-      "id": "paper:arxiv-2605-27922",
-      "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
-      "daily_action": "skim",
-      "triage_decision": "review",
-      "total_score": 80,
-      "sourceName": "arXiv terminal agents observability",
-      "sourceUrl": "https://arxiv.org/abs/2605.27922",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks",
-        "Reasoning / Post-training"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "High relevance to agent harness observability and real-world workflows; strong FDE signals."
-    }
-  ],
-  "professorLesson": "这是一篇提出 BraveGuard 自适应防御框架的论文，旨在通过从现实世界威胁信号和真实计算机操作代理轨迹中学习，提升对计算机使用代理的安全监控能力。",
-  "goodIdeaToSteal": "计算机使用代理将语言模型从文本生成扩展到与文件、终端、浏览器等工具的持续交互。这种转变带来了难以从孤立提示或最终回复检测的安全风险，因为危害往往通过多步执行轨迹显现，其中每一步单独看都显得无害。本文提出 BraveGuard，一个自进化的防御框架，从开放世界的威胁信号和真实的代理轨迹中训练守护模型。BraveGuard 挖掘近期研究来源以识别新兴风险和攻击模式，将其实例化为可执行的计算机使用任务，采集代理的 rollout 轨迹，并为守护模型训练提供轨迹级别的监督。当出现新威胁和验证失败时，该流程可重复执行，形成自适应防御循环。作者用多个守护骨干模型实例化 BraveGuard，并在轨迹级别的代理安全基准上评估。在 AgentHazard 上，BraveGuard 将现成守护模型的检测准确率从 38.79% 提升至 82.38%。",
-  "badIdeaOrRisk": "全部实验基于两个静态基准和两个附加判断基准，无真实部署数据。自进化循环仅通过消融组件模拟了迭代效果，未在长期动态环境中验证。数据生成和守卫训练均紧密依赖 OpenClaw，跨代理泛化证据有限。论文提及的局限性已部分通过跨基准评估缓解，但仍缺乏对生产环境噪声、延迟和误报影响的评估。",
-  "transferablePattern": "### 这篇论文到底做了什么？ BraveGuard 的核心思想很简单：**要判断一个计算机使用代理是否安全，不能只看它说了什么或最终回复了什么，必须审查它的整个操作轨迹**。而现有的安全守卫模型大多是在静态的提示词-回答对上训练的，根本不会“读”轨迹。所以作者设计了一套流水线，自动从最新的论文、漏洞报告中提取威胁知识，自动生成大量的多步恶意任务（但每步看起来都很正常），让真实代理（OpenClaw）执行并记录完整轨迹，然后用这些轨迹训练守卫模型。而且这套流水线是自进化的：守卫在验证集上犯错的地方会被分析，用来生成更多类似难例，反复迭代，从而不断适应新威胁。 **如果你只带走三件事，那就是：** 1. **轨迹级判断取代提示级判断…",
-  "futureWorkApplication": "覆盖范围取决于挖掘的威胁证据质量和任务合成的逼真度；可能对未公开或难以实例化的威胁代表性不足；性能可能随代理的轨迹格式、工具接口或执行环境不同而波动。",
-  "architectureTakeaway": "初步探索了使用技能作为推理时防御机制。在 AgentHazard 上对比了默认 OpenClaw、添加静态安全技能（shell-safe-exec）和使用 AutoSkills 检索技能三种配置。在 AgentHazard-Strongest 子集上，技能略降低攻击表现，但在全数据集上效果不一致，甚至 AutoSkills 反而提升攻击表现。这表明直接将技能机制用于防御可能不够可靠，有效的防御技能需要风险条件化激活、安全感知的检索和轨迹级验证。",
-  "interviewTalkingPoint": "deep_dive:84+ahe:observability+fde:customer/production system",
-  "projectIdea": "Read 《BraveGuard: From Open-World Threats to Safer Computer-Use Agents》 against your own questions before opening the analyst notes.",
+  "skim": [],
+  "professorLesson": "这篇论文提出了SpatialAct，一个基于3D模拟器的分层诊断基准，用于考察视觉语言模型（VLM）代理能否将空间推理转化为动态环境下的可靠动作，并揭示了当前模型在单步理解尚可但多轮交互精炼严重不足的“推理到行动鸿沟”。",
+  "goodIdeaToSteal": "人类能轻松地在3D环境中感知空间布局、建立认知表征并进行推理，进而转化为动作，但视觉语言模型（VLM，能同时处理图像和文本的AI模型）在这方面的能力尚不明确。现有空间推理基准大多只让模型作为观察者回答问题，不要求其动作改变环境；而具身基准则混入了底层控制（导航、操作），难以单独评估高层空间推理到行动的能力。本文提出“动作驱动的空间推理”（action-conditioned spatial reasoning）概念，即模型不仅推理当前空间状态，还要推理自身动作如何改变状态以及后续决策如何适应。为此，作者将其具体化为交互式3D布局精炼任务，并构建了基于模拟器的分层基准SpatialAct。该基准包含五个基本空间能力任务、单步错误检测与修复以及最具挑战性的多轮交互式精炼，旨在诊断模型从理解到行动的差距。",
+  "badIdeaOrRisk": "证据基于7款VLM在333个3D场景上的评估，场景涵盖抽象几何、城市建筑、室内三类，合计4,355个问答对。人类基线由7名测试者完成。实验设定统一，指标定义清晰。但缺乏真实世界验证，未与增强后的模型对比，样本量在统计意义上较充分但多样性与现实复杂性有限。性能差异有显著性，但结论的外推需谨慎。",
+  "transferablePattern": "# 帮你真正看懂这篇论文 ## 这篇论文到底做了什么？ SpatialAct 不是又一个泛泛的空间推理测试集。它的核心选题是：**当视觉语言模型（VLM）需要在 3D 环境中动手操作时，它能不能在“做动作→看结果→再做动作”的循环里维持住对空间状态的一致性理解，并据此做出正确动作？** 以往的空间基准大多只让模型“看”图回答“在哪里？”这种问题，不要求它亲自动手；而具身基准又混入了导航、抓取等底层控制，难以单独观察高层的空间思维。本文提出一个中间地带：让模型在模拟器里对 3D 布局发号施令（如“把椅子左移 0.5 米，旋转 30 度”），然后观察环境变化后的新视图，再做下一轮决策，目标是把场景里人为注入的空间错误（如碰撞、出界、方…",
+  "futureWorkApplication": "作者声明：所有评估均在模拟场景中进行，不清楚其表现如何迁移至真实环境；此外，未探索增强模型在该任务上能力的方法。未来工作包括扩展到真实场景、研究提升多轮推理与动作执行的方法、开发更鲁棒的人类式空间推理到行动能力。",
+  "architectureTakeaway": "表3详细列出了五个基本空间能力任务和单步检测修复任务的子类别及其代表性提示语，覆盖方向、关系、旋转、可视化等多维度，为诊断模型具体薄弱点提供了细粒度依据。",
+  "interviewTalkingPoint": "skim:74+fde:evaluation/reliability gate",
+  "projectIdea": "Read 《SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes》 against your own questions before opening the analyst notes.",
   "topPapers": [
     {
-      "id": "paper:arxiv-2606-01166",
-      "title": "BraveGuard: From Open-World Threats to Safer Computer-Use Agents",
+      "id": "paper:arxiv-2605-31148",
+      "title": "SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes",
       "daily_action": "must_read",
-      "triage_decision": "deep_dive",
-      "total_score": 84,
-      "sourceName": "arXiv terminal agents observability",
-      "sourceUrl": "https://arxiv.org/abs/2606.01166",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, Tool Use, Agent Harness / Observability; high relevance and practicality for agent safety."
-    },
-    {
-      "id": "paper:arxiv-2605-27922",
-      "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
-      "daily_action": "skim",
-      "triage_decision": "review",
-      "total_score": 80,
-      "sourceName": "arXiv terminal agents observability",
-      "sourceUrl": "https://arxiv.org/abs/2605.27922",
+      "triage_decision": "skim",
+      "total_score": 74,
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.31148",
       "matched_topics": [
         "Broad AI / ML",
         "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
+        "Multimodal UI",
         "Evaluation / Benchmarks",
+        "LLM Security / Reliability",
         "Reasoning / Post-training"
       ],
       "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "High relevance to agent harness observability and real-world workflows; strong FDE signals."
+      "hotness_signal": "high_signal_source",
+      "reason": "Relevant to agents and evaluation but lacks concrete application or system building insights; primarily a benchmark."
     }
   ],
   "selectionTrace": [
     {
-      "id": "paper:arxiv-2606-01166",
-      "title": "BraveGuard: From Open-World Threats to Safer Computer-Use Agents",
-      "score": 84,
+      "id": "paper:arxiv-2605-31148",
+      "title": "SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes",
+      "score": 74,
+      "decision": "skim",
+      "status": "selected",
+      "reason": "Broad AI / ML, AI Agents, Multimodal UI; total 74; strongest signals: role_relevance. FDE signals: evaluation/reliability gate, governance/permissions.",
+      "aheSignals": [],
+      "freshness": "new",
+      "hotness": "high_signal_source"
+    },
+    {
+      "id": "paper:arxiv-2606-05080",
+      "title": "AutoLab: Can Frontier Models Solve Long-Horizon Auto Research and Engineering Tasks?",
+      "score": 100,
       "decision": "deep_dive",
-      "status": "selected",
-      "reason": "AI Agents, Tool Use, Agent Harness / Observability; total 79; strongest signals: role_relevance, architecture_value, practicality. AHE signals: observability, execution trace, trajectory. FDE signals: customer/production system, API/tool/MCP integration, evaluation/reliability gate.",
-      "aheSignals": [
-        "observability",
-        "execution trace",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "paper:arxiv-2605-27922",
-      "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
-      "score": 80,
-      "decision": "review",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 78; strongest signals: role_relevance, architecture_value, practicality. AHE signals: observability, execution trace, trajectory. FDE signals: customer/production system, API/tool/MCP integration, observability/debugging.",
-      "aheSignals": [
-        "observability",
-        "execution trace",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "paper:arxiv-2606-03143",
-      "title": "FederatedSkill: Federated Learning for Agentic Skill Evolution",
-      "score": 81,
-      "decision": "review",
       "status": "rejected",
       "reason": "QA verdict failed",
       "aheSignals": [
-        "observability",
         "trajectory"
       ],
       "freshness": "new",
-      "hotness": "standard_source"
+      "hotness": "high_signal_source"
+    },
+    {
+      "id": "paper:arxiv-2606-01286",
+      "title": "BenchEvolver: Frontier Task Synthesis via Solution-Centric Evolution",
+      "score": 85,
+      "decision": "review",
+      "status": "rejected",
+      "reason": "QA verdict failed",
+      "aheSignals": [],
+      "freshness": "new",
+      "hotness": "high_signal_source"
     }
   ]
 }

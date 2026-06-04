@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-03T17:58:05.246Z",
+  "generatedAt": "2026-06-04T16:16:29.275Z",
   "principle": "discover -> evidence -> rank -> review -> verify -> publish -> archive",
   "surfaces": [
     {
@@ -128,63 +128,63 @@
     },
     {
       "surface": "papers",
-      "updatedAt": "2026-06-03T17:58:05.236Z",
+      "updatedAt": "2026-06-04T16:16:29.264Z",
       "latestRun": {
-        "id": "papers-2026-06-03-1780509485237",
+        "id": "papers-2026-06-04-1780589789265",
         "surface": "papers",
-        "date": "2026-06-03",
-        "generatedAt": "2026-06-03T17:58:05.236Z",
+        "date": "2026-06-04",
+        "generatedAt": "2026-06-04T16:16:29.264Z",
         "qualityStatus": "pass",
-        "selectedCount": 2,
-        "archivedCount": 1,
+        "selectedCount": 1,
+        "archivedCount": 2,
         "traceSummary": null,
         "reflectionSummary": "",
         "highlights": [
-          "Papers published 2 article analysis item(s).",
-          "1 QA failure(s) were excluded."
+          "Papers published 1 article analysis item(s).",
+          "2 QA failure(s) were excluded."
         ],
         "nextActions": [
           "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
           "Run node scripts/validate-papers-radar.mjs after publishing radar data."
         ]
       },
-      "runCount": 6,
+      "runCount": 7,
       "reusablePatterns": [
+        {
+          "text": "SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes: 这篇论文提出了SpatialAct，一个基于3D模拟器的分层诊断基准，用于考察视觉语言模型（VLM）代理能否将空间推理转化为动态环境下的可靠动作，并揭示了当前模型在单步理解尚可但多轮交互精炼严重不足的“推理到行动鸿沟”。",
+          "source": "papers",
+          "firstSeenAt": "2026-06-04T16:16:29.264Z",
+          "lastSeenAt": "2026-06-04T16:16:29.264Z"
+        },
         {
           "text": "BraveGuard: From Open-World Threats to Safer Computer-Use Agents: 这是一篇提出 BraveGuard 自适应防御框架的论文，旨在通过从现实世界威胁信号和真实计算机操作代理轨迹中学习，提升对计算机使用代理的安全监控能力。",
           "source": "papers",
           "firstSeenAt": "2026-06-03T17:58:05.236Z",
-          "lastSeenAt": "2026-06-03T17:58:05.236Z"
+          "lastSeenAt": "2026-06-04T16:16:29.264Z"
         },
         {
           "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 这篇论文提出了一个诊断基准 Harness-Bench，用于在真实的智能体工作流中系统性地衡量执行框架（harness）配置对模型性能的影响，将 agent 能力评估从只看底层模型扩展到模型–框架配对。",
           "source": "papers",
           "firstSeenAt": "2026-06-03T17:58:05.236Z",
-          "lastSeenAt": "2026-06-03T17:58:05.236Z"
+          "lastSeenAt": "2026-06-04T16:16:29.264Z"
         },
         {
           "text": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems: 该论文提出Agent Lifespan Engineering (ALE)框架和AgingBench基准，将长生命周期AI代理的可靠性问题从单点快照评估转向纵向退化测量与诊断。",
           "source": "papers",
           "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-06-03T17:58:05.236Z"
+          "lastSeenAt": "2026-06-04T16:16:29.264Z"
         },
         {
           "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文重新定义了智能体AI的瓶颈，从模型扩展转向系统扩展，强调围绕基础模型的执行架构（harness）是下一个关键挑战。",
           "source": "papers",
           "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-06-03T17:58:05.236Z"
+          "lastSeenAt": "2026-06-04T16:16:29.264Z"
         },
         {
           "text": "Code as Agent Harness: A survey that reframes code as the operational substrate for agent AI, organizing the field into three layers.",
           "source": "papers",
           "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-06-03T17:58:05.236Z"
-        },
-        {
-          "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 离线模式下只根据已收集证据保留《Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses》的基础脉络。",
-          "source": "papers",
-          "firstSeenAt": "2026-05-31T19:21:56.526Z",
-          "lastSeenAt": "2026-06-03T17:58:05.236Z"
+          "lastSeenAt": "2026-06-04T16:16:29.264Z"
         }
       ]
     },
@@ -253,18 +253,18 @@
   ],
   "recentRuns": [
     {
-      "id": "papers-2026-06-03-1780509485237",
+      "id": "papers-2026-06-04-1780589789265",
       "surface": "papers",
-      "date": "2026-06-03",
-      "generatedAt": "2026-06-03T17:58:05.236Z",
+      "date": "2026-06-04",
+      "generatedAt": "2026-06-04T16:16:29.264Z",
       "qualityStatus": "pass",
-      "selectedCount": 2,
-      "archivedCount": 1,
+      "selectedCount": 1,
+      "archivedCount": 2,
       "traceSummary": null,
       "reflectionSummary": "",
       "highlights": [
-        "Papers published 2 article analysis item(s).",
-        "1 QA failure(s) were excluded."
+        "Papers published 1 article analysis item(s).",
+        "2 QA failure(s) were excluded."
       ],
       "nextActions": [
         "Run node scripts/validate-articles.mjs before treating articles.json as stable.",

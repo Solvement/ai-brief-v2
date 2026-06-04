@@ -1,8 +1,141 @@
 {
   "schemaVersion": 1,
   "surface": "papers",
-  "updatedAt": "2026-06-03T17:58:05.236Z",
+  "updatedAt": "2026-06-04T16:16:29.264Z",
   "runs": [
+    {
+      "id": "papers-2026-06-04-1780589789265",
+      "surface": "papers",
+      "date": "2026-06-04",
+      "generatedAt": "2026-06-04T16:16:29.264Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "articlesArchive": "public/data/articles-archive.json",
+        "radar": "public/data/paper-radar.json",
+        "radarArchive": "data/papers/paper-radar-archive.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "140 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "3 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "1 current analysis item(s) available after QA and reviewer filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 recent deep article(s), 24 total archived deep item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "2 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "public/data/articles-archive.json, data/agent-memory, and SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-06-04T16:16:29.264Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "3 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has originalReading summaries",
+            "status": "pass",
+            "details": "3 paper(s) checked"
+          },
+          {
+            "id": "analyst-notes",
+            "label": "every paper has analystNotes",
+            "status": "pass",
+            "details": "3 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "2 failed item(s) excluded"
+          },
+          {
+            "id": "current-run-deep",
+            "label": "current run produced at least one new deep analysis",
+            "status": "pass",
+            "details": "1 current-run paper(s)"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-31148",
+          "title": "SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes",
+          "score": 74,
+          "reason": "这篇论文提出了SpatialAct，一个基于3D模拟器的分层诊断基准，用于考察视觉语言模型（VLM）代理能否将空间推理转化为动态环境下的可靠动作，并揭示了当前模型在单步理解尚可但多轮交互精炼严重不足的“推理到行动鸿沟”。"
+        }
+      ],
+      "archivedItems": [
+        {
+          "id": "paper:arxiv-2606-05080",
+          "title": "AutoLab: Can Frontier Models Solve Long-Horizon Auto Research and Engineering Tasks?",
+          "score": 100,
+          "reason": "QA verdict failed"
+        },
+        {
+          "id": "paper:arxiv-2606-01286",
+          "title": "BenchEvolver: Frontier Task Synthesis via Solution-Centric Evolution",
+          "score": 85,
+          "reason": "QA verdict failed"
+        }
+      ],
+      "highlights": [
+        "Papers published 1 article analysis item(s).",
+        "2 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
     {
       "id": "papers-2026-06-03-1780509485237",
       "surface": "papers",
@@ -849,148 +982,154 @@
   ],
   "reusablePatterns": [
     {
+      "text": "SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes: 这篇论文提出了SpatialAct，一个基于3D模拟器的分层诊断基准，用于考察视觉语言模型（VLM）代理能否将空间推理转化为动态环境下的可靠动作，并揭示了当前模型在单步理解尚可但多轮交互精炼严重不足的“推理到行动鸿沟”。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-04T16:16:29.264Z",
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
+    },
+    {
       "text": "BraveGuard: From Open-World Threats to Safer Computer-Use Agents: 这是一篇提出 BraveGuard 自适应防御框架的论文，旨在通过从现实世界威胁信号和真实计算机操作代理轨迹中学习，提升对计算机使用代理的安全监控能力。",
       "source": "papers",
       "firstSeenAt": "2026-06-03T17:58:05.236Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 这篇论文提出了一个诊断基准 Harness-Bench，用于在真实的智能体工作流中系统性地衡量执行框架（harness）配置对模型性能的影响，将 agent 能力评估从只看底层模型扩展到模型–框架配对。",
       "source": "papers",
       "firstSeenAt": "2026-06-03T17:58:05.236Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems: 该论文提出Agent Lifespan Engineering (ALE)框架和AgingBench基准，将长生命周期AI代理的可靠性问题从单点快照评估转向纵向退化测量与诊断。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文重新定义了智能体AI的瓶颈，从模型扩展转向系统扩展，强调围绕基础模型的执行架构（harness）是下一个关键挑战。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Code as Agent Harness: A survey that reframes code as the operational substrate for agent AI, organizing the field into three layers.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 离线模式下只根据已收集证据保留《Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses》的基础脉络。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 离线模式下只根据已收集证据保留《Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation》的基础脉络。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Code as Agent Harness: 一份系统性综述，将代码从生成产物重新定义为智能体系统可执行、可检查、有状态的操作基础，并提供三层分类框架。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 一个用三项可观测性支柱自动演化编码智能体“马具”（harness）的闭环系统",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Auditing Agent Harness Safety: 这篇论文提出了一种以执行轨迹为中心的agent harness安全审计框架，将安全评估从最终输出转移到完整执行过程，揭示了任务完成与安全执行之间的系统性脱节。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems: 论文将AI Agent的可靠性问题从单次基准测试扩展到部署后的生命周期退化，提出系统化的老化机制分类和诊断框架。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: Harness-Bench 将执行层 (harness) 作为主要评估变量, 揭示了模型–harness 配置对代理性能的显著影响, 而非仅归因于基础模型。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Polar: Agentic RL on Any Harness at Scale: Polar proposes a proxy-based rollout framework to enable RL training on arbitrary agent harnesses without modification.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems: MOSS argues that source-level rewriting is a fundamentally more general medium for agent self-evolution than text-mutable artifacts, and implements a production system achieving it with a deterministic pipeline and safe deployment.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "MobileExplorer: Accelerating On-Device Inference for Mobile GUI Agents via Online Exploration: MobileExplorer proposes overlapping VLM inference with online UI exploration to reduce latency for on-device mobile GUI agents.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Governed Evolution of Agent Runtimes through Executable Operational Cognition: 这篇论文为智能体运行时工件的演化提出了一个治理框架",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 本文提出一个诊断性基准Harness-Bench，用于系统评估不同harness配置（而非仅基础模型）对LLM agent在真实工作流中性能的影响，并揭示执行对齐失败模式。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 该论文引入了Harness-Bench，一个诊断基准，用于量化不同模型-配置组合下的harness效应。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 本文提出通过三个可观测性支柱实现编码智能体套件的自动演化，将每一次编辑转化为可验证的合约。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Auditing Agent Harness Safety: 提出 HarnessAudit 框架，通过审计完整执行轨迹来评估 LLM agent 安全，而非仅检查最终输出。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction: WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T13:35:19.310Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 提出一个多智能体系统Ptah，用于生成可验证、图文交织的多模态深度研究报告，并配以专门的评估协议PtahEval。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T13:35:19.310Z",
-      "lastSeenAt": "2026-06-03T17:58:05.236Z"
+      "lastSeenAt": "2026-06-04T16:16:29.264Z"
     }
   ]
 }

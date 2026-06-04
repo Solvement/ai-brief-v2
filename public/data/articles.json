@@ -1,13 +1,164 @@
 {
-  "generatedAt": "2026-06-03T17:58:05.211Z",
-  "archiveCount": 23,
+  "generatedAt": "2026-06-04T16:16:29.241Z",
+  "archiveCount": 24,
   "retention": {
     "activeLimit": 12,
     "archiveFile": "public/data/articles-archive.json",
-    "newPaperCount": 2,
-    "archiveCount": 23
+    "newPaperCount": 1,
+    "archiveCount": 24
   },
   "papers": [
+    {
+      "id": "paper:arxiv-2605-31148",
+      "title": "SpatialAct: Probing Spatial Reasoning-to-Action Capabilities of VLM Agents in 3D Scenes",
+      "authors": "Tianhui Liu, Jie Feng, Zhiheng Zheng, Shengyuan Wang, Yiming Guo, Yanxin Xi, Hangyu Fan, Yong Li, Pan Hui",
+      "venue": "Venue not provided",
+      "sourceName": "Hugging Face Daily Papers",
+      "sourceUrl": "https://huggingface.co/papers/2605.31148",
+      "verifiedAt": "2026-06-04T16:15:04.575Z",
+      "tier": "deep",
+      "leadJudgment": "这篇论文提出了SpatialAct，一个基于3D模拟器的分层诊断基准，用于考察视觉语言模型（VLM）代理能否将空间推理转化为动态环境下的可靠动作，并揭示了当前模型在单步理解尚可但多轮交互精炼严重不足的“推理到行动鸿沟”。",
+      "meta": {
+        "paperType": "benchmark",
+        "venueStatus": "unverified",
+        "sourceReliability": {
+          "discoverySource": "Hugging Face Daily Papers",
+          "primarySourceVerified": false,
+          "paperHtmlFetched": true,
+          "pdfFetched": false,
+          "repoFetched": false,
+          "appendixFetched": true
+        },
+        "tags": [
+          "空间推理",
+          "视觉语言模型代理",
+          "3D场景",
+          "基准",
+          "多轮交互",
+          "推理到行动",
+          "布局精炼"
+        ]
+      },
+      "originalReading": [
+        {
+          "heading": "1 引言",
+          "summary": "人类能轻松地在3D环境中感知空间布局、建立认知表征并进行推理，进而转化为动作，但视觉语言模型（VLM，能同时处理图像和文本的AI模型）在这方面的能力尚不明确。现有空间推理基准大多只让模型作为观察者回答问题，不要求其动作改变环境；而具身基准则混入了底层控制（导航、操作），难以单独评估高层空间推理到行动的能力。本文提出“动作驱动的空间推理”（action-conditioned spatial reasoning）概念，即模型不仅推理当前空间状态，还要推理自身动作如何改变状态以及后续决策如何适应。为此，作者将其具体化为交互式3D布局精炼任务，并构建了基于模拟器的分层基准SpatialAct。该基准包含五个基本空间能力任务、单步错误检测与修复以及最具挑战性的多轮交互式精炼，旨在诊断模型从理解到行动的差距。"
+        },
+        {
+          "heading": "2.1 基准构建",
+          "summary": "基准构建涵盖三种场景：抽象几何体（程序化生成，含5-7个随机形状如立方体、圆柱、L型等）、城市建筑（来自RAISECity，每场景不超过20栋建筑）和室内场景（来自InternScenes，挑选含5-15个可动物体的场景）。质量控制阶段，对城市建筑和室内场景先做程序化清理再人工过滤，排除已有异常并检查语义一致性。任务设计以多轮交互式精炼为核心：先向无错误的干净场景注入不同类型和修复步数的空间错误，要求模型通过多轮动作指令修复。为诊断失败原因，进一步设计了两个辅助级别：单步检测修复（判断并一次性修正一个错误）和五个基本空间能力（物体含义、空间关系、空间定向、心理旋转、空间可视化），这些能力维度借鉴心理测量学理论，但在抽象几何场景中重新设计并扩展至真实场景。所有任务共含4,355个问答对，形式包括开放式、选择题和多轮反馈交互。"
+        },
+        {
+          "heading": "2.2 评估环境设置",
+          "summary": "多轮交互式精炼通过迭代渲染流程实现。对于城市建筑场景，模型需检测三类错误：碰撞、道路冲突、方向异常；对于室内场景，则为碰撞、墙面冲突、方向异常。每轮模型接收顶视图和等轴测图，输出动作指令（move/rotate/scale），模拟器解析并执行，再渲染更新后的视图返回给模型。模型同时看到原始视图、当前视图、上一轮指令和历史记录，直到判定所有错误修复或达到最大轮次。人类评估平台是一个网页界面，提供三维场景和变换控件，允许自由拖拽编辑。评测指标分修复精度和效率：修复率（Repair Rate）=已修复错误数/初始错误数；场景成功率（Scene Success Rate）=完全修复的场景比例；有效修复轮次比（Effective Repair Turn Ratio）=实际减少错误的轮次占比；过早停止率（Premature Stop Rate）=错误未完全修复时主动停止的场景比例；平均完成Token数衡量计算开销。"
+        },
+        {
+          "heading": "3.1 基准 VLM 代理",
+          "summary": "共评测7款VLM：闭源模型包括GPT-5.4 mini、GPT-5.4、GLM-5V-Turbo、Gemini-3.1 Pro；开源模型包括Kimi-K2.5、Qwen3.6-27B、Qwen3.6-35B-A3B。推理设置统一：多轮精炼任务最大30轮，每轮单次响应最大8,096个生成token。"
+        },
+        {
+          "heading": "3.2 主要结果",
+          "summary": "主要结果见表2。多轮交互精炼中，Gemini-3.1 Pro表现最佳，修复率0.411，场景成功率0.206，且有效修复轮次比最高、过早停止率较低，表明其修复效率和准确性更优。但开源模型及GLM-5V-Turbo修复率接近零甚至为负（如GLM-5V-Turbo -0.012），说明它们不仅难以纠正已有错误，还可能引入新错误。图4展示了两种典型失败：模型错误诊断空间违规，或诊断正确但发出错误动作。单步检测修复任务中，闭源模型仍领先，Gemini-3.1 Pro达0.721，开源模型最高0.442。基本空间能力任务上，各模型差异较大，Gemini-3.1 Pro和GPT-5.4在多数任务上领先，但如Kimi-K2.5在空间关系上尚可，在心理旋转上较弱。人类基线：7名测试者在同样任务上修复率0.911、场景成功率0.763，远超最佳模型。",
+          "keyResults": [
+            {
+              "kind": "table",
+              "ref": "Table 2",
+              "finding": "在主要的多轮交互精炼指标上，Gemini-3.1 Pro取得修复率0.411，场景成功率0.206，而GLM-5V-Turbo修复率-0.012，开源模型修复率均低于0.04。人类基线修复率0.911，场景成功率0.763。"
+            },
+            {
+              "kind": "figure",
+              "ref": "Figure 4",
+              "finding": "模型在多轮交互中存在两类失败：错误诊断（如将正常摆放误判为碰撞）和推理到行动错误（即使检测到错误也发出无效动作），且这些失败会在轮次间传播。"
+            },
+            {
+              "kind": "figure",
+              "ref": "Figure 5(a)",
+              "finding": "人类与模型性能对比显示，人类修复率（0.911）比最佳模型（0.411）高出50个百分点，场景成功率（0.763）高出55.7个百分点。"
+            }
+          ]
+        },
+        {
+          "heading": "3.3 空间上下文与错误敏感性",
+          "summary": "图5(b)显示Gemini-3.1 Pro在室内场景的修复率和有效修复轮次比高于建筑场景，但建筑场景的成功率却更高，可能因为建筑布局更简单、对象依赖更少，一旦关键错误解决，全局修复较易。图5(c)揭示了一致的错误类型敏感性：方向错误最易修复，冲突错误（道路或墙面）最难，反映模型能处理属性级调整，但在需要联合建模边界、拓扑和多对象关系的约束级推理上不足，且冲突修复常需多对象协同，一步失误容易导致新连锁错误。图6(a)表明，初始错误越多，修复率和场景成功率越低，表明模型追踪多个目标时容易遗漏或产生冲突动作，长程一致性恶化。",
+          "keyResults": [
+            {
+              "kind": "figure",
+              "ref": "Figure 5(c)",
+              "finding": "所有模型在修复方向错误时能力最强，而修复冲突错误（如道路冲突、墙面冲突）时能力最弱，说明模型短板是约束感知的多对象协调，而非仅感知问题。"
+            }
+          ]
+        },
+        {
+          "heading": "3.4 上下文与任务关联的影响",
+          "summary": "图6(b)展示了Kimi-K2.5在不同上下文窗口大小下的表现：窗口增大，模型生成了更多内容并进行了更多轮交互，但修复率和场景成功率几乎不变，呈现收益递减，表明瓶颈不在token数量而在跨轮控制质量（状态追踪、错误优先级、动作可靠性）。图6(c)分析了六个基础任务（五个基本空间能力加单步检测修复）与多轮精炼指标的相关性：均为正相关，其中单步检测修复与修复率相关系数0.817、与场景成功率0.690，相关性最强，说明局部检测-修复操作是迭代精炼的基础组建。物体含义任务次之，提示对象中心的接地（identity, position）对传播局部编辑到全局一致性很关键。但基础能力高不保证多轮成功，还需要跨轮记忆、冲突感知规划和稳定动作序列等高层协调。",
+          "keyResults": [
+            {
+              "kind": "figure",
+              "ref": "Figure 6(c)",
+              "finding": "单步错误检测与修复任务与多轮修复率的皮尔逊相关系数达0.817，与场景成功率相关系数0.690，表明该局部操作能力是构成多轮修复的核心基础，但仅靠基础能力不足以实现鲁棒多轮表现。"
+            }
+          ]
+        },
+        {
+          "heading": "4 相关工作",
+          "summary": "相关工作分两块：一是3D空间智能评估。回顾了现有基准，指出它们主要将模型作为观察者（被动问答），输入从单视图扩展至多视图，但未让模型改变环境。少数具身基准虽有环境反馈，但混合底层控制。SpatialAct填补了中间地带。二是3D布局生成与理解。提到基于基础模型的布局生成方法（如LayoutGPT、Holodeck）和布局编辑工作（如3D-Layout-R1），但这些工作未直接评估VLM通过推理和动作完成布局任务的能力。SpatialAct正是为此设计。"
+        },
+        {
+          "heading": "5 结论",
+          "summary": "本文提出了SpatialAct，一个基于模拟器的分层基准，旨在探测VLM是否能把空间推理转化为动态3D反馈下的可靠动作。通过联合评估多轮交互精炼、单步纠错和基本空间能力，揭示了性能差距和背后的能力结构：基本任务上的好成绩不能稳定迁移到多轮修复，核心瓶颈在于跨轮状态维持、约束感知规划和稳定的推理到行动执行，而非单纯的感知。闭源模型领先但距人类可靠水平仍远，且性能受场景上下文、结构约束和错误复杂性系统影响。该基准也为开发更强空间状态追踪、反馈协调和可靠动作生成的VLM代理提供了可诊断的框架。"
+        },
+        {
+          "heading": "附录 A.1 讨论与未来工作",
+          "summary": "作者讨论了局限性：所有评估均在模拟场景中进行，不清楚在真实环境中的表现；未尝试任何增强模型能力的方法。未来工作包括扩展到真实场景、探索改善多轮推理和动作执行的技术、开发更鲁棒的空间推理到行动能力。"
+        },
+        {
+          "heading": "附录 A.2 任务子类别与提示设计",
+          "summary": "表3详细列出了五个基本空间能力任务和单步检测修复任务的子类别及其代表性提示语，覆盖方向、关系、旋转、可视化等多维度，为诊断模型具体薄弱点提供了细粒度依据。"
+        }
+      ],
+      "analystNotes": "# 帮你真正看懂这篇论文\n\n## 这篇论文到底做了什么？\n\nSpatialAct 不是又一个泛泛的空间推理测试集。它的核心选题是：**当视觉语言模型（VLM）需要在 3D 环境中动手操作时，它能不能在“做动作→看结果→再做动作”的循环里维持住对空间状态的一致性理解，并据此做出正确动作？** 以往的空间基准大多只让模型“看”图回答“在哪里？”这种问题，不要求它亲自动手；而具身基准又混入了导航、抓取等底层控制，难以单独观察高层的空间思维。本文提出一个中间地带：让模型在模拟器里对 3D 布局发号施令（如“把椅子左移 0.5 米，旋转 30 度”），然后观察环境变化后的新视图，再做下一轮决策，目标是把场景里人为注入的空间错误（如碰撞、出界、方向不对）一一修好。这就是“动作驱动的空间推理”。\n\n## 核心洞察：为什么多轮修复这么难？\n\n文中揭示的关键矛盾是： **当前 VLM 在“看一眼，答一题”时表现尚可（单步准确率能到 80%+），一旦需要“看着环境被自己弄乱后还能理出头绪并接着修”，就基本懵了（多轮修复率最高才 0.41，而人类是 0.91）** 。原因不是模型瞎，而是：\n- **状态追踪崩塌**：模型记不住自己上一轮改了哪里，也预测不准这一轮动作会带来什么全局影响。它可能把同一个错误在不同轮里重复“修”，或者修 A 时撞倒了 B。\n- **诊断与动作双重失灵**：模型可能根本看不出当前场景哪里有问题（诊断错误），或者看出来了却给了一个南辕北辙的修正指令（推理到行动错误）。这两个错误会在闭环里相互放大。\n- **约束级推理缺失**：修方向（把歪了的书柜转正）这类单对象属性调整相对容易；但处理碰撞（两个东西叠在一起）或墙面冲突需要同时考虑边界、拓扑和多对象关系，模型就捉襟见肘。这说明它缺少那种在脑子里“跑一遍物理约束”的规划能力。\n\n## 如果只记三件事，应该是这三件：\n\n1. **推理到行动鸿沟**：不要被模型在静态问答里的高分迷惑。空间智能的关键战场在“动作→反馈→更新→再动作”这个闭环里，而当前最强的 VLM 在这里也远远落后于人。\n2. **分层诊断设计是论文的巧思**：作者没有只报一个总分，而是搭了一个三层金字塔——从最底层的基本空间认知（认物体、辨方位、做心理旋转），到中间层的单步改错，再到塔尖的多轮交互精炼。这让人能看出模型到底“瘸”在哪一环：比如你会发现某模型基本旋转题做得还行，但一到多轮就乱，说明问题出在跨轮协调，而非感知旋转本身。\n3. **上下文窗口长≠能力强**：很多人觉得堆 Token 就能让模型多想几步。实验表明，给了更长窗口，模型确实会“絮叨”更多字，但修复率纹丝不动。瓶颈在于每轮动作的质量和跨轮策略的一致性，不在思考的字数。\n\n## 容易误读的几个地方\n\n- **“修复率负数”不是 Bug**：文中 GLM-5V-Turbo 的修复率是 -0.012。这并非测量失误，而是它确实在修复过程中引入了新错误，越修越糟。这恰好印证了多轮不一致性的破坏力。\n- **“场景成功率”苛刻在“清零”**：场景成功率要求把整个场景的所有错误都修掉才算成功，哪怕剩一个小错或者提前误判“修完了”都算失败。所以这个指标对模型的全局一致性和终止时机判断要求极高。\n- **“基本能力强”不能直接等同于“行动能力强”**：论文通过相关性分析明确告诉我们，单步纠错能力和多轮成功是强相关，但仅具基本能力还不够，因为多轮修复还需要额外的“调度层”来协调这些微观动作。\n\n# 评价与展望\n\n这篇论文的主张是站得住脚的。它没有过度宣称，而是用详尽的实验将 VLM 的空间交互弱点暴露得很清楚。证据强度上，7 款模型（含最新旗舰）在 333 个场景、4355 个问答对上得出一致的结论，并有真人基线对比统计学意义明显。分层设计让归因不再是“一锅粥”。\n\n但局限也很明显：所有实验发生在简化的虚拟房间里，没有真实世界的复杂视觉、物理和语义噪声；作者也没有尝试任何改良措施（如给模型外挂一个显式的空间记忆模块），所以我们看到的是 raw model 的裸奔水平。对于想把这些模型用到空间交互产品里的 PM 和工程师，结论是：**当前 VLM 远未到能放心地在多轮空间校正任务上取代人类的地步，但把它作为系统的一个子模块，并围绕它设计守护机制（如状态验证器、约束求解器），值得探索。**\n\n后续值得关注的是：基于这个基准，会不会有专门的训练范式或 Agent 架构出来，专门针对跨轮空间状态追踪做优化。另外，从室内扩展到室外、从虚拟到真实将是必然且艰难的下一步。",
+      "limitsAndFuture": {
+        "paperStated": "作者声明：所有评估均在模拟场景中进行，不清楚其表现如何迁移至真实环境；此外，未探索增强模型在该任务上能力的方法。未来工作包括扩展到真实场景、研究提升多轮推理与动作执行的方法、开发更鲁棒的人类式空间推理到行动能力。",
+        "evidenceNotes": "证据基于7款VLM在333个3D场景上的评估，场景涵盖抽象几何、城市建筑、室内三类，合计4,355个问答对。人类基线由7名测试者完成。实验设定统一，指标定义清晰。但缺乏真实世界验证，未与增强后的模型对比，样本量在统计意义上较充分但多样性与现实复杂性有限。性能差异有显著性，但结论的外推需谨慎。"
+      },
+      "selection": {
+        "convergence": [
+          "Hugging Face Daily Papers"
+        ],
+        "track": [
+          "Broad AI / ML",
+          "AI Agents",
+          "Multimodal UI",
+          "Evaluation / Benchmarks",
+          "LLM Security / Reliability",
+          "Reasoning / Post-training"
+        ],
+        "ideaSignal": "skim:74+fde:evaluation/reliability gate"
+      },
+      "selectionAudit": {
+        "candidateCount": 140,
+        "selectedCount": 1,
+        "selectionScore": 74,
+        "selectedReason": "select: single trusted source (Hugging Face Daily Papers, not top/official); tracks: Broad AI / ML, AI Agents, Multimodal UI; idea=skim:74+fde:evaluation/reliability gate; score=74. model adjustment 0: Relevant to agents and evaluation but lacks concrete application or system building insights; primarily a benchmark..",
+        "rejectedReasonIfAny": "",
+        "weightedFactors": {
+          "venuePrestige": 30,
+          "citationConvergence": 34,
+          "novelty": 74,
+          "recency": 100,
+          "evidenceStrength": 96,
+          "reproducibility": 81
+        },
+        "discoverySource": "Hugging Face Daily Papers",
+        "primaryEvidenceSource": "paper full text (huggingface.co)"
+      },
+      "provenance": {
+        "sourceUrl": "https://huggingface.co/papers/2605.31148",
+        "evidenceKind": "paper-text"
+      },
+      "arxivId": "2605.31148",
+      "publishedAt": "2026-05-29T10:59:26Z"
+    },
     {
       "id": "paper:arxiv-2605-27922",
       "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
@@ -364,7 +515,7 @@
     }
   ],
   "pipelineRun": {
-    "id": "papers-2026-06-03-1780509485237",
+    "id": "papers-2026-06-04-1780589789265",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -385,19 +536,19 @@
       "stage": "rank",
       "role": "Ranker",
       "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-      "signal": "2 current analysis item(s) available after QA and reviewer filtering"
+      "signal": "1 current analysis item(s) available after QA and reviewer filtering"
     },
     {
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "2 recent deep article(s), 23 total archived deep item(s)"
+      "signal": "3 recent deep article(s), 24 total archived deep item(s)"
     },
     {
       "stage": "verify",
       "role": "Verifier",
       "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
-      "signal": "1 QA failure(s) excluded before publish"
+      "signal": "2 QA failure(s) excluded before publish"
     },
     {
       "stage": "publish",
@@ -416,37 +567,37 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-06-03T17:58:05.236Z",
+    "checkedAt": "2026-06-04T16:16:29.264Z",
     "checks": [
       {
         "id": "papers-present",
         "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "2 paper(s)"
+        "details": "3 paper(s)"
       },
       {
         "id": "section-shape",
         "label": "every paper has originalReading summaries",
         "status": "pass",
-        "details": "2 paper(s) checked"
+        "details": "3 paper(s) checked"
       },
       {
         "id": "analyst-notes",
         "label": "every paper has analystNotes",
         "status": "pass",
-        "details": "2 paper(s) checked"
+        "details": "3 paper(s) checked"
       },
       {
         "id": "qa-fail-excluded",
         "label": "QA fail verdicts are not published",
         "status": "pass",
-        "details": "1 failed item(s) excluded"
+        "details": "2 failed item(s) excluded"
       },
       {
         "id": "current-run-deep",
         "label": "current run produced at least one new deep analysis",
         "status": "pass",
-        "details": "2 current-run paper(s)"
+        "details": "1 current-run paper(s)"
       },
       {
         "id": "qa-warnings",
