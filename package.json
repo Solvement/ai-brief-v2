@@ -34,6 +34,7 @@
     "papers:curate": "node --no-warnings scripts/columns/papers/curate.mjs",
     "papers:select": "node --no-warnings --env-file=.env.local scripts/columns/papers/select.mjs",
     "papers:hf": "npm run papers:curate && npm run papers:select",
+    "papers:deepread": "claude \"Read and follow docs/superpowers/specs/daily-deepread-prompt.md to author today's paper deep-reads (full-text grounded, Chinese, honest), then run build-index + validate. Do not git push.\"",
     "daily": "node --env-file-if-exists=.env.local --no-warnings scripts/daily.mjs",
     "news:daily": "node --no-warnings scripts/columns/news/daily.mjs",
     "projects:daily": "node --no-warnings scripts/columns/projects/daily.mjs",
