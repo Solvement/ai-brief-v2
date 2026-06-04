@@ -1,12 +1,51 @@
 {
-  "generatedAt": "2026-06-04T18:51:56.613Z",
+  "generatedAt": "2026-06-04T22:57:04.925Z",
   "date": "2026-06-04",
   "counts": {
-    "deepReads": 3,
+    "deepReads": 4,
     "radar": 10,
     "deepCandidates": 3
   },
   "deepReads": [
+    {
+      "slug": "2605.28556-taste",
+      "arxiv_id": "2605.28556",
+      "title": "A Matter of TASTE: Improving Coverage and Difficulty of Agent Benchmarks",
+      "date": "2026-05-28",
+      "authors": [
+        "Tomer Keren",
+        "Nitay Calderon",
+        "Asaf Yehudai",
+        "Yotam Perlitz",
+        "Michal Shmueli-Scheuer",
+        "Roi Reichart"
+      ],
+      "tags": [
+        "agent-benchmark",
+        "evaluation",
+        "coverage",
+        "task-synthesis",
+        "tool-use",
+        "llm-as-judge",
+        "difficulty-evolution"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 7,
+        "autosci_reuse_value": 9,
+        "buildability": 6,
+        "evaluation_value": 9,
+        "breadth_value": 7,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "把'造 agent 评测'从'写场景→推工具序列'反转成'先采样多样工具序列→围着它合成任务'(自适应对比 n-gram 保覆盖+有效性、k-medoids 选代表、难度演化)——造出 τ^c-Bench 让近饱和模型大跌(Gemini-3-Flash 0.82-0.94→0.28-0.61)、工具组合翻倍;对 AutoSci 自评是直接蓝本,证据扎实(部分精确数字需查原文表,我从 PDF 抽取)。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.28556.png"
+    },
     {
       "slug": "2605.29707-domino",
       "arxiv_id": "2605.29707",
@@ -177,7 +216,7 @@
         "evidence_quality": 3
       },
       "one_line": "从工具序列演化自动生成更难更广泛的agent基准，改进评测覆盖。",
-      "deep_slug": null
+      "deep_slug": "2605.28556-taste"
     }
   ],
   "radar": [

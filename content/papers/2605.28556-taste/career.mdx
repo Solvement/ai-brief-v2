@@ -1,0 +1,56 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对你(应用型 AI 工程师 / FDE)的价值。它把你拉到一条稀缺线:**agent 评测/基准构建**。
+
+## 为什么这对我重要
+
+人人都会跑现成 benchmark,但**会"造评测"的人很少**——尤其会量化"覆盖"、会自动生成又难又可解的任务。TASTE 是这条线的清晰样本。做 AI 应用/agent,你迟早要回答"我的 agent 到底行不行、在哪类工具组合上崩"——这正是 TASTE 教的:**把评测当一个可设计的系统**(采样→选代表→实例化→难度演化),而不是抓几个 case 试试。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 评测三标准 | validity / difficulty / coverage 怎么定义、怎么测 | 给你现有的一个 agent,写一份"它的基准满足这三条吗"的诊断 |
+| 覆盖的量化 | 用工具序列 + TTR/编辑距离/熵 度量覆盖 | 对一批 agent 轨迹算 TTR 和唯一工具组合数,画覆盖分布 |
+| 反转式任务合成 | 先采样"动作序列"再合成任务的思路 | 在一个小工具集上,用 n-gram 采样合法序列 → 套个任务模板 |
+| LLM-as-judge 做验证信号 | 用 LLM 判"序列是否合法/任务是否可解",及其偏置 | 写一个 verifier:给打乱的 gold 序列,判任务可解性 |
+| 难度演化 | 用"含糊用户 + 诱饵记录"系统性加难 | 给一个任务做 3 档难度变体,量模型掉分 |
+
+## 系统设计心法
+
+一句话:**评测是产品,不是事后检查。** TASTE 的精髓是"**反转生成方向**"——当你想覆盖某个空间(工具组合/输入分布/失败模式),与其从表象采样,不如**直接对那个空间采样再合成**。这个"反转 + 显式覆盖"的思路,在造数据集、测试用例、对抗样本里都通用。
+
+## 作品集角度(Portfolio angle)
+
+适合做一个**"agent 评测台"**:对一个开源工具型 agent,量它在工具组合上的覆盖 + 自动合成几个更难的任务,出一份"它在哪类组合上崩"的报告。这展示你**懂评测方法论 + 能量化覆盖**——比"我接了个 API"稀缺得多,也正好是 AutoSci 需要的能力(见 AutoSci 栏)。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| 覆盖度量小工具 | 给一批 agent 轨迹算 唯一工具组合/TTR/编辑距离/熵 | 2-3 天 | 把"覆盖"量化能力做成可复用件 |
+| Mini TASTE | 小工具集上 n-gram 采样合法序列 + 套模板合成任务 + LLM 判可解 | 1-2 周 | 吃透三阶段,产出能讲清的 repo |
+| 难度演化器 | 给现成任务做 含糊用户/诱饵 难度变体,量掉分 | 3-5 天 | 展示"系统性加难"的评测设计 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built a coverage-aware evaluation harness for tool-using agents: measured tool-combination coverage (unique n-grams, type-token ratio, weighted edit distance) and auto-synthesized harder tasks via tool-sequence sampling."*
+- *"Implemented an LLM-as-judge validity/solvability verifier (corrupted-gold-sequence check) and a difficulty-evolution step (ambiguous user + decoy records) that dropped a near-saturating model's score substantially."*
+
+> [!key] 面试可讲
+> "你怎么判断一个 agent 真的好,还是只是刷爆了基准?" —— 用 TASTE 的论点回答:**高分常是饱和**;要看**覆盖**(它在多样工具组合上是否稳)和**可控难度**。这是体现评测成熟度的高质量答案。
+
+## 学习清单
+
+**必学**
+- agent 评测三标准(validity/difficulty/coverage)+ 覆盖的量化指标
+- LLM-as-judge 做验证信号(及偏置)
+
+**有用**
+- 反转式数据/任务合成思路
+- k-medoids / 加权编辑距离 选代表样本
+
+**可选**
+- τ²-Bench 式工具环境的搭建(终态可验证范式)

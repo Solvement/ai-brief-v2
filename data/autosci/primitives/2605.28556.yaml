@@ -1,0 +1,39 @@
+primitive_id: reverse-synthesis-coverage-aware-eval
+source_paper: "2605.28556"
+title: "A Matter of TASTE: Improving Coverage and Difficulty of Agent Benchmarks"
+relevance_level: direct                     # AutoSci 要自评/造测，这是直接蓝本
+audience: ai_only
+core_pattern: >
+  反转生成方向 + 覆盖感知评测:与其从场景反推动作序列,不如直接对"动作序列空间"采样
+  (自适应对比 n-gram,LLM 判合法性,在线 sample-and-validate)→ k-medoids 选代表 →
+  实例化成任务 + 提示验证可解 + 难度演化(含糊用户/诱饵)。基准须同时满足 validity/difficulty/coverage,
+  覆盖用工具序列(TTR/编辑距离/熵)量化。
+problem_class: auto-generate-valid-difficult-high-coverage-eval-tasks-for-tool-agents
+components:
+  - contrastive_ngram_sampler   # 合法/不合法对比比值采样 + 在线更新
+  - llm_validity_judge          # 判序列/任务合法与可解
+  - representative_selector     # k-medoids + 加权 Levenshtein 选 N 个代表
+  - task_instantiator           # 序列 → 用户指令+DB+参数
+  - difficulty_evolver          # 含糊用户 + 诱饵记录 加难
+autosci_modules:
+  - self_eval_bench_generator   # AutoSci 给自己/被测 agent 自动造高覆盖难基准
+  - coverage_meter              # 量 AutoSci 行为/轨迹的工具组合覆盖(TTR/熵/编辑距离)
+  - cold_critic                 # LLM-as-judge 验证(须独立,generator≠judge)
+inputs:
+  - tool_environment            # 可执行工具 + 终态可验证
+  - benchmark_size_N
+outputs:
+  - synthesized_tasks           # 又难又可解、覆盖广的评测任务
+  - coverage_report             # 唯一工具组合数 / TTR / 熵
+implementation_idea: >
+  Mini 版:小工具集上建 n-gram(合法/不合法两表,LLM 判)→ 采样合法序列 → 套任务模板 →
+  LLM 判可解 → 难度变体。先量"覆盖"(唯一组合数/TTR),再加生成。100-300 行起步。
+small_experiment: >
+  对 AutoSci 现有的一组任务,量工具组合覆盖(TTR/唯一组合数);再用反转采样合成 10 个更高覆盖的新任务,
+  对照 AutoSci 在 原任务 vs 新任务 的成功率落差(若新任务掉分大 = 原基准饱和)。1-14 天。
+risks:
+  - judge_bias                  # 合法性/可解性靠 LLM 判,判错污染分布 → 对比设计+独立评委
+  - env_binding                 # 绑定终态可验证的工具环境,开放任务不直接迁
+  - heuristic_difficulty        # "难"靠启发式,未必对应真实难度 → 需人审
+  - coverage_proxy              # 工具序列覆盖忽略参数/语义级多样性
+status: extracted
