@@ -16,11 +16,13 @@ export async function main(argv = process.argv.slice(2)) {
   }
 
   const results = [];
-  results.push(await runColumn("news", () => runNewsDaily(passThroughArgs(options))));
-  results.push(await runColumn("papers", () => runPapersHfDaily()));
+  const want = (c) => options.only === "all" || options.only === c;   // --only news|papers|projects|models
+  if (want("news")) results.push(await runColumn("news", () => runNewsDaily(passThroughArgs(options))));
+  if (want("papers")) results.push(await runColumn("papers", () => runPapersHfDaily()));
   // Full 30-per-board radar by default (spec target); pass-through flags (offline/dry-run/cap) still apply.
-  results.push(await runColumn("projects", () => runProjectsDaily(["--limit", "30", "--radar-limit", "30", ...passThroughArgs(options)])));
-  results.push(await runColumn("models", () => runModelsDaily(passThroughArgs(options))));
+  if (want("projects")) results.push(await runColumn("projects", () => runProjectsDaily(["--limit", "30", "--radar-limit", "30", ...passThroughArgs(options)])));
+  if (want("models")) results.push(await runColumn("models", () => runModelsDaily(passThroughArgs(options))));
+  if (results.length === 0) { console.warn(`[daily] --only '${options.only}' matched no column`); return []; }
 
   printCombinedSummary(results);
 
@@ -38,6 +40,7 @@ export function parseArgs(argv = []) {
     offline: false,
     dryRun: false,
     cap: 0,
+    only: "all",
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -57,6 +60,10 @@ export function parseArgs(argv = []) {
       options.cap = numberOption(nextValue(), options.cap);
     } else if (arg.startsWith("--cap=")) {
       options.cap = numberOption(valueAfterEquals(arg), options.cap);
+    } else if (arg === "--only") {
+      options.only = nextValue();
+    } else if (arg.startsWith("--only=")) {
+      options.only = valueAfterEquals(arg);
     } else {
       throw new Error(`Unexpected argument: ${arg}`);
     }

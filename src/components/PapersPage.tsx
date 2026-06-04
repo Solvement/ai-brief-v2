@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SiteHeader } from "./SiteHeader";
+import { RefreshButton } from "./RefreshButton";
 import { loadPapersIndex, type PapersIndex } from "../lib/data";
 
 type Win = "daily" | "weekly" | "monthly";
@@ -54,7 +55,7 @@ export function PapersPage() {
 
   return (
     <>
-      <SiteHeader active="articles" meta={`更新于 ${data.date}`} />
+      <SiteHeader active="articles" meta={<><span className="meta-text">更新于 {data.date}</span><RefreshButton column="papers" /></>} />
       <main className="page pp2-page">
         <header className="pp2-hero">
           <div>
