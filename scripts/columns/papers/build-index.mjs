@@ -77,7 +77,7 @@ function boardFromCandidates(cand) {
   return board;
 }
 
-async function main() {
+export async function main() {
   const deepReads = await collectDeepReads();
   const selFile = await latestDated("selection");
   const candFile = await latestDated("candidates");
@@ -107,4 +107,6 @@ async function main() {
   console.log(`[papers-index] wrote ${path.relative(ROOT, OUT)}`);
 }
 
-main().catch((e) => { console.error(`[papers-index] FAILED: ${e.message}`); process.exitCode = 1; });
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => { console.error(`[papers-index] FAILED: ${e.message}`); process.exitCode = 1; });
+}

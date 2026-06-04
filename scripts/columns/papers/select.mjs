@@ -101,10 +101,15 @@ function deepCandMd(date, deep) {
   return `# 深读候选 · ${date}\n\n> 强模型(Claude)读全文写三栏深读时,从这里取。\n\n${deep.map(block).join("\n")}`;
 }
 
-async function main() {
+export async function main() {
   const date = arg("--date", new Date().toISOString().slice(0, 10));
   const minUpvotes = Number(arg("--min-upvotes", String(DEFAULT_MIN_UPVOTES)));
   const cap = Number(arg("--cap", String(DEFAULT_SCORE_CAP)));
+
+  if (!process.env.DEEPSEEK_API_KEY) {
+    console.warn("[select] 无 DEEPSEEK_API_KEY → 跳过评分(榜单仍由 curate/build-index 产出)");
+    return;
+  }
 
   const candFile = path.join(PAPERS_DIR, `${date}-candidates.json`);
   let cand;
@@ -179,4 +184,6 @@ async function main() {
   console.log(`[select] wrote content/radar/${date}.md + content/deep-dive-candidates/${date}.md + selection.json`);
 }
 
-main().catch((e) => { console.error(`[select] FAILED: ${e.message}`); process.exitCode = 1; });
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => { console.error(`[select] FAILED: ${e.message}`); process.exitCode = 1; });
+}

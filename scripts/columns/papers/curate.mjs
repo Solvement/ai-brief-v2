@@ -20,7 +20,7 @@ function arg(name, fallback) {
   return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
 }
 
-async function main() {
+export async function main() {
   const now = new Date();
   const date = now.toISOString().slice(0, 10);
   const limitArg = arg("--limit", "");
@@ -85,7 +85,9 @@ async function main() {
   console.log(`[curate] wrote ${path.relative(ROOT, outFile)} + updated ledger (${ledger.size} total)`);
 }
 
-main().catch((err) => {
-  console.error(`[curate] FAILED: ${err.message}`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(`[curate] FAILED: ${err.message}`);
+    process.exitCode = 1;
+  });
+}

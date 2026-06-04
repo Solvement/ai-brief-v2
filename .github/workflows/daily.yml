@@ -32,6 +32,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # 新论文管线用官方 hf CLI(hf papers ls)抓 HF 日/周/月榜 → runner 需安装
+      - name: Install Hugging Face CLI
+        run: pipx install "huggingface_hub[cli]" || pip install -U "huggingface_hub[cli]"
+
       - name: Run daily refresh
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
