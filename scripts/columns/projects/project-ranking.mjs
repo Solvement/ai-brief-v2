@@ -33,6 +33,7 @@ const INFRA_RE = /\b(agent|runtime|workflow|orchestration|memory|rag|retrieval|m
 const VERTICAL_RE = /\b(finance|financial|legal|healthcare|medical|education|sales|support|enterprise|compliance|insurance)\b/i;
 const RESOURCE_NAME_RE = /(?:^|[-_/])awesome[-_/]|[-_/]roadmap(?:$|[-_/])|[-_/]tutorial(?:$|[-_/])|books?|100[-_]?days|interview/i;
 const RESOURCE_DESC_RE = /\b(curated\s+list|resources?|roadmap|tutorial|cheat[-\s]?sheet)\b/i;
+const EXCLUDED_DEEP_IDENTITY_RE = /\b(awesome|course|courses|tutorial|tutorials|teaching|curriculum|lesson|lessons|book|books|roadmap|dotfiles|cheatsheet|cookbook|clone|starter|template|boilerplate|from[-\s]?scratch|skill|skills)\b/i;
 const BIG_TECH_ORG_RE = /^(microsoft|google|google-deepmind|deepmind|openai|anthropics?|meta|facebookresearch|apple|amazon-science|aws|nvidia|huggingface|bytedance|qwenlm|alibaba|baidu|tencent|stanford-oval|stanfordnlp|mit|berkeleyai|openbmb)$/i;
 const ARXIV_RE = /\barxiv\.org\b|\barxiv:\s*\d{4}\.\d{4,5}\b/i;
 
@@ -44,6 +45,11 @@ const PACKAGE_FILE_KEYS = [
   "docker_compose_yml",
   "dockerfile",
 ];
+const ARCHITECTURE_IDEA_TYPES = new Set(["agent-infra", "functional", "finance_agent", "research", "devtool"]);
+const DEEP_WINDOW_SOFT_CAP = 12;
+const DEEP_MIN_STARS_GAINED = 3000;   // 本月新增 star 速度门(验证信号,必要不充分);旧值 20 太松→24个深扒
+const DEEP_QUALITY_THRESHOLD = 80;    // 质量分门;旧值 75 不区分
+const DEEP_ELITE_SCORE = 90;          // ≥90 精英直通(质量极高则放宽 star 速度要求)
 
 export function scoreProject(evidenceSignals = {}) {
   const signals = normalizeEvidenceSignals(evidenceSignals);
@@ -213,20 +219,44 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
 }
 
 export function applyDailyDepthTargets(items = [], options = {}) {
-  const sorted = [...items].sort((left, right) => {
-    const scoreDelta = depthScore(right) - depthScore(left);
-    if (scoreDelta) return scoreDelta;
-    return sourceRank(left) - sourceRank(right);
-  });
+  const softCap = numberOption(options.deepWindowSoftCap ?? process.env.PROJECT_DEEP_WINDOW_SOFT_CAP, DEEP_WINDOW_SOFT_CAP);
+  const deepCandidates = [...items]
+    .filter((item) => normalizeDepth((item.eval || item)?.final_depth || (item.eval || item)?.depth_decision?.final_depth) === "deep")
+    .sort((left, right) => {
+      const compositeDelta = deepCompositeScore(right) - deepCompositeScore(left);
+      if (compositeDelta) return compositeDelta;
+      return sourceRank(left) - sourceRank(right);
+    });
+  const acceptedDeep = new Set();
+  const windowCounts = new Map();
 
-  for (const item of sorted) {
+  for (const item of deepCandidates) {
+    const windows = candidateWindows(item);
+    if (windows.some((window) => (windowCounts.get(window) || 0) >= softCap)) continue;
+    acceptedDeep.add(itemKey(item));
+    for (const window of windows) windowCounts.set(window, (windowCounts.get(window) || 0) + 1);
+  }
+
+  for (const item of items) {
     const evalResult = item.eval || item;
     const originalDepth = normalizeDepth(evalResult.final_depth || evalResult.depth_decision?.final_depth);
     const decision = cloneDecision(evalResult.depth_decision || evalResult);
-    const finalDepth = originalDepth;
+    const finalDepth = originalDepth === "deep" && !acceptedDeep.has(itemKey(item)) ? "analysis" : originalDepth;
     decision.final_depth = finalDepth;
+    if (originalDepth === "deep" && finalDepth !== "deep") {
+      decision.rejection_reasons = unique([...asArray(decision.rejection_reasons), "deep_window_soft_cap"]);
+      decision.ranking_reasons = unique([...asArray(decision.ranking_reasons), `deep_window_soft_cap:${softCap}`]);
+    }
+    decision.project_tier = projectTierForDepthName(finalDepth);
+    decision.project_tier_label = `Tier ${decision.project_tier}`;
+    decision.model_tier = modelForProjectTier(decision.project_tier);
+    decision.requires_manual_confirmation = decision.project_tier === 3;
     decision.recommended_action = recommendedAction(finalDepth, Number(decision.ranking_score ?? evalResult.score ?? 0), decision.needs_enrichment);
     evalResult.final_depth = finalDepth;
+    evalResult.project_tier = decision.project_tier;
+    evalResult.project_tier_label = decision.project_tier_label;
+    evalResult.model_tier = decision.model_tier;
+    evalResult.requires_manual_confirmation = decision.requires_manual_confirmation;
     evalResult.depth_decision = decision;
     evalResult.recommended_action = decision.recommended_action;
     evalResult.rejection_reasons = decision.rejection_reasons;
@@ -296,6 +326,7 @@ export function normalizeEvidenceSignals(input = {}) {
     forks: Number(input.forks) || 0,
     stars_today: Number(input.stars_today ?? input.starsToday ?? input.starsGained ?? input.stars_in_period ?? input.starsInPeriod) || 0,
     stars_in_period: Number(input.stars_in_period ?? input.starsInPeriod ?? input.stars_today ?? input.starsToday ?? input.starsGained) || 0,
+    stars_gained_by_window: normalizeStarsGainedByWindow(input.stars_gained_by_window || input.starsGainedByWindow),
     language: clean(input.language),
     topics: asArray(input.topics).map(clean).filter(Boolean),
     description: clean(input.description),
@@ -351,6 +382,7 @@ export function evidenceSummary(evidenceSignals = {}) {
     has_models: signals.has_models,
     has_demo: signals.has_demo,
     package_files: signals.package_files,
+    stars_gained_by_window: signals.stars_gained_by_window,
     project_tier: signals.project_tier,
     project_bucket: signals.project_bucket,
   };
@@ -359,6 +391,7 @@ export function evidenceSummary(evidenceSignals = {}) {
 export function scoreCanonicalProject(inputSignals = {}) {
   const signals = normalizeEvidenceSignals(inputSignals);
   const bucket = classifyProjectBucket(signals);
+  const deepGate = deepDiveEligibility(signals);
   const reasons = [`bucket:${bucket}`];
   const subscores = {
     relevance_gate: isAiRelevant(signals) ? 1 : 0,
@@ -384,15 +417,18 @@ export function scoreCanonicalProject(inputSignals = {}) {
       + subscores.heat_quality
       + subscores.endorsement,
   ));
-  const tier3Signals = tier3StrongSignals(signals);
   let tier = 1;
-  if (realNewProject && score >= 95 && tier3Signals.length > 0) {
+  const eliteBypass = deepGate.typeEligible && score >= DEEP_ELITE_SCORE; // 质量极高,放宽 star 速度
+  if ((deepGate.eligible && score >= DEEP_QUALITY_THRESHOLD) || eliteBypass) {
     tier = 3;
-    reasons.push(...tier3Signals);
+    reasons.push(`deep_gate:type:${deepGate.idea_type}`);
+    reasons.push(`deep_gate:stars_gained=${deepGate.maxStarsGained}`);
+    reasons.push(eliteBypass && !deepGate.eligible ? `deep_gate:elite_score=${score}` : "deep_gate:quality_pass");
     reasons.push("manual_confirmation_required");
   } else if (realNewProject && isTier2Project({ signals, score, subscores })) {
     tier = 2;
   }
+  reasons.push(...deepGate.reasons);
 
   return canonicalResult({ tier, bucket, score, subscores, reasons });
 }
@@ -407,6 +443,43 @@ export function classifyProjectBucket(inputSignals = {}) {
 
 export function minDepth(left, right) {
   return (DEPTH_ORDER[left] ?? 0) <= (DEPTH_ORDER[right] ?? 0) ? left : right;
+}
+
+export function classifyArchitectureIdeaType(inputSignals = {}) {
+  const signals = normalizeEvidenceSignals(inputSignals);
+  const text = [signals.repo, signals.description, signals.raw_readme, ...(signals.topics || [])].join("\n");
+  if (/\b(finance|financial|fintech|trading|stock|stocks|crypto|defi|accounting|tax|invoice|payment)\b/i.test(text) && (signals.has_agents || signals.has_mcp)) return "finance_agent";
+  if (signals.has_agents || signals.has_mcp || /\b(agent runtime|agent framework|orchestration|workflow engine|tool calling|multi-agent|memory framework)\b/i.test(text)) return "agent-infra";
+  if (signals.has_cli || /\b(devtool|developer tool|coding agent|code assistant|cli|command line|terminal|plugin|sdk|api server)\b/i.test(text)) return "devtool";
+  if (/\b(research|paper|arxiv|benchmark|eval|evaluation|harness|dataset|leaderboard|experiment)\b/i.test(text)) return "research";
+  if (/\b(functional|library|framework|runtime|engine|server|package|workflow|pipeline)\b/i.test(text)) return "functional";
+  return "";
+}
+
+export function isArchitectureIdeaProject(inputSignals = {}) {
+  return ARCHITECTURE_IDEA_TYPES.has(classifyArchitectureIdeaType(inputSignals));
+}
+
+export function deepDiveEligibility(inputSignals = {}, options = {}) {
+  const signals = normalizeEvidenceSignals(inputSignals);
+  const threshold = numberOption(options.deepMinStarsGained ?? process.env.PROJECT_DEEP_MIN_STARS_GAINED, DEEP_MIN_STARS_GAINED);
+  const ideaType = classifyArchitectureIdeaType(signals);
+  const maxStarsGained = maxWindowStarsGained(signals);
+  const reasons = [];
+  if (!ideaType) reasons.push("deep_gate:non_architecture_type");
+  if (isResourceProject(signals) || isExcludedDeepDiveIdentity(signals)) reasons.push("deep_gate:excluded_resource_teaching_list");
+  if (!hasSubstantiveCode(signals)) reasons.push("deep_gate:no_substantive_code");
+  if (maxStarsGained < threshold) reasons.push(`deep_gate:stars_gained_below_${threshold}`);
+  // typeEligible = 过类型/排除/代码门(不含 star 速度门),供 ≥90 精英直通用
+  const typeEligible = Boolean(ideaType && !isResourceProject(signals) && !isExcludedDeepDiveIdentity(signals) && hasSubstantiveCode(signals));
+  return {
+    eligible: Boolean(typeEligible && maxStarsGained >= threshold),
+    typeEligible,
+    idea_type: ideaType,
+    maxStarsGained,
+    threshold,
+    reasons,
+  };
 }
 
 function readmeEvidencePoints(signals, reasons) {
@@ -458,6 +531,15 @@ function isResourceProject(signals) {
       || language === "none"
       || language === "markdown",
   );
+}
+
+function isExcludedDeepDiveIdentity(signals) {
+  const identityText = [
+    signals.repo,
+    signals.description,
+    ...(signals.topics || []),
+  ].join("\n");
+  return EXCLUDED_DEEP_IDENTITY_RE.test(identityText);
 }
 
 function isOldComeback(signals) {
@@ -650,6 +732,38 @@ function normalizedTabs(signals) {
   ].map(normalizeTab).filter(Boolean));
 }
 
+function maxWindowStarsGained(signals = {}) {
+  const byWindow = signals.stars_gained_by_window || {};
+  const values = Object.values(byWindow).map(Number).filter(Number.isFinite);
+  if (values.length) return Math.max(...values);
+  return Number(signals.stars_in_period || signals.stars_today) || 0;
+}
+
+function deepCompositeScore(item) {
+  const evalResult = item.eval || item;
+  const signals = normalizeEvidenceSignals(evalResult.evidence_signals || evalResult.depth_decision?.evidence_signals || {});
+  const score = Number(evalResult.ranking_score ?? evalResult.score ?? evalResult.depth_decision?.ranking_score) || 0;
+  const velocity = maxWindowStarsGained(signals);
+  const totalStars = Number(signals.total_stars || signals.stars) || 0;
+  const freshnessRatio = totalStars > 0 ? velocity / totalStars : 0;
+  return score * 1000 + Math.min(500, velocity) + Math.min(100, Math.round(freshnessRatio * 1000));
+}
+
+function candidateWindows(item) {
+  const repo = item.candidate?.raw || item.raw || {};
+  const evalResult = item.eval || item;
+  const signals = normalizeEvidenceSignals(evalResult.evidence_signals || evalResult.depth_decision?.evidence_signals || {});
+  const windows = unique([
+    ...(Array.isArray(repo.windows) ? repo.windows : []),
+    ...normalizedTabs(signals),
+  ].map(normalizeTab).filter(Boolean));
+  return windows.length ? windows : ["radar"];
+}
+
+function itemKey(item) {
+  return item.candidate?.id || item.id || item.candidate?.raw?.fullName || item.raw?.fullName || JSON.stringify(item);
+}
+
 function normalizeTrendSource(value) {
   const tab = normalizeTab(value);
   return tab ? `github-trending:${tab}` : clean(value);
@@ -818,6 +932,17 @@ function normalizePackageFiles(input = {}) {
   };
 }
 
+function normalizeStarsGainedByWindow(input = {}) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return {};
+  const out = {};
+  for (const [key, value] of Object.entries(input)) {
+    const tab = normalizeTab(key);
+    const gained = Number(value);
+    if (tab && Number.isFinite(gained)) out[tab] = gained;
+  }
+  return out;
+}
+
 function boolPoints(condition, points, reasons, reason) {
   if (!condition) return 0;
   reasons.push(reason);
@@ -860,6 +985,11 @@ function clampScore(value, min, max) {
   const number = Math.round(Number(value));
   if (!Number.isFinite(number)) return min;
   return Math.max(min, Math.min(max, number));
+}
+
+function numberOption(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
 }
 
 function asArray(value) {

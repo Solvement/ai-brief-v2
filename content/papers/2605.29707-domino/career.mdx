@@ -1,0 +1,55 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对你(应用型 AI 工程师 / FDE)的价值。这是一篇**拓宽视野**型——把你从 agent 拉到**推理系统/serving**这条线。
+
+## 为什么这对我重要
+
+你做 AI 应用,迟早撞上**推理成本和延迟**。推测解码是把 LLM 推理提速 2-8× 的主流手段,Domino 是它当下的一个清晰样本。懂"draft 质量 vs 成本"的权衡、懂 EAGLE/DFlash/Domino 的取舍,能让你在**选型/调优/面试**里谈得出"怎么把一个 LLM 服务又快又省"——这是纯应用层很少碰、但很值钱的系统视角。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 推测解码原理 | drafter/verifier、接受长度、为什么不改输出分布 | 用 SGLang/transformers 开一个现成 EAGLE/Medusa,量"加速×接受长度" |
+| serving 吞吐评测 | TPS / 并发 / 接受长度 怎么测、怎么读 | 在固定硬件上跑同模型 有/无 推测解码,出一张吞吐对比表 |
+| 质量-成本权衡思维 | 并行 vs 自回归、低秩残差修正"花小钱补质量"的设计 | 读 Table 1,自己复述"为什么 Domino 能两头占" |
+| 训练小头(draft head) | teacher forcing、退火课程 等稳定训练技巧 | 看其训练代码,理解课程权重退火 |
+
+## 系统设计心法
+
+一句话:**"贵的算一次(并行),便宜的才串行"。** Domino 的精髓是把昂贵算子(整个 LM-head)并行摊掉、只让低秩小分支承担串行依赖。这种"把成本结构拆开、把贵的部分并行化"的思路,在任何延迟敏感系统里都通用——不止推理。
+
+## 作品集角度(Portfolio angle)
+
+适合做一个**"LLM 推理提速实测"**小项目:在你的硬件上对一个 Qwen/Llama 跑 baseline vs 推测解码,产出加速/接受长度/吞吐对比 + 一页解读。它展示你**懂 serving、能做基准、会读系统论文**——比再做一个套壳应用更稀缺。注意:复现 Domino 本身要训练 draft head + SGLang,成本不低;**先用现成方案做评测**更划算。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| 推测解码评测台 | 用现成 EAGLE/Medusa(不自己训)+ SGLang,出加速/接受长度/TPS 对比 | 3-6 天 | 展示 serving + 评测能力,可复用 |
+| "贵的并行/便宜的串行"解读卡 | 把 Domino 的成本拆解画成图 + 一页讲清 | 1 天 | 面试讲系统设计的素材 |
+| (进阶)复现 Domino head | 训练低秩修正头接到现成并行 backbone | 2-3 周 | 硬核但成本高,量力 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Benchmarked speculative decoding (EAGLE/DFlash-style) on Qwen3 under SGLang, measuring end-to-end speedup, acceptance length, and serving TPS across concurrency levels."*
+- *"Explained and reproduced the quality–cost trade-off in draft models; characterized how a lightweight causal-correction head recovers acceptance length at near-zero added latency."*
+
+> [!note] 别夸大
+> 除非你真训了 draft head,简历只写你**实测/评测/讲清**了推测解码,不要写"我实现了 Domino"。
+
+## 学习清单
+
+**必学**
+- 推测解码 drafter/verifier 机制 + 接受长度指标
+- serving 吞吐/并发评测怎么做、怎么读
+
+**有用**
+- 低秩残差修正、teacher forcing、退火课程等训练技巧
+- SGLang / vLLM 的推测解码接入
+
+**可选**
+- 自己训练 draft head(成本高,作品集进阶才碰)

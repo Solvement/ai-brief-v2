@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T04:05:46.368Z",
+  "generatedAt": "2026-06-04T21:35:38.701Z",
   "entity": "evidence-pack",
   "directory": "evidence-packs",
-  "count": 43,
+  "count": 45,
   "items": [
     {
       "id": "evidence-pack/9router-evidence-pack",
@@ -1121,6 +1121,91 @@
         {
           "target": "content/codewhale",
           "raw": "[[content/codewhale]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/compound-engineering-plugin-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "compound-engineering-plugin-evidence-pack",
+      "title": "compound-engineering-plugin — Evidence Pack",
+      "file": "evidence-packs/compound-engineering-plugin-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "compound-engineering-plugin",
+        "kind": "evidence-pack",
+        "title": "compound-engineering-plugin — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "给 AI 编程助手装上「复利工程」流程：把需求、计划、审查和知识积累串成一个越用越顺的循环。",
+            "internal_logic": "### Agent Loop\n\n本项目的核心是一个固定的工作流循环：**brainstorm → plan → work → review → compound**。用户通过 slash 命令驱动每一步，每步产出可被下一步消费的 artifact。例如：\n\n```text\n/ce-brainstorm \"make background job retries safer\"\n/ce-plan docs/brainstorms/background-job-retry-safety-requirements.md\n/ce-work\n/ce-code-review\n/ce-compound\n```\n\n`/ce-brainstorm` 会与用户进行交互式问答，产出需求文档；`/ce-plan` 读取需求文档生成实现计划；`/ce-work` 根据计划创建 worktrees 并执行任务；`/ce-code-review` 派生出多个 Agent 进行审查；`/ce-compound` 将本次学到的模式记录到知识库中，供未来 Agent 重用。循环之外，`/ce-strategy` 和 `/ce-product-pulse` 分别提供战略锚点与实际用户反馈。\n\n### Tool Interface (Skills)\n\n所有工具以 **slash command** 形式暴露给宿主环境（Claude Code 等）。每个 skill 实际是一个 Agent 或一组 Agent 的入口。README 列出了 9 个 Skill：\n\n- `/ce-strategy`：创建或维护 `STRATEGY.md`，作为后续构思的锚点。\n- `/ce-ideate`：生成并批判性评估多个方案，选出最佳一个进入 brainstorming。\n- `/ce-brainstorm`：需求分析交互。\n- `/ce-plan`：从特性想法或需求文档生成详细实现计划。\n- `/ce-work`：用 worktrees 和任务跟踪执行计划。\n- `/ce-debug`：系统性复现失败、追踪根因并实施修复。\n- `/ce-code-review`：多 Agent 代码审查。\n- `/ce-compound`：记录经验教训。\n- `/ce-product-pulse`：生成时间窗口内的产品脉搏报告（使用、性能、错误等），保存到 `docs/pulse-reports/`。\n\nSkill 内部可能会像 `$ce-code-review` 那样派生其他 Agent（例如审查 Agent、研究 Agent、工作流 Agent）。这种层次化调用形成了一个 **Agent 树**，父 Agent 将子任务委托给专业子 Agent。\n\n### State / Memory\n\n状态与记忆通过文件系统实现持久化：\n\n- `/ce-strategy` 写入 `STRATEGY.md`，作为所有后续步骤的“只读”上下文背景（grounding）。\n- `/ce-brainstorm` 生成的需求文档、`/ce-plan` 生成的计划文档均以 Markdown 文件形式存在，成为下一个阶段的输入。\n- `/ce-compound` 输出的知识点同样以文档形式持久化，供未来 Agent 读取。\n- `/ce-product-pulse` 报告存入 `docs/pulse-reports/`，形成按时间排列的浏览轨迹。\n\n这种“文档即记忆”的方式避免了上下文窗口膨胀，且知识可跨会话复用。\n\n### Planner\n\n`/ce-plan` 充当规划器。它接受特性描述或需求文档路径作为输入，生成详细实现计划。计划的具体格式未在 README 中说明，但提到会将计划交给 `/ce-work` 执行，因此计划可能包含步骤、任务列表或子 Agent 调用的指令。`/ce-work` 通过 worktrees 和任务跟踪完成执行，暗示计划可能是结构化的任务集。\n\n### Sandbox & Safety\n\n**沙箱与安全机制在 README 中完全未说明**。唯一暗示是 `/ce-work` 使用了 worktrees，这可能隔离了代码修改，但未说明执行环境（是否在隔离的容器或进程中运行）。多 Agent 派生是否默认授权，是否需要人类审批，均未提及。这是一个待确认的重大风险点。\n\n### Cross-platform Adaptation\n\n项目通过一个 Bun/TypeScript 安装器（`@every-env/compound-plugin`）将同一套 Skill/Agent 定义转换为不同平台的格式。平台包括：\n\n- Claude Code：原生 plugin，直接加载。\n- Cursor：通过 `/add-plugin` 从市场安装。\n- Codex：需三步安装（注册市场、Bun 安装 Agent、TUI 安装 Skill）。\n- Copilot CLI/VS Code：通过源码安装或市场命令。\n- Factory Droid、Qwen Code：通过 GitHub 仓库直接安装。\n- OpenCode、Pi、Gemini CLI、Kiro CLI：通过 Bun 安装器转换。\n\n对于没有原生 subagent 原语的平台（如 Pi），安装器会引入社区依赖（`pi-subagents`）来模拟 subagent 调用。这种适配层使得核心工作流可以在异构环境中保持一致性。",
+            "failure_mode": "强依赖多个第三方 AI 平台，任一平台接口变化都可能破坏对应安装。",
+            "source_pointer": "https://github.com/everyinc/compound-engineering-plugin"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/MIT/compound-engineering-v3.10.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/compound-engineering-plugin-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/compound-engineering-plugin-repo]]"
+        ],
+        "metrics": [
+          "stars=19715",
+          "forks=1464",
+          "open_issues=89",
+          "latest_release=compound-engineering-v3.10.0",
+          "pushed_at=2026-06-03T17:17:49Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "强依赖多个第三方 AI 平台，任一平台接口变化都可能破坏对应安装。",
+          "沙箱缺失可能导致 Agent 在无隔离环境下执行潜在危险操作，如修改生产配置或删除文件。",
+          "知识大量累积后，基于文件系统的检索可能低效，且缺乏去重与冲突解决机制，可能反而制造信息噪声。",
+          "README 自述的 37 Skill / 51 Agent 未经第三方审计，可能存在夸大或未实现的条目。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/everyinc/compound-engineering-plugin"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/compound-engineering-plugin-main-claim]],官方 artifact 落库为 [[artifacts/compound-engineering-plugin-repo]]。See [[content/compound-engineering-plugin]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/compound-engineering-plugin-main-claim]],官方 artifact 落库为 [[artifacts/compound-engineering-plugin-repo]]。See [[content/compound-engineering-plugin]]。",
+      "links": [
+        {
+          "target": "claims/compound-engineering-plugin-main-claim",
+          "raw": "[[claims/compound-engineering-plugin-main-claim]]"
+        },
+        {
+          "target": "artifacts/compound-engineering-plugin-repo",
+          "raw": "[[artifacts/compound-engineering-plugin-repo]]"
+        },
+        {
+          "target": "claims/compound-engineering-plugin-main-claim",
+          "raw": "[[claims/compound-engineering-plugin-main-claim]]"
+        },
+        {
+          "target": "artifacts/compound-engineering-plugin-repo",
+          "raw": "[[artifacts/compound-engineering-plugin-repo]]"
+        },
+        {
+          "target": "content/compound-engineering-plugin",
+          "raw": "[[content/compound-engineering-plugin]]"
         }
       ],
       "headings": [
@@ -3629,6 +3714,96 @@
         {
           "target": "content/vibe-trading",
           "raw": "[[content/vibe-trading]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/vimax-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "vimax-evidence-pack",
+      "title": "ViMax — Evidence Pack",
+      "file": "evidence-packs/vimax-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "vimax",
+        "kind": "evidence-pack",
+        "title": "ViMax — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个把想法、小说或剧本端到端拍成长视频的多智能体框架。",
+            "internal_logic": "### 整体流水线\n\n根据 README 架构图，ViMax 采用多智能体流水线，输入层接收想法、脚本、小说、自然语言提示、参考图像等，然后依次经过**剧本生成**（利用 RAG 引擎将长故事分段并保留关键情节和对话）、**分镜设计**（基于用户需求和目标受众，以电影化语言生成有表现力的分镜）、**参考图像选择**（从前一时间线的分镜中智能挑选当前镜头的首帧参考图）、**图像生成**（根据参考图和空间逻辑自动生成图像生成器提示词）、**一致性检查**（并行生成多张图片，通过 MLLM/VLM 选出最佳一致帧），最后进行并行镜头生成（同一机位顺序镜头并行处理）。（来源：README Architecture 部分）\n\n### Agent Loop 推测\n\nREADME 未详细描述 Agent 主循环，且“Coming Soon”列表中包含 `Agents Loop☑️`，表明当前版本可能尚未实现完整 Agent 循环或未公开该部分实现。\n\n### 工具与外部模型\n\n- 剧本生成环节使用 **RAG 引擎** 进行长文本分段。\n- 一致性检查使用 **MLLM/VLM**（多模态大模型/视觉语言模型）评估图像一致性。\n- 近期配置支持 **Google AI Studio API**（来源：README Coming Soon 已完成项），具体模型名称未说明。\n- 图像和视频生成的具体模型未在 README 中披露。\n\n### 状态与记忆\n\n系统通过“前一时间线的分镜”作为参考来维持角色和环境一致性，每生成一个镜头时会根据已生成的帧来调整新帧的提示词和空间位置。但 README 未说明状态存储格式（如结构化的故事板状态对象）或跨镜头记忆机制的具体技术方案。\n\n### 安全与沙箱\n\nREADME 未涉及安全边界、内容审核或沙箱策略。",
+            "failure_mode": "强依赖第三方 API（Google AI Studio 等），成本与可用性受制于人。",
+            "source_pointer": "https://github.com/hkuds/vimax"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/false/false/MIT/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/vimax-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/vimax-repo]]"
+        ],
+        "metrics": [
+          "stars=8718",
+          "forks=1330",
+          "open_issues=33",
+          "latest_release=not_found",
+          "pushed_at=2026-06-01T16:39:16Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "强依赖第三方 API（Google AI Studio 等），成本与可用性受制于人。",
+          "长视频角色一致性仅靠参考图像启发式方法，无量化保证，可能在高要求场景下失效。",
+          "缺乏技术报告或学术论文支撑，核心贡献难以验证。",
+          "社区生态尚弱，文档不全，上手门槛高。",
+          "自称 Movie-Grade Quality 但无第三方评测或用户广泛验证。"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found",
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/hkuds/vimax"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/vimax-main-claim]],官方 artifact 落库为 [[artifacts/vimax-repo]]。See [[content/vimax]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/vimax-main-claim]],官方 artifact 落库为 [[artifacts/vimax-repo]]。See [[content/vimax]]。",
+      "links": [
+        {
+          "target": "claims/vimax-main-claim",
+          "raw": "[[claims/vimax-main-claim]]"
+        },
+        {
+          "target": "artifacts/vimax-repo",
+          "raw": "[[artifacts/vimax-repo]]"
+        },
+        {
+          "target": "claims/vimax-main-claim",
+          "raw": "[[claims/vimax-main-claim]]"
+        },
+        {
+          "target": "artifacts/vimax-repo",
+          "raw": "[[artifacts/vimax-repo]]"
+        },
+        {
+          "target": "content/vimax",
+          "raw": "[[content/vimax]]"
         }
       ],
       "headings": [

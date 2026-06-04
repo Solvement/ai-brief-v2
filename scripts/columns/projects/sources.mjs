@@ -493,9 +493,12 @@ export function buildEvidenceSignals(repo = {}, {
     repo: repo.name || nameFromFullName(repo.fullName),
     url: repo.url || artifactAudit.repo_url || "",
     trend_sources: trendSourcesForRepo(repo, source),
+    appears_in_tabs: Array.isArray(repo.windows) ? repo.windows : [],
     stars: Number(repo.stars ?? artifactAudit.stargazers_count) || 0,
     forks: Number(repo.forks ?? artifactAudit.forks_count) || 0,
     stars_today: Number(repo.starsGained ?? repo.stars_today ?? repo.starsToday) || 0,
+    stars_in_period: Number(repo.starsGained ?? repo.stars_today ?? repo.starsToday) || 0,
+    stars_gained_by_window: repo.starsGainedByWindow || {},
     language: repo.language || artifactAudit.language || "",
     topics,
     description: repo.description || artifactAudit.description || artifactAudit.repo_description || "",
@@ -829,6 +832,7 @@ function toCandidate(repo, { source, window, rank, discoveredAt, sourceTerm = nu
     ownerAvatarUrl: repo.ownerAvatarUrl || (owner ? `https://github.com/${owner}.png?size=80` : ""),
     windows: window ? [window] : [],
     ranksByWindow: window ? { [window]: rank } : {},
+    starsGainedByWindow: window ? { [window]: Number(repo.starsGained) || 0 } : {},
     sourceTerms: sourceTerm ? [sourceTerm] : [],
     boostTerms: BOOST_TERMS,
   });
@@ -866,6 +870,7 @@ function mergeRepoRaw(left, right) {
     windows: unique([...(left.windows || []), ...(right.windows || [])]),
     sourceTerms: unique([...(left.sourceTerms || []), ...(right.sourceTerms || [])]),
     ranksByWindow: { ...(left.ranksByWindow || {}), ...(right.ranksByWindow || {}) },
+    starsGainedByWindow: { ...(left.starsGainedByWindow || {}), ...(right.starsGainedByWindow || {}) },
     stars: Math.max(Number(left.stars) || 0, Number(right.stars) || 0),
     forks: Math.max(Number(left.forks) || 0, Number(right.forks) || 0),
     starsGained: Math.max(Number(left.starsGained) || 0, Number(right.starsGained) || 0),
@@ -898,6 +903,7 @@ function normalizeRepo(repo) {
     license: repo.license || repo.license_spdx_id || null,
     windows: repo.windows || [],
     ranksByWindow: repo.ranksByWindow || {},
+    starsGainedByWindow: repo.starsGainedByWindow || {},
     sourceTerms: repo.sourceTerms || [],
   };
 }

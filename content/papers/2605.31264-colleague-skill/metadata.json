@@ -1,0 +1,30 @@
+{
+  "paper_id": "2605.31264",
+  "arxiv_id": "2605.31264",
+  "title": "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation",
+  "authors": ["Tianyi Zhou", "Dongrui Liu", "Leitao Yuan", "Jing Shao", "Xia Hu"],
+  "date": "2026-05-28",
+  "huggingface_url": "https://huggingface.co/papers/2605.31264",
+  "paper_url": "https://arxiv.org/abs/2605.31264",
+  "code_url": "https://github.com/titanwings/colleague-skill",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "source_rankings": ["weekly", "monthly"],
+  "human_tabs": ["paper", "career"],
+  "autosci_primitive": "data/autosci/primitives/2605.31264.yaml",
+  "first_seen_date": "2026-06-04",
+  "tags": ["trace-to-skill", "knowledge-distillation", "agent-skills", "correction-lifecycle", "versioned-artifact", "person-grounded-agent"],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 7,
+    "system_design_value": 9,
+    "career_value": 8,
+    "autosci_reuse_value": 9,
+    "buildability": 8,
+    "evaluation_value": 4,
+    "breadth_value": 7,
+    "evidence_quality": 5
+  },
+  "one_sentence_judgment": "把'人的专长散落在零散轨迹里'做成 trace→可检视/可纠正/可版本化的 skill package(capability+behavior 双轨)的端到端工作流——是 AutoSci 把自身轨迹蒸馏成可复用技能(L1 自进化)的直接蓝本;但没有保真度实验(作者自认 fidelity 是 open),证据是 19k★ 采用度而非效果。"
+}

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T04:05:46.368Z",
+  "generatedAt": "2026-06-04T21:35:38.701Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 43,
+  "count": 45,
   "items": [
     {
       "id": "claim/9router-main-claim",
@@ -514,6 +514,45 @@
         {
           "target": "content/codewhale",
           "raw": "[[content/codewhale]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/compound-engineering-plugin-main-claim",
+      "type": "claim",
+      "slug": "compound-engineering-plugin-main-claim",
+      "title": "Compound Engineering Plugin Main Claim",
+      "file": "claims/compound-engineering-plugin-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "ships 37 skills and 51 agents",
+        "slug": "compound-engineering-plugin-main-claim",
+        "kind": "claim",
+        "content": "compound-engineering-plugin",
+        "source_pointer": "README Getting Started 段落",
+        "evidence_strength": "low",
+        "supports": [
+          "compound-engineering-loop"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "只有总数字，未列出任何单个 skill/agent 的定义，无法核实。",
+          "可能存在未实现或不可用的条目，用户期望管理风险。"
+        ],
+        "status": "untested"
+      },
+      "body": "\n## Claim\n\n包含 37 个技能和 51 个代理\n\n证据:功能丰富度宣言。边界:只有总数字，未列出任何单个 skill/agent 的定义，无法核实。。风险:可能存在未实现或不可用的条目，用户期望管理风险。。See [[content/compound-engineering-plugin]]。\n",
+      "excerpt": "包含 37 个技能和 51 个代理",
+      "links": [
+        {
+          "target": "content/compound-engineering-plugin",
+          "raw": "[[content/compound-engineering-plugin]]"
         }
       ],
       "headings": [
@@ -1675,6 +1714,46 @@
         {
           "target": "content/vibe-trading",
           "raw": "[[content/vibe-trading]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/vimax-main-claim",
+      "type": "claim",
+      "slug": "vimax-main-claim",
+      "title": "Vimax Main Claim",
+      "file": "claims/vimax-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "支持从原始想法直接生成完整视频故事（Idea2Video）",
+        "slug": "vimax-main-claim",
+        "kind": "claim",
+        "content": "vimax",
+        "source_pointer": "README Key Features 表格 Idea2Video 行",
+        "evidence_strength": "medium",
+        "supports": [
+          "agentic-video-generation",
+          "multi-agent-pipeline"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供具体生成案例的 demo 视频长度、分辨率或输入示例",
+          "可能只是简化版流水线，真实效果依赖底层生成模型"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n你给一个大概想法，系统就能自动拍出一段视频。\n\n证据:有对应的功能描述和定位语“From Spark to Screen”。边界:未提供具体生成案例的 demo 视频长度、分辨率或输入示例。风险:可能只是简化版流水线，真实效果依赖底层生成模型。See [[content/vimax]]。\n",
+      "excerpt": "你给一个大概想法，系统就能自动拍出一段视频。",
+      "links": [
+        {
+          "target": "content/vimax",
+          "raw": "[[content/vimax]]"
         }
       ],
       "headings": [

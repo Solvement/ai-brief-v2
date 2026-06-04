@@ -1,0 +1,1624 @@
+{
+  "generatedAt": "2026-06-04T18:51:56.613Z",
+  "date": "2026-06-04",
+  "counts": {
+    "deepReads": 3,
+    "radar": 10,
+    "deepCandidates": 3
+  },
+  "deepReads": [
+    {
+      "slug": "2605.29707-domino",
+      "arxiv_id": "2605.29707",
+      "title": "Domino: Decoupling Causal Modeling from Autoregressive Drafting in Speculative Decoding",
+      "date": "2026-05-28",
+      "authors": [
+        "Jianuo Huang",
+        "Yaojie Zhang",
+        "Qituan Zhang",
+        "Hao Lin",
+        "Hanlin Xu",
+        "Linfeng Zhang"
+      ],
+      "tags": [
+        "speculative-decoding",
+        "inference-systems",
+        "serving",
+        "low-rank-correction",
+        "breadth"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 7,
+        "career_value": 6,
+        "autosci_reuse_value": 4,
+        "buildability": 4,
+        "evaluation_value": 7,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "把推测解码'草稿质量 vs 成本'两难用'并行 backbone 出整块 + 轻量 Domino head(GRU 因果编码+低秩残差)只对修正分支串行'解开——GSM8K-8B 7.92× 加速/接受长度 10.03(显著超 EAGLE-3/DFlash),仅 +5.3% 参数/+2.8% 延迟;证据扎实但仅推理、主要适配 SGLang,对 AutoSci 是降本提速的间接价值。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.29707.png"
+    },
+    {
+      "slug": "2605.30611-crafter-multi-agent-harness",
+      "arxiv_id": "2605.30611",
+      "title": "Crafter: A Multi-Agent Harness for Editable Scientific Figure Generation from Diverse Inputs",
+      "date": "2026-05-28",
+      "authors": [
+        "Haozhe Zhao",
+        "Shuzheng Si",
+        "Zhenhailong Wang",
+        "Zheng Wang",
+        "Liang Chen",
+        "Xiaotong Li"
+      ],
+      "tags": [
+        "multi-agent-harness",
+        "agentic-refinement",
+        "structured-memory",
+        "directive-critic",
+        "VLM-as-judge",
+        "verify-then-refine",
+        "figure-generation"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 7,
+        "breadth_value": 7,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "把'生成科学配图'重构成'给现成图像生成器套一层带结构化记忆(typed-edit spec)的编排 harness'——它的 plan→render→diagnose→refine 循环 + 指令式批评家 + best-so-far 回退,是可直接迁移到 AutoSci 自改进骨架的系统模式;证据扎实(每个组件消融都掉分、对基线 +16~22 分),代价是约 4× 推理成本且主指标依赖 VLM 自评。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30611.png"
+    },
+    {
+      "slug": "2605.31264-colleague-skill",
+      "arxiv_id": "2605.31264",
+      "title": "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation",
+      "date": "2026-05-28",
+      "authors": [
+        "Tianyi Zhou",
+        "Dongrui Liu",
+        "Leitao Yuan",
+        "Jing Shao",
+        "Xia Hu"
+      ],
+      "tags": [
+        "trace-to-skill",
+        "knowledge-distillation",
+        "agent-skills",
+        "correction-lifecycle",
+        "versioned-artifact",
+        "person-grounded-agent"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 4,
+        "breadth_value": 7,
+        "evidence_quality": 5
+      },
+      "source_rankings": [
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "把'人的专长散落在零散轨迹里'做成 trace→可检视/可纠正/可版本化的 skill package(capability+behavior 双轨)的端到端工作流——是 AutoSci 把自身轨迹蒸馏成可复用技能(L1 自进化)的直接蓝本;但没有保真度实验(作者自认 fidelity 是 open),证据是 19k★ 采用度而非效果。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31264.png"
+    }
+  ],
+  "deepCandidates": [
+    {
+      "arxiv_id": "2605.31264",
+      "title": "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation",
+      "final_score": 7.6,
+      "category": "agent",
+      "autosci_relevance": "direct",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "transferability_to_autosci": 9,
+        "breadth_value": 7,
+        "ai_engineering_value": 8,
+        "buildability": 6,
+        "evaluation_value": 6,
+        "evidence_quality": 6
+      },
+      "one_line": "通过专家知识蒸馏自动化生成AI技能，将异构痕迹转化为可检查的技能包",
+      "deep_slug": "2605.31264-colleague-skill"
+    },
+    {
+      "arxiv_id": "2605.29707",
+      "title": "Domino: Decoupling Causal Modeling from Autoregressive Drafting in Speculative Decoding",
+      "final_score": 7.4,
+      "category": "inference",
+      "autosci_relevance": "indirect",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "transferability_to_autosci": 6,
+        "breadth_value": 7,
+        "ai_engineering_value": 8,
+        "buildability": 7,
+        "evaluation_value": 8,
+        "evidence_quality": 7
+      },
+      "one_line": "解耦因果建模与自回归草稿，提升投机解码速度",
+      "deep_slug": "2605.29707-domino"
+    },
+    {
+      "arxiv_id": "2605.28556",
+      "title": "A Matter of TASTE: Improving Coverage and Difficulty of Agent Benchmarks",
+      "final_score": 7.35,
+      "category": "eval",
+      "autosci_relevance": "direct",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "transferability_to_autosci": 8,
+        "breadth_value": 7,
+        "ai_engineering_value": 7,
+        "buildability": 7,
+        "evaluation_value": 7,
+        "evidence_quality": 3
+      },
+      "one_line": "从工具序列演化自动生成更难更广泛的agent基准，改进评测覆盖。",
+      "deep_slug": null
+    }
+  ],
+  "radar": [
+    {
+      "arxiv_id": "2606.00408",
+      "title": "Masking Stale Observations Helps Search Agents -- Until It Doesn't: A Regime Map and Its Mechanism",
+      "final_score": 7.3,
+      "category": "agent",
+      "one_line": "观察遮蔽对搜索代理性能影响的规律与机制",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2606.02437",
+      "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+      "final_score": 7.15,
+      "category": "training",
+      "one_line": "将PEFT从廉价微调重新定位为持久局部状态，用于百万个性化模型",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2606.02800",
+      "title": "Cosmos 3: Omnimodal World Models for Physical AI",
+      "final_score": 7.05,
+      "category": "multimodal",
+      "one_line": "统一多模态世界模型的架构设计方法",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2605.29307",
+      "title": "GrepSeek: Training Search Agents for Direct Corpus Interaction",
+      "final_score": 7,
+      "category": "agent",
+      "one_line": "训练搜索agent通过shell命令直接与语料库交互，替代传统检索器",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2605.31268",
+      "title": "Mellum2 Technical Report",
+      "final_score": 7,
+      "category": "training",
+      "one_line": "开源了专精软件工程的MoE模型，展示了高效架构和agentic编码能力。",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2606.05121",
+      "title": "Audio Interaction Model",
+      "final_score": 6.8,
+      "category": "multimodal",
+      "one_line": "提出在线统一音频交互模型，实时感知-决策-响应，对多模态agent有启发。",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2606.03458",
+      "title": "KVarN: Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
+      "final_score": 6.45,
+      "category": "inference",
+      "one_line": "提出了校准-free的KV-cache量化方法，缓解推理误差累积，适用长序列。",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2606.00683",
+      "title": "OCC-RAG: Optimal Cognitive Core for Faithful Question Answering",
+      "final_score": 6.3,
+      "category": "rag",
+      "one_line": "用小模型结合检索实现忠实问答，强调推理而非参数知识。",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2605.31159",
+      "title": "Trust-Region Behavior Blending for On-Policy Distillation",
+      "final_score": 6.25,
+      "category": "training",
+      "one_line": "用信任区域行为混合改进在线蒸馏，提升学生早期训练质量。",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2605.31604",
+      "title": "Representation Forcing for Bottleneck-Free Unified Multimodal Models",
+      "final_score": 5.85,
+      "category": "training",
+      "one_line": "消除多模态模型瓶颈的表示强制训练技术",
+      "deep_slug": null
+    }
+  ],
+  "radarEmpty": false,
+  "board": {
+    "daily": [
+      {
+        "arxiv_id": "2606.05121",
+        "title": "Audio Interaction Model",
+        "upvotes": 81,
+        "num_comments": 2,
+        "authors": [
+          "Zhifei Xie",
+          "Zihang Liu",
+          "Ze An"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05121.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05121",
+        "paper_url": "https://arxiv.org/abs/2606.05121",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02800",
+        "title": "Cosmos 3: Omnimodal World Models for Physical AI",
+        "upvotes": 60,
+        "num_comments": 0,
+        "authors": [
+          "Aditi",
+          "Niket Agarwal",
+          "Arslan Ali"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02800.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02800",
+        "paper_url": "https://arxiv.org/abs/2606.02800",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02060",
+        "title": "Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in Agent Trajectories",
+        "upvotes": 41,
+        "num_comments": 4,
+        "authors": [
+          "Jiaming Wang",
+          "Ziteng Feng",
+          "Jiangtao Wu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02060.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02060",
+        "paper_url": "https://arxiv.org/abs/2606.02060",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.04923",
+        "title": "Reproducing, Analyzing, and Detecting Reward Hacking in Rubric-Based Reinforcement Learning",
+        "upvotes": 34,
+        "num_comments": 1,
+        "authors": [
+          "Xuekang Wang",
+          "Zhuoyuan Hao",
+          "Shuo Hou"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.04923.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.04923",
+        "paper_url": "https://arxiv.org/abs/2606.04923",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03890",
+        "title": "OVO-S-Bench: A Hierarchical Benchmark for Streaming Spatial Intelligence in Multimodal LLMs",
+        "upvotes": 28,
+        "num_comments": 1,
+        "authors": [
+          "Yifei Li",
+          "Pengyiang Liu",
+          "Yuhang Zang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03890.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03890",
+        "paper_url": "https://arxiv.org/abs/2606.03890",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03746",
+        "title": "Qwen-Image-Flash: Beyond Objective Design",
+        "upvotes": 28,
+        "num_comments": 3,
+        "authors": [
+          "Tianhe Wu",
+          "Kun Yan",
+          "Zikai Zhou"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03746.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03746",
+        "paper_url": "https://arxiv.org/abs/2606.03746",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05008",
+        "title": "M^3Eval: Multi-Modal Memory Evaluation through Cognitively-Grounded Video Tasks",
+        "upvotes": 24,
+        "num_comments": 1,
+        "authors": [
+          "Jie Huang",
+          "Ruixun Liu",
+          "Sirui Sun"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05008.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05008",
+        "paper_url": "https://arxiv.org/abs/2606.05008",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03503",
+        "title": "ThoughtFold: Folding Reasoning Chains via Introspective Preference Learning",
+        "upvotes": 24,
+        "num_comments": 1,
+        "authors": [
+          "Ziyan Liu",
+          "Xueda Shen",
+          "Yuzhe Gu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03503.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03503",
+        "paper_url": "https://arxiv.org/abs/2606.03503",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.04527",
+        "title": "Echo-Infinity: Learning Evolving Memory for Real-Time Infinite Video Generation",
+        "upvotes": 22,
+        "num_comments": 1,
+        "authors": [
+          "Yuxuan Bian",
+          "Zeyue Xue",
+          "Songchun Zhang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.04527.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.04527",
+        "paper_url": "https://arxiv.org/abs/2606.04527",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05158",
+        "title": "Streaming Communication in Multi-Agent Reasoning",
+        "upvotes": 21,
+        "num_comments": 1,
+        "authors": [
+          "Zhen Yang",
+          "Xiaogang Xu",
+          "Wen Wang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05158.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05158",
+        "paper_url": "https://arxiv.org/abs/2606.05158",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.27492",
+        "title": "Benchmarks are Not Enough: RAMP for Runtime Assessing of Agentic Models in Production Systems",
+        "upvotes": 19,
+        "num_comments": 2,
+        "authors": [
+          "Yipeng Ouyang",
+          "Xin Huang",
+          "Bingjie Liu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.27492.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.27492",
+        "paper_url": "https://arxiv.org/abs/2605.27492",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.04036",
+        "title": "Self-Distilled Policy Gradient",
+        "upvotes": 15,
+        "num_comments": 2,
+        "authors": [
+          "Yifeng Liu",
+          "Shiyuan Zhang",
+          "Yifan Zhang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.04036.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.04036",
+        "paper_url": "https://arxiv.org/abs/2606.04036",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03577",
+        "title": "Eliciting Complex Spatial Reasoning in MLLMs through Wide-Baseline Matching",
+        "upvotes": 13,
+        "num_comments": 1,
+        "authors": [
+          "Hao Zhong",
+          "Muzhi Zhu",
+          "Shenyan Zeng"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03577.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03577",
+        "paper_url": "https://arxiv.org/abs/2606.03577",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03197",
+        "title": "MemTrain: Self-Supervised Context Memory Training",
+        "upvotes": 12,
+        "num_comments": 1,
+        "authors": [
+          "Ziheng Li",
+          "Xingrun Xing",
+          "Haoqing Wang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03197.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03197",
+        "paper_url": "https://arxiv.org/abs/2606.03197",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.01993",
+        "title": "MMG2Skill: Can Agents Distill In-the-Wild Guides into Self-Evolving Skills?",
+        "upvotes": 12,
+        "num_comments": 1,
+        "authors": [
+          "Xinyu Che",
+          "Junqi Xiong",
+          "Yunfei Ge"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.01993.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.01993",
+        "paper_url": "https://arxiv.org/abs/2606.01993",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.04513",
+        "title": "MapAgent: An Industrial-Grade Agentic Framework for City-scale Lane-level Map Generation",
+        "upvotes": 11,
+        "num_comments": 1,
+        "authors": [
+          "Deguo Xia",
+          "Zihan Li",
+          "Haochen Zhao"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.04513.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.04513",
+        "paper_url": "https://arxiv.org/abs/2606.04513",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03972",
+        "title": "AAD-1: Asymmetric Adversarial Distillation for One-Step Autoregressive Video Generation",
+        "upvotes": 11,
+        "num_comments": 1,
+        "authors": [
+          "Haobo Li",
+          "Yanhong Zeng",
+          "Yunhong Lu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03972.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03972",
+        "paper_url": "https://arxiv.org/abs/2606.03972",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02684",
+        "title": "Filter, Then Reweight: Rethinking Optimization Granularity in On-Policy Distillation",
+        "upvotes": 11,
+        "num_comments": 1,
+        "authors": [
+          "Yuying Li",
+          "Leqi Zheng",
+          "Yongzi Yu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02684.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02684",
+        "paper_url": "https://arxiv.org/abs/2606.02684",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05102",
+        "title": "ZipSplat: Fewer Gaussians, Better Splats",
+        "upvotes": 10,
+        "num_comments": 1,
+        "authors": [
+          "Alexander Veicht",
+          "Sunghwan Hong",
+          "Dániel Baráth"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05102.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05102",
+        "paper_url": "https://arxiv.org/abs/2606.05102",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05080",
+        "title": "AutoLab: Can Frontier Models Solve Long-Horizon Auto Research and Engineering Tasks?",
+        "upvotes": 9,
+        "num_comments": 0,
+        "authors": [
+          "Zhangchen Xu",
+          "Junda Chen",
+          "Yue Huang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05080.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05080",
+        "paper_url": "https://arxiv.org/abs/2606.05080",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03773",
+        "title": "KletterMix: Climbing Toward High-Quality German Pretraining Data",
+        "upvotes": 9,
+        "num_comments": 5,
+        "authors": [
+          "Maurice Kraus",
+          "Ruben Härle",
+          "Sebastian Sztwiertnia"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03773.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03773",
+        "paper_url": "https://arxiv.org/abs/2606.03773",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03220",
+        "title": "WebRISE: Requirement-Induced State Evaluation for MLLM-Generated Web Artifacts",
+        "upvotes": 8,
+        "num_comments": 1,
+        "authors": [
+          "Yuxin Meng",
+          "Yuhan Suo",
+          "Junjie Wang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03220.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03220",
+        "paper_url": "https://arxiv.org/abs/2606.03220",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03031",
+        "title": "AUDITFLOW: Executable Symbolic Environments for Structured Financial Reporting Verification",
+        "upvotes": 6,
+        "num_comments": 1,
+        "authors": [
+          "Yan Wang",
+          "Xuguang Ai",
+          "Jaisal Patel"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03031.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03031",
+        "paper_url": "https://arxiv.org/abs/2606.03031",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05160",
+        "title": "GRAIL: Generating Humanoid Loco-Manipulation from 3D Assets and Video Priors",
+        "upvotes": 5,
+        "num_comments": 1,
+        "authors": [
+          "Tianyi Xie",
+          "Haotian Zhang",
+          "Jinhyung Park"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05160.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05160",
+        "paper_url": "https://arxiv.org/abs/2606.05160",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.01166",
+        "title": "BraveGuard: From Open-World Threats to Safer Computer-Use Agents",
+        "upvotes": 5,
+        "num_comments": 1,
+        "authors": [
+          "Yunhao Feng",
+          "Xiaohu Du",
+          "Xinhao Deng"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.01166.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.01166",
+        "paper_url": "https://arxiv.org/abs/2606.01166",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.01286",
+        "title": "BenchEvolver: Frontier Task Synthesis via Solution-Centric Evolution",
+        "upvotes": 5,
+        "num_comments": 1,
+        "authors": [
+          "Yangzhen Wu",
+          "Aaron J. Li",
+          "Wenjie Ma"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.01286.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.01286",
+        "paper_url": "https://arxiv.org/abs/2606.01286",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.29489",
+        "title": "Access Sets Matter: Budgeting Expert Reads for Scalable Weight-Space Model Merging",
+        "upvotes": 4,
+        "num_comments": 1,
+        "authors": [
+          "Yuanyi Wang",
+          "Yanggan Gu",
+          "Su Lu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.29489.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.29489",
+        "paper_url": "https://arxiv.org/abs/2605.29489",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05165",
+        "title": "STRIDE: Training Data Attribution via Sparse Recovery from Subset Perturbations",
+        "upvotes": 3,
+        "num_comments": 1,
+        "authors": [
+          "Rishit Dagli",
+          "Abir Harrasse",
+          "Luke Zhang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05165.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05165",
+        "paper_url": "https://arxiv.org/abs/2606.05165",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05112",
+        "title": "Evaluating Large Language Models in Dynamic Clinical Decision-Making with Standardized Patient Cases",
+        "upvotes": 3,
+        "num_comments": 1,
+        "authors": [
+          "Cheng Liang",
+          "Pengcheng Qiu",
+          "Ya Zhang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05112.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05112",
+        "paper_url": "https://arxiv.org/abs/2606.05112",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02859",
+        "title": "Economy of Minds: Emerging Multi-Agent Intelligence with Economic Interactions",
+        "upvotes": 3,
+        "num_comments": 1,
+        "authors": [
+          "Zhenting Qi",
+          "Huangyuan Su",
+          "Ao Qu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02859.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02859",
+        "paper_url": "https://arxiv.org/abs/2606.02859",
+        "already_done": false
+      }
+    ],
+    "weekly": [
+      {
+        "arxiv_id": "2605.30611",
+        "title": "Crafter: A Multi-Agent Harness for Editable Scientific Figure Generation from Diverse Inputs",
+        "upvotes": 185,
+        "num_comments": 3,
+        "authors": [
+          "Haozhe Zhao",
+          "Shuzheng Si",
+          "Zhenhailong Wang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30611.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30611",
+        "paper_url": "https://arxiv.org/abs/2605.30611",
+        "already_done": true
+      },
+      {
+        "arxiv_id": "2606.02437",
+        "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+        "upvotes": 168,
+        "num_comments": 4,
+        "authors": [
+          "Mind Lab",
+          "Song Cao",
+          "Vic Cao"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02437.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02437",
+        "paper_url": "https://arxiv.org/abs/2606.02437",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.29707",
+        "title": "Domino: Decoupling Causal Modeling from Autoregressive Drafting in Speculative Decoding",
+        "upvotes": 135,
+        "num_comments": 3,
+        "authors": [
+          "Jianuo Huang",
+          "Yaojie Zhang",
+          "Qituan Zhang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.29707.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.29707",
+        "paper_url": "https://arxiv.org/abs/2605.29707",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31264",
+        "title": "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation",
+        "upvotes": 104,
+        "num_comments": 3,
+        "authors": [
+          "Tianyi Zhou",
+          "Dongrui Liu",
+          "Leitao Yuan"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31264.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31264",
+        "paper_url": "https://arxiv.org/abs/2605.31264",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.29307",
+        "title": "GrepSeek: Training Search Agents for Direct Corpus Interaction",
+        "upvotes": 99,
+        "num_comments": 5,
+        "authors": [
+          "Alireza Salemi",
+          "Chang Zeng",
+          "Atharva Nijasure"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.29307.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.29307",
+        "paper_url": "https://arxiv.org/abs/2605.29307",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05121",
+        "title": "Audio Interaction Model",
+        "upvotes": 81,
+        "num_comments": 2,
+        "authors": [
+          "Zhifei Xie",
+          "Zihang Liu",
+          "Ze An"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05121.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05121",
+        "paper_url": "https://arxiv.org/abs/2606.05121",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.00683",
+        "title": "OCC-RAG: Optimal Cognitive Core for Faithful Question Answering",
+        "upvotes": 81,
+        "num_comments": 6,
+        "authors": [
+          "Maksim Savkin",
+          "Mikhail Goncharov",
+          "Alexander Gambashidze"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.00683.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.00683",
+        "paper_url": "https://arxiv.org/abs/2606.00683",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31159",
+        "title": "Trust-Region Behavior Blending for On-Policy Distillation",
+        "upvotes": 64,
+        "num_comments": 4,
+        "authors": [
+          "Daniil Plyusov",
+          "Alexey Gorbatovski",
+          "Alexey Malakhov"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31159.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31159",
+        "paper_url": "https://arxiv.org/abs/2605.31159",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.28556",
+        "title": "A Matter of TASTE: Improving Coverage and Difficulty of Agent Benchmarks",
+        "upvotes": 61,
+        "num_comments": 3,
+        "authors": [
+          "Tomer Keren",
+          "Nitay Calderon",
+          "Asaf Yehudai"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.28556.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.28556",
+        "paper_url": "https://arxiv.org/abs/2605.28556",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02800",
+        "title": "Cosmos 3: Omnimodal World Models for Physical AI",
+        "upvotes": 60,
+        "num_comments": 0,
+        "authors": [
+          "Aditi",
+          "Niket Agarwal",
+          "Arslan Ali"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02800.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02800",
+        "paper_url": "https://arxiv.org/abs/2606.02800",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.00408",
+        "title": "Masking Stale Observations Helps Search Agents -- Until It Doesn't: A Regime Map and Its Mechanism",
+        "upvotes": 58,
+        "num_comments": 2,
+        "authors": [
+          "Haoxiang Zhang",
+          "Qixin Xu",
+          "Zhuofeng Li"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.00408.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.00408",
+        "paper_url": "https://arxiv.org/abs/2606.00408",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31604",
+        "title": "Representation Forcing for Bottleneck-Free Unified Multimodal Models",
+        "upvotes": 57,
+        "num_comments": 2,
+        "authors": [
+          "Yuqing Wang",
+          "Zhijie Lin",
+          "Ceyuan Yang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31604.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31604",
+        "paper_url": "https://arxiv.org/abs/2605.31604",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30993",
+        "title": "SwanVoice: Expressive Long-Form Zero-Shot Speech Synthesis for Both Monologue and Dialogue",
+        "upvotes": 56,
+        "num_comments": 3,
+        "authors": [
+          "Ruiqi Li",
+          "Yu Zhang",
+          "Changhao Pan"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30993.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30993",
+        "paper_url": "https://arxiv.org/abs/2605.30993",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02404",
+        "title": "K-BrowseComp: A Web Browsing Agent Benchmark Grounded in Korean Contexts",
+        "upvotes": 52,
+        "num_comments": 1,
+        "authors": [
+          "Nahyun Lee",
+          "Dongkeun Yoon",
+          "Guijin Son"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02404.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02404",
+        "paper_url": "https://arxiv.org/abs/2606.02404",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31268",
+        "title": "Mellum2 Technical Report",
+        "upvotes": 51,
+        "num_comments": 3,
+        "authors": [
+          "Marko Kojic",
+          "Ivan Bondyrev",
+          "Aral de Moor"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31268.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31268",
+        "paper_url": "https://arxiv.org/abs/2605.31268",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.23895",
+        "title": "From Activation to Causality: Discovery of Causal Visual Representations in the Human Brain",
+        "upvotes": 50,
+        "num_comments": 2,
+        "authors": [
+          "Yuval Golbari",
+          "Navve Wasserman",
+          "Matias Cosarinsky"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.23895.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.23895",
+        "paper_url": "https://arxiv.org/abs/2605.23895",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03458",
+        "title": "KVarN: Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
+        "upvotes": 46,
+        "num_comments": 9,
+        "authors": [
+          "Lorenz K. Muller",
+          "Philippe Bich",
+          "Chiara Boretti"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03458.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03458",
+        "paper_url": "https://arxiv.org/abs/2606.03458",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02060",
+        "title": "Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in Agent Trajectories",
+        "upvotes": 41,
+        "num_comments": 4,
+        "authors": [
+          "Jiaming Wang",
+          "Ziteng Feng",
+          "Jiangtao Wu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02060.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02060",
+        "paper_url": "https://arxiv.org/abs/2606.02060",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31039",
+        "title": "GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration",
+        "upvotes": 41,
+        "num_comments": 2,
+        "authors": [
+          "Xiangtao Kong",
+          "Jixin Zhao",
+          "Lingchen Sun"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31039.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31039",
+        "paper_url": "https://arxiv.org/abs/2605.31039",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31584",
+        "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+        "upvotes": 41,
+        "num_comments": 2,
+        "authors": [
+          "Nianyi Lin",
+          "Jiajie Zhang",
+          "Lei Hou"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31584.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31584",
+        "paper_url": "https://arxiv.org/abs/2605.31584",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02373",
+        "title": "Harness-1: Reinforcement Learning for Search Agents with State-Externalizing Harnesses",
+        "upvotes": 40,
+        "num_comments": 2,
+        "authors": [
+          "Pengcheng Jiang",
+          "Zhiyi Shi",
+          "Kelly Hong"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02373.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02373",
+        "paper_url": "https://arxiv.org/abs/2606.02373",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30819",
+        "title": "Function2Scene: 3D Indoor Scene Layout from Functional Specifications",
+        "upvotes": 40,
+        "num_comments": 2,
+        "authors": [
+          "Ruiqi Wang",
+          "Qimin Chen",
+          "Daniel Ritchie"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30819.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30819",
+        "paper_url": "https://arxiv.org/abs/2605.30819",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03985",
+        "title": "Humanoid-GPT: Scaling Data and Structure for Zero-Shot Motion Tracking",
+        "upvotes": 37,
+        "num_comments": 0,
+        "authors": [
+          "Zekun Qi",
+          "Xuchuan Chen",
+          "Dairu Liu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03985.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03985",
+        "paper_url": "https://arxiv.org/abs/2606.03985",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.01249",
+        "title": "Trust Region On-Policy Distillation",
+        "upvotes": 37,
+        "num_comments": 2,
+        "authors": [
+          "Xingrun Xing",
+          "Haoqing Wang",
+          "Boyan Gao"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.01249.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.01249",
+        "paper_url": "https://arxiv.org/abs/2606.01249",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30940",
+        "title": "Towards Streaming Synchronized Spatial Audio Generation via Autoregressive Diffusion Transformer",
+        "upvotes": 36,
+        "num_comments": 2,
+        "authors": [
+          "Ke Lei",
+          "Yu Zhang",
+          "Changhao Pan"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30940.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30940",
+        "paper_url": "https://arxiv.org/abs/2605.30940",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30409",
+        "title": "SANA-Streaming: Real-time Streaming Video Editing with Hybrid Diffusion Transformer",
+        "upvotes": 36,
+        "num_comments": 2,
+        "authors": [
+          "Yuyang Zhao",
+          "Yicheng Pan",
+          "Qiyuan He"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30409.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30409",
+        "paper_url": "https://arxiv.org/abs/2605.30409",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30876",
+        "title": "dMoE: dLLMs with Learnable Block Experts",
+        "upvotes": 35,
+        "num_comments": 4,
+        "authors": [
+          "Sicheng Feng",
+          "Zigeng Chen",
+          "Gongfan Fang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30876.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30876",
+        "paper_url": "https://arxiv.org/abs/2605.30876",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.04923",
+        "title": "Reproducing, Analyzing, and Detecting Reward Hacking in Rubric-Based Reinforcement Learning",
+        "upvotes": 34,
+        "num_comments": 1,
+        "authors": [
+          "Xuekang Wang",
+          "Zhuoyuan Hao",
+          "Shuo Hou"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.04923.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.04923",
+        "paper_url": "https://arxiv.org/abs/2606.04923",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02482",
+        "title": "X-Stream: Exploring MLLMs as Multiplexers for Multi-Stream Understanding",
+        "upvotes": 32,
+        "num_comments": 1,
+        "authors": [
+          "Peiwen Sun",
+          "Xudong Lu",
+          "Huadai Liu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02482.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02482",
+        "paper_url": "https://arxiv.org/abs/2606.02482",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31075",
+        "title": "Task-Focused Memorization for Multimodal Agents",
+        "upvotes": 32,
+        "num_comments": 1,
+        "authors": [
+          "Tao Zou",
+          "Yichen He",
+          "Tian Qiu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31075.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31075",
+        "paper_url": "https://arxiv.org/abs/2605.31075",
+        "already_done": false
+      }
+    ],
+    "monthly": [
+      {
+        "arxiv_id": "2605.30611",
+        "title": "Crafter: A Multi-Agent Harness for Editable Scientific Figure Generation from Diverse Inputs",
+        "upvotes": 185,
+        "num_comments": 3,
+        "authors": [
+          "Haozhe Zhao",
+          "Shuzheng Si",
+          "Zhenhailong Wang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30611.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30611",
+        "paper_url": "https://arxiv.org/abs/2605.30611",
+        "already_done": true
+      },
+      {
+        "arxiv_id": "2606.02437",
+        "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+        "upvotes": 168,
+        "num_comments": 4,
+        "authors": [
+          "Mind Lab",
+          "Song Cao",
+          "Vic Cao"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02437.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02437",
+        "paper_url": "https://arxiv.org/abs/2606.02437",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.29707",
+        "title": "Domino: Decoupling Causal Modeling from Autoregressive Drafting in Speculative Decoding",
+        "upvotes": 135,
+        "num_comments": 3,
+        "authors": [
+          "Jianuo Huang",
+          "Yaojie Zhang",
+          "Qituan Zhang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.29707.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.29707",
+        "paper_url": "https://arxiv.org/abs/2605.29707",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31264",
+        "title": "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation",
+        "upvotes": 104,
+        "num_comments": 3,
+        "authors": [
+          "Tianyi Zhou",
+          "Dongrui Liu",
+          "Leitao Yuan"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31264.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31264",
+        "paper_url": "https://arxiv.org/abs/2605.31264",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.29307",
+        "title": "GrepSeek: Training Search Agents for Direct Corpus Interaction",
+        "upvotes": 99,
+        "num_comments": 5,
+        "authors": [
+          "Alireza Salemi",
+          "Chang Zeng",
+          "Atharva Nijasure"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.29307.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.29307",
+        "paper_url": "https://arxiv.org/abs/2605.29307",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.05121",
+        "title": "Audio Interaction Model",
+        "upvotes": 81,
+        "num_comments": 2,
+        "authors": [
+          "Zhifei Xie",
+          "Zihang Liu",
+          "Ze An"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05121.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.05121",
+        "paper_url": "https://arxiv.org/abs/2606.05121",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.00683",
+        "title": "OCC-RAG: Optimal Cognitive Core for Faithful Question Answering",
+        "upvotes": 81,
+        "num_comments": 6,
+        "authors": [
+          "Maksim Savkin",
+          "Mikhail Goncharov",
+          "Alexander Gambashidze"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.00683.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.00683",
+        "paper_url": "https://arxiv.org/abs/2606.00683",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31159",
+        "title": "Trust-Region Behavior Blending for On-Policy Distillation",
+        "upvotes": 64,
+        "num_comments": 4,
+        "authors": [
+          "Daniil Plyusov",
+          "Alexey Gorbatovski",
+          "Alexey Malakhov"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31159.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31159",
+        "paper_url": "https://arxiv.org/abs/2605.31159",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.28556",
+        "title": "A Matter of TASTE: Improving Coverage and Difficulty of Agent Benchmarks",
+        "upvotes": 61,
+        "num_comments": 3,
+        "authors": [
+          "Tomer Keren",
+          "Nitay Calderon",
+          "Asaf Yehudai"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.28556.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.28556",
+        "paper_url": "https://arxiv.org/abs/2605.28556",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02800",
+        "title": "Cosmos 3: Omnimodal World Models for Physical AI",
+        "upvotes": 60,
+        "num_comments": 0,
+        "authors": [
+          "Aditi",
+          "Niket Agarwal",
+          "Arslan Ali"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02800.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02800",
+        "paper_url": "https://arxiv.org/abs/2606.02800",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.00408",
+        "title": "Masking Stale Observations Helps Search Agents -- Until It Doesn't: A Regime Map and Its Mechanism",
+        "upvotes": 58,
+        "num_comments": 2,
+        "authors": [
+          "Haoxiang Zhang",
+          "Qixin Xu",
+          "Zhuofeng Li"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.00408.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.00408",
+        "paper_url": "https://arxiv.org/abs/2606.00408",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31604",
+        "title": "Representation Forcing for Bottleneck-Free Unified Multimodal Models",
+        "upvotes": 57,
+        "num_comments": 2,
+        "authors": [
+          "Yuqing Wang",
+          "Zhijie Lin",
+          "Ceyuan Yang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31604.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31604",
+        "paper_url": "https://arxiv.org/abs/2605.31604",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30993",
+        "title": "SwanVoice: Expressive Long-Form Zero-Shot Speech Synthesis for Both Monologue and Dialogue",
+        "upvotes": 56,
+        "num_comments": 3,
+        "authors": [
+          "Ruiqi Li",
+          "Yu Zhang",
+          "Changhao Pan"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30993.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30993",
+        "paper_url": "https://arxiv.org/abs/2605.30993",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02404",
+        "title": "K-BrowseComp: A Web Browsing Agent Benchmark Grounded in Korean Contexts",
+        "upvotes": 52,
+        "num_comments": 1,
+        "authors": [
+          "Nahyun Lee",
+          "Dongkeun Yoon",
+          "Guijin Son"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02404.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02404",
+        "paper_url": "https://arxiv.org/abs/2606.02404",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31268",
+        "title": "Mellum2 Technical Report",
+        "upvotes": 51,
+        "num_comments": 3,
+        "authors": [
+          "Marko Kojic",
+          "Ivan Bondyrev",
+          "Aral de Moor"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31268.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31268",
+        "paper_url": "https://arxiv.org/abs/2605.31268",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.23895",
+        "title": "From Activation to Causality: Discovery of Causal Visual Representations in the Human Brain",
+        "upvotes": 50,
+        "num_comments": 2,
+        "authors": [
+          "Yuval Golbari",
+          "Navve Wasserman",
+          "Matias Cosarinsky"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.23895.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.23895",
+        "paper_url": "https://arxiv.org/abs/2605.23895",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03458",
+        "title": "KVarN: Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
+        "upvotes": 46,
+        "num_comments": 9,
+        "authors": [
+          "Lorenz K. Muller",
+          "Philippe Bich",
+          "Chiara Boretti"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03458.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03458",
+        "paper_url": "https://arxiv.org/abs/2606.03458",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02060",
+        "title": "Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in Agent Trajectories",
+        "upvotes": 41,
+        "num_comments": 4,
+        "authors": [
+          "Jiaming Wang",
+          "Ziteng Feng",
+          "Jiangtao Wu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02060.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02060",
+        "paper_url": "https://arxiv.org/abs/2606.02060",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31039",
+        "title": "GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration",
+        "upvotes": 41,
+        "num_comments": 2,
+        "authors": [
+          "Xiangtao Kong",
+          "Jixin Zhao",
+          "Lingchen Sun"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31039.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31039",
+        "paper_url": "https://arxiv.org/abs/2605.31039",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31584",
+        "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+        "upvotes": 41,
+        "num_comments": 2,
+        "authors": [
+          "Nianyi Lin",
+          "Jiajie Zhang",
+          "Lei Hou"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31584.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31584",
+        "paper_url": "https://arxiv.org/abs/2605.31584",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02373",
+        "title": "Harness-1: Reinforcement Learning for Search Agents with State-Externalizing Harnesses",
+        "upvotes": 40,
+        "num_comments": 2,
+        "authors": [
+          "Pengcheng Jiang",
+          "Zhiyi Shi",
+          "Kelly Hong"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02373.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02373",
+        "paper_url": "https://arxiv.org/abs/2606.02373",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30819",
+        "title": "Function2Scene: 3D Indoor Scene Layout from Functional Specifications",
+        "upvotes": 40,
+        "num_comments": 2,
+        "authors": [
+          "Ruiqi Wang",
+          "Qimin Chen",
+          "Daniel Ritchie"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30819.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30819",
+        "paper_url": "https://arxiv.org/abs/2605.30819",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.03985",
+        "title": "Humanoid-GPT: Scaling Data and Structure for Zero-Shot Motion Tracking",
+        "upvotes": 37,
+        "num_comments": 0,
+        "authors": [
+          "Zekun Qi",
+          "Xuchuan Chen",
+          "Dairu Liu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.03985.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.03985",
+        "paper_url": "https://arxiv.org/abs/2606.03985",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.01249",
+        "title": "Trust Region On-Policy Distillation",
+        "upvotes": 37,
+        "num_comments": 2,
+        "authors": [
+          "Xingrun Xing",
+          "Haoqing Wang",
+          "Boyan Gao"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.01249.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.01249",
+        "paper_url": "https://arxiv.org/abs/2606.01249",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30940",
+        "title": "Towards Streaming Synchronized Spatial Audio Generation via Autoregressive Diffusion Transformer",
+        "upvotes": 36,
+        "num_comments": 2,
+        "authors": [
+          "Ke Lei",
+          "Yu Zhang",
+          "Changhao Pan"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30940.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30940",
+        "paper_url": "https://arxiv.org/abs/2605.30940",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30409",
+        "title": "SANA-Streaming: Real-time Streaming Video Editing with Hybrid Diffusion Transformer",
+        "upvotes": 36,
+        "num_comments": 2,
+        "authors": [
+          "Yuyang Zhao",
+          "Yicheng Pan",
+          "Qiyuan He"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30409.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30409",
+        "paper_url": "https://arxiv.org/abs/2605.30409",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.30876",
+        "title": "dMoE: dLLMs with Learnable Block Experts",
+        "upvotes": 35,
+        "num_comments": 4,
+        "authors": [
+          "Sicheng Feng",
+          "Zigeng Chen",
+          "Gongfan Fang"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30876.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.30876",
+        "paper_url": "https://arxiv.org/abs/2605.30876",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.04923",
+        "title": "Reproducing, Analyzing, and Detecting Reward Hacking in Rubric-Based Reinforcement Learning",
+        "upvotes": 34,
+        "num_comments": 1,
+        "authors": [
+          "Xuekang Wang",
+          "Zhuoyuan Hao",
+          "Shuo Hou"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.04923.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.04923",
+        "paper_url": "https://arxiv.org/abs/2606.04923",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.02482",
+        "title": "X-Stream: Exploring MLLMs as Multiplexers for Multi-Stream Understanding",
+        "upvotes": 32,
+        "num_comments": 1,
+        "authors": [
+          "Peiwen Sun",
+          "Xudong Lu",
+          "Huadai Liu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02482.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.02482",
+        "paper_url": "https://arxiv.org/abs/2606.02482",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2605.31075",
+        "title": "Task-Focused Memorization for Multimodal Agents",
+        "upvotes": 32,
+        "num_comments": 1,
+        "authors": [
+          "Tao Zou",
+          "Yichen He",
+          "Tian Qiu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31075.png",
+        "hf_paper_url": "https://huggingface.co/papers/2605.31075",
+        "paper_url": "https://arxiv.org/abs/2605.31075",
+        "already_done": false
+      }
+    ]
+  }
+}

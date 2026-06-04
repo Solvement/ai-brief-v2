@@ -165,6 +165,8 @@ test("Tier 3 is scarce and marked only when a strong signal is present", () => {
   assert.equal(decision.project_tier, 3);
   assert.equal(decision.final_depth, "deep");
   assert.equal(decision.requires_manual_confirmation, true);
-  assert.ok(decision.ranking_reasons.includes("tier3:strong_signal:arxiv"));
+  // 2026-06-04 收紧门(架构型 ∧ 月增star≥3000 ∧ 分≥80,或 分≥90 精英直通):
+  // tier3 由 deep_gate 标注(quality_pass 或 elite_score),取代旧的 tier3:strong_signal:arxiv。
+  assert.ok(decision.ranking_reasons.some((r) => r.startsWith("deep_gate:")));
   assert.ok(decision.ranking_reasons.includes("manual_confirmation_required"));
 });

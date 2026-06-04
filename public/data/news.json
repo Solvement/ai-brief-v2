@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T02:23:05.914Z",
+  "generatedAt": "2026-06-04T18:42:03.848Z",
   "column": "news",
-  "mode": "aggregate-only",
-  "llmEnabled": false,
+  "mode": "aggregate+optional-llm",
+  "llmEnabled": true,
   "retention": {
     "days": 14,
     "maxItems": 300,
@@ -14,9 +14,9 @@
       "id": "openai",
       "source": "OpenAI",
       "sourceType": "official",
-      "ok": true,
-      "count": 30,
-      "error": ""
+      "ok": false,
+      "count": 0,
+      "error": "fetch failed"
     },
     {
       "id": "techcrunch-ai",
@@ -103,7 +103,7 @@
       "source": "Hacker News",
       "sourceType": "community",
       "ok": true,
-      "count": 30,
+      "count": 27,
       "error": ""
     },
     {
@@ -111,7 +111,7 @@
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
       "ok": true,
-      "count": 12,
+      "count": 10,
       "error": ""
     },
     {
@@ -119,56 +119,79 @@
       "source": "r/MachineLearning",
       "sourceType": "reddit",
       "ok": true,
-      "count": 3,
+      "count": 7,
       "error": ""
     }
   ],
-  "totalDiscovered": 195,
-  "totalAfterDedupe": 86,
-  "totalPublished": 67,
-  "totalPublishedForGeneratedDay": 8,
+  "enrichment": {
+    "enabled": true,
+    "model": "deepseek-v4-flash",
+    "imageCandidateLimit": 10
+  },
+  "totalDiscovered": 164,
+  "totalAfterDedupe": 105,
+  "totalPublished": 79,
+  "totalPublishedForGeneratedDay": 20,
   "items": [
     {
       "title": "Responsible Scaling Policy",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy",
-      "publishedAt": "2026-06-04T02:07:41.667Z"
+      "publishedAt": "2026-06-04T02:07:41.667Z",
+      "titleZh": "负责任的扩展政策",
+      "summaryZh": "负责任的扩展政策",
+      "imageUrl": "https://cdn.sanity.io/images/4zrzovbb/website/4048dcbe1e4e38c32891bfb7ca28c1b7628982cd-2400x1260.png"
     },
     {
       "title": "🎉 DeepSeek-V4 预览版本发布，具备世界顶级推理性能，Agent 能力大幅提高，已在网页端、APP 和 API 上线，点击查看详情。",
       "source": "DeepSeek",
       "sourceType": "official",
       "url": "https://mp.weixin.qq.com/s/8bxXqS2R8Fx5-1TLDBiEDg",
-      "publishedAt": "2026-06-04T02:06:46.772Z"
+      "publishedAt": "2026-06-04T02:06:46.772Z",
+      "titleZh": "🎉 DeepSeek-V4 预览版本发布，具备世界顶级推理性能，Agent 能力大幅提高，已在网页端、APP 和 API 上线，点击查看详情。",
+      "summaryZh": "🎉 DeepSeek-V4 预览版本发布，具备世界顶级推理性能，Agent 能力大幅提高，已在网页端、APP 和 API 上线，点击查看详情。",
+      "imageUrl": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/T5aPbYwzUBMbcs0G5Yz9DQRu0wnIYYmHkg4ImuJDBgQXqK5soCrYc7Kwgc89yF5IEWDHsNTJNOgInQu2ud1zdmbIWU0tcnhjC0UzmlYic58M/0?wx_fmt=jpeg"
     },
     {
       "title": "AI Now Summit 2026",
       "source": "Mistral AI",
       "sourceType": "official",
       "url": "https://mistral.ai/news/ai-now-summit-2026",
-      "publishedAt": "2026-06-04T02:06:46.772Z"
+      "publishedAt": "2026-06-04T02:06:46.772Z",
+      "titleZh": "AI Now Summit 2026",
+      "summaryZh": "AI Now Summit 2026",
+      "imageUrl": "https://mistral.ai/cms-media/api/media/file/Cover-Mistral-Wallpaper01.jpg"
     },
     {
       "title": "Introducing Search Toolkit",
       "source": "Mistral AI",
       "sourceType": "official",
       "url": "https://mistral.ai/news/search-toolkit",
-      "publishedAt": "2026-06-04T02:06:46.772Z"
+      "publishedAt": "2026-06-04T02:06:46.772Z",
+      "titleZh": "推出搜索工具包",
+      "summaryZh": "推出搜索工具包",
+      "imageUrl": "https://mistral.ai/cms-media/api/media/file/og-mistral_1x.jpg"
     },
     {
       "title": "Mistral Medium 3.5",
       "source": "Mistral AI",
       "sourceType": "official",
       "url": "https://mistral.ai/news/vibe-remote-agents-mistral-medium-3-5/",
-      "publishedAt": "2026-06-04T02:06:46.772Z"
+      "publishedAt": "2026-06-04T02:06:46.772Z",
+      "titleZh": "Mistral Medium 3.5",
+      "summaryZh": "Mistral Medium 3.5",
+      "imageUrl": "https://mistral.ai/cms-media/api/media/file/Thumbnail-Model-Medium.jpg"
     },
     {
       "title": "Vibe gets to work.",
       "source": "Mistral AI",
       "sourceType": "official",
       "url": "https://mistral.ai/news/vibe-agent",
-      "publishedAt": "2026-06-04T02:06:46.772Z"
+      "publishedAt": "2026-06-04T02:06:46.772Z",
+      "titleZh": "Vibe开始工作。",
+      "summaryZh": "Vibe开始工作。",
+      "imageUrl": "https://mistral.ai/cms-media/api/media/file/Thumbnail-Solution-Vibe.jpg"
     },
     {
       "title": "The ways we contain Claude across products",
@@ -176,28 +199,156 @@
       "sourceType": "community",
       "url": "https://www.anthropic.com/engineering/how-we-contain-claude",
       "publishedAt": "2026-06-04T00:27:52.000Z",
-      "points": 44
+      "points": 204,
+      "imageUrl": "https://cdn.sanity.io/images/4zrzovbb/website/82d2262129af025d98a46411fbd42ee970a95cb4-2400x1260.heif",
+      "titleZh": "我们在各产品中约束Claude的方式"
     },
     {
-      "title": "GitHub - chopratejas/headroom: Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
+      "title": "The LLM warnings Google fired Timnit Gebru over have all come true",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.tumblr.com/dreaminginthedeepsouth/817865966907228160/darren-oconnor-timnit-gebru-was-fired-from",
+      "publishedAt": "2026-06-04T15:34:43.000Z",
+      "points": 91,
+      "imageUrl": "https://64.media.tumblr.com/23554fbf649df2f9a3423b08a6d7c071/30955b2a57c7f03c-0d/s1280x1920/f6d9fca7f039132eaa97ec4554368b5b22dabd0e.jpg",
+      "titleZh": "导致谷歌解雇Timnit Gebru的LLM警告已全部成真",
+      "summaryZh": "导致谷歌解雇Timnit Gebru的LLM警告已全部成真"
+    },
+    {
+      "title": "Show HN: Boxes.dev: ditch localhost; run Claude Code and Codex in the cloud",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://boxes.dev/",
+      "publishedAt": "2026-06-04T14:38:35.000Z",
+      "points": 69,
+      "imageUrl": "https://boxes.dev/og-1200x630.png",
+      "titleZh": "Show HN: Boxes.dev：抛弃本地主机；在云端运行Claude Code和Codex",
+      "summaryZh": "Show HN: Boxes.dev：抛弃本地主机；在云端运行Claude Code和Codex"
+    },
+    {
+      "title": "When AI Builds Itself: Our progress toward recursive self-improvement",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.anthropic.com/institute/recursive-self-improvement",
+      "publishedAt": "2026-06-04T16:20:17.000Z",
+      "points": 58,
+      "imageUrl": "https://cdn.sanity.io/images/4zrzovbb/website/6d4a0d28992ade92d6fa63646fd9c9d318245c6c-2400x1260.jpg",
+      "titleZh": "当AI自我构建：我们在递归自我改进方面的进展"
+    },
+    {
+      "title": "Nemotron 3 Ultra: Open Moe Hybrid Mamba-Transformer for Agentic Reasoning [pdf]",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://research.nvidia.com/labs/nemotron/files/NVIDIA-Nemotron-3-Ultra-Technical-Report.pdf",
+      "publishedAt": "2026-06-04T13:06:01.000Z",
+      "points": 20,
+      "titleZh": "Nemotron 3 Ultra：用于智能体推理的开放混合Mamba-Transformer模型 [pdf]",
+      "summaryZh": "Nemotron 3 Ultra：用于智能体推理的开放混合Mamba-Transformer模型 [pdf]"
+    },
+    {
+      "title": "Airlines Uses AI to Fake Empathy Rather Than Fix Problems: Passenger Sent Prompt",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://viewfromthewing.com/airlines-are-using-ai-to-manufacture-empathy-instead-of-solving-problems-one-passenger-was-sent-the-prompt-by-mistake/",
+      "publishedAt": "2026-06-04T17:39:59.000Z",
+      "points": 10,
+      "titleZh": "航空公司用AI假装同情而非解决问题：乘客发送提示",
+      "summaryZh": "航空公司用AI假装同情而非解决问题：乘客发送提示"
+    },
+    {
+      "title": "Show HN: Black-box API bug detection across 7 AI systems",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://resources.kusho.ai/ai-agent-benchmark-api-bug-detection",
+      "publishedAt": "2026-06-04T14:42:40.000Z",
+      "points": 10,
+      "titleZh": "Show HN：跨7个AI系统的黑盒API错误检测",
+      "summaryZh": "Show HN：跨7个AI系统的黑盒API错误检测"
+    },
+    {
+      "title": "Show HN: AgentKitten: Swift package for provider-agnostic AI agents",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/fbeeper/agentkitten",
+      "publishedAt": "2026-06-04T14:37:55.000Z",
+      "points": 9,
+      "titleZh": "Show HN：AgentKitten：用于与提供商无关的AI代理的Swift包",
+      "summaryZh": "Show HN：AgentKitten：用于与提供商无关的AI代理的Swift包"
+    },
+    {
+      "title": "Show HN: Chatcode – Remote Control for Claude Code and Codex",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://chatcode.dev/",
+      "publishedAt": "2026-06-04T10:35:56.000Z",
+      "points": 9,
+      "titleZh": "Show HN：Chatcode – Claude Code 和 Codex 的远程控制",
+      "summaryZh": "Show HN：Chatcode – Claude Code 和 Codex 的远程控制"
+    },
+    {
+      "title": "Claude can miss the motives of politicians",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://futuresearch.ai/llms-miss-motives-politicians/",
+      "publishedAt": "2026-06-04T14:33:23.000Z",
+      "points": 8,
+      "titleZh": "Claude 可能忽略政治家的动机",
+      "summaryZh": "Claude 可能忽略政治家的动机"
+    },
+    {
+      "title": "Show HN: Hydron – Hardware-aware coding agent",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.hydron.sh/",
+      "publishedAt": "2026-06-04T13:06:09.000Z",
+      "points": 8,
+      "titleZh": "Show HN：Hydron – 硬件感知的编码代理",
+      "summaryZh": "Show HN：Hydron – 硬件感知的编码代理"
+    },
+    {
+      "title": "Qwen 3.6 27B 30GB Same top p: 98.358 ± 0.033 % vs UD Q8 K XL 33GB Same top p: 97.426 ± 0.041 %",
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw8hsn/github_chopratejasheadroom_compress_tool_outputs/",
-      "publishedAt": "2026-06-04T00:57:48.000Z"
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1twu9r6/qwen_36_27b_30gb_same_top_p_98358_0033_vs_ud_q8_k/",
+      "publishedAt": "2026-06-04T17:22:18.000Z",
+      "titleZh": "Qwen 3.6 27B 30GB 相同 top p: 98.358 ± 0.033% 对比 UD Q8 K XL 33GB 相同 top p: 97.426 ± 0.041%",
+      "summaryZh": "Qwen 3.6 27B 30GB 相同 top p: 98.358 ± 0.033% 对比 UD Q8 K XL 33GB 相同 top p: 97.426 ± 0.041%"
+    },
+    {
+      "title": "How do ML researchers actually use AI tools to improve their writing? [D]",
+      "source": "r/MachineLearning",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1twtpmb/how_do_ml_researchers_actually_use_ai_tools_to/",
+      "publishedAt": "2026-06-04T17:02:53.000Z",
+      "titleZh": "机器学习研究人员如何实际使用 AI 工具改善写作？[D]",
+      "summaryZh": "机器学习研究人员如何实际使用 AI 工具改善写作？[D]"
+    },
+    {
+      "title": "I can fit 28% more context after building llama.cpp with OpenBLAS. Huh?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1twtkun/i_can_fit_28_more_context_after_building_llamacpp/",
+      "publishedAt": "2026-06-04T16:58:36.000Z",
+      "titleZh": "使用 OpenBLAS 构建 llama.cpp 后，我可以多容纳 28% 的上下文。咦？",
+      "summaryZh": "使用 OpenBLAS 构建 llama.cpp 后，我可以多容纳 28% 的上下文。咦？"
     },
     {
       "title": "Jun 3, 2026 Announcements Introducing the Services Track and Partner Hub of the Claude Partner Network",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/services-track-partner-hub",
-      "publishedAt": "2026-06-03T04:00:00.000Z"
+      "publishedAt": "2026-06-03T04:00:00.000Z",
+      "titleZh": "2026年6月3日 公告：介绍 Claude 合作伙伴网络的服务轨道和合作伙伴中心",
+      "summaryZh": "2026年6月3日 公告：介绍 Claude 合作伙伴网络的服务轨道和合作伙伴中心"
     },
     {
       "title": "Jun 3, 2026 Policy What we learned mapping a year’s worth of AI-enabled cyber threats",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack",
-      "publishedAt": "2026-06-03T04:00:00.000Z"
+      "publishedAt": "2026-06-03T04:00:00.000Z",
+      "titleZh": "2026年6月3日 政策：我们从绘制一年来 AI 驱动的网络威胁中学到的东西",
+      "summaryZh": "2026年6月3日 政策：我们从绘制一年来 AI 驱动的网络威胁中学到的东西"
     },
     {
       "title": "Gemma 4 12B: A unified, encoder-free multimodal model",
@@ -205,7 +356,9 @@
       "sourceType": "community",
       "url": "https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemma-4-12b/",
       "publishedAt": "2026-06-03T16:04:42.000Z",
-      "points": 697
+      "points": 697,
+      "titleZh": "Gemma 4 12B：一个统一的、无编码器的多模态模型",
+      "summaryZh": "Gemma 4 12B：一个统一的、无编码器的多模态模型"
     },
     {
       "title": "Show HN: Ideogram 4.0 – open-weight 9.3B text-to-image model",
@@ -213,7 +366,9 @@
       "sourceType": "community",
       "url": "https://github.com/ideogram-oss/ideogram4",
       "publishedAt": "2026-06-03T16:00:09.000Z",
-      "points": 37
+      "points": 37,
+      "titleZh": "Show HN：Ideogram 4.0 – 开放权重的 9.3B 文本到图像模型",
+      "summaryZh": "Show HN：Ideogram 4.0 – 开放权重的 9.3B 文本到图像模型"
     },
     {
       "title": "Show HN: Mnemo – local-first AI memory layer for any LLM (Rust, SQLite,petgraph)",
@@ -221,7 +376,9 @@
       "sourceType": "community",
       "url": "https://github.com/zaydmulani09/mnemo",
       "publishedAt": "2026-06-03T20:32:10.000Z",
-      "points": 28
+      "points": 28,
+      "titleZh": "Show HN: Mnemo – 本地优先的AI记忆层，支持任意LLM（Rust, SQLite, petgraph）",
+      "summaryZh": "Show HN: Mnemo – 本地优先的AI记忆层，支持任意LLM（Rust, SQLite, petgraph）"
     },
     {
       "title": "Claude Opus 4.8 Max responding to an empty message",
@@ -229,7 +386,18 @@
       "sourceType": "community",
       "url": "https://xcancel.com/davidad/status/2061858258046898518",
       "publishedAt": "2026-06-03T13:14:29.000Z",
-      "points": 27
+      "points": 27,
+      "titleZh": "Claude Opus 4.8 Max 对空消息的响应",
+      "summaryZh": "Claude Opus 4.8 Max 对空消息的响应"
+    },
+    {
+      "title": "A blueprint for democratic governance of frontier AI",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://openai.com/index/frontier-safety-blueprint/",
+      "publishedAt": "2026-06-03T17:50:05.000Z",
+      "points": 16,
+      "titleZh": "前沿AI民主治理蓝图"
     },
     {
       "title": "EU wants households to cut peak time energy use as industry and AI demand soars",
@@ -237,31 +405,9 @@
       "sourceType": "community",
       "url": "https://www.politico.eu/article/eu-households-electricity-energy-artificial-intelligence-ai/",
       "publishedAt": "2026-06-03T21:38:14.000Z",
-      "points": 12
-    },
-    {
-      "title": "Gemini Spark is the most impressive and terrifying AI experience I've had yet",
-      "source": "Hacker News",
-      "sourceType": "community",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/941388/gemini-spark-ai-agent-trip-planning",
-      "publishedAt": "2026-06-03T21:20:43.000Z",
-      "points": 11
-    },
-    {
-      "title": "Reddit user creates DB and MCP to mine Polygon, finds patterns on Polymarket",
-      "source": "Hacker News",
-      "sourceType": "community",
-      "url": "https://old.reddit.com/r/ClaudeAI/comments/1tvefqd/i_wired_claude_code_into_a_database_of_every/",
-      "publishedAt": "2026-06-03T21:45:10.000Z",
-      "points": 9
-    },
-    {
-      "title": "I Replaced My AI Agent's Flat Fact Store with a Graph Database",
-      "source": "Hacker News",
-      "sourceType": "community",
-      "url": "https://news.ycombinator.com/item?id=48383578",
-      "publishedAt": "2026-06-03T13:15:33.000Z",
-      "points": 9
+      "points": 12,
+      "titleZh": "欧盟希望家庭减少高峰时段能源使用，因工业与AI需求激增",
+      "summaryZh": "欧盟希望家庭减少高峰时段能源使用，因工业与AI需求激增"
     },
     {
       "title": "Google's new Gemma 4 12B model is designed to run on any laptop with 16GB of RAM",
@@ -269,23 +415,37 @@
       "sourceType": "community",
       "url": "https://arstechnica.com/google/2026/06/googles-new-gemma-4-open-ai-model-is-sized-for-your-laptop/",
       "publishedAt": "2026-06-03T21:30:41.000Z",
-      "points": 8
+      "points": 12,
+      "titleZh": "谷歌新Gemma 4 12B模型可在任何16GB内存笔记本上运行",
+      "summaryZh": "谷歌新Gemma 4 12B模型可在任何16GB内存笔记本上运行"
     },
     {
-      "title": "Git and S3 as the memory layer for agents",
+      "title": "Gemini Spark is the most impressive and terrifying AI experience I've had yet",
       "source": "Hacker News",
       "sourceType": "community",
-      "url": "https://twitter.com/VijitDhingra1/status/2062265896039833935",
-      "publishedAt": "2026-06-03T20:16:14.000Z",
-      "points": 8
+      "url": "https://www.theverge.com/ai-artificial-intelligence/941388/gemini-spark-ai-agent-trip-planning",
+      "publishedAt": "2026-06-03T21:20:43.000Z",
+      "points": 12,
+      "titleZh": "Gemini Spark是我迄今为止最令人印象深刻和令人恐惧的AI体验"
     },
     {
-      "title": "Free vLLM Course: Inference, Compression, Benchmarks",
+      "title": "Reddit user creates DB and MCP to mine Polygon, finds patterns on Polymarket",
       "source": "Hacker News",
       "sourceType": "community",
-      "url": "https://www.deeplearning.ai/courses/fast-and-efficient-llm-inference-with-vllm",
-      "publishedAt": "2026-06-03T17:27:14.000Z",
-      "points": 8
+      "url": "https://old.reddit.com/r/ClaudeAI/comments/1tvefqd/i_wired_claude_code_into_a_database_of_every/",
+      "publishedAt": "2026-06-03T21:45:10.000Z",
+      "points": 10,
+      "titleZh": "Reddit用户创建数据库和MCP来挖掘Polygon，发现Polymarket上的模式",
+      "summaryZh": "Reddit用户创建数据库和MCP来挖掘Polygon，发现Polymarket上的模式"
+    },
+    {
+      "title": "I Replaced My AI Agent's Flat Fact Store with a Graph Database",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://news.ycombinator.com/item?id=48383578",
+      "publishedAt": "2026-06-03T13:15:33.000Z",
+      "points": 10,
+      "titleZh": "我用图数据库取代了AI代理的平面事实存储"
     },
     {
       "title": "Anthopic, OpenAI Should Not Be Allowed to IPO, Says Ed Zitron [video]",
@@ -293,7 +453,28 @@
       "sourceType": "community",
       "url": "https://www.youtube.com/watch?v=zbKDmkJPVvI",
       "publishedAt": "2026-06-03T14:52:14.000Z",
-      "points": 8
+      "points": 9,
+      "titleZh": "Ed Zitron表示Anthropic和OpenAI不应被允许IPO [视频]",
+      "summaryZh": "Ed Zitron表示Anthropic和OpenAI不应被允许IPO [视频]"
+    },
+    {
+      "title": "Git and S3 as the memory layer for agents",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://twitter.com/VijitDhingra1/status/2062265896039833935",
+      "publishedAt": "2026-06-03T20:16:14.000Z",
+      "points": 8,
+      "titleZh": "Git和S3作为代理的记忆层"
+    },
+    {
+      "title": "Free vLLM Course: Inference, Compression, Benchmarks",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.deeplearning.ai/courses/fast-and-efficient-llm-inference-with-vllm",
+      "publishedAt": "2026-06-03T17:27:14.000Z",
+      "points": 8,
+      "titleZh": "免费 vLLM 课程：推理、压缩、基准测试",
+      "summaryZh": "免费 vLLM 课程：推理、压缩、基准测试"
     },
     {
       "title": "Look Who Just Crashed OpenAI and SoftBank's IPO Party",
@@ -301,14 +482,18 @@
       "sourceType": "community",
       "url": "https://www.bloomberg.com/opinion/articles/2026-06-02/ipo-race-look-who-just-crashed-open-ai-and-softbank-s-party",
       "publishedAt": "2026-06-03T02:12:48.000Z",
-      "points": 8
+      "points": 8,
+      "titleZh": "看看谁刚刚搅乱了 OpenAI 和 SoftBank 的 IPO 派对",
+      "summaryZh": "看看谁刚刚搅乱了 OpenAI 和 SoftBank 的 IPO 派对"
     },
     {
       "title": "I turned an Android phone into a Vulkan-accelerated local LLM node (GGUF + LiteLLM + Tailscale)",
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw63jz/i_turned_an_android_phone_into_a/",
-      "publishedAt": "2026-06-03T23:15:59.000Z"
+      "publishedAt": "2026-06-03T23:15:59.000Z",
+      "titleZh": "我将安卓手机变成了 Vulkan 加速的本地 LLM 节点（GGUF + LiteLLM + Tailscale）",
+      "summaryZh": "我将安卓手机变成了 Vulkan 加速的本地 LLM 节点（GGUF + LiteLLM + Tailscale）"
     },
     {
       "title": "Lovable signs multiyear deal with Google Cloud to up usage 5x, source says",
@@ -316,36 +501,36 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/03/lovable-signs-multi-year-deal-with-google-cloud-to-up-usage-5x-source-says/",
       "publishedAt": "2026-06-03T22:56:51.000Z",
-      "summary": "Lovable and Google signed an expanded multiyear deal that involves a 5x expansion of Lovable's footprint on Google Cloud, and expanded access to Anthropic Claude."
+      "summary": "Lovable and Google signed an expanded multiyear deal that involves a 5x expansion of Lovable's footprint on Google Cloud, and expanded access to Anthropic Claude.",
+      "titleZh": "Lovable与谷歌云签署多年协议，使用量将增长5倍",
+      "summaryZh": "Lovable与谷歌云签署了一份扩大的多年协议，涉及Lovable在谷歌云上的足迹扩大5倍，并扩展了对Anthropic Claude的访问。"
     },
     {
       "title": "Gemma 4 12B first coding agent test on a 4080 Super",
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw364k/gemma_4_12b_first_coding_agent_test_on_a_4080/",
-      "publishedAt": "2026-06-03T21:23:25.000Z"
+      "publishedAt": "2026-06-03T21:23:25.000Z",
+      "titleZh": "在 4080 Super 上对 Gemma 4 12B 进行首次编程代理测试",
+      "summaryZh": "在 4080 Super 上对 Gemma 4 12B 进行首次编程代理测试"
     },
     {
       "title": "gemma-4-12b-it vs Qwen3.5-9B on shared benchmarks: Qwen is overall winner beating gemma in 5/8 benchmarks despite a smaller footprint",
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw0lua/gemma412bit_vs_qwen359b_on_shared_benchmarks_qwen/",
-      "publishedAt": "2026-06-03T19:51:33.000Z"
-    },
-    {
-      "title": "Alphabet&#8217;s record-breaking $85B raise for Google&#8217;s AI business is a helluva good signal",
-      "source": "TechCrunch AI",
-      "sourceType": "press",
-      "url": "https://techcrunch.com/2026/06/03/alphabets-record-breaking-85b-raise-for-googles-ai-business-is-a-helluva-good-signal/",
-      "publishedAt": "2026-06-03T19:38:32.000Z",
-      "summary": "If Alphabet's record-breaking $85 billion stock sale signals investor appetite for AI-related offerings, we can see that investors are ready to chow."
+      "publishedAt": "2026-06-03T19:51:33.000Z",
+      "titleZh": "gemma-4-12b-it 与 Qwen3.5-9B 在共享基准测试中对比：Qwen 在 5/8 基准测试中胜出，尽管体积更小",
+      "summaryZh": "gemma-4-12b-it 与 Qwen3.5-9B 在共享基准测试中对比：Qwen 在 5/8 基准测试中胜出，尽管体积更小"
     },
     {
       "title": "Jun 2, 2026 Announcements Expanding Project Glasswing",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/expanding-project-glasswing",
-      "publishedAt": "2026-06-02T04:00:00.000Z"
+      "publishedAt": "2026-06-02T04:00:00.000Z",
+      "titleZh": "2026年6月2日：扩大Project Glasswing的公告",
+      "summaryZh": "2026年6月2日：扩大Project Glasswing的公告"
     },
     {
       "title": "Michael Burry says neither SpaceX nor Anthropic is worth $1T",
@@ -353,7 +538,9 @@
       "sourceType": "community",
       "url": "https://www.businessinsider.com/big-short-michael-burry-spacex-anthropic-ipo-ai-bubble-claude-2026-6",
       "publishedAt": "2026-06-02T10:09:21.000Z",
-      "points": 133
+      "points": 134,
+      "titleZh": "Michael Burry表示SpaceX和Anthropic都不值1万亿美元",
+      "summaryZh": "Michael Burry表示SpaceX和Anthropic都不值1万亿美元"
     },
     {
       "title": "Bringing Up DeepSeek-V4-Flash on AMD MI300X",
@@ -361,7 +548,9 @@
       "sourceType": "community",
       "url": "https://fergusfinn.com/blog/deepseek-v4-flash-mi300x/",
       "publishedAt": "2026-06-02T17:52:48.000Z",
-      "points": 117
+      "points": 119,
+      "titleZh": "在AMD MI300X上运行DeepSeek-V4-Flash",
+      "summaryZh": "在AMD MI300X上运行DeepSeek-V4-Flash"
     },
     {
       "title": "Uber caps employee AI spending after blowing through budget in 4 months",
@@ -369,7 +558,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/uber-caps-employee-ai-spending-after-blowing-through-budget-in-four-months/",
       "publishedAt": "2026-06-02T19:11:48.000Z",
-      "summary": "Uber's cutback has occurred after the company had reportedly encouraged staff to use AI as much as possible."
+      "summary": "Uber's cutback has occurred after the company had reportedly encouraged staff to use AI as much as possible.",
+      "titleZh": "Uber在4个月内超支后限制员工AI支出",
+      "summaryZh": "Uber的削减发生在该公司此前据报道鼓励员工尽可能多地使用AI之后。"
     },
     {
       "title": "New Microsoft tool lets devs spin up AI behavior tests using text descriptions",
@@ -377,7 +568,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/new-microsoft-tool-lets-devs-spin-up-ai-behavior-tests-using-text-descriptions/",
       "publishedAt": "2026-06-02T19:02:21.000Z",
-      "summary": "Microsoft on Tuesday took the wraps off Adaptive Spec-driven Scoring for Evaluation and Regression Testing, an open source framework for spinning up AI evaluations."
+      "summary": "Microsoft on Tuesday took the wraps off Adaptive Spec-driven Scoring for Evaluation and Regression Testing, an open source framework for spinning up AI evaluations.",
+      "titleZh": "新微软工具让开发者通过文本描述快速创建AI行为测试",
+      "summaryZh": "微软周二发布了Adaptive Spec-driven Scoring for Evaluation and Regression Testing，一个用于快速创建AI评估的开源框架。"
     },
     {
       "title": "Trump signs executive order to review AI models before they’re released",
@@ -385,7 +578,9 @@
       "sourceType": "press",
       "url": "https://www.theverge.com/policy/941775/trump-ai-executive-order",
       "publishedAt": "2026-06-02T18:33:42.000Z",
-      "summary": "President Donald Trump signed an executive order Tuesday creating a \"voluntary framework\" for AI companies to share their frontier models with the federal government before they're released \"to promote secure innovation"
+      "summary": "President Donald Trump signed an executive order Tuesday creating a \"voluntary framework\" for AI companies to share their frontier models with the federal government before they're released \"to promote secure innovation",
+      "titleZh": "特朗普签署行政令要求在AI模型发布前进行审查",
+      "summaryZh": "美国总统唐纳德·特朗普周二签署行政令，创建了一个‘自愿框架’，要求AI公司在发布前与联邦政府分享其前沿模型，以促进安全创新。"
     },
     {
       "title": "Martin Scorsese becomes the latest — and most unlikely — Hollywood voice for AI",
@@ -393,7 +588,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/martin-scorsese-becomes-the-latest-and-most-unlikely-hollywood-voice-for-ai/",
       "publishedAt": "2026-06-02T18:16:53.000Z",
-      "summary": "The caveat is that one of the world's most famous living directors is using the tech solely for storyboarding."
+      "summary": "The caveat is that one of the world's most famous living directors is using the tech solely for storyboarding.",
+      "titleZh": "马丁·斯科塞斯成为最新——也是最不可能的——好莱坞AI代言人",
+      "summaryZh": "但需要注意的是，这位世界上最著名的在世导演之一仅将这项技术用于故事板制作。"
     },
     {
       "title": "Microsoft’s first advanced reasoning AI is here",
@@ -401,7 +598,9 @@
       "sourceType": "press",
       "url": "https://www.theverge.com/tech/941664/microsoft-ai-model-reasoning-mai-thinking-1-build-2026",
       "publishedAt": "2026-06-02T18:12:44.000Z",
-      "summary": "Microsoft announced a bunch of new in-house AI models at Build 2026, including a new \"flagship\" model: MAI-Thinking-1. It's an ambitious step into model development for Microsoft, which introduced its initial in-house mo"
+      "summary": "Microsoft announced a bunch of new in-house AI models at Build 2026, including a new \"flagship\" model: MAI-Thinking-1. It's an ambitious step into model development for Microsoft, which introduced its initial in-house mo",
+      "titleZh": "微软首个先进推理AI来了",
+      "summaryZh": "微软在Build 2026上宣布了一系列新的内部AI模型，包括一个新的‘旗舰’模型：MAI-Thinking-1。这是微软在模型开发上迈出的雄心勃勃的一步。"
     },
     {
       "title": "Microsoft launches Scout, an OpenClaw-inspired personal assistant",
@@ -409,7 +608,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/microsoft-launches-scout-an-openclaw-inspired-personal-assistant/",
       "publishedAt": "2026-06-02T18:02:44.000Z",
-      "summary": "Launched at Build, Microsoft Scout is a new AI assistant meant to bring the power and flexibility of OpenClaw into the Microsoft 365 system."
+      "summary": "Launched at Build, Microsoft Scout is a new AI assistant meant to bring the power and flexibility of OpenClaw into the Microsoft 365 system.",
+      "titleZh": "微软推出受OpenClaw启发的个人助理Scout",
+      "summaryZh": "微软在Build大会上推出Scout，这是一款受OpenClaw启发的AI个人助理，旨在将OpenClaw的强大功能融入Microsoft 365系统。"
     },
     {
       "title": "Google rolls out fake call detection to protect against AI deepfake impersonation scams",
@@ -417,7 +618,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/google-rolls-out-fake-call-detection-to-protect-against-ai-deepfake-impersonation-scams/",
       "publishedAt": "2026-06-02T18:00:00.000Z",
-      "summary": "As people increasingly refuse to answer calls from unknown numbers, scammers are shifting their tactics by spoofing trusted phone numbers and using AI deepfake technology to sound like authority figures, family members,"
+      "summary": "As people increasingly refuse to answer calls from unknown numbers, scammers are shifting their tactics by spoofing trusted phone numbers and using AI deepfake technology to sound like authority figures, family members,",
+      "titleZh": "谷歌推出虚假来电检测以防范AI深度伪造冒充诈骗",
+      "summaryZh": "谷歌推出虚假来电检测功能，以应对诈骗分子利用AI深度伪造技术冒充可信号码的威胁。"
     },
     {
       "title": "Google’s Phone app will tell you if a scammer is impersonating one of your contacts",
@@ -425,7 +628,9 @@
       "sourceType": "press",
       "url": "https://www.theverge.com/tech/941517/google-phone-scammer-ai-impersonation",
       "publishedAt": "2026-06-02T18:00:00.000Z",
-      "summary": "Google is launching a new feature for its Phone app that aims to protect you from AI impersonation scams. Now, when you receive a call from a scammer that appears to be coming from the same number as one of your contacts"
+      "summary": "Google is launching a new feature for its Phone app that aims to protect you from AI impersonation scams. Now, when you receive a call from a scammer that appears to be coming from the same number as one of your contacts",
+      "titleZh": "谷歌电话应用将通知用户是否有诈骗者冒充联系人",
+      "summaryZh": "谷歌电话应用新增功能，可识别诈骗者冒充您的联系人。"
     },
     {
       "title": "Microsoft offers devs a better way to control AI agent behavior",
@@ -433,7 +638,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/microsoft-offers-devs-a-better-way-to-control-ai-agent-behavior/",
       "publishedAt": "2026-06-02T18:00:00.000Z",
-      "summary": "The specification lets developer, compliance, and security teams define their own policies for agents to follow in portable policy files."
+      "summary": "The specification lets developer, compliance, and security teams define their own policies for agents to follow in portable policy files.",
+      "titleZh": "微软为开发者提供更好的AI代理行为控制方式",
+      "summaryZh": "微软提供新规范，允许开发者、合规和安全团队通过可移植策略文件定义AI代理的行为规则。"
     },
     {
       "title": "Microsoft Scout is a new AI personal assistant built on OpenClaw",
@@ -441,7 +648,9 @@
       "sourceType": "press",
       "url": "https://www.theverge.com/news/939713/microsoft-scout-assistant-openclaw",
       "publishedAt": "2026-06-02T18:00:00.000Z",
-      "summary": "Much like Google, Microsoft is launching its own version of OpenClaw. Microsoft Scout is an always-on assistant that integrates into Microsoft 365 apps like Outlook, OneDrive, and Microsoft Teams, allowing businesses to"
+      "summary": "Much like Google, Microsoft is launching its own version of OpenClaw. Microsoft Scout is an always-on assistant that integrates into Microsoft 365 apps like Outlook, OneDrive, and Microsoft Teams, allowing businesses to",
+      "titleZh": "微软Scout是基于OpenClaw的新AI个人助理",
+      "summaryZh": "微软推出基于OpenClaw的AI个人助理Scout，它可始终在线并集成到Outlook、OneDrive和Teams等Microsoft 365应用中。"
     },
     {
       "title": "Trump signs narrower executive order on AI oversight after industry objections",
@@ -449,7 +658,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/trump-signs-narrower-executive-order-on-ai-oversight-after-industry-objections/",
       "publishedAt": "2026-06-02T16:23:08.000Z",
-      "summary": "After industry objections, President Trump signed a revised AI executive order requiring only voluntary prerelease government reviews of advanced models."
+      "summary": "After industry objections, President Trump signed a revised AI executive order requiring only voluntary prerelease government reviews of advanced models.",
+      "titleZh": "特朗普在行业反对后签署更窄的AI监管行政令",
+      "summaryZh": "特朗普签署修订后的AI行政令，仅要求对先进模型进行自愿的预发布政府审查。"
     },
     {
       "title": "OpenAI launches new Codex tools for white-collar work",
@@ -457,7 +668,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/openai-launches-new-codex-tools-for-white-collar-work/",
       "publishedAt": "2026-06-02T16:00:00.000Z",
-      "summary": "OpenAI released a set of six plug-ins aimed at specific jobs: data analytics, creative production, sales, product design, equity investing, and investment banking. Available from within the Codex app, each of the new too"
+      "summary": "OpenAI released a set of six plug-ins aimed at specific jobs: data analytics, creative production, sales, product design, equity investing, and investment banking. Available from within the Codex app, each of the new too",
+      "titleZh": "OpenAI推出新的Codex工具，面向白领工作",
+      "summaryZh": "OpenAI发布了六款面向特定工作的插件，包括数据分析、创意制作、销售、产品设计、股权投资和投资银行，可通过Codex应用使用。"
     },
     {
       "title": "Anthropic scales Claude Mythos to critical infrastructure in 15+ countries",
@@ -465,7 +678,9 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/anthropic-scales-claude-mythos-to-critical-infrastructure-in-15-countries/",
       "publishedAt": "2026-06-02T14:44:21.000Z",
-      "summary": "Anthropic is expanding Project Glasswing, its security vulnerability program, and access to Mythos to 150 organizations across 15 countries — targeting critical infrastructure in power, water, healthcare, and communicati"
+      "summary": "Anthropic is expanding Project Glasswing, its security vulnerability program, and access to Mythos to 150 organizations across 15 countries — targeting critical infrastructure in power, water, healthcare, and communicati",
+      "titleZh": "Anthropic将Claude Mythos扩展到15个以上国家的基础设施",
+      "summaryZh": "Anthropic将Project Glasswing漏洞赏金计划和Mythos访问权限扩展到15个国家的150个组织，涵盖电力、水务、医疗和通信等关键基础设施。"
     },
     {
       "title": "ZeroDrift raises $10M to protect AI models from themselves",
@@ -473,14 +688,18 @@
       "sourceType": "press",
       "url": "https://techcrunch.com/2026/06/02/zerodrift-raises-10-million-to-protect-ai-models-from-themselves/",
       "publishedAt": "2026-06-02T12:32:59.000Z",
-      "summary": "A new AI compliance service sits between AI models and end users to flag and replace any messages that might present a compliance problem."
+      "summary": "A new AI compliance service sits between AI models and end users to flag and replace any messages that might present a compliance problem.",
+      "titleZh": "ZeroDrift融资1000万美元，保护AI模型免受自身危害",
+      "summaryZh": "一个新的AI合规服务位于AI模型和终端用户之间，标记并替换可能带来合规问题的消息。"
     },
     {
       "title": "Jun 1, 2026 Announcements Anthropic confidentially submits draft S-1 to the SEC",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/confidential-draft-s1-sec",
-      "publishedAt": "2026-06-01T04:00:00.000Z"
+      "publishedAt": "2026-06-01T04:00:00.000Z",
+      "titleZh": "Anthropic于2026年6月1日秘密向SEC提交S-1草案",
+      "summaryZh": "Anthropic于2026年6月1日秘密向SEC提交S-1草案"
     },
     {
       "title": "Can the stockmarket swallow Anthropic, SpaceX and OpenAI?",
@@ -488,7 +707,9 @@
       "sourceType": "community",
       "url": "https://www.economist.com/finance-and-economics/2026/06/01/can-the-stockmarket-swallow-anthropic-spacex-and-openai",
       "publishedAt": "2026-06-01T23:45:46.000Z",
-      "points": 708
+      "points": 708,
+      "titleZh": "股市能否吞下 Anthropic、SpaceX 和 OpenAI？",
+      "summaryZh": "股市能否吞下 Anthropic、SpaceX 和 OpenAI？"
     },
     {
       "title": "Launch HN: Expanse (YC P26) – Unlock Wasted GPU Capacity",
@@ -496,7 +717,9 @@
       "sourceType": "community",
       "url": "https://news.ycombinator.com/item?id=48356312",
       "publishedAt": "2026-06-01T13:05:02.000Z",
-      "points": 99
+      "points": 99,
+      "titleZh": "Launch HN: Expanse（YC P26）——释放浪费的GPU容量",
+      "summaryZh": "Launch HN: Expanse（YC P26）——释放浪费的GPU容量"
     },
     {
       "title": "Qwen3.7-Plus: Multimodal Agent Intelligence",
@@ -504,7 +727,9 @@
       "sourceType": "community",
       "url": "https://qwen.ai/blog?id=qwen3.7-plus",
       "publishedAt": "2026-06-01T17:55:27.000Z",
-      "points": 41
+      "points": 41,
+      "titleZh": "Qwen3.7-Plus：多模态智能代理",
+      "summaryZh": "Qwen3.7-Plus：多模态智能代理"
     },
     {
       "title": "University System Went All in on A.I. Now It's Tearing Itself Apart",
@@ -512,21 +737,26 @@
       "sourceType": "community",
       "url": "https://www.nytimes.com/2026/06/01/magazine/ai-university-college-california.html",
       "publishedAt": "2026-06-01T21:18:40.000Z",
-      "points": 8
+      "points": 8,
+      "titleZh": "大学系统全力投入人工智能，如今正自相残杀",
+      "summaryZh": "大学系统全力投入人工智能，如今正自相残杀"
     },
     {
       "title": "Finetuning a Reasoning LLM with Supervised or Reinforcement Learning? [D]",
       "source": "r/MachineLearning",
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/MachineLearning/comments/1ttxcm5/finetuning_a_reasoning_llm_with_supervised_or/",
-      "publishedAt": "2026-06-01T16:23:24.000Z"
+      "publishedAt": "2026-06-01T16:23:24.000Z",
+      "titleZh": "用监督学习还是强化学习微调推理大语言模型？[D]"
     },
     {
       "title": "5060 Ti 16GB or Cloud: Which makes more sense for DL, RL, and LLM studies/research? [D]",
       "source": "r/MachineLearning",
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/MachineLearning/comments/1ttte5x/5060_ti_16gb_or_cloud_which_makes_more_sense_for/",
-      "publishedAt": "2026-06-01T14:09:51.000Z"
+      "publishedAt": "2026-06-01T14:09:51.000Z",
+      "titleZh": "5060 Ti 16GB 还是云：对于深度学习、强化学习和大语言模型研究哪个更合理？[D]",
+      "summaryZh": "5060 Ti 16GB 还是云：对于深度学习、强化学习和大语言模型研究哪个更合理？[D]"
     },
     {
       "title": "Claude Opus 4.8 distilled Alibaba Qwen models",
@@ -534,7 +764,9 @@
       "sourceType": "community",
       "url": "https://twitter.com/maxforai/status/2060053228566495410",
       "publishedAt": "2026-05-29T15:10:18.000Z",
-      "points": 23
+      "points": 23,
+      "titleZh": "Claude Opus 4.8 蒸馏了阿里巴巴Qwen模型",
+      "summaryZh": "Claude Opus 4.8 蒸馏了阿里巴巴Qwen模型"
     },
     {
       "title": "DeepSeek Slashes AI Costs to Cents",
@@ -542,7 +774,9 @@
       "sourceType": "community",
       "url": "https://businessanalytics.substack.com/p/deepseek-slashes-ai-costs-to-cents",
       "publishedAt": "2026-05-29T10:43:03.000Z",
-      "points": 13
+      "points": 13,
+      "titleZh": "DeepSeek将AI成本降至几美分",
+      "summaryZh": "DeepSeek将AI成本降至几美分"
     },
     {
       "title": "China Limits Overseas Travel for AI Talent at DeepSeek, Alibaba, Private Firms",
@@ -550,7 +784,9 @@
       "sourceType": "community",
       "url": "https://www.bloomberg.com/news/articles/2026-05-26/china-expands-travel-curbs-to-top-ai-talent-at-private-firms",
       "publishedAt": "2026-05-29T23:54:21.000Z",
-      "points": 10
+      "points": 10,
+      "titleZh": "中国限制DeepSeek、阿里巴巴及私营企业AI人才的海外旅行",
+      "summaryZh": "中国限制DeepSeek、阿里巴巴及私营企业AI人才的海外旅行"
     },
     {
       "title": "Claude Opus 4.8 may have distilled Qwen",
@@ -558,7 +794,9 @@
       "sourceType": "community",
       "url": "https://old.reddit.com/r/ClaudeCode/comments/1tqaist/opus_48_distilled_qwen/",
       "publishedAt": "2026-05-29T20:42:18.000Z",
-      "points": 9
+      "points": 9,
+      "titleZh": "Claude Opus 4.8 可能蒸馏了Qwen",
+      "summaryZh": "Claude Opus 4.8 可能蒸馏了Qwen"
     },
     {
       "title": "Claude Code Degraded Before Opus 4.8 Release",
@@ -566,21 +804,27 @@
       "sourceType": "community",
       "url": "https://marginlab.ai/blog/claude-code-degraded-before-opus-4-8/",
       "publishedAt": "2026-05-29T12:43:59.000Z",
-      "points": 8
+      "points": 8,
+      "titleZh": "Claude Code 在Opus 4.8发布前降级",
+      "summaryZh": "Claude Code 在Opus 4.8发布前降级"
     },
     {
       "title": "May 28, 2026 Announcements Anthropic raises $65B in Series H funding at $965B post-money valuation",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/series-h",
-      "publishedAt": "2026-05-28T04:00:00.000Z"
+      "publishedAt": "2026-05-28T04:00:00.000Z",
+      "titleZh": "2026年5月28日公告：Anthropic以9650亿美元投后估值完成650亿美元H轮融资",
+      "summaryZh": "2026年5月28日公告：Anthropic以9650亿美元投后估值完成650亿美元H轮融资"
     },
     {
       "title": "May 28, 2026 Product Introducing Claude Opus 4.8",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/claude-opus-4-8",
-      "publishedAt": "2026-05-28T04:00:00.000Z"
+      "publishedAt": "2026-05-28T04:00:00.000Z",
+      "titleZh": "2026年5月28日产品：推出Claude Opus 4.8",
+      "summaryZh": "2026年5月28日产品：推出Claude Opus 4.8"
     },
     {
       "title": "I cut my AI API costs 99% by switching from Claude to DeepSeek",
@@ -588,21 +832,26 @@
       "sourceType": "community",
       "url": "https://twitter.com/kevinsays/status/2059724146221662339",
       "publishedAt": "2026-05-28T11:27:36.000Z",
-      "points": 27
+      "points": 27,
+      "titleZh": "我通过从Claude切换到DeepSeek将AI API成本降低99%",
+      "summaryZh": "我通过从Claude切换到DeepSeek将AI API成本降低99%"
     },
     {
       "title": "May 27, 2026 Announcements Anthropic opens Milan office to support Italian enterprise, research, and developers",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/milan-office-opening",
-      "publishedAt": "2026-05-27T04:00:00.000Z"
+      "publishedAt": "2026-05-27T04:00:00.000Z",
+      "titleZh": "2026年5月27日公告：Anthropic开设米兰办事处以支持意大利企业、研究和开发者",
+      "summaryZh": "2026年5月27日公告：Anthropic开设米兰办事处以支持意大利企业、研究和开发者"
     },
     {
       "title": "Research Physics AI research that’s shaping the industry. Published breakthroughs pushing the state of the art. May 27, 2026 Mistral",
       "source": "Mistral AI",
       "sourceType": "official",
       "url": "https://mistral.ai/news/physics-ai-research",
-      "publishedAt": "2026-05-27T04:00:00.000Z"
+      "publishedAt": "2026-05-27T04:00:00.000Z",
+      "titleZh": "研究物理学AI研究，塑造行业。发布推动最前沿的突破。2026年5月27日 Mistral"
     },
     {
       "title": "Gemini, Gophers, and Fingers. Oh My Alternative Internets Beyond HTTPS",
@@ -610,35 +859,44 @@
       "sourceType": "community",
       "url": "https://brennan.day/gemini-gophers-and-fingers-oh-my-alternative-internets-beyond-https/",
       "publishedAt": "2026-05-27T17:24:25.000Z",
-      "points": 147
+      "points": 147,
+      "titleZh": "Gemini、Gophers和Fingers。哦，我的替代互联网超越HTTPS"
     },
     {
       "title": "May 26, 2026 Announcements Anthropic appoints KiYoung Choi as Representative Director of Korea ahead of Seoul office opening",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/kiyoung-choi-representative-director-anthropic-korea",
-      "publishedAt": "2026-05-26T04:00:00.000Z"
+      "publishedAt": "2026-05-26T04:00:00.000Z",
+      "titleZh": "Anthropic 任命 KiYoung Choi 为韩国代表理事，筹备首尔办事处开业",
+      "summaryZh": "Anthropic 任命 KiYoung Choi 为韩国代表理事，筹备首尔办事处开业"
     },
     {
       "title": "May 22, 2026 Announcements Project Glasswing: An initial update",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/research/glasswing-initial-update",
-      "publishedAt": "2026-05-25T04:00:00.000Z"
+      "publishedAt": "2026-05-25T04:00:00.000Z",
+      "titleZh": "Project Glasswing初步更新",
+      "summaryZh": "Project Glasswing初步更新"
     },
     {
       "title": "May 25, 2026 Announcements Anthropic co-founder Chris Olah&#x27;s remarks on Pope Leo XIV&#x27;s encyclical \"Magnifica humanitas\"",
       "source": "Anthropic",
       "sourceType": "official",
       "url": "https://www.anthropic.com/news/chris-olah-pope-leo-encyclical",
-      "publishedAt": "2026-05-25T04:00:00.000Z"
+      "publishedAt": "2026-05-25T04:00:00.000Z",
+      "titleZh": "Anthropic 联合创始人 Chris Olah 就教宗利奥十四世通谕《Magnifica humanitas》发表评论",
+      "summaryZh": "Anthropic 联合创始人 Chris Olah 就教宗利奥十四世通谕《Magnifica humanitas》发表评论"
     },
     {
       "title": "Company Emmi joins Mistral to accelerate the AI-native industry May 23, 2026 Mistral AI",
       "source": "Mistral AI",
       "sourceType": "official",
       "url": "https://mistral.ai/news/accelerate-ai-native-industry",
-      "publishedAt": "2026-05-23T04:00:00.000Z"
+      "publishedAt": "2026-05-23T04:00:00.000Z",
+      "titleZh": "Emmi 公司加入 Mistral，加速AI原生产业。2026年5月23日 Mistral AI",
+      "summaryZh": "Emmi 公司加入 Mistral，加速AI原生产业。2026年5月23日 Mistral AI"
     }
   ]
 }

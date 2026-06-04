@@ -4,11 +4,16 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createDeepSeekClient } from "../../lib/llm.mjs";
 import { discoverNews, mergeWithExisting } from "./sources.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
 const NEWS_FILE = path.join(ROOT, "public", "data", "news.json");
+const NEWS_ENRICH_MODEL = "deepseek-v4-flash";
+const NEWS_ENRICH_BATCH_SIZE = 8;
+const NEWS_IMAGE_CANDIDATE_LIMIT = 10;
+const DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; ai-brief/0.1; news enricher)";
 
 export async function main(argv = process.argv.slice(2)) {
   await loadEnv();
@@ -31,9 +36,14 @@ export async function main(argv = process.argv.slice(2)) {
     dailyCap: 0,
     now: () => generatedAt,
   });
-  const items = mergeWithExisting(current.items || [], discovered.items, {
+  let items = mergeWithExisting(current.items || [], discovered.items, {
     ...options,
     now: () => generatedAt,
+  });
+  items = await enrichNewsItems(items, {
+    ...options,
+    generatedAt,
+    logger: console,
   });
 
   const doc = {
@@ -48,6 +58,11 @@ export async function main(argv = process.argv.slice(2)) {
       dailyCap: options.dailyCap,
     },
     sourceStats: discovered.sourceStats,
+    enrichment: {
+      enabled: Boolean(options.enableLlm),
+      model: options.enableLlm ? NEWS_ENRICH_MODEL : "",
+      imageCandidateLimit: options.enableLlm ? NEWS_IMAGE_CANDIDATE_LIMIT : 0,
+    },
     totalDiscovered: discovered.items.length,
     totalAfterDedupe: dedupedItems.length,
     totalPublished: items.length,
@@ -69,8 +84,8 @@ export async function main(argv = process.argv.slice(2)) {
 export function parseArgs(argv = []) {
   const options = {
     dryRun: false,
-    noLlm: true,
-    enableLlm: false,
+    noLlm: false,
+    enableLlm: process.env.NEWS_ENABLE_LLM !== "0",
     perSourceLimit: numberOption(process.env.NEWS_PER_SOURCE_LIMIT, 30),
     dailyCap: numberOption(process.env.NEWS_DAILY_CAP, 20),
     retentionDays: numberOption(process.env.NEWS_RETENTION_DAYS, 14),
@@ -119,12 +134,149 @@ export function parseArgs(argv = []) {
     options.noLlm = false;
     options.enableLlm = true;
   }
-  if (process.env.NO_LLM === "1" || process.env.AI_BRIEF_OFFLINE === "1") {
+  if (process.env.NEWS_ENABLE_LLM === "0" || process.env.NO_LLM === "1" || process.env.AI_BRIEF_OFFLINE === "1") {
     options.noLlm = true;
     options.enableLlm = false;
   }
 
   return options;
+}
+
+async function enrichNewsItems(items = [], options = {}) {
+  if (!options.enableLlm || options.noLlm || process.env.NO_LLM === "1" || process.env.AI_BRIEF_OFFLINE === "1") {
+    return items;
+  }
+
+  const withImages = await enrichTopImages(items, options);
+  return enrichChineseFields(withImages, options);
+}
+
+async function enrichChineseFields(items = [], options = {}) {
+  const targets = items
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => item.title && (!item.titleZh || !item.summaryZh));
+  if (!targets.length) return items;
+
+  const client = createDeepSeekClient({ logger: options.logger || console });
+  const nextItems = items.map((item) => ({ ...item }));
+  for (const batch of chunk(targets, NEWS_ENRICH_BATCH_SIZE)) {
+    const payload = {
+      items: batch.map(({ item, index }) => ({
+        index,
+        title: item.title || "",
+        summary: item.summary || "",
+      })),
+    };
+    try {
+      const result = await client.chatJson({
+        model: NEWS_ENRICH_MODEL,
+        maxTokens: 3200,
+        system: newsEnrichSystemPrompt(),
+        user: JSON.stringify(payload),
+      });
+      const enriched = Array.isArray(result?.items) ? result.items : [];
+      for (const row of enriched) {
+        const index = Number(row?.index);
+        if (!Number.isInteger(index) || !nextItems[index]?.title) continue;
+        const titleZh = cleanText(row.titleZh);
+        const summaryZh = cleanText(row.summaryZh);
+        if (titleZh) nextItems[index].titleZh = titleZh;
+        if (summaryZh) nextItems[index].summaryZh = nextItems[index].summary ? summaryZh : titleZh || summaryZh;
+      }
+    } catch (error) {
+      options.logger?.warn?.(`[news] Chinese enrichment failed for ${batch.length} items: ${error.message || String(error)}`);
+    }
+  }
+  return nextItems.map((item) => {
+    if (!item.title) {
+      const { summaryZh, ...rest } = item;
+      return rest;
+    }
+    if (!item.summary && item.summaryZh && item.titleZh) {
+      return { ...item, summaryZh: item.titleZh };
+    }
+    return item;
+  });
+}
+
+async function enrichTopImages(items = [], options = {}) {
+  const generatedDay = dayFromIso(options.generatedAt);
+  const nextItems = items.map((item) => ({ ...item }));
+  const topCandidateIndexes = new Set(nextItems
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => dayFromIso(item.publishedAt) === generatedDay && item.url)
+    .slice(0, NEWS_IMAGE_CANDIDATE_LIMIT)
+    .map(({ index }) => index));
+  for (let index = 0; index < nextItems.length; index += 1) {
+    if (dayFromIso(nextItems[index].publishedAt) === generatedDay && !topCandidateIndexes.has(index)) {
+      delete nextItems[index].imageUrl;
+    }
+  }
+  const candidates = [...topCandidateIndexes]
+    .map((index) => ({ item: nextItems[index], index }))
+    .filter(({ item }) => item?.url && !item.imageUrl);
+  if (!candidates.length) return nextItems;
+
+  await Promise.all(candidates.map(async ({ item, index }) => {
+    const imageUrl = await fetchOpenGraphImage(item.url, options);
+    if (imageUrl) nextItems[index].imageUrl = imageUrl;
+  }));
+  return nextItems;
+}
+
+async function fetchOpenGraphImage(url, options = {}) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+    try {
+      const response = await fetch(url, {
+        headers: {
+          accept: "text/html,*/*;q=0.8",
+          "user-agent": DEFAULT_USER_AGENT,
+        },
+        signal: controller.signal,
+      });
+      if (!response.ok) return "";
+      const html = await response.text();
+      const raw = firstMetaContent(html, "og:image")
+        || firstMetaContent(html, "twitter:image")
+        || firstMetaContent(html, "twitter:image:src");
+      return normalizeAbsoluteUrl(raw, url);
+    } finally {
+      clearTimeout(timer);
+    }
+  } catch (error) {
+    options.logger?.warn?.(`[news] og:image fetch failed: ${url} - ${error.message || String(error)}`);
+    return "";
+  }
+}
+
+function newsEnrichSystemPrompt() {
+  return `You enrich AI news cards for a Chinese-language news column.
+
+Return only a JSON object shaped exactly as:
+{"items":[{"index":0,"titleZh":"...","summaryZh":"..."}]}
+
+Rules:
+- titleZh: translate the title into concise Simplified Chinese. Preserve proper nouns and product names such as GPT-5, Claude, DeepSeek, Qwen, Gemini, OpenAI, Anthropic.
+- summaryZh: one factual Chinese sentence that explains what happened.
+- Strict no fabrication: summaryZh may use only the provided title and existing summary. Do not add background, causes, implications, analysis, dates, numbers, or actors not present in the input.
+- If summary is empty, faithfully restate the title in Chinese without adding facts. If the title itself is insufficient to state an event, leave summaryZh empty.
+- If there is not enough source information, leave summaryZh empty.
+- Never produce a non-empty summaryZh for an item with an empty title.`;
+}
+
+function firstMetaContent(html, property) {
+  const escaped = property.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const patterns = [
+    new RegExp(`<meta\\b(?=[^>]*(?:property|name)=["']${escaped}["'])(?=[^>]*content=["']([^"']+)["'])[^>]*>`, "i"),
+    new RegExp(`<meta\\b(?=[^>]*content=["']([^"']+)["'])(?=[^>]*(?:property|name)=["']${escaped}["'])[^>]*>`, "i"),
+  ];
+  for (const pattern of patterns) {
+    const match = pattern.exec(String(html || ""));
+    if (match?.[1]) return decodeEntities(match[1]);
+  }
+  return "";
 }
 
 async function readNewsFile() {
@@ -171,6 +323,47 @@ function valueAfterEquals(arg) {
 function countItemsForDay(items = [], generatedAt) {
   const day = new Date(generatedAt).toISOString().slice(0, 10);
   return items.filter((item) => String(item.publishedAt || "").startsWith(day)).length;
+}
+
+function chunk(items = [], size = 1) {
+  const out = [];
+  const chunkSize = Math.max(1, Math.floor(size));
+  for (let index = 0; index < items.length; index += chunkSize) {
+    out.push(items.slice(index, index + chunkSize));
+  }
+  return out;
+}
+
+function cleanText(value) {
+  return decodeEntities(String(value || ""))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function decodeEntities(value) {
+  return String(value || "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
+
+function normalizeAbsoluteUrl(value, base) {
+  const raw = cleanText(value);
+  if (!raw || raw.startsWith("data:") || raw.startsWith("mailto:") || raw.startsWith("javascript:")) return "";
+  try {
+    return new URL(raw, base).toString();
+  } catch {
+    return "";
+  }
+}
+
+function dayFromIso(value) {
+  const parsed = Date.parse(value || "");
+  if (!Number.isFinite(parsed)) return "";
+  return new Date(parsed).toISOString().slice(0, 10);
 }
 
 function numberOption(value, fallback) {

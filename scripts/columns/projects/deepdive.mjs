@@ -7,6 +7,7 @@ import { collectEvidence, isOffline } from "./sources.mjs";
 import { evaluate } from "./evaluate.mjs";
 import { projectDeepDiveSystemPrompt, projectDeepDiveUser } from "./deepdive-prompts.mjs";
 import { writeProjectBriefWikiEntities } from "./brief-writer.mjs";
+import { emitProjectAutoSciPrimitive } from "./autosci-primitives.mjs";
 import { depthAtLeast, isBriefDepth } from "./project-ranking.mjs";
 import {
   applyReviewToDepthDecision,
@@ -169,9 +170,18 @@ export async function generateProjectDeepDive({
     options,
     logger,
   });
+  const autosciPrimitive = await emitProjectAutoSciPrimitive({
+    candidate,
+    evidence,
+    triage: triageForWrite,
+    deepDive: payload,
+    finalDepth,
+    options,
+  });
 
   return {
     ...written,
+    autosciPrimitive,
     repo: repo.fullName || repo.name || "",
     final_depth: finalDepth,
     depth_decision: depthDecision,

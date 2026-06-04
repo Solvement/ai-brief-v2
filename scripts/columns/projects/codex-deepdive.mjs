@@ -8,6 +8,7 @@ import { openAiBriefDb } from "../../lib/db.mjs";
 import { parseJson } from "../../lib/llm.mjs";
 import { publishBriefMirror, isProjectAlreadyDeepDived } from "./brief-pipeline.mjs";
 import { writeProjectBriefWikiEntities } from "./brief-writer.mjs";
+import { emitProjectAutoSciPrimitive } from "./autosci-primitives.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -234,6 +235,14 @@ async function authorOneDeepDive(record, options = {}) {
     options,
     logger: console,
   });
+  const autosciPrimitive = await emitProjectAutoSciPrimitive({
+    candidate: record.candidate,
+    evidence: record.evidence || {},
+    triage,
+    deepDive: payload,
+    finalDepth: "deep",
+    options,
+  });
 
   const generatedAt = nowIso(options);
   const dbPayload = {
@@ -247,6 +256,7 @@ async function authorOneDeepDive(record, options = {}) {
     artifactAudit: record.evidence?.artifactAudit || record.evidence?.metadata?.artifactAudit || null,
     authoring: payload.authoring,
     rawPayload: relativeToRoot(rawJsonPath),
+    autosciPrimitive,
   };
 
   let analysisId = null;
@@ -285,6 +295,7 @@ async function authorOneDeepDive(record, options = {}) {
     analysisId,
     paths: written.paths,
     rawPayload: rawJsonPath,
+    autosciPrimitive,
     prompt: promptPath,
     invocation: invocation.invocationPath,
     trending,

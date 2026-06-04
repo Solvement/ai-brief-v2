@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T04:05:46.368Z",
+  "generatedAt": "2026-06-04T21:35:38.701Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 81,
+  "count": 84,
   "items": [
     {
       "id": "concept/adaptive-element-relocation",
@@ -385,6 +385,62 @@
       ]
     },
     {
+      "id": "concept/agentic-video-generation",
+      "type": "concept",
+      "slug": "agentic-video-generation",
+      "title": "Agentic Video Generation",
+      "file": "concepts/agentic-video-generation.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Agentic Video Generation",
+        "slug": "agentic-video-generation",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "generation"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "vimax",
+        "related_content": [
+          "vimax"
+        ],
+        "related_concepts": [],
+        "explanation": "利用多个自主 AI 智能体协同完成视频从创意到成片的完整制作流程，每个智能体承担不同角色（如编剧、导演、制片），像人类团队一样分工合作。",
+        "examples": [
+          "ViMax 的 Idea2Video 工作流"
+        ],
+        "common_misunderstandings": [
+          "并非单个万能的视频生成模型，而是由多个智能体调用各种工具（如图像生成模型、脚本生成模型）协作完成。"
+        ],
+        "open_questions": [
+          "智能体之间如何通信和协调？",
+          "如何确保最终视频在风格、角色上的一致性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n利用多个自主 AI 智能体协同完成视频从创意到成片的完整制作流程，每个智能体承担不同角色（如编剧、导演、制片），像人类团队一样分工合作。 出处:https://github.com/hkuds/vimax。See [[content/vimax]]。\n\n## Supported by\n- [[claims/vimax-main-claim]]\n",
+      "excerpt": "利用多个自主 AI 智能体协同完成视频从创意到成片的完整制作流程，每个智能体承担不同角色（如编剧、导演、制片），像人类团队一样分工合作。 出处:https://github.com/hkuds/vimax。See [[content/vimax]]。",
+      "links": [
+        {
+          "target": "content/vimax",
+          "raw": "[[content/vimax]]"
+        },
+        {
+          "target": "claims/vimax-main-claim",
+          "raw": "[[claims/vimax-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/ai-agent-content-monetization",
       "type": "concept",
       "slug": "ai-agent-content-monetization",
@@ -714,6 +770,63 @@
         {
           "target": "claims/pixelle-video-main-claim",
           "raw": "[[claims/pixelle-video-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/compound-engineering-loop",
+      "type": "concept",
+      "slug": "compound-engineering-loop",
+      "title": "Compound Engineering Loop",
+      "file": "concepts/compound-engineering-loop.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Compound Engineering Loop",
+        "slug": "compound-engineering-loop",
+        "kind": "concept",
+        "tags": [
+          "agent-design",
+          "workflow",
+          "knowledge-management"
+        ],
+        "maturity": "active",
+        "first_seen_in": "compound-engineering-plugin",
+        "related_content": [
+          "compound-engineering-plugin"
+        ],
+        "related_concepts": [],
+        "explanation": "一个固定的 AI 辅助开发循环：需求分析（brainstorm）→ 实现计划（plan）→ 执行（work）→ 审查（review）→ 知识固化（compound），每步产出可被后续步骤甚至后续项目复用的文档。",
+        "examples": [
+          "README 中的 Quick Example：/ce-brainstorm → /ce-plan → /ce-work → /ce-code-review → /ce-compound"
+        ],
+        "common_misunderstandings": [
+          "不是非此即彼的退出机制，而是所有步骤都产生落地的 artifact，即使中途停止也能保留部分成果。"
+        ],
+        "open_questions": [
+          "当知识库膨胀时，Agent 如何高效检索相关笔记？",
+          "循环如何适应需要快速试错的探索性任务？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一个固定的 AI 辅助开发循环：需求分析（brainstorm）→ 实现计划（plan）→ 执行（work）→ 审查（review）→ 知识固化（compound），每步产出可被后续步骤甚至后续项目复用的文档。 出处:https://github.com/everyinc/compound-engineering-plugin。See [[content/compound-engineering-plugin]]。\n\n## Supported by\n- [[claims/compound-engineering-plugin-main-claim]]\n",
+      "excerpt": "一个固定的 AI 辅助开发循环：需求分析（brainstorm）→ 实现计划（plan）→ 执行（work）→ 审查（review）→ 知识固化（compound），每步产出可被后续步骤甚至后续项目复用的文档。 出处:https://github.com/everyinc/compound-engineering-plugin。See [[content/compound-engineering-plugin]]。",
+      "links": [
+        {
+          "target": "content/compound-engineering-plugin",
+          "raw": "[[content/compound-engineering-plugin]]"
+        },
+        {
+          "target": "claims/compound-engineering-plugin-main-claim",
+          "raw": "[[claims/compound-engineering-plugin-main-claim]]"
         }
       ],
       "headings": [
@@ -2532,6 +2645,61 @@
         {
           "depth": 2,
           "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/multi-agent-pipeline",
+      "type": "concept",
+      "slug": "multi-agent-pipeline",
+      "title": "Multi Agent Pipeline",
+      "file": "concepts/multi-agent-pipeline.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Multi-Agent Pipeline",
+        "slug": "multi-agent-pipeline",
+        "kind": "concept",
+        "tags": [
+          "architecture",
+          "agent"
+        ],
+        "maturity": "active",
+        "first_seen_in": "vimax",
+        "related_content": [
+          "vimax"
+        ],
+        "related_concepts": [],
+        "explanation": "将复杂任务分解为多个串行或并行的步骤，每个步骤由一个专用智能体负责，上游输出作为下游输入，从而降低单点难度并提高可维护性。",
+        "examples": [
+          "ViMax 的编剧 Agent → 导演 Agent → 制片 Agent 流水线"
+        ],
+        "common_misunderstandings": [
+          "不是简单的函数调用链，每个 Agent 可以拥有自己的状态、记忆和决策能力。"
+        ],
+        "open_questions": [
+          "流水线中某个 Agent 失败如何回滚或补偿？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将复杂任务分解为多个串行或并行的步骤，每个步骤由一个专用智能体负责，上游输出作为下游输入，从而降低单点难度并提高可维护性。 出处:https://github.com/hkuds/vimax。See [[content/vimax]]。\n\n## Supported by\n- [[claims/vimax-main-claim]]\n",
+      "excerpt": "将复杂任务分解为多个串行或并行的步骤，每个步骤由一个专用智能体负责，上游输出作为下游输入，从而降低单点难度并提高可维护性。 出处:https://github.com/hkuds/vimax。See [[content/vimax]]。",
+      "links": [
+        {
+          "target": "content/vimax",
+          "raw": "[[content/vimax]]"
+        },
+        {
+          "target": "claims/vimax-main-claim",
+          "raw": "[[claims/vimax-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
         }
       ]
     },

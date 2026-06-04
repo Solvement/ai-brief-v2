@@ -10,6 +10,29 @@ let cachedPipelineStatus: PipelineStatusData | null = null;
 let inflightPipelineStatus: Promise<PipelineStatusData | null> | null = null;
 
 /**
+ * Cross-window de-duplication: GitHub trending lists the same repo in daily/weekly/
+ * monthly simultaneously, so switching tabs shows the same project repeatedly. Keep
+ * each repo in its highest-priority window only (daily > weekly > monthly) so the three
+ * boards stay distinct. (Backend dedup is the eventual home; this is the frontend guard.)
+ */
+function dedupeAcrossWindows(data: TrendingData): TrendingData {
+  const claimed = new Set<string>();
+  const out = { ...data } as TrendingData;
+  for (const win of ["daily", "weekly", "monthly"] as const) {
+    const board = data[win];
+    if (!board?.repos) continue;
+    const kept = board.repos.filter((r) => {
+      const key = r.fullName;
+      if (!key || claimed.has(key)) return false;
+      claimed.add(key);
+      return true;
+    });
+    out[win] = { ...board, repos: kept };
+  }
+  return out;
+}
+
+/**
  * Load the static trending.json produced by `npm run ingest`.
  * The file lives in /public/data and is served at /data/trending.json.
  */
@@ -19,7 +42,7 @@ export function loadTrending(): Promise<TrendingData> {
   inflight = fetch("/data/trending.json", { cache: "no-cache" })
     .then(async (res) => {
       if (!res.ok) throw new Error(`加载 trending.json 失败：HTTP ${res.status}`);
-      const data = (await res.json()) as TrendingData;
+      const data = dedupeAcrossWindows((await res.json()) as TrendingData);
       cached = data;
       return data;
     })
@@ -88,6 +111,28 @@ export function loadBriefEntity<T = Record<string, unknown>>(name: string): Prom
     if (!res.ok) throw new Error(`加载 brief/${name}.json 失败：HTTP ${res.status}`);
     const data = (await res.json()) as BriefEntityFile<T>;
     briefCache.set(name, data as BriefEntityFile);
+    return data;
+  });
+}
+
+export interface PapersIndex {
+  generatedAt: string;
+  date: string;
+  counts: { deepReads: number; radar: number; deepCandidates: number };
+  deepReads: Array<{ slug: string; arxiv_id: string; title: string; date: string; authors: string[]; tags: string[]; scores: Record<string, number>; source_rankings: string[]; one_sentence_judgment: string; thumbnail_url: string }>;
+  deepCandidates: Array<{ arxiv_id: string; title: string; final_score: number; category: string; autosci_relevance: string; one_line: string; deep_slug: string | null }>;
+  radar: Array<{ arxiv_id: string; title: string; final_score: number; category: string; one_line: string; deep_slug: string | null }>;
+  radarEmpty: boolean;
+  board: Record<"daily" | "weekly" | "monthly", Array<{ arxiv_id: string; title: string; upvotes: number; num_comments: number; authors: string[]; thumbnail_url: string; hf_paper_url: string; paper_url: string; already_done: boolean }>>;
+}
+
+let cachedPapersIndex: PapersIndex | null = null;
+export function loadPapersIndex(): Promise<PapersIndex> {
+  if (cachedPapersIndex) return Promise.resolve(cachedPapersIndex);
+  return fetch("/data/papers-index.json", { cache: "no-cache" }).then(async (res) => {
+    if (!res.ok) throw new Error(`加载 papers-index.json 失败：HTTP ${res.status}`);
+    const data = (await res.json()) as PapersIndex;
+    cachedPapersIndex = data;
     return data;
   });
 }

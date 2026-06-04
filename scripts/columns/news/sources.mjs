@@ -327,6 +327,12 @@ export function normalizeNewsItem(input = {}) {
   if (Number.isFinite(Number(input.score))) out.score = Number(input.score);
   const summary = cleanText(input.summary);
   if (summary) out.summary = summary.slice(0, HTML_TEXT_LIMIT);
+  const titleZh = cleanText(input.titleZh);
+  if (titleZh) out.titleZh = titleZh;
+  const summaryZh = cleanText(input.summaryZh);
+  if (summaryZh && title) out.summaryZh = summaryZh;
+  const imageUrl = normalizeAbsoluteUrl(input.imageUrl);
+  if (imageUrl) out.imageUrl = imageUrl;
   return out;
 }
 

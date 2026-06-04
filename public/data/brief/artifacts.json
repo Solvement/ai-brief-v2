@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T04:05:46.368Z",
+  "generatedAt": "2026-06-04T21:35:38.701Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 43,
+  "count": 45,
   "items": [
     {
       "id": "artifact/9router-repo",
@@ -495,6 +495,45 @@
         {
           "target": "content/codewhale",
           "raw": "[[content/codewhale]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/compound-engineering-plugin-repo",
+      "type": "artifact",
+      "slug": "compound-engineering-plugin-repo",
+      "title": "Compound Engineering Plugin Repo",
+      "file": "artifacts/compound-engineering-plugin-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "compound-engineering-plugin-repo",
+        "kind": "artifact",
+        "content": "compound-engineering-plugin",
+        "artifact_type": "repo",
+        "url": "https://github.com/EveryInc/compound-engineering-plugin",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "完整的 Skill/Agent 清单与实现细节",
+          "安全沙箱说明",
+          "知识库检索机制文档"
+        ],
+        "last_checked": "2026-06-04"
+      },
+      "body": "\n## Artifact audit\n\n拥有详尽的 README、package.json、源码目录和测试，但核心 Agent 逻辑和大量组件定义位于未审计的子目录中。\n\n出处:https://github.com/everyinc/compound-engineering-plugin。See [[content/compound-engineering-plugin]]。\n",
+      "excerpt": "拥有详尽的 README、package.json、源码目录和测试，但核心 Agent 逻辑和大量组件定义位于未审计的子目录中。",
+      "links": [
+        {
+          "target": "content/compound-engineering-plugin",
+          "raw": "[[content/compound-engineering-plugin]]"
         }
       ],
       "headings": [
@@ -1599,6 +1638,45 @@
         {
           "target": "content/vibe-trading",
           "raw": "[[content/vibe-trading]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/vimax-repo",
+      "type": "artifact",
+      "slug": "vimax-repo",
+      "title": "Vimax Repo",
+      "file": "artifacts/vimax-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "vimax-repo",
+        "kind": "artifact",
+        "content": "vimax",
+        "artifact_type": "repo",
+        "url": "https://github.com/HKUDS/ViMax",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "unknown",
+        "missing_parts": [
+          "完整安装与运行示例",
+          "技术报告或论文",
+          "API 文档"
+        ],
+        "last_checked": "2026-06-04"
+      },
+      "body": "\n## Artifact audit\n\n仓库存在，包含 agents、pipelines、tests 等目录，但 README 关键部分不完整，运行方式不明。\n\n出处:https://github.com/hkuds/vimax。See [[content/vimax]]。\n",
+      "excerpt": "仓库存在，包含 agents、pipelines、tests 等目录，但 README 关键部分不完整，运行方式不明。",
+      "links": [
+        {
+          "target": "content/vimax",
+          "raw": "[[content/vimax]]"
         }
       ],
       "headings": [

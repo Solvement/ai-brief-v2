@@ -1,0 +1,40 @@
+primitive_id: trace-to-skill-distillation
+source_paper: "2605.31264"
+title: "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation"
+relevance_level: direct                     # AutoSci L1 自进化的直接蓝本
+audience: ai_only
+core_pattern: >
+  把异构执行/交互轨迹端到端蒸馏成"可检视、可纠正、可版本化、可跨宿主安装"的 skill package：
+  双轨分离(capability=做事本事 / behavior=风格规则);自然语言反馈→结构化补丁→存档旧版→版本+1→可回滚;
+  工件带 schema + 来源边界 + 生命周期状态(显式 > 隐藏 memory)。
+problem_class: distill-heterogeneous-traces-into-inspectable-correctable-reusable-skills
+components:
+  - trace_collector        # 归一化异构来源(日志/文档/评审)进本地知识目录
+  - capability_extractor   # 抽实践/心智模型/决策启发式/标准
+  - behavior_extractor     # 抽风格/互动规则/纠错记录(与能力分轨)
+  - skill_writer           # 渲染+归一化成版本化工件(SKILL.md/manifest.json)
+  - correction_handler     # NL 反馈 → 能力补丁 / {scene,wrong,correct} 行为记录
+  - version_manager        # 存档 + 回滚
+autosci_modules:
+  - self_skill_distiller   # 把 AutoSci 自身成功轨迹蒸馏成可复用 skill
+  - typed_memory           # skill package 即结构化记忆工件
+  - self_evolve_controller # 纠错生命周期 = 自我修正闭环
+  - cold_critic            # 纠错触发应由独立评委判定(generator≠critic)
+inputs:
+  - traces                 # AutoSci 的执行/实验轨迹
+  - scope                  # 来源范围 + 治理元数据
+outputs:
+  - skill_package          # 版本化、可检视、可调用的技能工件
+  - correction_log         # 纠错历史(可追溯/可回滚)
+implementation_idea: >
+  Mini 版:喂一批 AutoSci 成功轨迹 → analyzer 抽 capability/behavior 两轨 → writer 产 SKILL.md+manifest.json;
+  实现 correction_handler(NL→补丁) + version_manager(存档/回滚)。100-300 行可跑通。
+small_experiment: >
+  让 AutoSci 跑 N 个相似研究任务 → 蒸馏成 1 个 skill → 在第 N+1 个任务上对照"有 skill vs 无 skill"的
+  首轮成功率/步数;再测纠错闭环:注入一条 NL 反馈,验证 skill 版本+1 且行为改变、可回滚。1-14 天。
+risks:
+  - no_fidelity_proof      # 原文无保真度实验 → AutoSci 复用须自己加"蒸馏后是否真更强"的评测
+  - editor_bias            # 纠错会编码偏见 → 需独立评委 + 可追溯
+  - skill_rot              # 技能随任务漂移过期 → 版本/失效策略
+  - over_distill           # 把噪声轨迹也蒸成"技能" → 需质量门筛轨迹
+status: extracted

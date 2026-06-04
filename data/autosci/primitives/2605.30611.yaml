@@ -1,0 +1,44 @@
+primitive_id: engine-agnostic-refine-harness
+source_paper: "2605.30611"
+title: "Crafter: A Multi-Agent Harness for Editable Scientific Figure Generation"
+relevance_level: indirect_pattern_strong   # 任务领域无关，控制结构可几乎原样复用
+audience: ai_only                          # 给 AutoSci 自进化吃的，不进 Kevin 的阅读 tab
+core_pattern: >
+  把任意不可靠的"一步生成 engine"包进 plan→render→diagnose→refine 循环：
+  以可被 typed-edit 修改的结构化规格 𝒮 当记忆；指令式批评家输出逐维度分+缺陷+修正；
+  Convergence Judge 决定接受/精修/回退；非单调时回退到 best-so-far；便宜判据早退省预算。
+problem_class: unreliable-one-shot-generation-needs-controlled-iterative-correction
+components:
+  - intent_reasoner        # 初始化结构化记忆 𝒮0
+  - designer               # 出 K 个候选方案（多样性探索）
+  - executor               # 可热插拔的现成引擎（图像/代码/实验）
+  - directive_critic       # 逐维度分 + 缺陷 + 修正建议（非标量）
+  - reviser                # 把修正写成 typed edit 落进 𝒮
+  - convergence_judge      # 接受/精修/回退 best-so-far
+autosci_modules:
+  - refine_harness         # 本原语的落地模块
+  - typed_memory           # 结构化记忆 𝒮
+  - cold_critic            # 独立冷评委（generator ≠ critic）
+  - self_evolve_controller # 收敛/回退控制
+inputs:
+  - task_spec              # 目标 + 输入
+  - engine                 # 可调用生成器
+  - critic                 # 返回结构化诊断
+  - budget                 # max_rounds T + 成本上限 + 早退规则
+outputs:
+  - best_artifact
+  - final_spec             # 演化后的 𝒮
+  - trace                  # 每轮 诊断 + typed_edit，供审计/学习
+implementation_idea: >
+  100~200 行实现领域无关版：Spec 对象 + 一组 typed-edit 操作 + 调 OpenRouter 的 engine/critic；
+  先在单任务（如"生成实验设计草案"）跑通 3 轮循环，再抽象成与领域无关的小库。
+small_experiment: >
+  对照 A=自由文本改写 vs B=typed-edit 𝒮 + 指令式 critic + best-so-far，
+  在"研究实验设计草案"任务上跑 3 轮，比第 3 轮被独立冷评委判为"可执行"的比例；
+  并消融去掉结构化记忆 / 指令式 critic 各掉多少（复刻 Crafter Table 3 思路）。1-14 天。
+risks:
+  - judge_self_bias        # 同源模型既执行又评审会自我加分 → 必须独立冷评委
+  - cost_blowup            # 多智能体多轮 ~4× → 设硬预算/早退
+  - typed_edit_expressivity# 研究任务的结构化规格难定义，设计不好退化为自由文本
+  - over_transfer          # 别把图像专属智能体(SVG/SAM3)硬塞进 AutoSci
+status: extracted

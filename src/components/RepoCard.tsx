@@ -24,10 +24,12 @@ const DEPTH_CLS: Record<ProjectDepth, string> = {
   list_only: "depth-list",
   needs_enrichment: "depth-needs",
 };
+/** Action verdict → visual annotation chip. Strength tiers drive the color. */
 const ACTION_LABEL: Record<string, string> = {
   ignore: "忽略", monitor: "观望", try: "可一试", analyze: "值得分析",
   deep_dive: "值得深扒", clone_and_run: "克隆来跑", extract: "提炼复用",
 };
+const ACTION_STRONG = new Set(["deep_dive", "clone_and_run", "extract", "analyze"]);
 
 function depthOf(repo: AnalyzedRepo): ProjectDepth {
   return repo.final_depth || (repo.deep ? "deep" : "list_only");
@@ -42,13 +44,17 @@ function displayScore(score: number): string {
   return Number.isInteger(score) ? String(score) : score.toFixed(1);
 }
 
+/** Hide a failed avatar so the gradient fallback underneath shows instead of a broken icon. */
+function hideOnError(e: React.SyntheticEvent<HTMLImageElement>) {
+  e.currentTarget.style.visibility = "hidden";
+}
+
 interface Props { repo: AnalyzedRepo; featured?: boolean }
 
-export function RepoCard({ repo, featured = false }: Props) {
+export function RepoCard({ repo }: Props) {
   const depth = depthOf(repo);
   const slug = slugOf(repo);
   const score = typeof repo.ranking_score === "number" ? repo.ranking_score : repo.worthDeepDive;
-  const action = repo.recommended_action ? (ACTION_LABEL[repo.recommended_action] || repo.recommended_action) : null;
   const summary = repo.tier_template?.one_sentence_positioning || repo.tldr || repo.light || repo.description || "";
 
   // Tier paradigm (2026-06-03): tier drives the badge; depth is the legacy fallback.
@@ -66,27 +72,36 @@ export function RepoCard({ repo, featured = false }: Props) {
   const hasBrief = !isIndex && (tier === 2 || tier === 3 || depth === "deep" || depth === "analysis") && Boolean(slug);
   const manualConfirm = repo.requires_manual_confirmation || repo.tier_template?.manual_confirmation;
 
+  const action = repo.recommended_action ? (ACTION_LABEL[repo.recommended_action] || repo.recommended_action) : null;
+  const actionStrong = repo.recommended_action ? ACTION_STRONG.has(repo.recommended_action) : false;
+  const gained = Number(repo.starsGained) || 0;
+
+  // Uniform card — every repo gets the same shape/size. Visual texture comes from the
+  // tier-tinted avatar ring, the owner/name path, and annotation chips (NOT screenshots).
   const inner = (
     <>
       <div className="radar-card-top">
-        <img className="radar-avatar" src={repo.ownerAvatarUrl} alt={repo.owner} loading="lazy" />
+        <span className={`radar-avatar-ring ${tierCls}`}>
+          <img className="radar-avatar" src={repo.ownerAvatarUrl} alt={repo.owner} loading="lazy" onError={hideOnError} />
+        </span>
         <div className="radar-score-wrap" title={`ranking ${score}`}>
-          <span className="radar-score">{displayScore(score)}</span>
-          <span className={`radar-tier ${tierCls}`}>
-            {tierTag}
-          </span>
+          {Number.isFinite(score) && score > 0 && <span className="radar-score">{displayScore(score)}</span>}
+          <span className={`radar-tier ${tierCls}`}>{tierTag}</span>
         </div>
       </div>
 
       <div className="radar-card-head">
-        <h3 className="radar-name">{repo.name || repo.fullName}</h3>
-        <span className="radar-owner">{repo.owner}</span>
+        <h3 className="radar-name">
+          <span className="radar-owner-seg">{repo.owner}</span>
+          <span className="radar-path-sep">/</span>
+          {repo.name || repo.fullName}
+        </h3>
         {manualConfirm && <span className="radar-manual">需人工确认</span>}
       </div>
 
       {summary && <p className="radar-summary">{summary}</p>}
 
-      {repo.tags?.length > 0 && (
+      {repo.tags?.length > 0 && !isIndex && (
         <div className="radar-tags">
           {repo.tags.slice(0, 4).map((t) => <span className="radar-tag" key={t}>{t}</span>)}
         </div>
@@ -95,7 +110,7 @@ export function RepoCard({ repo, featured = false }: Props) {
       <div className="radar-foot">
         <div className="radar-meta">
           <span className="radar-meta-item">★ {fmt(repo.stars)}</span>
-          <span className="radar-meta-item">⑂ {fmt(repo.forks)}</span>
+          {gained > 0 && <span className="radar-meta-item radar-gained">+{fmt(gained)}</span>}
           {repo.language && (
             <span className="radar-meta-item">
               <span className="radar-lang-dot" style={{ background: repo.languageColor || "var(--radar-line-strong)" }} />
@@ -103,14 +118,17 @@ export function RepoCard({ repo, featured = false }: Props) {
             </span>
           )}
         </div>
-        <span className={`radar-cta ${hasBrief ? "deep" : ""}`}>
-          {hasBrief ? `${tierLabel} →` : "看仓库 →"}
+        <span className="radar-foot-right">
+          {action && <span className={`radar-action ${actionStrong ? "strong" : ""}`}>{action}</span>}
+          <span className={`radar-cta ${hasBrief ? "deep" : ""}`}>
+            {hasBrief ? `${tierLabel} →` : "看仓库 →"}
+          </span>
         </span>
       </div>
     </>
   );
 
-  const cls = `radar-card ${tierCls}${featured && !isIndex ? " featured" : ""}${hasBrief ? " has-brief" : ""}${isIndex ? " radar-card--index" : ""}`;
+  const cls = `radar-card ${tierCls}${hasBrief ? " has-brief" : ""}${isIndex ? " radar-card--index" : ""}`;
 
   if (hasBrief) {
     return <Link className={cls} href={`/brief/${encodeURIComponent(slug)}`}>{inner}</Link>;

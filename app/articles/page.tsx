@@ -1,5 +1,5 @@
-import { Articles } from "@/legacy/Articles";
+import { PapersPage } from "@/components/PapersPage";
 
 export default function Page() {
-  return <Articles />;
+  return <PapersPage />;
 }

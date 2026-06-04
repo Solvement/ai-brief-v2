@@ -218,6 +218,7 @@ export async function analyze(item, evidence, ctx = {}) {
     review: generated.review || null,
     paths: generated.paths,
     entitySlugs: generated.entitySlugs,
+    autosciPrimitive: generated.autosciPrimitive || null,
     offline: generated.offline,
     model: generated.model,
     triage: summarizeTriage(triage),
@@ -402,11 +403,12 @@ export async function archive(result, ctx = {}) {
 
 function enrichFromDb(db, candidate) {
   const analyses = db.listAnalyses(candidate.id);
-  const light = latestTier(analyses, "light")?.payload;
+  const lightRow = latestTier(analyses, "light");
+  const light = lightRow?.payload;
   const deepRow = latestTier(analyses, "deep");
   const briefWikiRow = latestTier(analyses, "brief-wiki");
   const briefWiki = briefWikiRow?.payload || null;
-  const reviewDecision = briefWiki?.depth_decision || null;
+  const reviewDecision = briefWikiRow && isAtLeastAsNew(briefWikiRow, lightRow) ? briefWiki?.depth_decision || null : null;
   const mergedLight = reviewDecision
     ? {
         ...(light || {}),
@@ -433,7 +435,21 @@ function enrichFromDb(db, candidate) {
 }
 
 function latestTier(analyses, tier) {
-  return analyses.find((analysis) => analysis.tier === tier) || null;
+  return analyses
+    .filter((analysis) => analysis.tier === tier)
+    .sort((left, right) => {
+      const timeDelta = Date.parse(right.generatedAt || right.generated_at || "") - Date.parse(left.generatedAt || left.generated_at || "");
+      if (Number.isFinite(timeDelta) && timeDelta) return timeDelta;
+      return Number(right.id || 0) - Number(left.id || 0);
+    })[0] || null;
+}
+
+function isAtLeastAsNew(left, right) {
+  if (!left || !right) return Boolean(left);
+  const leftTime = Date.parse(left.generatedAt || left.generated_at || "");
+  const rightTime = Date.parse(right.generatedAt || right.generated_at || "");
+  if (Number.isFinite(leftTime) && Number.isFinite(rightTime)) return leftTime >= rightTime;
+  return Number(left.id || 0) >= Number(right.id || 0);
 }
 
 export function makeBoard(window, items, options = {}) {
@@ -507,6 +523,7 @@ function repoForBoard(item, window, rank, options = {}) {
     stars: Number(repo.stars) || 0,
     forks: Number(repo.forks) || 0,
     starsGained: Number(repo.starsGained) || 0,
+    starsGainedByWindow: repo.starsGainedByWindow || {},
     rank,
     tldr: String(light.tldr || repo.tldr || repo.description || repo.fullName),
     tags: Array.isArray(light.tags) ? light.tags : [],

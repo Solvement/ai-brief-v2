@@ -86,3 +86,13 @@ Dynamic workflows use **Claude's subagents (this Claude Code subscription)**. He
 ## 验收门（DONE 的机器定义）
 - pnpm build 通过、e2e 通过、Lighthouse 性能&可访问性 > 90、视觉回归在容差内、内容 lint 通过。
 - 任一不过：保留上一版 + 告警，不部署。
+
+## 论文深读 & AutoSci 语料架构（2026-06-04 定，Kevin 决策）
+- **论文来源只用 HuggingFace**：`hf papers ls --date/--week/--month --sort publishedAt`（trending 排序是全局的、忽略窗口，不可用）→ 本地按 upvotes 重排。`--limit` 上限 100。
+- **策展管线确定性**：`scripts/columns/papers/{hf-source,ledger,curate}.mjs`。账本 `data/papers/ledger.jsonl`，arxiv_id 主键去重；`deep_read/analyzed/published` 状态的论文不再作为新候选。**只选高赞高收藏**，当日无高赞/全重复则当日空着，不硬凑。评分用 DeepSeek（便宜层）跑 8 维 rubric；**深读由强模型（Claude）读全文写**。
+- **受众分离（核心）**：人读语料 `content/papers/{id}-{slug}/` = `paper.mdx` + `career.mdx` + `metadata.json`（Kevin 只读 Paper 理解 + Career 职业两 tab）。**AutoSci 自进化语料是 AI-only**，单独存 `data/autosci/primitives/{id}.{yaml,md}`，不进 Kevin 的 tab。
+- **内容即语料**：用轻量 markdown（`.mdx` 文件名，**不上 true MDX 工具链**），架构图用 **Mermaid 源码块**（文本，AI 可读；前端懒加载渲染）。
+- **调和"从库渲染"红线**：文件是人读产物，但 `metadata.json` + AutoSci primitives **聚合成索引**（`public/data/papers-index.json` 等）供列表/排序/去重/查询/前端渲染——不直接从散文渲染。
+- **生成正确性门（lint）**：每篇产出的 markdown/JSON/YAML/Mermaid 必须过 lint 校验，不过门不入库不发布（接 `npm run validate`）。
+- **项目→AutoSci（C）**：项目排名规则改为**月榜前 10（按 star）默认 deep-dive**；项目原语**按 project_type 选择性抽取**——skill / 教学类不抽或少抽，架构型（如 finance agent）抽底层架构。
+- **eval/goal**：`scripts/eval-redesign.mjs` 是三栏改造的机器 DONE 定义，目标=全绿。

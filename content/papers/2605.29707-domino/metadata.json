@@ -1,0 +1,30 @@
+{
+  "paper_id": "2605.29707",
+  "arxiv_id": "2605.29707",
+  "title": "Domino: Decoupling Causal Modeling from Autoregressive Drafting in Speculative Decoding",
+  "authors": ["Jianuo Huang", "Yaojie Zhang", "Qituan Zhang", "Hao Lin", "Hanlin Xu", "Linfeng Zhang"],
+  "date": "2026-05-28",
+  "huggingface_url": "https://huggingface.co/papers/2605.29707",
+  "paper_url": "https://arxiv.org/abs/2605.29707",
+  "code_url": "https://github.com/jianuo-huang/Domino",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "source_rankings": ["weekly", "monthly"],
+  "human_tabs": ["paper", "career"],
+  "autosci_primitive": "data/autosci/primitives/2605.29707.yaml",
+  "first_seen_date": "2026-06-04",
+  "tags": ["speculative-decoding", "inference-systems", "serving", "low-rank-correction", "breadth"],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 7,
+    "system_design_value": 7,
+    "career_value": 6,
+    "autosci_reuse_value": 4,
+    "buildability": 4,
+    "evaluation_value": 7,
+    "breadth_value": 8,
+    "evidence_quality": 8
+  },
+  "one_sentence_judgment": "把推测解码'草稿质量 vs 成本'两难用'并行 backbone 出整块 + 轻量 Domino head(GRU 因果编码+低秩残差)只对修正分支串行'解开——GSM8K-8B 7.92× 加速/接受长度 10.03(显著超 EAGLE-3/DFlash),仅 +5.3% 参数/+2.8% 延迟;证据扎实但仅推理、主要适配 SGLang,对 AutoSci 是降本提速的间接价值。"
+}

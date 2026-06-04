@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "node scripts/lint.mjs",
     "verify": "npm run lint && npm run test && npm run build",
-    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs",
+    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs && node scripts/validate-papers-deepread.mjs",
     "test": "node --test scripts/__tests__/*.test.mjs && npm run validate",
     "preview": "next start",
     "ingest": "node --no-warnings scripts/ingest.mjs",
@@ -31,6 +31,9 @@
     "papers:daily": "node --no-warnings scripts/columns/papers/daily.mjs",
     "papers:run": "node --no-warnings scripts/columns/papers/daily.mjs",
     "papers:codex-deepdive": "node --no-warnings scripts/columns/papers/codex-deepdive.mjs",
+    "papers:curate": "node --no-warnings scripts/columns/papers/curate.mjs",
+    "papers:select": "node --no-warnings --env-file=.env.local scripts/columns/papers/select.mjs",
+    "papers:hf": "npm run papers:curate && npm run papers:select",
     "daily": "node --no-warnings scripts/daily.mjs",
     "news:daily": "node --no-warnings scripts/columns/news/daily.mjs",
     "projects:daily": "node --no-warnings scripts/columns/projects/daily.mjs",
@@ -42,9 +45,12 @@
   },
   "dependencies": {
     "jsonrepair": "^3.14.0",
+    "mermaid": "^11.15.0",
     "next": "^16.2.7",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

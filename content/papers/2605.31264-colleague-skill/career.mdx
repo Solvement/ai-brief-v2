@@ -1,0 +1,58 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+这是一份**"把知识工程做成可流通产品"的活样本**,而且是个 19k star、能直接贡献的开源系统。它教的不是模型,而是 agent 时代最值钱的一类工程:**把零散资料蒸馏成可检视/可纠正/可版本化、还能装进多个 agent 宿主(Claude Code/Codex/OpenClaw)的技能工件**。对想做"AI 应用 + agent 基建"的你,这是 skill/记忆/插件生态的核心范式。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 工件契约设计 | 怎么把"知识"定义成带 schema、版本、来源边界、生命周期状态的工件(SKILL.md+manifest.json) | 仿它定义一个最小 skill schema,跑通生成→安装→调用 |
+| trace→结构化抽取 | 用 LLM 把异构轨迹抽成"能力"和"行为"两类结构化条目 | 写一个 analyzer:喂一段聊天/评审,产出 capability/behavior 两份 markdown |
+| 纠错生命周期 | 自然语言反馈→结构化补丁→版本+存档+回滚 的闭环怎么落地 | 实现 `correction_handler` + `version_manager` 的最小版,做能力补丁 vs 行为记录两种路径 |
+| 多宿主插件分发 | 同一技能怎么装进不同 agent host(路径/frontmatter/安装脚本) | 把一个 skill 同时装进 Claude Code 和 Codex 的 skills 目录,验证调用 |
+| 治理/合规设计 | 来源边界、同意、保留期、可删除、免责声明怎么进工件 | 给你的 skill 加 governance 元数据 + opt-in 分享开关 |
+
+## 系统设计心法
+
+一句话:**把"知识"当一等公民的产品来设计,而不是塞进 prompt 或藏进向量库。** 显式 > 隐式(可检视可审计)、双轨分离(能力 vs 风格,别混)、生命周期 > 一次性(可纠正可回滚)、可移植 > 锁定(跨宿主)。你做任何"记忆/技能/persona"功能都该问:**它能被用户读懂、改正、回滚、带走吗?**
+
+## 作品集角度(Portfolio angle)
+
+这能撑起一个**"agent 技能工程"**方向的作品:不是又一个 chatbot,而是一套"把资料变成可治理技能"的工具 + 给这个 19k star 项目提一个真实 PR(新 preset / 新数据源解析器 / 评测脚本)。后者尤其值钱——**对一个热门 agent 基建项目有 merged PR** 是很硬的简历点。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Mini trace→skill 蒸馏器 | 喂一批我自己的笔记/评审 → 产出 capability/behavior 两轨 + SKILL.md | 3-5 天 | 吃透双轨抽取 + 工件契约,产出能讲清的 repo |
+| 纠错+版本管理组件 | NL 反馈→补丁→存档→回滚 的独立小库 | 3-4 天 | 把"可纠正/可回滚"这条稀缺能力做成可复用件 |
+| 给 colleague-skill 提 PR | 加一个数据源解析器(如 Notion)或一个评测脚本 | 1-2 周 | merged PR 进 19k star 项目 = 强简历点 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built a trace-to-skill distillation tool that turns heterogeneous traces (chats, reviews, docs) into versioned, inspectable skill packages with separate capability/behavior tracks."*
+- *"Implemented a natural-language correction lifecycle (feedback → structured patch → version bump → rollback) for agent skills, with per-host install across Claude Code/Codex."*
+- *"(若做了 PR)Contributed a {Notion source parser / eval harness} to colleague-skill (≈19k★ open-source agent-skill system)."*
+
+> [!key] 面试可讲
+> "agent 的'记忆/技能'该显式还是隐式?" —— 用本文论证:**显式版本化工件**(可检视/纠正/回滚/治理)在生产里往往比黑盒 memory 更可控、更可信。这体现产品+系统思维。
+
+## 学习清单
+
+**必学**
+- 工件 schema / 契约设计(SKILL.md + manifest)
+- trace→结构化抽取(capability vs behavior 双轨)
+- 纠错生命周期 + 版本/回滚
+
+**有用**
+- 多 agent 宿主的 skill 安装机制(Claude Code/Codex/OpenClaw 路径与 frontmatter)
+- 知识工件的治理/合规(来源边界、同意、保留)
+
+**可选**
+- celebrity 研究工具链(字幕→转写→六维合并→质检)——领域特定,迁移性一般

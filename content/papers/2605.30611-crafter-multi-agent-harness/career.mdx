@@ -1,0 +1,59 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里不复述论文,只谈它能给**应用型 AI 工程师 / FDE / AI-app 开发者**的你什么。
+
+## 为什么这对我重要
+
+Crafter 是一份**几乎可以照抄的"agentic 系统工程"范本**:它把一个不可靠的生成模型,用"规划→执行→验收→精修 + 结构化记忆"包装成一个可靠产品。这正是 FDE/应用工程师每天的真问题 —— **不是训练更强的模型,而是用编排让现成模型在真实任务上达标**。它把"agent harness"这个当下最值钱的工程能力,给了你一个有完整代码、有基准、有消融的落地样本。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| Agent 编排循环 | plan→render→diagnose→refine 的状态机怎么设计、何时早退、何时回退 | 把它的 6 角色用 100 行 Python 重写一个最小可跑版 |
+| 结构化记忆而非长 prompt | 为什么用 typed-edit 的结构化 spec 取代越堆越长的对话历史 | 自己实现一个 `Spec` 对象 + 一组 typed-edit 操作,对比纯文本改写的退化 |
+| 指令式批评家(directive critic) | 评委为什么要给"逐维度分+缺陷+修正"而不是一个标量分 | 写一个 VLM/LLM 评委,输出结构化 JSON 反馈,喂回修正环 |
+| best-so-far 回退 | 迭代非单调时怎么保证不越改越差 | 在你的循环里加"保留历史最优 + 回退"逻辑,做消融看效果 |
+| VLM-as-judge 评测搭建 | 怎么用模型当评委做可扩展评测,以及它的偏置/陷阱 | 复刻一个小 benchmark + 胜率口径,故意制造偏置看分数漂移 |
+
+## 系统设计心法
+
+一句话:**"能力 = 编排 × 记忆结构",而不是 = 模型权重。** 把任务专属逻辑全压进 prompt、让引擎可热插拔(`configs/default.yaml` 里三个模型槽位:llm / vlm / generator),是一种"模型会过时、harness 是资产"的架构信仰。你做任何 AI 应用都该问:**我的护城河是在编排和记忆里,还是只是在调某个模型?**
+
+## 作品集角度(Portfolio angle)
+
+这篇能变成一个**展示"agentic 工程"硬实力**的项目,而不是又一个套壳 demo。重点是把"验收-精修循环 + 结构化记忆 + 指令式批评家"做成可复用、可观测、可消融的东西 —— 面试官一眼能看出你懂 agent 工程,不是只会写 prompt。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| MiniCrafter | 用 OpenRouter 调一个图像模型,实现 plan→render→critic→refine 最小环(单图表类型) | 2-4 天 | 吃透核心循环,产出一个能讲清楚的 repo |
+| 通用 refine-harness 库 | 把"引擎无关的验收-精修环"抽象成与领域无关的小库(图像/代码/文案都能套) | 1-2 周 | 这是真正可迁移的资产,也是 AutoSci 的雏形(见 AutoSci 栏) |
+| Directive-Critic 组件 | 一个独立的"结构化反馈"评委组件 + 评测脚本,带偏置实验 | 3-5 天 | 把"评测/可靠性"这条稀缺线讲明白,简历加分 |
+
+## 简历 / 面试故事
+
+诚实、可验证的写法(只写你真做了的):
+
+- *"Built a model-agnostic agentic refinement harness (plan→render→critique→refine) with a typed-edit structured spec as memory; ablations showed the structured-memory and directive-critic components each contributed the largest quality gains."*
+- *"Implemented a VLM-as-judge evaluation harness with a multi-judge ensemble and documented its self-evaluation bias, using win-rate over a small human-annotated benchmark."*
+- *"Designed a best-so-far rollback safeguard for non-monotonic iterative refinement, preventing quality regressions across refine rounds."*
+
+> [!key] 面试可讲的点
+> "为什么不直接换更强的模型?" —— 你能用 Crafter 的消融数据回答:在结构化版面任务上,**编排和记忆结构带来的增益(去掉就 −8~9 分)往往大于换 backbone**。这是个能体现"系统思维"的高质量回答。
+
+## 学习清单
+
+**必学**
+- agent 编排循环 / 状态机(plan-render-diagnose-refine)
+- 结构化记忆 vs 长 prompt(typed edit 的动机)
+- VLM/LLM-as-judge 的搭建与偏置
+
+**有用**
+- best-so-far 回退、早退门(early-exit gate)等"循环稳态"技巧
+- 多模型槽位的工程化(OpenRouter / Azure 兼容端点切换)
+
+**可选**
+- SVG/矢量合成、SAM3 分割(本文具体领域,迁移性较弱)
+- 图像生成评测的人标流程(CraftBench 构建)
