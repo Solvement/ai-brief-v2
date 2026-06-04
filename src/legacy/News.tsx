@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { SiteHeader } from "../components/SiteHeader";
 
 interface NewsItem {
@@ -64,16 +65,17 @@ function Monogram({ item }: { item: NewsItem }) {
   return <div className={`news-mono ${sourceTypeClass(item.sourceType)}`} aria-hidden>{ch}</div>;
 }
 
-export function News() {
-  const [data, setData] = useState<NewsData | null>(null);
+export function News({ initial = null }: { initial?: NewsData | null }) {
+  const [data, setData] = useState<NewsData | null>(initial);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initial?.items?.length) return; // SSR provided data
     fetch("/data/news.json", { cache: "no-cache" })
       .then(async (res) => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return (await res.json()) as NewsData; })
       .then(setData)
       .catch((e) => setErr((e as Error)?.message || String(e)));
-  }, []);
+  }, [initial]);
 
   const groups = useMemo(() => {
     if (!data?.items) return [];
@@ -122,8 +124,7 @@ export function News() {
                     {group.heroes.map((item, i) => (
                       <a className="news-hero" key={`h-${item.url}-${i}`} href={item.url} target="_blank" rel="noreferrer">
                         <div className="news-hero-media">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={item.imageUrl} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                          <Image src={item.imageUrl!} alt="" fill sizes="(max-width: 900px) 100vw, 33vw" priority={i === 0} />
                         </div>
                         <div className="news-hero-body">
                           <div className="news-hero-title">{zh(item)}</div>
