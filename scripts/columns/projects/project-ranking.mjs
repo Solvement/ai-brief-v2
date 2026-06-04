@@ -31,6 +31,10 @@ const LIST_RE = /\b(awesome|curated list|resource list|resources|course|courses|
 const UI_RE = /\b(ui|frontend|dashboard|chat ui|interface|web app|react|vue|svelte|next\.?js|tailwind)\b/i;
 const INFRA_RE = /\b(agent|runtime|workflow|orchestration|memory|rag|retrieval|mcp|tool calling|eval|benchmark|sdk|cli|api|server|plugin|hooks?)\b/i;
 const VERTICAL_RE = /\b(finance|financial|legal|healthcare|medical|education|sales|support|enterprise|compliance|insurance)\b/i;
+const RESOURCE_NAME_RE = /(?:^|[-_/])awesome[-_/]|[-_/]roadmap(?:$|[-_/])|[-_/]tutorial(?:$|[-_/])|books?|100[-_]?days|interview/i;
+const RESOURCE_DESC_RE = /\b(curated\s+list|resources?|roadmap|tutorial|cheat[-\s]?sheet)\b/i;
+const BIG_TECH_ORG_RE = /^(microsoft|google|google-deepmind|deepmind|openai|anthropics?|meta|facebookresearch|apple|amazon-science|aws|nvidia|huggingface|bytedance|qwenlm|alibaba|baidu|tencent|stanford-oval|stanfordnlp|mit|berkeleyai|openbmb)$/i;
+const ARXIV_RE = /\barxiv\.org\b|\barxiv:\s*\d{4}\.\d{4,5}\b/i;
 
 const PACKAGE_FILE_KEYS = [
   "package_json",
@@ -43,6 +47,7 @@ const PACKAGE_FILE_KEYS = [
 
 export function scoreProject(evidenceSignals = {}) {
   const signals = normalizeEvidenceSignals(evidenceSignals);
+  const canonical = scoreCanonicalProject(signals);
   const text = evidenceText(signals);
   const reasons = [];
 
@@ -131,13 +136,22 @@ export function scoreProject(evidenceSignals = {}) {
     ...subscores,
     total,
     tier,
-    ranking_reasons: unique(reasons).slice(0, 12),
+    project_tier: canonical.project_tier,
+    project_bucket: canonical.project_bucket,
+    bucket: canonical.project_bucket,
+    canonical_score: canonical.score,
+    canonical_subscores: canonical.subscores,
+    canonical_reasons: canonical.reasons,
+    requires_manual_confirmation: canonical.requires_manual_confirmation,
+    model_tier: canonical.model_tier,
+    ranking_reasons: unique([...canonical.reasons, ...reasons]).slice(0, 16),
   };
 }
 
 export function decideProjectDepth({ ranking, evidence_signals: inputSignals } = {}) {
   const evidence_signals = normalizeEvidenceSignals(inputSignals);
   const scored = ranking || scoreProject(evidence_signals);
+  const canonical = scoreCanonicalProject(evidence_signals);
   const rejection_reasons = [];
   let max_allowed_depth = "deep";
   let needs_enrichment = Boolean(evidence_signals.needs_enrichment);
@@ -164,17 +178,31 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
   if (isPlainUiWrapper(evidence_signals)) capToLight("plain_ui_wrapper_without_agent_infra_or_workflow");
   if (!canDesignTestPlan(evidence_signals)) capToLight("cannot_design_practical_test_plan");
 
-  const tierDepth = depthForTier(scored.tier);
+  if (canonical.project_tier === 0) {
+    max_allowed_depth = "list_only";
+    rejection_reasons.push(`bucket:${canonical.project_bucket}`);
+  }
+
+  const tierDepth = depthForProjectTier(canonical.project_tier);
   const final_depth = needs_enrichment && evidence_signals.readme_fetch_failed
     ? "needs_enrichment"
     : minDepth(tierDepth, max_allowed_depth);
+  const final_project_tier = projectTierForDepthName(final_depth);
+  const final_model_tier = modelForProjectTier(final_project_tier);
 
   return {
-    ranking_score: scored.total,
-    ranking: scored,
+    ranking_score: canonical.score,
+    ranking: { ...scored, ...canonical, total: canonical.score },
     max_allowed_depth,
     final_depth,
-    ranking_reasons: scored.ranking_reasons || [],
+    project_tier: final_project_tier,
+    project_tier_label: `Tier ${final_project_tier}`,
+    scored_project_tier: canonical.project_tier,
+    project_bucket: canonical.project_bucket,
+    bucket: canonical.project_bucket,
+    model_tier: final_model_tier,
+    requires_manual_confirmation: final_project_tier === 3,
+    ranking_reasons: unique([...(canonical.reasons || []), ...(scored.ranking_reasons || [])]),
     rejection_reasons: unique(rejection_reasons),
     evidence_signals,
     recommended_action: recommendedAction(final_depth, scored.total, needs_enrichment),
@@ -227,6 +255,21 @@ export function depthForTier(tier) {
   return "list_only";
 }
 
+export function depthForProjectTier(tier) {
+  const value = Number(tier);
+  if (value >= 3) return "deep";
+  if (value === 2) return "analysis";
+  if (value === 1) return "light";
+  return "list_only";
+}
+
+function projectTierForDepthName(depth) {
+  if (depth === "deep") return 3;
+  if (depth === "analysis") return 2;
+  if (depth === "light") return 1;
+  return 0;
+}
+
 export function tierForScore(score) {
   const value = Number(score) || 0;
   if (value >= 75) return "deep_candidate";
@@ -243,17 +286,25 @@ export function normalizeEvidenceSignals(input = {}) {
     : rawReadme.length;
   return {
     owner: clean(input.owner),
+    owner_type: clean(input.owner_type || input.ownerType),
     repo: clean(input.repo || input.name),
     url: clean(input.url),
-    trend_sources: asArray(input.trend_sources || input.trendSources),
-    stars: Number(input.stars) || 0,
+    trend_sources: asArray(input.trend_sources || input.trendSources || input.appears_in_tabs || input.appearsInTabs).map(normalizeTrendSource),
+    appears_in_tabs: asArray(input.appears_in_tabs || input.appearsInTabs || input.trend_sources || input.trendSources).map(normalizeTab),
+    stars: Number(input.stars ?? input.total_stars ?? input.totalStars) || 0,
+    total_stars: Number(input.total_stars ?? input.totalStars ?? input.stars) || 0,
     forks: Number(input.forks) || 0,
-    stars_today: Number(input.stars_today ?? input.starsToday ?? input.starsGained) || 0,
+    stars_today: Number(input.stars_today ?? input.starsToday ?? input.starsGained ?? input.stars_in_period ?? input.starsInPeriod) || 0,
+    stars_in_period: Number(input.stars_in_period ?? input.starsInPeriod ?? input.stars_today ?? input.starsToday ?? input.starsGained) || 0,
     language: clean(input.language),
     topics: asArray(input.topics).map(clean).filter(Boolean),
     description: clean(input.description),
     created_at: clean(input.created_at || input.createdAt),
     updated_at: clean(input.updated_at || input.updatedAt),
+    pushed_at: clean(input.pushed_at || input.pushedAt || input.updated_at || input.updatedAt),
+    homepage: clean(input.homepage),
+    releases: Number(input.releases) || 0,
+    open_issues: Number(input.open_issues ?? input.openIssues) || 0,
     license: clean(input.license || input.license_spdx_id),
     raw_readme: rawReadme,
     readme_found: Boolean(input.readme_found ?? input.readmeFound),
@@ -300,7 +351,58 @@ export function evidenceSummary(evidenceSignals = {}) {
     has_models: signals.has_models,
     has_demo: signals.has_demo,
     package_files: signals.package_files,
+    project_tier: signals.project_tier,
+    project_bucket: signals.project_bucket,
   };
+}
+
+export function scoreCanonicalProject(inputSignals = {}) {
+  const signals = normalizeEvidenceSignals(inputSignals);
+  const bucket = classifyProjectBucket(signals);
+  const reasons = [`bucket:${bucket}`];
+  const subscores = {
+    relevance_gate: isAiRelevant(signals) ? 1 : 0,
+    real_project_gate: bucket === "真·新项目" ? 1 : 0,
+    novelty: noveltyAxis(signals, reasons),
+    heat_quality: heatQualityAxis(signals, reasons),
+    endorsement: endorsementAxis(signals, reasons),
+  };
+
+  if (!subscores.relevance_gate || bucket === "无关类") {
+    return canonicalResult({ tier: 0, bucket, score: 0, subscores, reasons: [...reasons, "gate:irrelevant_to_ai"] });
+  }
+  if (bucket === "资源类" || bucket === "老回潮") {
+    return canonicalResult({ tier: 0, bucket, score: 10, subscores, reasons: [...reasons, "gate:not_real_new_project"] });
+  }
+
+  const realNewProject = isRealNewProject(signals);
+  if (realNewProject) reasons.push("gate:real_new_project");
+
+  const score = Math.min(100, Math.round(
+    45
+      + subscores.novelty
+      + subscores.heat_quality
+      + subscores.endorsement,
+  ));
+  const tier3Signals = tier3StrongSignals(signals);
+  let tier = 1;
+  if (realNewProject && score >= 95 && tier3Signals.length > 0) {
+    tier = 3;
+    reasons.push(...tier3Signals);
+    reasons.push("manual_confirmation_required");
+  } else if (realNewProject && isTier2Project({ signals, score, subscores })) {
+    tier = 2;
+  }
+
+  return canonicalResult({ tier, bucket, score, subscores, reasons });
+}
+
+export function classifyProjectBucket(inputSignals = {}) {
+  const signals = normalizeEvidenceSignals(inputSignals);
+  if (isResourceProject(signals)) return "资源类";
+  if (isOldComeback(signals)) return "老回潮";
+  if (!isAiRelevant(signals)) return "无关类";
+  return "真·新项目";
 }
 
 export function minDepth(left, right) {
@@ -323,6 +425,259 @@ function readmeEvidencePoints(signals, reasons) {
     return 3;
   }
   return 1;
+}
+
+function canonicalResult({ tier, bucket, score, subscores, reasons }) {
+  return {
+    project_tier: tier,
+    project_tier_label: `Tier ${tier}`,
+    project_bucket: bucket,
+    bucket,
+    score,
+    subscores,
+    reasons: unique(reasons),
+    requires_manual_confirmation: tier === 3,
+    model_tier: modelForProjectTier(tier),
+  };
+}
+
+function modelForProjectTier(tier) {
+  if (tier === 3) return "codex:gpt-5.5;model_reasoning_effort=high";
+  if (tier === 2) return "deepseek-or-light-codex";
+  if (tier === 1) return "cheap-extraction";
+  return "none";
+}
+
+function isResourceProject(signals) {
+  const name = signals.repo || "";
+  const description = signals.description || "";
+  const language = (signals.language || "").trim().toLowerCase();
+  return Boolean(
+    RESOURCE_NAME_RE.test(name)
+      || RESOURCE_DESC_RE.test(description)
+      || language === "none"
+      || language === "markdown",
+  );
+}
+
+function isOldComeback(signals) {
+  const createdYear = yearFromIso(signals.created_at);
+  if (!createdYear) return false;
+  const ageYears = currentYear() - createdYear;
+  const totalStars = Number(signals.total_stars || signals.stars) || 0;
+  const periodStars = Number(signals.stars_in_period || signals.stars_today) || 0;
+  const relative = totalStars > 0 ? periodStars / totalStars : 0;
+  return ageYears >= 4 && totalStars >= 20000 && (periodStars < 800 || relative < 0.015);
+}
+
+function isRealNewProject(signals) {
+  const createdYear = yearFromIso(signals.created_at);
+  const ageYears = createdYear ? currentYear() - createdYear : null;
+  return Boolean(
+    isAiRelevant(signals)
+      && !isResourceProject(signals)
+      && !isOldComeback(signals)
+      && hasSubstantiveCode(signals)
+      && Number(signals.stars_in_period || signals.stars_today) >= 20
+      && (ageYears === null || ageYears <= 2 || heatQualityAxis(signals, []) >= 16),
+  );
+}
+
+function isAiRelevant(signals) {
+  const text = [
+    signals.repo,
+    signals.description,
+    signals.raw_readme,
+    ...(signals.topics || []),
+    ...(signals.key_files || []),
+  ].join("\n");
+  return Boolean(
+    signals.has_agents
+      || signals.has_mcp
+      || signals.has_skills
+      || signals.has_models
+      || AI_TERMS_RE.test(text),
+  );
+}
+
+function hasSubstantiveCode(signals) {
+  const language = (signals.language || "").trim().toLowerCase();
+  return Boolean(
+    language && language !== "none" && language !== "markdown"
+      && (hasArchitecturalDirs(signals) || hasAnyPackageFile(signals) || signals.has_install || signals.has_examples || signals.has_tests),
+  );
+}
+
+function noveltyAxis(signals, reasons) {
+  let score = 0;
+  const createdYear = yearFromIso(signals.created_at);
+  const ageYears = createdYear ? currentYear() - createdYear : null;
+  if (ageYears !== null && ageYears <= 1) {
+    score += 10;
+    reasons.push("novelty:new_repo");
+  } else if (ageYears !== null && ageYears <= 2) {
+    score += 6;
+    reasons.push("novelty:recent_repo");
+  }
+  const text = evidenceText(signals);
+  if (signals.has_agents || signals.has_mcp || /\b(coding agent|computer use|agent memory|multimodal|browser agent|local-first|rag|eval|benchmark)\b/i.test(text)) {
+    score += 10;
+    reasons.push("novelty:ai_builder_shape");
+  }
+  if (signals.has_tests || signals.has_examples || signals.has_docs) {
+    score += 4;
+    reasons.push("novelty:substantive_artifact");
+  }
+  return Math.min(25, score);
+}
+
+function heatQualityAxis(signals, reasons) {
+  let score = 0;
+  const periodStars = Number(signals.stars_in_period || signals.stars_today) || 0;
+  const createdYear = yearFromIso(signals.created_at);
+  const ageYears = createdYear ? Math.max(0.25, currentYear() - createdYear) : 1;
+  const velocity = periodStars / ageYears;
+  if (velocity >= 1000) score += 14;
+  else if (velocity >= 300) score += 11;
+  else if (velocity >= 100) score += 8;
+  else if (periodStars >= 20) score += 4;
+  if (periodStars > 0) reasons.push(`heat:stars_in_period=${periodStars}`);
+
+  const tabs = normalizedTabs(signals);
+  if (tabs.length >= 3) {
+    score += 10;
+    reasons.push("heat:daily_weekly_monthly_coverage");
+  } else if (tabs.length === 2) {
+    score += 6;
+    reasons.push("heat:multi_tab_coverage");
+  } else if (tabs.length === 1 && tabs[0] === "daily") {
+    score -= 5;
+    reasons.push("heat:daily_only_flash_penalty");
+  }
+  return Math.max(0, Math.min(25, score));
+}
+
+function endorsementAxis(signals, reasons) {
+  let score = 0;
+  if (hasMajorOrgEndorsement(signals)) {
+    score += 12;
+    reasons.push("endorsement:major_org");
+  }
+  if (hasArxivEndorsement(signals)) {
+    score += 12;
+    reasons.push("endorsement:arxiv");
+  }
+  if (signals.releases > 0) {
+    score += 3;
+    reasons.push("endorsement:release_signal");
+  }
+  return Math.min(25, score);
+}
+
+function tier3StrongSignals(signals) {
+  const out = [];
+  if (hasArxivEndorsement(signals)) out.push("tier3:strong_signal:arxiv");
+  if (hasMajorOrgEndorsement(signals)) out.push("tier3:strong_signal:major_org");
+  if (hasExplicitMethodNovelty(signals)) out.push("tier3:strong_signal:method_novelty");
+  if (hasSustainedHighVelocity(signals)) out.push("tier3:strong_signal:sustained_three_tab_velocity");
+  return out;
+}
+
+function hasArxivEndorsement(signals) {
+  if (ARXIV_RE.test(signals.homepage || "")) return true;
+  const text = [signals.raw_readme, signals.description].join("\n");
+  const arxivUrl = String.raw`(?:https?:\/\/)?(?:www\.)?arxiv\.org\/(?:abs|pdf)\/\d{4}\.\d{4,5}[^\s)"'<]*|arxiv:\s*\d{4}\.\d{4,5}`;
+  const paperLabel = String.raw`(?:paper|technical report|tech report|research report|publication)`;
+  return Boolean(
+    new RegExp(String.raw`\[[^\]]*\b${paperLabel}\b[^\]]*\]\([^)]*${arxivUrl}[^)]*\)`, "i").test(text)
+      || new RegExp(String.raw`<a\b[^>]*href=["'][^"']*${arxivUrl}[^"']*["'][^>]*>[^<]*\b${paperLabel}\b[^<]*<\/a>`, "i").test(text)
+      || new RegExp(String.raw`<a\b[^>]*href=["'][^"']*${arxivUrl}[^"']*["'][^>]*>[\s\S]{0,240}<(?:img|svg)\b[^>]*(?:alt|title)=["'][^"']*\barxiv\b[^"']*["']`, "i").test(text)
+  );
+}
+
+function hasMajorOrgEndorsement(signals) {
+  return (signals.owner_type || "").toLowerCase() === "org" && BIG_TECH_ORG_RE.test(signals.owner || "");
+}
+
+function hasExplicitMethodNovelty(signals) {
+  const text = [signals.description, signals.raw_readme].join("\n");
+  if (!/\b(novel|new method|new approach|new architecture|new algorithm|paper|state[-\s]?of[-\s]?the[-\s]?art|sota|benchmark)\b/i.test(text)) {
+    return false;
+  }
+  return /\b(tokenizer[-\s]?free|non[-\s]?autoregressive|self[-\s]?supervised|contrastive|diffusion|grpo|reinforcement learning|rl|agentic training|execution feedback|tree search|test[-\s]?time scaling|hybrid attention|mixture[-\s]?of[-\s]?experts|moe|world model|latent|reasoning model)\b/i.test(text);
+}
+
+function hasSustainedHighVelocity(signals) {
+  if (normalizedTabs(signals).length < 3) return false;
+  const periodStars = Number(signals.stars_in_period || signals.stars_today) || 0;
+  const ageDays = repoAgeDays(signals);
+  const starsPerDay = periodStars / Math.max(1, ageDays);
+  return periodStars >= 1500 || starsPerDay >= 25;
+}
+
+function isTier2Project({ signals, score, subscores }) {
+  if (score >= 89 && subscores.heat_quality >= 20 && subscores.novelty >= 16) return true;
+  if (score >= 85 && subscores.heat_quality >= 20 && hasArxivEndorsement(signals)) return true;
+  if (
+    score >= 76
+      && subscores.heat_quality >= 16
+      && subscores.novelty >= 14
+      && normalizedTabs(signals).length >= 2
+      && signals.has_install
+      && signals.has_examples
+      && signals.has_tests
+  ) {
+    return true;
+  }
+  return Boolean(
+    score >= 62
+      && subscores.novelty >= 14
+      && subscores.heat_quality >= 3
+      && signals.has_agents
+      && signals.has_mcp
+      && signals.has_skills
+      && signals.has_models
+      && signals.has_install
+      && signals.has_examples
+      && signals.has_tests,
+  );
+}
+
+function normalizedTabs(signals) {
+  return unique([
+    ...(signals.appears_in_tabs || []),
+    ...(signals.trend_sources || []).map(normalizeTab),
+  ].map(normalizeTab).filter(Boolean));
+}
+
+function normalizeTrendSource(value) {
+  const tab = normalizeTab(value);
+  return tab ? `github-trending:${tab}` : clean(value);
+}
+
+function normalizeTab(value) {
+  const raw = clean(value).toLowerCase();
+  if (raw.includes("daily")) return "daily";
+  if (raw.includes("weekly")) return "weekly";
+  if (raw.includes("monthly")) return "monthly";
+  return "";
+}
+
+function yearFromIso(value) {
+  const match = String(value || "").match(/^(\d{4})/);
+  return match ? Number(match[1]) : null;
+}
+
+function repoAgeDays(signals) {
+  const timestamp = Date.parse(signals.created_at || "");
+  if (!Number.isFinite(timestamp)) return 365;
+  const now = Date.now();
+  if (timestamp > now) return 1;
+  return Math.max(1, Math.ceil((now - timestamp) / 86400000));
+}
+
+function currentYear() {
+  return new Date().getUTCFullYear();
 }
 
 function weakDescriptionAiPoints(signals, reasons) {

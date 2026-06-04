@@ -54,6 +54,29 @@ export const OPEN_MODEL_OUTPUT_SCHEMA = {
     cost_caveats: "real cost/hardware/API caveats",
     sources: [{ name: "source name", url: "https://..." }],
   },
+  paradigm: {
+    tag: "[新模型 TierX｜open] or [更新｜open] or [变体·已归并]",
+    branch: "new_model|update|variant_merged",
+    access: "open",
+    tier: 0,
+    requiresHumanConfirmation: false,
+    template: "new_model_card|version_update|variant_merged",
+    card: {
+      "名称": "model name",
+      "厂商": "vendor",
+      "发布日": "YYYY-MM-DD or 官方未披露",
+      "开放度标签": "真开源可商用|有条件商用|仅研究|仅API闭源",
+      "类型": "基座|指令|多模态|推理",
+      "规模架构": "MoE 总参+激活参+context window",
+      "关键benchmark": [{ "名称": "GPQA Diamond", "分数": "...", "对手": "...", "标注": "自报|实测" }],
+      "强弱一句": "...",
+      "一句话定位": "...",
+      "许可证": { "名称": "license", "能否商用": "可商用|有条件商用，需核对许可证条款|不可商用或仅研究|官方未披露" },
+      "自托管硬件": "...",
+      "可用变体": ["..."],
+      "base_model": "...",
+    },
+  },
   analysisGeneratedAt: "YYYY-MM-DD or ISO",
   analysisAuthor: "model/pipeline author",
 };
@@ -87,12 +110,36 @@ export const CLOSED_MODEL_OUTPUT_SCHEMA = {
     limitations: "pricing/limits/edge cases from official notes only",
     sources: [{ name: "official changelog", url: "https://..." }],
   },
+  paradigm: {
+    tag: "[更新｜closed]",
+    branch: "update",
+    access: "closed",
+    template: "version_update",
+    update: {
+      "版本": "X→Y(YYYY-MM-DD)",
+      "变了什么": ["metrics/context/price/capability/license diff"],
+      "破坏性提醒": { "model string变更": "是|官方未披露", "旧版弃用": "是|官方未披露", "需迁移": "..." },
+      "值不值得切一句": "...",
+    },
+  },
   analysisGeneratedAt: "YYYY-MM-DD or ISO",
   analysisAuthor: "model/pipeline author",
 };
 
 const OPEN_SCHEMA_TEXT = JSON.stringify(OPEN_MODEL_OUTPUT_SCHEMA, null, 2);
 const CLOSED_SCHEMA_TEXT = JSON.stringify(CLOSED_MODEL_OUTPUT_SCHEMA, null, 2);
+
+const CANONICAL_PARADIGM_RULES = `
+Canonical docs/paradigms/models.md rules:
+- Branch 1 open-only dedupe: if base_model points elsewhere, name contains -GGUF/-AWQ/-GPTQ/-4bit/-8bit/-merge, or this is a third-party quant/finetune, output [变体·已归并], merge it into the canonical model's 可用变体 list, and stop.
+- Branch 2 classify against library records: closed new model_string or same-name capability announcement => [更新｜closed]; open same-family new repo or model-card revision => [更新｜open]; no same-family record => [新模型 TierX｜open/closed].
+- Branch 3 new models only: relevance gates + novelty/hotness/endorsement axes => Tier 0/1/2/3. Major/frontier releases are Tier3 [需人工确认] and should cross-link the tech report when available.
+- New-model card is fields-first: 名称/厂商/发布日/开放度标签/类型/规模架构/关键benchmark/强弱一句/一句话定位. Open must add 许可证(能否商用)/自托管硬件/可用变体/base_model. Closed must add 价格/知识截止/model string/速率/多模态I/O.
+- Update entry is diff-style: 版本X→Y(日期)/变了什么/破坏性提醒(model string变更/旧版弃用/需迁移)/值不值得切一句.
+- Every benchmark number must be tagged 自报 or 实测. Official/vendor numbers are 自报; third-party leaderboards/evals are 实测.
+- Open license must resolve to commercial-use status. Missing facts must be exactly "官方未披露".
+- Explain MoE/reasoning/context window in Chinese the first time they appear.
+`;
 
 export function openModelSystemPrompt() {
   return `${MODEL_READER_PERSONA}
@@ -108,7 +155,9 @@ export function openModelSystemPrompt() {
 - 只输出严格 JSON object,不要 markdown fence,不要注释,不要尾随逗号。
 
 输出必须匹配这个 JSON shape:
-${OPEN_SCHEMA_TEXT}`;
+${OPEN_SCHEMA_TEXT}
+
+${CANONICAL_PARADIGM_RULES}`;
 }
 
 export function closedModelSystemPrompt() {
@@ -125,7 +174,9 @@ export function closedModelSystemPrompt() {
 - 只输出严格 JSON object,不要 markdown fence,不要注释,不要尾随逗号。
 
 输出必须匹配这个 JSON shape:
-${CLOSED_SCHEMA_TEXT}`;
+${CLOSED_SCHEMA_TEXT}
+
+${CANONICAL_PARADIGM_RULES}`;
 }
 
 export function openModelUserPrompt({ model, fetched, goldStandard }) {

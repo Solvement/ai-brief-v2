@@ -1,9 +1,181 @@
 {
-  "generatedAt": "2026-06-02T03:41:39.783Z",
+  "generatedAt": "2026-06-04T04:05:46.368Z",
   "entity": "evidence-pack",
   "directory": "evidence-packs",
-  "count": 5,
+  "count": 43,
   "items": [
+    {
+      "id": "evidence-pack/9router-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "9router-evidence-pack",
+      "title": "9router — Evidence Pack",
+      "file": "evidence-packs/9router-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "9router",
+        "kind": "evidence-pack",
+        "title": "9router — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "9Router 是一个本地运行的 AI 路由器，把 Claude Code、Cursor 等编码工具接到 40+ 个免费/廉价模型，自动切换配额、压缩工具输出，让开发者不花一分钱也能不间断编码。",
+            "internal_logic": "### 代理环路（Agent Loop）\n9Router 并非传统意义上自主决策的代理，而是一个**请求代理**。环路为：\n\n**用户 CLI 工具（如 Claude Code）发送 API 请求 → 9Router 接收 → 根据模型名称和配置的路由规则选择实际提供商 → 可能执行令牌压缩（RTK）→ 转发请求并回传响应**。\n\n路由决策依赖内置的三层优先级：订阅配额未满则用第一层；配额耗尽切到廉价层；预算超限或不可用时自动落到免费层。**每一跳都保持 OpenAI 兼容格式**，CLI 工具无需感知后端模型变化。\n\n### 工具接口（Tool Interface）\n9Router 通过同一个 API 端点 `/v1` 暴露整个功能集：\n- **聊天补全（Chat Completions）**：OpenAI 格式，同时兼容 Anthropic 消息格式的自动转换。\n- **工具调用**：当 CLI 工具请求执行外部命令（如 `git diff`），返回的工具结果可被 RTK Token Saver 实时压缩，**剔除冗余输出**再送入模型。\n- **流式输出**：目录 `open-sse/` 暗示支持 SSE 流式传输，确保 IDE 内实时补全体验。\n\n每个请求都经过中间件，提取 `model` 字段映射到内部路由键，例如 `kr/claude-sonnet-4.5` 会被解释为“使用 Kiro 提供的 Claude 模型”。\n\n### 状态与记忆（State/Memory）\n状态管理分两层：\n- **配额统计**：每个提供商账户的 token 用量、剩余配额、重置周期会被持续跟踪，前端仪表盘可实时展示。未在 README/artifact 说明存储方式。\n- **认证令牌**：对于 OAuth 类提供商（Claude Code、Codex 等），9Router 自动刷新短期令牌，避免编码中途因令牌过期中断。令牌可能缓存在内存或本地数据库，未在 README 明确。\n\n历史会话状态仍由 CLI 工具本身维护，9Router 不参与多轮对话管理，仅透明转发。\n\n### 计划器（Planner）\n**无显式计划器**。路由决策是基于静态优先级链和实时配额数据的**规则引擎**。\n\n特殊情况：当某个提供商返回速率限制错误时，会触发**即时回退**，跳过当前层尝试下一个提供商。这种故障转移策略可视为一种简单反应式计划。\n\n### 沙箱（Sandbox）\n**无隔离沙箱**。9Router 作为本地网络服务运行，CLI 工具在同一主机上可直接访问。它不执行用户的代码或命令，只是 API 代理，因此安全风险主要来自：\n- 作为中间人接收所有 API 流量，若被入侵可能泄露凭证。\n- 本身可能存在代码漏洞，但项目采用 Next.js 框架，未在 README 说明安全审计。\n\n### 安全边界\n- **API 密钥管理**：仪表盘需手动输入或 OAuth 授权，密钥保存在本地（未说明加密方式），不传递到云端。\n- **开放端口**：默认 20128 端口仅监听本地回环（localhost），避免外部直接访问。生产环境中若绑定 0.0.0.0 需额外保护。\n- **日志与审计**：未在 README/artifact 说明是否记录请求内容，可能存在隐私风险。\n\n**结论**：安全性依赖本地部署和用户自行防护。",
+            "failure_mode": "免费提供商随时可能调整政策或下线（如 iFlow、Qwen 已在 2026 年停止免费层），导致部分路由失效",
+            "source_pointer": "https://github.com/decolua/9router"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/MIT/v0.4.63"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/9router-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/9router-repo]]"
+        ],
+        "metrics": [
+          "stars=16076",
+          "forks=2411",
+          "open_issues=619",
+          "latest_release=v0.4.63",
+          "pushed_at=2026-05-31T08:03:20Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "免费提供商随时可能调整政策或下线（如 iFlow、Qwen 已在 2026 年停止免费层），导致部分路由失效",
+          "作为本地代理，所有 API 流量经过 9Router，若服务本身被恶意篡改，可能泄露 OAuth 令牌或 API 密钥",
+          "令牌压缩（RTK）的具体算法未开源，可能存在隐藏成本或性能瓶颈",
+          "项目依赖大量第三方服务，维护 40+ 适配器的工作量大，长期兼容性存疑"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/decolua/9router"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/9router-main-claim]],官方 artifact 落库为 [[artifacts/9router-repo]]。See [[content/9router]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/9router-main-claim]],官方 artifact 落库为 [[artifacts/9router-repo]]。See [[content/9router]]。",
+      "links": [
+        {
+          "target": "claims/9router-main-claim",
+          "raw": "[[claims/9router-main-claim]]"
+        },
+        {
+          "target": "artifacts/9router-repo",
+          "raw": "[[artifacts/9router-repo]]"
+        },
+        {
+          "target": "claims/9router-main-claim",
+          "raw": "[[claims/9router-main-claim]]"
+        },
+        {
+          "target": "artifacts/9router-repo",
+          "raw": "[[artifacts/9router-repo]]"
+        },
+        {
+          "target": "content/9router",
+          "raw": "[[content/9router]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/academic-research-skills-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "academic-research-skills-evidence-pack",
+      "title": "academic-research-skills — Evidence Pack",
+      "file": "evidence-packs/academic-research-skills-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "academic-research-skills",
+        "kind": "evidence-pack",
+        "title": "academic-research-skills — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "学术研究全流程的 Claude Code 技能套件，覆盖从文献调研、写作、审稿到发表的完整学术流水线，强调人机协作而非全自动。",
+            "internal_logic": "### agent loop 与编排\n\nARS 的核心是一个 **10 阶段流水线编排器**，每个阶段可以看作一个 agent 的执行上下文。流水线支持从不同阶段中途进入（如直接从审稿阶段开始）。每个技能（Deep Research、Academic Paper、Reviewer）内部又包含多个模式，这些模式本质上是不同配置的 agent 协作循环。例如 **Deep Research 使用 13-agent 团队**，**Academic Paper 使用 12-agent 团队**，**Reviewer 使用 7-agent 团队**（主编+3位动态审稿人+魔鬼代言人）。agent 之间的交互通过项目上下文传递状态，由 Claude Code 的消息处理机制驱动。\n\n### tool interface（工具接口）\n\n技能主要通过 **Claude Code 的插件系统** 暴露为 `/ars-*` 命令，用户通过自然语言调用。此外，流水线内部使用了多种外部工具接口：\n- **Semantic Scholar API**：用于文献验证；\n- **Pandoc / tectonic**：用于格式转换与 PDF 编译；\n- **跨模型验证**（`ARS_CROSS_MODEL`）：可选的利用其他模型进行校验。\n\n工具调用遵循 Claude 的 function calling 规范，具体实现封装在 `agents/` 和 `skills/` 目录中。\n\n### state/memory（状态与记忆）\n\n状态管理体现在流水线的 **Material Passport（材料护照）** 和 **repro_lock（可复现锁）** 上。每一阶段产生的结果和元数据被记录为不可变快照，供后续阶段使用。**风格校准** 功能通过分析用户过往写作学习个人风格，这是一种长效记忆。`data_access_level` 元数据（raw/redacted/verified_only）为数据隔离提供状态标记，脚本 `check_data_access_level.py` 强制执行访问控制。\n\n### planner（规划器）\n\n规划能力通过 **Socratic guided mode（苏格拉底引导模式）** 和 **Plan mode** 提供，在与用户对话中构建论文大纲和章节结构。流水线本身充当高层次的计划执行器，动态调整后续阶段。\n\n### sandbox（沙箱）\n\n项目**未在 README/artifact 中说明显式的沙箱执行环境**。所有操作依赖 Claude Code 的运行环境，且建议启用 `Skip Permissions`（跳过权限）以提高自动化程度，这意味着没有严格的代码执行隔离。实验 agent 是独立的 `experiment-agent` 项目，也未提及其沙箱化。\n\n### safety（安全边界）\n\n安全边界主要体现在 **完整性门禁** 和 **伦理约束** 上：\n- **7-mode blocking checklist**：在阶段 2.5 和 4.5 对实现 bug、虚构结果、引用幻觉等失效模式进行阻断式检查。\n- **声明审计**（v3.8 引入 `ARS_CLAIM_AUDIT=1`）：通过获取引用源并判定声明是否被支持，新增 5 种 `HIGH-WARN` 类别，在输出前硬性阻断。\n- **只读约束**：审稿人技能要求对论文只读操作。\n- **反泄露协议**：防止数据污染（inspiration from PaperOrchestra）。\n- **人类在环**：所有输出均为协助性质，不代替人类做决策。\n\n### 关键模块\n\n- **`academic-pipeline`**：流水线编排与完整性门禁。\n- **`deep-research`**：多 agent 研究团队，支持系统综述、事实核查等。\n- **`academic-paper`**：写作智能体组，含风格校准、文本质量检测。\n- **`academic-paper-reviewer`**：多角色同行评审。\n- **`hooks`**：定义注入到 Claude Code 生命周期的钩子。\n- **`shared`**：通用模式与脚本，如数据访问级别检查。\n- **`evals`**：评估脚本与校准数据集。\n\n### 类似项目比较\n\n- **PaperOrchestra**（Google, 2026）：启发了 ARS 的 Semantic Scholar 验证、反泄露协议、VLM 图表验证、分数轨迹跟踪，但 ARS 作为 Claude Code 插件更贴近个人研究者的实际工作流。\n- **The AI Scientist**（Lu et al., 2026）：全自动研究流水线，ARS 将其失败模式清单整合为防御机制，并采取相反的“人机协作”哲学。",
+            "failure_mode": "项目高度耦合于 Claude Code 和 Anthropic API，切换基础模型成本高。",
+            "source_pointer": "https://github.com/imbad0202/academic-research-skills"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/NOASSERTION/v3.10.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/academic-research-skills-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/academic-research-skills-repo]]"
+        ],
+        "metrics": [
+          "stars=26581",
+          "forks=2190",
+          "open_issues=30",
+          "latest_release=v3.10.0",
+          "pushed_at=2026-06-03T11:08:27Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "项目高度耦合于 Claude Code 和 Anthropic API，切换基础模型成本高。",
+          "大规模语料级评估（corpus-scale evaluation）属于未来工作，当前自我校准的泛化能力未经验证。",
+          "流水线的可重复性声明实际上仅是配置记录，大模型输出不可字节再现，可能被误认为结果可复现。",
+          "无沙箱执行，若用户授权，agent 可能执行破坏性命令。",
+          "许可证为 CC BY-NC 4.0，禁止商业使用，限制部分场景下的集成。",
+          "依赖外部 API（Semantic Scholar）的可用性，无断开网络下的降级方案说明。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/imbad0202/academic-research-skills"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/academic-research-skills-main-claim]],官方 artifact 落库为 [[artifacts/academic-research-skills-repo]]。See [[content/academic-research-skills]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/academic-research-skills-main-claim]],官方 artifact 落库为 [[artifacts/academic-research-skills-repo]]。See [[content/academic-research-skills]]。",
+      "links": [
+        {
+          "target": "claims/academic-research-skills-main-claim",
+          "raw": "[[claims/academic-research-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/academic-research-skills-repo",
+          "raw": "[[artifacts/academic-research-skills-repo]]"
+        },
+        {
+          "target": "claims/academic-research-skills-main-claim",
+          "raw": "[[claims/academic-research-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/academic-research-skills-repo",
+          "raw": "[[artifacts/academic-research-skills-repo]]"
+        },
+        {
+          "target": "content/academic-research-skills",
+          "raw": "[[content/academic-research-skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
     {
       "id": "evidence-pack/agemem-evidence-pack",
       "type": "evidence-pack",
@@ -82,6 +254,268 @@
       "body": "\n## Notes\n\nEvidence extracted before synthesis (evidence-first). Benchmarks: ALFWorld, SciWorld, PDDL, BabyAI, HotpotQA (arxiv:2601.01885v2 §experiments).\n",
       "excerpt": "Evidence extracted before synthesis (evidence-first). Benchmarks: ALFWorld, SciWorld, PDDL, BabyAI, HotpotQA (arxiv:2601.01885v2 §experiments).",
       "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/agent-governance-toolkit-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "agent-governance-toolkit-evidence-pack",
+      "title": "agent-governance-toolkit — Evidence Pack",
+      "file": "evidence-packs/agent-governance-toolkit-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "agent-governance-toolkit",
+        "kind": "evidence-pack",
+        "title": "agent-governance-toolkit — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个针对 AI 智能体的策略执行、身份认证、沙箱与可靠性工程工具包，覆盖 OWASP 前十大智能体风险。",
+            "internal_logic": "### 策略执行引擎（Policy Engine）\n\nAGT 的核心是一个**确定性、无状态的策略决策引擎**。它不依赖 LLM 来判断一个操作是否安全，而是在代码层面拦截所有工具调用、消息发送或代理委托，根据预先定义的 YAML/OPA/Cedar 策略进行裁决。\n\n- **默认关闭（fail-closed）**：如果引擎未连接或异常，操作被默认拒绝，避免绕过。\n- **策略表达**：支持 YAML 声明式规则，如 `condition: \"action.type == 'delete'\"`，也支持程序化 API（`PolicyEvaluator`）。\n- **裁决结果**：允许、拒绝或要求人工审批。拒绝时会抛出 `GovernanceDenied` 异常。\n\n### 代理身份与信任（Agent Identity & Trust）\n\n在多代理系统中，共享 API 密钥导致难以审计。AGT 引入**零信任身份层**：\n\n- 使用 **SPIFFE/DID/mTLS** 为每个代理分配唯一身份，实现细粒度授权。\n- 即使代理共享底层凭证，也能通过身份区分其行为。\n- 结合信任评分（Trust Scoring）动态调整代理权限。\n\n### 执行沙箱（Execution Sandbox）\n\n`Agent Runtime` 提供**四层特权环**的沙箱机制，限制代理的代码执行、文件系统访问等。未在 README 中详细展开实现方式，但明确为可选模块。\n\n### 代理循环拦截点（Agent Loop Interception）\n\n`govern()` 函数提供最轻量的接入方式：用两行代码包装任意工具函数，每次调用自动进行策略检查。这种设计使得 AGT 可以嵌入任何现有的代理循环（如 LangChain、AutoGen 等），无需修改框架源码。\n\n### 审计与可观测性（Audit & Observability）\n\n- **防篡改日志**：记录每次决策的上下文，包括活跃策略、代理请求和裁决原因，用于合规审计。\n- **SRE 工具包**：提供 kill switch、SLO 监控、混沌测试，将代理视为生产服务对待。\n- **Governance Dashboard**：实时展示代理集群的健康、信任和合规状态。\n\n### MCP 安全网关\n\n针对 MCP（Model Context Protocol）生态的专项防护：\n- 检测工具中毒（Tool Poisoning）和隐藏指令（Hidden Instruction）。\n- 监控工具接口的漂移（Drift Monitoring），防止非预期变更。\n- 防范域名仿冒（Typosquatting）攻击。\n\n### 安全边界总结\n\nAGT 构建了一条**从提示到动作的完整防线**：\n1. **红队扫描** (`agt red-team`) 在开发阶段审计提示注入漏洞。\n2. **策略引擎** 在运行时对每个动作进行确定性裁决。\n3. **身份辨析** 确保责任到代理。\n4. **沙箱** 限制代理执行环境。\n5. **审计** 提供事后追溯能力。\n\n整个设计强调“只靠提示词约束是脆弱且不可靠的”，因此将安全控制下沉到应用代码层。",
+            "failure_mode": "项目处于 Public Preview 阶段，正式版（GA）可能有破坏性变更，用于生产需评估风险。",
+            "source_pointer": "https://github.com/microsoft/agent-governance-toolkit"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/MIT/v4.0.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/agent-governance-toolkit-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/agent-governance-toolkit-repo]]"
+        ],
+        "metrics": [
+          "stars=3872",
+          "forks=537",
+          "open_issues=38",
+          "latest_release=v4.0.0",
+          "pushed_at=2026-06-03T01:25:38Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "项目处于 Public Preview 阶段，正式版（GA）可能有破坏性变更，用于生产需评估风险。",
+          "策略编写依赖 YAML 和表达式语法，复杂策略可能难以维护和测试，团队需要学习成本。",
+          "虽然支持多语言，但完整功能栈目前仅在 Python 中提供，异构系统集成可能受限。",
+          "沙箱和信任层为可选模块，未默认开启，用户可能由于配置疏忽而暴露风险。",
+          "未在 README/artifact 说明性能开销（如策略评估延迟），高吞吐场景下可能成为瓶颈。"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/microsoft/agent-governance-toolkit"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agent-governance-toolkit-main-claim]],官方 artifact 落库为 [[artifacts/agent-governance-toolkit-repo]]。See [[content/agent-governance-toolkit]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agent-governance-toolkit-main-claim]],官方 artifact 落库为 [[artifacts/agent-governance-toolkit-repo]]。See [[content/agent-governance-toolkit]]。",
+      "links": [
+        {
+          "target": "claims/agent-governance-toolkit-main-claim",
+          "raw": "[[claims/agent-governance-toolkit-main-claim]]"
+        },
+        {
+          "target": "artifacts/agent-governance-toolkit-repo",
+          "raw": "[[artifacts/agent-governance-toolkit-repo]]"
+        },
+        {
+          "target": "claims/agent-governance-toolkit-main-claim",
+          "raw": "[[claims/agent-governance-toolkit-main-claim]]"
+        },
+        {
+          "target": "artifacts/agent-governance-toolkit-repo",
+          "raw": "[[artifacts/agent-governance-toolkit-repo]]"
+        },
+        {
+          "target": "content/agent-governance-toolkit",
+          "raw": "[[content/agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/agentmemory-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "agentmemory-evidence-pack",
+      "title": "agentmemory — Evidence Pack",
+      "file": "evidence-packs/agentmemory-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "agentmemory",
+        "kind": "evidence-pack",
+        "title": "agentmemory — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Agentmemory 是一个为 AI 编程代理（AI coding agent）提供持久记忆的服务器，基于 iii 引擎，通过 MCP（Model Context Protocol，模型上下文协议，一种让 AI 模型与外部工具通信的标准协议）或 HTTP 接入任何代理，使它们能记住项目上下文、决策和偏好，跨会话复用，避免重复解释。",
+            "internal_logic": "### 代理循环（Agent Loop）\n\nAgentmemory 本身**不是**一个代理，而是为外部 AI 编程代理提供记忆服务的后端。其代理循环完全由接入的代理（如 Claude Code、Cursor 等）自身管理。Agentmemory 在代理需要回忆历史信息时被调用（通过 MCP 工具或 HTTP API），将相关记忆片段注入代理的上下文窗口，从而影响代理的下一步决策。\n\n### 工具接口（Tool Interface）\n\n**MCP 服务器**：核心对外接口是一个 MCP 服务器，运行在 `:3111` 端口，暴露 **53 个 MCP 工具**。这些工具涵盖了记忆的存储、检索、更新、删除、摘要生成等操作。任何支持 MCP 的代理都可以通过配置接入，无需修改代理源码。\n\n**Hooks 系统**：提供了 **12 个自动钩子**，在代理生命周期内自动触发（如会话开始、消息发送前/后），用于异步捕获代理行为和注入记忆。\n\n**Skills 集成**：可通过 `npx skills add` 安装 8 个原生 skills，让代理“知道”何时该调用记忆工具。\n\n**REST API**：对于不支持 MCP 的代理（如 Aider），提供 REST API 直接调用。\n\n### 状态/记忆（State/Memory）\n\n**持久化存储**：默认使用嵌入式数据库（无外部依赖，根据 README“0 external DBs”推测为 SQLite），将代理会话中捕获的代码、决策、推理等信息存储为结构化记忆。\n\n**混合搜索**：采用 BM25（基于词频的全文搜索）与向量检索结合的混合搜索，在基准测试中取得高精度。\n\n**自动捕获**：代理执行任务时，Agentmemory 自动监听工具调用、文件变更、终端输出等，提取关键信息存入记忆，无需手动记录。\n\n**生命周期与置信度**：记忆条目带有置信度评分和生命周期管理，防止过时信息污染上下文。其设计扩展了 Karpathy 的 LLM Wiki 模式，加入了知识图谱（knowledge graph）。\n\n**多代理隔离**：通过 `AGENT_ID` 环境变量实现多代理间的记忆隔离，可选的 `AGENTMEMORY_AGENT_SCOPE=isolated` 提供更严格的过滤。\n\n### 规划器（Planner）\n\nAgentmemory 不包含显式规划器。它通过“记忆注入”影响代理的内部规划：当代理需要生成计划时，Agentmemory 提供历史相关记忆，帮助代理做出更准确的决策。这种机制可视为“记忆增强的规划”。\n\n### 沙箱（Sandbox）\n\nREADME 中提到“coding-agent-life-v1 (in-house corpus, sandbox-reproducible)”，表明项目提供了**可复现的沙箱环境**用于基准测试，但并未详细说明沙箱实现。推测可能是 Docker 容器或隔离的测试环境，用于模拟代理编程任务。\n\n### 安全边界（Safety）\n\n**代理隔离**：通过 `AGENT_ID` 隔离不同代理的记忆，避免数据混淆。\n\n**最小权限**：Agentmemory 作为 MCP 服务器运行时，仅与代理通信，不主动访问外部系统。\n\n**数据存储本地化**：所有记忆存储在本地文件系统中，无云端上传，减少数据泄露风险。\n\n**无外部数据库**：零外部依赖降低了攻击面。\n\nREADME 未提及更多安全措施（如加密、访问控制），安全部分可能尚在完善中。",
+            "failure_mode": "依赖 iii 引擎（github.com/iii-hq/iii），该引擎的成熟度和维护性未在 README 中说明，存在 bus factor 风险。",
+            "source_pointer": "https://github.com/rohitg00/agentmemory"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/true/Apache-2.0/v0.9.25"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/agentmemory-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/agentmemory-repo]]"
+        ],
+        "metrics": [
+          "stars=20791",
+          "forks=1712",
+          "open_issues=210",
+          "latest_release=v0.9.25",
+          "pushed_at=2026-06-02T23:35:02Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "依赖 iii 引擎（github.com/iii-hq/iii），该引擎的成熟度和维护性未在 README 中说明，存在 bus factor 风险。",
+          "项目仍处于早期版本（v0.9.x），API 可能不稳定，频繁更新可能导致集成代码需要调整。",
+          "性能基准基于自定义语料和公共数据集，但在真实大型项目上的表现未经验证。",
+          "仅以 npm 形式发布，对非 Node.js 生态的代理集成不便（需额外适配）。",
+          "安全特性（如加密、认证）在 README 中未详述，生产环境部署需谨慎评估。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/rohitg00/agentmemory"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agentmemory-main-claim]],官方 artifact 落库为 [[artifacts/agentmemory-repo]]。See [[content/agentmemory]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agentmemory-main-claim]],官方 artifact 落库为 [[artifacts/agentmemory-repo]]。See [[content/agentmemory]]。",
+      "links": [
+        {
+          "target": "claims/agentmemory-main-claim",
+          "raw": "[[claims/agentmemory-main-claim]]"
+        },
+        {
+          "target": "artifacts/agentmemory-repo",
+          "raw": "[[artifacts/agentmemory-repo]]"
+        },
+        {
+          "target": "claims/agentmemory-main-claim",
+          "raw": "[[claims/agentmemory-main-claim]]"
+        },
+        {
+          "target": "artifacts/agentmemory-repo",
+          "raw": "[[artifacts/agentmemory-repo]]"
+        },
+        {
+          "target": "content/agentmemory",
+          "raw": "[[content/agentmemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/ai-engineering-from-scratch-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "ai-engineering-from-scratch-evidence-pack",
+      "title": "ai-engineering-from-scratch — Evidence Pack",
+      "file": "evidence-packs/ai-engineering-from-scratch-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "ai-engineering-from-scratch",
+        "kind": "evidence-pack",
+        "title": "ai-engineering-from-scratch — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一套从数学基础到自主代理的完整 AI 工程课程，每节课都产出一个可复用的 Prompt、Skill、Agent 或 MCP Server，填补了「会用但不会造」的能力断层。",
+            "internal_logic": "### 课程体系统一教学框架（Agent Loop 融入教学流）\n\n课程通过 20 个递进阶段，将 **Agent Loop**、**Tool Interface** 等概念内嵌到每节课的「Build It / Use It / Ship It」节奏中。以下按 ** agent_framework ** 分诊拆解其体现的关键模块：\n\n#### 智能体主循环（Agent Loop）\n- **从零实现**：Phase 14 第 1 课给出纯 Python 的 `agent_loop.py`（~120 行，无依赖），使用 `history` 列表保存对话，循环调用 LLM，检测 `tool_calls` 并通过字典执行工具，达到最大步数则抛出异常。\n- **生产级使用**：产出 `outputs/skill-agent-loop.md`，将其封装为可复用的 ReAct 风格技能文件，可直接放入 Claude 等编辑器。\n\n#### 工具接口（Tool Interface）\n- **即字典映射**：工具以 `tools` 字典传入，键为函数名，值为可调用对象，通过 `call.name` 和 `call.args` 动态调用。这是最简单的工具注册模式。\n- **返回标准结果**：工具执行结果用 `tool_result(call.id, result)` 统一包装，保持消息历史一致性。\n\n#### 状态与记忆（State / Memory）\n- **会话级记忆**：Agent Loop 中仅使用 `history` 列表维护当前会话的消息链，未在 README 中体现长期记忆或向量存储。\n- **跨课程工件积累**：每节课输出的 Skill/Prompt/Agent/MCP 可视为一种“知识记忆”的持久化形式，供后续复用。\n\n#### 规划器（Planner）\n- **隐式规划**：当前 Agent Loop 示例采用 ReAct 模式，LLM 自行决定调用工具的顺序，没有独立规划模块。Phase 15/16 可能涉及更高级的规划与多代理协作，但 README 未详述。\n\n#### 沙箱与安全边界（Sandbox / Safety）\n- **安全关注**：Phase 18 专门讨论“伦理与对齐”，但 Agent Loop 内的权限控制、代码执行沙箱等安全边界在 README 中未见说明。\n\n#### 可观测性与调试\n- **调试 Prompt**：课程产出包含一个 `prompt-debug-agent.md`，指导 LLM 诊断代理运行轨迹。无独立日志或遥测体系。\n\n#### MCP 服务器集成\n- **从构建到交付**：Phase 13 讲授 MCP 协议，课程结束时产出可直接插入任何 MCP 客户端的服务器。这相当于将工具能力标准化，是 Agent 生态的关键连接器。",
+            "failure_mode": "课程声称 503 课，但部分阶段目录可能为空或内容不全（仓库有 51 个未关闭 Issue）。",
+            "source_pointer": "https://github.com/rohitg00/ai-engineering-from-scratch"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/MIT/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/ai-engineering-from-scratch-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/ai-engineering-from-scratch-repo]]"
+        ],
+        "metrics": [
+          "stars=27739",
+          "forks=4509",
+          "open_issues=51",
+          "latest_release=not_found",
+          "pushed_at=2026-06-03T00:12:38Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "课程声称 503 课，但部分阶段目录可能为空或内容不全（仓库有 51 个未关闭 Issue）。",
+          "无自动化测试覆盖，多语言实现的代码质量与正确性缺乏保障。",
+          "~320 小时的学习时长对在职人员压力较大，若中途放弃则易留下知识断层。",
+          "依赖外部 LLM API（如 OpenAI）进行部分练习，可能产生额外费用且受供应商限制。"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/rohitg00/ai-engineering-from-scratch"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ai-engineering-from-scratch-main-claim]],官方 artifact 落库为 [[artifacts/ai-engineering-from-scratch-repo]]。See [[content/ai-engineering-from-scratch]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ai-engineering-from-scratch-main-claim]],官方 artifact 落库为 [[artifacts/ai-engineering-from-scratch-repo]]。See [[content/ai-engineering-from-scratch]]。",
+      "links": [
+        {
+          "target": "claims/ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/ai-engineering-from-scratch-main-claim]]"
+        },
+        {
+          "target": "artifacts/ai-engineering-from-scratch-repo",
+          "raw": "[[artifacts/ai-engineering-from-scratch-repo]]"
+        },
+        {
+          "target": "claims/ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/ai-engineering-from-scratch-main-claim]]"
+        },
+        {
+          "target": "artifacts/ai-engineering-from-scratch-repo",
+          "raw": "[[artifacts/ai-engineering-from-scratch-repo]]"
+        },
+        {
+          "target": "content/ai-engineering-from-scratch",
+          "raw": "[[content/ai-engineering-from-scratch]]"
+        }
+      ],
       "headings": [
         {
           "depth": 2,
@@ -169,6 +603,1472 @@
         {
           "target": "content/ai-scientist-v2",
           "raw": "[[content/ai-scientist-v2]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/airllm-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "airllm-evidence-pack",
+      "title": "airllm — Evidence Pack",
+      "file": "evidence-packs/airllm-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "airllm",
+        "kind": "evidence-pack",
+        "title": "airllm — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "AirLLM 是一个内存优化的推理库，让 70B 大模型能在单张 4GB GPU 上运行，无需量化、蒸馏或剪枝，适合想在低端硬件上跑大模型的开发者。",
+            "internal_logic": "虽然 project_type 标签为 agent_framework，但 AirLLM 实质是模型推理优化库，不涉及 agent loop、tool 等概念。以下按推理优化视角拆解其核心机制。\n\n### 分层加载（Layer-wise Loading）\nAirLLM 将原始大模型按层拆分（decomposed and saved layer-wise），推理时仅将当前所需层加载到 GPU 显存，其余层保留在磁盘或 CPU，从而将峰值显存需求降低至单层大小（来源：README Quickstart 注意事项）。这是其在 4GB GPU 上运行 70B 模型的关键。\n\n### 块级量化压缩（Block-wise Quantization）\n压缩选项 `compression='4bit'` 或 `'8bit'` 启用块级量化，只压缩权重不压缩激活（来源：README Model Compression）。README 声称可实现高达 3 倍推理加速，精度损失几乎可忽略，并引用论文（arxiv:2212.09720）说明原理。需要安装 bitsandbytes 库。\n\n### 自动模型检测（AutoModel）\n从 airllm 导入的 AutoModel 会根据模型配置自动选择对应实现类，用户无需手动指定如 AirLLMLlama2 等具体类（来源：README v2.6 更新）。支持 Llama、ChatGLM、QWen、Baichuan、Mistral、InternLM 等在内的多种架构（来源：README Example notebooks）。\n\n### 预取与 I/O 重叠（Prefetching）\n配置参数 `prefetching` 默认开启，将模型加载与计算重叠执行，以隐藏 I/O 延迟。README 更新日志中 v2.5 声称该特性带来了 10% 的速度提升。目前仅 AirLLMLlama2 支持该功能。\n\n### 多平台支持\n通过简单安装即可在 Linux 和 MacOS（仅 Apple Silicon）上运行，MacOS 需要额外安装 mlx 和 torch（来源：README MacOS 小节）。v2.10.1 开始支持 CPU 推理。\n\n### 磁盘空间管理\n模型首次加载时会被拆分保存到磁盘，原始模型可能删除以节省空间（`delete_original=True`），且拆分过程对磁盘空间要求较高（来源：README FAQ #1）。",
+            "failure_mode": "依赖外部模型仓库 Hugging Face Hub，若服务中断或特定模型被下架，相关功能将不可用。",
+            "source_pointer": "https://github.com/lyogavin/airllm"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/true/Apache-2.0/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/airllm-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/airllm-repo]]"
+        ],
+        "metrics": [
+          "stars=18971",
+          "forks=2077",
+          "open_issues=159",
+          "latest_release=not_found",
+          "pushed_at=2026-03-10T11:42:34Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "依赖外部模型仓库 Hugging Face Hub，若服务中断或特定模型被下架，相关功能将不可用。",
+          "大模型拆分过程可能消耗大量磁盘空间（FAQ 中提到），若磁盘不足会导致运行失败。",
+          "块级量化压缩缺少独立验证的精度基准，可能在特定任务上有未预期的精度损失。",
+          "项目未提供自动化测试，代码质量难以保证，可能因依赖库升级引入 bug。",
+          "部分功能（如 prefetching）仅限特定模型架构，扩展性受限。"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found",
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/lyogavin/airllm"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/airllm-main-claim]],官方 artifact 落库为 [[artifacts/airllm-repo]]。See [[content/airllm]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/airllm-main-claim]],官方 artifact 落库为 [[artifacts/airllm-repo]]。See [[content/airllm]]。",
+      "links": [
+        {
+          "target": "claims/airllm-main-claim",
+          "raw": "[[claims/airllm-main-claim]]"
+        },
+        {
+          "target": "artifacts/airllm-repo",
+          "raw": "[[artifacts/airllm-repo]]"
+        },
+        {
+          "target": "claims/airllm-main-claim",
+          "raw": "[[claims/airllm-main-claim]]"
+        },
+        {
+          "target": "artifacts/airllm-repo",
+          "raw": "[[artifacts/airllm-repo]]"
+        },
+        {
+          "target": "content/airllm",
+          "raw": "[[content/airllm]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/aitoearn-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "aitoearn-evidence-pack",
+      "title": "AiToEarn — Evidence Pack",
+      "file": "evidence-packs/aitoearn-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "aitoearn",
+        "kind": "evidence-pack",
+        "title": "AiToEarn — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "帮助一人公司用 AI 自动化内容营销：创作、发布、互动、变现，覆盖抖音、小红书等十多个主流平台。",
+            "internal_logic": "### 整体架构\n\nAiToEarn 采用前后端分离 + 多 Agent 协同的架构，围绕**创作-发布-互动-变现**四大环节提供自动化能力。部署方式灵活，从 SaaS 网站到私有化 Docker、再到 MCP 集成，覆盖不同用户层次。\n\n**前端**\n- 基于 TypeScript 的 Web 应用 (`aitoearn-web`)，提供内容管理、发布排期、数据看板等界面。\n- 基于 Electron 的桌面客户端，利用本地资源（如 SQLite）实现更丰富的交互。\n- 浏览器插件负责在目标平台上执行自动化互动操作（点赞、评论抓取等）。\n\n**后端**\n- `aitoearn-server`：核心业务服务，处理发布任务、OAuth 授权、Relay 转发等。\n- `aitoearn-ai`：AI 服务，负责调用大模型进行内容生成、文案优化、视频/图片生成等。\n- 存储使用 MongoDB、Redis，配置通过环境变量或 `local.config.js` 注入。\n\n### Agent 循环与工具接口\n\n**Agent 定义**：项目将四大能力分别封装为 Agent（Monetize、Publish、Engage、Create），但 README 未描述统一的 Agent Loop 框架。可能的实现方式是每个 Agent 对应一组后台任务或 API 路由，通过事件驱动完成子任务。\n\n**工具接口**：\n- 各平台 API 被封装为发布/互动工具。\n- 浏览器插件通过注入脚本操作网页元素，实现自动化互动。\n- MCP 接口（`/api/unified/mcp`）允许外部 AI 助手（如 Claude）调用平台能力，相当于将 AiToEarn 暴露为工具集。\n\n**状态与记忆**：未在 README 说明。可能通过数据库存储任务状态、用户账号 Cookies、草稿历史等，但无具体持久化机制描述。\n\n**规划器**：未在 README 说明。从功能看，内容创作 Agent 可能接受用户指令后，依次调用生成模型、剪辑模块、发布工具，形成一个流程，但内部调度方式未知。\n\n### 沙盒与安全\n\n**沙盒**：未在 README 说明。\n**安全边界**：\n- API Key 用于所有 MCP/OpenClaw 接入的认证。\n- Relay 机制允许自部署用户借用官方凭证完成第三方平台 OAuth，避免直接暴露私密开发者密钥。\n- 浏览器插件可能运行在沙箱化的扩展脚本环境，但具体权限控制未提及。\n\n### 关键模块拆解\n\n**发布模块**\n- 统一发布队列，支持日历排期。\n- 通过 OAuth 或 Relay 代理完成平台授权，将内容 API 发起上传。\n- 视频、图文等素材由创作模块产出或用户上传。\n\n**创作模块**\n- 接入多种外部 AI 模型：文本生成、图片生成 (Nano Banana)、视频生成 (Grok, Veo, Seedance 等)。\n- 支持批量任务，可并行生成大量内容。\n- 内置视频翻译、剪辑等后期处理能力。\n\n**互动模块**\n- 浏览器插件监听用户操作，自动执行点赞、收藏、关注。\n- 调用大模型分析评论，自动生成回复，识别高转化信号。\n- 品牌监测可能通过爬取平台搜索结果或官方 API 实现，未详细说明。\n\n**变现模块**\n- 平台内部内容交易市场，支持 CPS、CPE、CPM 结算。\n- 创作者接取商家推广任务，发布指定内容。\n- 结算依赖播放量、互动量等平台数据，需平台 API 回传或插件采集。\n\n### 与同类项目对比\n\n- 相比 MoneyPrinterTurbo 等纯视频生成工具，AiToEarn 多了发布、互动和变现的完整闭环。\n- 相比 Sprout Social 等商业社媒管理平台，它开源、可私有化，且直接支持收益结算。\n- 缺点是高度依赖第三方平台，且内部 Agent 实现细节不透明，二次开发难度未知。\n\n### 部署与体验路径\n\n**最快体验**：访问 aitoearn.cn 或 aitoearn.ai，注册即可使用。\n**在 AI 助手中调用**：获取 API Key 后，在 Claude Desktop 或 Cursor 中配置 MCP 地址即可。\n**自部署**： `git clone + docker compose up -d` 一键启动，访问 localhost:8080。\n**开发调试**：进入 `project/aitoearn-backend` 手动启动多个 Node 服务，须先安装依赖、复制配置文件。",
+            "failure_mode": "严重依赖第三方社交媒体平台的 API 及 Web 结构，平台规则变更或封禁策略可能导致核心功能瘫痪。",
+            "source_pointer": "https://github.com/yikart/aitoearn"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/true/MIT/v2.4.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/aitoearn-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/aitoearn-repo]]"
+        ],
+        "metrics": [
+          "stars=17791",
+          "forks=2803",
+          "open_issues=20",
+          "latest_release=v2.4.0",
+          "pushed_at=2026-05-21T02:55:15Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "严重依赖第三方社交媒体平台的 API 及 Web 结构，平台规则变更或封禁策略可能导致核心功能瘫痪。",
+          "自部署版本需要额外配置 OAuth 开发者凭证或依赖官方 Relay，存在单点故障和隐私泄露风险。",
+          "官方内容交易市场和部分 AI 服务（如视频模型）可能要求使用云端服务，私有化部署者无法使用所有功能。",
+          "项目未提供系统级测试和详细架构文档，生产环境稳定性和可维护性存疑。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/yikart/aitoearn"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/aitoearn-main-claim]],官方 artifact 落库为 [[artifacts/aitoearn-repo]]。See [[content/aitoearn]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/aitoearn-main-claim]],官方 artifact 落库为 [[artifacts/aitoearn-repo]]。See [[content/aitoearn]]。",
+      "links": [
+        {
+          "target": "claims/aitoearn-main-claim",
+          "raw": "[[claims/aitoearn-main-claim]]"
+        },
+        {
+          "target": "artifacts/aitoearn-repo",
+          "raw": "[[artifacts/aitoearn-repo]]"
+        },
+        {
+          "target": "claims/aitoearn-main-claim",
+          "raw": "[[claims/aitoearn-main-claim]]"
+        },
+        {
+          "target": "artifacts/aitoearn-repo",
+          "raw": "[[artifacts/aitoearn-repo]]"
+        },
+        {
+          "target": "content/aitoearn",
+          "raw": "[[content/aitoearn]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/anthropic-cybersecurity-skills-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "anthropic-cybersecurity-skills-evidence-pack",
+      "title": "Anthropic-Cybersecurity-Skills — Evidence Pack",
+      "file": "evidence-packs/anthropic-cybersecurity-skills-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "anthropic-cybersecurity-skills",
+        "kind": "evidence-pack",
+        "title": "Anthropic-Cybersecurity-Skills — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个包含754个结构化网络安全技能的开源库，为AI代理提供类似高级分析师的实战流程，覆盖26个安全领域并映射到五大框架。",
+            "internal_logic": "### 技能结构：AI 代理的知识单元\n每个技能是一个目录，包含 SKILL.md、references/、scripts/、assets/。SKILL.md 使用 YAML frontmatter 定义元数据（名称、描述、域、标签、框架映射），然后 Markdown body 包含四个部分：**When to Use**（触发条件）、**Prerequisites**（先决条件）、**Workflow**（分步执行命令和决策点）、**Verification**（验证方法）。这种结构让代理能够像人类分析师一样跟随决策流程。\n\n### 渐进式披露：轻量扫描，按需加载\n设计核心：每个技能的 YAML frontmatter 约 30 token，代理可以一次性扫描全部 754 个技能而不会超出上下文窗口（~4k token 可扫描 130+ 个）。扫描时仅加载 frontmatter，匹配到相关技能后再加载完整的 Markdown 工作流（约 500-2000 token）。这类似于 RAG 中的两阶段检索，但专门为 agent 技能发现优化。\n\n### 框架映射：跨五大安全标准的统一语言\n每个技能在 YAML 中声明 `atlas_techniques`、`d3fend_techniques`、`nist_ai_rmf`、`nist_csf` 字段，并在 references/standards.md 中记录详细的 MITRE ATT&CK 技术映射。ATT&CK 映射已验证到 v19.1，确保现势性。这种映射让单个技能驱动多个合规需求，例如一条网络流量分析技能同时覆盖 ATT&CK T1071、NIST CSF DE.CM、ATLAS AML.T0047 等。\n\n### 代理集成：agentskills.io 标准与平台支持\n项目遵循 agentskills.io 开放标准，可通过 `npx skills add` 命令一键安装到兼容的代理平台（Claude Code、GitHub Copilot、OpenAI Codex CLI、Cursor 等）。这意味着不依赖特定 LLM 提供商，而是提供一个可移植的知识格式。代理使用技能的过程是：扫描 frontmatter → 匹配 → 加载完整工作流 → 执行 → 验证。\n\n### 安全边界与执行沙箱\nREADME 未明确说明执行环境的安全隔离。技能中的 Workflow 可能包含执行 Volatility3、PowerShell 等命令，但未提及沙箱或权限控制。在实际使用中，需要确保代理执行这些技能时的权限最小化，避免任意命令执行风险。项目未提供内置的沙箱机制，需要外部平台或人工监督。",
+            "failure_mode": "技能内容依赖社区贡献，质量可能参差不齐；MITRE 映射验证基于 Python 库，但工作流本身的准确性未经过安全审计。",
+            "source_pointer": "https://github.com/mukul975/anthropic-cybersecurity-skills"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/Apache-2.0/v1.2.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/anthropic-cybersecurity-skills-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/anthropic-cybersecurity-skills-repo]]"
+        ],
+        "metrics": [
+          "stars=13793",
+          "forks=1613",
+          "open_issues=14",
+          "latest_release=v1.2.0",
+          "pushed_at=2026-06-01T10:15:48Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "技能内容依赖社区贡献，质量可能参差不齐；MITRE 映射验证基于 Python 库，但工作流本身的准确性未经过安全审计。",
+          "技能 Workflow 可能包含危险的命令（如 Volatility3 插件），若代理自动执行，存在误操作风险。",
+          "未提供沙箱或安全执行环境，需要用户自行隔离。",
+          "未在 README 中说明技能更新频率，可能滞后于最新的攻击技术。",
+          "尽管映射到五大框架，但不同框架之间的关联可能过于宽泛，可能产生误报或无关提示。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/mukul975/anthropic-cybersecurity-skills"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/anthropic-cybersecurity-skills-main-claim]],官方 artifact 落库为 [[artifacts/anthropic-cybersecurity-skills-repo]]。See [[content/anthropic-cybersecurity-skills]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/anthropic-cybersecurity-skills-main-claim]],官方 artifact 落库为 [[artifacts/anthropic-cybersecurity-skills-repo]]。See [[content/anthropic-cybersecurity-skills]]。",
+      "links": [
+        {
+          "target": "claims/anthropic-cybersecurity-skills-main-claim",
+          "raw": "[[claims/anthropic-cybersecurity-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/anthropic-cybersecurity-skills-repo",
+          "raw": "[[artifacts/anthropic-cybersecurity-skills-repo]]"
+        },
+        {
+          "target": "claims/anthropic-cybersecurity-skills-main-claim",
+          "raw": "[[claims/anthropic-cybersecurity-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/anthropic-cybersecurity-skills-repo",
+          "raw": "[[artifacts/anthropic-cybersecurity-skills-repo]]"
+        },
+        {
+          "target": "content/anthropic-cybersecurity-skills",
+          "raw": "[[content/anthropic-cybersecurity-skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/cloakbrowser-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "cloakbrowser-evidence-pack",
+      "title": "CloakBrowser — Evidence Pack",
+      "file": "evidence-packs/cloakbrowser-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "cloakbrowser",
+        "kind": "evidence-pack",
+        "title": "CloakBrowser — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个在 C++ 源码级修改 Chromium 指纹的 stealth 浏览器，可无缝替换 Playwright/Puppeteer，专门针对反爬虫检测。",
+            "internal_logic": "### 如何服务 AI Agent\nCloakBrowser 本身不实现 agent 循环，但可作为被 AI agent 调用的浏览器工具。它暴露与 Playwright 完全一致的 API，agent 可直接使用 `page.goto()`、`page.click()` 等方法与网页交互。\n\n#### Agent Loop 集成\n- 外部 agent 在决策循环中调用 CloakBrowser 启动的浏览器实例，通过标准 Page 对象执行动作和获取页面状态。\n- 无内置计划或推理，仅为浏览器自动化提供隐身通道。\n\n#### Tool Interface\n- 通过 `launch()` 返回浏览器对象（Python/JS 均为 Playwright 的 Browser 类型），后续所有操作都通过该对象进行。\n- 支持常用配置：代理、有无头模式、`humanize=True` 等，全部通过参数传递。\n- 可加载 Chrome 扩展（`extension_paths`），实现更复杂的工具扩展。\n\n#### State & Memory\n- 支持 `launch_persistent_context()`，实现持久化用户数据目录（cookies、localStorage 等），跨 session 保留状态，绕过隐身模式检测。\n- 通过随机化指纹种子，每次启动产生不同的浏览器指纹，避免 session 关联。\n- 无共享内存或外部存储抽象。\n\n#### Planner\n未提供规划器。完全依赖外部 agent 或脚本控制流程。\n\n#### Sandbox\n- 浏览器进程本身是操作系统的进程沙盒，但 CloakBrowser 未额外增加隔离层。\n- 代理功能支持通过 HTTP/SOCKS5 代理，可配合网络隔离。\n- 无代码执行环境隔离。\n\n#### 安全边界\n- 核心安全机制是隐身而非访问控制。它隐藏自动化痕迹，但不防止被攻击或防护目标站点。\n- 预编译二进制通过 SHA-256 校验，但未公开构建过程或补丁源码，存在供应链信任风险。\n- 启用 `humanize` 和 `geoip` 时，会向外部服务发起网络请求以获取出口 IP 信息（ipify.org 等），可能暴露特征。",
+            "failure_mode": "预编译二进制未经源码审计，可能包含未声明的功能或漏洞。",
+            "source_pointer": "https://github.com/cloakhq/cloakbrowser"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/false/true/MIT/chromium-v146.0.7680.177.5"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/cloakbrowser-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/cloakbrowser-repo]]"
+        ],
+        "metrics": [
+          "stars=23578",
+          "forks=1873",
+          "open_issues=105",
+          "latest_release=chromium-v146.0.7680.177.5",
+          "pushed_at=2026-05-31T20:50:52Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "预编译二进制未经源码审计，可能包含未声明的功能或漏洞。",
+          "检测方可能采集 CloakBrowser 的独特指纹，进行针对性拦截。",
+          "依赖 Chromium 升级，补丁可能在新版本中出现兼容性或遗漏。",
+          "使用非自有代理或模拟人类行为可能违反目标网站服务条款。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/cloakhq/cloakbrowser"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/cloakbrowser-main-claim]],官方 artifact 落库为 [[artifacts/cloakbrowser-repo]]。See [[content/cloakbrowser]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/cloakbrowser-main-claim]],官方 artifact 落库为 [[artifacts/cloakbrowser-repo]]。See [[content/cloakbrowser]]。",
+      "links": [
+        {
+          "target": "claims/cloakbrowser-main-claim",
+          "raw": "[[claims/cloakbrowser-main-claim]]"
+        },
+        {
+          "target": "artifacts/cloakbrowser-repo",
+          "raw": "[[artifacts/cloakbrowser-repo]]"
+        },
+        {
+          "target": "claims/cloakbrowser-main-claim",
+          "raw": "[[claims/cloakbrowser-main-claim]]"
+        },
+        {
+          "target": "artifacts/cloakbrowser-repo",
+          "raw": "[[artifacts/cloakbrowser-repo]]"
+        },
+        {
+          "target": "content/cloakbrowser",
+          "raw": "[[content/cloakbrowser]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/codegraph-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "codegraph-evidence-pack",
+      "title": "codegraph — Evidence Pack",
+      "file": "evidence-packs/codegraph-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "codegraph",
+        "kind": "evidence-pack",
+        "title": "codegraph — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "给 Claude Code、Cursor 等编程 AI 助手配上一个离线的代码关系地图，让 AI 直接查地图找代码，而不是反复扫文件、搜字符串，省 token、省调用、完全本地跑。",
+            "internal_logic": "### 整体架构：预索引知识图谱 + MCP 工具接口\nCodeGraph 由两部分组成：一个本地索引引擎（解析代码生成符号关系图）和一个 MCP 服务器（暴露查询工具给 AI 助手）。两者共享同一个 SQLite 数据库，存放在项目 `.codegraph/` 目录下。AI 助手（如 Claude Code）启动时连接 MCP 服务器，之后所有代码探索都通过 `codegraph_explore` 等工具完成，无需直接读文件或 grep。\n\n#### Agent Loop\nCodeGraph 本身不控制 agent 的执行循环；循环由宿主 agent（Claude Code、Cursor 等）管理。CodeGraph 作为 MCP 服务器插入循环的“工具调用”环节：当 agent 需要理解代码结构时，调用 `codegraph_explore(question)`，获得预加工的答案（含相关符号、调用链、代码片段），然后直接输出给用户或继续推理。这种模式下 agent 的探索子任务大幅减少，通常一次工具调用便完成信息获取。\n\n#### Tool Interface\n通过 MCP 协议暴露的工具核心为**codegraph_explore**：接收自然语言问题，返回结构化的代码关系响应。此外还有 `codegraph_status` 用于检查索引状态。工具响应经过裁剪，会折叠冗余的重复实现，只返回签名，让 answer 大小与问题直接相关，而非与文件数量相关。所有工具均通过标准的 MCP JSON-RPC 交互，与具体模型无关。\n\n#### State/Memory\n状态完全存储在**本地 SQLite 数据库**中。索引过程解析代码生成符号表、调用图、路由映射等，入库。数据库随项目走（`.codegraph/`），可跨 agent 复用。同步机制保证一致性：\n- **文件监视器**（依靠 FSEvents/inotify/ReadDirectoryChangesW）捕获文件变更，经防抖（默认 2 秒）后触发增量索引。\n- **过时提醒**：当有文件待同步时，MCP 响应会插入警告 banner，引导 agent 直接读文件。\n- **连接时追赶**：每次 MCP 重连，会对工作树做快速校验（size、mtime、内容哈希），确保漏掉的编辑被补上。\n\n#### Planner\nCodeGraph 不包含规划组件，也没有内置的推理流程。它只是提供“知识检索”能力，由上层 AI 模型自行规划何时查询、如何组合多个查询。可以说，规划完全交给了 LLM。\n\n#### Sandbox\nCodeGraph 没有沙箱机制。它运行在用户的本地环境，直接访问文件系统，不限制 agent 的其他操作。\n\n#### 安全边界\nCodeGraph 的安全边界主要体现在**数据完全本地化**：不调用任何外部 API，不需要 API key，索引和查询都不离开本机。代码数据不会上传，风险仅来自 agent 本身的行为（但那是宿主 agent 的安全范畴）。此外，MCP 服务器仅监听本地接口，没有远程暴露。",
+            "failure_mode": "强依赖 MCP 协议，若未来 agent 生态转向其他标准则需适配。",
+            "source_pointer": "https://github.com/colbymchenry/codegraph"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/MIT/v0.9.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/codegraph-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/codegraph-repo]]"
+        ],
+        "metrics": [
+          "stars=38848",
+          "forks=2413",
+          "open_issues=191",
+          "latest_release=v0.9.9",
+          "pushed_at=2026-06-03T02:44:28Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "强依赖 MCP 协议，若未来 agent 生态转向其他标准则需适配。",
+          "语言和框架支持尚不完善，对于非主流语言或自定义语法可能无法索引。",
+          "初始索引对于超大型仓库（如几万文件）可能耗时较长，但 README 未给出具体数据。",
+          "自动同步依赖操作系统文件监视 API，在容器或沙箱环境内可能失效，需手动触发同步。",
+          "基准测试仅基于 Claude Opus 4.8 单模型，其他模型或 agent 的收益可能不同。",
+          "工具响应的“折叠冗余实现”策略可能漏掉 agent 需要的信息，导致额外查询。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/colbymchenry/codegraph"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/codegraph-main-claim]],官方 artifact 落库为 [[artifacts/codegraph-repo]]。See [[content/codegraph]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/codegraph-main-claim]],官方 artifact 落库为 [[artifacts/codegraph-repo]]。See [[content/codegraph]]。",
+      "links": [
+        {
+          "target": "claims/codegraph-main-claim",
+          "raw": "[[claims/codegraph-main-claim]]"
+        },
+        {
+          "target": "artifacts/codegraph-repo",
+          "raw": "[[artifacts/codegraph-repo]]"
+        },
+        {
+          "target": "claims/codegraph-main-claim",
+          "raw": "[[claims/codegraph-main-claim]]"
+        },
+        {
+          "target": "artifacts/codegraph-repo",
+          "raw": "[[artifacts/codegraph-repo]]"
+        },
+        {
+          "target": "content/codegraph",
+          "raw": "[[content/codegraph]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/codewhale-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "codewhale-evidence-pack",
+      "title": "CodeWhale — Evidence Pack",
+      "file": "evidence-packs/codewhale-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "codewhale",
+        "kind": "evidence-pack",
+        "title": "CodeWhale — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "终端里的 DeepSeek V4 编码智能体，通过宪法治理、自动模式和子代理并发，把模型从问答机升级成能独立完成任务的工程助手。",
+            "internal_logic": "### 代理循环 (Agent Loop)\n**用户输入→路由器（可选）→模型推理→工具调用→工具结果→继续推理→任务完成。** 引擎通过 `codewhale-tui` 异步运行，管理会话状态、轮次跟踪和持久任务队列。\n\n- **流式推理**：推理过程实时展示，工具结果流式反馈到上下文。\n- **LSP 诊断反馈**：每次编辑后自动运行 rust-analyzer、pyright 等，将错误作为纠正向量注入下一轮推理，实现自我纠正。\n- **回滚与快照**：每轮在仓库外创建 side-git 快照，提供 `/restore` 和 `revert_turn` 命令回退。\n\n### 工具接口 (Tool Interface)\n**类型化工具注册表**，包含 shell 命令、文件操作、git 操作、网络访问、子代理、MCP 协议、RLM 会话等。\n\n- **工具调用**：通过 OpenAI 兼容的 API 进行，结果流式返回并写入会话记录。\n- **子代理**：`agent_open` 非阻塞启动，并发执行（上限 20）；完成后注入 `subagent.done` 哨兵，附带摘要，需要时通过 `agent_eval` 获取完整内容。\n\n### 状态与记忆 (State/Memory)\n- **短期记忆**：会话上下文、工具输出、LSP 诊断信息。\n- **长期配置**：`~/.codewhale/config.toml` 存储 API 密钥和设置，支持多来源凭证。\n- **RLM 会话**：模型可通过递归查询，按需提取宪法中的信息，相当于开卷考试。\n- **快照与回滚**：side-git 提供版本化的工作区回溯。\n\n### 规划层 (Planner)\n**没有独立的规划模块**，但模型行为受「宪法」约束，而自动模式的路由选择具有规划色彩。\n\n- **宪法**：`prompts/base.md` 中的九级法律体系，明确指令优先级（用户意图>过期指令，验证>信心），本质是用静态策略树替代动态规划器。\n- **自动模式**：发送真正的推理请求前，用一个廉价的 Flash 调用（无思维）根据最近请求和上下文选择模型和思维层级，这是轻量级规划。\n\n### 沙箱与安全 (Sandbox & Safety)\n- **三种模式**：\n  - **Plan**：只读，无写入操作。\n  - **Agent**：破坏性操作需要用户审批。\n  - **YOLO**：受信工作区自动批准。\n- **系统沙箱**：macOS 使用 Seatbelt 主动限制；Linux 检测到 Landlock 但未强制执行；Windows 沙箱未实现。\n- **安全反馈**：非零退出码、类型错误、沙箱拒绝等作为纠正向量直接反馈给模型。\n\n### 子代理并发\n- **非阻塞启动**：`agent_open` 立即返回，子代理获得全新上下文和工具注册表独立运行。\n- **并发池**：引擎管理并发池（默认 10，可调至 20），无需轮询，完成时发送哨兵。\n- **可控摘要**：摘要包含发现、变更文件、风险，父代理无需额外工具调用即可集成。\n- **受限检索**：父代理通过 `handle_read` 按需获取子代理完整记录的切片、行范围或 JSONPath 投影，保持上下文精炼。\n\n### 自动模式 (Auto Mode)\n- **路由逻辑**：`--model auto` 为默认，每次发送前先用 Flash 调用判断任务复杂度，动态选择 `deepseek-v4-flash` 或 `deepseek-v4-pro`，以及思维模式 `off/high/max`。\n- **本地决策**：上游 API 永远收到具体模型和思维设置，成本按实际运行模型计算。路由失败时有本地回退启发式。",
+            "failure_mode": "深度绑定 DeepSeek 模型，切换其他模型需大量适配工作。",
+            "source_pointer": "https://github.com/hmbown/codewhale"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/MIT/v0.8.52"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/codewhale-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/codewhale-repo]]"
+        ],
+        "metrics": [
+          "stars=36842",
+          "forks=3170",
+          "open_issues=425",
+          "latest_release=v0.8.52",
+          "pushed_at=2026-06-03T10:44:42Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "深度绑定 DeepSeek 模型，切换其他模型需大量适配工作。",
+          "沙箱覆盖不全（Linux 未强制，Windows 未实现），可能被恶意代码突破。",
+          "宪法式 prompt 对模型指令遵循能力要求高，若模型能力下降可能失效。",
+          "子代理并发引入额外的状态管理和上下文污染风险，摘要丢失细节可能遗漏关键信息。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/hmbown/codewhale"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/codewhale-main-claim]],官方 artifact 落库为 [[artifacts/codewhale-repo]]。See [[content/codewhale]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/codewhale-main-claim]],官方 artifact 落库为 [[artifacts/codewhale-repo]]。See [[content/codewhale]]。",
+      "links": [
+        {
+          "target": "claims/codewhale-main-claim",
+          "raw": "[[claims/codewhale-main-claim]]"
+        },
+        {
+          "target": "artifacts/codewhale-repo",
+          "raw": "[[artifacts/codewhale-repo]]"
+        },
+        {
+          "target": "claims/codewhale-main-claim",
+          "raw": "[[claims/codewhale-main-claim]]"
+        },
+        {
+          "target": "artifacts/codewhale-repo",
+          "raw": "[[artifacts/codewhale-repo]]"
+        },
+        {
+          "target": "content/codewhale",
+          "raw": "[[content/codewhale]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/easy-vibe-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "easy-vibe-evidence-pack",
+      "title": "easy-vibe — Evidence Pack",
+      "file": "evidence-packs/easy-vibe-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "easy-vibe",
+        "kind": "evidence-pack",
+        "title": "easy-vibe — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个面向零基础到高级开发者的 AI 编程教学课程，通过分阶段的互动教程、可视化演示和真实案例，教你用自然语言「说」出应用。",
+            "internal_logic": "这是一个以 **Next.js 构建的文档教学站点**，而非可执行的 agent 框架，因此技术拆解重点在于其教学内容覆盖的概念和工程实践。\n\n### Agent Loop（教学中的代理循环）\n项目中 Stage 3 高级部分教授 Claude Code 的使用，**Agent Loop 体现为 “用户请求 -> LLM 规划 -> 执行代码/工具 -> 观察反馈 -> 迭代” 的对话式工作流**。教程通过实例引导用户用自然语言启动循环，并利用 MCP 和 Skills 扩展执行能力。\n\n### Tool Interface（工具接口）\n通过 **MCP（Model Context Protocol，模型上下文协议）和 Skills（自定义能力）** 教授如何让 AI 接入外部工具。教程指导集成支付（Stripe）、数据库、API 等，但未在仓库中提供具体工具接口代码。工具调用逻辑隐含在 Claude Code 等 IDE 产品的内部实现中。\n\n### State/Memory（状态与记忆）\n教学内容强调**长线任务（long-running tasks）和跨会话上下文**，通过 Spec Coding（规范编码）提前定义项目结构和约束，以此维持 agent 的状态一致性。但教程不涉及自定义记忆模块的实现，而是依赖 Claude Code 等工具的内置记忆管理。\n\n### Planner（规划器）\n在高级阶段，**Spec Coding 充当规划器**：用户在编码前用自然语言撰写详细的技术规范，AI 根据规范分步生成代码并自行检查。教程通过多个跨平台项目（Android/iOS/Web）演示如何制定计划并交由 agent 执行。\n\n### Sandbox（沙箱与安全边界）\n未在 README 或文档中明确说明安全沙箱机制。教学假设用户使用成熟的 AI IDE（如 Cursor、Trae、Claude Code），这些工具自身提供代码执行的安全边界。教程不涉及自定义沙箱实现。\n\n### 整体架构亮点\n- **文档与交互分离**：主站为静态文档，交互组件通过前端组件化加载（如 RAG 游戏化演示、Git 原理动画）。\n- **多语言工程**：采用 docs-readme 目录存放各语言翻译，构建时渲染为独立页面。\n- **AI 友好设计**：添加 `llms.txt` 文件，让 AI agents 能快速理解仓库结构并定位教程内容，这本身是一种与 agent 协作的工程实践。",
+            "failure_mode": "作为教学项目，仓库本身不包含可复用的 agent 框架代码，直接拿来即用的工程价值有限。",
+            "source_pointer": "https://github.com/datawhalechina/easy-vibe"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/not_found/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/easy-vibe-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/easy-vibe-repo]]"
+        ],
+        "metrics": [
+          "stars=15799",
+          "forks=1498",
+          "open_issues=14",
+          "latest_release=not_found",
+          "pushed_at=2026-06-03T05:40:18Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "作为教学项目，仓库本身不包含可复用的 agent 框架代码，直接拿来即用的工程价值有限。",
+          "高度依赖 Claude Code、Cursor 等外部工具，这些工具的更新可能使教程过时。",
+          "许可证为 CC BY-NC-SA 4.0，限制商业使用，若用于企业内部培训需注意授权。"
+        ],
+        "missing_details": [
+          "license_spdx_id: not_found",
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/datawhalechina/easy-vibe"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/easy-vibe-main-claim]],官方 artifact 落库为 [[artifacts/easy-vibe-repo]]。See [[content/easy-vibe]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/easy-vibe-main-claim]],官方 artifact 落库为 [[artifacts/easy-vibe-repo]]。See [[content/easy-vibe]]。",
+      "links": [
+        {
+          "target": "claims/easy-vibe-main-claim",
+          "raw": "[[claims/easy-vibe-main-claim]]"
+        },
+        {
+          "target": "artifacts/easy-vibe-repo",
+          "raw": "[[artifacts/easy-vibe-repo]]"
+        },
+        {
+          "target": "claims/easy-vibe-main-claim",
+          "raw": "[[claims/easy-vibe-main-claim]]"
+        },
+        {
+          "target": "artifacts/easy-vibe-repo",
+          "raw": "[[artifacts/easy-vibe-repo]]"
+        },
+        {
+          "target": "content/easy-vibe",
+          "raw": "[[content/easy-vibe]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/ecc-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "ecc-evidence-pack",
+      "title": "ECC — Evidence Pack",
+      "file": "evidence-packs/ecc-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "ecc",
+        "kind": "evidence-pack",
+        "title": "ECC — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一套横跨 Claude Code、Codex、Cursor 等多个 AI 编程助手的原生操作员系统，通过技能、本能、记忆与安全扫描提升 agentic 工作流的性能与一致性。",
+            "internal_logic": "### 与 AI 助手的交互枢纽：钩子 (Hooks)\n\nECC 并不重新发明 agent loop，而是通过**生命周期钩子**将自己的逻辑注入到宿主助手（harness）的运行中。每个钩子对应助手的不同阶段，例如 `SessionStart`（会话开始时触发）、`Stop`（会话结束时触发），从而在恰当的时刻做记忆持久化、安全检查、上下文加载等操作。钩子支持脚本化，可通过环境变量 `ECC_HOOK_PROFILE` 动态调整执行策略，无需修改代码即可切换 minimal/standard/strict 模式。\n\n### 可组装的工具接口：技能 (Skills) 与命令 (Commands)\n\n**技能 (Skills)** 是封装好的、可复用的任务逻辑，例如 `search-first`、`parallel-execution-optimizer`。它们被组织在 `skills/` 目录下，可通过助手的 slash 命令调用。技能之间可以串联，形成复杂工作流。\n\n**命令 (Commands)** 则是更细粒度的操作，直接映射到助手的命令系统，例如 `/harness-audit` 可对当前 harness 进行审计。命令背后可能是 shell 脚本或 Python 脚本，提供了跨 harness 的统一操作界面。\n\n### 状态与记忆：SQLite 状态存储与上下文上下文 (Contexts)\n\nECC 内置了一个 **SQLite 状态存储**，通过 `ecc status` 命令提供可查询的快照。此状态涵盖活跃会话、技能运行健康度、治理事件等，可将 Agent 的状态从“一次性”变为“可持续”。\n\n**记忆持久化** 通过钩子实现：当会话停止时，钩子自动将当前上下文摘要保存，下次会话开始时恢复，从而让助手跨会话“记住”之前的工作。\n\n**上下文 (Contexts)** 目录可能包含预置的上下文模板，用于指导助手的行为风格或领域知识。\n\n### 规划与质量门控：`quality-gate` 与本鞥 (Instincts)\n\nREADME 提到了 `/quality-gate` 命令，用于在流程中设置质量检查点。结合 `/loop-start` 和 `/loop-status`，可构建带验证的循环工作模式，类似于 agentic loop 中的规划-执行-验证循环。\n\n**本鞥 (Instincts)** 是一种快速参考模式，可能用于指导助手在某些情境下的优先反应，可以看作是一种轻量级规划偏好。\n\n### 安全边界：AgentShield 扫描\n\nECC 集成了 **AgentShield**，这是一个可独立安装的 npm 包，包含 1282 个测试验证的 102 条安全规则。通过 `/security-scan` 技能，可以直接在助手内执行代码安全扫描，及时发现漏洞、CVE 等风险。这构成了内联的安全审核屏障。\n\n### 跨 harness 适配层：MCP 配置与 Legacy Shims\n\n为了在不同助手间迁移，ECC 提供了 **MCP 配置**（模型上下文协议，一种连接外部工具的方法）和 **legacy command shims**（兼容旧命令的包装器）。这确保了技能和命令在 Claude Code、Codex CLI、Cursor 等多个环境中的兼容性。\n\n### 自我进化：持续学习 (Continuous Learning)\n\n系统能够从会话中自动提取模式，并转化为新的可复用技能，形成“使用→学习→增强”的飞轮。这依赖于钩子捕获的行为数据和模式识别机制，具体实现未在 README 详述。",
+            "failure_mode": "单维护者风险：README 明确强调由单个维护者负责，若其精力不济，项目可能停滞。",
+            "source_pointer": "https://github.com/affaan-m/ecc"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/true/MIT/v1.10.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/ecc-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/ecc-repo]]"
+        ],
+        "metrics": [
+          "stars=204159",
+          "forks=31317",
+          "open_issues=60",
+          "latest_release=v1.10.0",
+          "pushed_at=2026-06-02T11:51:04Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "单维护者风险：README 明确强调由单个维护者负责，若其精力不济，项目可能停滞。",
+          "依赖特定助手接口：钩子、命令等依赖 Claude Code、Cursor 等助手的内部机制，一旦这些助手 API 变更，ECC 可能出现大面积不兼容。",
+          "质量波动：海量技能和命令来自多数社区的贡献，可能存在未充分测试的组件，导致行为异常。",
+          "v2.0 为 alpha 阶段：新 Rust 控制面 (ecc2) 尚在 alpha，生产使用风险较高。",
+          "选择性安装的复杂性：manifest 驱动的选择性安装可能因组件间隐式依赖导致部分功能失效。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/affaan-m/ecc"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ecc-main-claim]],官方 artifact 落库为 [[artifacts/ecc-repo]]。See [[content/ecc]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ecc-main-claim]],官方 artifact 落库为 [[artifacts/ecc-repo]]。See [[content/ecc]]。",
+      "links": [
+        {
+          "target": "claims/ecc-main-claim",
+          "raw": "[[claims/ecc-main-claim]]"
+        },
+        {
+          "target": "artifacts/ecc-repo",
+          "raw": "[[artifacts/ecc-repo]]"
+        },
+        {
+          "target": "claims/ecc-main-claim",
+          "raw": "[[claims/ecc-main-claim]]"
+        },
+        {
+          "target": "artifacts/ecc-repo",
+          "raw": "[[artifacts/ecc-repo]]"
+        },
+        {
+          "target": "content/ecc",
+          "raw": "[[content/ecc]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/flowsint-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "flowsint-evidence-pack",
+      "title": "flowsint — Evidence Pack",
+      "file": "evidence-packs/flowsint-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "flowsint",
+        "kind": "evidence-pack",
+        "title": "flowsint — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "面向网络安全分析师的开源 OSINT 图谱调查平台，内置丰富的自动化数据丰富器（enrichers），用于探索实体间的关系。",
+            "internal_logic": "### 架构总览\nFlowsint 采用**前后端分离 + 模块化服务**的架构，通过消息队列连接数据流水线。核心模块从上到下分为：\n\n#### 前端（flowsint-app）\n- 使用 **TypeScript** 构建，提供现代 UI 和图谱交互。\n- 声明可流畅渲染**数千节点**（无卡顿），为大规模调查设计。\n- 通过 REST API 与后端通信，并订阅实时事件流。\n\n#### API 层（flowsint-api）\n- 基于 **FastAPI** 的 REST 服务，提供认证、用户管理、图谱查询等端点。\n- 集成 **Neo4j** 实时事件流，将调查结果推送给前端。\n- 仅定义路由和 schema，业务逻辑委托给 core。\n\n#### 核心协调器（flowsint-core）\n- **Orchestrator**：调查任务的调度中心，负责接收 API 请求并分配任务给 enricher。\n- **Celery tasks**：异步任务执行载体，enricher 的实际执行封装在 Celery worker 中。\n- **Vault**：安全管理 API 密钥、凭证等敏感信息。\n- **Base classes**：为 enricher 和工具定义统一的基类和接口。\n\n#### 丰富器引擎（flowsint-enrichers）\n- **可插拔的工具集合**，每个 enricher 是一个独立的模块，完成特定转换（例如 WHOIS 查询→注册信息）。\n- 现有 enricher 分类：\n  - 域名：子域名发现、DNS 解析、WHOIS、历史数据等。\n  - IP：地理定位、ASN 查询等。\n  - 社交媒体：Maigret 用户名搜索。\n  - 加密货币：钱包交易、NFT 查询等。\n  - 网站：爬虫、链接提取、追踪器识别等。\n  - 邮箱/电话/个人/组织等。\n- 所有 enricher 共享 flowsint-types 定义的数据模型，保证类型安全。\n\n#### 类型定义层（flowsint-types）\n- 使用 **Pydantic** 模型定义所有实体类型（Domain, IP, Email, Wallet 等），确保全栈类型一致。\n- 新增数据类型只需在此模块添加模型，自动传递到 enricher、API 和前端。\n\n#### 存储\n- **Neo4j**：图数据库，存储实体和关系，支撑图谱可视化。\n- **PostgreSQL**：存储用户、认证等关系型数据。\n\n### 调查流程（Agent Loop 类比）\n虽然未显式标注为 Agent，Flowsint 的调查流程具备典型 agent 模式：\n- **触发**：用户在前端界面添加一个实体（如域名）。\n- **任务分发**：API 调用 Orchestrator，Orchestrator 将该实体关联的 enricher 任务提交到 Celery 队列。\n- **工具执行**：各 enricher 作为 tools 独立运行，获取外部数据。\n- **状态更新**：结果写入 Neo4j 图，并触发事件通知前端。\n- **迭代**：前端展示新实体，用户可手动或自动对它们继续 enrichment，形成链式调查。\n- **记忆**：全部调查状态持久化在图数据库中，支持回溯和分享。\n\n### 安全边界与伦理约束\n- 内置认证，所有数据存储在本地，强调隐私。\n- `ETHICS.md` 明确禁止非法使用，声明只用于合法调查。\n- 环境变量 `.env.example` 管理第三方 API 密钥，生产部署需自行配置。\n\n### 相似项目比较\n未在 README/artifact 中提及具体对比项目。",
+            "failure_mode": "项目处于早期开发阶段，测试套件不完整，生产环境稳定性未知。",
+            "source_pointer": "https://github.com/reconurge/flowsint"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/Apache-2.0/v1.2.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/flowsint-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/flowsint-repo]]"
+        ],
+        "metrics": [
+          "stars=4812",
+          "forks=605",
+          "open_issues=43",
+          "latest_release=v1.2.9",
+          "pushed_at=2026-06-03T11:42:18Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "项目处于早期开发阶段，测试套件不完整，生产环境稳定性未知。",
+          "部署依赖 Docker 及多个数据库（Neo4j、PostgreSQL），维护成本较高。",
+          "伦理限制严格，若未正确配置或使用者无视指南，可能导致法律风险。",
+          "无内置的 Agentic Planner，大规模调查仍需人工决策，自动化程度有限。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/reconurge/flowsint"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/flowsint-main-claim]],官方 artifact 落库为 [[artifacts/flowsint-repo]]。See [[content/flowsint]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/flowsint-main-claim]],官方 artifact 落库为 [[artifacts/flowsint-repo]]。See [[content/flowsint]]。",
+      "links": [
+        {
+          "target": "claims/flowsint-main-claim",
+          "raw": "[[claims/flowsint-main-claim]]"
+        },
+        {
+          "target": "artifacts/flowsint-repo",
+          "raw": "[[artifacts/flowsint-repo]]"
+        },
+        {
+          "target": "claims/flowsint-main-claim",
+          "raw": "[[claims/flowsint-main-claim]]"
+        },
+        {
+          "target": "artifacts/flowsint-repo",
+          "raw": "[[artifacts/flowsint-repo]]"
+        },
+        {
+          "target": "content/flowsint",
+          "raw": "[[content/flowsint]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/funasr-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "funasr-evidence-pack",
+      "title": "FunASR — Evidence Pack",
+      "file": "evidence-packs/funasr-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "funasr",
+        "kind": "evidence-pack",
+        "title": "FunASR — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "FunASR 是一个端到端的工业级语音识别工具包，通过一行代码提供说话人分离、情感识别、流式转录和多语言支持，速度比 Whisper 快 170 倍。",
+            "internal_logic": "### 整体架构：流水线即代理工具\nFunASR 本身并非自循环代理，而是一个模块化语音处理工具箱，**通过 MCP 服务器和 OpenAI 兼容 API 变成外部代理可调用的工具**。内部采用**固定流水线**：语音活动检测 (VAD) → 语音识别 (ASR) → 标点恢复 → 说话人日志 → 情感识别，每个步骤由专门的模型完成。\n\n### Agent Loop：外部代理驱动，无内部自主循环\nFunASR 不实现自己的 agent loop。它**响应外部请求**，处理音频并返回结构化结果。对于流式场景，通过 WebSocket 持续接收音频块并实时输出，但决策逻辑仍由外部控制。\n\n### Tool Interface：双重接口让代理无缝接入\n- **OpenAI 兼容 API**：将语音识别包装为标准的 `/v1/audio/transcriptions` 端点，**任何支持 OpenAI 的工具都可直接调用**，适用于 LangChain、AutoGen 等框架。\n- **MCP 服务器**：提供专门的 MCP 协议服务器，使 Claude、Cursor 等代理能**发现并使用“语音转录”工具**，无需复杂集成。\n\n### State/Memory：轻量级流式缓存\n流式识别时，通过 `cache` 字典传递**分块状态**，例如 `model.generate(input=\"chunk.wav\", cache={}, chunk_size=[0, 10, 5])`。动态 VAD 自适应调整静音阈值，**在句子边界和长段分割之间平衡**。\n\n### Planner：自动模型选择与管线组合\n`AutoModel` 类扮演**简易规划器**：根据指定模型名（如 `\"paraformer-zh\"`）和可选 VAD、标点、说话人模型参数，**动态构建处理管道**。无需用户手动编排各步骤。\n\n### Sandbox & 安全边界：本地模型运行，远程代码信任风险\n所有模型在本地 Python 环境中运行，**推理本身无沙箱隔离**，依赖 PyTorch 和用户系统安全。启用 `trust_remote_code=True` 可加载 HuggingFace 上的模型代码，**这存在远程代码执行风险**，需要用户信任模型来源。API 模式下，项目提供了安全指南，需自行配置鉴权和速率限制。\n\n### 关键模块\n- **VAD (语音活动检测)**：fsmn-vad，仅 0.4M 参数，将长音频切分为语音片段。\n- **ASR 模型**：SenseVoice (234M, 带情感和声音事件)、Paraformer (220M, 非自回归，速度快)、Fun-ASR-Nano (800M, LLM 驱动)、Qwen3-ASR (1.7B, 52 语言)、GLM-ASR-Nano (1.5B)。\n- **标点恢复**：ct-punc (290M)，为识别文本加入标点。\n- **说话人日志**：cam++ (7.2M)，通过说话人嵌入区分。\n- **情感识别**：emotion2vec+large (300M)，识别高兴、悲伤、生气等情感。\n- **vLLM 加速**：为 LLM 类 ASR 模型提供 2-3 倍解码加速，支持 WebSocket 流式服务。",
+            "failure_mode": "模型精度在特定领域（如嘈杂环境、小众方言）可能下降，需根据场景评估。",
+            "source_pointer": "https://github.com/modelscope/funasr"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/MIT/v1.3.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/funasr-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/funasr-repo]]"
+        ],
+        "metrics": [
+          "stars=17029",
+          "forks=1735",
+          "open_issues=19",
+          "latest_release=v1.3.9",
+          "pushed_at=2026-05-30T16:19:19Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "模型精度在特定领域（如嘈杂环境、小众方言）可能下降，需根据场景评估。",
+          "多语言支持不均衡：50+ 语言中的低资源语言性能未经验证，可能不如主流语言。",
+          "Fun-ASR-Nano 等 LLM 模型使用 `trust_remote_code=True` 加载，存在远程代码执行风险，须审计模型文件。",
+          "OpenAI 兼容 API 默认无鉴权和速率限制，暴露于公网时需自行添加安全层。",
+          "高性能依赖 GPU，CPU 上仅小模型可实时，大模型延迟较高。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/modelscope/funasr"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/funasr-main-claim]],官方 artifact 落库为 [[artifacts/funasr-repo]]。See [[content/funasr]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/funasr-main-claim]],官方 artifact 落库为 [[artifacts/funasr-repo]]。See [[content/funasr]]。",
+      "links": [
+        {
+          "target": "claims/funasr-main-claim",
+          "raw": "[[claims/funasr-main-claim]]"
+        },
+        {
+          "target": "artifacts/funasr-repo",
+          "raw": "[[artifacts/funasr-repo]]"
+        },
+        {
+          "target": "claims/funasr-main-claim",
+          "raw": "[[claims/funasr-main-claim]]"
+        },
+        {
+          "target": "artifacts/funasr-repo",
+          "raw": "[[artifacts/funasr-repo]]"
+        },
+        {
+          "target": "content/funasr",
+          "raw": "[[content/funasr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/headroom-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "headroom-evidence-pack",
+      "title": "headroom — Evidence Pack",
+      "file": "evidence-packs/headroom-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "headroom",
+        "kind": "evidence-pack",
+        "title": "headroom — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个本地运行的上下文压缩中间件，在 AI 代理的提示、工具输出、日志、RAG 结果等进入 LLM 前将其压缩，减少 60‑95% 的 token 消耗，同时保持回答质量。",
+            "internal_logic": "### 嵌入开发流的位置\nHeadroom 作为 AI 代理与 LLM 之间的**透明压缩层**，不对现有代码做侵入性修改。它提供四种嵌入点：\n- **库模式**：在 Python/TypeScript 代码中直接调用 `compress(messages)`，嵌入在应用内部。\n- **代理包装模式**：通过 `headroom wrap <agent>` 命令直接拦截流行编码代理（Claude Code、Cursor、Aider 等）的请求。\n- **HTTP 代理模式**：启动 `headroom proxy --port 8787`，所有兼容 OpenAI 的客户端只需将 base URL 指向该代理即可获得压缩能力。\n- **MCP 服务器模式**：安装 MCP 工具后，任何 MCP 客户端可调用 `headroom_compress`、`headroom_retrieve` 等工具，将压缩能力嵌入到工具调用链中。\n\n### 命令入口\n所有功能通过统一的 CLI `headroom` 暴露：\n- **`headroom wrap`** — 包装一个代理（如 `claude`、`codex`、`cursor`），启动内部代理或管理配置。\n- **`headroom proxy`** — 启动 HTTP 压缩代理服务。\n- **`headroom mcp install`** — 注册 MCP 工具到客户端。\n- **`headroom stats`** — 查看已压缩的 token 数量及节省统计。\n- **`headroom learn`** — 分析失败会话，生成修复建议并写入项目的 `CLAUDE.md` / `AGENTS.md` 等文件。\n\n### 配置\n- 大部分行为通过**文档中的配置文件或环境变量**控制，但 README 未给出具体键值，仅提供指向完整文档的链接。\n- 安装时支持可选依赖分组：`[proxy]`、`[mcp]`、`[ml]`、`[agno]`、`[langchain]`、`[evals]`，可按需安装。\n- `headroom wrap` 支持传递 `--memory`、`--code-graph` 等选项，针对特定代理定制行为。\n\n### 插件 / 扩展\nHeadroom 内部采用**管道式可扩展架构**，提供多个扩展点：\n- **Pipeline Extensions**：通过 `on_pipeline_event(...)` 观察或自定义完整的请求生命周期。生命周期包含 Setup → Pre‑Start → Post‑Start → Input Received → Input Cached → Input Routed → Input Compressed → Input Remembered → Pre‑Send → Post‑Send → Response Received 十一个阶段。\n- **Compression Hooks**：在核心压缩环节之外设置的钩子，允许插入自定义逻辑。\n- **Proxy Extensions**：面向服务器/应用的集成接缝，可注册 ASGI 中间件、自定义路由和启动策略。\n- **Provider Slices**：`headroom/providers/` 目录下为不同代理（如 claude、copilot、codex）提供针对性的环境修正、API 目标规范化及后端选择，核心编排代码保持通用。\n\n### 错误处理\n**未在 README / artifact 中详细说明**。从架构推断：\n- 管道各阶段可抛出异常，可能通过 Pipeline Extensions 或生命周期钩子截获并处理。\n- 代理模式下的失败会被 `headroom learn` 捕获并分析，转化为纠正建议。\n- 但关于压缩失败降级、代理不可用重试、MCP 工具调用异常反馈等具体策略，README 未提供信息。",
+            "failure_mode": "压缩可能引入额外延迟，尤其在使用 Kompress‑base 等 ML 模型时，对实时性要求高的代理可能不适用。",
+            "source_pointer": "https://github.com/chopratejas/headroom"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/Apache-2.0/v0.22.4"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/headroom-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/headroom-repo]]"
+        ],
+        "metrics": [
+          "stars=5056",
+          "forks=387",
+          "open_issues=120",
+          "latest_release=v0.22.4",
+          "pushed_at=2026-06-02T00:08:41Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "压缩可能引入额外延迟，尤其在使用 Kompress‑base 等 ML 模型时，对实时性要求高的代理可能不适用。",
+          "某些敏感上下文被压缩后可能改变语义，虽然 CCR 可逆，但 LLM 可能不再主动检索原始细节，导致回答质量下降。",
+          "本地运行需要占用一定内存和 CPU，资源受限环境（如 CI 容器）可能无法使用。",
+          "跨代理内存的自动去重和共享逻辑若设计不当，可能造成隐私泄露或上下文混淆。",
+          "尚未在 README 中看到明确的错误降级策略和稳定性保证，生产使用前需要充分测试。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/chopratejas/headroom"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/headroom-main-claim]],官方 artifact 落库为 [[artifacts/headroom-repo]]。See [[content/headroom]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/headroom-main-claim]],官方 artifact 落库为 [[artifacts/headroom-repo]]。See [[content/headroom]]。",
+      "links": [
+        {
+          "target": "claims/headroom-main-claim",
+          "raw": "[[claims/headroom-main-claim]]"
+        },
+        {
+          "target": "artifacts/headroom-repo",
+          "raw": "[[artifacts/headroom-repo]]"
+        },
+        {
+          "target": "claims/headroom-main-claim",
+          "raw": "[[claims/headroom-main-claim]]"
+        },
+        {
+          "target": "artifacts/headroom-repo",
+          "raw": "[[artifacts/headroom-repo]]"
+        },
+        {
+          "target": "content/headroom",
+          "raw": "[[content/headroom]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/herdr-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "herdr-evidence-pack",
+      "title": "herdr — Evidence Pack",
+      "file": "evidence-packs/herdr-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "herdr",
+        "kind": "evidence-pack",
+        "title": "herdr — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个在终端里分屏管多个 AI 助手的小工具，能一眼看出谁在干活、谁卡住了、谁搞完了，还能随时断开重连不丢进度。",
+            "internal_logic": "### Agent Loop\n**Herdr 不实现代理循环**，它是一个终端多路复用器，包裹外部代理进程。代理（如 Claude Code、Codex）在 Herdr 分配的窗格中运行，其执行逻辑完全由代理自己控制。Herdr 通过监控进程名称和终端输出来推断代理状态（阻塞、工作中、完成等），**不干预代理的内部控制流**。因此，代理循环是外部代理的责任，Herdr 仅为它们提供一个可观察的运行时容器。\n\n### Tool Interface\nHerdr 提供**本地 Unix 套接字 API**，允许外部程序（包括 AI 代理）以编程方式操作 Herdr。通过套接字可以创建工作区、切分窗格、生成辅助进程、读取窗格输出以及等待状态变化。这构成了一个**工具接口**，使得代理能够自我编排，例如一个主代理可以启动子代理到不同窗格并监控它们。API 详情见 `SKILL.md` 和 `/docs/socket-api/`。\n\n### State / Memory\nHerdr 维护**会话状态**，支持**客户端分离和重连**。窗格进程在后台服务器中持续运行，即使终端客户端退出也不受影响。状态包含每个代理的**运行状态**（阻塞、工作中、完成、空闲），并在侧边栏中可视化。会话可以在服务器重启后恢复，并可选择性保留最近的屏幕历史。这些是**进程级状态**，不涉及对话记忆或代理内部数据。官方集成可以为支持的代理提供会话身份，以便在重启后恢复代理会话。\n\n### Planner\nHerdr **没有规划器**。它不自带任务分解或决策引擎。所有规划由在窗格中运行的代理自行完成。Herdr 的套接字 API 可能被外部规划器用于协调多代理工作流，但此功能不是内置的。\n\n### Sandbox\nHerdr **没有提供沙箱或隔离环境**。代理在用户的本地或远程主机上以相同权限运行，能够访问文件和网络。安全性依赖于用户对代理的信任。如果需要在受控环境中运行，必须结合 Docker 或虚拟机，这不是 Herdr 的范围。\n\n### Safety\n安全模型**极简**。代理可以执行任意命令，存在潜在破坏风险。没有内置的命令审批或权限控制。唯一的保护是用户可以在窗格中手动干预。许可证方面，使用 AGPL-3.0，可能对商业集成有合规要求，但提供商业许可证。\n\n### 与类似项目比较\n在 README 中，Herder 将自己与 **tmux** 和 **GUI 代理管理器** 进行了对比。tmux 提供持久会话但缺少代理感知；GUI 管理器显示代理状态但要求离开终端。Herder 是**唯一同时具备持久会话、原生终端支持和代理感知**的工具，特别适合习惯命令行工作流的工程师。",
+            "failure_mode": "启发式状态检测可能不可靠：依赖进程名和输出解析，若代理输出格式变化或自定义代理，检测可能失败或误报。",
+            "source_pointer": "https://github.com/ogulcancelik/herdr"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/NOASSERTION/v0.6.7"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/herdr-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/herdr-repo]]"
+        ],
+        "metrics": [
+          "stars=4012",
+          "forks=256",
+          "open_issues=23",
+          "latest_release=v0.6.7",
+          "pushed_at=2026-06-03T12:23:50Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "启发式状态检测可能不可靠：依赖进程名和输出解析，若代理输出格式变化或自定义代理，检测可能失败或误报。",
+          "实验性功能风险：`herdr update --handoff` 标记为实验，可能丢失窗格进程或导致会话崩溃。",
+          "无沙箱风险：代理拥有用户完整权限，若代理失误或被利用，可能造成文件损坏或安全漏洞。",
+          "依赖外部代理 CLI：每个受支持的代理需要单独维护集成，若第三方代理 CLI 改变接口，集成可能失效。",
+          "许可证限制：AGPL-3.0 可能阻碍闭源商业产品集成，但提供商业许可选项。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/ogulcancelik/herdr"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/herdr-main-claim]],官方 artifact 落库为 [[artifacts/herdr-repo]]。See [[content/herdr]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/herdr-main-claim]],官方 artifact 落库为 [[artifacts/herdr-repo]]。See [[content/herdr]]。",
+      "links": [
+        {
+          "target": "claims/herdr-main-claim",
+          "raw": "[[claims/herdr-main-claim]]"
+        },
+        {
+          "target": "artifacts/herdr-repo",
+          "raw": "[[artifacts/herdr-repo]]"
+        },
+        {
+          "target": "claims/herdr-main-claim",
+          "raw": "[[claims/herdr-main-claim]]"
+        },
+        {
+          "target": "artifacts/herdr-repo",
+          "raw": "[[artifacts/herdr-repo]]"
+        },
+        {
+          "target": "content/herdr",
+          "raw": "[[content/herdr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/hermes-agent-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "hermes-agent-evidence-pack",
+      "title": "hermes-agent — Evidence Pack",
+      "file": "evidence-packs/hermes-agent-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "hermes-agent",
+        "kind": "evidence-pack",
+        "title": "hermes-agent — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个支持自我学习、跨平台运行的 AI 助手，提供技能创建、记忆管理和多模型接入。",
+            "internal_logic": "### Agent Loop\nREADME 声称架构文档描述了 agent loop 和关键类（来源：README 文档表格 Architecture 行）。具体实现细节未在 README 中说明。\n\n### Tool Interface\nHermes 拥有超过 40 个工具（来源：README Tools & Toolsets），支持 toolset 系统并通过 MCP 集成扩展（来源：README MCP Integration）。工具可以通过 CLI 配置启用（`hermes tools`）。此外，终端后端提供本地、Docker、SSH、Singularity、Modal、Daytona 六种后端，实现运行环境隔离（来源：README Runs anywhere 部分）。\n\n示例：`hermes tools` 交互配置，`hermes config set` 设置项。\n\n### State / Memory\n仅有的 agent 包含内置学习循环：agent 从经验创建技能，在使用中改进技能，自我提醒持久化知识，搜索过去对话，建立用户模型（来源：README 开头描述）。具体机制：采用 FTS5 会话搜索和 LLM 摘要实现跨会话回忆，使用 Honcho 进行辩证用户建模（来源：README Closed learning loop 行）。技能存储在 `~/.hermes/skills/`，兼容 agentskills.io 标准（来源：README Skills System）。\n\n`/compress` 命令压缩上下文，`/usage` 查看用量。\n\n### Planner / Subagent Delegation\n可以生成独立的子代理进行并行工作流，并允许 Python 脚本通过 RPC 调用工具，将多步流程压缩为零上下文成本（来源：README Delegates and parallelizes 行）。具体 planner 机制未在 README 中说明。\n\n### Sandbox / Security\n安全措施包括命令审批、DM 配对、容器隔离（来源：README Security 文档行）。终端后端如 Docker、Daytona 等提供隔离环境。细节未在 README 中说明。\n\n### Research Tools\n提供批处理轨迹生成和轨迹压缩器，用于训练下一代工具调用模型（来源：README Research-ready 行）。\n\n### 主要命令速查\n`hermes` 启动交互，`hermes gateway start` 启动消息网关，`/model` 切换模型，`/skills` 浏览技能。\n\n### 安装与配置\n一键安装脚本处理 uv、Python 3.11、Node.js、ripgrep、ffmpeg 和 portable Git Bash（来源：README Quick Install）。`hermes setup --portal` 通过 OAuth 登录 Nous Portal，统一管理工具网关（来源：README Skip the API-key collection）。",
+            "failure_mode": "高度依赖多项第三方服务，任何一方变更都可能导致部分功能失效。",
+            "source_pointer": "https://github.com/nousresearch/hermes-agent"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v2026.5.29.2"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/hermes-agent-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/hermes-agent-repo]]"
+        ],
+        "metrics": [
+          "stars=179370",
+          "forks=30726",
+          "open_issues=17322",
+          "latest_release=v2026.5.29.2",
+          "pushed_at=2026-06-04T03:15:28Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "高度依赖多项第三方服务，任何一方变更都可能导致部分功能失效。",
+          "技能自动生成可能引入不安全行为，尽管有容器隔离，但细节不明。",
+          "CLI 工具执行可能带来主机安全风险，尤其在非隔离后端（如本地）运行时。",
+          "庞大的代码库和 17k+ open issues 暗示维护挑战，可能存在未解决的 bug。",
+          "README 中自我宣称“唯一”等营销语言可能夸大实际能力，学习闭环效果未经独立验证。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/nousresearch/hermes-agent"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hermes-agent-main-claim]],官方 artifact 落库为 [[artifacts/hermes-agent-repo]]。See [[content/hermes-agent]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hermes-agent-main-claim]],官方 artifact 落库为 [[artifacts/hermes-agent-repo]]。See [[content/hermes-agent]]。",
+      "links": [
+        {
+          "target": "claims/hermes-agent-main-claim",
+          "raw": "[[claims/hermes-agent-main-claim]]"
+        },
+        {
+          "target": "artifacts/hermes-agent-repo",
+          "raw": "[[artifacts/hermes-agent-repo]]"
+        },
+        {
+          "target": "claims/hermes-agent-main-claim",
+          "raw": "[[claims/hermes-agent-main-claim]]"
+        },
+        {
+          "target": "artifacts/hermes-agent-repo",
+          "raw": "[[artifacts/hermes-agent-repo]]"
+        },
+        {
+          "target": "content/hermes-agent",
+          "raw": "[[content/hermes-agent]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/hermes-desktop-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "hermes-desktop-evidence-pack",
+      "title": "hermes-desktop — Evidence Pack",
+      "file": "evidence-packs/hermes-desktop-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "hermes-desktop",
+        "kind": "evidence-pack",
+        "title": "hermes-desktop — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "为命令行AI代理 Hermes Agent 提供一键安装、配置和多功能桌面交互界面的 Electron 应用",
+            "internal_logic": "### 总览\n\nHermes Desktop 是一个 Electron 桌面应用，用于安装、配置并和 Hermes Agent 聊天。它不包含代理核心逻辑，而是作为前端壳层，通过 HTTP SSE 与本地或远程的 Hermes Agent 后端通信。整体设计遵循**胖客户端、瘦服务器**模式，将用户交互、会话管理、工具配置和消息网关等复杂功能都放在客户端实现。\n\n### 代理循环 (Agent Loop)\n\n代理循环本身运行在 Hermes Agent 后端，桌面应用不实现规划或执行逻辑。客户端通过向 `http://127.0.0.1:8642` （本地模式）或远程 URL 发送聊天请求，接收 SSE 流式响应，再渲染到界面上。因此，代理的推理、工具调用、自我改进等核心行为完全依赖于上游项目。\n\n#### 工具接口 (Tool Interface)\n\n桌面应用**管理工具的启用/禁用**，但不执行工具。界面中提供 14 类工具集（网页、浏览器、终端、文件、代码执行等）的开关，配置通过 Hermes Agent 的配置文件持久化。聊天时，工具调用的进度通过**实时流解析**渲染为 UI 指示器，让用户感知代理正在执行的操作。\n\n#### 状态与记忆 (State/Memory)\n\n- **会话状态**：使用 **better-sqlite3** 本地存储会话历史，并启用 **FTS5** 全文搜索，支持按日期分组浏览、恢复历史对话。\n- **用户记忆**：界面提供记忆条目查看、编辑、容量跟踪，并内置 6 个记忆后端（Honcho、Hindsight、Mem0 等）的发现和配置，记忆数据的实际存储和检索由后端和记忆服务商处理。\n- **配置文件**：在 `~/.hermes` 目录下管理多配置文件，通过 `Profiles` 功能实现环境隔离。\n\n#### 规划器 (Planner)\n\n未在 README 中说明任何显式规划机制。代理的任务规划能力可能作为后端的一个工具集（task planning）提供，桌面应用仅提供 UI 开关。\n\n#### 沙盒与安全边界 (Sandbox/Safety)\n\n未在 README 中提及沙盒或安全机制。应用本身是一个 Electron 容器，安全边界取决于底层操作系统和 Hermes Agent 的执行环境。源码审查可能发现沙盒策略，但基于 README 信息无法确认。\n\n### 架构拆解\n\n#### 多进程架构\n\n- **主进程**：管理 Hermes 安装生命周期、代理进程启停、本地后端连接、IPC 处理、系统托盘和自动更新。\n- **渲染进程**：React 19 界面，通过 IPC 与主进程通信，负责聊天 UI、设置页面、配置管理等。\n- **预加载脚本**：暴露安全的 API 桥接，进行 SSE 解析和令牌用量跟踪。\n\n#### 关键模块\n\n- **安装向导**：首次运行时检测环境，引导用户选择本地或远程模式，处理依赖安装（Git、uv、Python 3.11+）。\n- **会话管理**：SQLite 数据库存储所有对话，提供搜索和恢复功能。\n- **配置文件管理**：支持多配置文件，每个文件有独立的 Hermes 环境。\n- **供应商抽象层**：统一管理 11 个 LLM 供应商的配置和 API 密钥。\n- **计划任务引擎**：基于 cron 的任务构建器，支持 15 种交付目标。\n- **消息网关**：配置和切换 16 个消息平台集成，实现多平台代理交互。\n\n#### 开发与测试\n\n项目使用 Vite 7 + electron-vite 构建，配置了 ESLint、TypeScript 严格模式。测试用例覆盖 SSE 解析器、IPC 处理、安装器工具等，使用 Vitest 运行。",
+            "failure_mode": "项目重度依赖上游 Hermes Agent，若其 API 或配置方式变更，桌面应用可能无法工作。",
+            "source_pointer": "https://github.com/fathah/hermes-desktop"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/MIT/v0.5.5"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/hermes-desktop-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/hermes-desktop-repo]]"
+        ],
+        "metrics": [
+          "stars=9810",
+          "forks=1172",
+          "open_issues=248",
+          "latest_release=v0.5.5",
+          "pushed_at=2026-06-03T14:07:34Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "项目重度依赖上游 Hermes Agent，若其 API 或配置方式变更，桌面应用可能无法工作。",
+          "Windows 安装包未签名，Fedora RPM 无 GPG 签名，可能触发安全软件警告，影响分发。",
+          "处于早期阶段（v0.5.5），功能可能不稳定，公开 issues 248 个，表明存在较多未解决问题。",
+          "沙盒与安全边界未在文档中说明，存在潜在的本地运行风险。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/fathah/hermes-desktop"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hermes-desktop-main-claim]],官方 artifact 落库为 [[artifacts/hermes-desktop-repo]]。See [[content/hermes-desktop]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hermes-desktop-main-claim]],官方 artifact 落库为 [[artifacts/hermes-desktop-repo]]。See [[content/hermes-desktop]]。",
+      "links": [
+        {
+          "target": "claims/hermes-desktop-main-claim",
+          "raw": "[[claims/hermes-desktop-main-claim]]"
+        },
+        {
+          "target": "artifacts/hermes-desktop-repo",
+          "raw": "[[artifacts/hermes-desktop-repo]]"
+        },
+        {
+          "target": "claims/hermes-desktop-main-claim",
+          "raw": "[[claims/hermes-desktop-main-claim]]"
+        },
+        {
+          "target": "artifacts/hermes-desktop-repo",
+          "raw": "[[artifacts/hermes-desktop-repo]]"
+        },
+        {
+          "target": "content/hermes-desktop",
+          "raw": "[[content/hermes-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/hermes-webui-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "hermes-webui-evidence-pack",
+      "title": "hermes-webui — Evidence Pack",
+      "file": "evidence-packs/hermes-webui-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "hermes-webui",
+        "kind": "evidence-pack",
+        "title": "hermes-webui — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Hermes WebUI 是 Hermes Agent 的自托管 Web 界面，提供与 CLI 等价的三面板聊天-会话-工作区体验，无需额外配置即可使用现有 Agent 与模型。",
+            "internal_logic": "### 一句话判定\nHermes WebUI 是一个为 Hermes Agent 打造的自托管 Web 前端，实现了与 CLI 几乎 1:1 的特征对等，核心价值在于将具备持久记忆与自我学习能力的 Agent 体验无缝扩展到浏览器和移动端。\n\n### 解决的工程问题\n多数 AI 工具会话重置，缺乏对用户环境、项目规范和跨会话知识的长效记忆；同时，终端操作不便于随时随地访问，而现有 Web 界面或限于仪表板或需繁琐配置。Hermes WebUI 在解决这些问题的同时，保留了 Agent 的自主性和自进化能力，并避免绑定特定模型或云平台。\n\n### 为什么是现在\n自托管 AI Agent 从实验走向日常使用，用户需要更触手可及的界面以管理长期运行的代理进程；同时，对厂商锁定的担忧和对本地数据主权的要求上升，推动了对 agnostic 和 self-hosted 方案的需求。Hermes Agent 的成熟与社区增长（本项目已获 1.3 万星）使 WebUI 自然成为其“门面”。\n\n### 架构拆解\nHermes WebUI 是一个轻量级 Python 后端 + 原生 JavaScript 前端的组合体，无构建步骤、无框架、无打包器。后端主入口为 `server.py`，配合 `api/` 目录提供 REST 和 SSE 端点；前端位于 `static/`，采用三面板布局：左侧会话栏、中间聊天区、右侧工作区文件浏览器。模型、配置和代理状态通过底层 Hermes Agent 的直接调用或 CLI 桥接获得，会话数据复用 Hermes Agent 的 SQLite 存储。高级功能如 Gateway 支持的聊天和知识召回通过可选组件实现。\n\n- **Agent Loop**：循环由 Hermes Agent 本身实现，WebUI 仅负责展示和用户交互，包括流式 SSE 推送、工具调用卡片、子代理代理卡片等。\n- **Tool Interface**：工具调用由 Hermes Agent 输出，WebUI 将其渲染为可展开/折叠的卡片，显示工具名、参数和结果片段；对危险 shell 命令提供批准卡（允许一次/会话/始终/拒绝）。\n- **State / Memory**：用户画像、项目上下文、工作区文件状态和技能全部由 Hermes Agent 持久化，WebUI 通过 CLI 会话桥接从 SQLite 导入历史，保持状态一致。\n- **Planner**：规划完全交由 Hermes Agent 内部逻辑，WebUI 不做干预；子代理编排功能通过 Agent 之间的消息传递实现，不在 WebUI 层。\n- **Sandbox / 安全**：执行环境即宿主机，危险命令通过 UI 审批卡阻断；文件附件存储在工作区外默认位置，支持环境变量覆盖；访问控制通过 SSH 隧道或可选的密码保护。\n\n### 关键模块\n- **server.py / api/**：处理聊天消息、会话操作、工作区访问和配置读取的 HTTP/S SE 服务层。\n- **static/**：原生 JS 实现的三面板交互、SSE 客户端、语音输入（Web Speech API）、Mermaid 渲染、代码高亮等。\n- **bootstrap.py**：自动检测 Hermes Agent 并安装、创建 Python 环境、启动服务的一键引导脚本。\n- **ctl.sh**：守护进程管理脚本，封装 start/stop/status/logs 等命令，适合自托管 VM 场景。\n- **mcp_server.py**：可选的 MCP 服务器，提供标准化的代理通信接口（未在 README 详细说明）。\n- **docker-compose.yml / Dockerfile**：提供单容器和多容器部署方案。\n\n### 相似项目对比\nHermes 对比 OpenClaw、Claude Code、Codex CLI、OpenCode 的关键差异点在于：自动持久记忆（非仅项目级）、自学习技能（非市场/插件)、原生 Python 生态、自托管调度和 10+ 消息平台接入。Claude Code 无全自动跨会话记忆，OpenClaw 具有类似能力但技能系统依赖社区市场且稳定性不如 Hermes。整体上 Hermes 在自主性、可运行性和生态友好性上更优。\n\n### 部署与试用路径\n- **快速启动**：`git clone` 后运行 `python3 bootstrap.py`，脚本会检测并安装 Hermes Agent，启动服务并在浏览器打开；或使用 `./start.sh`。\n- **守护进程模式**：`./ctl.sh start` 后台运行，PID 写入 `~/.hermes/webui.pid`，日志在 `~/.hermes/webui.log`。\n- **Docker**：提供 `docker-compose.yml`，可单容器或三容器启动。\n- **远程访问**：通过 SSH 隧道或 Tailscale 等实现，README 有详细说明。\n\n### 风险与限制\n- **对 Hermes Agent 强依赖**：WebUI 自身不实现任何 Agent 逻辑，功能上限受 Hermes Agent 限制；若 Hermes Agent 缺少某项能力，WebUI 无法补足。\n- **平台限制**：官方引导脚本不支持原生 Windows，社区方案有路径和工具不匹配问题。\n- **安全问题**：作为 Web 界面，若直接暴露在公网而未经 SSH 隧道或密码保护，可能被未授权访问；危险命令审批依赖前端提示，无法完全杜绝误操作。\n- **版本同步**：WebUI 需跟上 Hermes Agent 的更新，若 Agent 接口变动可能导致 UI 部分功能异常。\n\n### 我能学到什么\n- 如何设计一个与 CLI 对等的 Agent Web UI，包括流式 SSE 渲染、上下文用量指示、工具调用卡片等交互模式。\n- 通过自托管守护进程管理（ctl.sh）实现生产级部署的模式。\n- MCP 服务器集成方法，可作为 Agent 间互操作的桥梁。\n- 持久会话和跨平台消息推送的架构思想，可迁移到其他 AI 应用。\n\n### 简历/项目亮点\n- \"主导设计并实现了 Hermes Agent 的全功能 Web 界面，采用无框架原生 JS 和 Python 后端，达到与 CLI 近 1:1 功能对等，社区获得 1.3 万星。\"\n- 可围绕以下点展开：如何通过 SSE 和轻量 API 实现与外部 Agent 进程的高效通信，如何处理工具调用卡片的复杂 UI 状态，会话管理的 SQLite 桥接技巧等。\n\n### 60 秒面试推销语\n\"Hermes WebUI 是一个自托管的 Agent Web 界面，它把具备记忆和自学习能力的 Hermes Agent 搬到了浏览器和手机上。我用 Python 和原生 JS 复刻了全部 CLI 功能，包括聊天、会话管理、工作区浏览和配置文件切换。项目只需一个引导脚本就能跑起来，无需额外配置。它在自托管 AI 领域对比 OpenClaw 等竞品有显著优势，尤其在技能自主生成和 Python 生态上。目前已获超 1.3 万星，成为同类最受欢迎的开源解决方案之一。\"\n\n### 是否能成为我的项目或 Playbook\n完全可以。这个项目是一个极好的 Agent UI 参考实现，可以 Fork 后定制主题、布局和集成方式；同时其会话管理、SSE 流式交互、工作区文件浏览等模块可抽象为可重用模式库，用作其他 Agent 前端的基础。",
+            "failure_mode": "功能完全依赖 Hermes Agent，WebUI 本身不实现 Agent 循环，若 Agent 进展缓慢或方向调整，WebUI 可能失去价值。",
+            "source_pointer": "https://github.com/nesquena/hermes-webui"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v0.51.230"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/hermes-webui-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/hermes-webui-repo]]"
+        ],
+        "metrics": [
+          "stars=12938",
+          "forks=1579",
+          "open_issues=240",
+          "latest_release=v0.51.230",
+          "pushed_at=2026-06-03T05:48:40Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "功能完全依赖 Hermes Agent，WebUI 本身不实现 Agent 循环，若 Agent 进展缓慢或方向调整，WebUI 可能失去价值。",
+          "官方不支持 Windows 引导，社区方案存在路径兼容和工具限制，可能影响部分用户群采用。",
+          "直接暴露 Web 接口有安全风险，依赖用户正确配置 SSH 隧道或密码，否则可能造成 Agent 误操作。",
+          "Hermes Agent 与 WebUI 版本可能脱节，维护成本高，需要持续跟随上游变更。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/nesquena/hermes-webui"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hermes-webui-main-claim]],官方 artifact 落库为 [[artifacts/hermes-webui-repo]]。See [[content/hermes-webui]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hermes-webui-main-claim]],官方 artifact 落库为 [[artifacts/hermes-webui-repo]]。See [[content/hermes-webui]]。",
+      "links": [
+        {
+          "target": "claims/hermes-webui-main-claim",
+          "raw": "[[claims/hermes-webui-main-claim]]"
+        },
+        {
+          "target": "artifacts/hermes-webui-repo",
+          "raw": "[[artifacts/hermes-webui-repo]]"
+        },
+        {
+          "target": "claims/hermes-webui-main-claim",
+          "raw": "[[claims/hermes-webui-main-claim]]"
+        },
+        {
+          "target": "artifacts/hermes-webui-repo",
+          "raw": "[[artifacts/hermes-webui-repo]]"
+        },
+        {
+          "target": "content/hermes-webui",
+          "raw": "[[content/hermes-webui]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/iii-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "iii-evidence-pack",
+      "title": "iii — Evidence Pack",
+      "file": "evidence-packs/iii-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "iii",
+        "kind": "evidence-pack",
+        "title": "iii — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "iii 是一个让后端服务像搭积木一样实时组合、扩展和观测的框架，每个服务都是一个可被即时发现和调用的 Worker",
+            "internal_logic": "### 代理循环（Agent Loop）\n\n**未在 README/artifact 说明**代理循环的具体实现步骤（例如感知、规划、行动、观察）。README 仅描述“当任务需要某个系统尚不具备的能力时，代理可以添加 Worker、发现其函数、调用并追踪过程”，表明代理具备运行时扩展能力，但决策、工具选择、多步执行的内部机制未暴露。\n\n### 工具接口（Tool Interface）\n\n**工具即函数**：Worker 内部注册的函数（Function）即为可调用单元。每个函数有稳定标识符（如 `content::classify`），可被其他 Worker 或代理直接调用。工具接口通过 iii 引擎统一完成路由、序列化和传递，无需额外适配层。\n\n**动态发现**：加入实时目录（live catalog）后，新 Worker 及其函数立即被所有已注册 Worker 知晓并可调用，代理可利用同一目录发现可用工具。\n\n### 状态/记忆（State/Memory）\n\n**未在 README/artifact 说明** iii 是否提供内建的状态存储或记忆持久化机制。README 将“状态”列为一种触发器类型（状态变化触发函数），并提及控制台可查看实时状态，但未说明状态的存储位置、生命周期或跨调用持久化策略。\n\n### 规划器（Planner）\n\n**未在 README/artifact 说明** 代理是否包含专门的规划模块。READM 仅强调代理可以通过添加 Worker 来动态获得新能力，暗示其能自行决定何时需要扩展，但规划算法或链式推理细节未提及。\n\n### 沙箱（Sandbox）\n\n**可安装沙箱 Worker**：通过 `iii worker add sandbox` 可将沙箱能力引入系统。README 未描述该 Worker 的实现细节，仅将其列为与队列、代理并列的可添加组件，推测沙箱提供隔离代码执行环境，但安全边界与资源限制未说明。\n\n### 安全边界（Safety）\n\n**未在 README/artifact 说明** 完整的安全模型，如函数权限控制、Worker 间隔离、调用认证、敏感数据处理等。仅能从架构推测每个 Worker 是独立进程，通过引擎注册后通信，但未看到明确的访问控制策略。\n\n### 可观测性\n\n**统一追踪**：所有调用链路可追踪。无论是直接调用、HTTP 触发还是队列消费，iii 自动记录追踪信息，开发者可通过控制台查看。\n\n**实时控制台**：iii-console 提供 Workers、Functions、Triggers、队列、追踪、日志和实时状态的检查界面，将系统表面直接可视化。\n\n### 多语言 SDK\n\n**统一原语**：Node.js、Python、Rust SDK 均以 Worker/Function/Trigger 三原语为核心，屏蔽语言差异。Worker 是进程，可使用任何相应语言编写，注册后纳入统一目录。\n\n### 代理技能（Agent Skills）\n\n**可供 Agent 阅读的参考材料**：`skills/` 目录中的文档覆盖了所有原语的使用说明，可通过 `npx skills add iii-hq/iii/skills` 安装到 Agent 上下文中，帮助 Agent 理解如何操作 iii 系统，相当于给 Agent 一本 iii 使用手册。",
+            "failure_mode": "核心引擎使用 Elastic License 2.0，可能限制商业闭源二次分发",
+            "source_pointer": "https://github.com/iii-hq/iii"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/not_found/iii/v0.17.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/iii-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/iii-repo]]"
+        ],
+        "metrics": [
+          "stars=17594",
+          "forks=1156",
+          "open_issues=38",
+          "latest_release=iii/v0.17.0",
+          "pushed_at=2026-06-03T14:26:03Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "核心引擎使用 Elastic License 2.0，可能限制商业闭源二次分发",
+          "未说明故障恢复机制与高可用部署方案，生产环境稳定性存疑",
+          "代理规划和状态管理细节未公开，难以评估复杂场景的可靠性",
+          "项目名称“iii”缺乏辨识度，可能与现有工具冲突"
+        ],
+        "missing_details": [
+          "license_spdx_id: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/iii-hq/iii"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/iii-main-claim]],官方 artifact 落库为 [[artifacts/iii-repo]]。See [[content/iii]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/iii-main-claim]],官方 artifact 落库为 [[artifacts/iii-repo]]。See [[content/iii]]。",
+      "links": [
+        {
+          "target": "claims/iii-main-claim",
+          "raw": "[[claims/iii-main-claim]]"
+        },
+        {
+          "target": "artifacts/iii-repo",
+          "raw": "[[artifacts/iii-repo]]"
+        },
+        {
+          "target": "claims/iii-main-claim",
+          "raw": "[[claims/iii-main-claim]]"
+        },
+        {
+          "target": "artifacts/iii-repo",
+          "raw": "[[artifacts/iii-repo]]"
+        },
+        {
+          "target": "content/iii",
+          "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/markitdown-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "markitdown-evidence-pack",
+      "title": "markitdown — Evidence Pack",
+      "file": "evidence-packs/markitdown-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "markitdown",
+        "kind": "evidence-pack",
+        "title": "markitdown — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个把各种文件（PDF、Office、图片、音视频等）转成 Markdown 的 Python 工具，主要供 LLM 文本分析流水线使用。",
+            "internal_logic": "### 整体架构\nMarkItDown 是一个无状态的文件转换工具，核心组件是 **MarkItDown 类**，通过内置转换器和可选插件将输入文件流向 Markdown 输出。没有复杂的 agent loop，而是按文件类型分发的线性管道。\n\n#### 核心转换循环\n- 输入可以是本地路径、文件对象、URL 或管道流。\n- 根据文件扩展名或 MIME 类型自动选择对应的转换器（如 `pdf`, `docx`, `xlsx` 等）。\n- 如果启用 LLM（通过 `llm_client` 和 `llm_model` 参数），对图像或 PPTX 中的图片生成描述文本。\n- 最终输出一个包含 **text_content** 或 **markdown** 属性的对象，或直接写入文件。\n\n#### 工具接口（插件系统）\n- 插件默认禁用，通过 `enable_plugins=True` 开启，采用 Python 入口点机制（`markitdown.plugins`）。\n- 第三方插件可以注册新的转换器，或覆盖内置转换器。\n- `markitdown-ocr` 插件演示了如何复用 LLM Vision 能力进行 OCR，遵循 `llm_client`/`llm_model` 统一接口。\n- 插件开发参考 `packages/markitdown-sample-plugin`。\n\n#### 状态/记忆\n- 完全无状态，每次 `convert()` 调用互不干扰。\n- 通过 `MarkItDown` 实例可配置全局参数（如 Azure 端点、LLM 客户端），但实例本身不保存转换历史。\n\n#### 规划器\n- 无显式规划；转换路径由文件类型和配置决定。\n- 当使用 Azure Content Understanding 时，根据文件模态自动路由到预构建分析器（如文档、视频、音频）。\n\n#### 沙箱与安全\n- **进程权限级别 I/O**：MarkItDown 以当前进程的权限打开文件和发送网络请求，如 `open()` 或 `requests.get()`。\n- 官方建议在不可信环境对输入进行净化，并调用最窄的转换函数（如 `convert_stream()` 或 `convert_local()`），避免读取未预期资源。\n- 使用 Azure 云服务时，需自行管理端点密钥和成本；可以限制 `cu_file_types` 控制传输格局。\n\n#### LLM 集成\n- **视觉理解**：提供 `llm_client` + `llm_model`，对图像和 PPTX 内嵌图片生成自然语言描述。\n- **自定义提示**：`llm_prompt` 参数可注入任务描述，例如要求提取特定信息。\n- **OCR 扩展**：`markitdown-ocr` 插件将同样模式用于 PDF/DOCX 内图片的文字提取。",
+            "failure_mode": "转换质量依赖底层格式解析库，复杂排版、表格、公式可能失真，README 未提供基准测试。",
+            "source_pointer": "https://github.com/microsoft/markitdown"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/MIT/v0.1.6"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/markitdown-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/markitdown-repo]]"
+        ],
+        "metrics": [
+          "stars=142402",
+          "forks=9719",
+          "open_issues=802",
+          "latest_release=v0.1.6",
+          "pushed_at=2026-05-26T22:41:34Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "转换质量依赖底层格式解析库，复杂排版、表格、公式可能失真，README 未提供基准测试。",
+          "插件生态起步阶段，可用第三方插件有限，维护可能滞后。",
+          "开启插件或 LLM 功能增加外部依赖和成本（如 OpenAI API 费用），且 LLM 输出不稳定可能引入噪声。",
+          "安全模型依赖于调用者正确使用最小权限函数，开发者容易忽略输入净化。",
+          "对超大文件（如高清视频）的处理内存和耗时未知，未在文档说明。"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/microsoft/markitdown"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/markitdown-main-claim]],官方 artifact 落库为 [[artifacts/markitdown-repo]]。See [[content/markitdown]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/markitdown-main-claim]],官方 artifact 落库为 [[artifacts/markitdown-repo]]。See [[content/markitdown]]。",
+      "links": [
+        {
+          "target": "claims/markitdown-main-claim",
+          "raw": "[[claims/markitdown-main-claim]]"
+        },
+        {
+          "target": "artifacts/markitdown-repo",
+          "raw": "[[artifacts/markitdown-repo]]"
+        },
+        {
+          "target": "claims/markitdown-main-claim",
+          "raw": "[[claims/markitdown-main-claim]]"
+        },
+        {
+          "target": "artifacts/markitdown-repo",
+          "raw": "[[artifacts/markitdown-repo]]"
+        },
+        {
+          "target": "content/markitdown",
+          "raw": "[[content/markitdown]]"
         }
       ],
       "headings": [
@@ -272,6 +2172,526 @@
       ]
     },
     {
+      "id": "evidence-pack/microsoft-agent-governance-toolkit-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "microsoft-agent-governance-toolkit-evidence-pack",
+      "title": "agent-governance-toolkit — Evidence Pack",
+      "file": "evidence-packs/microsoft-agent-governance-toolkit-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "microsoft-agent-governance-toolkit",
+        "kind": "evidence-pack",
+        "title": "agent-governance-toolkit — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Agent Governance Toolkit 是一个面向 AI Agent 的运行时治理工具集，用策略引擎、身份、审计、MCP/框架适配和 SRE 组件在工具调用前做 allow/deny/escalate/transform 决策。",
+            "internal_logic": "人话：AGT 的核心流程是：agent 想做一件事；治理层先拿到动作上下文；策略引擎判断允许、拒绝、警告、升级审批或改写；宿主代码按结果执行或拦下；同时写审计记录。最小用法可以只是 `govern()` 包一个工具函数，复杂用法可以把策略、身份、信任分数、MCP 网关、OpenTelemetry、SRE 和运行时限制都加上。\n\n技术词：\n- Policy：一组规则，决定某个 action 是否能执行。（来源：docs/tutorials/policy-as-code/01-your-first-policy.md What is a policy）\n- PEP/PDP：宿主 adapter 是 Policy Enforcement Point；ACS/runtime 是 Policy Decision Point。（来源：policy-engine README Agent Control Specification）\n- Intervention point：agent 生命周期里的拦截点，包括 `agent_startup`、`input`、`pre_model_call`、`post_model_call`、`pre_tool_call`、`post_tool_call`、`output`、`agent_shutdown`。（来源：policy-engine README Intervention points）\n- Fail closed：策略运行失败时返回 deny，而不是默认放行。（来源：policy-engine README Core properties）\n- 同进程边界：AGT 文档明确说 policy engine 和 agent 共享进程边界；高安全场景要加容器/VM 隔离。（来源：README Security；docs/ARCHITECTURE Security Model & Boundaries）",
+            "failure_mode": "README Prerequisites；agent-governance-python/agent-governance-toolkit-core/pyproject.toml；agent-governance-python/agent-governance-toolkit-integrations/pyproject.toml",
+            "source_pointer": "https://github.com/microsoft/agent-governance-toolkit"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/MIT/v4.0.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/microsoft-agent-governance-toolkit-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/microsoft-agent-governance-toolkit-repo]]"
+        ],
+        "metrics": [
+          "stars=3872",
+          "forks=537",
+          "open_issues=38",
+          "latest_release=v4.0.0",
+          "pushed_at=2026-06-03T01:25:38Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "README Prerequisites；agent-governance-python/agent-governance-toolkit-core/pyproject.toml；agent-governance-python/agent-governance-toolkit-integrations/pyproject.toml",
+          "agent-governance-typescript/package.json engines/scripts/dependencies",
+          "policy-engine/sdk/python/pyproject.toml；Dockerfile Stage 4",
+          "Dockerfile OPA CLI；policy-engine README Policies；agent-governance-rust/Cargo.toml",
+          "README Framework Support；agent-governance-python/agent-governance-toolkit-integrations/pyproject.toml",
+          "README Security；docs/ARCHITECTURE Security Model & Boundaries；docs/LIMITATIONS What AGT Is Not",
+          "VERSION；README Python distributions；agent-governance-python/agt-policies/pyproject.toml"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/microsoft/agent-governance-toolkit"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/microsoft-agent-governance-toolkit-main-claim]],官方 artifact 落库为 [[artifacts/microsoft-agent-governance-toolkit-repo]]。See [[content/microsoft-agent-governance-toolkit]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/microsoft-agent-governance-toolkit-main-claim]],官方 artifact 落库为 [[artifacts/microsoft-agent-governance-toolkit-repo]]。See [[content/microsoft-agent-governance-toolkit]]。",
+      "links": [
+        {
+          "target": "claims/microsoft-agent-governance-toolkit-main-claim",
+          "raw": "[[claims/microsoft-agent-governance-toolkit-main-claim]]"
+        },
+        {
+          "target": "artifacts/microsoft-agent-governance-toolkit-repo",
+          "raw": "[[artifacts/microsoft-agent-governance-toolkit-repo]]"
+        },
+        {
+          "target": "claims/microsoft-agent-governance-toolkit-main-claim",
+          "raw": "[[claims/microsoft-agent-governance-toolkit-main-claim]]"
+        },
+        {
+          "target": "artifacts/microsoft-agent-governance-toolkit-repo",
+          "raw": "[[artifacts/microsoft-agent-governance-toolkit-repo]]"
+        },
+        {
+          "target": "content/microsoft-agent-governance-toolkit",
+          "raw": "[[content/microsoft-agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/moneyprinterturbo-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "moneyprinterturbo-evidence-pack",
+      "title": "MoneyPrinterTurbo — Evidence Pack",
+      "file": "evidence-packs/moneyprinterturbo-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "moneyprinterturbo",
+        "kind": "evidence-pack",
+        "title": "MoneyPrinterTurbo — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个输入视频主题或关键词，就能自动生成文案、语音、字幕、背景音乐并合成高清短视频的全自动工具。",
+            "internal_logic": "### 嵌入开发流的位置\nMoneyPrinterTurbo 定位为独立的视频生成服务，通过 **WebUI**（Streamlit 应用）和 **REST API**（FastAPI 服务）两种形式嵌入开发流。WebUI 适合非技术用户直接交互；API 可供开发者集成到自动化管线（如内容生产系统、社交媒体调度工具）。它不直接作为插件内嵌其他平台，但可以通过 API 被调用。\n\n### 命令入口\n项目提供三个主要入口：\n- **webui.bat / webui.sh**：启动 Streamlit Web 界面，`webui.bat` 内部自动解析 Python 环境或通过 `uv run streamlit` 启动。可通过环境变量 `MPT_WEBUI_HOST` 绑定到 `0.0.0.0` 以允许局域网访问。\n- **main.py**：启动 FastAPI 后端服务，`uv run python main.py` 即可运行，API 文档在 `/docs` 和 `/redoc` 提供。\n- **Docker**：`docker-compose up` 会同时启动 WebUI (端口 8501) 和 API (端口 8080)。\n\n### 配置\n配置通过 **config.toml** 文件管理（首次需将 `config.example.toml` 复制为 `config.toml`）。核心配置项包括：\n- **pexels_api_keys**：用于获取无版权视频素材的 Pexels API 密钥（未在 README/artifact 说明 Pexels 以外的素材源）。\n- **llm_provider**：选择文案生成的大模型服务商，支持十几种提供商（OpenAI、DeepSeek、Gemini、Ollama 等）。\n- **tts_provider**：语音合成提供者，默认使用免费 Edge TTS（WebUI 中标记为 Azure TTS V1），也可配置付费 Azure TTS V2。\n- **subtitle_provider**：字幕生成方式，可选 `edge`（基于 Edge TTS 时间戳）或 `whisper`（本地 faster-whisper 模型）。\n- **ffmpeg_path**：处理 ffmpeg 缺失问题（常见问题中给出引导）。\n配置文件采用 TOML 格式，结构清晰，无需代码即可调整工作流行为。\n\n### 插件/扩展\n项目**没有明确定义的插件架构**，但通过 **Provider 模式** 实现扩展：\n- **LLM 提供商**：只需遵循统一的接口适配即可接入新的大模型服务，READMME 中列出的支持列表由 `app/llm/` 模块实现（未在 README/artifact 详细说明扩展步骤）。\n- **语音合成**：Edge TTS 和 Azure TTS V2 均通过统一接口调用，未来可增加新 TTS 选项。\n- **字幕方案**：edge 和 whisper 两种模式，也可视为可扩展点（留空则不生成字幕）。\n所有扩展点都集中在 `config.toml` 的选项中，通过字符串切换实现，没有动态加载或第三方插件注册机制。\n\n### 错误处理\nREADME 专门设立了“常见问题”章节，覆盖了主要运行时错误：\n- **ffmpeg 缺失**：自动下载失败时，提供手动设置 `ffmpeg_path` 的方法。\n- **ImageMagick 依赖**：明确指出新版本已改用 Pillow，旧版用户需更新代码。\n- **文件打开数过多**：提供 `ulimit -n 10240` 命令调整系统限制。\n- **Whisper 模型下载失败**：提供网盘下载地址并说明模型放置目录。\n这些处理都依赖用户手动介入或先验知识，程序本身没有内建自动修复或重试逻辑（未在 README/artifact 说明）。错误信息会直接传递给使用者，但未描述日志或调试模式。",
+            "failure_mode": "强依赖外部 API（LLM、TTS、Pexels），若任一服务中断或收费变更，视频生成会直接失败。",
+            "source_pointer": "https://github.com/harry0703/moneyprinterturbo"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v1.2.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/moneyprinterturbo-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/moneyprinterturbo-repo]]"
+        ],
+        "metrics": [
+          "stars=78623",
+          "forks=11169",
+          "open_issues=27",
+          "latest_release=v1.2.9",
+          "pushed_at=2026-06-03T08:57:00Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "强依赖外部 API（LLM、TTS、Pexels），若任一服务中断或收费变更，视频生成会直接失败。",
+          "视频素材版权：虽声称使用无版权素材，但来源仅限于 Pexels；用户本地素材版权需自行负责。",
+          "大模型输出不可控：文案质量波动可能影响视频整体观感，且没有质量预检步骤。",
+          "社区项目维护风险：贡献者单一，若停止更新，未来模型接口变动可能导致功能不可用。",
+          "本地 whisper 模式下载大型模型（3GB）可能失败，且需额外手动配置，对非技术用户不友好。"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/harry0703/moneyprinterturbo"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/moneyprinterturbo-main-claim]],官方 artifact 落库为 [[artifacts/moneyprinterturbo-repo]]。See [[content/moneyprinterturbo]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/moneyprinterturbo-main-claim]],官方 artifact 落库为 [[artifacts/moneyprinterturbo-repo]]。See [[content/moneyprinterturbo]]。",
+      "links": [
+        {
+          "target": "claims/moneyprinterturbo-main-claim",
+          "raw": "[[claims/moneyprinterturbo-main-claim]]"
+        },
+        {
+          "target": "artifacts/moneyprinterturbo-repo",
+          "raw": "[[artifacts/moneyprinterturbo-repo]]"
+        },
+        {
+          "target": "claims/moneyprinterturbo-main-claim",
+          "raw": "[[claims/moneyprinterturbo-main-claim]]"
+        },
+        {
+          "target": "artifacts/moneyprinterturbo-repo",
+          "raw": "[[artifacts/moneyprinterturbo-repo]]"
+        },
+        {
+          "target": "content/moneyprinterturbo",
+          "raw": "[[content/moneyprinterturbo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/ogulcancelik-herdr-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "ogulcancelik-herdr-evidence-pack",
+      "title": "herdr — Evidence Pack",
+      "file": "evidence-packs/ogulcancelik-herdr-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "ogulcancelik-herdr",
+        "kind": "evidence-pack",
+        "title": "herdr — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Herdr 是一个面向 AI coding agents 的 Rust 终端复用器，用 workspace/tab/pane、后台 session server、agent 状态识别和本地 socket API，把多个终端里的 agent 工作流放在一个 TUI 里管理。",
+            "internal_logic": "人话：Herdr 启动后默认连到一个后台 server；client 可以 detach，server 继续托管 pane 进程。界面上把项目组织成 workspaces，workspace 里有 tabs，tab 里有 panes。agent 状态来自三路信号：前台进程识别、终端屏幕启发式、hook/plugin/socket 上报。agent 或脚本优先用 CLI wrapper；需要长连接或精细控制时才用 raw socket。术语：Unix domain socket 是本机进程通信通道；newline-delimited JSON 是一行一个 JSON request/response；semantic state 是影响 wait、notification、rollup 的状态字段，不等同于 UI 上的 custom_status。（来源：README core concepts；docs/socket-api.mdx Choose an integration layer / Socket transport / Agent state reporting；docs/integrations.mdx How Herdr uses integrations）",
+            "failure_mode": "src/detect/agents/mod.rs；docs/integrations.mdx",
+            "source_pointer": "https://github.com/ogulcancelik/herdr"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/NOASSERTION/v0.6.7"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/ogulcancelik-herdr-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/ogulcancelik-herdr-repo]]"
+        ],
+        "metrics": [
+          "stars=4012",
+          "forks=256",
+          "open_issues=23",
+          "latest_release=v0.6.7",
+          "pushed_at=2026-06-03T12:23:50Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "src/detect/agents/mod.rs；docs/integrations.mdx",
+          "docs/install.mdx；docs/configuration.mdx",
+          "LICENSE header；Cargo.toml license",
+          "README development；本次 shell: cargo command not found"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/ogulcancelik/herdr"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ogulcancelik-herdr-main-claim]],官方 artifact 落库为 [[artifacts/ogulcancelik-herdr-repo]]。See [[content/ogulcancelik-herdr]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ogulcancelik-herdr-main-claim]],官方 artifact 落库为 [[artifacts/ogulcancelik-herdr-repo]]。See [[content/ogulcancelik-herdr]]。",
+      "links": [
+        {
+          "target": "claims/ogulcancelik-herdr-main-claim",
+          "raw": "[[claims/ogulcancelik-herdr-main-claim]]"
+        },
+        {
+          "target": "artifacts/ogulcancelik-herdr-repo",
+          "raw": "[[artifacts/ogulcancelik-herdr-repo]]"
+        },
+        {
+          "target": "claims/ogulcancelik-herdr-main-claim",
+          "raw": "[[claims/ogulcancelik-herdr-main-claim]]"
+        },
+        {
+          "target": "artifacts/ogulcancelik-herdr-repo",
+          "raw": "[[artifacts/ogulcancelik-herdr-repo]]"
+        },
+        {
+          "target": "content/ogulcancelik-herdr",
+          "raw": "[[content/ogulcancelik-herdr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/oh-my-pi-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "oh-my-pi-evidence-pack",
+      "title": "oh-my-pi — Evidence Pack",
+      "file": "evidence-packs/oh-my-pi-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "oh-my-pi",
+        "kind": "evidence-pack",
+        "title": "oh-my-pi — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "oh-my-pi 是一个把 IDE 能力（LSP、调试器、浏览器、子代理）直接塞进终端的 AI 编码代理，通过哈希锚点编辑、流式规则注入、跨平台原生实现，让 LLM 编辑代码更准、更快、更安全。",
+            "internal_logic": "### agent loop\n\n代理循环基于工具调用范式：模型生成工具调用 → 代理执行工具并返回结果 → 模型继续推理。README 强调 `read`、`edit`、`bash` 等工具与模型 prompt 深度绑定，且通过 `hashedit` 格式大幅降低重试率。**流式规则注入**（Time-traveling stream rules）能在模型输出过程中用正则匹配触发规则注入并中断、重试，从而实现实时纠偏而不占用固定上下文。对于子代理，`task` 工具将任务分发到独立工作树，每个子代理拥有自己的工具表面，结果以 schema 验证的对象返回，避免了解析合并冲突。\n\n### tool interface\n\n所有工具统一在 `read`/`write`/`edit`/`bash` 等同一命名空间下，通过 `--tools` 标志可钉选激活集，未选中的工具仍可通过 `search_tool_bm25` 发现和动态拉回。关键创新：\n\n- **Hashline 编辑**：模型通过内容哈希锚定目标行，而不是重输整个代码块，避免了格式漂移和匹配失效。\n- **内部 scheme**：`pr://`、`issue://`、`agent://` 等 10 种协议直接嵌入 FS 工具，例如 `read pr://1428` 和 `read src/foo.ts` 返回相同形状的数据。\n- **ACP（Agent Communication Protocol）**：让代理能在 Zed 等编辑器中运行，通过编辑器的保存路径写入文件，直接操作编辑器缓冲区。\n\n### state/memory\n\n- **会话记忆**：`retain` 和 `recall` 工具形成事实记忆，代理在运行中写入关键信息，后续回合可回溯。会话结束会压缩成“心理模型”，下次启动第一回合自动加载。\n- **项目作用域**：记忆默认项目隔离，不同代码库之间不会混淆。\n- **上下文压缩**：rule 注入在 compaction 后仍然保留，保证长期纠正效果。\n\n### planner\n\nREADME 未显式定义规划器模块，但通过以下机制隐式实现：\n- **子代理分配**：`task` 工具按约束（如 IRC 通信）将工作拆分给多个子代理并行执行，最后汇总。\n- **代码审查**：`/review` 命令生成 P0-P3 优先级的审查意见，并由专门审查子代理并行扫描分支、提交或未提交更改。\n- **原子提交拆分**：`omp commit` 分析工作树并将无关变更分组为原子提交，依赖排序后写入。\n\n### sandbox\n\n代码执行沙箱由两个持久化内核提供：Python 和 Bun 工作器，它们可通过**回环桥接**（loopback bridge）反向调用代理的 `read`、`search`、`task` 等工具。这意味着代理可以一边运行 Python 数据分析，一边在 JavaScript 中绘图，全程不离开工具链。与其他仅提供一次性沙箱的方案不同，omp 的内核是常驻的。\n\n### safety\n\n- **编辑预览与确认**：`ast_edit` 产生提议卡片，代理调用 `resolve` 后由用户通过 TUI 的 **Accept** 卡片原子化写入磁盘。\n- **哈希锚定失效保护**：文件变动导致哈希锚失配时，编辑被拒绝，防止误改。\n- **流式规则**：可在模型即将生成危险代码时中断注入，从源头阻挡。\n- **权限控制**：毁灭性工具暂停并询问用户，支持“一次性允许”。\n- **隐身上网**：浏览器工具默认指纹模拟普通用户，防止被反爬，但也能驱动 Slack 等 Electron 应用，安全边界未细述。\n\n### 工程亮点\n\n- **~27k 行 Rust 核心**：ripgrep、glob、find 等搜索工具内联进程，避免 shell 调用和跨平台兼容问题。\n- **多格式配置继承**：可直接读取 Cursor MDC、Cline .clinerules、Codex AGENTS.md 等 8 种流行配置，无需迁移。\n- **Shell 补全动态生成**：从实时的 CLI 元数据生成，避免脱节。\n- **冲突解决**：合并冲突映射为 `conflict://N` 路径，代理可写入 `@ours`/`@theirs`/`@base` 一键解决。\n\n### 性能和兼容性\n\n- **40+ 模型提供商**：通过统一 API 表面支持，并针对每个模型调整编辑格式和 prompts，benchmark 中 Grok Code Fast 通过率从 6.7% 提升至 68.3%，MiniMax 提升 2.1 倍。\n- **跨平台**：macOS、Linux、Windows 原生二进制，不依赖 WSL。\n- **工具性能**：Read 返回摘要而非全文，Search 极速，LSP 提供 IDE 级语义信息。",
+            "failure_mode": "对 README 中宣称的性能提升（如 Grok Code Fast 通过率提升到 68.3%）无独立复现验证，可能依赖特定模型版本和 prompt 调整。",
+            "source_pointer": "https://github.com/can1357/oh-my-pi"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/MIT/v15.8.2"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/oh-my-pi-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/oh-my-pi-repo]]"
+        ],
+        "metrics": [
+          "stars=10196",
+          "forks=843",
+          "open_issues=252",
+          "latest_release=v15.8.2",
+          "pushed_at=2026-06-03T12:23:09Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "对 README 中宣称的性能提升（如 Grok Code Fast 通过率提升到 68.3%）无独立复现验证，可能依赖特定模型版本和 prompt 调整。",
+          "代码库庞大且未提供完整测试套件，长期维护和稳定性存疑。",
+          "Windows 原生支持未详细说明兼容性边界，部分工具（如某些 LSP server）可能仍存在平台问题。",
+          "虽支持 40+ 提供商，但每个模型都需要单独调优编辑格式，增加维护负担。",
+          "浏览器隐身模式可能存在法律和政策风险，尤其在驱动 Slack 等应用时。",
+          "子代理的隔离工作树开销可能较大，大规模并行时可能遇到磁盘 I/O 或资源竞争。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/can1357/oh-my-pi"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/oh-my-pi-main-claim]],官方 artifact 落库为 [[artifacts/oh-my-pi-repo]]。See [[content/oh-my-pi]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/oh-my-pi-main-claim]],官方 artifact 落库为 [[artifacts/oh-my-pi-repo]]。See [[content/oh-my-pi]]。",
+      "links": [
+        {
+          "target": "claims/oh-my-pi-main-claim",
+          "raw": "[[claims/oh-my-pi-main-claim]]"
+        },
+        {
+          "target": "artifacts/oh-my-pi-repo",
+          "raw": "[[artifacts/oh-my-pi-repo]]"
+        },
+        {
+          "target": "claims/oh-my-pi-main-claim",
+          "raw": "[[claims/oh-my-pi-main-claim]]"
+        },
+        {
+          "target": "artifacts/oh-my-pi-repo",
+          "raw": "[[artifacts/oh-my-pi-repo]]"
+        },
+        {
+          "target": "content/oh-my-pi",
+          "raw": "[[content/oh-my-pi]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/open-llm-vtuber-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "open-llm-vtuber-evidence-pack",
+      "title": "Open-LLM-VTuber — Evidence Pack",
+      "file": "evidence-packs/open-llm-vtuber-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "open-llm-vtuber",
+        "kind": "evidence-pack",
+        "title": "Open-LLM-VTuber — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个跨平台、可离线运行的语音交互AI伴侣框架，集成Live2D虚拟形象、视觉感知和多种LLM、语音识别、语音合成后端，侧重语音打断和桌面宠物模式",
+            "internal_logic": "### Agent Loop\n\nREADME 说明项目支持**可继承的 Agent 接口**，用户可以自己实现 Agent 并接入 HumeAI EVI、OpenAI Her、Mem0 等架构。这说明存在一个基础的 Agent 抽象层，**未在 README/artifact 说明**具体循环细节（如感知-思考-行动循环是否在`src/`内实现）。从功能描述推断，循环大致为：语音输入→ASR转文本→LLM生成回复→TTS合成语音→前端播放，同时伴以 Live2D 表情映射和视觉感知输入。\n\n### Tool Interface\n\n**未在 README/artifact 说明**是否有显式的工具调用接口。项目主要通过**配置文件切换模块**来集成不同后端，这可能意味着工具并非作为独立插件，而是作为可替换的模块（LLM、ASR、TTS）实现。视觉感知（摄像头、屏幕截图）很可能是作为特殊工具集成在流程中。\n\n### State / Memory\n\nREADME 提到**长期记忆功能已被暂时移除**（即将回归），目前仅依赖**聊天日志持久化**来延续对话上下文。状态管理似乎局限在单次会话的对话历史，未发现有独立的记忆存储或检索机制。\n\n### Planner\n\n**未在 README/artifact 说明**。由于项目支持接入任意 LLM，规划能力完全由外部语言模型提供，框架本身可能没有内置规划器。\n\n### Sandbox\n\n**未在 README/artifact 说明**。项目声称可离线运行，但并未提及对 LLM 输出的沙盒约束或操作限制。\n\n### 安全边界\n\n- **本地运行**：完全离线时对话数据留存在设备上，降低网络泄露风险。\n- **语音打断无耳机**：README 声称 AI 不会听到自己的声音，这涉及音频回环抑制，**未在 README/artifact 说明**具体实现。\n- **Live2D 示例模型许可**：自带 Live2D 示例模型有独立的许可协议，商业使用尤其需额外授权。\n- **反向代理 HTTPS 要求**：远程访问时必须配置 HTTPS，否则前端麦克风无法启动（浏览器安全策略）。",
+            "failure_mode": "长期记忆功能缺失，对话连续性依赖简单日志，用户粘性可能不足",
+            "source_pointer": "https://github.com/open-llm-vtuber/open-llm-vtuber"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/false/true/false/NOASSERTION/v1.2.1"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/open-llm-vtuber-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/open-llm-vtuber-repo]]"
+        ],
+        "metrics": [
+          "stars=8774",
+          "forks=1097",
+          "open_issues=126",
+          "latest_release=v1.2.1",
+          "pushed_at=2026-05-15T07:18:04Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "长期记忆功能缺失，对话连续性依赖简单日志，用户粘性可能不足",
+          "v2.0 正在规划重写，v1 只修 bug，未来可能破坏性变更，现网功能可能停更",
+          "Live2D 示例模型受第三方许可限制，用于商业产品时存在法律风险",
+          "依赖大量第三方模型和库（Ollama、Whisper 等），环境搭建和版本兼容较为脆弱",
+          "远程访问必须配置 HTTPS 且有浏览器安全限制，部署复杂度增加"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/open-llm-vtuber/open-llm-vtuber"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/open-llm-vtuber-main-claim]],官方 artifact 落库为 [[artifacts/open-llm-vtuber-repo]]。See [[content/open-llm-vtuber]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/open-llm-vtuber-main-claim]],官方 artifact 落库为 [[artifacts/open-llm-vtuber-repo]]。See [[content/open-llm-vtuber]]。",
+      "links": [
+        {
+          "target": "claims/open-llm-vtuber-main-claim",
+          "raw": "[[claims/open-llm-vtuber-main-claim]]"
+        },
+        {
+          "target": "artifacts/open-llm-vtuber-repo",
+          "raw": "[[artifacts/open-llm-vtuber-repo]]"
+        },
+        {
+          "target": "claims/open-llm-vtuber-main-claim",
+          "raw": "[[claims/open-llm-vtuber-main-claim]]"
+        },
+        {
+          "target": "artifacts/open-llm-vtuber-repo",
+          "raw": "[[artifacts/open-llm-vtuber-repo]]"
+        },
+        {
+          "target": "content/open-llm-vtuber",
+          "raw": "[[content/open-llm-vtuber]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/opendataloader-pdf-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "opendataloader-pdf-evidence-pack",
+      "title": "opendataloader-pdf — Evidence Pack",
+      "file": "evidence-packs/opendataloader-pdf-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "opendataloader-pdf",
+        "kind": "evidence-pack",
+        "title": "opendataloader-pdf — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一款能解析任意 PDF 并输出带坐标的 Markdown/JSON 的开源工具，同时可自动生成无障碍 Tagged PDF。",
+            "internal_logic": "### 整体架构\n\nOpenDataLoader PDF 采用**核心 Java 引擎 + 多语言 SDK** 的设计。Java 引擎负责版式分析、阅读顺序确定（XY-Cut++ 算法）、元素边界框计算以及 PDF 标签化；Python、Node.js 和 Java SDK 通过进程调用封装 Java 引擎，提供统一的 `convert()` 接口。\n\n### 双模式处理流水线\n\n#### 1. 本地确定性模式（Fast mode）\n- **流程**：输入 PDF → Java 引擎解析 → 版面分割 → 应用 XY-Cut++ 阅读顺序 → 生成带边界框的结构化输出（Markdown/JSON/HTML）。\n- **特点**：纯确定性，速度快（README 声称 0.015s/page），无外部依赖，适合标准数字 PDF。\n- **输出示例**（JSON 片段，来源 README）：\n```json\n{\n  \"type\": \"formula\",\n  \"page number\": 1,\n  \"bounding box\": [226.2, 144.7, 377.1, 168.7],\n  \"content\": \"\\\\frac{f(x+h) - f(x)}{h}\"\n}\n```\n\n#### 2. 混合模式（Hybrid mode）\n- **流程**：本地 Java 引擎对简单页面直接输出（约 0.02s），对复杂页面（由决策模块判断）路由到 AI 后端服务 `opendataloader-pdf-hybrid`。\n- **AI 后端** 可启用 OCR、公式提取、图表描述等能力，最终输出融合结果。\n- **决策模块**（planner）**：README 未说明具体的路由规则，但提到“复杂页面路由到 AI 后端”，推测基于页面内表格、扫描特征等指标。\n- **接口**：AI 后端通过 `--enrich-formula`、`--enrich-picture-description` 等 flag 启用富化，客户端通过 `--hybrid docling-fast` 选择后端模型（如 docling-fast）。\n\n### Agent 工具特性\nOpenDataLoader PDF 可被其他 Agent 作为工具调用，提供以下能力：\n- **LangChain 集成**：README 明确提及 LangChain integration available。\n- **AI 安全过滤器**：内置 prompt injection 过滤（来源 README Capability Matrix）。\n- **状态/记忆**：项目本身无显式的对话记忆，但输出的结构化 JSON 可作为 Agent 工作记忆的持久化载体。\n- **工具接口**：通过 SDK 或 CLI 调用，输入 PDF 路径，输出结构化数据，符合 Agent tool 标准形态。\n\n### 无障碍自动化管线\n- **输入**：无标签的 PDF。\n- **处理**：Java 引擎进行布局分析，识别标题、段落、表格、图像等，并依据 Well-Tagged PDF 规范生成语义标签。\n- **输出**：Tagged PDF，可直接供屏幕阅读器使用。\n- **验证**：与 Dual Lab 合作，使用 veraPDF 进行自动化验证。\n\n### 安全边界\n- **AI 安全**：README 声称具备 prompt injection 过滤，但具体实现（规则/模型）未披露。\n- **进程隔离**：每个 `convert()` 调用会启动一个独立的 JVM 进程（来源 README 批处理注释），提供一定隔离性。",
+            "failure_mode": "Java 依赖：必须预装 JDK 11+，增加了部署复杂度，在无 root 权限或受限环境可能成为障碍。",
+            "source_pointer": "https://github.com/opendataloader-project/opendataloader-pdf"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/true/Apache-2.0/v2.4.7"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/opendataloader-pdf-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/opendataloader-pdf-repo]]"
+        ],
+        "metrics": [
+          "stars=23366",
+          "forks=2186",
+          "open_issues=57",
+          "latest_release=v2.4.7",
+          "pushed_at=2026-06-03T16:14:48Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "Java 依赖：必须预装 JDK 11+，增加了部署复杂度，在无 root 权限或受限环境可能成为障碍。",
+          "AI 后端集成不稳定风险：Hybrid 模式依赖外部 AI 推理服务（需自行启动 `opendataloader-pdf-hybrid`），若服务不可用或性能不足，原本路由到 AI 的复杂页面将退化，影响最终质量。",
+          "企业功能锁定风险：PDF/UA 合规导出、无障碍编辑器等核心无障碍能力属于企业附加组件，可能导致开源版本在法规强约束下稍显不足。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/opendataloader-project/opendataloader-pdf"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/opendataloader-pdf-main-claim]],官方 artifact 落库为 [[artifacts/opendataloader-pdf-repo]]。See [[content/opendataloader-pdf]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/opendataloader-pdf-main-claim]],官方 artifact 落库为 [[artifacts/opendataloader-pdf-repo]]。See [[content/opendataloader-pdf]]。",
+      "links": [
+        {
+          "target": "claims/opendataloader-pdf-main-claim",
+          "raw": "[[claims/opendataloader-pdf-main-claim]]"
+        },
+        {
+          "target": "artifacts/opendataloader-pdf-repo",
+          "raw": "[[artifacts/opendataloader-pdf-repo]]"
+        },
+        {
+          "target": "claims/opendataloader-pdf-main-claim",
+          "raw": "[[claims/opendataloader-pdf-main-claim]]"
+        },
+        {
+          "target": "artifacts/opendataloader-pdf-repo",
+          "raw": "[[artifacts/opendataloader-pdf-repo]]"
+        },
+        {
+          "target": "content/opendataloader-pdf",
+          "raw": "[[content/opendataloader-pdf]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/pi-agent-evidence-pack",
       "type": "evidence-pack",
       "slug": "pi-agent-evidence-pack",
@@ -347,6 +2767,181 @@
       "body": "\n## Notes\n\n证据来自 artifact(monorepo 包职责/供应链做法/发布纪律)与采纳信号。注意 star 含 libGDX 作者光环,需结合提交活跃度与发布纪律交叉判断。\n",
       "excerpt": "证据来自 artifact(monorepo 包职责/供应链做法/发布纪律)与采纳信号。注意 star 含 libGDX 作者光环,需结合提交活跃度与发布纪律交叉判断。",
       "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/pixelle-video-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "pixelle-video-evidence-pack",
+      "title": "Pixelle-Video — Evidence Pack",
+      "file": "evidence-packs/pixelle-video-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "pixelle-video",
+        "kind": "evidence-pack",
+        "title": "Pixelle-Video — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "输入主题一键生成带配图语音背景音乐短视频的 AI 全自动引擎",
+            "internal_logic": "### Agent 循环\nPixelle-Video 的“agent”是一个固定的线性工作流，而非传统意义上带反思和决策的循环。其核心循环为：\n- **输入解析**：接收用户主题或固定文案\n- **脚本生成**：调用 LLM（如 GPT、通义千问）生成分镜脚本，包含每帧文案与视觉提示\n- **媒体生成**：根据脚本逐帧生成插图/视频（通过 ComfyUI、RunningHub 或 API），同时为每段文本合成语音（TTS）\n- **视频合成**：将媒体素材与语音、背景音乐按选择模板合成为最终视频\n该流程没有反馈循环，属于一次性流水线。进度由前端 streamlit 实时展示当前步骤编号。\n\n### 工具接口\n项目通过“工作流”抽象来封装工具调用，工具接口分为三类：\n- **ComfyUI/RunningHub 工作流**：通过 HTTP API 调用预定义的 JSON 工作流文件（存放在 workflows/ 目录），实现图像/视频生成。接口细节封装在 pixelle_video 模块内，配置中只需提供 ComfyUI 服务地址或 RunningHub API Key。\n- **直连 API 媒体模型**：直接调用第三方模型供应商的 REST API（如 DashScope、OpenAI Image、Kling 等），配置相应供应商的密钥和 Base URL，并支持本地代理。\n- **TTS 工作流**：同样通过 ComfyUI 工作流或内置的 Edge-TTS/Index-TTS 实现语音合成。\n工具接口采用“可替换原子能力”设计，用户可在 Web UI 中选择不同的工作流或 API 模型，无需修改代码。\n\n### 状态/内存\n- **会话状态**：利用 Streamlit 的 session_state 保存用户配置（API Key、模型选择等）和任务中间结果（如生成的脚本、图片 URL 等），刷新页面后状态保留。\n- **任务历史**：提供历史记录页面，可查看过往生成任务及视频，但未详细说明其持久化机制（可能包括数据库或文件）。\n- **长期记忆**：未在 README/artifact 中说明，无面向用户的记忆概念。\n\n### 规划器\n规划器由 LLM 承担：LLM 根据主题生成一份结构化脚本，该脚本定义了分镜数量、各镜头的文案和视觉提示词（prompt）。从更新日志“优化 LLM 返回结构化数据的逻辑”可推断，LLM 输出为某种结构化数据（如 JSON），驱动后续媒体生成。此规划是一次性的，不支持运行时动态调整。\n\n### 沙盒/安全\n项目本身未实现显式的沙盒环境，运行依赖用户本地环境或提供的 API。安全性主要依赖于各模型服务自身的认证（API Key 等）和流量控制。项目中提及“内容审核失败后的提示词中性化重试”，表明图像/视频生成遇到安全审核时会尝试修改 prompt 重试，但未详细说明具体的安全策略和过滤机制。\n\n### 编排与执行\n整体执行由 streamlit Web 界面触发，后台调用 pixelle_video 包中的核心逻辑。代码结构显示 pixelle_video/ 下可能包含 pipeline 模块，负责串联各步骤。由于未见源码，具体执行模型可能是同步或异步，至少 RunningHub 调用支持并发控制。\n\n### 可观测性\n提供浏览器端的实时进度条，展示当前步骤（如“分镜 3/5 - 生成插图”），也可在终端打印模型请求参数用于调试。未发现日志收集或监控集成。",
+            "failure_mode": "完全依赖外部 AI 模型服务的可用性和稳定性，若服务降级或限额，视频生成将失败",
+            "source_pointer": "https://github.com/aidc-ai/pixelle-video"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/Apache-2.0/v0.1.15"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/pixelle-video-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/pixelle-video-repo]]"
+        ],
+        "metrics": [
+          "stars=21216",
+          "forks=2958",
+          "open_issues=122",
+          "latest_release=v0.1.15",
+          "pushed_at=2026-06-01T06:27:45Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "完全依赖外部 AI 模型服务的可用性和稳定性，若服务降级或限额，视频生成将失败",
+          "缺少测试代码，代码质量和技术债务风险较高",
+          "未提供详细的错误处理和重试机制说明（除了内容审核重试），异常场景恢复能力不明",
+          "项目无 CLI 或 API 封装，仅通过 Web UI 操作，集成到其他系统较困难",
+          "许可证为 Apache-2.0，但引用的工作流和模型可能有各自的授权限制"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/aidc-ai/pixelle-video"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/pixelle-video-main-claim]],官方 artifact 落库为 [[artifacts/pixelle-video-repo]]。See [[content/pixelle-video]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/pixelle-video-main-claim]],官方 artifact 落库为 [[artifacts/pixelle-video-repo]]。See [[content/pixelle-video]]。",
+      "links": [
+        {
+          "target": "claims/pixelle-video-main-claim",
+          "raw": "[[claims/pixelle-video-main-claim]]"
+        },
+        {
+          "target": "artifacts/pixelle-video-repo",
+          "raw": "[[artifacts/pixelle-video-repo]]"
+        },
+        {
+          "target": "claims/pixelle-video-main-claim",
+          "raw": "[[claims/pixelle-video-main-claim]]"
+        },
+        {
+          "target": "artifacts/pixelle-video-repo",
+          "raw": "[[artifacts/pixelle-video-repo]]"
+        },
+        {
+          "target": "content/pixelle-video",
+          "raw": "[[content/pixelle-video]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/production-agentic-rag-course-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "production-agentic-rag-course-evidence-pack",
+      "title": "production-agentic-rag-course — Evidence Pack",
+      "file": "evidence-packs/production-agentic-rag-course-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "production-agentic-rag-course",
+        "kind": "evidence-pack",
+        "title": "production-agentic-rag-course — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个通过7周课程逐步教你构建生产级RAG系统（含Agentic RAG）的教学项目，从基础设施一路搞到LangGraph智能体和Telegram机器人。",
+            "internal_logic": "### Agent Loop（智能体循环）\n\n**基于 LangGraph 构建的有状态工作流**：在 Week 7 中，系统使用 LangGraph 实现 agentic RAG 工作流，其循环包括多个决策节点：评估用户查询、判断是否需要检索、对检索到的文档进行分级、在结果不足时重写查询。工作流循环直到满足条件或触发护栏。\n\n**决策逻辑与透明性**：智能体在每一步都记录推理过程，可追踪调试。但具体状态转移逻辑和条件分支的代码细节未在 README 中展示，仅通过架构图（`static/langgraph-mermaid.png`）示意。\n\n**流程说明**：从 README 描述和 Mermaid 图可见，工作流开始于用户输入，经过意图分析、检索、文档评估、可能的重写循环，最后生成响应。这种循环适应不同查询难度，是典型的 agent loop 模式。\n\n### Tool Interface（工具接口）\n\n**内部搜索 API 作为工具**：Agent 使用的核心工具是项目自建的混合搜索 API（`/api/v1/search`），它结合了 BM25 关键词搜索和向量语义搜索。这个 API 被 agent 作为检索工具调用。\n\n**其它工具集成**：未在 README/artifact 说明 agent 是否集成了除搜索以外的工具（如计算器、数据库查询等）。\n\n**工具接口设计**：由于项目是教育用途，工具接口直接使用 REST API，而非通常 agent 框架中的 function calling 抽象，但原理相似。具体参数格式和返回结构未在 README 说明。\n\n### State/Memory（状态与记忆）\n\n**对话状态管理**：LangGraph 工作流天然支持状态图，agent 可以在节点间保持状态，包括对话历史、检索上下文、中间决策结果。\n\n**记忆实现**：未在 README/artifact 说明是否实现了长期记忆或会话记忆（如保存到数据库的对话历史）。但从 Week 7 架构图看，可能通过 LangGraph 的状态对象在单次会话中传递上下文。\n\n**缓存支持**：Week 6 引入了 Redis 缓存，可能用于缓存 LLM 响应或搜索结果，但这属于性能优化而非 agent 的状态记忆。\n\n### Planner（规划器）\n\n**隐式规划**：Agent 的“规划”体现在 LangGraph 工作流的节点决策中：系统评估查询类型，决定采用何种检索策略，是否需要查询重写。没有显式的分层规划器。\n\n**动态路由**：工作流根据文档相关性评分自动决定是直接生成回答还是重写查询，这可以看作一种简单的规划能力。\n\n**未实现复杂规划**：未在 README/artifact 说明存在如 ReAct、Tree-of-Thoughts 等复杂规划方法。\n\n### Sandbox（沙箱）\n\n**未提及沙箱**：项目未在 README/artifact 说明任何代码执行沙箱或隔离环境。作为课程项目，所有操作在本地 Docker 环境中运行，环境隔离由 Docker 容器提供，但非严格意义上的 agent 沙箱。\n\n### Safety（安全边界）\n\n**护栏：外域检测**：Week 7 明确提到 \"Guardrails: Out-of-domain detection prevents hallucination\"。当用户提问超出知识库范围时，agent 会检测并拒绝回答，而不是生成虚假信息。\n\n**具体实现未说明**：未在 README/artifact 说明护栏是通过分类模型还是基于规则实现。\n\n**API 安全**：FastAPI 应用可能使用标准的请求验证，但未在 README 提及认证或授权机制。\n\n**数据隐私**：使用本地 LLM（Ollama）可避免数据泄露给第三方，这是隐私方面的优势。\n\n### 整体架构模式\n\n项目采用 **分层构建** 模式：从基础设施 → 数据管道 → 关键词搜索 → 混合搜索 → RAG pipeline → 监控/缓存 → Agentic 扩展。每一层都建立在前一层之上，最终形成完整的智能检索系统。这种架构模式适合教学，也反映了生产系统的演进路径。\n\n### 技术栈关键点\n\n- **搜索核心**：OpenSearch 2.19 提供 BM25 全文检索和向量搜索能力，混合搜索使用 RRF（Reciprocal Rank Fusion）融合两种排序结果。\n- **LLM**：通过 Ollama 在本地运行 LLM，支持流式响应，保证数据隐私。\n- **嵌入**：使用 Jina AI 的嵌入服务生成向量，但需要免费 API key。\n- **工作流引擎**：Apache Airflow 用于数据管道编排，而非 agent 工作流（Agent 工作流由 LangGraph 处理）。\n- **监控**：Langfuse 提供端到端的 RAG pipeline tracing。\n- **前端交互**：Gradio 提供 Web 聊天界面，Telegram Bot 提供移动端访问。\n\n### 项目特点与局限\n\n**特点**：\n- 全面的生产级 RAG 实践教学，涵盖搜索、检索、生成、监控和 agent 化。\n- 从基础到高级的渐进式学习，适合初学者和有经验的工程师。\n- 代码配套博客文章，解释设计决策。\n- 使用广泛认可的组件，技能可迁移。\n\n**局限**：\n- Agent 实现细节未深入，可能只是 LangGraph 的一个简单工作流示例。\n- 依赖大量外部服务（OpenSearch、Airflow、Ollama、Jina、Langfuse），部署和运行有一定门槛。\n- 数据源仅限 arXiv，虽可扩展到其他领域，但需要额外工作。\n- 作为教育项目，不适合直接作为生产框架；需根据实际需求调整。\n- README 中部分实现细节（如 agent 工作流代码、护栏具体逻辑）缺失，需查看源码。",
+            "failure_mode": "项目是教学设计，其代码质量和生产就绪程度可能不足以直接应用于高负载生产环境，需进行压力测试和定制。",
+            "source_pointer": "https://github.com/jamwithai/production-agentic-rag-course"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/false/false/MIT/week7.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/production-agentic-rag-course-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/production-agentic-rag-course-repo]]"
+        ],
+        "metrics": [
+          "stars=6609",
+          "forks=1504",
+          "open_issues=21",
+          "latest_release=week7.0",
+          "pushed_at=2026-04-05T06:13:54Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "项目是教学设计，其代码质量和生产就绪程度可能不足以直接应用于高负载生产环境，需进行压力测试和定制。",
+          "依赖较多特定版本的服务（如 OpenSearch 2.19、Airflow 3.0），版本升级可能导致不兼容。",
+          "Agent 部分的实现较浅，可能仅适用于简单场景，复杂 agent 行为（如复杂工具使用）需要自行扩展。",
+          "未提供详细的单元测试覆盖，测试目录存在但未在 README 说明覆盖范围和质量，可能影响可靠性。",
+          "使用本地 Ollama 可能无法满足高并发需求，若切换到云 LLM 需要额外适配。",
+          "数据源限定为 arXiv，若需多源数据或私有数据，需自行开发数据摄入模块。"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/jamwithai/production-agentic-rag-course"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/production-agentic-rag-course-main-claim]],官方 artifact 落库为 [[artifacts/production-agentic-rag-course-repo]]。See [[content/production-agentic-rag-course]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/production-agentic-rag-course-main-claim]],官方 artifact 落库为 [[artifacts/production-agentic-rag-course-repo]]。See [[content/production-agentic-rag-course]]。",
+      "links": [
+        {
+          "target": "claims/production-agentic-rag-course-main-claim",
+          "raw": "[[claims/production-agentic-rag-course-main-claim]]"
+        },
+        {
+          "target": "artifacts/production-agentic-rag-course-repo",
+          "raw": "[[artifacts/production-agentic-rag-course-repo]]"
+        },
+        {
+          "target": "claims/production-agentic-rag-course-main-claim",
+          "raw": "[[claims/production-agentic-rag-course-main-claim]]"
+        },
+        {
+          "target": "artifacts/production-agentic-rag-course-repo",
+          "raw": "[[artifacts/production-agentic-rag-course-repo]]"
+        },
+        {
+          "target": "content/production-agentic-rag-course",
+          "raw": "[[content/production-agentic-rag-course]]"
+        }
+      ],
       "headings": [
         {
           "depth": 2,
@@ -431,6 +3026,696 @@
       "body": "\n## Notes\n\n证据先于综合。关键审稿点是 §5.1 的 baseline 公平性(同 scaffold 复现 + 去 commit 泄漏 + 统一 300 turn),它决定了『强是否诚实』的判断。\n",
       "excerpt": "证据先于综合。关键审稿点是 §5.1 的 baseline 公平性(同 scaffold 复现 + 去 commit 泄漏 + 统一 300 turn),它决定了『强是否诚实』的判断。",
       "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/ruview-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "ruview-evidence-pack",
+      "title": "RuView — Evidence Pack",
+      "file": "evidence-packs/ruview-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "ruview",
+        "kind": "evidence-pack",
+        "title": "RuView — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "π RuView 将普通WiFi信号转化为实时空间智能、生命体征监测和存在检测，无需摄像头、无需可穿戴设备。",
+            "internal_logic": "### Agent Loop\n\nRuView 的边缘模块本质上是一个持续的感知-推理-输出循环。模块运行在ESP32微控制器上，循环从**采集CSI数据**开始：ESP32-S3以固定采样率捕获WiFi子载波的幅度和相位信息。随后**特征提取**通过带通滤波、相位解缠等手段得到呼吸、心跳、运动等信号。紧接着**推理引擎**可能调用小型量化模型（如8KB的对比编码器或脉冲神经网络）产生结构化输出（存在/人数/姿势关键点）。最后**输出阶段**通过MQTT、WebSocket或Home Assistant实体发布结果，并触发联动动作（如告警、记录）。该循环可以完全离线运行，不依赖云服务。\n\n### Tool Interface\n\n系统通过多种接口暴露能力，形成工具调用协议：\n- **REST API**：提供`/api/v1/config/dedup-factor`等端点，支持运行时调整参数。\n- **MQTT**：原生集成Home Assistant，每个节点发布21个实体（原始信号和语义状态），工具可以直接订阅。\n- **MCP代理**：MCP（Model Context Protocol，模型上下文协议）允许外部AI模型以标准方式调用RuView的感知功能，实现“AI观察空间”。\n- **WebSocket & asyncio客户端**：Python客户端库`ruview[client]`提供了异步工具调用接口，便于集成到其他Agent框架。\n- **Cogs（边缘模块）**：105个预编译模块，每个都可视为一个独立工具，如`occupancy-zones`、`elevator-count`，可直接在边缘运行。\n\n### State / Memory\n\n系统状态由CSI流和向量数据库共同维护：\n- **短期状态**：内存中保留最近的CSI帧和信号统计，用于实时滤波和阈值判断。\n- **长期记忆**：可选的Cognitum Seed（$140）提供持久化向量存储+近似最近邻（kNN）检索。它能保存环境指纹、历史事件，并支持跨时间段的模式比对。\n- **密码学状态链**：所有测量通过Ed25519见证链签名，形成不可篡改的状态历史，增强数据审计和信任。\n- **环境自适应**：脉冲神经网络在30秒内适应特定空间，存储了环境的校准参数和射频指纹。\n\n### Planner\n\n未在 README/artifact 说明有独立的规划器模块。系统的决策逻辑主要是信号驱动的反应式规则，而非长时规划。例如：\n- 呼吸率提取：固定算法（带通滤波+过零检测BPM）。\n- 跌倒检测：相位加速度阈值+帧去抖动。\n- 多频段跳频：时分调度，由mesh控制器静态分配时隙。\n若将“Cog模块组合”视为一种静态规划，则其并不存在动态任务规划能力。\n\n### Sandbox\n\n边缘模块运行在真实的硬件上，隔离性依赖芯片架构和固件设计，而非软件沙箱。ESP32固件划分为独立任务，但未在README中提及内存隔离或受控执行环境。Cog模块从注册表加载，但签名验证仅通过数字签名保证完整性，未提到运行时权限限制。\n\n### 安全边界\n\n系统实现了多层次安全机制：\n- **密码学证明**：每条传感数据都用Ed25519签名，形成不可否认的“见证链”，防止数据在传输或存储中被篡改。\n- **本地处理**：无云端依赖，隐私数据不出硬件边界，降低攻击面。\n- **硬件信任根**：Cognitum Seed提供硬件级密钥存储和加密运算。\n- **固件完整性**：ESP32使用安全启动，Cog二进制文件需通过签名验证才能加载。\n- **通信加密**：MQTT over TLS，HTTPS API。",
+            "failure_mode": "硬件强依赖：全部高级功能（生命体征、穿墙）均需要ESP32-S3或研究级网卡提供CSI数据，普通WiFi网卡只能做RSSI存在检测，功能受限。",
+            "source_pointer": "https://github.com/ruvnet/ruview"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/MIT/v1591"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/ruview-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/ruview-repo]]"
+        ],
+        "metrics": [
+          "stars=70415",
+          "forks=9421",
+          "open_issues=168",
+          "latest_release=v1591",
+          "pushed_at=2026-06-03T13:48:38Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "硬件强依赖：全部高级功能（生命体征、穿墙）均需要ESP32-S3或研究级网卡提供CSI数据，普通WiFi网卡只能做RSSI存在检测，功能受限。",
+          "环境敏感性：模型性能依赖于特定空间布局和多径特征，在不同环境中可能需要重新校准或微调，否则精度下降。",
+          "精度声明限制：v2编码器82.3%的准确率是在特定测试条件下测得，实际部署中可能受人群移动、家具变动等影响。",
+          "安全边界模糊：沙箱隔离机制未明确，若加载恶意Cog模块，可能危及整个节点。",
+          "工程复杂度高：涉及固件烧录、射频参数调整、多种网络协议配置，对非专业用户门槛较高。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/ruvnet/ruview"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ruview-main-claim]],官方 artifact 落库为 [[artifacts/ruview-repo]]。See [[content/ruview]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ruview-main-claim]],官方 artifact 落库为 [[artifacts/ruview-repo]]。See [[content/ruview]]。",
+      "links": [
+        {
+          "target": "claims/ruview-main-claim",
+          "raw": "[[claims/ruview-main-claim]]"
+        },
+        {
+          "target": "artifacts/ruview-repo",
+          "raw": "[[artifacts/ruview-repo]]"
+        },
+        {
+          "target": "claims/ruview-main-claim",
+          "raw": "[[claims/ruview-main-claim]]"
+        },
+        {
+          "target": "artifacts/ruview-repo",
+          "raw": "[[artifacts/ruview-repo]]"
+        },
+        {
+          "target": "content/ruview",
+          "raw": "[[content/ruview]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/scrapling-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "scrapling-evidence-pack",
+      "title": "Scrapling — Evidence Pack",
+      "file": "evidence-packs/scrapling-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "scrapling",
+        "kind": "evidence-pack",
+        "title": "Scrapling — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "面向 AI 代理的自适应网页抓取框架，能从单次请求扩展到全站爬取，自动绕过反爬并适应页面结构变化。",
+            "internal_logic": "### 自适应抓取引擎：解决网站结构变化的核心难题\n网站一改版，爬虫就失效。Scrapling 的解析器能学习页面结构，自动重新定位你的目标元素，让你无需手动修改代码。\n\n具体做法：当你首次用 `auto_save=True` 抓取时，框架会保存每个选中元素的**特征签名**（例如文本、属性、相邻节点结构）。之后网站结构变动，只需对相同选择器加上 `adaptive=True`，它会用保存的签名在 DOM 中重新搜索，实现“自适应元素重定位”。这背后依赖 lxml 和签名匹配算法，签名数据存储在本地 SQLite 文件里。\n\n### Agent 循环：爬虫的生命周期就像智能代理\nScrapling 的 Spider 并非简单请求队列。它实现了一个类似 Agent 循环的模式：每个 Spider 可以定义 `before_start`、`before_request`、`after_response` 等生命周期 hook，相当于一个智能代理在做出决策。这种设计允许你插入反反爬逻辑、动态调整请求头，或根据响应内容实时改变抓取策略。此外，Spider 还支持并发、暂停/恢复和自动代理轮换，使它适合长时间、高强度的抓取任务。\n\n### 工具接口：让 AI 代理直接调用爬虫\nScrapling 提供了两个对 AI 友好的接口：\n- **MCP 服务器**：遵循 Model Context Protocol，AI 模型可以通过标准化的工具调用请求网页抓取。你只需启动 MCP 服务，Agent 就能像调用一个函数一样抓取页面并返回解析后的数据。\n- **Agent-Skill**：一个预定义的技能包（在 `agent-skill/` 目录下），包含了一些常见的抓取任务模板。AI 代理可以直接使用这些技能，无需自己编写选择器。\n\n这使得 Scrapling 不仅是程序员工具，更是 AI 应用的数据采集层。\n\n### 状态与记忆：自适应签名持久化\n前面提到的 `auto_save` 功能会在本地创建一张记忆表，记录每个元素的唯一签名。这张表就像爬虫的“长期记忆”，即使脚本多次重启，它也能记得之前抓取过的元素特征。当页面变化时，`adaptive` 模式从记忆中查找最相似的元素，这是一种轻量级的记忆增强机制。\n\n### 规划器：爬虫任务调度\nSpider 内部有一个简易的任务规划器，负责管理请求队列、控制并发数、处理重试和错误。虽然它不支持复杂的爬取策略（如深度优先/广度优先需自行实现），但其内置的暂停/恢复和代理轮换已经覆盖大多数场景。你可以通过设置 `concurrent_requests` 和代理列表来自定义调度行为。\n\n### 沙箱与安全边界\nScrapling 本身不提供 JS 沙箱或内容安全检查。安全性主要体现在**反反爬**：`StealthyFetcher` 基于 Playwright 无头浏览器，模拟真实用户的鼠标轨迹、键盘输入，并禁用自动化标志，从而绕过 Cloudflare Turnstile 等常见反爬机制。但请务必注意，如果你用 MCP 服务器暴露接口，要限制代理可访问的 URL，避免被恶意利用。\n\n### 关键模块拆解\n- **Fetchers**：多种请求器（同步/异步、隐身、动态渲染），统一接口。`StealthyFetcher.adaptive = True` 启用内置反反爬 tricks。\n- **Parser**：基于 lxml，支持 CSS/XPath/regex 选择器，自适应重定位是本库的杀手特性。\n- **Spider**：类 Scrapy 风格，支持异步、并发、中间件、信号。\n- **Proxy 集成**：自动从文件或 API 加载代理列表，实现轮换和失败切换。\n\n### 与其他框架的对比\n- **vs Scrapy**：Scrapy 更成熟，但无需自带自适应解析和隐身请求；Scrapling 更易上手且抗反爬能力更强。\n- **vs BeautifulSoup/Requests**：Scrapling 提供更高层抽象，省去手动处理 Cookie、代理、渲染的麻烦。\n- **vs 直接使用 Playwright**：Scrapling 封装了 Playwright 并加入自适应选择器，对开发者更友好。",
+            "failure_mode": "自适应解析器可能误匹配，导致抓取到错误元素，需要仔细验证签名。",
+            "source_pointer": "https://github.com/d4vinci/scrapling"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/BSD-3-Clause/v0.4.8"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/scrapling-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/scrapling-repo]]"
+        ],
+        "metrics": [
+          "stars=59800",
+          "forks=5772",
+          "open_issues=24",
+          "latest_release=v0.4.8",
+          "pushed_at=2026-06-01T23:19:28Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "自适应解析器可能误匹配，导致抓取到错误元素，需要仔细验证签名。",
+          "隐身请求依赖对 Playwright 的配置，高级反爬（如 DataDome 等）可能会失效，需持续关注社区更新。",
+          "Spider 的高并发和代理轮换如果配置不当，可能消耗大量内存或触发被爬站点的防御。",
+          "MCP 服务器若不加限制，可能被恶意 Agent 利用发起任意请求，必须实施 URL 白名单等安全措施。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/d4vinci/scrapling"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/scrapling-main-claim]],官方 artifact 落库为 [[artifacts/scrapling-repo]]。See [[content/scrapling]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/scrapling-main-claim]],官方 artifact 落库为 [[artifacts/scrapling-repo]]。See [[content/scrapling]]。",
+      "links": [
+        {
+          "target": "claims/scrapling-main-claim",
+          "raw": "[[claims/scrapling-main-claim]]"
+        },
+        {
+          "target": "artifacts/scrapling-repo",
+          "raw": "[[artifacts/scrapling-repo]]"
+        },
+        {
+          "target": "claims/scrapling-main-claim",
+          "raw": "[[claims/scrapling-main-claim]]"
+        },
+        {
+          "target": "artifacts/scrapling-repo",
+          "raw": "[[artifacts/scrapling-repo]]"
+        },
+        {
+          "target": "content/scrapling",
+          "raw": "[[content/scrapling]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/skills-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "skills-evidence-pack",
+      "title": "skills — Evidence Pack",
+      "file": "evidence-packs/skills-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "skills",
+        "kind": "evidence-pack",
+        "title": "skills — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一套小型、可组合的编码代理技能集，用工程最佳实践解决代理开发中的对齐、沟通、反馈和架构退化问题。",
+            "internal_logic": "### Agent Loop 集成\n技能通过**斜杠命令**（如 `/grill-me`）注入代理的命令循环。代理识别命令后，加载对应的 `SKILL.md` 并执行其中的工作流指令。这相当于在现有代理的**工具调用层**增加了自定义行为，但技能本身不控制整体循环。\n\n### Tool Interface（技能接口）\n每个技能是一个 Markdown 文件，遵循约定：存放在 `skills/<category>/<name>/SKILL.md`。接口简洁：文件名即为命令名，文档内包含指令、参数和资源引用。安装器将技能注册到代理中，使其可被发现和调用。这种设计类似**声明式工具注册表**，无需额外代码。\n\n### State / Memory 管理\n技能利用文件系统建立**持久化记忆**：\n- `CONTEXT.md`：保存共享语言和领域术语，作为**长期语义记忆**，减少后续对话的歧义和 token 消耗。\n- `docs/adr/`：架构决策记录（ADR），记录重大设计决策的上下文，供代理回溯。\n- **交接文档**（`/handoff`）：将当前会话压缩为结构化文档，允许其他代理接续工作，充当**会话状态快照**。\n- **Triage 标签词汇表**：通过 `/setup-matt-pocock-skills` 配置，存储每个仓库的标签语义，维持一致的问题分类。\n\n### Planner（规划阶段）\n部分技能在代理生成计划前执行：\n- `/grill-me` / `/grill-with-docs`：执行**需求盘问**，强制代理提问以澄清模糊点，类似规划前的**对齐检查**。\n- `/to-prd` 和 `/to-issues`：将对话上下文合成为产品需求文档（PRD）或任务列表，直接生成**可执行的规划产物**。\n- `/zoom-out`：要求代理解释代码时提供**系统级视角**，影响后续规划的理解基础。\n\n### Sandbox 与安全边界\n仓库不提供完整的沙箱环境，但通过以下方式构建安全边界：\n- **Git 护栏**（`/git-guardrails-claude-code`）：配置钩子阻止危险命令（如 `push`, `reset --hard`），防止代理误操作。\n- **可审查性**：所有技能为纯文本 Markdown，用户可自由审计和修改，降低黑箱风险。\n- **无执行隔离**：技能直接操作本地环境，依赖用户的代理配置和系统权限，无额外沙箱。\n\n### 关键模块\n- **工程技能**：`diagnose` (系统化调试循环)、`tdd` (红-绿-重构)、`triage` (状态机分类)、`improve-codebase-architecture` (架构腐烂修复)、`prototype` (丢弃型原型)。\n- **生产效率技能**：`caveman` (超压缩沟通，减少75% token)、`handoff` (会话交接)、`write-a-skill` (技能工厂)。\n- **设置技能**：`setup-matt-pocock-skills` (项目初始化配置，统筹问题跟踪、标签、文档路径)。\n\n### 类似项目比较\nREADME 提及 GSD、BMAD、Spec-Kit 等方案，指出它们“拥有流程但剥夺控制权”。本技能集与之相反：**小型、可组合、可改造**，不强制流程，而是提供可插拔的纪律约束。类似理念可见于 Cursor Rules 和自定义命令，但本仓库提供了更系统的工程模式封装。",
+            "failure_mode": "技能文件无自动化测试，兼容性仅在作者环境中验证，不同代理行为可能不完全一致。",
+            "source_pointer": "https://github.com/mattpocock/skills"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/MIT/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/skills-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/skills-repo]]"
+        ],
+        "metrics": [
+          "stars=115960",
+          "forks=10166",
+          "open_issues=56",
+          "latest_release=not_found",
+          "pushed_at=2026-06-03T11:46:30Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "技能文件无自动化测试，兼容性仅在作者环境中验证，不同代理行为可能不完全一致。",
+          "高度依赖作者的个人实践，社区贡献模式未明确，长期维护可持续性存疑。",
+          "部分技能（如架构改进）效果受代码库复杂度影响大，可能产生不可预期的修改。",
+          "Git 护栏等安全措施仅通过钩子实现，无法防御代理绕过钩子的情况。"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found",
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/mattpocock/skills"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/skills-main-claim]],官方 artifact 落库为 [[artifacts/skills-repo]]。See [[content/skills]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/skills-main-claim]],官方 artifact 落库为 [[artifacts/skills-repo]]。See [[content/skills]]。",
+      "links": [
+        {
+          "target": "claims/skills-main-claim",
+          "raw": "[[claims/skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/skills-repo",
+          "raw": "[[artifacts/skills-repo]]"
+        },
+        {
+          "target": "claims/skills-main-claim",
+          "raw": "[[claims/skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/skills-repo",
+          "raw": "[[artifacts/skills-repo]]"
+        },
+        {
+          "target": "content/skills",
+          "raw": "[[content/skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/supermemory-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "supermemory-evidence-pack",
+      "title": "supermemory — Evidence Pack",
+      "file": "evidence-packs/supermemory-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "supermemory",
+        "kind": "evidence-pack",
+        "title": "supermemory — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Supermemory 是一个开箱即用的 AI 记忆引擎，自动从对话中提取事实、维护用户画像，并融合 RAG 与连接器，让任何 AI 应用都拥有持久化、可演进的上下文记忆。",
+            "internal_logic": "### 记忆引擎核心：不是 RAG，而是有状态的用户认知\nSupermemory 将记忆定义为随时间和对话更新的**事实知识图谱**，而非简单的文档分块。它从对话中提取原子事实，并维护一个动态更新的用户画像。其关键机制包括：\n- **事实提取与更新**：通过 LLM 从文本中抽取结构化事实，当新信息与旧事实冲突时（如“我搬到了 SF” vs “我住在 NYC”），自动消解矛盾，旧事实被覆盖。\n- **自动遗忘**：临时事实（如“我明天有考试”）在时间点后自动过期；矛盾和新信息会触发旧记忆的降权或删除。\n- **用户画像**：分为静态部分（长期偏好、身份）和动态部分（近期活动、项目），一次调用即可获取完整画像，延迟约 50ms。\n\n### Agent 工具接口：记忆作为可调用的工具\nSupermemory 通过 **MCP（Model Context Protocol）** 和 SDK 包装，将记忆能力暴露为 Agent 可以直接使用的工具。典型的工具集包括：\n- `memory`：保存或忘记信息，Agent 可在对话中主动调用。\n- `recall`：根据查询搜索记忆，返回相关记忆和用户画像摘要。\n- `context`：在对话开始时注入完整用户画像（偏好、近期活动），通过 `/context` 命令触发。\n\n对于开发者，API 提供了更细粒度的控制：\n- `client.add()`：存储任意内容（文本、对话、URL 等），系统自动提取和索引。\n- `client.profile()`：获取用户画像并可选附加搜索，一次调用同时得到静态和动态事实。\n- `client.search.memories()`：混合搜索（Hybrid Search），同时检索个人记忆和知识库文档，解决通用知识和个人上下文结合的问题。\n\n### 状态与存储设计：containerTag 隔离与多模态\n- **隔离机制**：通过 `containerTag`（项目标签）实现多租户/多项目隔离，每个标签下的记忆和画像独立演化，可用于区分不同用户或不同项目。\n- **存储后端**：未在 README 中详细说明，但根据 tech stack（Cloudflare Workers、KV、Postgres、Drizzle ORM）和\"extremely fast, scalable\"的承诺，推测其存储层结合了 Cloudflare KV 用于快速画像读取、Postgres 用于关系型事实存储、向量索引用于语义搜索。\n- **连接器**：自动同步 Google Drive、Gmail、Notion 等外部数据，通过 webhook 实时更新，文件被自动处理、分块并变为可搜索。\n\n### Planner 与上下文编排\nSupermemory 不提供独立的 Planner 组件，但通过混合搜索默认同时执行 RAG 和 Memory 查询，将知识库文档和个人上下文合并返回，相当于为 Agent 的 Planner 提供了统一的上下文来源。用户可以在 `searchMode` 中选择仅记忆或混合模式，灵活控制 Planner 可用的信息类型。\n\n### 安全边界与沙箱\n- **访问控制**：通过 API Key 或 OAuth 保护 MCP 和 API 端点，支持多客户端（Claude、Cursor 等）。\n- **数据隔离**：containerTag 提供基本隔离，但未声明行级安全或加密机制。\n- **沙箱**：未提及代码执行或工具使用的沙箱，因为 Supermemory 主要是数据面，不涉及 Agent 执行动作。其 skill 扩展机制允许运行 `npx` 命令，但安全边界依赖宿主环境。",
+            "failure_mode": "云服务依赖：核心记忆能力通过 hosted API 提供，自托管方案未在 README 中说明，存在厂商锁定风险，且离线或内网部署受限。",
+            "source_pointer": "https://github.com/supermemoryai/supermemory"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/MIT/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/supermemory-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/supermemory-repo]]"
+        ],
+        "metrics": [
+          "stars=24973",
+          "forks=2197",
+          "open_issues=26",
+          "latest_release=not_found",
+          "pushed_at=2026-06-03T12:04:42Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "云服务依赖：核心记忆能力通过 hosted API 提供，自托管方案未在 README 中说明，存在厂商锁定风险，且离线或内网部署受限。",
+          "评估基准的代表性：虽然三大基准 #1，但基准成绩不一定完全对应真实应用中的记忆准确性和时效性，需额外内测验证。",
+          "多模态提取的成熟度：PDF、视频、代码提取等未给出具体实现细节和准确率，可能存在提取质量不稳定的情况。",
+          "市场竞品跟进：Mem0、Zep 等同样主打记忆的玩家也在快速发展，社区和文档的持续投入是保持优势的关键。"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/supermemoryai/supermemory"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/supermemory-main-claim]],官方 artifact 落库为 [[artifacts/supermemory-repo]]。See [[content/supermemory]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/supermemory-main-claim]],官方 artifact 落库为 [[artifacts/supermemory-repo]]。See [[content/supermemory]]。",
+      "links": [
+        {
+          "target": "claims/supermemory-main-claim",
+          "raw": "[[claims/supermemory-main-claim]]"
+        },
+        {
+          "target": "artifacts/supermemory-repo",
+          "raw": "[[artifacts/supermemory-repo]]"
+        },
+        {
+          "target": "claims/supermemory-main-claim",
+          "raw": "[[claims/supermemory-main-claim]]"
+        },
+        {
+          "target": "artifacts/supermemory-repo",
+          "raw": "[[artifacts/supermemory-repo]]"
+        },
+        {
+          "target": "content/supermemory",
+          "raw": "[[content/supermemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/taste-skill-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "taste-skill-evidence-pack",
+      "title": "taste-skill — Evidence Pack",
+      "file": "evidence-packs/taste-skill-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "taste-skill",
+        "kind": "evidence-pack",
+        "title": "taste-skill — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "给 AI 编程助手 (Codex/Cursor/Claude Code) 用的前端 UI 品味提升技能包，通过可调参数和多种风格技能防止生成千篇一律的垃圾界面",
+            "internal_logic": "### agent loop 集成方式\n\n项目本身不是 Agent 框架，而是一组可被 Agent 加载的**技能文件**。集成方式是将 `SKILL.md` 通过 `npx skills add` 安装到 Agent 的配置中，或直接粘贴到对话里。Agent 在处理前端任务时，会读取这些指令并据此调整输出，本质上是在 Agent 的决策循环中插入了额外的约束和规则。没有显式的 agent loop 修改，更多是作为 prompt 增强。\n\n### tool interface\n\n技能作为指令文件，没有定义传统意义上的工具接口（如 API 调用）。它通过声明式规则（例如禁止使用 em-dash、强制使用特定 GSAP 动画骨架）来限制代码生成行为。对于图片生成技能，接口是用户将 SKILL.md 附在对话中，Agent 据此生成设计参考图。\n\n### state / memory\n\n未在 README/artifact 说明。技能文件本身是无状态的，不涉及 Agent 的状态存储或记忆。\n\n### planner\n\n未在 README/artifact 说明。项目不包含任务规划或分解的模块，仅提供风格指导。\n\n### sandbox\n\n未在 README/artifact 说明。生成的代码在 Agent 的外部沙箱中执行，项目本身不提供运行环境隔离。\n\n### 安全边界\n\n技能规则中包含一些硬性禁令（如禁止 em-dash）和风格边界，可视为一种**风格安全边界**，防止 Agent 跌入常见的不良模式。但未涉及代码注入、数据泄露等传统安全议题。\n\n### 核心机制：品味旋钮\n\ntaste-skill v2 引入了三个可调节的 1-10 数值旋钮：**DESIGN_VARIANCE**（布局实验性）、**MOTION_INTENSITY**（动画深度）、**VISUAL_DENSITY**（信息密度）。这些旋钮通过改变提示中强调的权重来影响生成结果，是一种轻量但有效的设计语言参数化方法。\n\n### 多技能组合\n\n项目通过划分多个专用技能实现工作流控制：\n- **代码生成技能**：直接输出代码，如 taste-skill、gpt-taste、soft-skill、minimalist-skill 等。\n- **图片生成技能**：仅生成设计参考图，再交由其他 Agent 编码。\n- **流程技能**：image-to-code-skill 将图片生成、分析和编码组合成一条流水线。\n- **改造技能**：redesign-skill 专门针对现有项目进行 UI 审计和修复。\n这些技能可自由组合，适应不同开发阶段。",
+            "failure_mode": "deep: agent/workflow evidence, skills/hooks evidence, model/RAG evidence",
+            "source_pointer": "https://github.com/leonxlnx/taste-skill"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/true/MIT/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/taste-skill-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/taste-skill-repo]]"
+        ],
+        "metrics": [
+          "stars=32267",
+          "forks=2375",
+          "open_issues=24",
+          "latest_release=not_found",
+          "pushed_at=2026-05-26T19:31:39Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "deep: agent/workflow evidence, skills/hooks evidence, model/RAG evidence"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/leonxlnx/taste-skill"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/taste-skill-main-claim]],官方 artifact 落库为 [[artifacts/taste-skill-repo]]。See [[content/taste-skill]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/taste-skill-main-claim]],官方 artifact 落库为 [[artifacts/taste-skill-repo]]。See [[content/taste-skill]]。",
+      "links": [
+        {
+          "target": "claims/taste-skill-main-claim",
+          "raw": "[[claims/taste-skill-main-claim]]"
+        },
+        {
+          "target": "artifacts/taste-skill-repo",
+          "raw": "[[artifacts/taste-skill-repo]]"
+        },
+        {
+          "target": "claims/taste-skill-main-claim",
+          "raw": "[[claims/taste-skill-main-claim]]"
+        },
+        {
+          "target": "artifacts/taste-skill-repo",
+          "raw": "[[artifacts/taste-skill-repo]]"
+        },
+        {
+          "target": "content/taste-skill",
+          "raw": "[[content/taste-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/ui-tars-desktop-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "ui-tars-desktop-evidence-pack",
+      "title": "UI-TARS-desktop — Evidence Pack",
+      "file": "evidence-packs/ui-tars-desktop-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "ui-tars-desktop",
+        "kind": "evidence-pack",
+        "title": "UI-TARS-desktop — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个开源的多模态 AI Agent 栈，让 AI 直接操控你的电脑、浏览器和终端，像人类一样完成订票、填表等复杂 UI 任务",
+            "internal_logic": "### Agent Loop 与事件驱动\n\nAgent TARS 的回路基于 **Event Stream** 协议，每一步动作（思考、工具调用、截图、结果）都被序列化为事件。这使得整个 loop 可观测、可中断、可重放。用户通过 CLI 或 Web UI 发起任务后，Agent 进入「感知 → 推理 → 行动」循环，**多模态 LLM** 接收屏幕截图/元素信息，输出下一步操作指令（例如点击坐标、输入文本），然后由运行时执行，并将执行结果重新反馈给模型。该事件流不仅驱动 Agent 行为，还直接驱动前端 UI 的实时更新，实现了执行与展示的分离。\n\n#### 混合感知与行动\n\n浏览器操作支持三种策略：**Visual Grounding**（基于屏幕截图让模型理解界面）、**DOM**（解析页面元素树提供结构化信息）、以及二者的混合。这解决了纯视觉方案在复杂网页中定位不准的问题，同时利用 DOM 信息提高效率。Agent 可以根据任务难度动态选择最合适的感知模式。\n\n### Tool Interface：MCP 作为统一工具层\n\n整个 Agent 内核构建在 **MCP（Model Context Protocol）** 之上，所有工具（浏览器操作、命令行执行、文件读写、第三方 API）都被抽象为 MCP Server。用户可以通过配置挂载额外的 MCP 服务，例如搜索引擎、机票 API，无缝扩展 Agent 能力。工具调用同样通过事件流通知，调用结果以结构化的方式流式返回，并带有计时统计。\n\n#### 沙箱：AIO Agent Sandbox\n\n为了实现安全的工具执行，Agent TARS 集成了 **AIO agent Sandbox**，这是一个独立的、一体化的执行环境。Shell 命令、文件操作等危险操作会被隔离运行，防止对宿主系统造成破坏。沙箱的引入使得 Agent 能够执行任意、多步的工具链，而不会触发系统的安全告警或污染用户环境。\n\n### State / Memory 管理\n\n项目主要通过 **Context Engineering**（上下文工程）来管理状态和记忆，它会动态压缩和重组历史交互，将关键的截图、DOM 快照、用户指令和工具结果保留在模型上下文中。与传统的对话记忆不同，这种工程化上下文专门为 GUI Agent 设计，确保在长长的操作序列中模型不会丢失目标。\n\n#### Planner 实现\n\n未在 README/artifact 中说明明确的规划器模块。从行为上看，多模态 LLM 本身扮演了规划器角色，根据当前屏幕状态和历史事件流决定下一步动作，属于「反应式规划」，而没有预先规划整个任务树。未来版本可能加入分层规划（如将复杂任务拆解为子任务），但目前未提供证据。\n\n### 安全边界\n\n未在 README/artifact 中说明安全边界的具体策略。存在以下隐含担忧：GUI 操作可以访问用户屏幕上的任何内容，包括敏感信息；远程计算机和浏览器操作可能被滥用。项目提及沙箱隔离工具执行，但未说明数据隐私保护、操作权限限制、或对 AI 行为的审计机制。\n\n### 关键模块与架构\n\n仓库采用 **pnpm monorepo** 结构：\n\n- **apps/**：包含 UI-TARS Desktop 应用和 Agent TARS Web UI，使用 Electron？\n- **packages/**：存放可复用的核心逻辑，如 @agent-tars/cli、@agent-tars/sdk 等。\n- **infra/**：基础设施代码，可能包含 MCP 内核实现。\n- **multimodal/**：多模态模型相关逻辑。\n\nAgent TARS 本身是一个命令行工具，同时提供 Web UI 作为可选的图形化交互方式。UI-TARS Desktop 则是独立的桌面应用程序，直接运行在用户操作系统上，能够控制本地窗口和应用。",
+            "failure_mode": "安全边界未明确：Agent 能截取全屏截图、执行任意系统命令，虽提供沙箱但仅在工具执行层隔离，缺乏对模型操作行为的细粒度权限控制和审计日志",
+            "source_pointer": "https://github.com/bytedance/ui-tars-desktop"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/true/Apache-2.0/v0.3.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/ui-tars-desktop-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/ui-tars-desktop-repo]]"
+        ],
+        "metrics": [
+          "stars=35949",
+          "forks=3619",
+          "open_issues=401",
+          "latest_release=v0.3.0",
+          "pushed_at=2026-05-18T02:55:49Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "安全边界未明确：Agent 能截取全屏截图、执行任意系统命令，虽提供沙箱但仅在工具执行层隔离，缺乏对模型操作行为的细粒度权限控制和审计日志",
+          "模型依赖性强：底层模型 UI-TARS 与 Seed-VL 为字节跳动专有，虽然开源但社区生态不如主流模型，切换其他 VLM 可能需要大量适配工作",
+          "生产环境成熟度存疑：当前最新版本 v0.3.0，开放 issue 超过 400 个，部分功能（如远程操作）可能尚不稳定，缺乏全面的测试覆盖和 CI/CD 证明",
+          "仅支持 Node.js 生态：整体项目基于 TypeScript/Node.js，虽然跨平台但限制了非 JS 栈的开发者和生产环境（如 Python 后端）的深度集成",
+          "远程操控风险：远程计算机和浏览器操作功能免费且零配置，但未说明身份认证机制，存在被恶意利用的风险"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/bytedance/ui-tars-desktop"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ui-tars-desktop-main-claim]],官方 artifact 落库为 [[artifacts/ui-tars-desktop-repo]]。See [[content/ui-tars-desktop]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/ui-tars-desktop-main-claim]],官方 artifact 落库为 [[artifacts/ui-tars-desktop-repo]]。See [[content/ui-tars-desktop]]。",
+      "links": [
+        {
+          "target": "claims/ui-tars-desktop-main-claim",
+          "raw": "[[claims/ui-tars-desktop-main-claim]]"
+        },
+        {
+          "target": "artifacts/ui-tars-desktop-repo",
+          "raw": "[[artifacts/ui-tars-desktop-repo]]"
+        },
+        {
+          "target": "claims/ui-tars-desktop-main-claim",
+          "raw": "[[claims/ui-tars-desktop-main-claim]]"
+        },
+        {
+          "target": "artifacts/ui-tars-desktop-repo",
+          "raw": "[[artifacts/ui-tars-desktop-repo]]"
+        },
+        {
+          "target": "content/ui-tars-desktop",
+          "raw": "[[content/ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/vibe-trading-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "vibe-trading-evidence-pack",
+      "title": "Vibe-Trading — Evidence Pack",
+      "file": "evidence-packs/vibe-trading-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "vibe-trading",
+        "kind": "evidence-pack",
+        "title": "Vibe-Trading — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "面向个人开发者的 AI 交易代理框架，一条命令让 LLM 智能体接管市场研究、策略回测与多券商安全交易（来源：README 标题与定位语）",
+            "internal_logic": "### 代理循环与工具接口\n\n代理循环采用典型的 ReAct 模式，LLM 通过工具调用来完成任务。关键特性：\n- **迭代预算与强制结束**：代理循环在达到 80% 迭代预算时触发 wrap-up nudge，最后一步移除工具定义，强制模型生成最终文本答案，防止陷入死循环（来源：README 2026-05-30 robustness pass #148）\n- **MCP 工具集成**：通过 MCP 协议暴露 36 个工具，涵盖数据获取、回测、交易下单等。工具调用 trace 携带 `call_id` 以实现结果回溯（来源：README 2026-06-03 #168）\n- **并发与心跳**：Swarm 模式下 worker 可调用外部 MCP 服务器，带心跳保活与 stale run 回收机制（来源：README 2026-05-28 Swarm safety & 05-22 MCP keepalive）\n\n**示例**：对代理说“分析特斯拉过去一个月走势，如果适合买入则用 paper 账户下 10 股”，代理会依次调用 `yfinance` 数据工具、`run_backtest` 工具、`trading_place_order` MCP 工具（经过 mandate 检查）。\n\n### 状态与记忆\n\n- **会话持久化**：session 消息以 JSONL 追加写入，每次写入后 `flush + fsync` 防止崩溃丢失（来源：README 2026-05-30 #147）\n- **研究目标快照**：Goal 层持久化 claims、evidence 等，代理可从当前快照继续推进，而非仅依赖原始 prompt（来源：README 2026-05-26 Goal lifecycle）\n- **假设注册表**：Hypothesis Registry 支持持久化查询和状态过滤（来源：README 2026-05-20）\n\n### 规划与多代理协作\n\n- **Research Goal**：用户可定义目标、接受标准、证据行和完成策略，代理自动分解任务并记录进度（来源：README 2026-05-24）\n- **Swarm**：DAG 工作流，支持上游失败阻断下游任务，worker 可配置外部 MCP 工具（来源：README 2026-05-28 #145, #142）\n- **strict alpha gate**：`run_bench_strict()` 加入同 universe 随机对照与 OOS 分割，防止仅捕捉市场 Beta 的因子通过（来源：README 2026-05-28 #143）\n\n### 沙盒与安全边界\n\n**安全模型的核心是 mandate + 多道防线**：\n- **用户提交的 mandate**：交易前需定义 symbol 白名单、最大 order size、总曝光、杠杆倍数、日交易额上限（来源：README 2026-05-29 Robinhood 安全模型）\n- **文件系统 kill switch**：存在特定文件即立刻阻止所有新订单并平仓（来源：同上）\n- **fail-closed pre-trade gate**：任何检查失败拒绝下单，不静默放行（来源：同上）\n- **审计账本**：所有指令与决策记录完整审计日志（来源：同上）\n- **paper/live 结构隔离**：通过帐号格式、主机隔离、demo flag 等确保 paper 和 live 绝对分离，Longbridge 因 API 无 paper/live 判别器而只能 paper + read-only（来源：README 2026-06-02 broker connectors）\n\n**连接器设计**：每个 broker connector 明确区分只读、paper 下单、mandate 保护的下单三种能力层次，并在连接器选择时显式区分 paper/live 属性（来源：README 2026-05-31 connector-first architecture）\n\n### 数据与回测\n\n- 多数据源 fallback: `mootdx`（通达信原生 TCP，A 股）、`ccxt`（代理支持，加密货币）、`yfinance` 等\n- 回测支持 LLM 生成信号引擎，有预检接口验证（来源：README 2026-05-30 #149）\n- 输出渲染优化，鼓励 markdown 表格，去除多余分隔线（来源：README 2026-05-27 #139）\n\n### 部署与前端\n\n- 单命令安装 `pip install vibe-trading-ai`，支持 Docker\n- 后端 FastAPI + React 19 前端\n- CLI 交互式终端，支持管道输出（来源：README 2026-05-23 Interactive CLI refresh）",
+            "failure_mode": "安全依赖用户正确配置 mandate，若用户疏忽将限制设得过宽，可能存在意外损失风险；项目声明「Experimental / use at your own risk」",
+            "source_pointer": "https://github.com/hkuds/vibe-trading"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/MIT/v0.1.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/vibe-trading-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/vibe-trading-repo]]"
+        ],
+        "metrics": [
+          "stars=10060",
+          "forks=2016",
+          "open_issues=7",
+          "latest_release=v0.1.9",
+          "pushed_at=2026-06-04T02:43:31Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "安全依赖用户正确配置 mandate，若用户疏忽将限制设得过宽，可能存在意外损失风险；项目声明「Experimental / use at your own risk」",
+          "LLM 输出的不可预测性可能导致不符合预期的交易行为，即使有 mandate 限制，仍可能在允许范围内做出错误决策",
+          "金融监管合规风险：代理提供的建议和自动交易可能涉及投资咨询牌照，不同司法管辖区要求不同",
+          "依赖的实验性 broker connector（如 Binance、OKX）可能不稳定，导致订单丢失或状态不一致",
+          "社区版可见 issue 少但实际使用中可能有较深的 bug，因开源时间短尚未暴露"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/hkuds/vibe-trading"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/vibe-trading-main-claim]],官方 artifact 落库为 [[artifacts/vibe-trading-repo]]。See [[content/vibe-trading]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/vibe-trading-main-claim]],官方 artifact 落库为 [[artifacts/vibe-trading-repo]]。See [[content/vibe-trading]]。",
+      "links": [
+        {
+          "target": "claims/vibe-trading-main-claim",
+          "raw": "[[claims/vibe-trading-main-claim]]"
+        },
+        {
+          "target": "artifacts/vibe-trading-repo",
+          "raw": "[[artifacts/vibe-trading-repo]]"
+        },
+        {
+          "target": "claims/vibe-trading-main-claim",
+          "raw": "[[claims/vibe-trading-main-claim]]"
+        },
+        {
+          "target": "artifacts/vibe-trading-repo",
+          "raw": "[[artifacts/vibe-trading-repo]]"
+        },
+        {
+          "target": "content/vibe-trading",
+          "raw": "[[content/vibe-trading]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/voxcpm-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "voxcpm-evidence-pack",
+      "title": "VoxCPM — Evidence Pack",
+      "file": "evidence-packs/voxcpm-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "voxcpm",
+        "kind": "evidence-pack",
+        "title": "VoxCPM — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "VoxCPM 是一个无 tokenizer 的端到端文本转语音系统，通过扩散自回归架构直接生成连续语音，支持 30 种语言、语音设计、可控克隆和 48kHz 高质量输出，提供 Python API、CLI 和 Web demo。",
+            "internal_logic": "### 嵌入开发流的位置\n- **Python 库**：通过 `pip install voxcpm` 作为依赖引入，在代码中 `from voxcpm import VoxCPM`，实例化后调用 `generate` 方法即可将文本转为音频。\n- **命令行工具**：提供 `voxcpm` 命令，可作为独立步骤嵌入脚本或 CI 流程（例如，将文本文件批量合成为音频）。\n- **生产服务**：支持通过 Nano-vLLM 或 vLLM-Omni 启动 OpenAI 兼容的 HTTP API，可作为微服务集成到更大的语音应用后端。\n\n### 命令入口\n- CLI 主命令：`voxcpm`。\n- 子命令：`design`（语音设计）、`clone`（语音克隆）、`batch`（批量处理）。\n- 参数示例：`--text` 指定合成文本、`--output` 输出文件、`--reference-audio` 参考音频、`--control` 风格描述。\n- 实际用例：\n  ```bash\n  # 根据文本描述生成语音\n  voxcpm design --text \"Hello, world\" --output out.wav\n  # 从参考音频克隆\n  voxcpm clone --text \"克隆语音\" --reference-audio voice.wav --output clone.wav\n  # 批量处理\n  voxcpm batch --input examples/input.txt --output-dir outs\n  ```\n\n### 配置\n- 模型配置：通过 `from_pretrained` 的参数加载，例如 `load_denoiser=False`。\n- 运行时设备：Web demo 支持 `--device auto/cpu/cuda` 等。\n- 高级配置：`cfg_value`、`inference_timesteps` 等生成参数在 API 调用时传入，无需外部配置文件。\n\n### 插件/扩展\n- 未在 README 中描述内建插件系统，但生态系统提供两种加速引擎：\n  - [Nano-vLLM-VoxCPM](https://github.com/a710128/nanovllm-voxcpm)：提供低延迟并发推理。\n  - [vLLM-Omni](https://github.com/vllm-project/vllm-omni)：PagedAttention 和多 GPU 部署。\n- 微调扩展：`lora_ft_webui.py` 提供 LoRA 微调的 Web 界面，可定制音色。\n\n### 错误处理\n- 未在 README 中详细说明错误处理策略，但作为 Python 库，预期会抛出异常（如文件不存在、CUDA 不可用等），用户需通过标准异常捕获处理。CLI 会输出错误信息并退出。",
+            "failure_mode": "资源需求高：2B 参数模型需约 8 GB VRAM，需要 NVIDIA GPU（CUDA ≥ 12.0），限制了在低资源设备上的使用。",
+            "source_pointer": "https://github.com/openbmb/voxcpm"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/false/true/Apache-2.0/2.0.3"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/voxcpm-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/voxcpm-repo]]"
+        ],
+        "metrics": [
+          "stars=25498",
+          "forks=2907",
+          "open_issues=113",
+          "latest_release=2.0.3",
+          "pushed_at=2026-05-22T03:27:10Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "资源需求高：2B 参数模型需约 8 GB VRAM，需要 NVIDIA GPU（CUDA ≥ 12.0），限制了在低资源设备上的使用。",
+          "内容安全：README 提到“risks and limitations”但未给出具体缓解措施，可能生成不当内容。",
+          "语言覆盖有限：支持 30 种语言，但许多低资源语言不在其中，且方言支持很少。",
+          "实时性依赖 GPU：即使 RTF 低至 0.3，仍需要高端 GPU，CPU 模式未提及性能。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/openbmb/voxcpm"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/voxcpm-main-claim]],官方 artifact 落库为 [[artifacts/voxcpm-repo]]。See [[content/voxcpm]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/voxcpm-main-claim]],官方 artifact 落库为 [[artifacts/voxcpm-repo]]。See [[content/voxcpm]]。",
+      "links": [
+        {
+          "target": "claims/voxcpm-main-claim",
+          "raw": "[[claims/voxcpm-main-claim]]"
+        },
+        {
+          "target": "artifacts/voxcpm-repo",
+          "raw": "[[artifacts/voxcpm-repo]]"
+        },
+        {
+          "target": "claims/voxcpm-main-claim",
+          "raw": "[[claims/voxcpm-main-claim]]"
+        },
+        {
+          "target": "artifacts/voxcpm-repo",
+          "raw": "[[artifacts/voxcpm-repo]]"
+        },
+        {
+          "target": "content/voxcpm",
+          "raw": "[[content/voxcpm]]"
+        }
+      ],
       "headings": [
         {
           "depth": 2,

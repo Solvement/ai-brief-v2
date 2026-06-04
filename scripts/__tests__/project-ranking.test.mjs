@@ -82,3 +82,89 @@ test("daily depth target helper does not cap deep candidates", () => {
   assert.equal(assigned.filter((item) => item.eval.final_depth === "deep").length, 2);
   assert.equal(assigned.filter((item) => item.eval.rejection_reasons.some((reason) => reason.startsWith("daily_"))).length, 0);
 });
+
+test("ordinary AI projects need a strong signal before Tier 3", () => {
+  const ordinary = {
+    owner: "indie-dev",
+    owner_type: "User",
+    repo: "agent-workbench",
+    trend_sources: ["github-trending:daily", "github-trending:weekly"],
+    appears_in_tabs: ["daily", "weekly"],
+    stars: 2400,
+    stars_in_period: 520,
+    forks: 80,
+    language: "TypeScript",
+    topics: ["ai", "agent", "mcp"],
+    description: "AI agent workbench with MCP tools, RAG memory, install docs, examples, demos, and tests",
+    created_at: "2026-05-01T00:00:00Z",
+    raw_readme: "Agent runtime with MCP tools, RAG memory, installation, examples, demos, tests, docs, CLI usage, and reusable workflow orchestration. ".repeat(30),
+    readme_found: true,
+    readme_fetch_failed: false,
+    readme_empty: false,
+    readme_length: 3600,
+    top_level_dirs: ["src", "agents", "mcp", "docs", "examples", "tests"],
+    key_files: ["package.json", "README.md"],
+    has_docs: true,
+    has_examples: true,
+    has_tests: true,
+    has_install: true,
+    has_cli: true,
+    has_agents: true,
+    has_mcp: true,
+    has_skills: false,
+    has_models: true,
+    has_demo: true,
+    package_files: { package_json: true },
+  };
+
+  const decision = decideProjectDepth({ ranking: scoreProject(ordinary), evidence_signals: ordinary });
+
+  assert.equal(decision.project_tier, 2);
+  assert.equal(decision.final_depth, "analysis");
+  assert.equal(decision.requires_manual_confirmation, false);
+  assert.ok(!decision.ranking_reasons.some((reason) => reason.startsWith("tier3:strong_signal:")));
+});
+
+test("Tier 3 is scarce and marked only when a strong signal is present", () => {
+  const arxivBacked = {
+    owner: "research-lab",
+    owner_type: "Org",
+    repo: "agentic-training-runtime",
+    trend_sources: ["github-trending:daily", "github-trending:weekly"],
+    appears_in_tabs: ["daily", "weekly"],
+    stars: 3200,
+    stars_in_period: 720,
+    forks: 120,
+    language: "Python",
+    topics: ["ai", "agent", "benchmark"],
+    description: "Novel agentic training runtime with execution feedback benchmark",
+    homepage: "https://arxiv.org/abs/2601.12345",
+    created_at: "2026-04-15T00:00:00Z",
+    raw_readme: "Novel agentic training method with execution feedback, benchmark results, installation, examples, demos, tests, docs, and CLI usage. arXiv:2601.12345 ".repeat(30),
+    readme_found: true,
+    readme_fetch_failed: false,
+    readme_empty: false,
+    readme_length: 4500,
+    top_level_dirs: ["src", "agents", "docs", "examples", "tests"],
+    key_files: ["pyproject.toml", "README.md"],
+    has_docs: true,
+    has_examples: true,
+    has_tests: true,
+    has_install: true,
+    has_cli: true,
+    has_agents: true,
+    has_mcp: false,
+    has_skills: false,
+    has_models: true,
+    has_demo: true,
+    package_files: { pyproject_toml: true },
+  };
+
+  const decision = decideProjectDepth({ ranking: scoreProject(arxivBacked), evidence_signals: arxivBacked });
+
+  assert.equal(decision.project_tier, 3);
+  assert.equal(decision.final_depth, "deep");
+  assert.equal(decision.requires_manual_confirmation, true);
+  assert.ok(decision.ranking_reasons.includes("tier3:strong_signal:arxiv"));
+  assert.ok(decision.ranking_reasons.includes("manual_confirmation_required"));
+});

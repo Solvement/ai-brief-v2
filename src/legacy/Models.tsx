@@ -159,6 +159,13 @@ function ModelsIndex({ data, onRefresh, refreshing }: { data: ModelsData; onRefr
                 <b>{entry.latestVersion}</b>
                 <span>{relativeTime(entry.latestReleasedAt)}</span>
               </div>
+              {entry.paradigm && (
+                <div className="model-card-access">
+                  <AccessPill label={(entry.paradigm.card as ParadigmCard | undefined)?.开放度标签} access={entry.paradigm.access} />
+                  {entry.paradigm.branch === "update" && <span className="model-card-tag">版本更新</span>}
+                  {entry.paradigm.branch === "new_model" && <span className="model-card-tag new">新模型</span>}
+                </div>
+              )}
               <p className="model-card-takeaway">{takeaway(entry)}</p>
               <StatusChips entry={entry} inCard />
               <div className="model-card-foot"><span>查看分析 &gt;</span></div>
@@ -205,6 +212,8 @@ function ModelDetail({ entry, generatedAt, onRefresh, refreshing }: { entry: Mod
             <RefreshButton onRefresh={onRefresh} refreshing={refreshing} lastChecked={generatedAt} />
           </aside>
         </section>
+
+        <ParadigmBlock entry={entry} />
 
         {entry.kind === "open" ? <OpenAnalysisView entry={entry} /> : <ClosedChangelogView entry={entry} />}
 
@@ -358,6 +367,253 @@ function sourceTypeLabel(sourceType: string): string {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return <div className="info-row"><span>{label}</span><b>{value}</b></div>;
+}
+
+// ─────────────────────────── paradigm cards ───────────────────────────
+
+interface ParadigmBenchmark {
+  名称?: string;
+  分数?: string;
+  对手?: string;
+  标注?: string; // 自报 / 实测
+  解读?: string;
+}
+
+interface ParadigmCard {
+  名称?: string;
+  厂商?: string;
+  发布日?: string;
+  开放度标签?: string;
+  类型?: string;
+  规模架构?: string;
+  关键benchmark?: ParadigmBenchmark[];
+  强弱一句?: string;
+  一句话定位?: string;
+  术语注解?: string[];
+  许可证?: { 名称?: string; 能否商用?: string };
+  自托管硬件?: string;
+  可用变体?: string[];
+  base_model?: string;
+  价格?: { 输入每百万token?: string; 输出每百万token?: string };
+  知识截止?: string;
+  "model string"?: string;
+  速率?: string;
+  "多模态I/O"?: string;
+}
+
+interface ParadigmUpdate {
+  版本?: string;
+  变了什么?: string[];
+  破坏性提醒?: { [k: string]: string };
+  值不值得切一句?: string;
+}
+
+function isMissing(v?: string): boolean {
+  return !v || v === "官方未披露" || v === "000";
+}
+
+/** Colored pill for openness label (开放度). */
+function AccessPill({ label, access }: { label?: string; access?: string }) {
+  const text = label || (access === "open" ? "开源" : "闭源");
+  let cls = "closed";
+  if (text.includes("真开源")) cls = "open-free";
+  else if (text.includes("有条件")) cls = "open-cond";
+  else if (text.includes("仅研究")) cls = "research";
+  else if (text.includes("闭源") || text.includes("仅API")) cls = "closed";
+  return <span className={`access-pill ${cls}`}>{text}</span>;
+}
+
+function ParadigmBlock({ entry }: { entry: ModelEntry }) {
+  const p = entry.paradigm;
+  if (!p) return null;
+  if (p.template === "version_update" && p.update) {
+    return <VersionUpdateCard entry={entry} card={p.card as ParadigmCard | undefined} update={p.update as ParadigmUpdate} access={p.access} updateSize={p.updateSize} />;
+  }
+  if (p.template === "variant_merged" || p.branch === "variant_merged" || p.variant) {
+    return <VariantMergedCard entry={entry} variant={p.variant as VariantInfo | undefined} card={p.card as ParadigmCard | undefined} />;
+  }
+  if (p.card) {
+    return <NewModelCard entry={entry} card={p.card as ParadigmCard} access={p.access} />;
+  }
+  return null;
+}
+
+interface VariantInfo {
+  名称?: string;
+  name?: string;
+  canonical?: string;
+  归并入?: string;
+  merged_into?: string;
+  可用变体?: string[];
+  note?: string;
+  备注?: string;
+}
+
+/** Fallback card for variant models that were merged into a canonical entry. */
+function VariantMergedCard({ entry, variant, card }: { entry: ModelEntry; variant?: VariantInfo; card?: ParadigmCard }) {
+  const v = variant || {};
+  const variantName = v.名称 || v.name || card?.名称 || entry.latestVersion || entry.id;
+  const canonical = v.canonical || v.归并入 || v.merged_into || "";
+  const variants = v.可用变体 || card?.可用变体 || [];
+  const note = v.note || v.备注 || "";
+  return (
+    <section className="section">
+      <div className="section-kicker">变体已归并</div>
+      <article className="paradigm-card variant-merged">
+        <div className="pcard-head">
+          <h3>{variantName}</h3>
+          <span className="access-pill open-cond">[变体·已归并]</span>
+        </div>
+        <div className="pcard-line">
+          <b>说明</b>
+          <p>
+            这是一个变体版本，已归并到{canonical ? <> 正式版 <b>{canonical}</b></> : "正式版"}下。
+            {canonical ? "请在正式版的「可用变体」中查看。" : "详情见对应正式版条目。"}
+          </p>
+        </div>
+        {variants.length > 0 && (
+          <div className="pcard-meta pcard-meta--extra">
+            <span className="pcard-meta-wide"><b>可用变体</b> {variants.join(" · ")}</span>
+          </div>
+        )}
+        {!isMissing(note) && <div className="pcard-line"><b>备注</b><p>{note}</p></div>}
+      </article>
+    </section>
+  );
+}
+
+function BenchAttr({ attr }: { attr?: string }) {
+  // No defaulting to 自报: only show a definite pill when the source is known.
+  if (attr === "实测") return <span className="bench-attr verified">✓ 实测</span>;
+  if (attr === "自报") return <span className="bench-attr self">自报</span>;
+  return <span className="bench-attr unknown">来源未披露</span>;
+}
+
+function NewModelFields({ card, access }: { card: ParadigmCard; access?: string }) {
+  const isOpen = access === "open";
+  const benches = (card.关键benchmark || []).filter((b) => !isMissing(b.名称) && !isMissing(b.分数));
+  return (
+    <>
+      <div className="pcard-meta">
+        <span><b>厂商</b> {card.厂商 || "—"}</span>
+        <span><b>发布日</b> {isMissing(card.发布日) ? "未披露" : card.发布日}</span>
+        {!isMissing(card.类型) && <span><b>类型</b> {card.类型}</span>}
+        {!isMissing(card.规模架构) && <span><b>规模/架构</b> {card.规模架构}</span>}
+      </div>
+
+      {benches.length > 0 && (
+        <div className="pcard-section">
+          <div className="pcard-label">关键 benchmark</div>
+          <div className="pcard-bench-list">
+            {benches.map((b, i) => (
+              <div className="pcard-bench" key={`${b.名称}-${i}`}>
+                <div className="pcard-bench-top">
+                  <span className="pcard-bench-name">{b.名称}</span>
+                  <BenchAttr attr={b.标注} />
+                </div>
+                <div className="pcard-bench-score">{b.分数}</div>
+                {!isMissing(b.对手) && <div className="pcard-bench-vs">{b.对手}</div>}
+                {!isMissing(b.解读) && <div className="pcard-bench-note">{b.解读}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!isMissing(card.强弱一句) && (
+        <div className="pcard-line"><b>强在哪 / 弱在哪</b><p>{card.强弱一句}</p></div>
+      )}
+      {!isMissing(card.一句话定位) && (
+        <div className="pcard-line"><b>一句话定位</b><p>{card.一句话定位}</p></div>
+      )}
+
+      {isOpen ? (
+        <div className="pcard-meta pcard-meta--extra">
+          {card.许可证 && <span><b>许可证</b> {card.许可证.名称}（{card.许可证.能否商用 || "?"}）</span>}
+          {!isMissing(card.自托管硬件) && <span><b>自托管硬件</b> {card.自托管硬件}</span>}
+          {!isMissing(card.base_model) && <span><b>base model</b> {card.base_model}</span>}
+          {card.可用变体 && card.可用变体.length > 0 && <span className="pcard-meta-wide"><b>可用变体</b> {card.可用变体.join(" · ")}</span>}
+        </div>
+      ) : (
+        <div className="pcard-meta pcard-meta--extra">
+          {card.价格 && (!isMissing(card.价格.输入每百万token) || !isMissing(card.价格.输出每百万token)) && (
+            <span><b>价格 /百万token</b> 入 {card.价格.输入每百万token || "?"} · 出 {card.价格.输出每百万token || "?"}</span>
+          )}
+          {!isMissing(card.知识截止) && <span><b>知识截止</b> {card.知识截止}</span>}
+          {!isMissing(card["model string"]) && <span><b>model string</b> <code>{card["model string"]}</code></span>}
+          {!isMissing(card.速率) && <span><b>速率</b> {card.速率}</span>}
+          {!isMissing(card["多模态I/O"]) && <span><b>多模态 I/O</b> {card["多模态I/O"]}</span>}
+        </div>
+      )}
+    </>
+  );
+}
+
+function NewModelCard({ entry, card, access }: { entry: ModelEntry; card: ParadigmCard; access?: string }) {
+  return (
+    <section className="section">
+      <div className="section-kicker">新模型卡片</div>
+      <article className="paradigm-card new-model">
+        <div className="pcard-head">
+          <h3>{card.名称 || entry.latestVersion}</h3>
+          <AccessPill label={card.开放度标签} access={access} />
+        </div>
+        <NewModelFields card={card} access={access} />
+      </article>
+    </section>
+  );
+}
+
+function VersionUpdateCard({
+  entry, card, update, access, updateSize,
+}: {
+  entry: ModelEntry;
+  card?: ParadigmCard;
+  update: ParadigmUpdate;
+  access?: string;
+  updateSize?: string;
+}) {
+  const changes = update.变了什么 || [];
+  const breaking = update.破坏性提醒 || {};
+  const breakingItems = Object.entries(breaking).filter(([, v]) => !isMissing(v));
+  return (
+    <section className="section">
+      <div className="section-kicker">版本更新</div>
+      <article className="paradigm-card version-update">
+        <div className="pcard-head">
+          <div className="pcard-head-left">
+            <h3>{update.版本 || entry.latestVersion}</h3>
+            {updateSize && <span className={`update-size ${updateSize}`}>{updateSize === "medium" ? "中等更新" : "小更新"}</span>}
+          </div>
+          <AccessPill label={card?.开放度标签} access={access} />
+        </div>
+
+        {changes.length > 0 && (
+          <div className="pcard-section">
+            <div className="pcard-label">变了什么</div>
+            <ul className="pcard-diff-list">
+              {changes.map((c, i) => <li key={i}>{c}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {breakingItems.length > 0 && (
+          <div className="pcard-breaking">
+            <div className="pcard-label">破坏性提醒</div>
+            <div className="pcard-breaking-rows">
+              {breakingItems.map(([k, v]) => (
+                <span key={k}><b>{k}</b> {v}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!isMissing(update.值不值得切一句) && (
+          <div className="pcard-verdict"><b>值不值得切</b><p>{update.值不值得切一句}</p></div>
+        )}
+      </article>
+    </section>
+  );
 }
 
 function SourceList({ sources }: { sources: ModelSource[] }) {

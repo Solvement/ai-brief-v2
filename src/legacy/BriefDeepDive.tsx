@@ -3,12 +3,17 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "../components/SiteHeader";
 import { Markdown } from "../components/Markdown";
 import { loadBriefEntity } from "../lib/data";
+import { LightSpineDeepDive } from "../components/LightSpineDeepDive";
+import type { LightSpine } from "../components/LightSpineDeepDive";
+import { TierTemplateDeepDive } from "../components/TierTemplateDeepDive";
+import type { ProjectTierTemplate } from "../types";
 
 /** Minimal shapes for the BriefMem JSON mirror (public/data/brief/*.json). */
 interface BriefItem {
   slug: string;
   title?: string;
   body?: string;
+  excerpt?: string;
   meta: Record<string, any>;
 }
 
@@ -52,7 +57,7 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
   if (!deepDives || !content) return <Shell><p className="brief-loading">加载中…</p></Shell>;
 
   // Pick the requested deep-dive, or the first one available.
-  const dive = slug ? deepDives.find((d) => (d.meta?.content ?? d.slug) === slug) : deepDives[0];
+  const dive = slug ? deepDives.find((d) => (d.meta?.content ?? d.slug) === slug || d.slug === slug) : deepDives[0];
   if (!dive) {
     return (
       <Shell>
@@ -69,6 +74,27 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
     );
   }
 
+  // NEWEST shape: project-radar tier paradigm (2026-06-03) → tier_template page.
+  const tierTpl: ProjectTierTemplate | undefined = dive.meta?.tier_template;
+  if (tierTpl && (typeof tierTpl.tier === "number" || tierTpl.one_sentence_positioning)) {
+    return (
+      <Shell mode="lightspine">
+        <TierTemplateDeepDive item={dive} tpl={tierTpl} />
+      </Shell>
+    );
+  }
+
+  // NEW shape: project-light-spine/v1 → premium light-spine reading page.
+  const lightSpine: LightSpine | undefined = dive.meta?.light_spine;
+  if (lightSpine && lightSpine.schema_version) {
+    return (
+      <Shell mode="lightspine">
+        <LightSpineDeepDive item={dive} spine={lightSpine} />
+      </Shell>
+    );
+  }
+
+  // ── OLD shape (37 legacy deep-dives): keep the existing renderer working. ──
   const paper = content.find((c) => c.slug === dive.meta?.content);
   const pm = paper?.meta ?? {};
   const m = dive.meta ?? {};
@@ -229,11 +255,11 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children, mode }: { children: React.ReactNode; mode?: "lightspine" }) {
   return (
     <div className="page">
-      <SiteHeader active="articles" />
-      <main className="workbench-main brief-deepdive">{children}</main>
+      <SiteHeader active={mode === "lightspine" ? "projects" : "articles"} />
+      <main className={`workbench-main brief-deepdive${mode === "lightspine" ? " dd-page" : ""}`}>{children}</main>
     </div>
   );
 }

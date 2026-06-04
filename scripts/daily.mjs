@@ -3,6 +3,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { main as runModelsDaily } from "./columns/models/daily.mjs";
+import { main as runNewsDaily } from "./columns/news/daily.mjs";
 import { main as runPapersColumnDaily } from "./columns/papers/daily.mjs";
 import { main as runProjectsDaily } from "./columns/projects/daily.mjs";
 
@@ -15,8 +16,10 @@ export async function main(argv = process.argv.slice(2)) {
   }
 
   const results = [];
+  results.push(await runColumn("news", () => runNewsDaily(passThroughArgs(options))));
   results.push(await runColumn("papers", () => runPapersColumnDaily(passThroughArgs(options))));
-  results.push(await runColumn("projects", () => runProjectsDaily(passThroughArgs(options))));
+  // Full 30-per-board radar by default (spec target); pass-through flags (offline/dry-run/cap) still apply.
+  results.push(await runColumn("projects", () => runProjectsDaily(["--limit", "30", "--radar-limit", "30", ...passThroughArgs(options)])));
   results.push(await runColumn("models", () => runModelsDaily(passThroughArgs(options))));
 
   printCombinedSummary(results);
@@ -123,6 +126,7 @@ function printUsage() {
   node scripts/daily.mjs [--offline] [--dry-run] [--cap N]
 
 Runs daily checks in sequence:
+  news     -> scripts/columns/news/daily.mjs
   papers   -> scripts/columns/papers/daily.mjs
   projects -> scripts/columns/projects/daily.mjs
   models   -> scripts/columns/models/daily.mjs

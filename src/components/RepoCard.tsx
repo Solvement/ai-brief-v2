@@ -14,6 +14,9 @@ const DEPTH_LABEL: Record<ProjectDepth, string> = {
   list_only: "雷达",
   needs_enrichment: "待补全",
 };
+/** Tier → label per the project-radar tier paradigm. */
+const TIER_LABEL: Record<number, string> = { 3: "深扒", 2: "分析", 1: "速读", 0: "索引" };
+const TIER_CLS: Record<number, string> = { 3: "depth-deep", 2: "depth-analysis", 1: "depth-light", 0: "depth-list" };
 const DEPTH_CLS: Record<ProjectDepth, string> = {
   deep: "depth-deep",
   analysis: "depth-analysis",
@@ -32,70 +35,87 @@ function depthOf(repo: AnalyzedRepo): ProjectDepth {
 function slugOf(repo: AnalyzedRepo): string {
   return repo.briefSlug || repo.brief_slug || "";
 }
-function firstSentence(text: string): string {
-  const t = (text || "").replace(/\s+/g, " ").trim();
-  const m = t.match(/^(.+?[。！？.!?])\s*/);
-  const s = m ? m[1] : t;
-  return s.length > 92 ? s.slice(0, 90) + "…" : s;
+
+/** ranking_score may be 0-100 OR 0-5; worthDeepDive is 0-100. Display the raw number. */
+function displayScore(score: number): string {
+  if (!Number.isFinite(score)) return "—";
+  return Number.isInteger(score) ? String(score) : score.toFixed(1);
 }
 
-interface Props { repo: AnalyzedRepo }
+interface Props { repo: AnalyzedRepo; featured?: boolean }
 
-export function RepoCard({ repo }: Props) {
+export function RepoCard({ repo, featured = false }: Props) {
   const depth = depthOf(repo);
   const slug = slugOf(repo);
-  const hasBrief = (depth === "deep" || depth === "analysis") && Boolean(slug);
   const score = typeof repo.ranking_score === "number" ? repo.ranking_score : repo.worthDeepDive;
   const action = repo.recommended_action ? (ACTION_LABEL[repo.recommended_action] || repo.recommended_action) : null;
-  const whyNot = !hasBrief ? (repo.rejection_reasons?.[0] || (repo.needs_enrichment ? "证据不足，待补全后再判" : "")) : "";
+  const summary = repo.tier_template?.one_sentence_positioning || repo.tldr || repo.light || repo.description || "";
+
+  // Tier paradigm (2026-06-03): tier drives the badge; depth is the legacy fallback.
+  const tier = typeof repo.project_tier === "number" ? repo.project_tier : null;
+  const bucket = repo.project_bucket || repo.bucket || repo.tier_template?.bucket || "";
+  const tierLabel = tier !== null ? TIER_LABEL[tier] : DEPTH_LABEL[depth];
+  const tierCls = tier !== null ? TIER_CLS[tier] : DEPTH_CLS[depth];
+  // Prefer the canonical [Tier X｜桶] tag; fall back to a reconstructed label.
+  const canonicalTag = repo.tier_tag || repo.tier_template?.tag || "";
+  const tierTag = canonicalTag.trim()
+    ? canonicalTag
+    : `${tier !== null ? `Tier ${tier}` : tierLabel}${bucket ? `｜${bucket}` : ""}`;
+  // Tier 0 = 索引 (muted, list-only). Tier 1 = 速读. Tier 2/3 link to a deep-dive page.
+  const isIndex = tier === 0 || (tier === null && (depth === "list_only" || depth === "light"));
+  const hasBrief = !isIndex && (tier === 2 || tier === 3 || depth === "deep" || depth === "analysis") && Boolean(slug);
+  const manualConfirm = repo.requires_manual_confirmation || repo.tier_template?.manual_confirmation;
 
   const inner = (
     <>
-      <div className={`depth-badge ${DEPTH_CLS[depth]}`} title={`ranking ${score}`}>
-        <span>{DEPTH_LABEL[depth]}</span>
-        <b>{score}</b>
-      </div>
-
-      <div className="card-row">
-        <img className="avatar" src={repo.ownerAvatarUrl} alt={repo.owner} loading="lazy" />
-        <div className="card-title-row">
-          <div className="rank-row">
-            <span className="rank">#{repo.rank}</span>
-            <span className="repo-name">{repo.fullName}</span>
-          </div>
-          {repo.tldr && <p className="tldr">{repo.tldr}</p>}
+      <div className="radar-card-top">
+        <img className="radar-avatar" src={repo.ownerAvatarUrl} alt={repo.owner} loading="lazy" />
+        <div className="radar-score-wrap" title={`ranking ${score}`}>
+          <span className="radar-score">{displayScore(score)}</span>
+          <span className={`radar-tier ${tierCls}`}>
+            {tierTag}
+          </span>
         </div>
       </div>
+
+      <div className="radar-card-head">
+        <h3 className="radar-name">{repo.name || repo.fullName}</h3>
+        <span className="radar-owner">{repo.owner}</span>
+        {manualConfirm && <span className="radar-manual">需人工确认</span>}
+      </div>
+
+      {summary && <p className="radar-summary">{summary}</p>}
 
       {repo.tags?.length > 0 && (
-        <div className="tag-row">{repo.tags.slice(0, 5).map((t) => <span className="tag" key={t}>{t}</span>)}</div>
+        <div className="radar-tags">
+          {repo.tags.slice(0, 4).map((t) => <span className="radar-tag" key={t}>{t}</span>)}
+        </div>
       )}
 
-      <div className="repo-decision-grid">
-        <div><span>为什么重要</span><b>{firstSentence(repo.deep?.atGlance || repo.light || repo.description || "")}</b></div>
-        {action && <div><span>建议动作</span><b>{action}</b></div>}
-        {whyNot && <div><span>为何未深扒</span><b>{whyNot}</b></div>}
-      </div>
-
-      <div className="card-foot-row">
-        <div className="meta-row">
+      <div className="radar-foot">
+        <div className="radar-meta">
+          <span className="radar-meta-item">★ {fmt(repo.stars)}</span>
+          <span className="radar-meta-item">⑂ {fmt(repo.forks)}</span>
           {repo.language && (
-            <span><span className="lang-dot" style={{ background: repo.languageColor || "var(--line-strong)" }} />{repo.language}</span>
+            <span className="radar-meta-item">
+              <span className="radar-lang-dot" style={{ background: repo.languageColor || "var(--radar-line-strong)" }} />
+              {repo.language}
+            </span>
           )}
-          <span>★ {fmt(repo.stars)}</span>
-          {repo.starsGained > 0 && <span className="gain">+{fmt(repo.starsGained)} ★</span>}
         </div>
-        <span className={`repo-cta ${hasBrief ? "deep" : ""}`}>
-          {hasBrief ? `${DEPTH_LABEL[depth]} →` : "看仓库 →"}
+        <span className={`radar-cta ${hasBrief ? "deep" : ""}`}>
+          {hasBrief ? `${tierLabel} →` : "看仓库 →"}
         </span>
       </div>
     </>
   );
 
+  const cls = `radar-card ${tierCls}${featured && !isIndex ? " featured" : ""}${hasBrief ? " has-brief" : ""}${isIndex ? " radar-card--index" : ""}`;
+
   if (hasBrief) {
-    return <Link className={`card clickable has-deep ${DEPTH_CLS[depth]}`} href={`/brief/${encodeURIComponent(slug)}`}>{inner}</Link>;
+    return <Link className={cls} href={`/brief/${encodeURIComponent(slug)}`}>{inner}</Link>;
   }
   return (
-    <a className={`card clickable ${DEPTH_CLS[depth]}`} href={repo.url} target="_blank" rel="noreferrer">{inner}</a>
+    <a className={cls} href={repo.url} target="_blank" rel="noreferrer">{inner}</a>
   );
 }

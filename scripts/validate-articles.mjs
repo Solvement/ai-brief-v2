@@ -33,17 +33,24 @@ if (!Array.isArray(data.papers)) fail("papers must be an array");
 
 for (const [i, p] of data.papers.entries()) {
   const where = `papers[${i}] (${p?.id ?? "?"})`;
-  for (const f of ["id", "title", "authors", "venue", "sourceName", "sourceUrl", "verifiedAt", "leadJudgment", "analystNotes"]) {
+  for (const f of ["id", "title", "authors", "venue", "sourceName", "sourceUrl", "verifiedAt", "leadJudgment"]) {
     if (typeof p?.[f] !== "string" || !p[f]) fail(`${where}: missing ${f}`);
   }
-  if (p.tier !== "deep") fail(`${where}: tier must be "deep" (academic papers only produce deep)`);
+  if (!["deep", "light"].includes(p.tier)) fail(`${where}: tier must be "deep" or "light"`);
 
   validateMeta(p.meta, where);
-  validateOriginalReading(p.originalReading, where);
-  validateLimits(p.limitsAndFuture, where);
   validateSelection(p.selection, where);
   validateSelectionAudit(p.selectionAudit, p.meta, where);
   if (!p?.provenance?.sourceUrl) fail(`${where}: provenance.sourceUrl`);
+
+  if (p.tier === "deep") {
+    requireString(p.analystNotes, `${where}.analystNotes`);
+    validateOriginalReading(p.originalReading, where, { faithful: !p.paradigm });
+    validateLimits(p.limitsAndFuture, where);
+    validateV2Paradigm(p.paradigm, where);
+  } else {
+    validateLightCard(p, where);
+  }
 
   const blob = JSON.stringify(p);
   if (REPLACEMENT.test(blob)) fail(`${where}: mojibake (U+FFFD)`);
@@ -73,14 +80,14 @@ function validateMeta(meta, where) {
   for (const [j, t] of meta.tags.entries()) requireString(t, `${where}.meta.tags[${j}]`);
 }
 
-function validateOriginalReading(value, where) {
+function validateOriginalReading(value, where, { faithful = true } = {}) {
   if (!Array.isArray(value) || value.length === 0) fail(`${where}: originalReading empty`);
   let keyResultTotal = 0;
   for (const [j, s] of value.entries()) {
     const sp = `${where}.originalReading[${j}]`;
     requireString(s?.heading, `${sp}.heading`);
     requireString(s?.summary, `${sp}.summary`);
-    assertFaithful(s.summary, `${sp}.summary`);
+    if (faithful) assertFaithful(s.summary, `${sp}.summary`);
     if (s.keyResults !== undefined) {
       if (!Array.isArray(s.keyResults)) fail(`${sp}.keyResults must be an array`);
       for (const [k, r] of s.keyResults.entries()) {
@@ -88,7 +95,7 @@ function validateOriginalReading(value, where) {
         if (!KEY_RESULT_KINDS.has(r?.kind)) fail(`${rp}.kind must be figure|table|result`);
         requireString(r?.ref, `${rp}.ref`);
         requireString(r?.finding, `${rp}.finding`);
-        assertFaithful(r.finding, `${rp}.finding`);
+        if (faithful) assertFaithful(r.finding, `${rp}.finding`);
         keyResultTotal += 1;
       }
     }
@@ -106,6 +113,26 @@ function assertFaithful(text, path) {
 function validateLimits(value, where) {
   if (typeof value?.paperStated !== "string") fail(`${where}: limitsAndFuture.paperStated`);
   if (typeof value?.evidenceNotes !== "string") fail(`${where}: limitsAndFuture.evidenceNotes`);
+}
+
+function validateV2Paradigm(value, where) {
+  if (value === undefined) return;
+  if (!value || typeof value !== "object" || Array.isArray(value)) fail(`${where}: paradigm must be an object when present`);
+  if (!Array.isArray(value.lookahead) || value.lookahead.length < 2) fail(`${where}: paradigm.lookahead must contain at least 2 items`);
+  for (const [j, point] of value.lookahead.entries()) {
+    requireString(point, `${where}.paradigm.lookahead[${j}]`);
+    if (/\d/.test(point)) fail(`${where}.paradigm.lookahead[${j}]: 看点 must not contain numbers`);
+  }
+  if (typeof value.proseMarkdown !== "string" || !value.proseMarkdown) fail(`${where}: paradigm.proseMarkdown missing`);
+  if (/\(来源[:：]|（来源[:：]/.test(value.proseMarkdown)) fail(`${where}: paradigm prose must use footnotes, not inline source labels`);
+  if (!/\[\^\d+\]/.test(value.proseMarkdown)) warn(`${where}: paradigm prose has no footnote marker`);
+}
+
+function validateLightCard(p, where) {
+  if (p.cardKind && p.cardKind !== "light_card") fail(`${where}: light cardKind must be light_card`);
+  requireString(p.hook || p.leadJudgment, `${where}.hook`);
+  if (!Array.isArray(p.lookahead) || p.lookahead.length < 1) fail(`${where}: light card lookahead empty`);
+  for (const [j, point] of p.lookahead.entries()) requireString(point, `${where}.lookahead[${j}]`);
 }
 
 function validateSelection(value, where) {

@@ -1,0 +1,644 @@
+{
+  "generatedAt": "2026-06-04T02:23:05.914Z",
+  "column": "news",
+  "mode": "aggregate-only",
+  "llmEnabled": false,
+  "retention": {
+    "days": 14,
+    "maxItems": 300,
+    "perSourceLimit": 30,
+    "dailyCap": 20
+  },
+  "sourceStats": [
+    {
+      "id": "openai",
+      "source": "OpenAI",
+      "sourceType": "official",
+      "ok": true,
+      "count": 30,
+      "error": ""
+    },
+    {
+      "id": "techcrunch-ai",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "ok": true,
+      "count": 20,
+      "error": ""
+    },
+    {
+      "id": "venturebeat-ai",
+      "source": "VentureBeat AI",
+      "sourceType": "press",
+      "ok": true,
+      "count": 7,
+      "error": ""
+    },
+    {
+      "id": "the-verge-ai",
+      "source": "The Verge AI",
+      "sourceType": "press",
+      "ok": true,
+      "count": 10,
+      "error": ""
+    },
+    {
+      "id": "anthropic",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "ok": true,
+      "count": 10,
+      "error": ""
+    },
+    {
+      "id": "deepmind",
+      "source": "Google DeepMind",
+      "sourceType": "official",
+      "ok": true,
+      "count": 1,
+      "error": ""
+    },
+    {
+      "id": "meta-ai",
+      "source": "Meta AI",
+      "sourceType": "official",
+      "ok": true,
+      "count": 5,
+      "error": ""
+    },
+    {
+      "id": "mistral",
+      "source": "Mistral AI",
+      "sourceType": "official",
+      "ok": true,
+      "count": 30,
+      "error": ""
+    },
+    {
+      "id": "deepseek",
+      "source": "DeepSeek",
+      "sourceType": "official",
+      "ok": true,
+      "count": 7,
+      "error": ""
+    },
+    {
+      "id": "qwen",
+      "source": "Qwen",
+      "sourceType": "official",
+      "ok": true,
+      "count": 30,
+      "error": ""
+    },
+    {
+      "id": "xai",
+      "source": "xAI",
+      "sourceType": "official",
+      "ok": false,
+      "count": 0,
+      "error": "GET https://x.ai/news -> 403; GET https://x.ai/news/rss.xml -> 404"
+    },
+    {
+      "id": "hacker-news",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "ok": true,
+      "count": 30,
+      "error": ""
+    },
+    {
+      "id": "reddit-local-llama",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "ok": true,
+      "count": 12,
+      "error": ""
+    },
+    {
+      "id": "reddit-machine-learning",
+      "source": "r/MachineLearning",
+      "sourceType": "reddit",
+      "ok": true,
+      "count": 3,
+      "error": ""
+    }
+  ],
+  "totalDiscovered": 195,
+  "totalAfterDedupe": 86,
+  "totalPublished": 67,
+  "totalPublishedForGeneratedDay": 8,
+  "items": [
+    {
+      "title": "Responsible Scaling Policy",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy",
+      "publishedAt": "2026-06-04T02:07:41.667Z"
+    },
+    {
+      "title": "🎉 DeepSeek-V4 预览版本发布，具备世界顶级推理性能，Agent 能力大幅提高，已在网页端、APP 和 API 上线，点击查看详情。",
+      "source": "DeepSeek",
+      "sourceType": "official",
+      "url": "https://mp.weixin.qq.com/s/8bxXqS2R8Fx5-1TLDBiEDg",
+      "publishedAt": "2026-06-04T02:06:46.772Z"
+    },
+    {
+      "title": "AI Now Summit 2026",
+      "source": "Mistral AI",
+      "sourceType": "official",
+      "url": "https://mistral.ai/news/ai-now-summit-2026",
+      "publishedAt": "2026-06-04T02:06:46.772Z"
+    },
+    {
+      "title": "Introducing Search Toolkit",
+      "source": "Mistral AI",
+      "sourceType": "official",
+      "url": "https://mistral.ai/news/search-toolkit",
+      "publishedAt": "2026-06-04T02:06:46.772Z"
+    },
+    {
+      "title": "Mistral Medium 3.5",
+      "source": "Mistral AI",
+      "sourceType": "official",
+      "url": "https://mistral.ai/news/vibe-remote-agents-mistral-medium-3-5/",
+      "publishedAt": "2026-06-04T02:06:46.772Z"
+    },
+    {
+      "title": "Vibe gets to work.",
+      "source": "Mistral AI",
+      "sourceType": "official",
+      "url": "https://mistral.ai/news/vibe-agent",
+      "publishedAt": "2026-06-04T02:06:46.772Z"
+    },
+    {
+      "title": "The ways we contain Claude across products",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.anthropic.com/engineering/how-we-contain-claude",
+      "publishedAt": "2026-06-04T00:27:52.000Z",
+      "points": 44
+    },
+    {
+      "title": "GitHub - chopratejas/headroom: Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw8hsn/github_chopratejasheadroom_compress_tool_outputs/",
+      "publishedAt": "2026-06-04T00:57:48.000Z"
+    },
+    {
+      "title": "Jun 3, 2026 Announcements Introducing the Services Track and Partner Hub of the Claude Partner Network",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/services-track-partner-hub",
+      "publishedAt": "2026-06-03T04:00:00.000Z"
+    },
+    {
+      "title": "Jun 3, 2026 Policy What we learned mapping a year’s worth of AI-enabled cyber threats",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack",
+      "publishedAt": "2026-06-03T04:00:00.000Z"
+    },
+    {
+      "title": "Gemma 4 12B: A unified, encoder-free multimodal model",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemma-4-12b/",
+      "publishedAt": "2026-06-03T16:04:42.000Z",
+      "points": 697
+    },
+    {
+      "title": "Show HN: Ideogram 4.0 – open-weight 9.3B text-to-image model",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/ideogram-oss/ideogram4",
+      "publishedAt": "2026-06-03T16:00:09.000Z",
+      "points": 37
+    },
+    {
+      "title": "Show HN: Mnemo – local-first AI memory layer for any LLM (Rust, SQLite,petgraph)",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/zaydmulani09/mnemo",
+      "publishedAt": "2026-06-03T20:32:10.000Z",
+      "points": 28
+    },
+    {
+      "title": "Claude Opus 4.8 Max responding to an empty message",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://xcancel.com/davidad/status/2061858258046898518",
+      "publishedAt": "2026-06-03T13:14:29.000Z",
+      "points": 27
+    },
+    {
+      "title": "EU wants households to cut peak time energy use as industry and AI demand soars",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.politico.eu/article/eu-households-electricity-energy-artificial-intelligence-ai/",
+      "publishedAt": "2026-06-03T21:38:14.000Z",
+      "points": 12
+    },
+    {
+      "title": "Gemini Spark is the most impressive and terrifying AI experience I've had yet",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/941388/gemini-spark-ai-agent-trip-planning",
+      "publishedAt": "2026-06-03T21:20:43.000Z",
+      "points": 11
+    },
+    {
+      "title": "Reddit user creates DB and MCP to mine Polygon, finds patterns on Polymarket",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://old.reddit.com/r/ClaudeAI/comments/1tvefqd/i_wired_claude_code_into_a_database_of_every/",
+      "publishedAt": "2026-06-03T21:45:10.000Z",
+      "points": 9
+    },
+    {
+      "title": "I Replaced My AI Agent's Flat Fact Store with a Graph Database",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://news.ycombinator.com/item?id=48383578",
+      "publishedAt": "2026-06-03T13:15:33.000Z",
+      "points": 9
+    },
+    {
+      "title": "Google's new Gemma 4 12B model is designed to run on any laptop with 16GB of RAM",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://arstechnica.com/google/2026/06/googles-new-gemma-4-open-ai-model-is-sized-for-your-laptop/",
+      "publishedAt": "2026-06-03T21:30:41.000Z",
+      "points": 8
+    },
+    {
+      "title": "Git and S3 as the memory layer for agents",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://twitter.com/VijitDhingra1/status/2062265896039833935",
+      "publishedAt": "2026-06-03T20:16:14.000Z",
+      "points": 8
+    },
+    {
+      "title": "Free vLLM Course: Inference, Compression, Benchmarks",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.deeplearning.ai/courses/fast-and-efficient-llm-inference-with-vllm",
+      "publishedAt": "2026-06-03T17:27:14.000Z",
+      "points": 8
+    },
+    {
+      "title": "Anthopic, OpenAI Should Not Be Allowed to IPO, Says Ed Zitron [video]",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.youtube.com/watch?v=zbKDmkJPVvI",
+      "publishedAt": "2026-06-03T14:52:14.000Z",
+      "points": 8
+    },
+    {
+      "title": "Look Who Just Crashed OpenAI and SoftBank's IPO Party",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.bloomberg.com/opinion/articles/2026-06-02/ipo-race-look-who-just-crashed-open-ai-and-softbank-s-party",
+      "publishedAt": "2026-06-03T02:12:48.000Z",
+      "points": 8
+    },
+    {
+      "title": "I turned an Android phone into a Vulkan-accelerated local LLM node (GGUF + LiteLLM + Tailscale)",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw63jz/i_turned_an_android_phone_into_a/",
+      "publishedAt": "2026-06-03T23:15:59.000Z"
+    },
+    {
+      "title": "Lovable signs multiyear deal with Google Cloud to up usage 5x, source says",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/03/lovable-signs-multi-year-deal-with-google-cloud-to-up-usage-5x-source-says/",
+      "publishedAt": "2026-06-03T22:56:51.000Z",
+      "summary": "Lovable and Google signed an expanded multiyear deal that involves a 5x expansion of Lovable's footprint on Google Cloud, and expanded access to Anthropic Claude."
+    },
+    {
+      "title": "Gemma 4 12B first coding agent test on a 4080 Super",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw364k/gemma_4_12b_first_coding_agent_test_on_a_4080/",
+      "publishedAt": "2026-06-03T21:23:25.000Z"
+    },
+    {
+      "title": "gemma-4-12b-it vs Qwen3.5-9B on shared benchmarks: Qwen is overall winner beating gemma in 5/8 benchmarks despite a smaller footprint",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tw0lua/gemma412bit_vs_qwen359b_on_shared_benchmarks_qwen/",
+      "publishedAt": "2026-06-03T19:51:33.000Z"
+    },
+    {
+      "title": "Alphabet&#8217;s record-breaking $85B raise for Google&#8217;s AI business is a helluva good signal",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/03/alphabets-record-breaking-85b-raise-for-googles-ai-business-is-a-helluva-good-signal/",
+      "publishedAt": "2026-06-03T19:38:32.000Z",
+      "summary": "If Alphabet's record-breaking $85 billion stock sale signals investor appetite for AI-related offerings, we can see that investors are ready to chow."
+    },
+    {
+      "title": "Jun 2, 2026 Announcements Expanding Project Glasswing",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/expanding-project-glasswing",
+      "publishedAt": "2026-06-02T04:00:00.000Z"
+    },
+    {
+      "title": "Michael Burry says neither SpaceX nor Anthropic is worth $1T",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.businessinsider.com/big-short-michael-burry-spacex-anthropic-ipo-ai-bubble-claude-2026-6",
+      "publishedAt": "2026-06-02T10:09:21.000Z",
+      "points": 133
+    },
+    {
+      "title": "Bringing Up DeepSeek-V4-Flash on AMD MI300X",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://fergusfinn.com/blog/deepseek-v4-flash-mi300x/",
+      "publishedAt": "2026-06-02T17:52:48.000Z",
+      "points": 117
+    },
+    {
+      "title": "Uber caps employee AI spending after blowing through budget in 4 months",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/uber-caps-employee-ai-spending-after-blowing-through-budget-in-four-months/",
+      "publishedAt": "2026-06-02T19:11:48.000Z",
+      "summary": "Uber's cutback has occurred after the company had reportedly encouraged staff to use AI as much as possible."
+    },
+    {
+      "title": "New Microsoft tool lets devs spin up AI behavior tests using text descriptions",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/new-microsoft-tool-lets-devs-spin-up-ai-behavior-tests-using-text-descriptions/",
+      "publishedAt": "2026-06-02T19:02:21.000Z",
+      "summary": "Microsoft on Tuesday took the wraps off Adaptive Spec-driven Scoring for Evaluation and Regression Testing, an open source framework for spinning up AI evaluations."
+    },
+    {
+      "title": "Trump signs executive order to review AI models before they’re released",
+      "source": "The Verge AI",
+      "sourceType": "press",
+      "url": "https://www.theverge.com/policy/941775/trump-ai-executive-order",
+      "publishedAt": "2026-06-02T18:33:42.000Z",
+      "summary": "President Donald Trump signed an executive order Tuesday creating a \"voluntary framework\" for AI companies to share their frontier models with the federal government before they're released \"to promote secure innovation"
+    },
+    {
+      "title": "Martin Scorsese becomes the latest — and most unlikely — Hollywood voice for AI",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/martin-scorsese-becomes-the-latest-and-most-unlikely-hollywood-voice-for-ai/",
+      "publishedAt": "2026-06-02T18:16:53.000Z",
+      "summary": "The caveat is that one of the world's most famous living directors is using the tech solely for storyboarding."
+    },
+    {
+      "title": "Microsoft’s first advanced reasoning AI is here",
+      "source": "The Verge AI",
+      "sourceType": "press",
+      "url": "https://www.theverge.com/tech/941664/microsoft-ai-model-reasoning-mai-thinking-1-build-2026",
+      "publishedAt": "2026-06-02T18:12:44.000Z",
+      "summary": "Microsoft announced a bunch of new in-house AI models at Build 2026, including a new \"flagship\" model: MAI-Thinking-1. It's an ambitious step into model development for Microsoft, which introduced its initial in-house mo"
+    },
+    {
+      "title": "Microsoft launches Scout, an OpenClaw-inspired personal assistant",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/microsoft-launches-scout-an-openclaw-inspired-personal-assistant/",
+      "publishedAt": "2026-06-02T18:02:44.000Z",
+      "summary": "Launched at Build, Microsoft Scout is a new AI assistant meant to bring the power and flexibility of OpenClaw into the Microsoft 365 system."
+    },
+    {
+      "title": "Google rolls out fake call detection to protect against AI deepfake impersonation scams",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/google-rolls-out-fake-call-detection-to-protect-against-ai-deepfake-impersonation-scams/",
+      "publishedAt": "2026-06-02T18:00:00.000Z",
+      "summary": "As people increasingly refuse to answer calls from unknown numbers, scammers are shifting their tactics by spoofing trusted phone numbers and using AI deepfake technology to sound like authority figures, family members,"
+    },
+    {
+      "title": "Google’s Phone app will tell you if a scammer is impersonating one of your contacts",
+      "source": "The Verge AI",
+      "sourceType": "press",
+      "url": "https://www.theverge.com/tech/941517/google-phone-scammer-ai-impersonation",
+      "publishedAt": "2026-06-02T18:00:00.000Z",
+      "summary": "Google is launching a new feature for its Phone app that aims to protect you from AI impersonation scams. Now, when you receive a call from a scammer that appears to be coming from the same number as one of your contacts"
+    },
+    {
+      "title": "Microsoft offers devs a better way to control AI agent behavior",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/microsoft-offers-devs-a-better-way-to-control-ai-agent-behavior/",
+      "publishedAt": "2026-06-02T18:00:00.000Z",
+      "summary": "The specification lets developer, compliance, and security teams define their own policies for agents to follow in portable policy files."
+    },
+    {
+      "title": "Microsoft Scout is a new AI personal assistant built on OpenClaw",
+      "source": "The Verge AI",
+      "sourceType": "press",
+      "url": "https://www.theverge.com/news/939713/microsoft-scout-assistant-openclaw",
+      "publishedAt": "2026-06-02T18:00:00.000Z",
+      "summary": "Much like Google, Microsoft is launching its own version of OpenClaw. Microsoft Scout is an always-on assistant that integrates into Microsoft 365 apps like Outlook, OneDrive, and Microsoft Teams, allowing businesses to"
+    },
+    {
+      "title": "Trump signs narrower executive order on AI oversight after industry objections",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/trump-signs-narrower-executive-order-on-ai-oversight-after-industry-objections/",
+      "publishedAt": "2026-06-02T16:23:08.000Z",
+      "summary": "After industry objections, President Trump signed a revised AI executive order requiring only voluntary prerelease government reviews of advanced models."
+    },
+    {
+      "title": "OpenAI launches new Codex tools for white-collar work",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/openai-launches-new-codex-tools-for-white-collar-work/",
+      "publishedAt": "2026-06-02T16:00:00.000Z",
+      "summary": "OpenAI released a set of six plug-ins aimed at specific jobs: data analytics, creative production, sales, product design, equity investing, and investment banking. Available from within the Codex app, each of the new too"
+    },
+    {
+      "title": "Anthropic scales Claude Mythos to critical infrastructure in 15+ countries",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/anthropic-scales-claude-mythos-to-critical-infrastructure-in-15-countries/",
+      "publishedAt": "2026-06-02T14:44:21.000Z",
+      "summary": "Anthropic is expanding Project Glasswing, its security vulnerability program, and access to Mythos to 150 organizations across 15 countries — targeting critical infrastructure in power, water, healthcare, and communicati"
+    },
+    {
+      "title": "ZeroDrift raises $10M to protect AI models from themselves",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/02/zerodrift-raises-10-million-to-protect-ai-models-from-themselves/",
+      "publishedAt": "2026-06-02T12:32:59.000Z",
+      "summary": "A new AI compliance service sits between AI models and end users to flag and replace any messages that might present a compliance problem."
+    },
+    {
+      "title": "Jun 1, 2026 Announcements Anthropic confidentially submits draft S-1 to the SEC",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/confidential-draft-s1-sec",
+      "publishedAt": "2026-06-01T04:00:00.000Z"
+    },
+    {
+      "title": "Can the stockmarket swallow Anthropic, SpaceX and OpenAI?",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.economist.com/finance-and-economics/2026/06/01/can-the-stockmarket-swallow-anthropic-spacex-and-openai",
+      "publishedAt": "2026-06-01T23:45:46.000Z",
+      "points": 708
+    },
+    {
+      "title": "Launch HN: Expanse (YC P26) – Unlock Wasted GPU Capacity",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://news.ycombinator.com/item?id=48356312",
+      "publishedAt": "2026-06-01T13:05:02.000Z",
+      "points": 99
+    },
+    {
+      "title": "Qwen3.7-Plus: Multimodal Agent Intelligence",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://qwen.ai/blog?id=qwen3.7-plus",
+      "publishedAt": "2026-06-01T17:55:27.000Z",
+      "points": 41
+    },
+    {
+      "title": "University System Went All in on A.I. Now It's Tearing Itself Apart",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.nytimes.com/2026/06/01/magazine/ai-university-college-california.html",
+      "publishedAt": "2026-06-01T21:18:40.000Z",
+      "points": 8
+    },
+    {
+      "title": "Finetuning a Reasoning LLM with Supervised or Reinforcement Learning? [D]",
+      "source": "r/MachineLearning",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1ttxcm5/finetuning_a_reasoning_llm_with_supervised_or/",
+      "publishedAt": "2026-06-01T16:23:24.000Z"
+    },
+    {
+      "title": "5060 Ti 16GB or Cloud: Which makes more sense for DL, RL, and LLM studies/research? [D]",
+      "source": "r/MachineLearning",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1ttte5x/5060_ti_16gb_or_cloud_which_makes_more_sense_for/",
+      "publishedAt": "2026-06-01T14:09:51.000Z"
+    },
+    {
+      "title": "Claude Opus 4.8 distilled Alibaba Qwen models",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://twitter.com/maxforai/status/2060053228566495410",
+      "publishedAt": "2026-05-29T15:10:18.000Z",
+      "points": 23
+    },
+    {
+      "title": "DeepSeek Slashes AI Costs to Cents",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://businessanalytics.substack.com/p/deepseek-slashes-ai-costs-to-cents",
+      "publishedAt": "2026-05-29T10:43:03.000Z",
+      "points": 13
+    },
+    {
+      "title": "China Limits Overseas Travel for AI Talent at DeepSeek, Alibaba, Private Firms",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.bloomberg.com/news/articles/2026-05-26/china-expands-travel-curbs-to-top-ai-talent-at-private-firms",
+      "publishedAt": "2026-05-29T23:54:21.000Z",
+      "points": 10
+    },
+    {
+      "title": "Claude Opus 4.8 may have distilled Qwen",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://old.reddit.com/r/ClaudeCode/comments/1tqaist/opus_48_distilled_qwen/",
+      "publishedAt": "2026-05-29T20:42:18.000Z",
+      "points": 9
+    },
+    {
+      "title": "Claude Code Degraded Before Opus 4.8 Release",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://marginlab.ai/blog/claude-code-degraded-before-opus-4-8/",
+      "publishedAt": "2026-05-29T12:43:59.000Z",
+      "points": 8
+    },
+    {
+      "title": "May 28, 2026 Announcements Anthropic raises $65B in Series H funding at $965B post-money valuation",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/series-h",
+      "publishedAt": "2026-05-28T04:00:00.000Z"
+    },
+    {
+      "title": "May 28, 2026 Product Introducing Claude Opus 4.8",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/claude-opus-4-8",
+      "publishedAt": "2026-05-28T04:00:00.000Z"
+    },
+    {
+      "title": "I cut my AI API costs 99% by switching from Claude to DeepSeek",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://twitter.com/kevinsays/status/2059724146221662339",
+      "publishedAt": "2026-05-28T11:27:36.000Z",
+      "points": 27
+    },
+    {
+      "title": "May 27, 2026 Announcements Anthropic opens Milan office to support Italian enterprise, research, and developers",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/milan-office-opening",
+      "publishedAt": "2026-05-27T04:00:00.000Z"
+    },
+    {
+      "title": "Research Physics AI research that’s shaping the industry. Published breakthroughs pushing the state of the art. May 27, 2026 Mistral",
+      "source": "Mistral AI",
+      "sourceType": "official",
+      "url": "https://mistral.ai/news/physics-ai-research",
+      "publishedAt": "2026-05-27T04:00:00.000Z"
+    },
+    {
+      "title": "Gemini, Gophers, and Fingers. Oh My Alternative Internets Beyond HTTPS",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://brennan.day/gemini-gophers-and-fingers-oh-my-alternative-internets-beyond-https/",
+      "publishedAt": "2026-05-27T17:24:25.000Z",
+      "points": 147
+    },
+    {
+      "title": "May 26, 2026 Announcements Anthropic appoints KiYoung Choi as Representative Director of Korea ahead of Seoul office opening",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/kiyoung-choi-representative-director-anthropic-korea",
+      "publishedAt": "2026-05-26T04:00:00.000Z"
+    },
+    {
+      "title": "May 22, 2026 Announcements Project Glasswing: An initial update",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/research/glasswing-initial-update",
+      "publishedAt": "2026-05-25T04:00:00.000Z"
+    },
+    {
+      "title": "May 25, 2026 Announcements Anthropic co-founder Chris Olah&#x27;s remarks on Pope Leo XIV&#x27;s encyclical \"Magnifica humanitas\"",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/chris-olah-pope-leo-encyclical",
+      "publishedAt": "2026-05-25T04:00:00.000Z"
+    },
+    {
+      "title": "Company Emmi joins Mistral to accelerate the AI-native industry May 23, 2026 Mistral AI",
+      "source": "Mistral AI",
+      "sourceType": "official",
+      "url": "https://mistral.ai/news/accelerate-ai-native-industry",
+      "publishedAt": "2026-05-23T04:00:00.000Z"
+    }
+  ]
+}

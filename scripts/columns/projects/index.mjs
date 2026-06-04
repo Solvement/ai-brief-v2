@@ -83,6 +83,21 @@ export async function analyze(item, evidence, ctx = {}) {
   const repoId = repo.fullName || repo.url || candidate?.id || "unknown-project";
   const finalDepth = triage.final_depth || triage.depth_decision?.final_depth || "list_only";
 
+  if (isProjectAlreadyDeepDived(candidate, options)) {
+    ctx.logger?.info?.(`projects brief-wiki skipped ${repoId}: already deep-dived`);
+    return {
+      tier: "brief-wiki",
+      status: "already_deep_dived",
+      skipped: true,
+      reason: "brief-wiki content already marks this repo as deep_dived",
+      candidateId: candidate?.id,
+      repo: repoId,
+      slug: repo.briefSlug || null,
+      final_depth: finalDepth,
+      triage: summarizeTriage(triage),
+    };
+  }
+
   if (finalDepth === "light") {
     return generateProjectLightAnalysis({
       candidate,
@@ -91,6 +106,36 @@ export async function analyze(item, evidence, ctx = {}) {
       options,
       logger: ctx.logger || console,
     });
+  }
+
+  if (options.skipBriefAuthoring || options.noProjectBriefAuthoring) {
+    ctx.logger?.info?.(`projects brief-wiki skipped ${repoId}: brief authoring disabled`);
+    return {
+      tier: "brief-wiki",
+      status: "brief_authoring_disabled",
+      skipped: true,
+      reason: "brief authoring disabled for cheap discovery/light publish verification",
+      candidateId: candidate?.id,
+      repo: repoId,
+      final_depth: finalDepth,
+      triage: summarizeTriage(triage),
+    };
+  }
+
+  if (finalDepth === "deep" && options.codexDeepDiveAuthoring !== false) {
+    ctx.logger?.info?.(`projects brief-wiki queued ${repoId}: deep authoring is handled by codex-deepdive pass`);
+    return {
+      tier: "brief-wiki",
+      status: "pending_codex_authoring",
+      skipped: true,
+      generated: false,
+      reason: "deep authoring is decoupled; run scripts/columns/projects/codex-deepdive.mjs",
+      candidateId: candidate?.id,
+      repo: repoId,
+      final_depth: finalDepth,
+      depth_decision: triage.depth_decision || null,
+      triage: summarizeTriage(triage),
+    };
   }
 
   if (!isBriefDepth(finalDepth)) {
@@ -106,26 +151,26 @@ export async function analyze(item, evidence, ctx = {}) {
     };
   }
 
-  if (isProjectAlreadyDeepDived(candidate, options)) {
-    ctx.logger?.info?.(`projects brief-wiki skipped ${repoId}: already deep-dived`);
-    return {
-      tier: "brief-wiki",
-      status: "already_deep_dived",
-      skipped: true,
-      reason: "brief-wiki content already marks this repo as deep_dived",
-      candidateId: candidate?.id,
-      repo: repoId,
-      triage: summarizeTriage(triage),
-    };
+  let generated;
+  try {
+    generated = await generateProjectDeepDive({
+      candidate,
+      evidence,
+      triage,
+      options,
+      logger: ctx.logger || console,
+    });
+  } catch (error) {
+    return fallbackAfterDeepDiveFailure({
+      candidate,
+      evidence,
+      triage,
+      options,
+      ctx,
+      repoId,
+      error,
+    });
   }
-
-  const generated = await generateProjectDeepDive({
-    candidate,
-    evidence,
-    triage,
-    options,
-    logger: ctx.logger || console,
-  });
 
   if (generated?.skipped || !generated?.slug) {
     if (generated?.depth_decision) {
@@ -240,7 +285,7 @@ export async function publish(_qaItems = [], ctx = {}) {
     discover: `${enriched.length} repos from GitHub Trending plus topic/search supplements`,
     evidence: `${enriched.length} README + artifactAudit + evidence_signals records in SQLite`,
     rank: briefWikiPipeline
-      ? "deterministic rank/depth; deep has no numeric cap and is gated only by score>=75 plus hard evidence gates"
+      ? "canonical Tier 0/1/2/3 rank; Tier 3 has no count cap and is scarce only because the bar is high"
       : `worthDeepDive threshold ${numberOption(options.worthThreshold, 60)}`,
     review: briefWikiPipeline
       ? `${deepDiveCount} brief-wiki project analysis/deep briefs with separate reviewer pass, ${allRepos.length} radar cards`
@@ -314,7 +359,7 @@ export async function publish(_qaItems = [], ctx = {}) {
     generatedAt,
     analysisModels: {
       projectLight: projectLightModel(),
-      projectDeep: projectDeepModel(),
+      projectDeep: briefWikiPipeline ? "Tier 3: codex:gpt-5.5;model_reasoning_effort=high" : projectDeepModel(),
       projectReview: projectReviewModel(options),
     },
     pipelineRun: {
@@ -382,7 +427,7 @@ function enrichFromDb(db, candidate) {
     eval: db.getEval(candidate.id),
     light: mergedLight,
     deep,
-    briefSlug: briefWiki?.slug || null,
+    briefSlug: briefWiki?.slug || candidate.raw?.briefSlug || null,
     briefWiki,
   };
 }
@@ -391,16 +436,20 @@ function latestTier(analyses, tier) {
   return analyses.find((analysis) => analysis.tier === tier) || null;
 }
 
-function makeBoard(window, items, options = {}) {
+export function makeBoard(window, items, options = {}) {
   const generatedAt = nowIso(options);
-  const repos = items
+  const nativeItems = items
     .filter((item) => (item.repo.windows || []).includes(window))
-    .sort((left, right) => sortForWindow(left, right, window))
+    .sort((left, right) => sortForWindow(left, right, window));
+  const boardLimit = Number.isFinite(Number(options.boardLimit)) ? Number(options.boardLimit) : null;
+  const boardItems = boardLimit == null ? nativeItems : nativeItems.slice(0, boardLimit);
+  const repos = boardItems
     .map((item, index) => repoForBoard(item, window, index + 1, options));
 
   return {
     window,
     generatedAt,
+    target: repos.length,
     repos,
   };
 }
@@ -466,6 +515,14 @@ function repoForBoard(item, window, rank, options = {}) {
     ranking_score: rankingScore,
     max_allowed_depth: light.max_allowed_depth || depthDecision.max_allowed_depth || "list_only",
     final_depth: finalDepth,
+    project_tier: Number(light.project_tier ?? depthDecision.project_tier ?? projectTierForDepth(finalDepth)),
+    project_tier_label: light.project_tier_label || depthDecision.project_tier_label || `Tier ${projectTierForDepth(finalDepth)}`,
+    project_bucket: light.project_bucket || light.bucket || depthDecision.project_bucket || depthDecision.bucket || "无关类",
+    bucket: light.project_bucket || light.bucket || depthDecision.project_bucket || depthDecision.bucket || "无关类",
+    tier_tag: light.tier_tag || `[Tier ${Number(light.project_tier ?? depthDecision.project_tier ?? projectTierForDepth(finalDepth))}｜${light.project_bucket || light.bucket || depthDecision.project_bucket || depthDecision.bucket || "无关类"}]`,
+    model_tier: light.model_tier || depthDecision.model_tier || modelForProjectTier(light.project_tier ?? depthDecision.project_tier ?? projectTierForDepth(finalDepth)),
+    requires_manual_confirmation: Boolean(light.requires_manual_confirmation || depthDecision.requires_manual_confirmation || projectTierForDepth(finalDepth) === 3),
+    tier_template: light.tier_template || null,
     recommended_action: light.recommended_action || depthDecision.recommended_action || "monitor",
     needs_enrichment: Boolean(light.needs_enrichment || depthDecision.needs_enrichment),
     ranking_reasons: Array.isArray(light.ranking_reasons) ? light.ranking_reasons : [],
@@ -604,6 +661,20 @@ function publicDepthDecision(light = {}) {
   };
 }
 
+function projectTierForDepth(depth) {
+  if (depth === "deep") return 3;
+  if (depth === "analysis") return 2;
+  if (depth === "light") return 1;
+  return 0;
+}
+
+function modelForProjectTier(tier) {
+  if (Number(tier) === 3) return "codex:gpt-5.5;model_reasoning_effort=high";
+  if (Number(tier) === 2) return "deepseek-or-light-codex";
+  if (Number(tier) === 1) return "cheap-extraction";
+  return "none";
+}
+
 function numberOption(value, fallback) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
@@ -611,4 +682,101 @@ function numberOption(value, fallback) {
 
 function nowIso(options = {}) {
   return options.now?.() || new Date().toISOString();
+}
+
+function fallbackAfterDeepDiveFailure({
+  candidate = {},
+  evidence = {},
+  triage = {},
+  options = {},
+  ctx = {},
+  repoId = "unknown-project",
+  error,
+} = {}) {
+  const message = error?.message || String(error);
+  ctx.logger?.warn?.(`projects brief-wiki deep-dive failed ${repoId}: ${message}`);
+
+  const fallbackTriage = deepDiveFailureTriage(triage, message);
+  persistRadarEvaluation(options.db, candidate, fallbackTriage, nowIso(options), "project-deep-dive-fallback");
+
+  return {
+    tier: "brief-wiki",
+    status: "needs_enrichment",
+    skipped: true,
+    generated: false,
+    fallback_tier: "light",
+    reason: `deep_dive_failed: ${message}`,
+    error: message,
+    candidateId: candidate?.id,
+    repo: repoId,
+    final_depth: fallbackTriage.final_depth,
+    depth_decision: fallbackTriage.depth_decision,
+    review: {
+      verdict: "not_run",
+      issues: ["deep_dive_generation_failed"],
+      rationale: message,
+    },
+    triage: summarizeTriage(fallbackTriage),
+    artifactAudit: evidence?.artifactAudit || evidence?.metadata?.artifactAudit || null,
+  };
+}
+
+function deepDiveFailureTriage(triage = {}, message = "") {
+  const decision = triage.depth_decision || {};
+  const score = Number(triage.ranking_score ?? decision.ranking_score ?? triage.score ?? triage.worthDeepDive ?? 0);
+  const rejectionReasons = unique([
+    ...asArray(decision.rejection_reasons),
+    ...asArray(triage.rejection_reasons),
+    "deep_dive_generation_failed",
+  ]);
+  const reviewIssues = unique([
+    ...asArray(decision.review_issues),
+    ...asArray(triage.review_issues),
+    "deep_dive_generation_failed",
+  ]);
+  const depthDecision = {
+    ...decision,
+    ranking_score: score,
+    max_allowed_depth: decision.max_allowed_depth || triage.max_allowed_depth || "deep",
+    final_depth: "needs_enrichment",
+    ranking_reasons: asArray(decision.ranking_reasons || triage.ranking_reasons),
+    rejection_reasons: rejectionReasons,
+    recommended_action: "monitor",
+    needs_enrichment: true,
+    review_verdict: "not_applicable",
+    review_issues: reviewIssues,
+  };
+
+  return {
+    ...triage,
+    decision: "needs_enrichment",
+    mode: triage.mode || "deterministic-radar",
+    score,
+    worthDeepDive: Number(triage.worthDeepDive ?? score),
+    ranking_score: score,
+    reason: `deep_dive_failed: ${message}`,
+    signals: unique([
+      ...asArray(triage.signals),
+      "final_depth:needs_enrichment",
+      "deep_dive_generation_failed",
+    ]),
+    verdict: "skip",
+    final_depth: "needs_enrichment",
+    max_allowed_depth: depthDecision.max_allowed_depth,
+    recommended_action: "monitor",
+    needs_enrichment: true,
+    rejection_reasons: rejectionReasons,
+    review_verdict: "not_applicable",
+    review_issues: reviewIssues,
+    depth_decision: depthDecision,
+  };
+}
+
+function asArray(value) {
+  if (value == null) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function unique(items) {
+  return [...new Set(items.filter(Boolean))];
 }

@@ -74,6 +74,7 @@ export async function fetchOpenModelStatus(model, options = {}) {
       downloads: Number(modelInfo?.downloads) || 0,
       likes: Number(modelInfo?.likes) || 0,
       hfId: model.hfId,
+      base_model: extractHfBaseModel(latest || modelInfo),
       hfLastModified: modelInfo?.lastModified || null,
       relatedHfModels: latestVersionVariants,
     },
@@ -273,6 +274,13 @@ function extractHfLicense(modelInfo = {}) {
   if (cardLicense) return String(cardLicense);
   const tag = (modelInfo.tags || []).find((item) => /^license:/i.test(String(item)));
   return tag ? String(tag).replace(/^license:/i, "") : "";
+}
+
+function extractHfBaseModel(modelInfo = {}) {
+  const cardData = modelInfo.cardData || {};
+  const baseModel = cardData.base_model || cardData.baseModel;
+  if (Array.isArray(baseModel)) return baseModel.filter(Boolean).map(String);
+  return baseModel ? String(baseModel) : "";
 }
 
 function hasHfEvalData(modelInfo = {}) {

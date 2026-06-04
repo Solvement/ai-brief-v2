@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { createDeepSeekClient } from "../../lib/llm.mjs";
 import { getModelConfig } from "./registry.mjs";
 import { buildOfflineModelStatus, fetchModelStatus } from "./sources.mjs";
+import { buildCanonicalParadigm, classifyModelParadigm } from "./paradigm.mjs";
 import {
   closedModelSystemPrompt,
   closedModelUserPrompt,
@@ -66,6 +67,8 @@ export async function generateModelEntry({
     payload,
     generatedAt,
     analysisAuthor: offline ? "offline-model-generator-stub" : `DeepSeek:${selectedModel}`,
+    existing: options.existingEntry || null,
+    libraryRecords: options.libraryRecords || [],
   });
 }
 
@@ -79,8 +82,23 @@ async function loadGoldOpenExample() {
   return gold;
 }
 
-function buildEntry({ model, fetched, payload, generatedAt, analysisAuthor }) {
+function buildEntry({ model, fetched, payload, generatedAt, analysisAuthor, existing = null, libraryRecords = [] }) {
   const status = statusFields(model, fetched);
+  const classification = classifyModelParadigm({ model, fetched, existing, libraryRecords });
+  if (classification.branch === "variant_merged") {
+    return {
+      id: model.id,
+      name: model.name,
+      vendor: model.vendor,
+      country: model.country,
+      kind: model.kind,
+      ...status,
+      analysisGeneratedAt: generatedAt,
+      analysisAuthor,
+      isOpen: model.kind === "open",
+      paradigm: buildCanonicalParadigm({ model, fetched, classification, existing }),
+    };
+  }
   const base = {
     id: model.id,
     name: model.name,
@@ -99,6 +117,13 @@ function buildEntry({ model, fetched, payload, generatedAt, analysisAuthor }) {
       ...base,
       isOpen: true,
       analysis: normalizeOpenAnalysis(analysis),
+      paradigm: buildCanonicalParadigm({
+        model,
+        fetched,
+        analysis: normalizeOpenAnalysis(analysis),
+        classification,
+        existing,
+      }),
     };
   }
 
@@ -108,6 +133,13 @@ function buildEntry({ model, fetched, payload, generatedAt, analysisAuthor }) {
     ...base,
     isOpen: false,
     changelog: normalizeClosedChangelog(changelog),
+    paradigm: buildCanonicalParadigm({
+      model,
+      fetched,
+      changelog: normalizeClosedChangelog(changelog),
+      classification,
+      existing,
+    }),
   };
 }
 
@@ -175,6 +207,7 @@ function normalizeBenchmark(input = {}) {
       comparator: cleanString(item?.comparator),
       interpretation: cleanString(item?.interpretation),
       sourceType: normalizeSourceType(item?.sourceType),
+      attribution: normalizeBenchmarkAttribution(item?.attribution, item?.sourceType),
     })).filter((item) => item.label),
     caveats: normalizeStringArray(input.caveats),
   };
@@ -266,6 +299,12 @@ function normalizeSources(value) {
 function normalizeSourceType(value) {
   const raw = cleanString(value);
   return ["official", "third-party", "derived"].includes(raw) ? raw : "official";
+}
+
+function normalizeBenchmarkAttribution(value, sourceType) {
+  const raw = cleanString(value);
+  if (raw === "自报" || raw === "实测") return raw;
+  return normalizeSourceType(sourceType) === "official" ? "自报" : "实测";
 }
 
 function isOffline(options = {}, env = process.env) {

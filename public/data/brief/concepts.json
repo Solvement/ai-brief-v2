@@ -1,9 +1,294 @@
 {
-  "generatedAt": "2026-06-02T03:41:39.783Z",
+  "generatedAt": "2026-06-04T04:05:46.368Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 7,
+  "count": 81,
   "items": [
+    {
+      "id": "concept/adaptive-element-relocation",
+      "type": "concept",
+      "slug": "adaptive-element-relocation",
+      "title": "Adaptive Element Relocation",
+      "file": "concepts/adaptive-element-relocation.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "自适应元素重定位",
+        "slug": "adaptive-element-relocation",
+        "kind": "concept",
+        "tags": [
+          "web-scraping",
+          "automation",
+          "resilience"
+        ],
+        "maturity": "active",
+        "first_seen_in": "scrapling",
+        "related_content": [
+          "scrapling"
+        ],
+        "related_concepts": [],
+        "explanation": "通过在首次抓取时保存元素的特征签名（文本、属性、结构），在页面结构变化后，利用保存的签名进行模糊匹配，重新定位目标元素，从而避免因为小幅度改版而失败。",
+        "examples": [
+          "Scrapling 中先执行 auto_save，然后使用 adaptive=True 重选元素"
+        ],
+        "common_misunderstandings": [
+          "不是所有变化都能应对，需要元素的基础内容保持相对稳定。"
+        ],
+        "open_questions": [
+          "如何选择最有区分度的签名特征？",
+          "如何处理动态加载或频繁变化的元素？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过在首次抓取时保存元素的特征签名（文本、属性、结构），在页面结构变化后，利用保存的签名进行模糊匹配，重新定位目标元素，从而避免因为小幅度改版而失败。 出处:https://github.com/d4vinci/scrapling。See [[content/scrapling]]。\n\n## Supported by\n- [[claims/scrapling-main-claim]]\n",
+      "excerpt": "通过在首次抓取时保存元素的特征签名（文本、属性、结构），在页面结构变化后，利用保存的签名进行模糊匹配，重新定位目标元素，从而避免因为小幅度改版而失败。 出处:https://github.com/d4vinci/scrapling。See [[content/scrapling]]。",
+      "links": [
+        {
+          "target": "content/scrapling",
+          "raw": "[[content/scrapling]]"
+        },
+        {
+          "target": "claims/scrapling-main-claim",
+          "raw": "[[claims/scrapling-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/agent-awareness-via-output-parsing",
+      "type": "concept",
+      "slug": "agent-awareness-via-output-parsing",
+      "title": "Agent Awareness Via Output Parsing",
+      "file": "concepts/agent-awareness-via-output-parsing.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "通过输出解析的代理感知",
+        "slug": "agent-awareness-via-output-parsing",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "status",
+          "terminal",
+          "heuristic"
+        ],
+        "maturity": "active",
+        "first_seen_in": "herdr",
+        "related_content": [
+          "herdr"
+        ],
+        "related_concepts": [],
+        "explanation": "不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。",
+        "examples": [
+          "Herder 检测到 'claude' 进程并解析输出中包含 'waiting for input' 来显示阻塞状态。"
+        ],
+        "common_misunderstandings": [
+          "它并不是真正的语义理解，而是模式匹配。"
+        ],
+        "open_questions": [
+          "如何应对代理输出格式的国际化？",
+          "自定义代理如何注册自己的输出模式？"
+        ]
+      },
+      "body": "\n## Explanation\n\n不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。\n\n## Supported by\n- [[claims/herdr-main-claim]]\n",
+      "excerpt": "不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。",
+      "links": [
+        {
+          "target": "content/herdr",
+          "raw": "[[content/herdr]]"
+        },
+        {
+          "target": "claims/herdr-main-claim",
+          "raw": "[[claims/herdr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/agent-loop",
+      "type": "concept",
+      "slug": "agent-loop",
+      "title": "Agent Loop",
+      "file": "concepts/agent-loop.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "智能体主循环",
+        "slug": "agent-loop",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "control-flow",
+          "react"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "ai-engineering-from-scratch",
+        "related_content": [
+          "ai-engineering-from-scratch"
+        ],
+        "related_concepts": [],
+        "explanation": "一种在对话历史中迭代调用 LLM 并执行工具直到产生最终回复的控制流程。核心模式：历史记录、工具调用检测、工具结果反馈。适用于构建自主任务执行器。",
+        "examples": [
+          "Phase 14 lesson 01 的 agent_loop.py：纯 Python 实现，使用 history 列表和 tools 字典。"
+        ],
+        "common_misunderstandings": [
+          "不仅仅是 while 循环，必须妥善处理最大步数、超时和异常。"
+        ],
+        "open_questions": [
+          "如何集成流式响应和并行工具调用？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种在对话历史中迭代调用 LLM 并执行工具直到产生最终回复的控制流程。核心模式：历史记录、工具调用检测、工具结果反馈。适用于构建自主任务执行器。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/ai-engineering-from-scratch]]。\n\n## Supported by\n- [[claims/ai-engineering-from-scratch-main-claim]]\n",
+      "excerpt": "一种在对话历史中迭代调用 LLM 并执行工具直到产生最终回复的控制流程。核心模式：历史记录、工具调用检测、工具结果反馈。适用于构建自主任务执行器。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/ai-engineering-from-scratch]]。",
+      "links": [
+        {
+          "target": "content/ai-engineering-from-scratch",
+          "raw": "[[content/ai-engineering-from-scratch]]"
+        },
+        {
+          "target": "claims/ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/ai-engineering-from-scratch-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/agent-skills",
+      "type": "concept",
+      "slug": "agent-skills",
+      "title": "Agent Skills",
+      "file": "concepts/agent-skills.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "代理技能",
+        "slug": "agent-skills",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "skills",
+          "learning"
+        ],
+        "maturity": "active",
+        "first_seen_in": "hermes-agent",
+        "related_content": [
+          "hermes-agent"
+        ],
+        "related_concepts": [],
+        "explanation": "代理可从对话中自动创建可复用的技能，技能在使用中自我改进，并以文件形式持久化。",
+        "examples": [
+          "用户通过复杂命令序列，agent 自动生成一个 skill 文件，此后可用 `/<skill-name>` 调用。"
+        ],
+        "common_misunderstandings": [
+          "并非所有任务都会生成技能，触发条件未公开。"
+        ],
+        "open_questions": [
+          "技能如何避免冲突和保证安全性？",
+          "技能自我改进的准确率如何？"
+        ]
+      },
+      "body": "\n## Explanation\n\n代理可从对话中自动创建可复用的技能，技能在使用中自我改进，并以文件形式持久化。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。\n\n## Supported by\n- [[claims/hermes-agent-main-claim]]\n",
+      "excerpt": "代理可从对话中自动创建可复用的技能，技能在使用中自我改进，并以文件形式持久化。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。",
+      "links": [
+        {
+          "target": "content/hermes-agent",
+          "raw": "[[content/hermes-agent]]"
+        },
+        {
+          "target": "claims/hermes-agent-main-claim",
+          "raw": "[[claims/hermes-agent-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/agent-skills-catalog",
+      "type": "concept",
+      "slug": "agent-skills-catalog",
+      "title": "Agent Skills Catalog",
+      "file": "concepts/agent-skills-catalog.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "技能目录",
+        "slug": "agent-skills-catalog",
+        "kind": "concept",
+        "tags": [
+          "tool-use",
+          "modularity"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "ecc",
+        "related_content": [
+          "ecc"
+        ],
+        "related_concepts": [],
+        "explanation": "将常见任务封装为独立的、可调用的技能文件，通过 slash 命令触发，可组合成复杂工作流。",
+        "examples": [
+          "search-first 技能指导助手优先搜索现有代码而非从头编写",
+          "parallel-execution-optimizer 将重复的优化提示转为基准工作流"
+        ],
+        "common_misunderstandings": [
+          "技能并非微服务或独立进程，它只是一组指令和脚本，运行时受宿主助手解释。"
+        ],
+        "open_questions": [
+          "技能之间如何传递数据和状态？",
+          "技能的使用是否有权限控制和成本限制？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将常见任务封装为独立的、可调用的技能文件，通过 slash 命令触发，可组合成复杂工作流。 出处:https://github.com/affaan-m/ecc。See [[content/ecc]]。\n\n## Supported by\n- [[claims/ecc-main-claim]]\n",
+      "excerpt": "将常见任务封装为独立的、可调用的技能文件，通过 slash 命令触发，可组合成复杂工作流。 出处:https://github.com/affaan-m/ecc。See [[content/ecc]]。",
+      "links": [
+        {
+          "target": "content/ecc",
+          "raw": "[[content/ecc]]"
+        },
+        {
+          "target": "claims/ecc-main-claim",
+          "raw": "[[claims/ecc-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
     {
       "id": "concept/agentic-memory",
       "type": "concept",
@@ -100,6 +385,807 @@
       ]
     },
     {
+      "id": "concept/ai-agent-content-monetization",
+      "type": "concept",
+      "slug": "ai-agent-content-monetization",
+      "title": "Ai Agent Content Monetization",
+      "file": "concepts/ai-agent-content-monetization.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "AI Agent 内容变现",
+        "slug": "ai-agent-content-monetization",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "monetization",
+          "social-media"
+        ],
+        "maturity": "active",
+        "first_seen_in": "aitoearn",
+        "related_content": [
+          "aitoearn"
+        ],
+        "related_concepts": [],
+        "explanation": "通过多个 AI Agent 协同工作，覆盖内容创作、跨平台分发、自动化互动和效果结算的全链路，使个体创作者像运营公司一样高效。",
+        "examples": [
+          "AiToEarn 的 Publish Agent 自动将视频推送到抖音、YouTube 等平台",
+          "Engage Agent 自动回复评论并抓取高转化信号"
+        ],
+        "common_misunderstandings": [
+          "不等于简单的内容自动发布工具，它包含交易市场和效果结算",
+          "Agent 不是完全自主，仍需用户设定任务和提供初始素材"
+        ],
+        "open_questions": [
+          "如何确保 AI 生成内容的质量不损害创作者品牌？",
+          "交易市场的供需匹配算法如何避免刷量作弊？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过多个 AI Agent 协同工作，覆盖内容创作、跨平台分发、自动化互动和效果结算的全链路，使个体创作者像运营公司一样高效。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。\n\n## Supported by\n- [[claims/aitoearn-main-claim]]\n",
+      "excerpt": "通过多个 AI Agent 协同工作，覆盖内容创作、跨平台分发、自动化互动和效果结算的全链路，使个体创作者像运营公司一样高效。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。",
+      "links": [
+        {
+          "target": "content/aitoearn",
+          "raw": "[[content/aitoearn]]"
+        },
+        {
+          "target": "claims/aitoearn-main-claim",
+          "raw": "[[claims/aitoearn-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/automodel-pipeline",
+      "type": "concept",
+      "slug": "automodel-pipeline",
+      "title": "Automodel Pipeline",
+      "file": "concepts/automodel-pipeline.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "AutoModel 自动组装流水线",
+        "slug": "automodel-pipeline",
+        "kind": "concept",
+        "tags": [
+          "api-design",
+          "pipeline",
+          "model-management"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "funasr",
+        "related_content": [
+          "funasr"
+        ],
+        "related_concepts": [],
+        "explanation": "通过一个简洁的 API 调用，自动加载指定模型和可选辅助模型，构建完整的语音处理管道。用户无需手动配置各组件。",
+        "examples": [
+          "model = AutoModel(model='iic/SenseVoiceSmall', vad_model='fsmn-vad', spk_model='cam++')"
+        ],
+        "common_misunderstandings": [
+          "AutoModel 不能任意组合所有模型，参数需受支持的模型名称"
+        ],
+        "open_questions": [
+          "如何动态注册自定义模型到 AutoModel 体系中？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过一个简洁的 API 调用，自动加载指定模型和可选辅助模型，构建完整的语音处理管道。用户无需手动配置各组件。 出处:https://github.com/modelscope/funasr。See [[content/funasr]]。\n\n## Supported by\n- [[claims/funasr-main-claim]]\n",
+      "excerpt": "通过一个简洁的 API 调用，自动加载指定模型和可选辅助模型，构建完整的语音处理管道。用户无需手动配置各组件。 出处:https://github.com/modelscope/funasr。See [[content/funasr]]。",
+      "links": [
+        {
+          "target": "content/funasr",
+          "raw": "[[content/funasr]]"
+        },
+        {
+          "target": "claims/funasr-main-claim",
+          "raw": "[[claims/funasr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/cachealigner",
+      "type": "concept",
+      "slug": "cachealigner",
+      "title": "Cachealigner",
+      "file": "concepts/cachealigner.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "CacheAligner",
+        "slug": "cachealigner",
+        "kind": "concept",
+        "tags": [
+          "caching",
+          "optimization",
+          "prompt-engineering"
+        ],
+        "maturity": "active",
+        "first_seen_in": "headroom",
+        "related_content": [
+          "headroom"
+        ],
+        "related_concepts": [],
+        "explanation": "一种前缀稳定化技术，确保经过压缩的提示在传递给 LLM 时，其前缀与提供商的 KV 缓存布局对齐，从而提高缓存命中率，降低首 token 延迟。",
+        "examples": [
+          "在对一系列相似请求进行压缩时，CacheAligner 保证相同前缀在 token 序列中位置固定，使 Anthropic 或 OpenAI 的缓存生效。"
+        ],
+        "common_misunderstandings": [
+          "它并不压缩内容本身，而是调整已压缩内容的序列化方式。",
+          "只有使用支持 KV 缓存的提供商的 API 时才有意义。"
+        ],
+        "open_questions": [
+          "在多个代理并发时，缓存对齐的一致性如何保证？",
+          "对齐策略是否依赖特定模型版本？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种前缀稳定化技术，确保经过压缩的提示在传递给 LLM 时，其前缀与提供商的 KV 缓存布局对齐，从而提高缓存命中率，降低首 token 延迟。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。\n\n## Supported by\n- [[claims/headroom-main-claim]]\n",
+      "excerpt": "一种前缀稳定化技术，确保经过压缩的提示在传递给 LLM 时，其前缀与提供商的 KV 缓存布局对齐，从而提高缓存命中率，降低首 token 延迟。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。",
+      "links": [
+        {
+          "target": "content/headroom",
+          "raw": "[[content/headroom]]"
+        },
+        {
+          "target": "claims/headroom-main-claim",
+          "raw": "[[claims/headroom-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/claim-level-citation-audit",
+      "type": "concept",
+      "slug": "claim-level-citation-audit",
+      "title": "Claim Level Citation Audit",
+      "file": "concepts/claim-level-citation-audit.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "声明级引文审计",
+        "slug": "claim-level-citation-audit",
+        "kind": "concept",
+        "tags": [
+          "citation",
+          "factuality",
+          "audit"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "academic-research-skills",
+        "related_content": [
+          "academic-research-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "将论文中的每个引用声明与实际被引文献内容进行比对，验证声明的真实性，而不是仅仅检查引用格式或存在性。",
+        "examples": [
+          "ARS v3.8 在声明周围植入三层锚点，审计时获取文献原文并与锚点中的声明进行一致性判断。"
+        ],
+        "common_misunderstandings": [
+          "审计并非自动禁止某一引用，而是标记风险，最终由人决定。"
+        ],
+        "open_questions": [
+          "引用锚点对改写后的声明是否仍有效？如何处理多篇文献支持同一声明的情况？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将论文中的每个引用声明与实际被引文献内容进行比对，验证声明的真实性，而不是仅仅检查引用格式或存在性。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/academic-research-skills]]。\n\n## Supported by\n- [[claims/academic-research-skills-main-claim]]\n",
+      "excerpt": "将论文中的每个引用声明与实际被引文献内容进行比对，验证声明的真实性，而不是仅仅检查引用格式或存在性。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/academic-research-skills]]。",
+      "links": [
+        {
+          "target": "content/academic-research-skills",
+          "raw": "[[content/academic-research-skills]]"
+        },
+        {
+          "target": "claims/academic-research-skills-main-claim",
+          "raw": "[[claims/academic-research-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/closed-learning-loop",
+      "type": "concept",
+      "slug": "closed-learning-loop",
+      "title": "Closed Learning Loop",
+      "file": "concepts/closed-learning-loop.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "闭环学习循环",
+        "slug": "closed-learning-loop",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "learning",
+          "memory"
+        ],
+        "maturity": "active",
+        "first_seen_in": "hermes-agent",
+        "related_content": [
+          "hermes-agent"
+        ],
+        "related_concepts": [],
+        "explanation": "agent 通过执行任务、创建技能、记忆存储、自我提醒形成持续改进的循环。",
+        "examples": [
+          "完成一个代码审查任务后，agent 可能创建一个 skill，并在未来相似任务中自动使用。"
+        ],
+        "common_misunderstandings": [
+          "不是强化学习，而是基于 LLM 的规则和文件管理。"
+        ],
+        "open_questions": [
+          "学习循环的有效性如何评估？",
+          "如何防止错误的技能固化？"
+        ]
+      },
+      "body": "\n## Explanation\n\nagent 通过执行任务、创建技能、记忆存储、自我提醒形成持续改进的循环。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。\n\n## Supported by\n- [[claims/hermes-agent-main-claim]]\n",
+      "excerpt": "agent 通过执行任务、创建技能、记忆存储、自我提醒形成持续改进的循环。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。",
+      "links": [
+        {
+          "target": "content/hermes-agent",
+          "raw": "[[content/hermes-agent]]"
+        },
+        {
+          "target": "claims/hermes-agent-main-claim",
+          "raw": "[[claims/hermes-agent-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/comfyui-workflow-integration",
+      "type": "concept",
+      "slug": "comfyui-workflow-integration",
+      "title": "Comfyui Workflow Integration",
+      "file": "concepts/comfyui-workflow-integration.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "ComfyUI 工作流集成",
+        "slug": "comfyui-workflow-integration",
+        "kind": "concept",
+        "tags": [
+          "comfyui",
+          "workflow",
+          "api-integration"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "pixelle-video",
+        "related_content": [
+          "pixelle-video"
+        ],
+        "related_concepts": [],
+        "explanation": "将 ComfyUI 或 RunningHub 的图形化工作流（JSON 定义）作为可替换的图像/视频生成模块，通过 HTTP API 调用，实现低代码定制。用户只需在 Web UI 选择或上传工作流文件即可切换生成方式。",
+        "examples": [
+          "默认使用 image_flux.json 工作流生成配图",
+          "支持用户将自己编写的工作流放入 workflows/ 目录动态加载"
+        ],
+        "common_misunderstandings": [
+          "不是直接使用 ComfyUI 的图形界面，而是通过其 API 驱动自动化生成"
+        ],
+        "open_questions": [
+          "工作流版本管理与依赖冲突如何处理？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将 ComfyUI 或 RunningHub 的图形化工作流（JSON 定义）作为可替换的图像/视频生成模块，通过 HTTP API 调用，实现低代码定制。用户只需在 Web UI 选择或上传工作流文件即可切换生成方式。 出处:https://github.com/aidc-ai/pixelle-video。See [[content/pixelle-video]]。\n\n## Supported by\n- [[claims/pixelle-video-main-claim]]\n",
+      "excerpt": "将 ComfyUI 或 RunningHub 的图形化工作流（JSON 定义）作为可替换的图像/视频生成模块，通过 HTTP API 调用，实现低代码定制。用户只需在 Web UI 选择或上传工作流文件即可切换生成方式。 出处:https://github.com/aidc-ai/pixelle-video。See [[content/pixelle-video]]。",
+      "links": [
+        {
+          "target": "content/pixelle-video",
+          "raw": "[[content/pixelle-video]]"
+        },
+        {
+          "target": "claims/pixelle-video-main-claim",
+          "raw": "[[claims/pixelle-video-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/connector-first-broker-abstraction",
+      "type": "concept",
+      "slug": "connector-first-broker-abstraction",
+      "title": "Connector First Broker Abstraction",
+      "file": "concepts/connector-first-broker-abstraction.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Connector-First Broker Abstraction",
+        "slug": "connector-first-broker-abstraction",
+        "kind": "concept",
+        "tags": [
+          "infra",
+          "trading"
+        ],
+        "maturity": "active",
+        "first_seen_in": "vibe-trading",
+        "related_content": [
+          "vibe-trading"
+        ],
+        "related_concepts": [],
+        "explanation": "交易后端抽象为可选择的连接器 profile，每个连接器明确声明其能力层级：只读、paper 下单、live 下单（受 mandate 保护）。paper/live 隔离通过结构性手段（账号格式、主机分离等）保证。",
+        "examples": [
+          "用 `vibe-trading connector use robinhood-paper` 切换到 Robinhood paper 环境，交易工具透明切换。"
+        ],
+        "common_misunderstandings": [
+          "连接器之间不保证统一接口，每个 broker 的 API 特殊性仍可能暴露。"
+        ],
+        "open_questions": [
+          "如何保证 paper 环境与 live 环境的行为一致性？",
+          "连接器配置的复杂度是否对普通用户友好？"
+        ]
+      },
+      "body": "\n## Explanation\n\n交易后端抽象为可选择的连接器 profile，每个连接器明确声明其能力层级：只读、paper 下单、live 下单（受 mandate 保护）。paper/live 隔离通过结构性手段（账号格式、主机分离等）保证。 出处:https://github.com/hkuds/vibe-trading。See [[content/vibe-trading]]。\n\n## Supported by\n- [[claims/vibe-trading-main-claim]]\n",
+      "excerpt": "交易后端抽象为可选择的连接器 profile，每个连接器明确声明其能力层级：只读、paper 下单、live 下单（受 mandate 保护）。paper/live 隔离通过结构性手段（账号格式、主机分离等）保证。 出处:https://github.com/hkuds/vibe-trading。See [[content/vibe-trading]]。",
+      "links": [
+        {
+          "target": "content/vibe-trading",
+          "raw": "[[content/vibe-trading]]"
+        },
+        {
+          "target": "claims/vibe-trading-main-claim",
+          "raw": "[[claims/vibe-trading-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/constitution-governance",
+      "type": "concept",
+      "slug": "constitution-governance",
+      "title": "Constitution Governance",
+      "file": "concepts/constitution-governance.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "宪法治理",
+        "slug": "constitution-governance",
+        "kind": "concept",
+        "tags": [
+          "prompt-engineering",
+          "safety",
+          "governance"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "codewhale",
+        "related_content": [
+          "codewhale"
+        ],
+        "related_concepts": [],
+        "explanation": "通过在系统提示中嵌入一个具有明确法律优先级的宪法文本，解决 LLM 代理在多轮交互中指令冲突的问题。宪法规定不同信息来源（用户、系统、工具输出等）的权威层级，保证模型遵循正确的指令。",
+        "examples": [
+          "CodeWhale 的 prompts/base.md 定义了九级法律体系，Article II 甚至规定真理优先于用户请求。"
+        ],
+        "common_misunderstandings": [
+          "宪法只是静态系统提示，并不能适应动态环境；宪法需要严格的设计和模型配合，否则可能被忽略。"
+        ],
+        "open_questions": [
+          "宪法的有效性能否在公开基准上量化？",
+          "如何平衡宪法的详尽程度与上下文窗口限制？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过在系统提示中嵌入一个具有明确法律优先级的宪法文本，解决 LLM 代理在多轮交互中指令冲突的问题。宪法规定不同信息来源（用户、系统、工具输出等）的权威层级，保证模型遵循正确的指令。 出处:https://github.com/hmbown/codewhale。See [[content/codewhale]]。\n\n## Supported by\n- [[claims/codewhale-main-claim]]\n",
+      "excerpt": "通过在系统提示中嵌入一个具有明确法律优先级的宪法文本，解决 LLM 代理在多轮交互中指令冲突的问题。宪法规定不同信息来源（用户、系统、工具输出等）的权威层级，保证模型遵循正确的指令。 出处:https://github.com/hmbown/codewhale。See [[content/codewhale]]。",
+      "links": [
+        {
+          "target": "content/codewhale",
+          "raw": "[[content/codewhale]]"
+        },
+        {
+          "target": "claims/codewhale-main-claim",
+          "raw": "[[claims/codewhale-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/content-router",
+      "type": "concept",
+      "slug": "content-router",
+      "title": "Content Router",
+      "file": "concepts/content-router.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "ContentRouter",
+        "slug": "content-router",
+        "kind": "concept",
+        "tags": [
+          "routing",
+          "compression",
+          "pipeline"
+        ],
+        "maturity": "active",
+        "first_seen_in": "headroom",
+        "related_content": [
+          "headroom"
+        ],
+        "related_concepts": [],
+        "explanation": "内容路由器，负责检测输入内容的类型（JSON、代码、自然语言等），并将它们分发给最合适的压缩器，比如 SmartCrusher 处理 JSON，CodeCompressor 处理代码。",
+        "examples": [
+          "当输入是一段 Python 代码时，ContentRouter 将其导向 CodeCompressor；而当输入是一个大型 JSON 数组时，则导向 SmartCrusher。"
+        ],
+        "common_misunderstandings": [
+          "它只做路由，不做压缩。",
+          "路由规则需要预先定义，可能无法处理未知混合内容。"
+        ],
+        "open_questions": [
+          "检测依据的具体规则是怎样的？",
+          "如果内容混合（如代码和评论），如何处理？"
+        ]
+      },
+      "body": "\n## Explanation\n\n内容路由器，负责检测输入内容的类型（JSON、代码、自然语言等），并将它们分发给最合适的压缩器，比如 SmartCrusher 处理 JSON，CodeCompressor 处理代码。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。\n\n## Supported by\n- [[claims/headroom-main-claim]]\n",
+      "excerpt": "内容路由器，负责检测输入内容的类型（JSON、代码、自然语言等），并将它们分发给最合适的压缩器，比如 SmartCrusher 处理 JSON，CodeCompressor 处理代码。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。",
+      "links": [
+        {
+          "target": "content/headroom",
+          "raw": "[[content/headroom]]"
+        },
+        {
+          "target": "claims/headroom-main-claim",
+          "raw": "[[claims/headroom-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/cross-framework-mapping-for-security-ai",
+      "type": "concept",
+      "slug": "cross-framework-mapping-for-security-ai",
+      "title": "Cross Framework Mapping For Security Ai",
+      "file": "concepts/cross-framework-mapping-for-security-ai.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Cross-Framework Mapping for Security AI",
+        "slug": "cross-framework-mapping-for-security-ai",
+        "kind": "concept",
+        "tags": [
+          "security",
+          "mapping",
+          "compliance"
+        ],
+        "maturity": "active",
+        "first_seen_in": "anthropic-cybersecurity-skills",
+        "related_content": [
+          "anthropic-cybersecurity-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "将单一安全操作映射到多个行业标准框架（ATT&CK、NIST CSF、ATLAS、D3FEND、AI RMF），使 AI 代理能够同时满足威胁检测、合规和风险管理需求。",
+        "examples": [
+          "analyzing-network-traffic-of-malware 映射到 ATT&CK T1071, NIST CSF DE.CM 等。"
+        ],
+        "common_misunderstandings": [
+          "映射并非自动推断，需要专家手动关联。"
+        ],
+        "open_questions": [
+          "当前映射是否保持与框架版本同步？是否有自动化更新机制？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将单一安全操作映射到多个行业标准框架（ATT&CK、NIST CSF、ATLAS、D3FEND、AI RMF），使 AI 代理能够同时满足威胁检测、合规和风险管理需求。 出处:https://github.com/mukul975/anthropic-cybersecurity-skills。See [[content/anthropic-cybersecurity-skills]]。\n\n## Supported by\n- [[claims/anthropic-cybersecurity-skills-main-claim]]\n",
+      "excerpt": "将单一安全操作映射到多个行业标准框架（ATT&CK、NIST CSF、ATLAS、D3FEND、AI RMF），使 AI 代理能够同时满足威胁检测、合规和风险管理需求。 出处:https://github.com/mukul975/anthropic-cybersecurity-skills。See [[content/anthropic-cybersecurity-skills]]。",
+      "links": [
+        {
+          "target": "content/anthropic-cybersecurity-skills",
+          "raw": "[[content/anthropic-cybersecurity-skills]]"
+        },
+        {
+          "target": "claims/anthropic-cybersecurity-skills-main-claim",
+          "raw": "[[claims/anthropic-cybersecurity-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/desktop-agent-shell",
+      "type": "concept",
+      "slug": "desktop-agent-shell",
+      "title": "Desktop Agent Shell",
+      "file": "concepts/desktop-agent-shell.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "桌面代理壳层",
+        "slug": "desktop-agent-shell",
+        "kind": "concept",
+        "tags": [
+          "electron",
+          "agent-shell",
+          "desktop-app"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "hermes-desktop",
+        "related_content": [
+          "hermes-desktop"
+        ],
+        "related_concepts": [],
+        "explanation": "为 CLI 代理提供 Electron 桌面界面，处理安装、配置、会话和 UI 交互，但不实现代理核心逻辑。通过 HTTP SSE 与后端代理通信。",
+        "examples": [
+          "Hermes Desktop 为 Hermes Agent 提供图形化安装和管理界面。"
+        ],
+        "common_misunderstandings": [
+          "不是代理的实现，不包含推理或执行工具的能力。"
+        ],
+        "open_questions": [
+          "如何确保壳层与后端版本兼容？",
+          "多代理后端支持的可能性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n为 CLI 代理提供 Electron 桌面界面，处理安装、配置、会话和 UI 交互，但不实现代理核心逻辑。通过 HTTP SSE 与后端代理通信。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。\n\n## Supported by\n- [[claims/hermes-desktop-main-claim]]\n",
+      "excerpt": "为 CLI 代理提供 Electron 桌面界面，处理安装、配置、会话和 UI 交互，但不实现代理核心逻辑。通过 HTTP SSE 与后端代理通信。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。",
+      "links": [
+        {
+          "target": "content/hermes-desktop",
+          "raw": "[[content/hermes-desktop]]"
+        },
+        {
+          "target": "claims/hermes-desktop-main-claim",
+          "raw": "[[claims/hermes-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/deterministic-policy-interception",
+      "type": "concept",
+      "slug": "deterministic-policy-interception",
+      "title": "Deterministic Policy Interception",
+      "file": "concepts/deterministic-policy-interception.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "确定性策略拦截",
+        "slug": "deterministic-policy-interception",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "security",
+          "governance"
+        ],
+        "maturity": "active",
+        "first_seen_in": "agent-governance-toolkit",
+        "related_content": [
+          "agent-governance-toolkit"
+        ],
+        "related_concepts": [],
+        "explanation": "在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。",
+        "examples": [
+          "AGT 的 `govern()` 函数包装工具，当 action='delete' 且策略中禁止时抛出 GovernanceDenied。"
+        ],
+        "common_misunderstandings": [
+          "不等于禁止所有危险操作，而是要求显式定义哪些操作危险并阻止。",
+          "不能理解业务语义，仅基于字段匹配，可能误拦看似危险实则安全的操作。"
+        ],
+        "open_questions": [
+          "策略表达式能力有限时，如何平衡安全性和灵活性？",
+          "当策略复杂到需要维护人员理解整个系统时，是否会陷入配置泥潭？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/agent-governance-toolkit-main-claim]]\n",
+      "excerpt": "在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。",
+      "links": [
+        {
+          "target": "content/agent-governance-toolkit",
+          "raw": "[[content/agent-governance-toolkit]]"
+        },
+        {
+          "target": "claims/agent-governance-toolkit-main-claim",
+          "raw": "[[claims/agent-governance-toolkit-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/enricher-pattern",
+      "type": "concept",
+      "slug": "enricher-pattern",
+      "title": "Enricher Pattern",
+      "file": "concepts/enricher-pattern.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "可插拔数据丰富器",
+        "slug": "enricher-pattern",
+        "kind": "concept",
+        "tags": [
+          "agent-tools",
+          "modularity",
+          "pipeline"
+        ],
+        "maturity": "active",
+        "first_seen_in": "flowsint",
+        "related_content": [
+          "flowsint"
+        ],
+        "related_concepts": [],
+        "explanation": "将数据转换步骤封装为独立模块，遵循统一接口（如接收实体，返回新实体或关系），由中心调度器自动调用，实现探索流水线的可扩展性。",
+        "examples": [
+          "Domain to IP enricher: 输入 domain，查询 DNS，输出 IP 实体并建立 'points_to' 关系。"
+        ],
+        "common_misunderstandings": [
+          "enricher 不是一次性脚本，它是集成到工作流中的可复用组件，需要处理错误和限流。"
+        ],
+        "open_questions": [
+          "如何标准化 enricher 的输入上下文（如调查会话）？",
+          "失败重试、速率限制的最佳实现模式？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将数据转换步骤封装为独立模块，遵循统一接口（如接收实体，返回新实体或关系），由中心调度器自动调用，实现探索流水线的可扩展性。 出处:https://github.com/reconurge/flowsint。See [[content/flowsint]]。\n\n## Supported by\n- [[claims/flowsint-main-claim]]\n",
+      "excerpt": "将数据转换步骤封装为独立模块，遵循统一接口（如接收实体，返回新实体或关系），由中心调度器自动调用，实现探索流水线的可扩展性。 出处:https://github.com/reconurge/flowsint。See [[content/flowsint]]。",
+      "links": [
+        {
+          "target": "content/flowsint",
+          "raw": "[[content/flowsint]]"
+        },
+        {
+          "target": "claims/flowsint-main-claim",
+          "raw": "[[claims/flowsint-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/event-driven-agent-loop",
+      "type": "concept",
+      "slug": "event-driven-agent-loop",
+      "title": "Event Driven Agent Loop",
+      "file": "concepts/event-driven-agent-loop.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "事件驱动的 Agent 回路",
+        "slug": "event-driven-agent-loop",
+        "kind": "concept",
+        "tags": [
+          "agent-loop",
+          "event-stream",
+          "observability"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "ui-tars-desktop",
+        "related_content": [
+          "ui-tars-desktop"
+        ],
+        "related_concepts": [],
+        "explanation": "Agent 的每一次感知、推理、行动、结果都作为结构化事件发出，形成一条事件流。这条流不仅用于状态追踪和调试，还直接驱动前端 UI 的实时更新，实现动作执行和用户界面的解耦。同时，事件流经过上下文工程模块压缩后注入模型的上下文，维持任务记忆。",
+        "examples": [
+          "Agent TARS 的 Web UI 接收 Event Stream 实时展示 Agent 的思考过程和屏幕操作",
+          "通过 Event Stream Viewer 可以追踪和调试工具调用的时间线和数据流"
+        ],
+        "common_misunderstandings": [
+          "不是简单地打印日志，而是有明确 schema 的协议，可以被程序消费",
+          "Context Engineering 不是简单的历史列表，需要对事件进行筛选、摘要和重排"
+        ],
+        "open_questions": [
+          "事件流的格式是否开源或标准化？",
+          "长任务中如何决定哪些事件保留，哪些丢弃？"
+        ]
+      },
+      "body": "\n## Explanation\n\nAgent 的每一次感知、推理、行动、结果都作为结构化事件发出，形成一条事件流。这条流不仅用于状态追踪和调试，还直接驱动前端 UI 的实时更新，实现动作执行和用户界面的解耦。同时，事件流经过上下文工程模块压缩后注入模型的上下文，维持任务记忆。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/ui-tars-desktop]]。\n\n## Supported by\n- [[claims/ui-tars-desktop-main-claim]]\n",
+      "excerpt": "Agent 的每一次感知、推理、行动、结果都作为结构化事件发出，形成一条事件流。这条流不仅用于状态追踪和调试，还直接驱动前端 UI 的实时更新，实现动作执行和用户界面的解耦。同时，事件流经过上下文工程模块压缩后注入模型的上下文，维持任务记忆。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/ui-tars-desktop]]。",
+      "links": [
+        {
+          "target": "content/ui-tars-desktop",
+          "raw": "[[content/ui-tars-desktop]]"
+        },
+        {
+          "target": "claims/ui-tars-desktop-main-claim",
+          "raw": "[[claims/ui-tars-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/experiment-manager-agent",
       "type": "concept",
       "slug": "experiment-manager-agent",
@@ -142,6 +1228,1254 @@
         {
           "target": "claims/ai-scientist-v2-main-claim",
           "raw": "[[claims/ai-scientist-v2-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/external-memory-server",
+      "type": "concept",
+      "slug": "external-memory-server",
+      "title": "External Memory Server",
+      "file": "concepts/external-memory-server.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "外部记忆服务器",
+        "slug": "external-memory-server",
+        "kind": "concept",
+        "tags": [
+          "memory",
+          "server",
+          "agent"
+        ],
+        "maturity": "active",
+        "first_seen_in": "agentmemory",
+        "related_content": [
+          "agentmemory"
+        ],
+        "related_concepts": [],
+        "explanation": "作为独立进程运行，为 AI 代理提供持久记忆的读写服务。代理通过 RPC（如 MCP）或 REST API 与之交互，实现记忆与代理逻辑解耦。",
+        "examples": [
+          "agentmemory 启动后，Claude Code 通过 MCP 工具 store_memory、recall_memory 存取记忆。"
+        ],
+        "common_misunderstandings": [
+          "记忆服务器不是向量数据库，它内部封装了存储和搜索逻辑，对外暴露高层语义工具。"
+        ],
+        "open_questions": [
+          "如何设计记忆的过期与清理策略？"
+        ]
+      },
+      "body": "\n## Explanation\n\n作为独立进程运行，为 AI 代理提供持久记忆的读写服务。代理通过 RPC（如 MCP）或 REST API 与之交互，实现记忆与代理逻辑解耦。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。\n\n## Supported by\n- [[claims/agentmemory-main-claim]]\n",
+      "excerpt": "作为独立进程运行，为 AI 代理提供持久记忆的读写服务。代理通过 RPC（如 MCP）或 REST API 与之交互，实现记忆与代理逻辑解耦。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。",
+      "links": [
+        {
+          "target": "content/agentmemory",
+          "raw": "[[content/agentmemory]]"
+        },
+        {
+          "target": "claims/agentmemory-main-claim",
+          "raw": "[[claims/agentmemory-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/file-to-markdown-converter",
+      "type": "concept",
+      "slug": "file-to-markdown-converter",
+      "title": "File To Markdown Converter",
+      "file": "concepts/file-to-markdown-converter.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "文件转Markdown转换器",
+        "slug": "file-to-markdown-converter",
+        "kind": "concept",
+        "tags": [
+          "document-processing",
+          "markdown",
+          "llm-ingestion"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "markitdown",
+        "related_content": [
+          "markitdown"
+        ],
+        "related_concepts": [],
+        "explanation": "一种将异构文档格式统一为结构化 Markdown 的模式，通过分发器根据文件类型调用特定解析器，输出保留标题、表格、链接等结构。",
+        "examples": [
+          "MarkItDown 转换 PDF 保留标题层级，转换 Excel 保留表格 Markdown"
+        ],
+        "common_misunderstandings": [
+          "不是所见即得的 PDF 渲染器，输出可能丢失复杂布局"
+        ],
+        "open_questions": [
+          "如何平衡结构保真与存储/计算开销？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种将异构文档格式统一为结构化 Markdown 的模式，通过分发器根据文件类型调用特定解析器，输出保留标题、表格、链接等结构。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。\n\n## Supported by\n- [[claims/markitdown-main-claim]]\n",
+      "excerpt": "一种将异构文档格式统一为结构化 Markdown 的模式，通过分发器根据文件类型调用特定解析器，输出保留标题、表格、链接等结构。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。",
+      "links": [
+        {
+          "target": "content/markitdown",
+          "raw": "[[content/markitdown]]"
+        },
+        {
+          "target": "claims/markitdown-main-claim",
+          "raw": "[[claims/markitdown-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/graph-investigation-loop",
+      "type": "concept",
+      "slug": "graph-investigation-loop",
+      "title": "Graph Investigation Loop",
+      "file": "concepts/graph-investigation-loop.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "图谱调查循环",
+        "slug": "graph-investigation-loop",
+        "kind": "concept",
+        "tags": [
+          "agent-loop",
+          "exploration",
+          "graph-db"
+        ],
+        "maturity": "active",
+        "first_seen_in": "flowsint",
+        "related_content": [
+          "flowsint"
+        ],
+        "related_concepts": [],
+        "explanation": "用户选择一个节点（种子），平台自动调用相关丰富器扩展图谱，新发现的节点可继续作为种子，形成迭代探索闭环。",
+        "examples": [
+          "从域名出发，获取其 IP、子域名、WHOIS 记录，再对 IP 进行地理定位和关联域名查询。"
+        ],
+        "common_misunderstandings": [
+          "循环并非全自动，当前版本由用户决策下一步，非自主规划。"
+        ],
+        "open_questions": [
+          "能否引入简单的规划器让系统自动推荐高价值下一步？"
+        ]
+      },
+      "body": "\n## Explanation\n\n用户选择一个节点（种子），平台自动调用相关丰富器扩展图谱，新发现的节点可继续作为种子，形成迭代探索闭环。 出处:https://github.com/reconurge/flowsint。See [[content/flowsint]]。\n\n## Supported by\n- [[claims/flowsint-main-claim]]\n",
+      "excerpt": "用户选择一个节点（种子），平台自动调用相关丰富器扩展图谱，新发现的节点可继续作为种子，形成迭代探索闭环。 出处:https://github.com/reconurge/flowsint。See [[content/flowsint]]。",
+      "links": [
+        {
+          "target": "content/flowsint",
+          "raw": "[[content/flowsint]]"
+        },
+        {
+          "target": "claims/flowsint-main-claim",
+          "raw": "[[claims/flowsint-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/grilling-session",
+      "type": "concept",
+      "slug": "grilling-session",
+      "title": "Grilling Session",
+      "file": "concepts/grilling-session.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Grilling Session（盘问会话）",
+        "slug": "grilling-session",
+        "kind": "concept",
+        "tags": [
+          "alignment",
+          "requirements-engineering",
+          "agent-interaction"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "skills",
+        "related_content": [
+          "skills"
+        ],
+        "related_concepts": [],
+        "explanation": "在开始编码前，代理向开发者提出一系列详细问题，以澄清需求、边界条件和设计选择。目的是对齐双方的认知模型。",
+        "examples": [
+          "/grill-me 对任何计划进行盘问，/grill-with-docs 额外更新 CONTEXT.md 和 ADR。"
+        ],
+        "common_misunderstandings": [
+          "不是简单的 checklist，而是对话式的深度挖掘。",
+          "不仅适用于代码，也适用于通用工作流（/grill-me）。"
+        ],
+        "open_questions": [
+          "如何防止盘问偏移到无关细节？",
+          "盘问会话的耗时是否在大型项目中可接受？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在开始编码前，代理向开发者提出一系列详细问题，以澄清需求、边界条件和设计选择。目的是对齐双方的认知模型。 出处:https://github.com/mattpocock/skills。See [[content/skills]]。\n\n## Supported by\n- [[claims/skills-main-claim]]\n",
+      "excerpt": "在开始编码前，代理向开发者提出一系列详细问题，以澄清需求、边界条件和设计选择。目的是对齐双方的认知模型。 出处:https://github.com/mattpocock/skills。See [[content/skills]]。",
+      "links": [
+        {
+          "target": "content/skills",
+          "raw": "[[content/skills]]"
+        },
+        {
+          "target": "claims/skills-main-claim",
+          "raw": "[[claims/skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/harness-hooks",
+      "type": "concept",
+      "slug": "harness-hooks",
+      "title": "Harness Hooks",
+      "file": "concepts/harness-hooks.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Harness Hooks 自动化钩子",
+        "slug": "harness-hooks",
+        "kind": "concept",
+        "tags": [
+          "agent-enhancement",
+          "lifecycle-management"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "ecc",
+        "related_content": [
+          "ecc"
+        ],
+        "related_concepts": [],
+        "explanation": "在 AI 编程助手的生命周期关键节点（如会话开始、结束）执行指定脚本，用于注入通用逻辑，实现记忆持久化、安全检查等。",
+        "examples": [
+          "SessionStart 钩子加载上次会话摘要",
+          "Stop 钩子保存当前上下文到 SQLite"
+        ],
+        "common_misunderstandings": [
+          "钩子不是独立的 agent，而是助手工作流中的插件；不提供自主决策，只响应事件。"
+        ],
+        "open_questions": [
+          "钩子执行的性能开销如何？",
+          "多个钩子并发或依赖时的协调机制是否健壮？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在 AI 编程助手的生命周期关键节点（如会话开始、结束）执行指定脚本，用于注入通用逻辑，实现记忆持久化、安全检查等。 出处:https://github.com/affaan-m/ecc。See [[content/ecc]]。\n\n## Supported by\n- [[claims/ecc-main-claim]]\n",
+      "excerpt": "在 AI 编程助手的生命周期关键节点（如会话开始、结束）执行指定脚本，用于注入通用逻辑，实现记忆持久化、安全检查等。 出处:https://github.com/affaan-m/ecc。See [[content/ecc]]。",
+      "links": [
+        {
+          "target": "content/ecc",
+          "raw": "[[content/ecc]]"
+        },
+        {
+          "target": "claims/ecc-main-claim",
+          "raw": "[[claims/ecc-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/hashline-editing",
+      "type": "concept",
+      "slug": "hashline-editing",
+      "title": "Hashline Editing",
+      "file": "concepts/hashline-editing.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Hashline 编辑",
+        "slug": "hashline-editing",
+        "kind": "concept",
+        "tags": [
+          "editing",
+          "agent",
+          "token-optimization"
+        ],
+        "maturity": "active",
+        "first_seen_in": "oh-my-pi",
+        "related_content": [
+          "oh-my-pi"
+        ],
+        "related_concepts": [],
+        "explanation": "一种编辑格式，模型通过提供待修改行的内容哈希（锚点）而不是完整行内容来定位修改位置。代理在应用前验证哈希，避免因文件并发修改导致的错误。",
+        "examples": [
+          "README 提到 Grok 4 Fast 使用后输出 token 减少 61%",
+          "传统 diff 格式匹配失败时 hashline 可以快速拒绝过期锚点"
+        ],
+        "common_misunderstandings": [
+          "不是用哈希唯一标识行，而是在生成的编辑命令中引用现有多行内容哈希来定位；仍需要模型输出替换内容。",
+          "依赖文件内容稳定，频繁变更的文件可能导致锚点频繁失效。"
+        ],
+        "open_questions": [
+          "如何处理同一哈希对应多行的情况？",
+          "在大规模重构中锚点失效比例如何？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种编辑格式，模型通过提供待修改行的内容哈希（锚点）而不是完整行内容来定位修改位置。代理在应用前验证哈希，避免因文件并发修改导致的错误。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。\n\n## Supported by\n- [[claims/oh-my-pi-main-claim]]\n",
+      "excerpt": "一种编辑格式，模型通过提供待修改行的内容哈希（锚点）而不是完整行内容来定位修改位置。代理在应用前验证哈希，避免因文件并发修改导致的错误。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。",
+      "links": [
+        {
+          "target": "content/oh-my-pi",
+          "raw": "[[content/oh-my-pi]]"
+        },
+        {
+          "target": "claims/oh-my-pi-main-claim",
+          "raw": "[[claims/oh-my-pi-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/humanize",
+      "type": "concept",
+      "slug": "humanize",
+      "title": "Humanize",
+      "file": "concepts/humanize.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "人性化行为模拟",
+        "slug": "humanize",
+        "kind": "concept",
+        "tags": [
+          "humanization",
+          "anti-bot"
+        ],
+        "maturity": "active",
+        "first_seen_in": "cloakbrowser",
+        "related_content": [
+          "cloakbrowser"
+        ],
+        "related_concepts": [],
+        "explanation": "在自动化操作中加入人类用户的典型行为模式，如贝塞尔曲线鼠标移动、随机键盘延迟、真实滚动模式，以规避行为分析。",
+        "examples": [
+          "CloakBrowser 的 humanize=True 自动实现所有交互人性化。"
+        ],
+        "common_misunderstandings": [
+          "简单随机延迟不足以对抗机器学习行为模型。"
+        ],
+        "open_questions": [
+          "行为模拟是否能持续对抗不断进化的检测算法？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在自动化操作中加入人类用户的典型行为模式，如贝塞尔曲线鼠标移动、随机键盘延迟、真实滚动模式，以规避行为分析。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。\n\n## Supported by\n- [[claims/cloakbrowser-main-claim]]\n",
+      "excerpt": "在自动化操作中加入人类用户的典型行为模式，如贝塞尔曲线鼠标移动、随机键盘延迟、真实滚动模式，以规避行为分析。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。",
+      "links": [
+        {
+          "target": "content/cloakbrowser",
+          "raw": "[[content/cloakbrowser]]"
+        },
+        {
+          "target": "claims/cloakbrowser-main-claim",
+          "raw": "[[claims/cloakbrowser-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/hybrid-pdf-pipeline",
+      "type": "concept",
+      "slug": "hybrid-pdf-pipeline",
+      "title": "Hybrid Pdf Pipeline",
+      "file": "concepts/hybrid-pdf-pipeline.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Hybrid PDF Processing Pipeline",
+        "slug": "hybrid-pdf-pipeline",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "data-pipeline",
+          "pdf"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "opendataloader-pdf",
+        "related_content": [
+          "opendataloader-pdf"
+        ],
+        "related_concepts": [],
+        "explanation": "一种结合本地确定性解析器和远程 AI 模型的流水线模式，通过动态路由将页面分为简单与复杂两类，简单页面走快速本地处理以节省成本和延迟，复杂页面交由 AI 模型提升精度。",
+        "examples": [
+          "opendataloader-pdf 的 hybrid mode",
+          "其他类似工具的 AI 模式如 Docling"
+        ],
+        "common_misunderstandings": [
+          "并非所有页面都会经过 AI，仅由决策模块筛选出的复杂页面"
+        ],
+        "open_questions": [
+          "路由策略如何避免频繁切换开销？",
+          "如何处理跨页的表格或上下文关联？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种结合本地确定性解析器和远程 AI 模型的流水线模式，通过动态路由将页面分为简单与复杂两类，简单页面走快速本地处理以节省成本和延迟，复杂页面交由 AI 模型提升精度。 出处:https://github.com/opendataloader-project/opendataloader-pdf。See [[content/opendataloader-pdf]]。\n\n## Supported by\n- [[claims/opendataloader-pdf-main-claim]]\n",
+      "excerpt": "一种结合本地确定性解析器和远程 AI 模型的流水线模式，通过动态路由将页面分为简单与复杂两类，简单页面走快速本地处理以节省成本和延迟，复杂页面交由 AI 模型提升精度。 出处:https://github.com/opendataloader-project/opendataloader-pdf。See [[content/opendataloader-pdf]]。",
+      "links": [
+        {
+          "target": "content/opendataloader-pdf",
+          "raw": "[[content/opendataloader-pdf]]"
+        },
+        {
+          "target": "claims/opendataloader-pdf-main-claim",
+          "raw": "[[claims/opendataloader-pdf-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/hybrid-search",
+      "type": "concept",
+      "slug": "hybrid-search",
+      "title": "Hybrid Search",
+      "file": "concepts/hybrid-search.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "混合搜索",
+        "slug": "hybrid-search",
+        "kind": "concept",
+        "tags": [
+          "search",
+          "bm25",
+          "vector-search",
+          "rrf"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "production-agentic-rag-course",
+        "related_content": [
+          "production-agentic-rag-course"
+        ],
+        "related_concepts": [],
+        "explanation": "结合关键词搜索（如 BM25）和向量语义搜索，通过融合算法（如 RRF）合并结果，提升检索准确性和召回率。",
+        "examples": [
+          "Week 4 中实现基于 OpenSearch 的 BM25 + 向量搜索，并用 RRF 融合打分。"
+        ],
+        "common_misunderstandings": [
+          "认为向量搜索可以完全替代关键词搜索，忽略了精确术语匹配、代码搜索等场景。"
+        ],
+        "open_questions": [
+          "RRF 的参数 k 如何根据数据特性调整？",
+          "是否存在比 RRF 更有效的融合策略？"
+        ]
+      },
+      "body": "\n## Explanation\n\n结合关键词搜索（如 BM25）和向量语义搜索，通过融合算法（如 RRF）合并结果，提升检索准确性和召回率。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/production-agentic-rag-course]]。\n\n## Supported by\n- [[claims/production-agentic-rag-course-main-claim]]\n",
+      "excerpt": "结合关键词搜索（如 BM25）和向量语义搜索，通过融合算法（如 RRF）合并结果，提升检索准确性和召回率。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/production-agentic-rag-course]]。",
+      "links": [
+        {
+          "target": "content/production-agentic-rag-course",
+          "raw": "[[content/production-agentic-rag-course]]"
+        },
+        {
+          "target": "claims/production-agentic-rag-course-main-claim",
+          "raw": "[[claims/production-agentic-rag-course-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/integrity-gate-with-blocking-checklist",
+      "type": "concept",
+      "slug": "integrity-gate-with-blocking-checklist",
+      "title": "Integrity Gate With Blocking Checklist",
+      "file": "concepts/integrity-gate-with-blocking-checklist.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "完整性门禁与阻断清单",
+        "slug": "integrity-gate-with-blocking-checklist",
+        "kind": "concept",
+        "tags": [
+          "quality",
+          "guardrailing",
+          "academic-writing"
+        ],
+        "maturity": "active",
+        "first_seen_in": "academic-research-skills",
+        "related_content": [
+          "academic-research-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "在 AI 辅助生成流程的关键节点插入人工或自动化检查清单，若不满足则中断输出，以防止幻觉、数据错误等进入后续阶段。",
+        "examples": [
+          "ARS 在论文草稿完成后（Stage 2.5）和最终审稿前（Stage 4.5）运行7模式检查，阻挡虚构引用和统计错误。"
+        ],
+        "common_misunderstandings": [
+          "门禁不是简单的关键词过滤，而是针对 AI 特定失效模式的语义与结构检查。"
+        ],
+        "open_questions": [
+          "如何动态扩展失效模式清单以覆盖新出现的 AI 缺陷？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在 AI 辅助生成流程的关键节点插入人工或自动化检查清单，若不满足则中断输出，以防止幻觉、数据错误等进入后续阶段。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/academic-research-skills]]。\n\n## Supported by\n- [[claims/academic-research-skills-main-claim]]\n",
+      "excerpt": "在 AI 辅助生成流程的关键节点插入人工或自动化检查清单，若不满足则中断输出，以防止幻觉、数据错误等进入后续阶段。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/academic-research-skills]]。",
+      "links": [
+        {
+          "target": "content/academic-research-skills",
+          "raw": "[[content/academic-research-skills]]"
+        },
+        {
+          "target": "claims/academic-research-skills-main-claim",
+          "raw": "[[claims/academic-research-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/layer-wise-model-loading",
+      "type": "concept",
+      "slug": "layer-wise-model-loading",
+      "title": "Layer Wise Model Loading",
+      "file": "concepts/layer-wise-model-loading.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Layer-wise Model Loading",
+        "slug": "layer-wise-model-loading",
+        "kind": "concept",
+        "tags": [
+          "memory-optimization",
+          "inference"
+        ],
+        "maturity": "active",
+        "first_seen_in": "airllm",
+        "related_content": [
+          "airllm"
+        ],
+        "related_concepts": [],
+        "explanation": "将大模型的权重按层拆分成多个文件，推理时只加载当前计算所需的一层到 GPU，其他层保留在磁盘或内存中，从而降低峰值显存。",
+        "examples": [
+          "AirLLM 的 AutoModel 初始化过程会将 HF 模型拆分保存到磁盘，并在 generate 时逐层加载。"
+        ],
+        "common_misunderstandings": [
+          "并不是所有模型都适合逐层加载，比如带有跨层 attention 的模型可能无法正常工作。"
+        ],
+        "open_questions": [
+          "如何处理模型中的共享权重（如 embedding 层）？",
+          "当模型有残差连接时，是否需要缓存中间激活？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将大模型的权重按层拆分成多个文件，推理时只加载当前计算所需的一层到 GPU，其他层保留在磁盘或内存中，从而降低峰值显存。 出处:https://github.com/lyogavin/airllm。See [[content/airllm]]。\n\n## Supported by\n- [[claims/airllm-main-claim]]\n",
+      "excerpt": "将大模型的权重按层拆分成多个文件，推理时只加载当前计算所需的一层到 GPU，其他层保留在磁盘或内存中，从而降低峰值显存。 出处:https://github.com/lyogavin/airllm。See [[content/airllm]]。",
+      "links": [
+        {
+          "target": "content/airllm",
+          "raw": "[[content/airllm]]"
+        },
+        {
+          "target": "claims/airllm-main-claim",
+          "raw": "[[claims/airllm-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/live-catalog",
+      "type": "concept",
+      "slug": "live-catalog",
+      "title": "Live Catalog",
+      "file": "concepts/live-catalog.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "实时目录",
+        "slug": "live-catalog",
+        "kind": "concept",
+        "tags": [
+          "discovery",
+          "runtime"
+        ],
+        "maturity": "active",
+        "first_seen_in": "iii",
+        "related_content": [
+          "iii"
+        ],
+        "related_concepts": [],
+        "explanation": "所有注册的 Worker 及其 Function 组成一个动态更新的目录。当新 Worker 加入或离开，所有其它 Worker 都能感知并立即调用其函数。代理也使用同一目录发现能力。",
+        "examples": [
+          "添加一个队列 Worker 后，其他 Worker 可以直接调用其入队函数"
+        ],
+        "common_misunderstandings": [
+          "目录是运行时的，不是静态配置，Worker 可动态增删",
+          "目录不仅包含函数签名，还可能包含触发条件、状态等元数据"
+        ],
+        "open_questions": [
+          "目录如何实现（广播、集中注册？）",
+          "大数量 Worker 下的性能如何？"
+        ]
+      },
+      "body": "\n## Explanation\n\n所有注册的 Worker 及其 Function 组成一个动态更新的目录。当新 Worker 加入或离开，所有其它 Worker 都能感知并立即调用其函数。代理也使用同一目录发现能力。 出处:https://github.com/iii-hq/iii。See [[content/iii]]。\n\n## Supported by\n- [[claims/iii-main-claim]]\n",
+      "excerpt": "所有注册的 Worker 及其 Function 组成一个动态更新的目录。当新 Worker 加入或离开，所有其它 Worker 都能感知并立即调用其函数。代理也使用同一目录发现能力。 出处:https://github.com/iii-hq/iii。See [[content/iii]]。",
+      "links": [
+        {
+          "target": "content/iii",
+          "raw": "[[content/iii]]"
+        },
+        {
+          "target": "claims/iii-main-claim",
+          "raw": "[[claims/iii-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/live2d-avatar",
+      "type": "concept",
+      "slug": "live2d-avatar",
+      "title": "Live2d Avatar",
+      "file": "concepts/live2d-avatar.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Live2D 虚拟形象",
+        "slug": "live2d-avatar",
+        "kind": "concept",
+        "tags": [
+          "visual",
+          "avatar",
+          "animation"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "open-llm-vtuber",
+        "related_content": [
+          "open-llm-vtuber"
+        ],
+        "related_concepts": [],
+        "explanation": "一种将 2D 图片通过骨骼绑定和蒙皮实现类 3D 动画效果的技术，常用于游戏和虚拟主播。本项目通过后端控制 Live2D 模型的表情、动作。",
+        "examples": [
+          "项目自带 Live2D 示例模型，可替换自定义模型"
+        ],
+        "common_misunderstandings": [
+          "Live2D 模型本身不是 AI 生成的，而是预先制作的艺术资产"
+        ],
+        "open_questions": [
+          "如何将 LLM 输出的情绪准确映射到 Live2D 表情参数？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种将 2D 图片通过骨骼绑定和蒙皮实现类 3D 动画效果的技术，常用于游戏和虚拟主播。本项目通过后端控制 Live2D 模型的表情、动作。 出处:https://github.com/open-llm-vtuber/open-llm-vtuber。See [[content/open-llm-vtuber]]。\n\n## Supported by\n- [[claims/open-llm-vtuber-main-claim]]\n",
+      "excerpt": "一种将 2D 图片通过骨骼绑定和蒙皮实现类 3D 动画效果的技术，常用于游戏和虚拟主播。本项目通过后端控制 Live2D 模型的表情、动作。 出处:https://github.com/open-llm-vtuber/open-llm-vtuber。See [[content/open-llm-vtuber]]。",
+      "links": [
+        {
+          "target": "content/open-llm-vtuber",
+          "raw": "[[content/open-llm-vtuber]]"
+        },
+        {
+          "target": "claims/open-llm-vtuber-main-claim",
+          "raw": "[[claims/open-llm-vtuber-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/llm-provider-adaptation",
+      "type": "concept",
+      "slug": "llm-provider-adaptation",
+      "title": "Llm Provider Adaptation",
+      "file": "concepts/llm-provider-adaptation.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "LLM 提供商适配",
+        "slug": "llm-provider-adaptation",
+        "kind": "concept",
+        "tags": [
+          "llm",
+          "integration"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "moneyprinterturbo",
+        "related_content": [
+          "moneyprinterturbo"
+        ],
+        "related_concepts": [],
+        "explanation": "通过配置文件动态切换不同的 LLM 服务，实现后端模型无侵入变更，降低对单一供应商的依赖。",
+        "examples": [
+          "MoneyPrinterTurbo 支持 OpenAI、Gemini、DeepSeek 等，通过修改 config.toml 中的 llm_provider 字段即可切换。"
+        ],
+        "common_misunderstandings": [
+          "所有模型输出可直接互换使用；但实际上不同模型的文案风格、长度可能差异较大，需要后续适配提示词。"
+        ],
+        "open_questions": [
+          "如何统一不同模型的输出质量？是否有自动评分和选择机制？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过配置文件动态切换不同的 LLM 服务，实现后端模型无侵入变更，降低对单一供应商的依赖。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/moneyprinterturbo]]。\n\n## Supported by\n- [[claims/moneyprinterturbo-main-claim]]\n",
+      "excerpt": "通过配置文件动态切换不同的 LLM 服务，实现后端模型无侵入变更，降低对单一供应商的依赖。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/moneyprinterturbo]]。",
+      "links": [
+        {
+          "target": "content/moneyprinterturbo",
+          "raw": "[[content/moneyprinterturbo]]"
+        },
+        {
+          "target": "claims/moneyprinterturbo-main-claim",
+          "raw": "[[claims/moneyprinterturbo-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/llms-txt",
+      "type": "concept",
+      "slug": "llms-txt",
+      "title": "Llms Txt",
+      "file": "concepts/llms-txt.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "llms.txt",
+        "slug": "llms-txt",
+        "kind": "concept",
+        "tags": [
+          "ai-integration",
+          "seo-for-llms"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "easy-vibe",
+        "related_content": [
+          "easy-vibe"
+        ],
+        "related_concepts": [],
+        "explanation": "一个位于网站根目录的文件，类似于 robots.txt，用于指导大型语言模型或 AI agent 更好地理解和索引网站内容。",
+        "examples": [
+          "项目在 News 中提到添加了 llms.txt 以便 AI agents 快速理解仓库结构。"
+        ],
+        "common_misunderstandings": [
+          "并非标准协议，需要各 AI 平台支持。"
+        ],
+        "open_questions": [
+          "llms.txt 的内容规范是什么？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一个位于网站根目录的文件，类似于 robots.txt，用于指导大型语言模型或 AI agent 更好地理解和索引网站内容。 出处:https://github.com/datawhalechina/easy-vibe。See [[content/easy-vibe]]。\n\n## Supported by\n- [[claims/easy-vibe-main-claim]]\n",
+      "excerpt": "一个位于网站根目录的文件，类似于 robots.txt，用于指导大型语言模型或 AI agent 更好地理解和索引网站内容。 出处:https://github.com/datawhalechina/easy-vibe。See [[content/easy-vibe]]。",
+      "links": [
+        {
+          "target": "content/easy-vibe",
+          "raw": "[[content/easy-vibe]]"
+        },
+        {
+          "target": "claims/easy-vibe-main-claim",
+          "raw": "[[claims/easy-vibe-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/local-api-gateway",
+      "type": "concept",
+      "slug": "local-api-gateway",
+      "title": "Local Api Gateway",
+      "file": "concepts/local-api-gateway.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "本地 API 网关",
+        "slug": "local-api-gateway",
+        "kind": "concept",
+        "tags": [
+          "gateway",
+          "routing",
+          "cost-control"
+        ],
+        "maturity": "active",
+        "first_seen_in": "9router",
+        "related_content": [
+          "9router"
+        ],
+        "related_concepts": [],
+        "explanation": "在开发者本机运行的代理服务，统一接收 AI 请求，根据预设路由和实时状态（如配额）将请求分发至不同后端模型。",
+        "examples": [
+          "9Router 的三层自动回退：订阅 → 廉价 → 免费"
+        ],
+        "common_misunderstandings": [
+          "网关本身不提供模型，只做路由和格式转换，效果取决于后端模型质量"
+        ],
+        "open_questions": [
+          "如何高效管理 40+ 个适配器的配置和认证？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在开发者本机运行的代理服务，统一接收 AI 请求，根据预设路由和实时状态（如配额）将请求分发至不同后端模型。 出处:https://github.com/decolua/9router。See [[content/9router]]。\n\n## Supported by\n- [[claims/9router-main-claim]]\n",
+      "excerpt": "在开发者本机运行的代理服务，统一接收 AI 请求，根据预设路由和实时状态（如配额）将请求分发至不同后端模型。 出处:https://github.com/decolua/9router。See [[content/9router]]。",
+      "links": [
+        {
+          "target": "content/9router",
+          "raw": "[[content/9router]]"
+        },
+        {
+          "target": "claims/9router-main-claim",
+          "raw": "[[claims/9router-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mandate-gated-trading",
+      "type": "concept",
+      "slug": "mandate-gated-trading",
+      "title": "Mandate Gated Trading",
+      "file": "concepts/mandate-gated-trading.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Mandate-Gated Trading",
+        "slug": "mandate-gated-trading",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "safety",
+          "trading"
+        ],
+        "maturity": "active",
+        "first_seen_in": "vibe-trading",
+        "related_content": [
+          "vibe-trading"
+        ],
+        "related_concepts": [],
+        "explanation": "用户在代理执行交易前预先提交一份结构化授权（mandate），指定允许的交易标的、单笔规模、总敞口、杠杆倍数、日交易上限。代理所有交易请求必须通过 mandate 检查，同时设有文件系统 kill switch 和审计日志。这实现了 LLM 代理的约束自主。",
+        "examples": [
+          "用户设定 mandate：symbols=[AAPL, TSLA], max_order_size=10, max_exposure=100000, leverage=1, daily_cap=5000。代理试图下单 20 股 TSLA 会被拒绝。"
+        ],
+        "common_misunderstandings": [
+          "mandate 不是法律约束，仍依赖软件实现正确性；",
+          "不能防止所有意外损失，如市场闪崩时仍可能在 mandate 内亏损。"
+        ],
+        "open_questions": [
+          "mandate 配置错误（如限制过宽）的检测与提醒机制？",
+          "在多个代理同时运行时，mandate 如何聚合？"
+        ]
+      },
+      "body": "\n## Explanation\n\n用户在代理执行交易前预先提交一份结构化授权（mandate），指定允许的交易标的、单笔规模、总敞口、杠杆倍数、日交易上限。代理所有交易请求必须通过 mandate 检查，同时设有文件系统 kill switch 和审计日志。这实现了 LLM 代理的约束自主。 出处:https://github.com/hkuds/vibe-trading。See [[content/vibe-trading]]。\n\n## Supported by\n- [[claims/vibe-trading-main-claim]]\n",
+      "excerpt": "用户在代理执行交易前预先提交一份结构化授权（mandate），指定允许的交易标的、单笔规模、总敞口、杠杆倍数、日交易上限。代理所有交易请求必须通过 mandate 检查，同时设有文件系统 kill switch 和审计日志。这实现了 LLM 代理的约束自主。 出处:https://github.com/hkuds/vibe-trading。See [[content/vibe-trading]]。",
+      "links": [
+        {
+          "target": "content/vibe-trading",
+          "raw": "[[content/vibe-trading]]"
+        },
+        {
+          "target": "claims/vibe-trading-main-claim",
+          "raw": "[[claims/vibe-trading-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-as-tool-gateway",
+      "type": "concept",
+      "slug": "mcp-as-tool-gateway",
+      "title": "Mcp As Tool Gateway",
+      "file": "concepts/mcp-as-tool-gateway.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 作为工具网关",
+        "slug": "mcp-as-tool-gateway",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "integration",
+          "tool-calling"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "aitoearn",
+        "related_content": [
+          "aitoearn"
+        ],
+        "related_concepts": [],
+        "explanation": "将平台的核心能力通过 Model Context Protocol 封装为工具，让外部 AI 助手（如 Claude）可以直接操控，实现“AI 使用 AI 产品”。",
+        "examples": [
+          "在 Claude Desktop 中配置 MCP 地址后，可以直接让 Claude 执行发布任务"
+        ],
+        "common_misunderstandings": [
+          "MCP 不是简单的 API 代理，它让 AI 助手理解工具的语义并自主决定调用时机",
+          "需要 AI 助手本身支持 MCP，并不是所有对话模型都原生支持"
+        ],
+        "open_questions": [
+          "MCP 工具调用的失败反馈如何设计才能让 AI 助手自愈？",
+          "如何在不影响用户体验的前提下保障多租户间的隔离？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将平台的核心能力通过 Model Context Protocol 封装为工具，让外部 AI 助手（如 Claude）可以直接操控，实现“AI 使用 AI 产品”。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。\n\n## Supported by\n- [[claims/aitoearn-main-claim]]\n",
+      "excerpt": "将平台的核心能力通过 Model Context Protocol 封装为工具，让外部 AI 助手（如 Claude）可以直接操控，实现“AI 使用 AI 产品”。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。",
+      "links": [
+        {
+          "target": "content/aitoearn",
+          "raw": "[[content/aitoearn]]"
+        },
+        {
+          "target": "claims/aitoearn-main-claim",
+          "raw": "[[claims/aitoearn-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-kernel-agent",
+      "type": "concept",
+      "slug": "mcp-kernel-agent",
+      "title": "Mcp Kernel Agent",
+      "file": "concepts/mcp-kernel-agent.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 即内核的 Agent",
+        "slug": "mcp-kernel-agent",
+        "kind": "concept",
+        "tags": [
+          "agent-architecture",
+          "mcp",
+          "tool-integration"
+        ],
+        "maturity": "active",
+        "first_seen_in": "ui-tars-desktop",
+        "related_content": [
+          "ui-tars-desktop"
+        ],
+        "related_concepts": [],
+        "explanation": "将 Agent 的核心架构基于 MCP（Model Context Protocol）构建，所有工具都以 MCP Server 的形式接入，Agent 运行时通过 MCP 客户端发现和调用工具，实现工具即插即用。这种设计解耦了工具提供与 Agent 调度，大幅降低扩展成本。",
+        "examples": [
+          "Agent TARS 的 CLI 就是基于 @agent-tars/cli 包，内部通过 MCP 与浏览器自动化、命令行、第三方 API 工具通信"
+        ],
+        "common_misunderstandings": [
+          "不是说 Agent 替换了 MCP，而是 Agent 的循环调度本身就使用 MCP 协议与各个工具交互",
+          "MCP 不等于工具本身，它只是通信协议"
+        ],
+        "open_questions": [
+          "如何动态发现和管理大量的 MCP 工具而不会让 LLM 上下文过载？",
+          "错误处理与重试机制在 MCP 协议层面如何与 Agent loop 交互？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将 Agent 的核心架构基于 MCP（Model Context Protocol）构建，所有工具都以 MCP Server 的形式接入，Agent 运行时通过 MCP 客户端发现和调用工具，实现工具即插即用。这种设计解耦了工具提供与 Agent 调度，大幅降低扩展成本。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/ui-tars-desktop]]。\n\n## Supported by\n- [[claims/ui-tars-desktop-main-claim]]\n",
+      "excerpt": "将 Agent 的核心架构基于 MCP（Model Context Protocol）构建，所有工具都以 MCP Server 的形式接入，Agent 运行时通过 MCP 客户端发现和调用工具，实现工具即插即用。这种设计解耦了工具提供与 Agent 调度，大幅降低扩展成本。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/ui-tars-desktop]]。",
+      "links": [
+        {
+          "target": "content/ui-tars-desktop",
+          "raw": "[[content/ui-tars-desktop]]"
+        },
+        {
+          "target": "claims/ui-tars-desktop-main-claim",
+          "raw": "[[claims/ui-tars-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-server",
+      "type": "concept",
+      "slug": "mcp-server",
+      "title": "Mcp Server",
+      "file": "concepts/mcp-server.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 服务器",
+        "slug": "mcp-server",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "protocol",
+          "tooling"
+        ],
+        "maturity": "active",
+        "first_seen_in": "ai-engineering-from-scratch",
+        "related_content": [
+          "ai-engineering-from-scratch"
+        ],
+        "related_concepts": [],
+        "explanation": "遵循 Model Context Protocol（模型上下文协议）的服务端，将工具或数据源封装为标准接口，可被任何 MCP 客户端发现和调用。实现智能体与外部世界的安全连接。",
+        "examples": [
+          "Phase 13 结束时产出可直接安装的 MCP 服务器。"
+        ],
+        "common_misunderstandings": [
+          "MCP 服务器不是仅用于文件访问，它可暴露任何函数级的能力。"
+        ],
+        "open_questions": [
+          "MCP 与 Function Calling API 的长期关系如何？"
+        ]
+      },
+      "body": "\n## Explanation\n\n遵循 Model Context Protocol（模型上下文协议）的服务端，将工具或数据源封装为标准接口，可被任何 MCP 客户端发现和调用。实现智能体与外部世界的安全连接。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/ai-engineering-from-scratch]]。\n\n## Supported by\n- [[claims/ai-engineering-from-scratch-main-claim]]\n",
+      "excerpt": "遵循 Model Context Protocol（模型上下文协议）的服务端，将工具或数据源封装为标准接口，可被任何 MCP 客户端发现和调用。实现智能体与外部世界的安全连接。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/ai-engineering-from-scratch]]。",
+      "links": [
+        {
+          "target": "content/ai-engineering-from-scratch",
+          "raw": "[[content/ai-engineering-from-scratch]]"
+        },
+        {
+          "target": "claims/ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/ai-engineering-from-scratch-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-tool-integration",
+      "type": "concept",
+      "slug": "mcp-tool-integration",
+      "title": "Mcp Tool Integration",
+      "file": "concepts/mcp-tool-integration.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 工具集成",
+        "slug": "mcp-tool-integration",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "tool-calling",
+          "integration"
+        ],
+        "maturity": "active",
+        "first_seen_in": "codegraph",
+        "related_content": [
+          "codegraph"
+        ],
+        "related_concepts": [],
+        "explanation": "通过 Model Context Protocol 将自定义工具注册到 AI 助手的工具列表中，使 LLM 能直接调用本地功能。CodeGraph 借此让 agent 用自然语言查询代码结构，而非笨拙的文件操作。",
+        "examples": [
+          "`codegraph serve --mcp` 启动 MCP 服务器，`codegraph install` 自动将其配置到 Claude Code、Cursor 等，agent 随后可调用 `codegraph_explore`。"
+        ],
+        "common_misunderstandings": [
+          "MCP 不是取代 API 调用，而是标准化工具描述和传输。",
+          "CodeGraph 的 MCP 服务器只提供代码探索，不提供其他工具；它不是通用 MCP 网关。"
+        ],
+        "open_questions": [
+          "MCP 协议未来变化会不会导致 CodeGraph 的集成方式过时？",
+          "非 MCP 原生 agent 如何接入？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过 Model Context Protocol 将自定义工具注册到 AI 助手的工具列表中，使 LLM 能直接调用本地功能。CodeGraph 借此让 agent 用自然语言查询代码结构，而非笨拙的文件操作。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。\n\n## Supported by\n- [[claims/codegraph-main-claim]]\n",
+      "excerpt": "通过 Model Context Protocol 将自定义工具注册到 AI 助手的工具列表中，使 LLM 能直接调用本地功能。CodeGraph 借此让 agent 用自然语言查询代码结构，而非笨拙的文件操作。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。",
+      "links": [
+        {
+          "target": "content/codegraph",
+          "raw": "[[content/codegraph]]"
+        },
+        {
+          "target": "claims/codegraph-main-claim",
+          "raw": "[[claims/codegraph-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-tool-server",
+      "type": "concept",
+      "slug": "mcp-tool-server",
+      "title": "Mcp Tool Server",
+      "file": "concepts/mcp-tool-server.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 工具服务器",
+        "slug": "mcp-tool-server",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "tool",
+          "integration"
+        ],
+        "maturity": "active",
+        "first_seen_in": "agentmemory",
+        "related_content": [
+          "agentmemory"
+        ],
+        "related_concepts": [],
+        "explanation": "遵循 Model Context Protocol 的工具提供服务，允许语言模型在对话中动态调用自定义工具。每个工具定义名称、描述和 JSON Schema 参数。",
+        "examples": [
+          "agentmemory 提供 store_reasoning_trace（存储推理链）、find_relevant_memories（查找相关记忆）等 53 个 MCP 工具。"
+        ],
+        "common_misunderstandings": [
+          "MCP 工具服务器不处理自然语言，它只接收结构化的工具调用请求并返回结果。"
+        ],
+        "open_questions": [
+          "如何管理工具的数量和粒度，以避免上下文膨胀？"
+        ]
+      },
+      "body": "\n## Explanation\n\n遵循 Model Context Protocol 的工具提供服务，允许语言模型在对话中动态调用自定义工具。每个工具定义名称、描述和 JSON Schema 参数。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。\n\n## Supported by\n- [[claims/agentmemory-main-claim]]\n",
+      "excerpt": "遵循 Model Context Protocol 的工具提供服务，允许语言模型在对话中动态调用自定义工具。每个工具定义名称、描述和 JSON Schema 参数。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。",
+      "links": [
+        {
+          "target": "content/agentmemory",
+          "raw": "[[content/agentmemory]]"
+        },
+        {
+          "target": "claims/agentmemory-main-claim",
+          "raw": "[[claims/agentmemory-main-claim]]"
         }
       ],
       "headings": [
@@ -202,6 +2536,1085 @@
       ]
     },
     {
+      "id": "concept/non-autoregressive-asr",
+      "type": "concept",
+      "slug": "non-autoregressive-asr",
+      "title": "Non Autoregressive Asr",
+      "file": "concepts/non-autoregressive-asr.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "非自回归语音识别 (NAR ASR)",
+        "slug": "non-autoregressive-asr",
+        "kind": "concept",
+        "tags": [
+          "asr",
+          "inference-optimization"
+        ],
+        "maturity": "active",
+        "first_seen_in": "funasr",
+        "related_content": [
+          "funasr"
+        ],
+        "related_concepts": [],
+        "explanation": "不同于传统逐帧生成文本的模型，Paraformer 使用并行解码，一次性输出整个序列，因此速度极快，适合实时场景。",
+        "examples": [
+          "Paraformer-zh 模型在 GPU 上达到 120x 实时速度，无需等待顺序生成。"
+        ],
+        "common_misunderstandings": [
+          "非自回归并不牺牲精度，Paraformer 在中文任务上接近自回归模型效果。"
+        ],
+        "open_questions": [
+          "NAR 模型在多长句子上会有性能下降？"
+        ]
+      },
+      "body": "\n## Explanation\n\n不同于传统逐帧生成文本的模型，Paraformer 使用并行解码，一次性输出整个序列，因此速度极快，适合实时场景。 出处:https://github.com/modelscope/funasr。See [[content/funasr]]。\n\n## Supported by\n- [[claims/funasr-main-claim]]\n",
+      "excerpt": "不同于传统逐帧生成文本的模型，Paraformer 使用并行解码，一次性输出整个序列，因此速度极快，适合实时场景。 出处:https://github.com/modelscope/funasr。See [[content/funasr]]。",
+      "links": [
+        {
+          "target": "content/funasr",
+          "raw": "[[content/funasr]]"
+        },
+        {
+          "target": "claims/funasr-main-claim",
+          "raw": "[[claims/funasr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/ogulcancelik-herdr-agent-awareness-via-output-parsing",
+      "type": "concept",
+      "slug": "ogulcancelik-herdr-agent-awareness-via-output-parsing",
+      "title": "Ogulcancelik Herdr Agent Awareness Via Output Parsing",
+      "file": "concepts/ogulcancelik-herdr-agent-awareness-via-output-parsing.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "基于输出解析的 agent 状态感知",
+        "slug": "ogulcancelik-herdr-agent-awareness-via-output-parsing",
+        "kind": "concept",
+        "tags": [
+          "agent-state",
+          "heuristics",
+          "terminal-ui"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "ogulcancelik-herdr",
+        "related_content": [
+          "ogulcancelik-herdr"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：看 agent 终端里显示了什么，再判断它是在工作、等批准、已完成还是空闲。术语：screen heuristic 从 terminal screen snapshot 和 foreground process 推断 semantic state；hook/plugin report 可以补充或替代部分信号。",
+        "examples": [
+          "docs/agents.mdx 的 foreground process detection、terminal output heuristics、integration reports",
+          "src/detect/agents/codex.rs 与 src/detect/agents/claude_code.rs"
+        ],
+        "common_misunderstandings": [
+          "把支持矩阵当成协议级保证；很多状态来自屏幕启发式，外部 UI 变更会影响结果。"
+        ],
+        "open_questions": [
+          "各 agent 最新版本 UI 的回归测试频率未在 README/docs/tree 说明。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：看 agent 终端里显示了什么，再判断它是在工作、等批准、已完成还是空闲。术语：screen heuristic 从 terminal screen snapshot 和 foreground process 推断 semantic state；hook/plugin report 可以补充或替代部分信号。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。\n\n## Supported by\n- [[claims/ogulcancelik-herdr-main-claim]]\n",
+      "excerpt": "人话：看 agent 终端里显示了什么，再判断它是在工作、等批准、已完成还是空闲。术语：screen heuristic 从 terminal screen snapshot 和 foreground process 推断 semantic state；hook/plugin report 可以补充或替代部分信号。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。",
+      "links": [
+        {
+          "target": "content/ogulcancelik-herdr",
+          "raw": "[[content/ogulcancelik-herdr]]"
+        },
+        {
+          "target": "claims/ogulcancelik-herdr-main-claim",
+          "raw": "[[claims/ogulcancelik-herdr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/ogulcancelik-herdr-terminal-multiplexing-for-agents",
+      "type": "concept",
+      "slug": "ogulcancelik-herdr-terminal-multiplexing-for-agents",
+      "title": "Ogulcancelik Herdr Terminal Multiplexing For Agents",
+      "file": "concepts/ogulcancelik-herdr-terminal-multiplexing-for-agents.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "面向 agent 的终端复用",
+        "slug": "ogulcancelik-herdr-terminal-multiplexing-for-agents",
+        "kind": "concept",
+        "tags": [
+          "terminal",
+          "agents",
+          "devtool"
+        ],
+        "maturity": "active",
+        "first_seen_in": "ogulcancelik-herdr",
+        "related_content": [
+          "ogulcancelik-herdr"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：把多个 agent、shell、server、test 放进一个终端界面，随时切换、拆分、保活。术语：terminal multiplexing 是在一个终端会话里管理多个 PTY/pane；Herdr 在这个基础上加了 agent 状态识别和 socket 控制面。",
+        "examples": [
+          "Herdr workspace/tab/pane",
+          "detach 后 reattach 到同一个 background session"
+        ],
+        "common_misunderstandings": [
+          "误以为它会替你执行 LLM 推理；实际它管理运行 agent 的终端。"
+        ],
+        "open_questions": [
+          "不同终端和 SSH 组合下的 mouse、clipboard、notification 体验需要实测。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：把多个 agent、shell、server、test 放进一个终端界面，随时切换、拆分、保活。术语：terminal multiplexing 是在一个终端会话里管理多个 PTY/pane；Herdr 在这个基础上加了 agent 状态识别和 socket 控制面。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。\n\n## Supported by\n- [[claims/ogulcancelik-herdr-main-claim]]\n",
+      "excerpt": "人话：把多个 agent、shell、server、test 放进一个终端界面，随时切换、拆分、保活。术语：terminal multiplexing 是在一个终端会话里管理多个 PTY/pane；Herdr 在这个基础上加了 agent 状态识别和 socket 控制面。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。",
+      "links": [
+        {
+          "target": "content/ogulcancelik-herdr",
+          "raw": "[[content/ogulcancelik-herdr]]"
+        },
+        {
+          "target": "claims/ogulcancelik-herdr-main-claim",
+          "raw": "[[claims/ogulcancelik-herdr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/persistent-memory-agent",
+      "type": "concept",
+      "slug": "persistent-memory-agent",
+      "title": "Persistent Memory Agent",
+      "file": "concepts/persistent-memory-agent.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "持久记忆代理",
+        "slug": "persistent-memory-agent",
+        "kind": "concept",
+        "tags": [
+          "memory",
+          "agent",
+          "persistence"
+        ],
+        "maturity": "active",
+        "first_seen_in": "hermes-webui",
+        "related_content": [
+          "hermes-webui"
+        ],
+        "related_concepts": [],
+        "explanation": "AI Agent 能够跨会话记住用户信息、项目环境和学习到的技能，不再每次对话都从零开始，从而提供更个性化的长期辅助。",
+        "examples": [
+          "Hermes Agent 的用户画像、项目上下文和技能存储"
+        ],
+        "common_misunderstandings": [
+          "不等于简单的聊天历史记录，而是结构化的知识提取和自适应行为调整。"
+        ],
+        "open_questions": [
+          "记忆的存储和检索机制如何平衡效率与准确性？",
+          "长期记忆如何避免过时和冲突？"
+        ]
+      },
+      "body": "\n## Explanation\n\nAI Agent 能够跨会话记住用户信息、项目环境和学习到的技能，不再每次对话都从零开始，从而提供更个性化的长期辅助。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。\n\n## Supported by\n- [[claims/hermes-webui-main-claim]]\n",
+      "excerpt": "AI Agent 能够跨会话记住用户信息、项目环境和学习到的技能，不再每次对话都从零开始，从而提供更个性化的长期辅助。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。",
+      "links": [
+        {
+          "target": "content/hermes-webui",
+          "raw": "[[content/hermes-webui]]"
+        },
+        {
+          "target": "claims/hermes-webui-main-claim",
+          "raw": "[[claims/hermes-webui-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/plugin-based-converter-architecture",
+      "type": "concept",
+      "slug": "plugin-based-converter-architecture",
+      "title": "Plugin Based Converter Architecture",
+      "file": "concepts/plugin-based-converter-architecture.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "基于插件的转换器架构",
+        "slug": "plugin-based-converter-architecture",
+        "kind": "concept",
+        "tags": [
+          "plugin-system",
+          "extensibility"
+        ],
+        "maturity": "active",
+        "first_seen_in": "markitdown",
+        "related_content": [
+          "markitdown"
+        ],
+        "related_concepts": [],
+        "explanation": "核心引擎提供注册机制，外部通过入口点贡献格式处理器或后处理步骤，不修改核心代码即可扩展能力。",
+        "examples": [
+          "MarkItDown 的 markitdown-ocr 插件通过 entry point 注册 OCR 转换器，复用 llm_client"
+        ],
+        "common_misunderstandings": [
+          "插件不一定运行在沙箱，可能继承宿主权限"
+        ],
+        "open_questions": [
+          "如何保证插件的质量和安全审查？"
+        ]
+      },
+      "body": "\n## Explanation\n\n核心引擎提供注册机制，外部通过入口点贡献格式处理器或后处理步骤，不修改核心代码即可扩展能力。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。\n\n## Supported by\n- [[claims/markitdown-main-claim]]\n",
+      "excerpt": "核心引擎提供注册机制，外部通过入口点贡献格式处理器或后处理步骤，不修改核心代码即可扩展能力。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。",
+      "links": [
+        {
+          "target": "content/markitdown",
+          "raw": "[[content/markitdown]]"
+        },
+        {
+          "target": "claims/markitdown-main-claim",
+          "raw": "[[claims/markitdown-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/policy-decision-point",
+      "type": "concept",
+      "slug": "policy-decision-point",
+      "title": "Policy Decision Point",
+      "file": "concepts/policy-decision-point.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Policy Decision Point",
+        "slug": "policy-decision-point",
+        "kind": "concept",
+        "tags": [
+          "policy",
+          "authorization",
+          "acs"
+        ],
+        "maturity": "active",
+        "first_seen_in": "microsoft-agent-governance-toolkit",
+        "related_content": [
+          "microsoft-agent-governance-toolkit"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：负责判断能不能做的脑子。技术词：PDP 接收完整上下文或 snapshot，按 policy 返回标准 verdict；AGT 的 policy-engine/ACS 是这个角色。",
+        "examples": [
+          "policy-engine README 描述 ACS native runtime over Rust core performs deterministic decision."
+        ],
+        "common_misunderstandings": [
+          "PDP 不一定执行动作；它只给决策，执行在 PEP。"
+        ],
+        "open_questions": [
+          "ACS 当前 0.3.1-beta/alpha 口径在文档和包版本之间需要确认。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：负责判断能不能做的脑子。技术词：PDP 接收完整上下文或 snapshot，按 policy 返回标准 verdict；AGT 的 policy-engine/ACS 是这个角色。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/microsoft-agent-governance-toolkit-main-claim]]\n",
+      "excerpt": "人话：负责判断能不能做的脑子。技术词：PDP 接收完整上下文或 snapshot，按 policy 返回标准 verdict；AGT 的 policy-engine/ACS 是这个角色。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。",
+      "links": [
+        {
+          "target": "content/microsoft-agent-governance-toolkit",
+          "raw": "[[content/microsoft-agent-governance-toolkit]]"
+        },
+        {
+          "target": "claims/microsoft-agent-governance-toolkit-main-claim",
+          "raw": "[[claims/microsoft-agent-governance-toolkit-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/policy-enforcement-point",
+      "type": "concept",
+      "slug": "policy-enforcement-point",
+      "title": "Policy Enforcement Point",
+      "file": "concepts/policy-enforcement-point.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Policy Enforcement Point",
+        "slug": "policy-enforcement-point",
+        "kind": "concept",
+        "tags": [
+          "agent-governance",
+          "security",
+          "runtime"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "microsoft-agent-governance-toolkit",
+        "related_content": [
+          "microsoft-agent-governance-toolkit"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：真正拦住或放行动作的地方。技术词：PEP 是宿主 adapter、中间件或 sidecar，负责拦截 agent action、调用策略决策层，并执行 allow/deny/escalate/transform verdict。",
+        "examples": [
+          "AGT host adapters in agent-os intercept the agent loop and enforce returned verdicts."
+        ],
+        "common_misunderstandings": [
+          "把 prompt safety 当成 PEP；prompt 只是输入，不是强制执行点。"
+        ],
+        "open_questions": [
+          "每个 framework adapter 是否完整覆盖所有危险工具调用路径需要逐个验证。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：真正拦住或放行动作的地方。技术词：PEP 是宿主 adapter、中间件或 sidecar，负责拦截 agent action、调用策略决策层，并执行 allow/deny/escalate/transform verdict。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/microsoft-agent-governance-toolkit-main-claim]]\n",
+      "excerpt": "人话：真正拦住或放行动作的地方。技术词：PEP 是宿主 adapter、中间件或 sidecar，负责拦截 agent action、调用策略决策层，并执行 allow/deny/escalate/transform verdict。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。",
+      "links": [
+        {
+          "target": "content/microsoft-agent-governance-toolkit",
+          "raw": "[[content/microsoft-agent-governance-toolkit]]"
+        },
+        {
+          "target": "claims/microsoft-agent-governance-toolkit-main-claim",
+          "raw": "[[claims/microsoft-agent-governance-toolkit-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/pre-indexed-knowledge-graph",
+      "type": "concept",
+      "slug": "pre-indexed-knowledge-graph",
+      "title": "Pre Indexed Knowledge Graph",
+      "file": "concepts/pre-indexed-knowledge-graph.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "预索引知识图谱",
+        "slug": "pre-indexed-knowledge-graph",
+        "kind": "concept",
+        "tags": [
+          "code-intelligence",
+          "performance-optimization",
+          "agent-tool"
+        ],
+        "maturity": "active",
+        "first_seen_in": "codegraph",
+        "related_content": [
+          "codegraph"
+        ],
+        "related_concepts": [],
+        "explanation": "在 AI 助手开始工作前，先对整个代码库做静态分析，生成包含符号、调用关系、路由等的结构化图谱并存入数据库。后续查询时无需扫描文件，直接检索图谱，大幅降低 token 和工具调用。",
+        "examples": [
+          "CodeGraph 在 VS Code 仓库上，agent 用 `codegraph_explore` 一次性获得扩展宿主通信的完整调用链，0 次文件读取。"
+        ],
+        "common_misunderstandings": [
+          "不是代码生成，不修改源码；不替代 agent 的推理，只提供上下文。",
+          "索引是本地独立进程，不依赖外部服务。图谱可能不是实时，依赖于同步机制。"
+        ],
+        "open_questions": [
+          "对于动态类型语言或大量运行时反射的代码，静态解析的图谱能覆盖多少真实调用关系？",
+          "如何评估图谱的召回率与准确率对 agent 最终回答质量的影响？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在 AI 助手开始工作前，先对整个代码库做静态分析，生成包含符号、调用关系、路由等的结构化图谱并存入数据库。后续查询时无需扫描文件，直接检索图谱，大幅降低 token 和工具调用。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。\n\n## Supported by\n- [[claims/codegraph-main-claim]]\n",
+      "excerpt": "在 AI 助手开始工作前，先对整个代码库做静态分析，生成包含符号、调用关系、路由等的结构化图谱并存入数据库。后续查询时无需扫描文件，直接检索图谱，大幅降低 token 和工具调用。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。",
+      "links": [
+        {
+          "target": "content/codegraph",
+          "raw": "[[content/codegraph]]"
+        },
+        {
+          "target": "claims/codegraph-main-claim",
+          "raw": "[[claims/codegraph-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/prefix-caching-exploitation",
+      "type": "concept",
+      "slug": "prefix-caching-exploitation",
+      "title": "Prefix Caching Exploitation",
+      "file": "concepts/prefix-caching-exploitation.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "前缀缓存利用",
+        "slug": "prefix-caching-exploitation",
+        "kind": "concept",
+        "tags": [
+          "cost-optimization",
+          "prompt-engineering"
+        ],
+        "maturity": "active",
+        "first_seen_in": "codewhale",
+        "related_content": [
+          "codewhale"
+        ],
+        "related_concepts": [],
+        "explanation": "利用 DeepSeek V4 或其他模型的前缀缓存机制，将长固定提示（如宪法）置于对话开头，大幅降低后续每轮的 token 成本，使长时间固定上下文的经济性可行。",
+        "examples": [
+          "CodeWhale 将宪法放在每次会话的开头，通过前缀缓存将成本降低约 100 倍。"
+        ],
+        "common_misunderstandings": [
+          "并非所有模型都支持前缀缓存，且缓存可能因上下文增长或内容变化而失效。"
+        ],
+        "open_questions": [
+          "不同模型提供商前缀缓存的实现差异有多大？",
+          "是否可以设计缓存友好的提示结构来最大化命中率？"
+        ]
+      },
+      "body": "\n## Explanation\n\n利用 DeepSeek V4 或其他模型的前缀缓存机制，将长固定提示（如宪法）置于对话开头，大幅降低后续每轮的 token 成本，使长时间固定上下文的经济性可行。 出处:https://github.com/hmbown/codewhale。See [[content/codewhale]]。\n\n## Supported by\n- [[claims/codewhale-main-claim]]\n",
+      "excerpt": "利用 DeepSeek V4 或其他模型的前缀缓存机制，将长固定提示（如宪法）置于对话开头，大幅降低后续每轮的 token 成本，使长时间固定上下文的经济性可行。 出处:https://github.com/hmbown/codewhale。See [[content/codewhale]]。",
+      "links": [
+        {
+          "target": "content/codewhale",
+          "raw": "[[content/codewhale]]"
+        },
+        {
+          "target": "claims/codewhale-main-claim",
+          "raw": "[[claims/codewhale-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/production-rag",
+      "type": "concept",
+      "slug": "production-rag",
+      "title": "Production Rag",
+      "file": "concepts/production-rag.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "生产级 RAG",
+        "slug": "production-rag",
+        "kind": "concept",
+        "tags": [
+          "rag",
+          "production",
+          "monitoring",
+          "caching"
+        ],
+        "maturity": "active",
+        "first_seen_in": "production-agentic-rag-course",
+        "related_content": [
+          "production-agentic-rag-course"
+        ],
+        "related_concepts": [],
+        "explanation": "不仅包含检索和生成，还融入监控、缓存、数据管道、评估和 Agentic 行为的 RAG 系统，强调可靠性、可维护性和可扩展性。",
+        "examples": [
+          "本项目从 Week 1 到 Week 7 逐步添加生产特性，最终形成可监控的 Agentic RAG 系统。"
+        ],
+        "common_misunderstandings": [
+          "认为 RAG 就是向量搜索 + LLM，忽视了数据质量、搜索基础、性能和可观测性。"
+        ],
+        "open_questions": [
+          "如何评估 RAG 系统的检索质量和生成忠实度？",
+          "如何在不显著增加延迟的前提下添加 Agentic 决策？"
+        ]
+      },
+      "body": "\n## Explanation\n\n不仅包含检索和生成，还融入监控、缓存、数据管道、评估和 Agentic 行为的 RAG 系统，强调可靠性、可维护性和可扩展性。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/production-agentic-rag-course]]。\n\n## Supported by\n- [[claims/production-agentic-rag-course-main-claim]]\n",
+      "excerpt": "不仅包含检索和生成，还融入监控、缓存、数据管道、评估和 Agentic 行为的 RAG 系统，强调可靠性、可维护性和可扩展性。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/production-agentic-rag-course]]。",
+      "links": [
+        {
+          "target": "content/production-agentic-rag-course",
+          "raw": "[[content/production-agentic-rag-course]]"
+        },
+        {
+          "target": "claims/production-agentic-rag-course-main-claim",
+          "raw": "[[claims/production-agentic-rag-course-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/progressive-disclosure-for-agent-skills",
+      "type": "concept",
+      "slug": "progressive-disclosure-for-agent-skills",
+      "title": "Progressive Disclosure For Agent Skills",
+      "file": "concepts/progressive-disclosure-for-agent-skills.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Progressive Disclosure for Agent Skills",
+        "slug": "progressive-disclosure-for-agent-skills",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "knowledge-management",
+          "token-efficiency"
+        ],
+        "maturity": "active",
+        "first_seen_in": "anthropic-cybersecurity-skills",
+        "related_content": [
+          "anthropic-cybersecurity-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "一种设计模式，将 AI 代理需要的专业知识分为轻量元数据（YAML frontmatter）和详细工作流（Markdown body），代理先通过元数据扫描快速匹配相关条目，再按需加载执行步骤，从而在大规模知识库中保持低 token 消耗。",
+        "examples": [
+          "每个技能如 performing-memory-forensics-with-volatility3，其 SKILL.md 的 YAML frontmatter 约 30 token，完整文档约 500-2000 token。"
+        ],
+        "common_misunderstandings": [
+          "并非所有技能都必须遵循此结构；技能的实际 token 数可能因长描述而异。"
+        ],
+        "open_questions": [
+          "代理如何确定加载哪些完整工作流？是否有评分机制？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种设计模式，将 AI 代理需要的专业知识分为轻量元数据（YAML frontmatter）和详细工作流（Markdown body），代理先通过元数据扫描快速匹配相关条目，再按需加载执行步骤，从而在大规模知识库中保持低 token 消耗。 出处:https://github.com/mukul975/anthropic-cybersecurity-skills。See [[content/anthropic-cybersecurity-skills]]。\n\n## Supported by\n- [[claims/anthropic-cybersecurity-skills-main-claim]]\n",
+      "excerpt": "一种设计模式，将 AI 代理需要的专业知识分为轻量元数据（YAML frontmatter）和详细工作流（Markdown body），代理先通过元数据扫描快速匹配相关条目，再按需加载执行步骤，从而在大规模知识库中保持低 token 消耗。 出处:https://github.com/mukul975/anthropic-cybersecurity-skills。See [[content/anthropic-cybersecurity-skills]]。",
+      "links": [
+        {
+          "target": "content/anthropic-cybersecurity-skills",
+          "raw": "[[content/anthropic-cybersecurity-skills]]"
+        },
+        {
+          "target": "claims/anthropic-cybersecurity-skills-main-claim",
+          "raw": "[[claims/anthropic-cybersecurity-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/provider-abstraction",
+      "type": "concept",
+      "slug": "provider-abstraction",
+      "title": "Provider Abstraction",
+      "file": "concepts/provider-abstraction.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "供应商抽象层",
+        "slug": "provider-abstraction",
+        "kind": "concept",
+        "tags": [
+          "llm-provider",
+          "abstraction",
+          "ui-ux"
+        ],
+        "maturity": "active",
+        "first_seen_in": "hermes-desktop",
+        "related_content": [
+          "hermes-desktop"
+        ],
+        "related_concepts": [],
+        "explanation": "统一管理多个 LLM 供应商的 API 密钥、端点配置和模型列表，通过 UI 切换，无需修改代码。",
+        "examples": [
+          "Hermes Desktop 支持 OpenRouter、Anthropic、OpenAI、Ollama 等 11 种供应商。"
+        ],
+        "common_misunderstandings": [
+          "不是只做转发，而是针对每个供应商进行了专门的 UI 配置适配。"
+        ],
+        "open_questions": [
+          "如何在添加新供应商时保持抽象层的简洁性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n统一管理多个 LLM 供应商的 API 密钥、端点配置和模型列表，通过 UI 切换，无需修改代码。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。\n\n## Supported by\n- [[claims/hermes-desktop-main-claim]]\n",
+      "excerpt": "统一管理多个 LLM 供应商的 API 密钥、端点配置和模型列表，通过 UI 切换，无需修改代码。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。",
+      "links": [
+        {
+          "target": "content/hermes-desktop",
+          "raw": "[[content/hermes-desktop]]"
+        },
+        {
+          "target": "claims/hermes-desktop-main-claim",
+          "raw": "[[claims/hermes-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/replaceable-media-pipeline",
+      "type": "concept",
+      "slug": "replaceable-media-pipeline",
+      "title": "Replaceable Media Pipeline",
+      "file": "concepts/replaceable-media-pipeline.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "可替换的媒体生成管道",
+        "slug": "replaceable-media-pipeline",
+        "kind": "concept",
+        "tags": [
+          "pipeline",
+          "configuration",
+          "abstraction"
+        ],
+        "maturity": "active",
+        "first_seen_in": "pixelle-video",
+        "related_content": [
+          "pixelle-video"
+        ],
+        "related_concepts": [],
+        "explanation": "将视频生成流程中的图像、视频、语音等环节抽象为独立管道，每个管道可选用不同的后端实现（本地 ComfyUI、云端 RunningHub、直连 API），通过配置灵活切换，业务逻辑无需修改。",
+        "examples": [
+          "图像生成可选择 selfhost/xxx.json, runninghub/xxx, api/dashscope-wan",
+          "TTS 可从下拉菜单选择不同的工作流"
+        ],
+        "common_misunderstandings": [
+          "并非每个管道都能任意互操作，某些组合可能需要手动调整参数"
+        ],
+        "open_questions": [
+          "如何保证管道切换时输出的格式和质量一致性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将视频生成流程中的图像、视频、语音等环节抽象为独立管道，每个管道可选用不同的后端实现（本地 ComfyUI、云端 RunningHub、直连 API），通过配置灵活切换，业务逻辑无需修改。 出处:https://github.com/aidc-ai/pixelle-video。See [[content/pixelle-video]]。\n\n## Supported by\n- [[claims/pixelle-video-main-claim]]\n",
+      "excerpt": "将视频生成流程中的图像、视频、语音等环节抽象为独立管道，每个管道可选用不同的后端实现（本地 ComfyUI、云端 RunningHub、直连 API），通过配置灵活切换，业务逻辑无需修改。 出处:https://github.com/aidc-ai/pixelle-video。See [[content/pixelle-video]]。",
+      "links": [
+        {
+          "target": "content/pixelle-video",
+          "raw": "[[content/pixelle-video]]"
+        },
+        {
+          "target": "claims/pixelle-video-main-claim",
+          "raw": "[[claims/pixelle-video-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/scrapling-mcp-tool-integration",
+      "type": "concept",
+      "slug": "scrapling-mcp-tool-integration",
+      "title": "Scrapling Mcp Tool Integration",
+      "file": "concepts/scrapling-mcp-tool-integration.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 工具集成",
+        "slug": "scrapling-mcp-tool-integration",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "ai-agent",
+          "integration"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "scrapling",
+        "related_content": [
+          "scrapling"
+        ],
+        "related_concepts": [],
+        "explanation": "通过实现 Model Context Protocol 将现有工具（如爬虫）暴露为大语言模型可调用的函数，使 AI 能直接触发实际操作。",
+        "examples": [
+          "Scrapling 的 MCP 服务器让 LLM 可以请求抓取网页"
+        ],
+        "common_misunderstandings": [
+          "MCP 要求工具描述清晰、参数明确，还需处理认证和速率限制。"
+        ],
+        "open_questions": [
+          "如何安全地授予 AI 代理对敏感 URL 的访问权限？",
+          "如何设计健壮的错误处理和重试逻辑？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过实现 Model Context Protocol 将现有工具（如爬虫）暴露为大语言模型可调用的函数，使 AI 能直接触发实际操作。 出处:https://github.com/d4vinci/scrapling。See [[content/scrapling]]。\n\n## Supported by\n- [[claims/scrapling-main-claim]]\n",
+      "excerpt": "通过实现 Model Context Protocol 将现有工具（如爬虫）暴露为大语言模型可调用的函数，使 AI 能直接触发实际操作。 出处:https://github.com/d4vinci/scrapling。See [[content/scrapling]]。",
+      "links": [
+        {
+          "target": "content/scrapling",
+          "raw": "[[content/scrapling]]"
+        },
+        {
+          "target": "claims/scrapling-main-claim",
+          "raw": "[[claims/scrapling-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/self-hosted-agent-ui",
+      "type": "concept",
+      "slug": "self-hosted-agent-ui",
+      "title": "Self Hosted Agent Ui",
+      "file": "concepts/self-hosted-agent-ui.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "自托管 Agent 界面",
+        "slug": "self-hosted-agent-ui",
+        "kind": "concept",
+        "tags": [
+          "self-hosted",
+          "agent",
+          "web-ui"
+        ],
+        "maturity": "active",
+        "first_seen_in": "hermes-webui",
+        "related_content": [
+          "hermes-webui"
+        ],
+        "related_concepts": [],
+        "explanation": "通过自建 Web 服务为本地运行的 AI Agent 提供图形化交互界面，无需依赖云厂商的服务，数据存储在用户自己的机器上。",
+        "examples": [
+          "Hermes WebUI",
+          "OpenCode 的 WebUI（部分）"
+        ],
+        "common_misunderstandings": [
+          "不等于代理的‘控制面板’，而是完整的交互前端，可执行与 CLI 相同的操作。"
+        ],
+        "open_questions": [
+          "如何保证 UI 与 Agent 进程之间的低延迟和高可靠通信？",
+          "如何设计离线状态下的任务队列和结果推送？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过自建 Web 服务为本地运行的 AI Agent 提供图形化交互界面，无需依赖云厂商的服务，数据存储在用户自己的机器上。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。\n\n## Supported by\n- [[claims/hermes-webui-main-claim]]\n",
+      "excerpt": "通过自建 Web 服务为本地运行的 AI Agent 提供图形化交互界面，无需依赖云厂商的服务，数据存储在用户自己的机器上。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。",
+      "links": [
+        {
+          "target": "content/hermes-webui",
+          "raw": "[[content/hermes-webui]]"
+        },
+        {
+          "target": "claims/hermes-webui-main-claim",
+          "raw": "[[claims/hermes-webui-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/self-supervised-contrastive-encoder",
+      "type": "concept",
+      "slug": "self-supervised-contrastive-encoder",
+      "title": "Self Supervised Contrastive Encoder",
+      "file": "concepts/self-supervised-contrastive-encoder.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "自监督对比编码器",
+        "slug": "self-supervised-contrastive-encoder",
+        "kind": "concept",
+        "tags": [
+          "ssl",
+          "embeddings",
+          "pretraining"
+        ],
+        "maturity": "active",
+        "first_seen_in": "ruview",
+        "related_content": [
+          "ruview"
+        ],
+        "related_concepts": [],
+        "explanation": "一种训练方法，模型通过对比相似和不相似的样本对来学习数据表示，无需人工标签。本例中将CSI帧映射到128维向量空间。",
+        "examples": [
+          "ruvnet/wifi-densepose-pretrained模型",
+          "82.3% temporal-triplet准确率"
+        ],
+        "common_misunderstandings": [
+          "虽然叫自监督，但训练阶段仍需构造正负例对，这在无线信号中如何定义正例是挑战。"
+        ],
+        "open_questions": [
+          "该嵌入空间是否对身份信息敏感？能否用于跨房间泛化？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种训练方法，模型通过对比相似和不相似的样本对来学习数据表示，无需人工标签。本例中将CSI帧映射到128维向量空间。 出处:https://github.com/ruvnet/ruview。See [[content/ruview]]。\n\n## Supported by\n- [[claims/ruview-main-claim]]\n",
+      "excerpt": "一种训练方法，模型通过对比相似和不相似的样本对来学习数据表示，无需人工标签。本例中将CSI帧映射到128维向量空间。 出处:https://github.com/ruvnet/ruview。See [[content/ruview]]。",
+      "links": [
+        {
+          "target": "content/ruview",
+          "raw": "[[content/ruview]]"
+        },
+        {
+          "target": "claims/ruview-main-claim",
+          "raw": "[[claims/ruview-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/shared-language-memory",
+      "type": "concept",
+      "slug": "shared-language-memory",
+      "title": "Shared Language Memory",
+      "file": "concepts/shared-language-memory.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Shared Language Memory（共享语言记忆）",
+        "slug": "shared-language-memory",
+        "kind": "concept",
+        "tags": [
+          "ddd",
+          "ubiquitous-language",
+          "memory",
+          "context"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "skills",
+        "related_content": [
+          "skills"
+        ],
+        "related_concepts": [],
+        "explanation": "通过维护一个 CONTEXT.md 文件，定义项目中的领域术语和缩写，使代理和开发者使用同一套词汇表，减少歧义和 token 消耗。",
+        "examples": [
+          "将'有材料化级联问题'简化为'materialization cascade'。"
+        ],
+        "common_misunderstandings": [
+          "不是简单的术语表，而是需要与代理共同演化的活的文档。",
+          "不是一次性创建，而是通过 /grill-with-docs 持续更新。"
+        ],
+        "open_questions": [
+          "如何确保共享语言的一致性在多个代理间保持？",
+          "共享语言是否对非英语团队同样有效？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过维护一个 CONTEXT.md 文件，定义项目中的领域术语和缩写，使代理和开发者使用同一套词汇表，减少歧义和 token 消耗。 出处:https://github.com/mattpocock/skills。See [[content/skills]]。\n\n## Supported by\n- [[claims/skills-main-claim]]\n",
+      "excerpt": "通过维护一个 CONTEXT.md 文件，定义项目中的领域术语和缩写，使代理和开发者使用同一套词汇表，减少歧义和 token 消耗。 出处:https://github.com/mattpocock/skills。See [[content/skills]]。",
+      "links": [
+        {
+          "target": "content/skills",
+          "raw": "[[content/skills]]"
+        },
+        {
+          "target": "claims/skills-main-claim",
+          "raw": "[[claims/skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/source-level-stealth",
+      "type": "concept",
+      "slug": "source-level-stealth",
+      "title": "Source Level Stealth",
+      "file": "concepts/source-level-stealth.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "源码级隐身",
+        "slug": "source-level-stealth",
+        "kind": "concept",
+        "tags": [
+          "anti-detection",
+          "stealth"
+        ],
+        "maturity": "active",
+        "first_seen_in": "cloakbrowser",
+        "related_content": [
+          "cloakbrowser"
+        ],
+        "related_concepts": [],
+        "explanation": "在浏览器引擎源代码层面（C++）修改指纹数据，使得浏览器在底层看起来与真实用户无异，规避 JavaScript 指纹检测。",
+        "examples": [
+          "CloakBrowser 对 canvas、WebGL、audio 等指纹进行 C++ 级替换。"
+        ],
+        "common_misunderstandings": [
+          "认为只需修改 navigator.webdriver 等 JS 属性即可绕过后端检测，实际上现代反爬会检查渲染一致性、底层 API 行为等。"
+        ],
+        "open_questions": [
+          "反爬厂商是否会针对特定二进制构建指纹库进行防御？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在浏览器引擎源代码层面（C++）修改指纹数据，使得浏览器在底层看起来与真实用户无异，规避 JavaScript 指纹检测。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。\n\n## Supported by\n- [[claims/cloakbrowser-main-claim]]\n",
+      "excerpt": "在浏览器引擎源代码层面（C++）修改指纹数据，使得浏览器在底层看起来与真实用户无异，规避 JavaScript 指纹检测。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。",
+      "links": [
+        {
+          "target": "content/cloakbrowser",
+          "raw": "[[content/cloakbrowser]]"
+        },
+        {
+          "target": "claims/cloakbrowser-main-claim",
+          "raw": "[[claims/cloakbrowser-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/stateful-memory-engine",
+      "type": "concept",
+      "slug": "stateful-memory-engine",
+      "title": "Stateful Memory Engine",
+      "file": "concepts/stateful-memory-engine.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "状态化记忆引擎",
+        "slug": "stateful-memory-engine",
+        "kind": "concept",
+        "tags": [
+          "memory",
+          "state-management",
+          "agent-memory"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "supermemory",
+        "related_content": [
+          "supermemory"
+        ],
+        "related_concepts": [],
+        "explanation": "与无状态的 RAG 不同，状态化记忆引擎持续跟踪和更新关于用户的事实，能处理信息演化（如搬家）、时间过期（如明天考试）和矛盾（新旧事实冲突），始终保留一个准确的用户认知状态。",
+        "examples": [
+          "Supermemory 自动将“我使用 Vim”与后来的“我现在用 VS Code”合并，更新用户画像。",
+          "Mem0 和 Zep 也提供类似的状态化记忆，但 Supermemory 在基准上暂时领先。"
+        ],
+        "common_misunderstandings": [
+          "混淆为简单的向量存储或文档 RAG，忽视其事实更新和遗忘逻辑。",
+          "误认为所有记忆都会永久保存，实际上临时和矛盾信息会被自动清除。"
+        ],
+        "open_questions": [
+          "如何决定记住什么和忘记什么？是否有可配置的保留策略？",
+          "如何处理多层次事实冲突（例如多个信息源存在矛盾）？"
+        ]
+      },
+      "body": "\n## Explanation\n\n与无状态的 RAG 不同，状态化记忆引擎持续跟踪和更新关于用户的事实，能处理信息演化（如搬家）、时间过期（如明天考试）和矛盾（新旧事实冲突），始终保留一个准确的用户认知状态。 出处:https://github.com/supermemoryai/supermemory。See [[content/supermemory]]。\n\n## Supported by\n- [[claims/supermemory-main-claim]]\n",
+      "excerpt": "与无状态的 RAG 不同，状态化记忆引擎持续跟踪和更新关于用户的事实，能处理信息演化（如搬家）、时间过期（如明天考试）和矛盾（新旧事实冲突），始终保留一个准确的用户认知状态。 出处:https://github.com/supermemoryai/supermemory。See [[content/supermemory]]。",
+      "links": [
+        {
+          "target": "content/supermemory",
+          "raw": "[[content/supermemory]]"
+        },
+        {
+          "target": "claims/supermemory-main-claim",
+          "raw": "[[claims/supermemory-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/supply-chain-hardening",
       "type": "concept",
       "slug": "supply-chain-hardening",
@@ -244,6 +3657,285 @@
         {
           "depth": 2,
           "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/taste-skill-agent-framework-pattern",
+      "type": "concept",
+      "slug": "taste-skill-agent-framework-pattern",
+      "title": "Taste Skill Agent Framework Pattern",
+      "file": "concepts/taste-skill-agent-framework-pattern.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "taste-skill agent_framework 模式",
+        "slug": "taste-skill-agent-framework-pattern",
+        "kind": "concept",
+        "tags": [
+          "agent-framework",
+          "project-pattern"
+        ],
+        "maturity": "active",
+        "first_seen_in": "taste-skill",
+        "related_content": [
+          "taste-skill"
+        ],
+        "related_concepts": [],
+        "explanation": "未在 README/artifact 说明",
+        "examples": [
+          "Leonxlnx/taste-skill: 未在 README/artifact 说明"
+        ],
+        "common_misunderstandings": [],
+        "open_questions": []
+      },
+      "body": "\n## Explanation\n\n未在 README/artifact 说明 出处:https://github.com/leonxlnx/taste-skill。See [[content/taste-skill]]。\n\n## Supported by\n- [[claims/taste-skill-main-claim]]\n",
+      "excerpt": "未在 README/artifact 说明 出处:https://github.com/leonxlnx/taste-skill。See [[content/taste-skill]]。",
+      "links": [
+        {
+          "target": "content/taste-skill",
+          "raw": "[[content/taste-skill]]"
+        },
+        {
+          "target": "claims/taste-skill-main-claim",
+          "raw": "[[claims/taste-skill-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/terminal-multiplexing-for-agents",
+      "type": "concept",
+      "slug": "terminal-multiplexing-for-agents",
+      "title": "Terminal Multiplexing For Agents",
+      "file": "concepts/terminal-multiplexing-for-agents.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "面向代理的终端多路复用",
+        "slug": "terminal-multiplexing-for-agents",
+        "kind": "concept",
+        "tags": [
+          "terminal",
+          "multiplexer",
+          "agent",
+          "workspace"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "herdr",
+        "related_content": [
+          "herdr"
+        ],
+        "related_concepts": [],
+        "explanation": "将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。",
+        "examples": [
+          "Herder 允许每个项目一个工作区，包含多个窗格，每个窗格运行不同的代理。"
+        ],
+        "common_misunderstandings": [
+          "代理不是由 Herder 托管的守护进程；只是普通终端进程。"
+        ],
+        "open_questions": [
+          "多个窗格间的剪贴板或上下文共享机制？",
+          "是否支持跨机器的代理迁移？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。\n\n## Supported by\n- [[claims/herdr-main-claim]]\n",
+      "excerpt": "将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。",
+      "links": [
+        {
+          "target": "content/herdr",
+          "raw": "[[content/herdr]]"
+        },
+        {
+          "target": "claims/herdr-main-claim",
+          "raw": "[[claims/herdr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/time-traveling-stream-rules",
+      "type": "concept",
+      "slug": "time-traveling-stream-rules",
+      "title": "Time Traveling Stream Rules",
+      "file": "concepts/time-traveling-stream-rules.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "流式规则注入",
+        "slug": "time-traveling-stream-rules",
+        "kind": "concept",
+        "tags": [
+          "safety",
+          "prompt-engineering",
+          "streaming"
+        ],
+        "maturity": "active",
+        "first_seen_in": "oh-my-pi",
+        "related_content": [
+          "oh-my-pi"
+        ],
+        "related_concepts": [],
+        "explanation": "在模型生成输出过程中实时监测 token 流，一旦匹配到用户定义的正则规则，立即中断生成，注入系统提醒，然后从断点重试。规则在上下文压缩后仍保留。",
+        "examples": [
+          "README 示例：代理想写 Box::leak 时被规则拦截并引导改用 Arc<str>",
+          "避免每次对话都携带冗长的规则描述，只按需触发"
+        ],
+        "common_misunderstandings": [
+          "并不是在事后审查，而是在生成过程中实时打断，所以能影响当前输出。",
+          "规则只作用于模型输出，不能阻止用户输入的不安全操作。"
+        ],
+        "open_questions": [
+          "正则匹配对多语言代码的覆盖度如何？",
+          "中断重试在响应延迟上的额外开销多大？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在模型生成输出过程中实时监测 token 流，一旦匹配到用户定义的正则规则，立即中断生成，注入系统提醒，然后从断点重试。规则在上下文压缩后仍保留。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。\n\n## Supported by\n- [[claims/oh-my-pi-main-claim]]\n",
+      "excerpt": "在模型生成输出过程中实时监测 token 流，一旦匹配到用户定义的正则规则，立即中断生成，注入系统提醒，然后从断点重试。规则在上下文压缩后仍保留。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。",
+      "links": [
+        {
+          "target": "content/oh-my-pi",
+          "raw": "[[content/oh-my-pi]]"
+        },
+        {
+          "target": "claims/oh-my-pi-main-claim",
+          "raw": "[[claims/oh-my-pi-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/token-compression-middleware",
+      "type": "concept",
+      "slug": "token-compression-middleware",
+      "title": "Token Compression Middleware",
+      "file": "concepts/token-compression-middleware.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "令牌压缩中间件",
+        "slug": "token-compression-middleware",
+        "kind": "concept",
+        "tags": [
+          "cost-optimization",
+          "middleware",
+          "token-saving"
+        ],
+        "maturity": "active",
+        "first_seen_in": "9router",
+        "related_content": [
+          "9router"
+        ],
+        "related_concepts": [],
+        "explanation": "在 API 请求发送前，用规则或小模型自动裁剪工具返回的冗余输出，减少送入主模型的上下文长度，从而节省 token 成本。",
+        "examples": [
+          "9Router 的 RTK 将 git diff 的增量部分精简化，保留关键变化行"
+        ],
+        "common_misunderstandings": [
+          "压缩并非无损，会丢失部分原始输出，不适合需要完整工具输出的场景"
+        ],
+        "open_questions": [
+          "如何设定压缩策略以保证代码补全的正确性不受影响？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在 API 请求发送前，用规则或小模型自动裁剪工具返回的冗余输出，减少送入主模型的上下文长度，从而节省 token 成本。 出处:https://github.com/decolua/9router。See [[content/9router]]。\n\n## Supported by\n- [[claims/9router-main-claim]]\n",
+      "excerpt": "在 API 请求发送前，用规则或小模型自动裁剪工具返回的冗余输出，减少送入主模型的上下文长度，从而节省 token 成本。 出处:https://github.com/decolua/9router。See [[content/9router]]。",
+      "links": [
+        {
+          "target": "content/9router",
+          "raw": "[[content/9router]]"
+        },
+        {
+          "target": "claims/9router-main-claim",
+          "raw": "[[claims/9router-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/tokenizer-free-tts",
+      "type": "concept",
+      "slug": "tokenizer-free-tts",
+      "title": "Tokenizer Free Tts",
+      "file": "concepts/tokenizer-free-tts.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "无分词器文本转语音",
+        "slug": "tokenizer-free-tts",
+        "kind": "concept",
+        "tags": [
+          "tts",
+          "architecture"
+        ],
+        "maturity": "active",
+        "first_seen_in": "voxcpm",
+        "related_content": [
+          "voxcpm"
+        ],
+        "related_concepts": [],
+        "explanation": "直接生成连续语音表征，跳过将文本转换为离散音素、音调单元等中间步骤，以自然度换取计算复杂度。",
+        "examples": [
+          "VoxCPM 的扩散自回归架构"
+        ],
+        "common_misunderstandings": [
+          "并不是完全不用分词，而是不将语音离散化，文本端可能仍使用语言模型 tokenizer。"
+        ],
+        "open_questions": [
+          "如何在长文本上保持一致性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n直接生成连续语音表征，跳过将文本转换为离散音素、音调单元等中间步骤，以自然度换取计算复杂度。 出处:https://github.com/openbmb/voxcpm。See [[content/voxcpm]]。\n\n## Supported by\n- [[claims/voxcpm-main-claim]]\n",
+      "excerpt": "直接生成连续语音表征，跳过将文本转换为离散音素、音调单元等中间步骤，以自然度换取计算复杂度。 出处:https://github.com/openbmb/voxcpm。See [[content/voxcpm]]。",
+      "links": [
+        {
+          "target": "content/voxcpm",
+          "raw": "[[content/voxcpm]]"
+        },
+        {
+          "target": "claims/voxcpm-main-claim",
+          "raw": "[[claims/voxcpm-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
         }
       ]
     },
@@ -294,6 +3986,64 @@
       ]
     },
     {
+      "id": "concept/user-profile-injection",
+      "type": "concept",
+      "slug": "user-profile-injection",
+      "title": "User Profile Injection",
+      "file": "concepts/user-profile-injection.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "用户画像注入",
+        "slug": "user-profile-injection",
+        "kind": "concept",
+        "tags": [
+          "agent-context",
+          "personalization"
+        ],
+        "maturity": "active",
+        "first_seen_in": "supermemory",
+        "related_content": [
+          "supermemory"
+        ],
+        "related_concepts": [],
+        "explanation": "在每次对话开始时，自动将用户的偏好、长期事实和近期活动列表注入系统提示或上下文，使得 Agent 在不进行搜索的情况下就能立即“认识”用户，减少对话轮次。",
+        "examples": [
+          "在 Cursor 或 Claude Code 中通过 /context 命令注入画像。",
+          "API 中 client.profile() 返回 static 和 dynamic 字段，可拼接进 prompt。"
+        ],
+        "common_misunderstandings": [
+          "以为画像只包含用户手动输入的信息，实际是系统自动从历史对话中提取和维护的。",
+          "忘记画像的有效期和刷新机制，可能使用过时信息。"
+        ],
+        "open_questions": [
+          "画像的刷新频率如何？在频繁交互下是否能保证实时性？",
+          "如果用户行为突然改变，画像更新需要多少轮对话才能反映？"
+        ]
+      },
+      "body": "\n## Explanation\n\n在每次对话开始时，自动将用户的偏好、长期事实和近期活动列表注入系统提示或上下文，使得 Agent 在不进行搜索的情况下就能立即“认识”用户，减少对话轮次。 出处:https://github.com/supermemoryai/supermemory。See [[content/supermemory]]。\n\n## Supported by\n- [[claims/supermemory-main-claim]]\n",
+      "excerpt": "在每次对话开始时，自动将用户的偏好、长期事实和近期活动列表注入系统提示或上下文，使得 Agent 在不进行搜索的情况下就能立即“认识”用户，减少对话轮次。 出处:https://github.com/supermemoryai/supermemory。See [[content/supermemory]]。",
+      "links": [
+        {
+          "target": "content/supermemory",
+          "raw": "[[content/supermemory]]"
+        },
+        {
+          "target": "claims/supermemory-main-claim",
+          "raw": "[[claims/supermemory-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/verifiable-task-synthesis",
       "type": "concept",
       "slug": "verifiable-task-synthesis",
@@ -337,6 +4087,460 @@
         {
           "depth": 2,
           "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/vibe-coding",
+      "type": "concept",
+      "slug": "vibe-coding",
+      "title": "Vibe Coding",
+      "file": "concepts/vibe-coding.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Vibe Coding",
+        "slug": "vibe-coding",
+        "kind": "concept",
+        "tags": [
+          "methodology",
+          "ai-coding",
+          "rapid-prototyping"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "easy-vibe",
+        "related_content": [
+          "easy-vibe"
+        ],
+        "related_concepts": [],
+        "explanation": "一种使用自然语言对话来生成代码的编程范式，强调快速原型和迭代，无需编写传统代码。",
+        "examples": [
+          "README 中描述：Want an expense tracker? Say it."
+        ],
+        "common_misunderstandings": [
+          "认为完全不需要技术知识，但实际上仍需理解产品逻辑和基本调试。"
+        ],
+        "open_questions": [
+          "如何保证生成代码的质量和可维护性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种使用自然语言对话来生成代码的编程范式，强调快速原型和迭代，无需编写传统代码。 出处:https://github.com/datawhalechina/easy-vibe。See [[content/easy-vibe]]。\n\n## Supported by\n- [[claims/easy-vibe-main-claim]]\n",
+      "excerpt": "一种使用自然语言对话来生成代码的编程范式，强调快速原型和迭代，无需编写传统代码。 出处:https://github.com/datawhalechina/easy-vibe。See [[content/easy-vibe]]。",
+      "links": [
+        {
+          "target": "content/easy-vibe",
+          "raw": "[[content/easy-vibe]]"
+        },
+        {
+          "target": "claims/easy-vibe-main-claim",
+          "raw": "[[claims/easy-vibe-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/video-generation-pipeline",
+      "type": "concept",
+      "slug": "video-generation-pipeline",
+      "title": "Video Generation Pipeline",
+      "file": "concepts/video-generation-pipeline.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "视频生成流水线",
+        "slug": "video-generation-pipeline",
+        "kind": "concept",
+        "tags": [
+          "ai",
+          "video",
+          "automation"
+        ],
+        "maturity": "active",
+        "first_seen_in": "moneyprinterturbo",
+        "related_content": [
+          "moneyprinterturbo"
+        ],
+        "related_concepts": [],
+        "explanation": "将 AI 文案生成、语音合成、字幕时间轴对齐、素材检索与匹配、视频合成等步骤串联成自动化流程，用户只需输入主题即可获得成品视频。",
+        "examples": [
+          "MoneyPrinterTurbo 从主题到最终视频的完整链路。"
+        ],
+        "common_misunderstandings": [
+          "以为完全不需要人工干预；实际上可能需要调整文案、声音、素材。"
+        ],
+        "open_questions": [
+          "如何量化并保证视频质量？是否可以引入 A/B 测试？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将 AI 文案生成、语音合成、字幕时间轴对齐、素材检索与匹配、视频合成等步骤串联成自动化流程，用户只需输入主题即可获得成品视频。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/moneyprinterturbo]]。\n\n## Supported by\n- [[claims/moneyprinterturbo-main-claim]]\n",
+      "excerpt": "将 AI 文案生成、语音合成、字幕时间轴对齐、素材检索与匹配、视频合成等步骤串联成自动化流程，用户只需输入主题即可获得成品视频。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/moneyprinterturbo]]。",
+      "links": [
+        {
+          "target": "content/moneyprinterturbo",
+          "raw": "[[content/moneyprinterturbo]]"
+        },
+        {
+          "target": "claims/moneyprinterturbo-main-claim",
+          "raw": "[[claims/moneyprinterturbo-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/voice-design",
+      "type": "concept",
+      "slug": "voice-design",
+      "title": "Voice Design",
+      "file": "concepts/voice-design.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "语音设计",
+        "slug": "voice-design",
+        "kind": "concept",
+        "tags": [
+          "tts",
+          "voice-cloning"
+        ],
+        "maturity": "active",
+        "first_seen_in": "voxcpm",
+        "related_content": [
+          "voxcpm"
+        ],
+        "related_concepts": [],
+        "explanation": "无需参考音频，仅通过自然语言描述（如年龄、性别、语气、语速等）生成特定音色。",
+        "examples": [
+          "在 text 中以括号包含描述：\"(a deep male voice)Hello.\""
+        ],
+        "common_misunderstandings": [
+          "不是简单的音色叠加，而是从训练数据中学习到的声音属性映射。"
+        ],
+        "open_questions": [
+          "如何量化和控制声音设计中的细微情感变化？"
+        ]
+      },
+      "body": "\n## Explanation\n\n无需参考音频，仅通过自然语言描述（如年龄、性别、语气、语速等）生成特定音色。 出处:https://github.com/openbmb/voxcpm。See [[content/voxcpm]]。\n\n## Supported by\n- [[claims/voxcpm-main-claim]]\n",
+      "excerpt": "无需参考音频，仅通过自然语言描述（如年龄、性别、语气、语速等）生成特定音色。 出处:https://github.com/openbmb/voxcpm。See [[content/voxcpm]]。",
+      "links": [
+        {
+          "target": "content/voxcpm",
+          "raw": "[[content/voxcpm]]"
+        },
+        {
+          "target": "claims/voxcpm-main-claim",
+          "raw": "[[claims/voxcpm-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/voice-interruption",
+      "type": "concept",
+      "slug": "voice-interruption",
+      "title": "Voice Interruption",
+      "file": "concepts/voice-interruption.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "语音打断",
+        "slug": "voice-interruption",
+        "kind": "concept",
+        "tags": [
+          "voice",
+          "interaction",
+          "real-time"
+        ],
+        "maturity": "active",
+        "first_seen_in": "open-llm-vtuber",
+        "related_content": [
+          "open-llm-vtuber"
+        ],
+        "related_concepts": [],
+        "explanation": "AI 在说话时能够被用户语音输入打断，无需物理按钮或关键词，类似人与人对话的自然打断。实现需处理音频流回波消除和状态机。",
+        "examples": [
+          "Open-LLM-VTuber 支持 voice interruption without headphones"
+        ],
+        "common_misunderstandings": [
+          "不是简单地静音麦克风，而是需要复杂的音频处理来避免 AI 听见自己"
+        ],
+        "open_questions": [
+          "如何在不使用耳机的情况下避免自反馈？"
+        ]
+      },
+      "body": "\n## Explanation\n\nAI 在说话时能够被用户语音输入打断，无需物理按钮或关键词，类似人与人对话的自然打断。实现需处理音频流回波消除和状态机。 出处:https://github.com/open-llm-vtuber/open-llm-vtuber。See [[content/open-llm-vtuber]]。\n\n## Supported by\n- [[claims/open-llm-vtuber-main-claim]]\n",
+      "excerpt": "AI 在说话时能够被用户语音输入打断，无需物理按钮或关键词，类似人与人对话的自然打断。实现需处理音频流回波消除和状态机。 出处:https://github.com/open-llm-vtuber/open-llm-vtuber。See [[content/open-llm-vtuber]]。",
+      "links": [
+        {
+          "target": "content/open-llm-vtuber",
+          "raw": "[[content/open-llm-vtuber]]"
+        },
+        {
+          "target": "claims/open-llm-vtuber-main-claim",
+          "raw": "[[claims/open-llm-vtuber-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/weight-only-block-wise-quantization",
+      "type": "concept",
+      "slug": "weight-only-block-wise-quantization",
+      "title": "Weight Only Block Wise Quantization",
+      "file": "concepts/weight-only-block-wise-quantization.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Weight-only Block-wise Quantization",
+        "slug": "weight-only-block-wise-quantization",
+        "kind": "concept",
+        "tags": [
+          "quantization",
+          "compression"
+        ],
+        "maturity": "active",
+        "first_seen_in": "airllm",
+        "related_content": [
+          "airllm"
+        ],
+        "related_concepts": [],
+        "explanation": "只对权重进行分块量化（将权重矩阵分成小块，每块独立量化），不量化激活值，以降低磁盘加载量和内存占用，同时避免激活量化带来的精度损失。",
+        "examples": [
+          "AirLLM 通过 compression='4bit' 启用此功能，依赖 bitsandbytes 实现。"
+        ],
+        "common_misunderstandings": [
+          "并不等同于传统量化推理（需要 kernel 支持），它主要加速磁盘 I/O，计算仍在浮点精度下进行。"
+        ],
+        "open_questions": [
+          "块大小如何选择？误差与速度的 trade-off 如何？",
+          "与 GPTQ、AWQ 等方法的比较？"
+        ]
+      },
+      "body": "\n## Explanation\n\n只对权重进行分块量化（将权重矩阵分成小块，每块独立量化），不量化激活值，以降低磁盘加载量和内存占用，同时避免激活量化带来的精度损失。 出处:https://github.com/lyogavin/airllm。See [[content/airllm]]。\n\n## Supported by\n- [[claims/airllm-main-claim]]\n",
+      "excerpt": "只对权重进行分块量化（将权重矩阵分成小块，每块独立量化），不量化激活值，以降低磁盘加载量和内存占用，同时避免激活量化带来的精度损失。 出处:https://github.com/lyogavin/airllm。See [[content/airllm]]。",
+      "links": [
+        {
+          "target": "content/airllm",
+          "raw": "[[content/airllm]]"
+        },
+        {
+          "target": "claims/airllm-main-claim",
+          "raw": "[[claims/airllm-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/wifi-csi-sensing",
+      "type": "concept",
+      "slug": "wifi-csi-sensing",
+      "title": "Wifi Csi Sensing",
+      "file": "concepts/wifi-csi-sensing.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "WiFi信道状态信息感知",
+        "slug": "wifi-csi-sensing",
+        "kind": "concept",
+        "tags": [
+          "iot",
+          "sensing",
+          "wireless"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "ruview",
+        "related_content": [
+          "ruview"
+        ],
+        "related_concepts": [],
+        "explanation": "利用WiFi物理层信道状态信息（包含每子载波的振幅和相位）感知环境变化，而非简单的信号强度。多径效应使微小的移动和生理信号都可被探测。",
+        "examples": [
+          "ESP32-S3 CSI流获取",
+          "RuView中的呼吸率提取使用相位变化"
+        ],
+        "common_misunderstandings": [
+          "不同于基于RSSI的运动检测，CSI提供更细粒度的多子载波信息，足以区分心跳和呼吸。",
+          "需要特定的驱动和硬件，普通WiFi网卡不一定能输出CSI。"
+        ],
+        "open_questions": [
+          "如何标准化CSI数据的预处理以减少设备差异？",
+          "大规模部署中的信道干扰管理？"
+        ]
+      },
+      "body": "\n## Explanation\n\n利用WiFi物理层信道状态信息（包含每子载波的振幅和相位）感知环境变化，而非简单的信号强度。多径效应使微小的移动和生理信号都可被探测。 出处:https://github.com/ruvnet/ruview。See [[content/ruview]]。\n\n## Supported by\n- [[claims/ruview-main-claim]]\n",
+      "excerpt": "利用WiFi物理层信道状态信息（包含每子载波的振幅和相位）感知环境变化，而非简单的信号强度。多径效应使微小的移动和生理信号都可被探测。 出处:https://github.com/ruvnet/ruview。See [[content/ruview]]。",
+      "links": [
+        {
+          "target": "content/ruview",
+          "raw": "[[content/ruview]]"
+        },
+        {
+          "target": "claims/ruview-main-claim",
+          "raw": "[[claims/ruview-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/worker-function-trigger",
+      "type": "concept",
+      "slug": "worker-function-trigger",
+      "title": "Worker Function Trigger",
+      "file": "concepts/worker-function-trigger.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Worker-Function-Trigger 原语",
+        "slug": "worker-function-trigger",
+        "kind": "concept",
+        "tags": [
+          "architecture",
+          "abstraction",
+          "backend"
+        ],
+        "maturity": "active",
+        "first_seen_in": "iii",
+        "related_content": [
+          "iii"
+        ],
+        "related_concepts": [],
+        "explanation": "将后端任意能力抽象为三个概念：Worker（进程，负责注册）、Function（工作单元，有唯一标识）、Trigger（触发条件，声明式）。所有服务都通过这套原语接入运行时，实现零集成组合。",
+        "examples": [
+          "一个 TypeScript API 服务可以是一个 Worker，内部注册了 `content::classify` 函数，通过 HTTP 端点触发"
+        ],
+        "common_misunderstandings": [
+          "Worker 不是微服务，不强制独立部署，可以是一个进程内的组件",
+          "Trigger 类型很多，但 iii 仅承诺统一路由和交付，不负责实现具体触发逻辑"
+        ],
+        "open_questions": [
+          "是否支持流式输出和 Server-Sent Events？",
+          "如何保证跨 Worker 调用的顺序性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n将后端任意能力抽象为三个概念：Worker（进程，负责注册）、Function（工作单元，有唯一标识）、Trigger（触发条件，声明式）。所有服务都通过这套原语接入运行时，实现零集成组合。 出处:https://github.com/iii-hq/iii。See [[content/iii]]。\n\n## Supported by\n- [[claims/iii-main-claim]]\n",
+      "excerpt": "将后端任意能力抽象为三个概念：Worker（进程，负责注册）、Function（工作单元，有唯一标识）、Trigger（触发条件，声明式）。所有服务都通过这套原语接入运行时，实现零集成组合。 出处:https://github.com/iii-hq/iii。See [[content/iii]]。",
+      "links": [
+        {
+          "target": "content/iii",
+          "raw": "[[content/iii]]"
+        },
+        {
+          "target": "claims/iii-main-claim",
+          "raw": "[[claims/iii-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/zero-trust-agent-identity",
+      "type": "concept",
+      "slug": "zero-trust-agent-identity",
+      "title": "Zero Trust Agent Identity",
+      "file": "concepts/zero-trust-agent-identity.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "零信任代理身份",
+        "slug": "zero-trust-agent-identity",
+        "kind": "concept",
+        "tags": [
+          "identity",
+          "zero-trust",
+          "agent"
+        ],
+        "maturity": "active",
+        "first_seen_in": "agent-governance-toolkit",
+        "related_content": [
+          "agent-governance-toolkit"
+        ],
+        "related_concepts": [],
+        "explanation": "为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。",
+        "examples": [
+          "AGT 的 Agent Mesh 使用 DID 和 mTLS 来区分同一凭证下的多个代理。"
+        ],
+        "common_misunderstandings": [
+          "零信任不是‘不信任’，而是‘从不假设可信，始终验证’。",
+          "身份本身不保证行为安全，需要结合策略引擎。"
+        ],
+        "open_questions": [
+          "在快速变化的微代理环境中，身份的生命周期管理如何自动化？",
+          "DID 和 SPIFFE 的采用成本对团队有多高？"
+        ]
+      },
+      "body": "\n## Explanation\n\n为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/agent-governance-toolkit-main-claim]]\n",
+      "excerpt": "为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。",
+      "links": [
+        {
+          "target": "content/agent-governance-toolkit",
+          "raw": "[[content/agent-governance-toolkit]]"
+        },
+        {
+          "target": "claims/agent-governance-toolkit-main-claim",
+          "raw": "[[claims/agent-governance-toolkit-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
         }
       ]
     }

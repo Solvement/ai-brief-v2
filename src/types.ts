@@ -42,6 +42,44 @@ export interface DeepDive {
 }
 
 export type ProjectDepth = "list_only" | "light" | "analysis" | "deep" | "needs_enrichment";
+export type ProjectTier = 0 | 1 | 2 | 3;
+
+/** Per-tier structured fields from the project-radar tier paradigm (2026-06-03). */
+export interface ProjectTierTemplate {
+  tier?: ProjectTier;
+  bucket?: string;
+  tag?: string;
+  one_sentence_positioning?: string;
+  what_it_does?: string;
+  metadata?: {
+    language?: string | null;
+    total_stars?: number | string;
+    stars_in_period?: number | string;
+    author?: string;
+  };
+  labels?: string[];
+  prose_body?: string;
+  // Tier 2+
+  pain_point?: string;
+  core_capabilities?: string[];
+  how_to_run?: { install_command?: string; minimal_example?: string };
+  maturity_signals?: {
+    star_velocity?: string;
+    recent_commit?: string;
+    releases?: string;
+    issue_activity?: string;
+  };
+  comparison?: string;
+  trajectory_note?: string;
+  manual_confirmation?: boolean;
+  // Tier 3+
+  how_it_works_with_analogy?: string;
+  essential_design_difference?: string;
+  practitioner_meaning?: string;
+  cross_links?: Array<{ label?: string; title?: string; url?: string; type?: string } | string>;
+  // Tier 0
+  index_only?: { name?: string; url?: string; automatic_tags?: string[] };
+}
 
 export interface AnalyzedRepo extends RepoSummary {
   rank: number;
@@ -64,6 +102,14 @@ export interface AnalyzedRepo extends RepoSummary {
   depth_decision?: Record<string, unknown>;
   briefSlug?: string;
   brief_slug?: string;
+  // ---- 2026-06-03 tier paradigm (replaces light_spine) ----
+  project_tier?: ProjectTier;
+  project_tier_label?: string;
+  project_bucket?: string;
+  bucket?: string;
+  tier_tag?: string;
+  requires_manual_confirmation?: boolean;
+  tier_template?: ProjectTierTemplate;
 }
 
 export interface Board {
@@ -192,6 +238,7 @@ export interface ModelBenchmarkItem {
   comparator: string;
   interpretation: string;
   sourceType: ModelBenchmarkSourceType;
+  attribution?: "自报" | "实测";
 }
 
 export interface ModelBenchmark {
@@ -257,9 +304,23 @@ export interface ModelClosedChangelog {
   sources: ModelSource[];
 }
 
+export interface ModelParadigm {
+  tag: string;
+  branch: "new_model" | "update" | "variant_merged";
+  access: ModelKind;
+  tier?: 0 | 1 | 2 | 3;
+  updateSize?: "light" | "medium";
+  requiresHumanConfirmation?: boolean;
+  template: "new_model_card" | "version_update" | "variant_merged";
+  card?: Record<string, unknown>;
+  update?: Record<string, unknown>;
+  variant?: Record<string, unknown>;
+}
+
 export interface ModelEntryBase extends ModelIdentity, ModelStatusCard {
   analysisGeneratedAt: string;
   analysisAuthor: string;
+  paradigm?: ModelParadigm;
 }
 
 export interface ModelOpenEntry extends ModelEntryBase {
@@ -382,18 +443,86 @@ export interface AcademicPaperAnalysis {
   arxivId?: string;
   publishedAt?: string;
   verifiedAt: string;         // RULES §6
-  tier: "deep";               // academic papers only ever produce deep
+  tier: "deep" | "light";
+  cardKind?: "deep_v2" | "light_card";
   /** 定调 — one framing line (framing, NOT good/bad). */
   leadJudgment: string;
+  hook?: string;
+  lookahead?: string[];
   meta: PaperMeta;
   /** Stage 1 · 原文: faithful, follows the paper's own section order. No AI judgment. */
-  originalReading: PaperReadingSection[];
+  originalReading?: PaperReadingSection[];
   /** Stage 2 · AI 分析: free-form critical commentary. The ONLY place judgment is allowed. */
-  analystNotes: string;
-  limitsAndFuture: AcademicPaperLimits;
+  analystNotes?: string;
+  limitsAndFuture?: AcademicPaperLimits;
   selection: AcademicPaperSelection;
   selectionAudit: SelectionAudit;
   provenance: { sourceUrl: string; evidenceKind: string };
+  paradigm?: PaperParadigm;
+  sourceContext?: {
+    hfDate?: string;
+    hfSourceUrl?: string;
+    hfUpvotes?: number;
+  };
+}
+
+/** v2 机器之心-style paper 解读 (paper-paradigm/v1). */
+export interface PaperParadigmResultFirst {
+  body?: string;
+  source_anchor?: string;
+}
+export interface PaperParadigmDesignComparison {
+  choice?: string;
+  why_not_common_alternative?: string;
+  paper_anchor?: string;
+}
+export interface PaperParadigmEvidence {
+  claim?: string;
+  reported_number?: string;
+  opponent_or_baseline?: string;
+  source_anchor?: string;
+}
+export interface PaperParadigmAblation {
+  question_answered?: string;
+  paper_report?: string;
+  source_anchor?: string;
+}
+export interface PaperParadigmSection {
+  title?: string;
+  body?: string;
+  design_comparisons?: PaperParadigmDesignComparison[];
+  evidence?: PaperParadigmEvidence[];
+  ablations?: PaperParadigmAblation[];
+}
+export interface PaperParadigmMeaning {
+  engineering?: string;
+  methodology?: string;
+  application_builder?: string;
+}
+export interface PaperParadigmLimitation {
+  limit?: string;
+  paper_anchor?: string;
+}
+export interface PaperParadigmNumericClaim {
+  value?: string;
+  claim?: string;
+  source_anchor?: string;
+}
+export interface PaperParadigm {
+  schemaVersion?: string;
+  openingTension?: string;
+  oneSentenceClaim?: string;
+  resultFirst?: PaperParadigmResultFirst | null;
+  lookahead?: string[];
+  sections?: PaperParadigmSection[];
+  meaning?: PaperParadigmMeaning | null;
+  limitations?: PaperParadigmLimitation[];
+  closingLine?: string;
+  numericClaims?: PaperParadigmNumericClaim[];
+  proseMarkdown?: string;
+  evidenceTrace?: Record<string, unknown> | null;
+  validation?: Record<string, unknown> | null;
+  authoring?: Record<string, unknown> | null;
 }
 
 export interface ArticlesData {

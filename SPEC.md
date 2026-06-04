@@ -4,6 +4,22 @@
 
 > 本 SPEC 是从零重写，不继承旧 draft 的文字；内容来自 2026-05-29 这场对话里 Kevin 亲自推导并确认的判断。
 
+## 0. 2026-06-03 现状与方向更新（最新，与下文冲突处以本节为准）
+
+**定位演进**：在原"个人 AI 情报+学习器"之上，明确对标 **机器之心式的完整 AI 资讯流**；同时它是 Kevin 个人的 **L0 学习底座**（北极星：L0 语料库 → L1 自进化 → L2 tutor → L3 research，Kevin 与 AI 都据此学习）。
+
+**活跃栏目（4 个）**：① 文章（HF Daily Papers top → 机器之心式论文解读）② 项目（GitHub Trending 日/周/月真实窗口、去重）③ 模型（HF=open + 厂商 changelog=closed）④ **AI 新闻（已激活，取代 §5 的"暂缓"）**——官方博客 RSS/HTML + Hacker News API + 科技媒体 RSS + Reddit（X 抓不到）；不限内容只要 AI 相关、分析可选、每日上限~20。Podcast 暂缓。
+
+**各栏 canonical 分析范式**（Kevin 亲自成文，存于 `docs/paradigms/{papers,projects,models}.md`）。共享家规：Tier 分级 / 关键术语中文注解 / 不编造（缺失标"数据不足·官方未披露"）/ 自报 vs 实测、已核实 vs 自称 / 深度档标 [需人工确认] / 用类比讲机制 / 不当"翻译机"（项目 Tier2/3 价值 = 成熟度判断 + 横向对比）。论文范式 = 密度分区（看点无数字、方法用类比、数字集中在结果/消融、来源走脚注不行内挂）。
+
+**分析引擎**：深度档由**强模型 codex GPT-5.5 high 读全文/源码**生成（论文读 arXiv 全文、项目 clone 读源码）——要具体（真实配置/代码/数字），不是框架草稿。质量闸 = 出生 reviewer + **独立冷读 audit**（双审，早期高覆盖）。
+
+**运行方式**：**本地订阅（Claude Code / codex），开机时本地更新（Windows 任务计划），不走云端按 token API**（Kevin 只在电脑前看，关机更新是伪需求）。廉价层（discover/light/新闻聚合）本地 DeepSeek。
+
+**视觉（取代 §4 的"B Focus Console 暗色暖金"）**：已改为 **浅色主题 + 蓝色主调**（按 Kevin 2026-06-03 用 GPT 生成并验收的 mockup）。
+
+**分工（细化 §8）**：Claude = 前端 + 架构 + 审核 + 总路由 PM；codex = 后端工程实现（自开子 agent）；**大批量/审计/多角度用 dynamic workflow**；小 bug Claude 直接改。详见 `CLAUDE.md`。
+
 ## 1. 项目画像（首要为我自己）
 
 AI Brief 首要是 **Kevin 自己用的个人 AI 情报 + 学习器**，不是给雇主看的作品集（作品集是副产品）。

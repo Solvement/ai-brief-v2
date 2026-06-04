@@ -683,7 +683,7 @@ function mergeCandidates(candidates) {
   return [...map.values()];
 }
 
-function parseHfStylePapers(html, source, sourceName, baseUrl, limit) {
+export function parseHfStylePapers(html, source, sourceName, baseUrl, limit) {
   const out = [];
   const seen = new Set();
   const anchorRe = /href="(\/papers\/([^"?#]+))"[^>]*>([\s\S]{0,500}?)<\/a>/g;
@@ -951,7 +951,7 @@ function openReviewValue(value) {
   return value;
 }
 
-function toKernelCandidate(paper, { discoveredAt }) {
+export function toKernelCandidate(paper, { discoveredAt }) {
   const raw = finalizeCandidate({ ...paper, discoveredAt: paper.discoveredAt || discoveredAt });
   return {
     id: kernelPaperId(raw),
@@ -996,7 +996,7 @@ function makeCandidate(input = {}) {
   };
 }
 
-function finalizeCandidate(input = {}) {
+export function finalizeCandidate(input = {}) {
   const candidate = makeCandidate(input);
   candidate.key = paperKey(candidate);
   candidate.id = candidate.id || candidateId(candidate);
@@ -1004,7 +1004,7 @@ function finalizeCandidate(input = {}) {
   return candidate;
 }
 
-function paperEvidence(candidateId, paper, { sourceText, fullText, fetchedAt, maxChars }) {
+export function paperEvidence(candidateId, paper, { sourceText, fullText, fetchedAt, maxChars }) {
   const sections = [];
   const lines = [];
 
@@ -1063,7 +1063,7 @@ async function fetchSourcePageText(url, options = {}) {
   return stripTags(html).slice(0, numberOption(options.sourcePageMaxChars, 12000));
 }
 
-async function fetchFullPaperText(paper, options = {}) {
+export async function fetchFullPaperText(paper, options = {}) {
   for (const candidate of fullTextUrlCandidates(paper)) {
     try {
       const fetched = candidate.kind === "pdf"

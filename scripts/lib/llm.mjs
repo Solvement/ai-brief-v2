@@ -1,3 +1,5 @@
+import { jsonrepair } from "jsonrepair";
+
 export function deepseekBaseUrl(env = process.env) {
   return env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
 }
@@ -11,9 +13,30 @@ export function projectDeepModel(env = process.env) {
 }
 
 export function parseJson(raw) {
-  let s = raw.trim();
-  if (s.startsWith("```")) s = s.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
-  return JSON.parse(s);
+  const s = stripMarkdownFences(String(raw || ""));
+  const balanced = extractBalancedJsonObject(s);
+  const candidates = uniqueCandidates([s, balanced]);
+  let lastError;
+  for (const candidate of candidates) {
+    for (const normalized of jsonSyntaxCandidates(candidate)) {
+      try {
+        return JSON.parse(normalized);
+      } catch (error) {
+        lastError = error;
+      }
+    }
+  }
+
+  for (const candidate of uniqueCandidates([balanced])) {
+    for (const normalized of jsonSyntaxCandidates(candidate)) {
+      try {
+        return JSON.parse(jsonrepair(normalized));
+      } catch (error) {
+        lastError = error;
+      }
+    }
+  }
+  throw lastError || new SyntaxError("No JSON content to parse");
 }
 
 export function createDeepSeekClient({
@@ -48,8 +71,13 @@ export function createDeepSeekClient({
           throw new Error(`DeepSeek ${r.status}: ${e.slice(0, 200)}`);
         }
         const d = await r.json();
-        const c = d?.choices?.[0]?.message?.content;
+        const choice = d?.choices?.[0];
+        const finishReason = choice?.finish_reason;
+        const c = choice?.message?.content;
         if (!c) throw new Error("empty content");
+        if (finishReason === "length") {
+          logger?.warn?.(`DeepSeek finish_reason=length; output may be truncated (model=${selectedModel}, max_tokens=${body.max_tokens})`);
+        }
         return c;
       } catch (e) {
         lastErr = e;
@@ -85,4 +113,145 @@ export function createDeepSeekClient({
   }
 
   return { chat, chatJson };
+}
+
+function stripMarkdownFences(value) {
+  const trimmed = String(value || "").trim();
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  return fenced ? fenced[1].trim() : trimmed;
+}
+
+function extractBalancedJsonObject(value) {
+  const start = value.indexOf("{");
+  if (start < 0) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let index = start; index < value.length; index += 1) {
+    const char = value[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === "\"") {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === "\"") {
+      inString = true;
+    } else if (char === "{") {
+      depth += 1;
+    } else if (char === "}") {
+      depth -= 1;
+      if (depth === 0) return value.slice(start, index + 1);
+    }
+  }
+
+  return null;
+}
+
+function removeTrailingCommas(value) {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+
+  for (let index = 0; index < value.length; index += 1) {
+    const char = value[index];
+    if (inString) {
+      out += char;
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === "\"") {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === "\"") {
+      inString = true;
+      out += char;
+      continue;
+    }
+
+    if (char === ",") {
+      let next = index + 1;
+      while (/\s/.test(value[next] || "")) next += 1;
+      if (value[next] === "}" || value[next] === "]") continue;
+    }
+    out += char;
+  }
+
+  return out;
+}
+
+function removeMismatchedClosingBrackets(value) {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+  let removed = false;
+  const stack = [];
+
+  for (let index = 0; index < value.length; index += 1) {
+    const char = value[index];
+    if (inString) {
+      out += char;
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === "\"") {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === "\"") {
+      inString = true;
+      out += char;
+      continue;
+    }
+
+    if (char === "{" || char === "[") {
+      stack.push(char);
+      out += char;
+      continue;
+    }
+
+    if (char === "}" || char === "]") {
+      const expected = char === "}" ? "{" : "[";
+      if (stack.at(-1) === expected) {
+        stack.pop();
+        out += char;
+      } else {
+        removed = true;
+      }
+      continue;
+    }
+
+    out += char;
+  }
+
+  return removed ? out : value;
+}
+
+function jsonSyntaxCandidates(candidate) {
+  const withoutTrailingCommas = removeTrailingCommas(candidate);
+  const withoutMismatchedClosers = removeMismatchedClosingBrackets(candidate);
+  return uniqueCandidates([
+    candidate,
+    withoutTrailingCommas,
+    withoutMismatchedClosers,
+    removeTrailingCommas(withoutMismatchedClosers),
+  ]);
+}
+
+function uniqueCandidates(candidates) {
+  return [...new Set(candidates.filter((candidate) => typeof candidate === "string" && candidate.trim()))];
 }

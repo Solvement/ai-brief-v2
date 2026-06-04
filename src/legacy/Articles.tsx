@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { loadArticles } from "../lib/data";
 import { SiteHeader } from "../components/SiteHeader";
+import { ProseMarkdown } from "../components/ProseMarkdown";
 
 interface Props {
   paperId?: string;
@@ -138,17 +139,16 @@ function ArticlesIndex({ data }: { data: ArticlesData }) {
         <section className="articles-intro">
           <div>
             <div className="eyebrow">Academic · 学术精读</div>
-            <h1>先读原文，自己想；再看 AI 怎么说</h1>
+            <h1>一篇论文，机器之心式读法读完</h1>
             <p>
-              选题闸门按<b> 学术信誉(顶会评奖 × 跨平台被引 × 新颖性) </b>替你把关，能进来的都值得读。点开是<b>两段式精读</b>：先顺论文原文结构、忠实翻译总结、罗列关键图表数据让你形成判断，再读一段有依据、有理由的 AI 深度点评。
+              选题闸门按<b> 学术信誉(顶会评奖 × 跨平台被引 × 新颖性) </b>替你把关，能进来的都值得读。点开是<b>机器之心式解读</b>：先讲清这篇要解决的<b>问题</b>，再把核心<b>结果</b>摆在最前面，列出值得关注的<b>看点</b>，最后用大白话给一段有依据的<b>带读解读</b>。
             </p>
           </div>
           <div className="article-read-model">
-            <span>顺原文</span>
-            <span>翻译总结</span>
-            <span>关键图表</span>
-            <span>分隔</span>
-            <span>AI 分析</span>
+            <span>问题驱动</span>
+            <span>结果先看</span>
+            <span>看点先读</span>
+            <span>带读解读</span>
           </div>
         </section>
 
@@ -184,19 +184,31 @@ function ArticlesIndex({ data }: { data: ArticlesData }) {
 
 function ArticleCard({ paper }: { paper: AcademicPaperAnalysis }) {
   const meta = paper.meta;
-  const sectionCount = paper.originalReading?.length || 0;
+  const isLight = paper.tier === "light";
+  const pa = paper.paradigm;
+  // Result-forward: prefer the v2 one-sentence claim / hook for the lead line.
+  const hook = pa?.oneSentenceClaim || paper.hook || paper.leadJudgment;
+  const lookahead = pa?.lookahead?.length ? pa.lookahead : paper.lookahead;
   return (
-    <a className="article-card" href={`/articles/${encodeURIComponent(paper.id)}`}>
+    <a className={`article-card ${isLight ? "article-card-light" : ""}`} href={`/articles/${encodeURIComponent(paper.id)}`}>
       <div className="article-card-top">
         <div className="article-card-source">
           <span>{paper.venue || paper.sourceName}</span>
           {paper.arxivId ? <span className="muted-mono">{paper.arxivId}</span> : null}
         </div>
-        {meta?.paperType ? <b className="ac-type">{PT_LABEL[meta.paperType] || meta.paperType}</b> : null}
+        <span className={`ac-tier ac-tier-${isLight ? "light" : "deep"}`}>{isLight ? "速读" : "深度解读"}</span>
       </div>
       <h2 className="article-title">{paper.title}</h2>
-      <p className="article-lead">{paper.leadJudgment}</p>
+      <p className="article-lead">{hook}</p>
+      {lookahead?.length ? (
+        <ul className="article-lookahead">
+          {lookahead.slice(0, 3).map((point) => <li key={point}>{point}</li>)}
+        </ul>
+      ) : null}
       <div className="article-card-badges">
+        {!isLight && meta?.paperType ? (
+          <span className="ac-type">{PT_LABEL[meta.paperType] || meta.paperType}</span>
+        ) : null}
         {meta?.venueStatus ? (
           <span className={`ac-venue ac-venue-${meta.venueStatus}`}>{VS_LABEL[meta.venueStatus] || meta.venueStatus}</span>
         ) : null}
@@ -210,7 +222,7 @@ function ArticleCard({ paper }: { paper: AcademicPaperAnalysis }) {
         </div>
       ) : null}
       <div className="article-card-foot">
-        <span>{sectionCount ? `精读 ${sectionCount} 节` : "学术精读"}</span>
+        <span>{isLight ? "快速一览" : "完整解读"}</span>
         <span>核验于 {formatDate(paper.verifiedAt)}</span>
       </div>
     </a>
@@ -218,6 +230,11 @@ function ArticleCard({ paper }: { paper: AcademicPaperAnalysis }) {
 }
 
 function ArticleDetail({ paper, generatedAt }: { paper: AcademicPaperAnalysis; generatedAt: string }) {
+  const pa = paper.paradigm;
+  // v2 机器之心-style 解读: render the full prose_markdown reading page.
+  if (pa?.proseMarkdown) return <PaperDetailV2 paper={paper} generatedAt={generatedAt} />;
+  // Light papers without v2 prose: compact reading.
+  if (paper.tier === "light") return <PaperDetailLight paper={paper} generatedAt={generatedAt} />;
   const reading = paper.originalReading || [];
   return (
     <>
@@ -274,7 +291,7 @@ function ArticleDetail({ paper, generatedAt }: { paper: AcademicPaperAnalysis; g
             <section className="reading-stage">
               <div className="stage-tag stage-tag-analyst">第二段 · AI 深度点评<small>有依据 · 有理由 · 有意义</small></div>
               <div className="analyst-notes">
-                <MarkdownLite text={paper.analystNotes} />
+                <MarkdownLite text={paper.analystNotes || ""} />
               </div>
             </section>
 
@@ -306,6 +323,116 @@ function ArticleDetail({ paper, generatedAt }: { paper: AcademicPaperAnalysis; g
 
           <ReadingNav sections={reading} />
         </div>
+      </main>
+    </>
+  );
+}
+
+/* ── v2 机器之心-style paper 解读 (paradigm.proseMarkdown) ── */
+function PaperDetailV2({ paper, generatedAt }: { paper: AcademicPaperAnalysis; generatedAt: string }) {
+  const pa = paper.paradigm!;
+  const lookahead = pa.lookahead?.length ? pa.lookahead : paper.lookahead;
+  const resultBody = pa.resultFirst?.body;
+  return (
+    <>
+      <SiteHeader active="articles" meta={`Articles 更新于 ${formatDate(generatedAt)}`} />
+      <main className="detail article-detail paper-v2">
+        <div className="breadcrumb">
+          <a href="/articles">Articles</a><span className="sep">/</span><span>{paper.title}</span>
+        </div>
+
+        <section className="paper-hero paper-v2-hero">
+          <div className="eyebrow">{paper.venue || paper.sourceName} · 深度解读</div>
+          <h1>{paper.title}</h1>
+          {pa.oneSentenceClaim ? <p className="paper-lead">{pa.oneSentenceClaim}</p> : null}
+          <div className="paper-meta-strip">
+            <span>{paper.authors}</span>
+            <span className="sep">·</span>
+            <a href={paper.provenance?.sourceUrl || paper.sourceUrl} target="_blank" rel="noreferrer">{paper.sourceName}</a>
+            {paper.arxivId ? <><span className="sep">·</span><span className="muted-mono">{paper.arxivId}</span></> : null}
+            <span className="sep">·</span>
+            <span className="muted-mono">核验于 {formatDate(paper.verifiedAt)}</span>
+          </div>
+          <div className="paper-hero-badges">
+            {paper.meta?.paperType ? <span className="ac-type">{PT_LABEL[paper.meta.paperType] || paper.meta.paperType}</span> : null}
+            {paper.meta?.venueStatus ? <span className={`ac-venue ac-venue-${paper.meta.venueStatus}`}>{VS_LABEL[paper.meta.venueStatus] || paper.meta.venueStatus}</span> : null}
+          </div>
+          <p className="paper-selfreport-note">📊 本页所有 benchmark 数字均为<strong>论文自报</strong>，非第三方实测。</p>
+        </section>
+
+        <div className="paper-v2-layout">
+          <div className="paper-v2-main">
+            {resultBody ? (
+              <aside className="paper-result-first">
+                <span className="paper-result-kicker">结果先看</span>
+                <p>{resultBody}</p>
+                {pa.resultFirst?.source_anchor ? (
+                  <span className="paper-result-anchor">出处：{pa.resultFirst.source_anchor}</span>
+                ) : null}
+              </aside>
+            ) : null}
+
+            {lookahead?.length ? (
+              <section className="paper-lookahead-box">
+                <span className="paper-result-kicker">看点先读</span>
+                <ul>
+                  {lookahead.map((p) => <li key={p}>{p}</li>)}
+                </ul>
+              </section>
+            ) : null}
+
+            <article className="paper-v2-prose">
+              <ProseMarkdown text={pa.proseMarkdown!} dropLeadingH1 />
+            </article>
+
+            {pa.closingLine ? <p className="paper-closing">{pa.closingLine}</p> : null}
+
+            <section className="paper-provenance">
+              <span>来源</span>
+              <a href={paper.provenance?.sourceUrl || paper.sourceUrl} target="_blank" rel="noreferrer">
+                {paper.provenance?.sourceUrl || paper.sourceUrl}
+              </a>
+            </section>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+
+/* ── Light paper: compact reading (hook + 看点), no heavy detail. ── */
+function PaperDetailLight({ paper, generatedAt }: { paper: AcademicPaperAnalysis; generatedAt: string }) {
+  const lookahead = paper.paradigm?.lookahead?.length ? paper.paradigm.lookahead : paper.lookahead;
+  return (
+    <>
+      <SiteHeader active="articles" meta={`Articles 更新于 ${formatDate(generatedAt)}`} />
+      <main className="detail article-detail paper-light-detail">
+        <div className="breadcrumb">
+          <a href="/articles">Articles</a><span className="sep">/</span><span>{paper.title}</span>
+        </div>
+        <section className="paper-hero">
+          <div className="eyebrow">{paper.venue || paper.sourceName} · 速读</div>
+          <h1>{paper.title}</h1>
+          {paper.hook ? <p className="paper-lead">{paper.hook}</p> : null}
+          <div className="paper-meta-strip">
+            <span>{paper.authors}</span>
+            <span className="sep">·</span>
+            <a href={paper.provenance?.sourceUrl || paper.sourceUrl} target="_blank" rel="noreferrer">{paper.sourceName}</a>
+            {paper.arxivId ? <><span className="sep">·</span><span className="muted-mono">{paper.arxivId}</span></> : null}
+          </div>
+        </section>
+        {lookahead?.length ? (
+          <section className="paper-lookahead-box">
+            <span className="paper-result-kicker">看点</span>
+            <ul>{lookahead.map((p) => <li key={p}>{p}</li>)}</ul>
+          </section>
+        ) : null}
+        <section className="paper-provenance">
+          <span>来源</span>
+          <a href={paper.provenance?.sourceUrl || paper.sourceUrl} target="_blank" rel="noreferrer">
+            {paper.provenance?.sourceUrl || paper.sourceUrl}
+          </a>
+        </section>
       </main>
     </>
   );

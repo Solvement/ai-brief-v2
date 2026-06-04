@@ -1,0 +1,714 @@
+#!/usr/bin/env node
+
+import { spawn } from "node:child_process";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { openAiBriefDb } from "../../lib/db.mjs";
+import { parseJson } from "../../lib/llm.mjs";
+import { publishBriefMirror, isProjectAlreadyDeepDived } from "./brief-pipeline.mjs";
+import { writeProjectBriefWikiEntities } from "./brief-writer.mjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..", "..", "..");
+const TRENDING_FILE = path.join(ROOT, "public", "data", "trending.json");
+const DEFAULT_WIKI_ROOT = "brief-wiki";
+const TIER_TEMPLATE_SCHEMA_VERSION = "project-tier-template/v1";
+const CODEX_DEEP_MODEL = "gpt-5.5";
+// Deep-dive default = high: at high, codex clones + reads the repo source, which is
+// what produces concrete (not framework-sketch) analysis. See memory: analysis-concreteness
+// + deepdive-model-cost-strategy. Override per-run with --reasoning-effort=medium to save quota.
+const CODEX_REASONING_EFFORT = "high";
+
+export async function main(argv = process.argv.slice(2)) {
+  const options = parseArgs(argv);
+  if (options.help) {
+    printUsage();
+    return null;
+  }
+
+  const db = await openAiBriefDb(options.dbPath);
+  options.db = db;
+
+  try {
+    await mkdir(options.logRoot, { recursive: true });
+    const records = selectAuthoringRecords(loadProjectRecords(db, options), options);
+    const results = [];
+
+    for (const record of records) {
+      const repo = record.repo.fullName || record.candidate.id;
+      try {
+        if (!options.force && isProjectAlreadyDeepDived(record.candidate, options)) {
+          results.push({ repo, status: "skipped", reason: "already_deep_dived" });
+          console.log(`codex deep-dive skipped ${repo}: already deep-dived`);
+          continue;
+        }
+
+        const result = await authorOneDeepDive(record, options);
+        results.push(result);
+        console.log(`codex deep-dive generated ${repo}: ${result.slug}`);
+      } catch (error) {
+        const fallback = markNeedsEnrichment(record, error, options);
+        results.push(fallback);
+        console.warn(`codex deep-dive failed ${repo}: ${error.message}`);
+      }
+    }
+
+    let briefMirror = null;
+    if (options.build) {
+      briefMirror = await publishBriefMirror({ options, logger: console });
+    }
+
+    const summary = {
+      generatedAt: nowIso(options),
+      integration: "decoupled-codex-deep-dive-authoring",
+      model: options.model,
+      model_reasoning_effort: options.reasoningEffort,
+      command_template: codexCommandTemplate(options),
+      logRoot: relativeToRoot(options.logRoot),
+      results,
+      briefMirror,
+    };
+    const summaryPath = path.join(options.logRoot, "summary.json");
+    await writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
+    console.log(JSON.stringify({ summaryPath, results }, null, 2));
+    return summary;
+  } finally {
+    db.close();
+  }
+}
+
+export function parseArgs(argv = []) {
+  const stamp = new Date().toISOString().replace(/[:.]/g, "").slice(0, 15);
+  const options = {
+    repos: [],
+    limit: 1,
+    candidateLimit: 1000,
+    wikiRoot: DEFAULT_WIKI_ROOT,
+    logRoot: path.join(ROOT, "logs", `codex-deepdive-${stamp}`),
+    model: CODEX_DEEP_MODEL,
+    reasoningEffort: CODEX_REASONING_EFFORT,
+    codexBin: "codex",
+    timeoutMs: Number(process.env.PROJECT_CODEX_DEEP_DIVE_TIMEOUT_MS) || 20 * 60 * 1000,
+    build: true,
+    updateTrending: true,
+    force: false,
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    const nextValue = () => {
+      if (index + 1 >= argv.length) throw new Error(`Missing value for ${arg}`);
+      return argv[++index];
+    };
+
+    if (arg === "--help" || arg === "-h") options.help = true;
+    else if (arg === "--repo") options.repos.push(nextValue());
+    else if (arg.startsWith("--repo=")) options.repos.push(valueAfterEquals(arg));
+    else if (arg === "--limit") options.limit = numberOption(nextValue(), options.limit);
+    else if (arg.startsWith("--limit=")) options.limit = numberOption(valueAfterEquals(arg), options.limit);
+    else if (arg === "--candidate-limit") options.candidateLimit = numberOption(nextValue(), options.candidateLimit);
+    else if (arg.startsWith("--candidate-limit=")) options.candidateLimit = numberOption(valueAfterEquals(arg), options.candidateLimit);
+    else if (arg === "--db") options.dbPath = nextValue();
+    else if (arg.startsWith("--db=")) options.dbPath = valueAfterEquals(arg);
+    else if (arg === "--wiki-root") options.wikiRoot = nextValue();
+    else if (arg.startsWith("--wiki-root=")) options.wikiRoot = valueAfterEquals(arg);
+    else if (arg === "--log-root") options.logRoot = path.resolve(ROOT, nextValue());
+    else if (arg.startsWith("--log-root=")) options.logRoot = path.resolve(ROOT, valueAfterEquals(arg));
+    else if (arg === "--model") options.model = nextValue();
+    else if (arg.startsWith("--model=")) options.model = valueAfterEquals(arg);
+    else if (arg === "--reasoning-effort") options.reasoningEffort = nextValue();
+    else if (arg.startsWith("--reasoning-effort=")) options.reasoningEffort = valueAfterEquals(arg);
+    else if (arg === "--codex-bin") options.codexBin = nextValue();
+    else if (arg.startsWith("--codex-bin=")) options.codexBin = valueAfterEquals(arg);
+    else if (arg === "--timeout-ms") options.timeoutMs = numberOption(nextValue(), options.timeoutMs);
+    else if (arg.startsWith("--timeout-ms=")) options.timeoutMs = numberOption(valueAfterEquals(arg), options.timeoutMs);
+    else if (arg === "--force") options.force = true;
+    else if (arg === "--no-build") options.build = false;
+    else if (arg === "--no-trending") options.updateTrending = false;
+    else if (!arg.startsWith("--")) options.repos.push(arg);
+    else throw new Error(`Unexpected argument: ${arg}`);
+  }
+
+  options.logRoot = path.resolve(ROOT, options.logRoot);
+  return options;
+}
+
+export function loadProjectRecords(db, options = {}) {
+  return db.listCandidates({ column: "projects", limit: options.candidateLimit || 1000 })
+    .map((candidate) => {
+      const analyses = db.listAnalyses(candidate.id);
+      const lightRows = analyses.filter((analysis) => analysis.tier === "light");
+      const lightRow = lightRows.find((analysis) => analysis.payload?.final_depth === "deep" || analysis.payload?.depth_decision?.final_depth === "deep")
+        || lightRows[0];
+      const briefWikiRow = analyses.find((analysis) => analysis.tier === "brief-wiki");
+      const evidenceRows = db.listEvidence(candidate.id);
+      const evidence = evidenceRows.find((row) => row.kind === "readme") || evidenceRows[0] || null;
+      const light = lightRow?.payload || {};
+      const finalDepth = light.final_depth || light.depth_decision?.final_depth || null;
+      return {
+        candidate,
+        repo: candidate.raw || {},
+        evidence,
+        light,
+        finalDepth,
+        lightRow,
+        briefWikiRow,
+      };
+    });
+}
+
+export function selectAuthoringRecords(records, options = {}) {
+  const byRepo = new Map(records.map((record) => [normalizeRepoFullName(record.repo.fullName || record.repo.url), record]));
+  if (options.repos?.length) {
+    return options.repos.map((repoArg) => {
+      const record = byRepo.get(normalizeRepoFullName(repoArg));
+      if (!record) throw new Error(`Repo not found in project DB: ${repoArg}`);
+      return record;
+    });
+  }
+
+  return records
+    .filter((record) => record.finalDepth === "deep")
+    .filter((record) => options.force || !record.briefWikiRow)
+    .slice(0, options.limit || 1);
+}
+
+async function authorOneDeepDive(record, options = {}) {
+  const repo = record.repo;
+  const repoLabel = repo.fullName || record.candidate.id;
+  const safeRepo = slugify(repoLabel.replace("/", "__"));
+  const itemLogDir = path.join(options.logRoot, safeRepo);
+  const checkoutDir = path.join(itemLogDir, "checkout");
+  const responsePath = path.join(itemLogDir, "codex-last-message.json");
+  const schemaPath = path.join(itemLogDir, "output-schema.json");
+  const promptPath = path.join(itemLogDir, "prompt.md");
+
+  await mkdir(itemLogDir, { recursive: true });
+  await mkdir(checkoutDir, { recursive: true });
+  await writeFile(schemaPath, `${JSON.stringify(codexOutputSchema(), null, 2)}\n`, "utf8");
+
+  const prompt = buildCodexAuthorPrompt({
+    candidate: record.candidate,
+    repo,
+    evidence: record.evidence,
+    triage: record.light,
+    checkoutDir,
+  });
+  await writeFile(promptPath, prompt, "utf8");
+
+  const invocation = await runCodexExec({
+    prompt,
+    outputPath: responsePath,
+    schemaPath,
+    itemLogDir,
+    options,
+  });
+
+  const rawMessage = await readFile(responsePath, "utf8");
+  const parsed = parseJson(rawMessage);
+  const payload = normalizeCodexPayload(parsed, {
+    repo,
+    invocation,
+    responsePath,
+    promptPath,
+  });
+  const rawJsonPath = path.join(itemLogDir, "author-payload.json");
+  await writeFile(rawJsonPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+
+  const triage = {
+    ...record.light,
+    final_depth: "deep",
+    depth_decision: {
+      ...(record.light.depth_decision || {}),
+      final_depth: "deep",
+      max_allowed_depth: record.light.max_allowed_depth || record.light.depth_decision?.max_allowed_depth || "deep",
+      needs_enrichment: false,
+    },
+  };
+  const written = await writeProjectBriefWikiEntities({
+    candidate: record.candidate,
+    evidence: record.evidence || {},
+    triage,
+    deepDive: payload,
+    options,
+    logger: console,
+  });
+
+  const generatedAt = nowIso(options);
+  const dbPayload = {
+    repo: repoLabel,
+    slug: written.slug,
+    final_depth: "deep",
+    depth_decision: triage.depth_decision,
+    paths: written.paths,
+    entitySlugs: written.entitySlugs,
+    triage: summarizeTriage(triage),
+    artifactAudit: record.evidence?.artifactAudit || record.evidence?.metadata?.artifactAudit || null,
+    authoring: payload.authoring,
+    rawPayload: relativeToRoot(rawJsonPath),
+  };
+
+  let analysisId = null;
+  if (options.db) {
+    const row = options.db.insertAnalysis({
+      candidateId: record.candidate.id,
+      tier: "brief-wiki",
+      payload: dbPayload,
+      model: authoringModelLabel(options),
+      generatedAt,
+    });
+    analysisId = row.id;
+    options.db.recordRun({
+      id: `projects-codex-deep-dive:${record.candidate.id}:${Date.now()}`,
+      column: "projects",
+      stage: "codex-deep-dive",
+      status: "pass",
+      metrics: {
+        repo: repoLabel,
+        slug: written.slug,
+        model: options.model,
+        model_reasoning_effort: options.reasoningEffort,
+      },
+      ranAt: generatedAt,
+    });
+  }
+
+  const trending = options.updateTrending
+    ? await backfillTrendingBriefSlug({ repoFullName: repoLabel, slug: written.slug, options })
+    : null;
+
+  return {
+    repo: repoLabel,
+    status: "generated",
+    slug: written.slug,
+    analysisId,
+    paths: written.paths,
+    rawPayload: rawJsonPath,
+    prompt: promptPath,
+    invocation: invocation.invocationPath,
+    trending,
+  };
+}
+
+function normalizeCodexPayload(input = {}, { repo, invocation, responsePath, promptPath } = {}) {
+  if (!input.tier_template && !input.tierTemplate) {
+    throw new Error("codex response missing tier_template");
+  }
+  return {
+    ...input,
+    schema_version: input.schema_version || TIER_TEMPLATE_SCHEMA_VERSION,
+    project_type: input.project_type || input.projectType,
+    authoring: {
+      method: "codex-exec",
+      model: invocation.model,
+      model_reasoning_effort: invocation.model_reasoning_effort,
+      command: invocation.command,
+      prompt: relativeToRoot(promptPath),
+      raw_response: relativeToRoot(responsePath),
+      invoked_at: invocation.startedAt,
+      completed_at: invocation.finishedAt,
+      repo: repo.fullName || repo.url || "",
+    },
+  };
+}
+
+async function runCodexExec({ prompt, outputPath, schemaPath, itemLogDir, options = {} }) {
+  const startedAt = nowIso(options);
+  const codexArgs = [
+    "exec",
+    "-c",
+    `model_reasoning_effort="${options.reasoningEffort}"`,
+    "-m",
+    options.model,
+    "-s",
+    "danger-full-access",
+    "-C",
+    ROOT,
+    "--color",
+    "never",
+    "--output-last-message",
+    outputPath,
+    "-",
+  ];
+  const resolved = resolveCodexCommand(options);
+  const spawnArgs = [...resolved.argsPrefix, ...codexArgs];
+  const command = [resolved.command, ...spawnArgs].map(quoteArg).join(" ");
+  const invocationPath = path.join(itemLogDir, "codex-invocation.json");
+  await writeFile(invocationPath, `${JSON.stringify({
+    command,
+    argv: [resolved.command, ...spawnArgs],
+    codexArgv: [options.codexBin, ...codexArgs],
+    model: options.model,
+    model_reasoning_effort: options.reasoningEffort,
+    startedAt,
+  }, null, 2)}\n`, "utf8");
+
+  const result = await spawnWithInput(resolved.command, spawnArgs, prompt, {
+    cwd: ROOT,
+    timeoutMs: options.timeoutMs,
+  });
+  const finishedAt = nowIso(options);
+  await writeFile(path.join(itemLogDir, "codex-stdout.log"), result.stdout, "utf8");
+  await writeFile(path.join(itemLogDir, "codex-stderr.log"), result.stderr, "utf8");
+
+  const invocation = {
+    command,
+    model: options.model,
+    model_reasoning_effort: options.reasoningEffort,
+    startedAt,
+    finishedAt,
+    exitCode: result.code,
+    invocationPath,
+  };
+  await writeFile(invocationPath, `${JSON.stringify(invocation, null, 2)}\n`, "utf8");
+
+  if (result.code !== 0) {
+    throw new Error(`codex exec exited ${result.code}: ${lastLines(result.stderr || result.stdout, 8)}`);
+  }
+  return invocation;
+}
+
+function spawnWithInput(command, args, input, { cwd, timeoutMs }) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd,
+      windowsHide: true,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGTERM");
+    }, timeoutMs);
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (timedOut) {
+        reject(new Error(`codex exec timed out after ${timeoutMs}ms`));
+        return;
+      }
+      resolve({ code, stdout, stderr });
+    });
+    child.stdin.end(input);
+  });
+}
+
+function markNeedsEnrichment(record, error, options = {}) {
+  const repo = record.repo.fullName || record.candidate.id;
+  const message = error?.message || String(error);
+  const generatedAt = nowIso(options);
+  const payload = {
+    ...(record.light || {}),
+    final_depth: "needs_enrichment",
+    needs_enrichment: true,
+    recommended_action: "monitor",
+    reason: `codex_deep_dive_failed: ${message}`,
+    rejection_reasons: unique([...(record.light.rejection_reasons || []), "codex_deep_dive_failed"]),
+    review_verdict: "not_applicable",
+    review_issues: unique([...(record.light.review_issues || []), "codex_deep_dive_failed"]),
+    depth_decision: {
+      ...(record.light.depth_decision || {}),
+      final_depth: "needs_enrichment",
+      needs_enrichment: true,
+      recommended_action: "monitor",
+      rejection_reasons: unique([...(record.light.depth_decision?.rejection_reasons || []), "codex_deep_dive_failed"]),
+    },
+  };
+
+  let analysisId = null;
+  if (options.db) {
+    options.db.upsertEval({
+      candidateId: record.candidate.id,
+      decision: "needs_enrichment",
+      mode: "codex-deep-dive-fallback",
+      score: Number(record.light.ranking_score || record.light.worthDeepDive || 0),
+      signals: unique([...(record.light.signals || []), "final_depth:needs_enrichment", "codex_deep_dive_failed"]),
+      reason: payload.reason,
+      evaluatedAt: generatedAt,
+    });
+    const row = options.db.insertAnalysis({
+      candidateId: record.candidate.id,
+      tier: "light",
+      payload,
+      model: "project-codex-deep-dive-fallback",
+      generatedAt,
+    });
+    analysisId = row.id;
+    options.db.recordRun({
+      id: `projects-codex-deep-dive:${record.candidate.id}:fail:${Date.now()}`,
+      column: "projects",
+      stage: "codex-deep-dive",
+      status: "fail",
+      metrics: { repo, error: message },
+      ranAt: generatedAt,
+    });
+  }
+
+  return {
+    repo,
+    status: "needs_enrichment",
+    generated: false,
+    analysisId,
+    error: message,
+  };
+}
+
+async function backfillTrendingBriefSlug({ repoFullName, slug, options = {} }) {
+  let data;
+  try {
+    data = JSON.parse(await readFile(TRENDING_FILE, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return { file: TRENDING_FILE, touched: 0, missing: true };
+    throw error;
+  }
+
+  let touched = 0;
+  for (const boardName of ["radar", "daily", "weekly", "monthly"]) {
+    const repos = data[boardName]?.repos || [];
+    for (const repo of repos) {
+      if (normalizeRepoFullName(repo.fullName || repo.url) !== normalizeRepoFullName(repoFullName)) continue;
+      repo.briefSlug = slug;
+      repo.brief_slug = slug;
+      touched += 1;
+    }
+  }
+
+  data.analysisModels = {
+    ...(data.analysisModels || {}),
+    projectDeep: authoringModelLabel(options),
+  };
+  data.deepDiveAuthoring = {
+    ...(data.deepDiveAuthoring || {}),
+    method: "decoupled-codex-exec",
+    model: options.model,
+    model_reasoning_effort: options.reasoningEffort,
+    lastBackfillAt: nowIso(options),
+  };
+
+  await writeFile(TRENDING_FILE, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+  return { file: TRENDING_FILE, touched };
+}
+
+function buildCodexAuthorPrompt({ candidate, repo, evidence, triage, checkoutDir }) {
+  return `You are the AI-Brief project deep-dive author.
+
+Task: author one Chinese project deep-dive for ${repo.fullName || repo.url}.
+
+Hard requirements:
+- You MUST autonomously inspect the real upstream repository, not only the enrichment README below.
+- Clone or otherwise read the real repo into this temporary directory: ${checkoutDir}
+- Read README plus deeper docs/examples/config/package files when present. Use source anchors that name the file/section, e.g. （来源：README Quickstart）, （来源：docs/policy.md）, （来源：package.json scripts）.
+- Do not edit the AI-Brief workspace. The caller will write brief-wiki files.
+- Use Chinese plain-language two-layer writing: first explain in human language, then define technical terms.
+- No fabrication: undocumented facts become 未知/未在 README/docs/tree 说明.
+- README, badges, benchmark, marketing, "supports N", "fastest/best/only" claims must be attributed as 自称. Facts you verify from files/tree/package config can be 已核实.
+- Keep exact numbers and wording. Do not round, infer, or fill counts.
+- Do not write speculation as fact. Avoid 可能/也许/应该/看起来/大概.
+- Keep body size proportional to evidence. No padding.
+
+Return only a JSON object matching this schema shape:
+{
+  "schema_version": "${TIER_TEMPLATE_SCHEMA_VERSION}",
+  "repo": "owner/name",
+  "project_type": "agent_framework|devtool_cli|ai_app|model_infra|frontend_ui|dataset_benchmark|library_sdk|template_boilerplate|non_ai_eng",
+  "tier_template": {
+    "one_sentence": {"summary": "...", "body_md": "..."},
+    "why_worth_attention": {"body_md": "...", "bullets": ["..."]},
+    "key_claims_evidence": {
+      "body_md": "...",
+      "items": [
+        {"claim": "...", "plain_english": "...", "source": "...", "attribution": "自称|已核实", "evidence_strength": "high|medium|low|none", "supports": "...", "does_not_support": "...", "threat": "..."}
+      ]
+    },
+    "how_it_works": {"body_md": "..."},
+    "reusable_abstractions": {"body_md": "...", "items": [{"name": "...", "copy": "...", "skip": "...", "why_it_matters": "..."}]},
+    "dependency_platform_risk": {"body_md": "...", "items": [{"dependency": "...", "what_if_change": "...", "exposure": "high|medium|low|unknown", "mitigation_or_unknown": "...", "source": "..."}]},
+    "unknowns_to_confirm": {"body_md": "...", "items": ["..."]},
+    "judgment": {"action": "skip|watch|read-docs|clone-and-run|extract-pattern", "ratings": {"相关度": 1, "工程深度": 1, "复用价值": 1, "成熟度": 1}, "body_md": "..."}
+  },
+  "concepts": [
+    {"slug": "lowercase-hyphen", "name": "...", "explanation": "...", "tags": ["..."], "maturity": "stable|active|emerging|deprecated", "examples": ["..."], "common_misunderstandings": ["..."], "open_questions": ["..."]}
+  ],
+  "artifact": {"artifact_type": "repo", "url": "${repo.url || ""}", "official_or_third_party": "official", "status": "available|partial|missing|broken|on_hold", "license": "...", "runnable": "yes|no|unknown", "missing_parts": ["..."], "last_checked": "${new Date().toISOString().slice(0, 10)}", "summary": "..."}
+}
+
+Concreteness contract:
+- Every tier_template section must contain specific, concrete detail extracted from the actual upstream repo. Do not write only category labels, architecture sketches, or generic capability summaries.
+- "how_it_works" must walk a real flow with a real example from the repo. Include actual config/code/commands/file paths where present, such as a policy rule text, a function call, a CLI command, a deny/allow path, or a package/module path. A sentence like "it uses a policy engine to intercept tools" fails unless it shows the concrete mechanism and example.
+- "key_claims_evidence.items" must make each claim concrete: state the literal mechanism, number, config, path, command, or example that supports it. Do not write abstract claims like "provides governance capabilities" unless you also quote what it literally does and where.
+- Actively pull real snippets, config keys, commands, numbers, module names, and file paths from README plus source/docs/examples/config/tests. The result should read like someone inspected the code, not someone skimmed the README.
+- Standard: "more useful than a full translation." Preserve the concrete details a raw translation would carry, then organize and judge them. Any section that contains only a framework/category with no concrete example, number, snippet, command, or path is a failure.
+- If a section fails that concreteness standard, add a top-level "render_warnings" array explaining which section is too abstract and why.
+- Concreteness must not reintroduce fabrication. Every concrete specific must be sourced inline and attributed as self-claimed or verified. If you cannot find a concrete detail, say unknown/README docs tree did not explain it; do not invent.
+
+Context from local radar pipeline, for orientation only:
+${JSON.stringify({
+  repo,
+  candidate: {
+    id: candidate.id,
+    source: candidate.source,
+    discoveredAt: candidate.discoveredAt,
+  },
+  triage,
+  evidence: {
+    kind: evidence?.kind,
+    fetchedAt: evidence?.fetchedAt,
+    artifactAudit: evidence?.artifactAudit || evidence?.metadata?.artifactAudit || null,
+    readme_excerpt: String(evidence?.content || "").slice(0, 4000),
+  },
+}, null, 2)}
+`;
+}
+
+function codexOutputSchema() {
+  return {
+    type: "object",
+    additionalProperties: true,
+    required: ["schema_version", "repo", "tier_template"],
+    properties: {
+      schema_version: { type: "string" },
+      repo: { type: "string" },
+      project_type: { type: "string" },
+      tier_template: {
+        type: "object",
+        additionalProperties: true,
+        required: [
+          "tier",
+          "bucket",
+          "one_sentence_positioning",
+          "what_it_does",
+          "metadata",
+          "pain_point",
+          "core_capabilities",
+          "how_to_run",
+          "maturity_signals",
+          "comparison",
+          "trajectory_note",
+          "how_it_works_with_analogy",
+          "essential_design_difference",
+          "practitioner_meaning",
+        ],
+      },
+    },
+  };
+}
+
+function summarizeTriage(triage = {}) {
+  return {
+    project_type: triage.project_type || null,
+    verdict: triage.verdict || null,
+    ratings: triage.ratings || null,
+    worthDeepDive: Number(triage.worthDeepDive ?? triage.score ?? 0),
+    ranking_score: Number(triage.ranking_score ?? triage.score ?? 0),
+    max_allowed_depth: triage.max_allowed_depth || triage.depth_decision?.max_allowed_depth || null,
+    final_depth: triage.final_depth || triage.depth_decision?.final_depth || null,
+    recommended_action: triage.recommended_action || triage.depth_decision?.recommended_action || null,
+    needs_enrichment: Boolean(triage.needs_enrichment || triage.depth_decision?.needs_enrichment),
+    reason: triage.reason || "",
+  };
+}
+
+function authoringModelLabel(options = {}) {
+  return `codex:${options.model || CODEX_DEEP_MODEL};model_reasoning_effort=${options.reasoningEffort || CODEX_REASONING_EFFORT}`;
+}
+
+function codexCommandTemplate(options = {}) {
+  return `${options.codexBin || "codex"} exec -c model_reasoning_effort="${options.reasoningEffort || CODEX_REASONING_EFFORT}" -m ${options.model || CODEX_DEEP_MODEL} -s danger-full-access -C <repo> --output-last-message <file> -`;
+}
+
+function resolveCodexCommand(options = {}) {
+  if (options.codexBin && options.codexBin !== "codex") return { command: options.codexBin, argsPrefix: [] };
+  if (process.platform !== "win32") return { command: options.codexBin || "codex", argsPrefix: [] };
+
+  const npmRoot = process.env.APPDATA ? path.join(process.env.APPDATA, "npm") : "";
+  const codexJs = npmRoot ? path.join(npmRoot, "node_modules", "@openai", "codex", "bin", "codex.js") : "";
+  if (codexJs) return { command: process.execPath, argsPrefix: [codexJs] };
+  return { command: options.codexBin || "codex", argsPrefix: [] };
+}
+
+function normalizeRepoFullName(value) {
+  const raw = String(value || "")
+    .trim()
+    .replace(/^github\.com\//i, "")
+    .replace(/^https?:\/\/github\.com\//i, "")
+    .replace(/^git@github\.com:/i, "");
+  const match = raw.match(/^([^/\s?#]+)\/([^/\s?#]+?)(?:\.git)?(?:[/?#].*)?$/);
+  return match ? `${match[1]}/${match[2]}`.toLowerCase() : "";
+}
+
+function valueAfterEquals(arg) {
+  return arg.slice(arg.indexOf("=") + 1);
+}
+
+function numberOption(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function nowIso(options = {}) {
+  return options.now?.() || new Date().toISOString();
+}
+
+function relativeToRoot(value) {
+  return path.relative(ROOT, path.resolve(ROOT, value || "")) || ".";
+}
+
+function quoteArg(value) {
+  const raw = String(value);
+  return /^[A-Za-z0-9_./:=\\"-]+$/.test(raw) ? raw : JSON.stringify(raw);
+}
+
+function lastLines(value, count) {
+  return String(value || "").trim().split(/\r?\n/).slice(-count).join("\n");
+}
+
+function slugify(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-") || "project";
+}
+
+function unique(items) {
+  return [...new Set(items.filter(Boolean))];
+}
+
+function printUsage() {
+  console.log(`Usage:
+  node scripts/columns/projects/codex-deepdive.mjs --repo owner/name [--repo owner/name] [--force]
+
+Runs the decoupled project deep-dive authoring pass:
+  SQLite deep candidate -> codex exec gpt-5.5 medium -> light-spine JSON -> brief-wiki -> trending briefSlug backfill
+
+Flags:
+  --repo owner/name       Explicit repo from data/ai-brief.db. Repeatable.
+  --limit N              Auto-select count when --repo is omitted. Default: 1.
+  --force                Author even if brief-wiki already marks the repo deep_dived.
+  --wiki-root DIR        Brief wiki root. Default: brief-wiki.
+  --log-root DIR         Raw prompt/response/invocation output dir.
+  --no-build             Skip public/data/brief rebuild.
+  --no-trending          Skip public/data/trending.json briefSlug backfill.
+`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.stack || error.message);
+    process.exitCode = 1;
+  });
+}

@@ -1,4 +1,4 @@
-import type { ArticlesData, ModelsData, PaperRadarPublicData, PipelineStatusData, TrendingData } from "../types";
+import type { ArticlesData, ModelsData, PipelineStatusData, TrendingData } from "../types";
 
 let cached: TrendingData | null = null;
 let inflight: Promise<TrendingData> | null = null;
@@ -6,8 +6,6 @@ let cachedModels: ModelsData | null = null;
 let inflightModels: Promise<ModelsData> | null = null;
 let cachedArticles: ArticlesData | null = null;
 let inflightArticles: Promise<ArticlesData> | null = null;
-let cachedPaperRadar: PaperRadarPublicData | null = null;
-let inflightPaperRadar: Promise<PaperRadarPublicData | null> | null = null;
 let cachedPipelineStatus: PipelineStatusData | null = null;
 let inflightPipelineStatus: Promise<PipelineStatusData | null> | null = null;
 
@@ -66,23 +64,6 @@ export function loadArticles(): Promise<ArticlesData> {
       inflightArticles = null;
     });
   return inflightArticles;
-}
-
-export function loadPaperRadar(): Promise<PaperRadarPublicData | null> {
-  if (cachedPaperRadar) return Promise.resolve(cachedPaperRadar);
-  if (inflightPaperRadar) return inflightPaperRadar;
-  inflightPaperRadar = fetch("/data/paper-radar.json", { cache: "no-cache" })
-    .then(async (res) => {
-      if (res.status === 404) return null;
-      if (!res.ok) throw new Error(`加载 paper-radar.json 失败：HTTP ${res.status}`);
-      const data = (await res.json()) as PaperRadarPublicData;
-      cachedPaperRadar = data;
-      return data;
-    })
-    .finally(() => {
-      inflightPaperRadar = null;
-    });
-  return inflightPaperRadar;
 }
 
 /**

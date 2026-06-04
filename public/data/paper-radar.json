@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
-  "date": "2026-05-31",
-  "generatedAt": "2026-05-31T19:21:56.506Z",
+  "date": "2026-06-03",
+  "generatedAt": "2026-06-03T02:48:07.788Z",
   "sourceFiles": {
-    "daily": "data/papers/daily-2026-05-31.json",
-    "triage": "data/papers/triage-2026-05-31.json"
+    "daily": "data/papers/daily-2026-06-03.json",
+    "triage": "data/papers/triage-2026-06-03.json"
   },
   "pipelineRun": {
-    "id": "papers-2026-05-31-1780255316528",
+    "id": "papers-daily-offline-20260603024807",
     "memoryFile": "data/agent-memory/papers.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -15,25 +15,37 @@
     "schemaVersion": 1,
     "surface": "papers",
     "status": "pass",
-    "checkedAt": "2026-05-31T19:21:56.524Z",
+    "checkedAt": "2026-06-03T02:48:07.795Z",
     "checks": [
       {
         "id": "papers-present",
         "label": "articles.json contains at least one paper",
         "status": "pass",
-        "details": "10 paper(s)"
+        "details": "4 paper(s)"
       },
       {
         "id": "section-shape",
-        "label": "every paper has section summaries",
+        "label": "every paper has originalReading summaries",
         "status": "pass",
-        "details": "10 paper(s) checked"
+        "details": "4 paper(s) checked"
+      },
+      {
+        "id": "analyst-notes",
+        "label": "every paper has analystNotes",
+        "status": "pass",
+        "details": "4 paper(s) checked"
       },
       {
         "id": "qa-fail-excluded",
         "label": "QA fail verdicts are not published",
         "status": "pass",
         "details": "0 failed item(s) excluded"
+      },
+      {
+        "id": "current-run-deep",
+        "label": "current run produced at least one new deep analysis",
+        "status": "pass",
+        "details": "1 current-run paper(s)"
       },
       {
         "id": "qa-warnings",
@@ -47,35 +59,35 @@
   "reflection": null,
   "memoryVersion": 1,
   "triageSummary": {
-    "candidateCount": 10,
-    "selectedCount": 10,
+    "candidateCount": 1,
+    "selectedCount": 1,
     "rejectedCount": 0,
-    "cutoffScore": 95
+    "cutoffScore": 77
   },
   "agentFlow": [
     {
       "stage": "discover",
       "role": "Discoverer",
       "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-      "signal": "15 paper candidate(s) from the papers kernel"
+      "signal": "1 paper candidate(s) from the papers kernel"
     },
     {
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "10 analyzed candidate(s) with paper-text evidence"
+      "signal": "1 analyzed candidate(s) with paper-text evidence"
     },
     {
       "stage": "rank",
       "role": "Ranker",
       "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-      "signal": "10 current analysis item(s) available after QA filtering"
+      "signal": "1 current analysis item(s) available after QA and reviewer filtering"
     },
     {
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "10 section-mirroring academic analysis item(s)"
+      "signal": "4 recent deep article(s), 16 total archived deep item(s)"
     },
     {
       "stage": "verify",
@@ -93,463 +105,63 @@
       "stage": "archive",
       "role": "Archivist",
       "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
-      "signal": "SQLite runs table"
+      "signal": "public/data/articles-archive.json, data/agent-memory, and SQLite runs table"
     }
   ],
   "mustRead": {
-    "id": "paper:arxiv-2605-26302",
-    "title": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems",
+    "id": "agent-harness-engineering-survey",
+    "title": "Agent Harness Engineering: A Survey",
     "daily_action": "must_read",
-    "triage_decision": "deep_dive",
-    "total_score": 100,
-    "sourceName": "arXiv agent harness engineering",
-    "sourceUrl": "https://arxiv.org/abs/2605.26302",
+    "triage_decision": "review",
+    "total_score": 77,
+    "sourceName": "OpenReview",
+    "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
     "matched_topics": [
-      "Broad AI / ML",
       "AI Agents",
-      "Agent Harness / Observability",
-      "RAG / Knowledge Systems",
-      "Evaluation / Benchmarks",
-      "Human-AI Interaction"
+      "Agent Harness / Observability"
     ],
     "freshness_signal": "new",
     "hotness_signal": "high_signal_source",
-    "reason": "strong agent harness engineering and reliability benchmark"
+    "reason": "AI Agents, Agent Harness / Observability; total 77; strongest signals: role_relevance, architecture_value, novelty. AHE signals: harness engineering, agent harness. FDE signals: observability/debugging."
   },
-  "skim": [
-    {
-      "id": "paper:arxiv-2605-26112",
-      "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 100,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.26112",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 94; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: API/tool/MCP integration, workflow readiness, RAG/k"
-    },
-    {
-      "id": "paper:arxiv-2605-18747",
-      "title": "Code as Agent Harness",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 100,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.18747",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Multimodal UI",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "High relevance to agent harness and AI engineering; strong FDE signals."
-    },
-    {
-      "id": "paper:arxiv-2604-25850",
-      "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 100,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2604.25850",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 100; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, observability, trajectory, rollback, Terminal-Bench. FDE signals: "
-    }
-  ],
-  "professorLesson": "该论文提出Agent Lifespan Engineering (ALE)框架和AgingBench基准，将长生命周期AI代理的可靠性问题从单点快照评估转向纵向退化测量与诊断。",
-  "goodIdeaToSteal": "核心主张：部署后的AI代理存在时间依赖的可靠性退化，且退化是多机制、多维度的，无法通过单点评估捕捉。",
-  "badIdeaOrRisk": "证据主要来自人工设计的程序化场景（7个），样本量为~400次运行。模型覆盖14个，但许多实验仅使用8-12会话，可能不足以模拟极长期部署（如数百会话）。反事实归因假设流水线组件可分离，但实际中可能相互影响。",
-  "transferablePattern": "论文通过7个场景、14个模型、多种记忆策略、约400次运行（8-200会话）的实验结果支撑该主张。具体数据见表3。",
-  "futureWorkApplication": "论文在附录I中讨论广泛影响和局限性，但具体内容未在提供的文本中详述。作者指出AgingBench的生成器不旨在建模真实用户行为的完整分布，而是提供可控的压力表面来隔离纵向失败。",
-  "architectureTakeaway": "论文通过7个场景、14个模型、多种记忆策略、约400次运行（8-200会话）的实验结果支撑该主张。具体数据见表3。",
-  "interviewTalkingPoint": "deep_dive:100+ahe:harness engineering+fde:customer/production system",
-  "projectIdea": "Build a grounded checklist from Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems and test it against one agent workflow.",
+  "skim": [],
+  "professorLesson": "离线模式下只根据已收集证据保留《Agent Harness Engineering: A Survey》的基础脉络。",
+  "goodIdeaToSteal": "## Metadata Title: Agent Harness Engineering: A Survey Authors: 双盲匿名 (TMLR under review) Venue: TMLR · 在审 Source: OpenReview Source URL: https://openreview.net/pdf?id=3hXEPbG0dh PDF URL: https://openreview.net/pdf?id=3hXEPbG0dh Source signals: OpenReview, TMLR · 在审, offline fixture Focus topics: AI Agents, Agent Harness / Observability ## Paper section list…",
+  "badIdeaOrRisk": "当前分析受限于已收集 evidence.content，未使用证据外信息。",
+  "transferablePattern": "离线模式：本轮只抓到论文文本摘要，未做联网核验，暂不展开批判性分析；以上原文部分仅供先行阅读。",
+  "futureWorkApplication": "论文证据未提供限制或未来工作段落。",
+  "architectureTakeaway": "## Metadata Title: Agent Harness Engineering: A Survey Authors: 双盲匿名 (TMLR under review) Venue: TMLR · 在审 Source: OpenReview Source URL: https://openreview.net/pdf?id=3hXEPbG0dh PDF URL: https://openreview.net/pdf?id=3hXEPbG0dh Source signals: OpenReview, TMLR · 在审, offline fixture Focus topics: AI Agents, Agent Harness / Observability ## Paper section list…",
+  "interviewTalkingPoint": "review:77+ahe:harness engineering+fde:observability/debugging",
+  "projectIdea": "Read 《Agent Harness Engineering: A Survey》 against your own questions before opening the analyst notes.",
   "topPapers": [
     {
-      "id": "paper:arxiv-2605-26302",
-      "title": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems",
+      "id": "agent-harness-engineering-survey",
+      "title": "Agent Harness Engineering: A Survey",
       "daily_action": "must_read",
-      "triage_decision": "deep_dive",
-      "total_score": 100,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.26302",
+      "triage_decision": "review",
+      "total_score": 77,
+      "sourceName": "OpenReview",
+      "sourceUrl": "https://openreview.net/pdf?id=3hXEPbG0dh",
       "matched_topics": [
-        "Broad AI / ML",
         "AI Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Evaluation / Benchmarks",
-        "Human-AI Interaction"
+        "Agent Harness / Observability"
       ],
       "freshness_signal": "new",
       "hotness_signal": "high_signal_source",
-      "reason": "strong agent harness engineering and reliability benchmark"
-    },
-    {
-      "id": "paper:arxiv-2605-26112",
-      "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 100,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.26112",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 94; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: API/tool/MCP integration, workflow readiness, RAG/k"
-    },
-    {
-      "id": "paper:arxiv-2605-18747",
-      "title": "Code as Agent Harness",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 100,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.18747",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Multimodal UI",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "High relevance to agent harness and AI engineering; strong FDE signals."
-    },
-    {
-      "id": "paper:arxiv-2604-25850",
-      "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 100,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2604.25850",
-      "matched_topics": [
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "standard_source",
-      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 100; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, observability, trajectory, rollback, Terminal-Bench. FDE signals: "
-    },
-    {
-      "id": "paper:arxiv-2605-29861",
-      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 99,
-      "sourceName": "Hugging Face Daily Papers",
-      "sourceUrl": "https://huggingface.co/papers/2605.29861",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Multimodal UI",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "Multi-agent harness for verifiable multimodal deep research with strong AI engineer relevance: agent orchestration, tool use, RAG, and evaluation."
-    },
-    {
-      "id": "paper:arxiv-2605-14271",
-      "title": "Auditing Agent Harness Safety",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 99,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.14271",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks",
-        "LLM Security / Reliability",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "recent",
-      "hotness_signal": "high_signal_source",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 99; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: customer/production system, API/tool/MCP integratio"
-    },
-    {
-      "id": "paper:arxiv-2605-27922",
-      "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 97,
-      "sourceName": "arXiv terminal agents observability",
-      "sourceUrl": "https://arxiv.org/abs/2605.27922",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: observability, execution trace, trajectory. FDE signals: customer/production system, API/tool/MCP integration, o"
-    },
-    {
-      "id": "paper:arxiv-2605-21516",
-      "title": "Harnesses for Inference-Time Alignment over Execution Trajectories",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 96,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.21516",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Evaluation / Benchmarks"
-      ],
-      "freshness_signal": "recent",
-      "hotness_signal": "high_signal_source",
-      "reason": "High relevance to AI agents and harness engineering; deterministic score already 96."
-    },
-    {
-      "id": "paper:arxiv-2605-29341",
-      "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 96,
-      "sourceName": "Hugging Face Daily Papers",
-      "sourceUrl": "https://huggingface.co/papers/2605.29341",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Agent Harness / Observability",
-        "RAG / Knowledge Systems",
-        "Multimodal UI",
-        "Evaluation / Benchmarks",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "Excellent fit for AI engineer interview: multimodal agent memory benchmark, harness engineering, RAG/knowledge, eval/observability."
-    },
-    {
-      "id": "paper:arxiv-2605-15040",
-      "title": "Orchard: An Open-Source Agentic Modeling Framework",
-      "daily_action": "skim",
-      "triage_decision": "deep_dive",
-      "total_score": 95,
-      "sourceName": "arXiv agent harness engineering",
-      "sourceUrl": "https://arxiv.org/abs/2605.15040",
-      "matched_topics": [
-        "Broad AI / ML",
-        "AI Agents",
-        "Tool Use",
-        "AI Coding / SWE Agents",
-        "Agent Harness / Observability",
-        "Multimodal UI",
-        "Evaluation / Benchmarks",
-        "Human-AI Interaction"
-      ],
-      "freshness_signal": "new",
-      "hotness_signal": "high_signal_source",
-      "reason": "Strong agentic framework for coding agents, tool use, and scalable training."
+      "reason": "AI Agents, Agent Harness / Observability; total 77; strongest signals: role_relevance, architecture_value, novelty. AHE signals: harness engineering, agent harness. FDE signals: observability/debugging."
     }
   ],
   "selectionTrace": [
     {
-      "id": "paper:arxiv-2605-26302",
-      "title": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems",
-      "score": 100,
-      "decision": "deep_dive",
+      "id": "agent-harness-engineering-survey",
+      "title": "Agent Harness Engineering: A Survey",
+      "score": 77,
+      "decision": "review",
       "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Agent Harness / Observability; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness. FDE signals: customer/production system, RAG/knowledge system, evaluation/reliability gate.",
+      "reason": "AI Agents, Agent Harness / Observability; total 77; strongest signals: role_relevance, architecture_value, novelty. AHE signals: harness engineering, agent harness. FDE signals: observability/debugging.",
       "aheSignals": [
         "harness engineering",
         "agent harness"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "paper:arxiv-2605-26112",
-      "title": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI",
-      "score": 100,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 94; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: API/tool/MCP integration, workflow readiness, RAG/knowledge system. Pure-algorithm/scaling penalty: 2.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "paper:arxiv-2605-18747",
-      "title": "Code as Agent Harness",
-      "score": 100,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 95; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, rollback. FDE signals: customer/production system, API/tool/MCP integration, RAG/knowledge system.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "rollback"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "paper:arxiv-2604-25850",
-      "title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses",
-      "score": 100,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "AI Agents, Tool Use, AI Coding / SWE Agents; total 100; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, observability, trajectory, rollback, Terminal-Bench. FDE signals: API/tool/MCP integration, RAG/knowledge system, observability/debugging.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "observability",
-        "trajectory",
-        "rollback",
-        "Terminal-Bench"
-      ],
-      "freshness": "new",
-      "hotness": "standard_source"
-    },
-    {
-      "id": "paper:arxiv-2605-29861",
-      "title": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation",
-      "score": 99,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 91; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness. FDE signals: API/tool/MCP integration, workflow readiness, RAG/knowledge system.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "paper:arxiv-2605-14271",
-      "title": "Auditing Agent Harness Safety",
-      "score": 99,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 99; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: customer/production system, API/tool/MCP integration, evaluation/reliability gate.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "trajectory"
-      ],
-      "freshness": "recent",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "paper:arxiv-2605-27922",
-      "title": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows",
-      "score": 97,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 97; strongest signals: role_relevance, architecture_value, practicality. AHE signals: observability, execution trace, trajectory. FDE signals: customer/production system, API/tool/MCP integration, observability/debugging.",
-      "aheSignals": [
-        "observability",
-        "execution trace",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "paper:arxiv-2605-21516",
-      "title": "Harnesses for Inference-Time Alignment over Execution Trajectories",
-      "score": 96,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 96; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: API/tool/MCP integration, workflow readiness, RAG/knowledge system.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "trajectory"
-      ],
-      "freshness": "recent",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "paper:arxiv-2605-29341",
-      "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
-      "score": 96,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Agent Harness / Observability; total 93; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: customer/production system, RAG/knowledge system, observability/debugging.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "trajectory"
-      ],
-      "freshness": "new",
-      "hotness": "high_signal_source"
-    },
-    {
-      "id": "paper:arxiv-2605-15040",
-      "title": "Orchard: An Open-Source Agentic Modeling Framework",
-      "score": 95,
-      "decision": "deep_dive",
-      "status": "selected",
-      "reason": "Broad AI / ML, AI Agents, Tool Use; total 95; strongest signals: role_relevance, architecture_value, practicality. AHE signals: harness engineering, agent harness, trajectory. FDE signals: customer/production system, API/tool/MCP integration, workflow readiness. Pure-algorithm/scaling penalty: 2.",
-      "aheSignals": [
-        "harness engineering",
-        "agent harness",
-        "trajectory"
       ],
       "freshness": "new",
       "hotness": "high_signal_source"

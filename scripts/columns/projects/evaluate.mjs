@@ -145,6 +145,8 @@ export async function analyze(item, evidence, ctx = {}) {
 export function radarCardPayload(evaluation = {}) {
   const decision = evaluation.depth_decision || evaluation;
   const evidence_signals = decision.evidence_signals || evaluation.evidence_signals || {};
+  const tier = Number(decision.project_tier ?? evaluation.project_tier ?? projectTierForDepth(decision.final_depth || evaluation.final_depth));
+  const bucket = decision.project_bucket || evaluation.project_bucket || evaluation.bucket || "无关类";
   return {
     tldr: evaluation.tldr || deterministicTldr(evaluation.repo || {}, decision),
     tags: evaluation.tags || tagsFromDecision(decision),
@@ -158,6 +160,14 @@ export function radarCardPayload(evaluation = {}) {
     ranking_score: Number(decision.ranking_score ?? evaluation.score ?? 0),
     max_allowed_depth: decision.max_allowed_depth || "list_only",
     final_depth: decision.final_depth || "list_only",
+    project_tier: tier,
+    project_tier_label: `Tier ${tier}`,
+    project_bucket: bucket,
+    bucket,
+    model_tier: decision.model_tier || evaluation.model_tier || modelForProjectTier(tier),
+    requires_manual_confirmation: Boolean(decision.requires_manual_confirmation || evaluation.requires_manual_confirmation || tier === 3),
+    tier_tag: `[Tier ${tier}｜${bucket}]`,
+    tier_template: evaluation.tier_template || deterministicTierTemplate(evaluation.repo || {}, decision, { tier, bucket }),
     ranking_reasons: decision.ranking_reasons || [],
     rejection_reasons: decision.rejection_reasons || [],
     recommended_action: decision.recommended_action || "monitor",
@@ -169,8 +179,19 @@ export function radarCardPayload(evaluation = {}) {
 
 export function normalizeLightResult(input = {}, repo = {}, evidence = {}, triage = {}) {
   const fallback = radarCardPayload(triage);
+  const evidenceSignals = evidence?.evidenceSignals
+    || evidence?.evidence_signals
+    || evidence?.metadata?.evidenceSignals
+    || evidence?.metadata?.evidence_signals
+    || triage?.evidence_signals
+    || triage?.depth_decision?.evidence_signals
+    || {};
+  const groundedTldr = deterministicTldr(repo, { ...triage, evidence_signals: evidenceSignals });
+  const fallbackTldr = groundedTldr || fallback.tldr || deterministicTldr(repo, triage);
+  const tier = Number(triage?.project_tier ?? triage?.depth_decision?.project_tier ?? fallback.project_tier ?? 1);
+  const bucket = triage?.project_bucket || triage?.bucket || triage?.depth_decision?.project_bucket || fallback.project_bucket || "真·新项目";
   return {
-    tldr: cleanString(input?.tldr || fallback.tldr || deterministicTldr(repo, triage)).slice(0, 120),
+    tldr: fallbackTldr.slice(0, 120),
     tags: normalizeTags(input?.tags || fallback.tags || tagsFromDecision(triage)),
     light: cleanString(input?.light || input?.summary || fallback.light || deterministicRadarText(repo, triage)),
     worthDeepDive: Number(triage?.ranking_score ?? triage?.score ?? fallback.worthDeepDive ?? 0),
@@ -178,6 +199,14 @@ export function normalizeLightResult(input = {}, repo = {}, evidence = {}, triag
     project_type: normalizeProjectType(input?.project_type ?? input?.projectType, triage?.project_type || classifyProjectType({ repo, readme: evidence?.content, light: input?.light, tags: input?.tags })),
     verdict: legacyVerdictForDepth(triage?.final_depth || triage?.depth_decision?.final_depth),
     ratings: triage?.ratings || ratingsFromRanking(triage?.ranking || triage?.depth_decision?.ranking || {}),
+    project_tier: tier,
+    project_tier_label: `Tier ${tier}`,
+    project_bucket: bucket,
+    bucket,
+    model_tier: triage?.model_tier || triage?.depth_decision?.model_tier || modelForProjectTier(tier),
+    requires_manual_confirmation: Boolean(triage?.requires_manual_confirmation || triage?.depth_decision?.requires_manual_confirmation || tier === 3),
+    tier_tag: `[Tier ${tier}｜${bucket}]`,
+    tier_template: normalizeTierTemplate(input?.tier_template || input?.tierTemplate, deterministicTierTemplate(repo, triage, { tier, bucket })),
   };
 }
 
@@ -370,6 +399,14 @@ function evaluationFromDecision({ candidate, repo, evidence_signals, ranking, de
     project_type,
     verdict: legacyVerdictForDepth(depth_decision.final_depth),
     ratings: ratingsFromRanking(ranking),
+    project_tier: depth_decision.project_tier,
+    project_tier_label: depth_decision.project_tier_label,
+    project_bucket: depth_decision.project_bucket,
+    bucket: depth_decision.project_bucket,
+    model_tier: depth_decision.model_tier,
+    requires_manual_confirmation: depth_decision.requires_manual_confirmation,
+    tier_tag: `[Tier ${depth_decision.project_tier}｜${depth_decision.project_bucket}]`,
+    tier_template: deterministicTierTemplate(repo, depth_decision),
     rankingReason: publicRankingReason(depth_decision),
     ranking,
     ranking_score: depth_decision.ranking_score,
@@ -433,12 +470,82 @@ function evidenceSignalsFrom(repo = {}, evidence = {}) {
 
 function deterministicTldr(repo = {}, decision = {}) {
   const name = repo.fullName || repo.name || decision.evidence_signals?.repo || "project";
+  const signals = decision.evidence_signals || {};
   const depth = decision.final_depth || "list_only";
-  if (depth === "needs_enrichment") return `${name}: README fetch failed; needs enrichment before analysis`;
-  if (depth === "deep") return `${name}: deep radar candidate with agent/tooling evidence`;
-  if (depth === "analysis") return `${name}: analysis candidate with enough repo evidence`;
-  if (depth === "light") return `${name}: light radar item; useful but hard-gated`;
-  return `${name}: radar mention only`;
+  const description = cleanDescription(repo.description || signals.description);
+  if (depth === "needs_enrichment") return `${name} 的 README 抓取失败，需补全证据后再判断。`;
+  if (description) return `${name}：${descriptionToChinese(description)}。`;
+  const subject = evidenceBackedSubject(repo, signals);
+  if (subject) return `${name}：${subject}。`;
+  return "证据不足，待补全";
+}
+
+function evidenceBackedSubject(repo = {}, signals = {}) {
+  const readmeTitle = firstReadmeTitle(signals.raw_readme);
+  if (readmeTitle) return `README 标题为“${readmeTitle}”`;
+  const topics = unique([
+    ...(Array.isArray(repo.topics) ? repo.topics : []),
+    ...(Array.isArray(signals.topics) ? signals.topics : []),
+  ]).slice(0, 4);
+  if (topics.length) return `GitHub topics 包括 ${topics.join("、")}，暂无更具体描述`;
+  return "";
+}
+
+function descriptionToChinese(value) {
+  const text = cleanDescription(value);
+  if (!text) return "";
+  if (/[\u4e00-\u9fff]/.test(text)) return text;
+  const literal = literalChineseDescription(text);
+  if (literal) return literal;
+  return `GitHub 描述为“${text}”`;
+}
+
+function literalChineseDescription(text) {
+  if (/^Python tool for converting files and office documents to Markdown$/i.test(text)) {
+    return "Python 工具，用于将文件和 Office 文档转换为 Markdown";
+  }
+  if (/^The agent harness performance optimization system\./i.test(text)) {
+    return "agent harness 性能优化系统，包含面向 Claude Code、Codex、Opencode、Cursor 等的 skills、instincts、memory、security 和 research-first development";
+  }
+  if (/^#1 Persistent memory for AI coding agents based on real-world benchmarks$/i.test(text)) {
+    return "基于真实基准测试的 AI 编程智能体持久记忆";
+  }
+  if (/^The Open-Source Multimodal AI Agent Stack:/i.test(text)) {
+    return "开源多模态 AI Agent 技术栈，用于连接前沿 AI 模型和 Agent 基础设施";
+  }
+  if (/^Compress tool outputs, logs, files, and RAG chunks before they reach the LLM\./i.test(text)) {
+    return "在工具输出、日志、文件和 RAG chunks 到达 LLM 前进行压缩；形态包括库、代理和 MCP server";
+  }
+  if (/^AI Agent Governance Toolkit/i.test(text)) {
+    return "AI Agent Governance Toolkit，用于 autonomous AI agents 的策略执行、zero-trust identity、执行沙箱和可靠性工程";
+  }
+  if (/^An adaptive Web Scraping framework/i.test(text.replace(/^[^\p{L}\p{N}]+/u, ""))) {
+    return "自适应 Web Scraping 框架，可处理从单次请求到 full-scale crawl 的抓取任务";
+  }
+  if (/^MOSS.?TTS Family is an open.?source speech and sound generation model family/i.test(text)) {
+    return "MOSS-TTS 开源语音和声音生成模型家族，覆盖长语音、多说话人对话、声音设计、环境音效和实时流式 TTS";
+  }
+  return "";
+}
+
+function firstReadmeTitle(value) {
+  const lines = String(value || "").split(/\r?\n/);
+  for (const line of lines) {
+    const match = line.match(/^\s{0,3}#\s+(.+?)\s*#*\s*$/);
+    if (!match) continue;
+    const title = cleanString(match[1].replace(/\[!\[[^\]]*\]\([^)]+\)\]\([^)]+\)/g, ""));
+    if (title && title.length <= 80) return title;
+  }
+  return "";
+}
+
+function cleanDescription(value) {
+  const text = cleanString(value)
+    .replace(/\s+/g, " ")
+    .replace(/[。.!?]+$/g, "")
+    .trim();
+  if (!text) return "";
+  return text;
 }
 
 function deterministicRadarText(repo = {}, decision = {}) {
@@ -458,6 +565,8 @@ function deterministicRadarText(repo = {}, decision = {}) {
 function tagsFromDecision(decision = {}) {
   const signals = decision.evidence_signals || {};
   return unique([
+    decision.project_tier_label,
+    decision.project_bucket,
     signals.has_agents ? "agents" : "",
     signals.has_mcp ? "mcp" : "",
     signals.has_skills ? "skills" : "",
@@ -527,6 +636,12 @@ function publicDepthDecision(decision = {}) {
     ranking_score: Number(decision.ranking_score || 0),
     max_allowed_depth: decision.max_allowed_depth || "list_only",
     final_depth: decision.final_depth || "list_only",
+    project_tier: Number(decision.project_tier ?? projectTierForDepth(decision.final_depth)),
+    project_tier_label: decision.project_tier_label || `Tier ${projectTierForDepth(decision.final_depth)}`,
+    project_bucket: decision.project_bucket || decision.bucket || "无关类",
+    bucket: decision.project_bucket || decision.bucket || "无关类",
+    model_tier: decision.model_tier || modelForProjectTier(projectTierForDepth(decision.final_depth)),
+    requires_manual_confirmation: Boolean(decision.requires_manual_confirmation || projectTierForDepth(decision.final_depth) === 3),
     ranking_reasons: decision.ranking_reasons || [],
     rejection_reasons: decision.rejection_reasons || [],
     recommended_action: decision.recommended_action || "monitor",
@@ -535,6 +650,126 @@ function publicDepthDecision(decision = {}) {
     review_issues: decision.review_issues || [],
     evidence_summary: evidenceSummary(decision.evidence_signals || {}),
   };
+}
+
+function deterministicTierTemplate(repo = {}, decision = {}, explicit = {}) {
+  const tier = Number(explicit.tier ?? decision.project_tier ?? projectTierForDepth(decision.final_depth));
+  const bucket = explicit.bucket || decision.project_bucket || decision.bucket || "无关类";
+  const signals = decision.evidence_signals || {};
+  const base = {
+    tier,
+    bucket,
+    tag: `[Tier ${tier}｜${bucket}]`,
+    one_sentence_positioning: deterministicTldr(repo, decision),
+    what_it_does: cleanString(repo.description || signals.description || "数据不足"),
+    metadata: {
+      language: repo.language || signals.language || "数据不足",
+      total_stars: Number(repo.stars ?? signals.total_stars ?? signals.stars) || 0,
+      stars_in_period: Number(repo.starsGained ?? signals.stars_in_period ?? signals.stars_today) || 0,
+      author: repo.owner || signals.owner || "数据不足",
+    },
+    labels: tagsFromDecision(decision).filter((tag) => !/^Tier /.test(tag) && tag !== bucket).slice(0, 5),
+    prose_body: deterministicRadarText(repo, decision),
+  };
+
+  if (tier <= 0) {
+    return {
+      ...base,
+      index_only: {
+        name: repo.fullName || repo.name || signals.repo || "数据不足",
+        url: repo.url || signals.url || "",
+        automatic_tags: [bucket, ...(decision.rejection_reasons || [])].filter(Boolean).slice(0, 6),
+      },
+    };
+  }
+
+  if (tier === 1) return base;
+
+  const tier2 = {
+    ...base,
+    pain_point: "数据不足",
+    core_capabilities: capabilityList(signals),
+    how_to_run: {
+      install_command: signals.has_install ? "见 README 安装说明" : "数据不足",
+      minimal_example: signals.has_examples || signals.has_demo ? "见 README/examples 最小示例" : "数据不足",
+    },
+    maturity_signals: {
+      star_velocity: `${base.metadata.stars_in_period} period stars / ${base.metadata.total_stars} total stars`,
+      recent_commit: signals.pushed_at || signals.updated_at || "数据不足",
+      releases: Number(signals.releases) > 0 ? String(signals.releases) : "数据不足",
+      issue_activity: Number(signals.open_issues) > 0 ? `${signals.open_issues} open issues` : "数据不足",
+    },
+    comparison: "数据不足",
+    trajectory_note: trajectoryNote(signals),
+  };
+
+  if (tier === 2) return tier2;
+
+  return {
+    ...tier2,
+    manual_confirmation: true,
+    how_it_works_with_analogy: "数据不足",
+    essential_design_difference: "数据不足",
+    practitioner_meaning: "数据不足",
+    cross_links: [],
+  };
+}
+
+function normalizeTierTemplate(input, fallback) {
+  if (!input || typeof input !== "object") return fallback;
+  return {
+    ...fallback,
+    ...input,
+    metadata: {
+      ...(fallback.metadata || {}),
+      ...(input.metadata || {}),
+    },
+  };
+}
+
+function capabilityList(signals = {}) {
+  const capabilities = [];
+  if (signals.has_agents) capabilities.push("agent 工作流");
+  if (signals.has_mcp) capabilities.push("MCP 连接");
+  if (signals.has_cli) capabilities.push("CLI 入口");
+  if (signals.has_models) capabilities.push("模型/RAG 组件");
+  if (signals.has_docs) capabilities.push("文档");
+  if (signals.has_examples || signals.has_demo) capabilities.push("示例/demo");
+  return (capabilities.length ? capabilities : ["数据不足", "数据不足", "数据不足"]).slice(0, 3);
+}
+
+function trajectoryNote(signals = {}) {
+  const tabs = unique([
+    ...(signals.appears_in_tabs || []),
+    ...(signals.trend_sources || []).map((source) => String(source).split(":").pop()),
+  ].map((tab) => normalizeTrajectoryTab(tab)).filter(Boolean));
+  if (tabs.includes("daily") && tabs.includes("weekly") && tabs.includes("monthly")) return "日周月皆在=持续重要";
+  if (tabs.length === 1 && tabs[0] === "daily") return "仅日榜=昙花存疑";
+  if (tabs.length > 1) return `${tabs.join("+")} 覆盖=有持续观察价值`;
+  return "数据不足";
+}
+
+function normalizeTrajectoryTab(value) {
+  const raw = String(value || "").toLowerCase();
+  if (raw.includes("daily")) return "daily";
+  if (raw.includes("weekly")) return "weekly";
+  if (raw.includes("monthly")) return "monthly";
+  return "";
+}
+
+function projectTierForDepth(depth) {
+  const value = String(depth || "list_only");
+  if (value === "deep") return 3;
+  if (value === "analysis") return 2;
+  if (value === "light") return 1;
+  return 0;
+}
+
+function modelForProjectTier(tier) {
+  if (Number(tier) === 3) return "codex:gpt-5.5;model_reasoning_effort=high";
+  if (Number(tier) === 2) return "deepseek-or-light-codex";
+  if (Number(tier) === 1) return "cheap-extraction";
+  return "none";
 }
 
 function skippedAnalysis(tier, reason, { candidate = {}, triage = {}, options = {}, error = null } = {}) {

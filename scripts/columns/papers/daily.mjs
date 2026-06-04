@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { openAiBriefDb } from "../../lib/db.mjs";
 import { runColumnPipeline } from "../../lib/pipeline-kernel.mjs";
+import { main as runCodexDeepDiveDaily } from "./codex-deepdive.mjs";
 import papersColumnModule from "./index.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -18,6 +19,10 @@ export async function main(argv = process.argv.slice(2)) {
   if (options.help) {
     printUsage();
     return null;
+  }
+
+  if (!options.legacyKernel) {
+    return runCodexDeepDiveDaily(toCodexArgs(options));
   }
 
   const db = await openAiBriefDb(options.dbPath);
@@ -49,6 +54,8 @@ export async function main(argv = process.argv.slice(2)) {
 export function parseArgs(argv = []) {
   const options = {
     cap: numberOption(process.env.PAPERS_DEEP_CAP, 3),
+    topN: numberOption(process.env.PAPERS_TOP_N ?? process.env.PAPERS_DEEP_LIMIT, 5),
+    maxLimit: numberOption(process.env.PAPERS_MAX_DEEP_LIMIT, 12),
     limit: numberOption(process.env.PAPERS_DISCOVER_LIMIT, 140),
     minScore: numberOption(process.env.PAPERS_MIN_SCORE, null),
     paperTextMaxChars: numberOption(process.env.PAPERS_TEXT_MAX_CHARS, 120000),
@@ -75,16 +82,35 @@ export function parseArgs(argv = []) {
       options.dryRun = true;
       options.offline = true;
       options.noLlm = true;
+      options.noCodex = true;
+    } else if (arg === "--legacy-kernel") {
+      options.legacyKernel = true;
+    } else if (arg === "--no-codex") {
+      options.noCodex = true;
     } else if (arg === "--no-cache") {
       options.noCache = true;
+    } else if (arg === "--top-n") {
+      options.topN = numberOption(nextValue(), options.topN);
+    } else if (arg.startsWith("--top-n=")) {
+      options.topN = numberOption(valueAfterEquals(arg), options.topN);
     } else if (arg === "--cap") {
       options.cap = numberOption(nextValue(), options.cap);
+      options.topN = options.cap;
     } else if (arg.startsWith("--cap=")) {
       options.cap = numberOption(valueAfterEquals(arg), options.cap);
+      options.topN = options.cap;
     } else if (arg === "--limit") {
-      options.limit = numberOption(nextValue(), options.limit);
+      options.topN = numberOption(nextValue(), options.topN);
     } else if (arg.startsWith("--limit=")) {
+      options.topN = numberOption(valueAfterEquals(arg), options.topN);
+    } else if (arg === "--candidate-limit") {
+      options.limit = numberOption(nextValue(), options.limit);
+    } else if (arg.startsWith("--candidate-limit=")) {
       options.limit = numberOption(valueAfterEquals(arg), options.limit);
+    } else if (arg === "--max-limit") {
+      options.maxLimit = numberOption(nextValue(), options.maxLimit);
+    } else if (arg.startsWith("--max-limit=")) {
+      options.maxLimit = numberOption(valueAfterEquals(arg), options.maxLimit);
     } else if (arg === "--min-score") {
       options.minScore = numberOption(nextValue(), options.minScore);
     } else if (arg.startsWith("--min-score=")) {
@@ -122,6 +148,17 @@ export function parseArgs(argv = []) {
   return options;
 }
 
+function toCodexArgs(options = {}) {
+  const args = [
+    "--limit", String(options.topN || 5),
+    "--max-limit", String(options.maxLimit || 12),
+    "--candidate-limit", String(options.limit || 45),
+    "--active-limit", String(options.activeArticlesLimit || 12),
+  ];
+  if (options.noCodex || options.noLlm || options.offline || options.dryRun) args.push("--no-codex");
+  return args;
+}
+
 async function loadEnv() {
   const file = path.join(ROOT, ".env.local");
   if (!existsSync(file)) return;
@@ -152,14 +189,17 @@ function numberOption(value, fallback) {
 
 function printUsage() {
   console.log(`Usage:
-  node scripts/columns/papers/daily.mjs [--cap N] [--offline] [--dry-run]
+  node scripts/columns/papers/daily.mjs [--limit N] [--candidate-limit N] [--no-codex]
 
 Runs the canonical papers chain:
-  discover -> evidence -> evaluate -> select -> analyze -> qa -> publish articles.json + paper-radar.json
+  HF Daily Papers -> top-N by upvotes+signal -> codex v2 deep authoring -> light cards -> publish articles.json
 
 Flags:
-  --cap N          Max selected deep-analysis papers. Default: 3
-  --offline        No LLM/network deep analysis; use cached/offline data where available
+  --limit N        Deep v2 top-N. Default: 5, max: 12
+  --candidate-limit N  HF Daily papers to keep as deep candidates + light cards. Default: 45
+  --no-codex       Fetch/select/publish with dry-run deep payloads
+  --legacy-kernel  Run the older kernel pipeline path
+  --offline        Alias for no-LLM/no-codex where supported
   --dry-run        Offline/no-LLM fixture path for cheap shape verification
   --db PATH        SQLite DB path override
 `);

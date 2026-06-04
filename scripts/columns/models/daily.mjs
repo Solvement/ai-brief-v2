@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { generateModelEntry } from "./generate.mjs";
 import { MODEL_REGISTRY } from "./registry.mjs";
 import { fetchModelStatus } from "./sources.mjs";
+import { buildCanonicalParadigm, classifyModelParadigm } from "./paradigm.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -61,21 +62,44 @@ export async function main(argv = process.argv.slice(2)) {
       });
       checked += 1;
 
+      const paradigmClass = classifyModelParadigm({
+        model,
+        fetched,
+        existing,
+        libraryRecords: [...MODEL_REGISTRY, ...existingModels],
+      });
+      if (paradigmClass.branch === "variant_merged") {
+        const merged = mergeVariantIntoCanonical(existingModels, updatesById, paradigmClass, fetched);
+        console.log(`[models] ${model.id}: ${paradigmClass.tag}; merged variant into ${merged || paradigmClass.variant.canonicalHfId}`);
+        continue;
+      }
+
       const changed = isNewOrChangedVersion(existing, fetched, options);
       if (changed) newVersions += 1;
 
-      if (changed && !options.dryRun) {
-        console.log(`[models] ${model.id}: ${existing ? "new version" : "new model"}; regenerating analysis`);
+      const shouldRegenerate = changed || options.force;
+
+      if (shouldRegenerate && !options.dryRun) {
+        const reason = options.force && !changed ? "forced regenerate" : (existing ? "new version" : "new model");
+        console.log(`[models] ${model.id}: ${reason}; regenerating analysis`);
         const generatedEntry = await generateModelEntry({
           model,
           fetched,
-          options: { ...options, generatedAt: startedAt },
+          options: {
+            ...options,
+            generatedAt: startedAt,
+            existingEntry: existing,
+            libraryRecords: [...MODEL_REGISTRY, ...existingModels],
+          },
           logger: console,
         });
         updatesById.set(model.id, generatedEntry);
         regenerated += 1;
-      } else if (changed) {
-        console.log(`[models] ${model.id}: would regenerate analysis (${versionLabel(existing)} -> ${versionLabel(fetched)})`);
+      } else if (shouldRegenerate) {
+        const reason = options.force && !changed
+          ? "forced regenerate"
+          : `regenerate analysis (${versionLabel(existing)} -> ${versionLabel(fetched)})`;
+        console.log(`[models] ${model.id}: would ${reason}`);
         updatesById.set(model.id, mergeStatusFields(existing, model, fetched, options));
       } else {
         console.log(`[models] ${model.id}: unchanged; refreshing status card`);
@@ -129,6 +153,7 @@ export function parseArgs(argv = []) {
     only: [],
     offline: false,
     dryRun: false,
+    force: false,
     cap: 0,
   };
 
@@ -146,6 +171,8 @@ export function parseArgs(argv = []) {
       options.noLlm = true;
     } else if (arg === "--dry-run") {
       options.dryRun = true;
+    } else if (arg === "--force" || arg === "--regenerate") {
+      options.force = true;
     } else if (arg === "--only") {
       options.only.push(...splitIds(nextValue()));
     } else if (arg.startsWith("--only=")) {
@@ -234,6 +261,14 @@ function mergeStatusFields(existing, model, fetched = {}, options = {}) {
     ...statusPatch,
   };
 
+  next.paradigm = buildCanonicalParadigm({
+    model,
+    fetched: { ...fetched, status: { ...(fetched.status || fetched || {}), ...statusPatch } },
+    analysis: next.analysis,
+    changelog: next.changelog,
+    existing,
+  });
+
   for (const field of STATUS_FIELDS) {
     if (!(field in statusPatch)) delete next[field];
   }
@@ -295,6 +330,34 @@ function mergeModelOrder(existingModels, updatesById, selectedModels) {
     }
   }
   return out;
+}
+
+function mergeVariantIntoCanonical(existingModels, updatesById, classification, fetched = {}) {
+  const variant = classification.variant || {};
+  const variantName = cleanString(variant.variantName || fetched.status?.latestVersion);
+  if (!variantName) return "";
+  const canonicalKey = cleanString(variant.canonicalHfId).toLowerCase();
+  const candidate = existingModels.find((entry) => {
+    const sourceHit = entry.changelogUrl && canonicalKey && entry.changelogUrl.toLowerCase().includes(canonicalKey);
+    const variantHit = Array.isArray(entry.latestVersionVariants)
+      && entry.latestVersionVariants.some((item) => cleanString(item).toLowerCase() === variantName.toLowerCase());
+    return sourceHit || variantHit;
+  });
+  if (!candidate) return "";
+  const current = updatesById.get(candidate.id) || candidate;
+  const variants = [...new Set([...(current.latestVersionVariants || []), variantName])];
+  updatesById.set(candidate.id, {
+    ...current,
+    latestVersionVariants: variants,
+    paradigm: current.paradigm?.card ? current.paradigm : buildCanonicalParadigm({
+      model: { ...current, kind: current.kind },
+      fetched: current,
+      analysis: current.analysis,
+      changelog: current.changelog,
+      existing: current,
+    }),
+  });
+  return candidate.id;
 }
 
 function versionLabel(input) {
@@ -359,18 +422,20 @@ function asArray(value) {
 
 function printUsage() {
   console.log(`Usage:
-  node scripts/columns/models/daily.mjs [--only id,id] [--cap N] [--offline] [--dry-run]
+  node scripts/columns/models/daily.mjs [--only id,id] [--cap N] [--offline] [--dry-run] [--force|--regenerate]
 
 Runs model daily refresh:
   stage-1 source check for every selected registry model
-  stage-2 analysis generation only for new or changed latestVersion
-  unchanged entries keep existing analysis/changelog and refresh status-card fields
+  stage-2 analysis generation only for new/changed latestVersion, unless forced
+  unchanged entries keep existing analysis/changelog and refresh status-card + paradigm fields
 
 Flags:
   --only id,id      Limit to specific model ids
   --cap N           Limit selected registry models after --only filtering
   --offline         No LLM/network; use source/generator offline stubs for new models
   --dry-run         Compute and log what would change; write nothing
+  --force           Regenerate selected models even when latestVersion is unchanged
+  --regenerate      Alias for --force
 `);
 }
 

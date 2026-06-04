@@ -77,11 +77,11 @@ export async function generateProjectDeepDive({
       system: projectDeepDiveSystemPrompt(triage.project_type, finalDepth),
       user: projectDeepDiveUser(candidate, evidence, triage, options),
       model,
-      maxTokens: options.deepDiveMaxTokens || options.deepMaxTokens || Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 12000,
+      maxTokens: options.deepDiveMaxTokens || options.deepMaxTokens || Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 16000,
     });
   }
 
-  if (isReviewableDepth(finalDepth)) {
+  if (isReviewableDepth(finalDepth) && !options.skipReview) {
     review = await reviewProjectAnalysis({
       candidate,
       evidence,
@@ -100,7 +100,7 @@ export async function generateProjectDeepDive({
         system: projectDeepDiveSystemPrompt(triage.project_type, finalDepth),
         user: projectDeepDiveUser(candidate, evidence, triage, { ...options, reviewIssues: review.issues }),
         model,
-        maxTokens: options.deepDiveMaxTokens || options.deepMaxTokens || Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 12000,
+        maxTokens: options.deepDiveMaxTokens || options.deepMaxTokens || Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 16000,
       });
       const secondReview = await reviewProjectAnalysis({
         candidate,

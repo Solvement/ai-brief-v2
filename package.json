@@ -30,14 +30,18 @@
     "papers:review": "node --no-warnings scripts/papers-radar.mjs review",
     "papers:daily": "node --no-warnings scripts/columns/papers/daily.mjs",
     "papers:run": "node --no-warnings scripts/columns/papers/daily.mjs",
+    "papers:codex-deepdive": "node --no-warnings scripts/columns/papers/codex-deepdive.mjs",
     "daily": "node --no-warnings scripts/daily.mjs",
+    "news:daily": "node --no-warnings scripts/columns/news/daily.mjs",
     "projects:daily": "node --no-warnings scripts/columns/projects/daily.mjs",
+    "projects:codex-deepdive": "node --no-warnings scripts/columns/projects/codex-deepdive.mjs",
     "models:check": "node --no-warnings scripts/columns/models/sources.mjs",
     "models:generate": "node --no-warnings scripts/columns/models/generate.mjs",
     "models:daily": "node --no-warnings scripts/columns/models/daily.mjs",
     "pipeline:sync": "node --no-warnings scripts/sync-pipeline-status.mjs"
   },
   "dependencies": {
+    "jsonrepair": "^3.14.0",
     "next": "^16.2.7",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

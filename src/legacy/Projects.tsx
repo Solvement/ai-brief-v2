@@ -6,7 +6,7 @@ import { RepoCard } from "../components/RepoCard";
 import { SiteHeader } from "../components/SiteHeader";
 
 const TITLES: Record<TrendingWindow, string> = { daily: "今日榜", weekly: "本周榜", monthly: "本月榜" };
-const ICONS: Record<TrendingWindow, string> = { daily: "日", weekly: "周", monthly: "月" };
+const SORT_LABEL = "综合排序";
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -18,22 +18,24 @@ function relativeTime(iso: string): string {
   return `${Math.round(h / 24)} 天前`;
 }
 
-function BoardCol({ board }: { board: Board }) {
-  const deepCount = board.repos.filter((r) => r.deep).length;
+function depthOf(repo: { final_depth?: string; deep?: unknown }): string {
+  return repo.final_depth || (repo.deep ? "deep" : "list_only");
+}
+
+function RadarGrid({ board }: { board: Board }) {
+  const repos = board.repos;
+  if (repos.length === 0) return <div className="empty">这个榜没抓到数据</div>;
+  const deepCount = repos.filter((r) => depthOf(r) === "deep").length;
+  const analysisCount = repos.filter((r) => depthOf(r) === "analysis").length;
   return (
-    <section className="board">
-      <header className="board-head">
-        <h2><span className="board-icon">{ICONS[board.window]}</span>{TITLES[board.window]}</h2>
-        <span className="board-tag">
-          {board.repos.length} 个 · <b style={{ color: "var(--gold-deep)" }}>{deepCount}</b> 个点金
-        </span>
-      </header>
-      {board.repos.length === 0 ? (
-        <div className="empty">这个榜没抓到数据</div>
-      ) : (
-        board.repos.map((r) => <RepoCard key={r.fullName} repo={r} />)
-      )}
-    </section>
+    <>
+      <div className="radar-grid">
+        {repos.map((r, i) => <RepoCard key={r.fullName} repo={r} featured={i === 0} />)}
+      </div>
+      <div className="radar-footstats">
+        已收录 <b>{repos.length}</b> 个项目 · 深扒 <b>{deepCount}</b> · 分析 <b>{analysisCount}</b>
+      </div>
+    </>
   );
 }
 
@@ -98,16 +100,30 @@ export function Projects() {
         )}
       />
 
-      <main className="page">
-        <div className="page-intro">
-          GitHub Trending 的<b>日 / 周 / 月</b>项目简报。每张卡片先回答：这是什么、为什么现在值得看、
-          适合谁、建议你读还是试。右上角会明确区分<b>价值分</b>和<b>总分</b>。
-          <div style={{ marginTop: 10, color: "var(--ink-3)", fontSize: 13 }}>
-            <b>分析视角</b>：默认给刚开始接触 AI 工具和项目的学生看，先用人话解释，再保留工程细节。
-            深度解读会把 Overview、How it works、Try it 和自测标准放到默认路径里。
+      <main className="page radar-page">
+        <header className="radar-header">
+          <h1 className="radar-title">项目雷达</h1>
+          <p className="radar-subtitle">
+            GitHub Trending 的日 / 周 / 月项目雷达。每张卡片先回答这是什么、为什么值得看、适合谁、建议你读还是试。
+          </p>
+        </header>
+
+        <div className="radar-filters">
+          <div className="radar-chip-group">
+            {(["daily", "weekly", "monthly"] as TrendingWindow[]).map((w) => (
+              <button
+                key={w}
+                className={`radar-chip${win === w ? " active" : ""}`}
+                onClick={() => setWin(w)}
+              >
+                {TITLES[w]}
+                {data && <span className="radar-chip-count">{data[w].repos.length}</span>}
+              </button>
+            ))}
           </div>
-          <div style={{ marginTop: 10, color: "var(--ink-3)", fontSize: 13 }}>
-            <b>新增栏目</b>：<a href="/models">Models</a> 先用 DeepSeek 做公司级模型演进样板。
+          <div className="radar-chip-group radar-chip-group-right">
+            <span className="radar-chip radar-chip-static active">全部领域</span>
+            <span className="radar-chip radar-chip-static radar-chip-sort">{SORT_LABEL} ▾</span>
           </div>
         </div>
 
@@ -120,20 +136,7 @@ export function Projects() {
 
         {!data && !err && <div className="loading">正在加载榜单…</div>}
 
-        {data && (
-          <>
-            <div className="board-tabs">
-              {(["daily", "weekly", "monthly"] as TrendingWindow[]).map((w) => (
-                <button key={w} className={`board-tab${win === w ? " active" : ""}`} onClick={() => setWin(w)}>
-                  {TITLES[w]}<span className="board-tab-count">{data[w].repos.length}</span>
-                </button>
-              ))}
-            </div>
-            <div className="boards single">
-              <BoardCol board={data[win]} />
-            </div>
-          </>
-        )}
+        {data && <RadarGrid board={data[win]} />}
       </main>
 
       {ingest !== "idle" && (

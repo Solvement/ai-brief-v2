@@ -1,9 +1,86 @@
 {
-  "generatedAt": "2026-06-02T03:41:39.783Z",
+  "generatedAt": "2026-06-04T04:05:46.368Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 5,
+  "count": 43,
   "items": [
+    {
+      "id": "artifact/9router-repo",
+      "type": "artifact",
+      "slug": "9router-repo",
+      "title": "9router Repo",
+      "file": "artifacts/9router-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "9router-repo",
+        "kind": "artifact",
+        "content": "9router",
+        "artifact_type": "repo",
+        "url": "https://github.com/decolua/9router",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未在 README 提供详细的 API 文档或配置参考",
+          "令牌压缩（RTK）的具体算法未随源码公开",
+          "单元测试和集成测试的覆盖率信息缺失"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n完整的 MIT 开源仓库，提供本地免费 AI 路由器，源码可用，文档齐全但部分功能实现细节未公开。\n\n出处:https://github.com/decolua/9router。See [[content/9router]]。\n",
+      "excerpt": "完整的 MIT 开源仓库，提供本地免费 AI 路由器，源码可用，文档齐全但部分功能实现细节未公开。",
+      "links": [
+        {
+          "target": "content/9router",
+          "raw": "[[content/9router]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/academic-research-skills-repo",
+      "type": "artifact",
+      "slug": "academic-research-skills-repo",
+      "title": "Academic Research Skills Repo",
+      "file": "artifacts/academic-research-skills-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "academic-research-skills-repo",
+        "kind": "artifact",
+        "content": "academic-research-skills",
+        "artifact_type": "repo",
+        "url": "https://github.com/imbad0202/academic-research-skills",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "CC BY-NC 4.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "Docker 部署支持",
+          "商业使用许可"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个活跃维护的 Claude Code 技能套件，面向学术研究全流程，具备丰富的文档、示例和测试，但依赖特定平台，且许可证限制商业用途。\n\n出处:https://github.com/imbad0202/academic-research-skills。See [[content/academic-research-skills]]。\n",
+      "excerpt": "一个活跃维护的 Claude Code 技能套件，面向学术研究全流程，具备丰富的文档、示例和测试，但依赖特定平台，且许可证限制商业用途。",
+      "links": [
+        {
+          "target": "content/academic-research-skills",
+          "raw": "[[content/academic-research-skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
     {
       "id": "artifact/agemem-code",
       "type": "artifact",
@@ -31,6 +108,122 @@
         {
           "target": "content/agemem",
           "raw": "[[content/agemem]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/agent-governance-toolkit-repo",
+      "type": "artifact",
+      "slug": "agent-governance-toolkit-repo",
+      "title": "Agent Governance Toolkit Repo",
+      "file": "artifacts/agent-governance-toolkit-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "agent-governance-toolkit-repo",
+        "kind": "artifact",
+        "content": "agent-governance-toolkit",
+        "artifact_type": "repo",
+        "url": "https://github.com/microsoft/agent-governance-toolkit",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未在 README/artifact 说明生产性能数据（如策略评估延迟）。",
+          "未在 README/artifact 提供各语言 SDK 功能对齐的详细对比。",
+          "未在 README/artifact 给出沙箱四层特权环的技术细节。"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n微软官方开源的 AI 代理治理工具包，v4.0.0 为当前版本，Python 为全功能栈，其他语言提供核心能力。具备完整的文档、示例和 CI，但处于 Public Preview，部分细节待沉淀。\n\n出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。\n",
+      "excerpt": "微软官方开源的 AI 代理治理工具包，v4.0.0 为当前版本，Python 为全功能栈，其他语言提供核心能力。具备完整的文档、示例和 CI，但处于 Public Preview，部分细节待沉淀。",
+      "links": [
+        {
+          "target": "content/agent-governance-toolkit",
+          "raw": "[[content/agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/agentmemory-repo",
+      "type": "artifact",
+      "slug": "agentmemory-repo",
+      "title": "Agentmemory Repo",
+      "file": "artifacts/agentmemory-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "agentmemory-repo",
+        "kind": "artifact",
+        "content": "agentmemory",
+        "artifact_type": "repo",
+        "url": "https://github.com/rohitg00/agentmemory",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "安全配置文档未在 README 详述",
+          "iii 引擎架构细节缺失"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\nnpm 记忆服务器，支持多代理 MCP 接入，带 benchmarks，可直接 install 运行。\n\n出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。\n",
+      "excerpt": "npm 记忆服务器，支持多代理 MCP 接入，带 benchmarks，可直接 install 运行。",
+      "links": [
+        {
+          "target": "content/agentmemory",
+          "raw": "[[content/agentmemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/ai-engineering-from-scratch-repo",
+      "type": "artifact",
+      "slug": "ai-engineering-from-scratch-repo",
+      "title": "Ai Engineering From Scratch Repo",
+      "file": "artifacts/ai-engineering-from-scratch-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "ai-engineering-from-scratch-repo",
+        "kind": "artifact",
+        "content": "ai-engineering-from-scratch",
+        "artifact_type": "repo",
+        "url": "https://github.com/rohitg00/ai-engineering-from-scratch",
+        "official_or_third_party": "official",
+        "status": "partial",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "自动化测试套件",
+          "独立的示例项目目录",
+          "部分阶段可能未完成（存在 51 个 open issues）"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个庞大的 AI 工程课程仓库，结构清晰，核心教学循环已实现，但完成度、代码质量和测试覆盖率需实地验证。\n\n出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/ai-engineering-from-scratch]]。\n",
+      "excerpt": "一个庞大的 AI 工程课程仓库，结构清晰，核心教学循环已实现，但完成度、代码质量和测试覆盖率需实地验证。",
+      "links": [
+        {
+          "target": "content/ai-engineering-from-scratch",
+          "raw": "[[content/ai-engineering-from-scratch]]"
         }
       ],
       "headings": [
@@ -81,6 +274,651 @@
       ]
     },
     {
+      "id": "artifact/airllm-repo",
+      "type": "artifact",
+      "slug": "airllm-repo",
+      "title": "Airllm Repo",
+      "file": "artifacts/airllm-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "airllm-repo",
+        "kind": "artifact",
+        "content": "airllm",
+        "artifact_type": "repo",
+        "url": "https://github.com/lyogavin/airllm",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "自动化测试 (tests)",
+          "setup 打包配置 (pyproject.toml/setup.py)",
+          "详细文档"
+        ],
+        "last_checked": "2026-06-04"
+      },
+      "body": "\n## Artifact audit\n\n完整的仓库，包含 README、示例、需求文件，可 pip 安装并运行示例；缺少测试和正式打包文件。\n\n出处:https://github.com/lyogavin/airllm。See [[content/airllm]]。\n",
+      "excerpt": "完整的仓库，包含 README、示例、需求文件，可 pip 安装并运行示例；缺少测试和正式打包文件。",
+      "links": [
+        {
+          "target": "content/airllm",
+          "raw": "[[content/airllm]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/aitoearn-repo",
+      "type": "artifact",
+      "slug": "aitoearn-repo",
+      "title": "Aitoearn Repo",
+      "file": "artifacts/aitoearn-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "aitoearn-repo",
+        "kind": "artifact",
+        "content": "aitoearn",
+        "artifact_type": "repo",
+        "url": "https://github.com/yikart/AiToEarn",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "tests 目录未发现",
+          "根目录未发现 package.json，但子目录可能存在",
+          "详细架构/API 文档缺失"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\nMIT 许可的开源项目，提供 Docker 一键部署，有演示视频，但缺少自动化测试和详细开发文档。\n\n出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。\n",
+      "excerpt": "MIT 许可的开源项目，提供 Docker 一键部署，有演示视频，但缺少自动化测试和详细开发文档。",
+      "links": [
+        {
+          "target": "content/aitoearn",
+          "raw": "[[content/aitoearn]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/anthropic-cybersecurity-skills-repo",
+      "type": "artifact",
+      "slug": "anthropic-cybersecurity-skills-repo",
+      "title": "Anthropic Cybersecurity Skills Repo",
+      "file": "artifacts/anthropic-cybersecurity-skills-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "anthropic-cybersecurity-skills-repo",
+        "kind": "artifact",
+        "content": "anthropic-cybersecurity-skills",
+        "artifact_type": "repo",
+        "url": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "缺少测试",
+          "缺少CI/CD说明",
+          "缺少安全沙箱实现"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n包含754个结构化网络安全技能的仓库，使用 agentskills.io 标准，映射到五大安全框架，支持26+ AI 平台。可直接通过 npx 或 git clone 使用，但未提供执行安全性保证。\n\n出处:https://github.com/mukul975/anthropic-cybersecurity-skills。See [[content/anthropic-cybersecurity-skills]]。\n",
+      "excerpt": "包含754个结构化网络安全技能的仓库，使用 agentskills.io 标准，映射到五大安全框架，支持26+ AI 平台。可直接通过 npx 或 git clone 使用，但未提供执行安全性保证。",
+      "links": [
+        {
+          "target": "content/anthropic-cybersecurity-skills",
+          "raw": "[[content/anthropic-cybersecurity-skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/cloakbrowser-repo",
+      "type": "artifact",
+      "slug": "cloakbrowser-repo",
+      "title": "Cloakbrowser Repo",
+      "file": "artifacts/cloakbrowser-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "cloakbrowser-repo",
+        "kind": "artifact",
+        "content": "cloakbrowser",
+        "artifact_type": "repo",
+        "url": "https://github.com/CloakHQ/CloakBrowser",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "C++ 补丁源文件",
+          "二进制构建文档"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n完整的仓库，包含 Python 和 JS 包装代码、示例、测试、Dockerfile。预编译的隐身 Chromium 二进制在首次运行时自动下载。\n\n出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。\n",
+      "excerpt": "完整的仓库，包含 Python 和 JS 包装代码、示例、测试、Dockerfile。预编译的隐身 Chromium 二进制在首次运行时自动下载。",
+      "links": [
+        {
+          "target": "content/cloakbrowser",
+          "raw": "[[content/cloakbrowser]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/codegraph-repo",
+      "type": "artifact",
+      "slug": "codegraph-repo",
+      "title": "Codegraph Repo",
+      "file": "artifacts/codegraph-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "codegraph-repo",
+        "kind": "artifact",
+        "content": "codegraph",
+        "artifact_type": "repo",
+        "url": "https://github.com/colbymchenry/codegraph",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未提供 Docker 部署方式",
+          "未在 README 中展示完整的 API 文档（docs 目录可能有）",
+          "未详细说明如何扩展或添加新语言解析器"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个本地运行、基于 MCP 的代码知识图谱，为多种 AI 编程助手提供高效的代码探索能力，附有详尽的基准测试和清晰的安装指南。\n\n出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。\n",
+      "excerpt": "一个本地运行、基于 MCP 的代码知识图谱，为多种 AI 编程助手提供高效的代码探索能力，附有详尽的基准测试和清晰的安装指南。",
+      "links": [
+        {
+          "target": "content/codegraph",
+          "raw": "[[content/codegraph]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/codewhale-repo",
+      "type": "artifact",
+      "slug": "codewhale-repo",
+      "title": "Codewhale Repo",
+      "file": "artifacts/codewhale-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "codewhale-repo",
+        "kind": "artifact",
+        "content": "codewhale",
+        "artifact_type": "repo",
+        "url": "https://github.com/hmbown/codewhale",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "源代码在 crates 目录中，但具体结构未在本次审计中深入分析"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n终端编码代理，用 Rust 编写，为 DeepSeek V4 提供宪法治理、子代理并发和自动模式等高级特性，具备预编译二进制和多种安装方式，活跃维护。\n\n出处:https://github.com/hmbown/codewhale。See [[content/codewhale]]。\n",
+      "excerpt": "终端编码代理，用 Rust 编写，为 DeepSeek V4 提供宪法治理、子代理并发和自动模式等高级特性，具备预编译二进制和多种安装方式，活跃维护。",
+      "links": [
+        {
+          "target": "content/codewhale",
+          "raw": "[[content/codewhale]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/easy-vibe-repo",
+      "type": "artifact",
+      "slug": "easy-vibe-repo",
+      "title": "Easy Vibe Repo",
+      "file": "artifacts/easy-vibe-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "easy-vibe-repo",
+        "kind": "artifact",
+        "content": "easy-vibe",
+        "artifact_type": "repo",
+        "url": "https://github.com/datawhalechina/easy-vibe",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "CC-BY-NC-SA-4.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "无测试代码",
+          "无独立可复用的 agent 框架模块"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个面向 AI 编程教学的多语言文档站点，基于 Next.js 构建，内容覆盖从入门到高级 agent 工作流。工程上是一个静态内容仓库，并非可集成的框架或库。\n\n出处:https://github.com/datawhalechina/easy-vibe。See [[content/easy-vibe]]。\n",
+      "excerpt": "一个面向 AI 编程教学的多语言文档站点，基于 Next.js 构建，内容覆盖从入门到高级 agent 工作流。工程上是一个静态内容仓库，并非可集成的框架或库。",
+      "links": [
+        {
+          "target": "content/easy-vibe",
+          "raw": "[[content/easy-vibe]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/ecc-repo",
+      "type": "artifact",
+      "slug": "ecc-repo",
+      "title": "Ecc Repo",
+      "file": "artifacts/ecc-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "ecc-repo",
+        "kind": "artifact",
+        "content": "ecc",
+        "artifact_type": "repo",
+        "url": "https://github.com/affaan-m/ECC",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n完整的跨平台 AI 助手工作流系统，包含安装脚本、详细文档、多项测试和 CI 配置，可直接克隆并运行。缺少 Docker 支持，但无碍核心使用。\n\n出处:https://github.com/affaan-m/ecc。See [[content/ecc]]。\n",
+      "excerpt": "完整的跨平台 AI 助手工作流系统，包含安装脚本、详细文档、多项测试和 CI 配置，可直接克隆并运行。缺少 Docker 支持，但无碍核心使用。",
+      "links": [
+        {
+          "target": "content/ecc",
+          "raw": "[[content/ecc]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/flowsint-repo",
+      "type": "artifact",
+      "slug": "flowsint-repo",
+      "title": "Flowsint Repo",
+      "file": "artifacts/flowsint-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "flowsint-repo",
+        "kind": "artifact",
+        "content": "flowsint",
+        "artifact_type": "repo",
+        "url": "https://github.com/reconurge/flowsint",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "完整的测试套件"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n仓库代码完备，包含前端、后端、核心库、丰富器及类型定义，通过 Docker Compose 可一键部署。测试覆盖不足，文档和伦理指南完善。\n\n出处:https://github.com/reconurge/flowsint。See [[content/flowsint]]。\n",
+      "excerpt": "仓库代码完备，包含前端、后端、核心库、丰富器及类型定义，通过 Docker Compose 可一键部署。测试覆盖不足，文档和伦理指南完善。",
+      "links": [
+        {
+          "target": "content/flowsint",
+          "raw": "[[content/flowsint]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/funasr-repo",
+      "type": "artifact",
+      "slug": "funasr-repo",
+      "title": "Funasr Repo",
+      "file": "artifacts/funasr-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "funasr-repo",
+        "kind": "artifact",
+        "content": "funasr",
+        "artifact_type": "repo",
+        "url": "https://github.com/modelscope/FunASR",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n工业级语音识别工具包，提供 Python 包、模型动物园、OpenAI 兼容 API 和 MCP 服务器，速度远超 Whisper，内置说话人分离和情感识别，支持 50+ 语言。\n\n出处:https://github.com/modelscope/funasr。See [[content/funasr]]。\n",
+      "excerpt": "工业级语音识别工具包，提供 Python 包、模型动物园、OpenAI 兼容 API 和 MCP 服务器，速度远超 Whisper，内置说话人分离和情感识别，支持 50+ 语言。",
+      "links": [
+        {
+          "target": "content/funasr",
+          "raw": "[[content/funasr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/headroom-repo",
+      "type": "artifact",
+      "slug": "headroom-repo",
+      "title": "Headroom Repo",
+      "file": "artifacts/headroom-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "headroom-repo",
+        "kind": "artifact",
+        "content": "headroom",
+        "artifact_type": "repo",
+        "url": "https://github.com/chopratejas/headroom",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [],
+        "last_checked": "2026-06-02"
+      },
+      "body": "\n## Artifact audit\n\n仓库结构完整，包含源码、测试、文档、示例、CI 配置，已发布到 PyPI 和 npm，有最新的 v0.22.4 版本，可直接安装运行。\n\n出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。\n",
+      "excerpt": "仓库结构完整，包含源码、测试、文档、示例、CI 配置，已发布到 PyPI 和 npm，有最新的 v0.22.4 版本，可直接安装运行。",
+      "links": [
+        {
+          "target": "content/headroom",
+          "raw": "[[content/headroom]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/herdr-repo",
+      "type": "artifact",
+      "slug": "herdr-repo",
+      "title": "Herdr Repo",
+      "file": "artifacts/herdr-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "herdr-repo",
+        "kind": "artifact",
+        "content": "herdr",
+        "artifact_type": "repo",
+        "url": "https://github.com/ogulcancelik/herdr",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "未在 README/artifact 说明 (SPDX: NOASSERTION, README states AGPL-3.0-or-later with commercial option)",
+        "runnable": "yes",
+        "missing_parts": [
+          "缺少示例代码或 demo 录像（README 指向一个 GitHub 视频，但无内嵌示例）",
+          "缺少 Docker 部署配置（has_docker 为 false）",
+          "缺少对自定义代理集成模式的详细指南"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个用 Rust 编写的终端代理多路复用器，提供工作区、窗格、持久会话和代理状态感知。项目结构完整，有源代码、测试、文档和变更日志。许可证在 README 中说明为 AGPL-3.0 或商业许可，但 GitHub 未检测到标准许可证文件。建议查阅官方文档以获取完整集成说明。\n\n出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。\n",
+      "excerpt": "一个用 Rust 编写的终端代理多路复用器，提供工作区、窗格、持久会话和代理状态感知。项目结构完整，有源代码、测试、文档和变更日志。许可证在 README 中说明为 AGPL-3.0 或商业许可，但 GitHub 未检测到标准许可证文件。建议查阅官方文档以获取完整集成说明。",
+      "links": [
+        {
+          "target": "content/herdr",
+          "raw": "[[content/herdr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/hermes-agent-repo",
+      "type": "artifact",
+      "slug": "hermes-agent-repo",
+      "title": "Hermes Agent Repo",
+      "file": "artifacts/hermes-agent-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "hermes-agent-repo",
+        "kind": "artifact",
+        "content": "hermes-agent",
+        "artifact_type": "repo",
+        "url": "https://github.com/NousResearch/hermes-agent",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "部分文档链接的具体实现细节未在 README 中体现",
+          "技能创建和改进的算法未公开",
+          "无独立的 benchmark 或示例目录"
+        ],
+        "last_checked": "2026-06-04"
+      },
+      "body": "\n## Artifact audit\n\n一个功能丰富的 AI 代理框架，提供一键安装、CLI/消息平台入口、多模型支持和声称的自我学习能力，但具体实现和安全细节需要源码审查。\n\n出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。\n",
+      "excerpt": "一个功能丰富的 AI 代理框架，提供一键安装、CLI/消息平台入口、多模型支持和声称的自我学习能力，但具体实现和安全细节需要源码审查。",
+      "links": [
+        {
+          "target": "content/hermes-agent",
+          "raw": "[[content/hermes-agent]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/hermes-desktop-repo",
+      "type": "artifact",
+      "slug": "hermes-desktop-repo",
+      "title": "Hermes Desktop Repo",
+      "file": "artifacts/hermes-desktop-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "hermes-desktop-repo",
+        "kind": "artifact",
+        "content": "hermes-desktop",
+        "artifact_type": "repo",
+        "url": "https://github.com/fathah/hermes-desktop",
+        "official_or_third_party": "third_party",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "Docker 支持",
+          "沙盒安全说明",
+          "上游 API 稳定性保证"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n第三方为 Hermes Agent 开发的桌面伴侣应用，包含引导安装、多供应商管理、会话搜索和消息网关等功能，技术栈为 Electron + React + TypeScript。\n\n出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。\n",
+      "excerpt": "第三方为 Hermes Agent 开发的桌面伴侣应用，包含引导安装、多供应商管理、会话搜索和消息网关等功能，技术栈为 Electron + React + TypeScript。",
+      "links": [
+        {
+          "target": "content/hermes-desktop",
+          "raw": "[[content/hermes-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/hermes-webui-repo",
+      "type": "artifact",
+      "slug": "hermes-webui-repo",
+      "title": "Hermes Webui Repo",
+      "file": "artifacts/hermes-webui-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "hermes-webui-repo",
+        "kind": "artifact",
+        "content": "hermes-webui",
+        "artifact_type": "repo",
+        "url": "https://github.com/nesquena/hermes-webui",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未在 README 中说明与 Hermes Agent 的完整通信协议。",
+          "未在 README 中给出自学习技能的具体示例或成功率。",
+          "测试覆盖率和内容未在 README 披露。"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个自托管的 Hermes Agent Web 界面仓库，代码完整、文档丰富，具备引导脚本和 Docker 支持，但与 Hermes Agent 内部细节紧耦合，稳定性依赖上游。\n\n出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。\n",
+      "excerpt": "一个自托管的 Hermes Agent Web 界面仓库，代码完整、文档丰富，具备引导脚本和 Docker 支持，但与 Hermes Agent 内部细节紧耦合，稳定性依赖上游。",
+      "links": [
+        {
+          "target": "content/hermes-webui",
+          "raw": "[[content/hermes-webui]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/iii-repo",
+      "type": "artifact",
+      "slug": "iii-repo",
+      "title": "Iii Repo",
+      "file": "artifacts/iii-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "iii-repo",
+        "kind": "artifact",
+        "content": "iii",
+        "artifact_type": "repo",
+        "url": "https://github.com/iii-hq/iii",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "引擎：Elastic License 2.0；SDK、控制台、文档、网站：Apache License 2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "缺少顶层测试目录（未发现 tests/）",
+          "缺少本仓库内的示例代码（示例在外部仓库）",
+          "未在 README 中明确开发者首次运行所需依赖（如 Rust 工具链、语言环境）"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n仓库结构完整，核心引擎、SDK、控制台、文档、技能材料均实际存在。许可证信息明确。但测试代码和内部代理逻辑未公开，完整性评分高但透明度有待提升。\n\n出处:https://github.com/iii-hq/iii。See [[content/iii]]。\n",
+      "excerpt": "仓库结构完整，核心引擎、SDK、控制台、文档、技能材料均实际存在。许可证信息明确。但测试代码和内部代理逻辑未公开，完整性评分高但透明度有待提升。",
+      "links": [
+        {
+          "target": "content/iii",
+          "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/markitdown-repo",
+      "type": "artifact",
+      "slug": "markitdown-repo",
+      "title": "Markitdown Repo",
+      "file": "artifacts/markitdown-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "markitdown-repo",
+        "kind": "artifact",
+        "content": "markitdown",
+        "artifact_type": "repo",
+        "url": "https://github.com/microsoft/markitdown",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "独立文档站（无 docs/ 目录）",
+          "测试文件在根目录不可见（在 packages 内，但 has_tests 标记为 false）",
+          "性能基准或转换质量对比报告"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n微软 AutoGen 团队出品的文件转 Markdown 工具，支持 10+ 格式、插件系统、Azure 云集成，MIT 许可证，stars 超 14 万，成熟度极高。\n\n出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。\n",
+      "excerpt": "微软 AutoGen 团队出品的文件转 Markdown 工具，支持 10+ 格式、插件系统、Azure 云集成，MIT 许可证，stars 超 14 万，成熟度极高。",
+      "links": [
+        {
+          "target": "content/markitdown",
+          "raw": "[[content/markitdown]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/memoryagentbench-code",
       "type": "artifact",
       "slug": "memoryagentbench-code",
@@ -109,6 +947,240 @@
         {
           "target": "content/memoryagentbench",
           "raw": "[[content/memoryagentbench]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/microsoft-agent-governance-toolkit-repo",
+      "type": "artifact",
+      "slug": "microsoft-agent-governance-toolkit-repo",
+      "title": "Microsoft Agent Governance Toolkit Repo",
+      "file": "artifacts/microsoft-agent-governance-toolkit-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "microsoft-agent-governance-toolkit-repo",
+        "kind": "artifact",
+        "content": "microsoft-agent-governance-toolkit",
+        "artifact_type": "repo",
+        "url": "https://github.com/microsoft/agent-governance-toolkit",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未运行完整测试和 benchmark",
+          "未核验外部包仓库发布状态",
+          "README/docs/package VERSION 存在版本口径不一致",
+          "性能和红队百分比需要用公开 methodology 或本地复现实验确认",
+          "同进程边界不是 OS 级隔离"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n真实上游仓库已克隆检查。它是一个大型 Public Preview agent governance 工具集，包含多语言 SDK、Rust policy-engine/ACS、Python 核心包、框架适配、MCP/协议组件、examples、docs/specs、CI 和 Docker 开发环境。适合深读和试跑，生产采用前必须锁版本、跑目标 adapter、验证 fail-closed 和端到端延迟。\n\n出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。\n",
+      "excerpt": "真实上游仓库已克隆检查。它是一个大型 Public Preview agent governance 工具集，包含多语言 SDK、Rust policy-engine/ACS、Python 核心包、框架适配、MCP/协议组件、examples、docs/specs、CI 和 Docker 开发环境。适合深读和试跑，生产采用前必须锁版本、跑目标 adapter、验证 fail-closed 和端到端延迟。",
+      "links": [
+        {
+          "target": "content/microsoft-agent-governance-toolkit",
+          "raw": "[[content/microsoft-agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/moneyprinterturbo-repo",
+      "type": "artifact",
+      "slug": "moneyprinterturbo-repo",
+      "title": "Moneyprinterturbo Repo",
+      "file": "artifacts/moneyprinterturbo-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "moneyprinterturbo-repo",
+        "kind": "artifact",
+        "content": "moneyprinterturbo",
+        "artifact_type": "repo",
+        "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "详细的 API 文档仅包含自动生成的 FastAPI 界面，无补充说明。",
+          "没有贡献指南或开发者文档说明如何扩展新 LLM provider。"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个利用 AI 大模型一键生成高清短视频的工具，提供 WebUI 和 API，支持多种 LLM/TTS 配置，部署方式多样，适合快速内容生产。\n\n出处:https://github.com/harry0703/moneyprinterturbo。See [[content/moneyprinterturbo]]。\n",
+      "excerpt": "一个利用 AI 大模型一键生成高清短视频的工具，提供 WebUI 和 API，支持多种 LLM/TTS 配置，部署方式多样，适合快速内容生产。",
+      "links": [
+        {
+          "target": "content/moneyprinterturbo",
+          "raw": "[[content/moneyprinterturbo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/ogulcancelik-herdr-repo",
+      "type": "artifact",
+      "slug": "ogulcancelik-herdr-repo",
+      "title": "Ogulcancelik Herdr Repo",
+      "file": "artifacts/ogulcancelik-herdr-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "ogulcancelik-herdr-repo",
+        "kind": "artifact",
+        "content": "ogulcancelik-herdr",
+        "artifact_type": "repo",
+        "url": "https://github.com/ogulcancelik/herdr",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "AGPL-3.0-or-later；LICENSE 另写 commercial licenses are available for organizations that cannot comply with AGPL",
+        "runnable": "unknown",
+        "missing_parts": [
+          "本次环境未安装 cargo，无法执行 cargo test --locked",
+          "未实测 release binary 或包管理器安装",
+          "未实测外部 agent 集成"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n已克隆真实上游仓库到指定 checkout；HEAD 为 e05bd5cb2a26e3690d73ca241e1e457d3eb664cb，最新本地 tag 列表包含 v0.6.7。仓库是 Rust CLI/TUI 项目，Cargo.toml 版本 0.6.7，README/docs/source 显示核心是终端复用、agent 状态识别、本地 socket API、官方集成和 session/remote 工作流。\n\n出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。\n",
+      "excerpt": "已克隆真实上游仓库到指定 checkout；HEAD 为 e05bd5cb2a26e3690d73ca241e1e457d3eb664cb，最新本地 tag 列表包含 v0.6.7。仓库是 Rust CLI/TUI 项目，Cargo.toml 版本 0.6.7，README/docs/source 显示核心是终端复用、agent 状态识别、本地 socket API、官方集成和 session/remote 工作流。",
+      "links": [
+        {
+          "target": "content/ogulcancelik-herdr",
+          "raw": "[[content/ogulcancelik-herdr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/oh-my-pi-repo",
+      "type": "artifact",
+      "slug": "oh-my-pi-repo",
+      "title": "Oh My Pi Repo",
+      "file": "artifacts/oh-my-pi-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "oh-my-pi-repo",
+        "kind": "artifact",
+        "content": "oh-my-pi",
+        "artifact_type": "repo",
+        "url": "https://github.com/can1357/oh-my-pi",
+        "official_or_third_party": "third_party",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未找到独立的测试套件",
+          "未提供详细的 API 文档，仅有 README 功能介绍",
+          "未在仓库中找到贡献指南"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n仓库活跃，代码庞大，包含 TypeScript 和 Rust 组件，提供安装脚本和 Dockerfile，可直接运行，但缺少测试和部分文档。\n\n出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。\n",
+      "excerpt": "仓库活跃，代码庞大，包含 TypeScript 和 Rust 组件，提供安装脚本和 Dockerfile，可直接运行，但缺少测试和部分文档。",
+      "links": [
+        {
+          "target": "content/oh-my-pi",
+          "raw": "[[content/oh-my-pi]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/open-llm-vtuber-repo",
+      "type": "artifact",
+      "slug": "open-llm-vtuber-repo",
+      "title": "Open Llm Vtuber Repo",
+      "file": "artifacts/open-llm-vtuber-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "open-llm-vtuber-repo",
+        "kind": "artifact",
+        "content": "open-llm-vtuber",
+        "artifact_type": "repo",
+        "url": "https://github.com/Open-LLM-VTuber/Open-LLM-VTuber",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "NOASSERTION",
+        "runnable": "yes",
+        "missing_parts": [
+          "没有找到测试代码",
+          "长期记忆功能暂缺",
+          "缺少详细的 Agent 开发文档"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个旨在用开源方案离线复刻 AI Vtuber neuro-sama 的语音交互框架，支持多平台和丰富模型后端，目前 v1.2.1 可在本地部署运行，但长期记忆缺失且 v2 重写中。\n\n出处:https://github.com/open-llm-vtuber/open-llm-vtuber。See [[content/open-llm-vtuber]]。\n",
+      "excerpt": "一个旨在用开源方案离线复刻 AI Vtuber neuro-sama 的语音交互框架，支持多平台和丰富模型后端，目前 v1.2.1 可在本地部署运行，但长期记忆缺失且 v2 重写中。",
+      "links": [
+        {
+          "target": "content/open-llm-vtuber",
+          "raw": "[[content/open-llm-vtuber]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/opendataloader-pdf-repo",
+      "type": "artifact",
+      "slug": "opendataloader-pdf-repo",
+      "title": "Opendataloader Pdf Repo",
+      "file": "artifacts/opendataloader-pdf-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "opendataloader-pdf-repo",
+        "kind": "artifact",
+        "content": "opendataloader-pdf",
+        "artifact_type": "repo",
+        "url": "https://github.com/opendataloader-project/opendataloader-pdf",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "测试代码未在仓库中公开",
+          "核心 Java 引擎的部分细节未在 README 展开"
+        ],
+        "last_checked": "2026-06-04"
+      },
+      "body": "\n## Artifact audit\n\n拥有完整 README、多语言 SDK、持续更新的活跃项目；Java 核心可运行，但缺乏公开测试。\n\n出处:https://github.com/opendataloader-project/opendataloader-pdf。See [[content/opendataloader-pdf]]。\n",
+      "excerpt": "拥有完整 README、多语言 SDK、持续更新的活跃项目；Java 核心可运行，但缺乏公开测试。",
+      "links": [
+        {
+          "target": "content/opendataloader-pdf",
+          "raw": "[[content/opendataloader-pdf]]"
         }
       ],
       "headings": [
@@ -156,6 +1228,86 @@
       ]
     },
     {
+      "id": "artifact/pixelle-video-repo",
+      "type": "artifact",
+      "slug": "pixelle-video-repo",
+      "title": "Pixelle Video Repo",
+      "file": "artifacts/pixelle-video-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "pixelle-video-repo",
+        "kind": "artifact",
+        "content": "pixelle-video",
+        "artifact_type": "repo",
+        "url": "https://github.com/AIDC-AI/Pixelle-Video",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "tests 目录缺失",
+          "源码内部结构未完全审计",
+          "CLI 接口未发现",
+          "详细的错误处理文档缺失"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n仓库结构清晰，包含 Web UI、核心代码、工作流定义和部署配置；但有测试缺失和部分实现细节未暴露的问题\n\n出处:https://github.com/aidc-ai/pixelle-video。See [[content/pixelle-video]]。\n",
+      "excerpt": "仓库结构清晰，包含 Web UI、核心代码、工作流定义和部署配置；但有测试缺失和部分实现细节未暴露的问题",
+      "links": [
+        {
+          "target": "content/pixelle-video",
+          "raw": "[[content/pixelle-video]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/production-agentic-rag-course-repo",
+      "type": "artifact",
+      "slug": "production-agentic-rag-course-repo",
+      "title": "Production Agentic Rag Course Repo",
+      "file": "artifacts/production-agentic-rag-course-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "production-agentic-rag-course-repo",
+        "kind": "artifact",
+        "content": "production-agentic-rag-course",
+        "artifact_type": "repo",
+        "url": "https://github.com/jamwithai/production-agentic-rag-course",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "CI/CD 配置文件",
+          "独立的文档目录",
+          "Agent 实现细节的源码注释或文档",
+          "详细的测试说明"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n仓库完整，包含源码、测试、Jupyter notebooks、Dockerfile 和详细 README，许可证明确，可通过 Docker Compose 运行，但缺少 CI 和更深层的技术文档。\n\n出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/production-agentic-rag-course]]。\n",
+      "excerpt": "仓库完整，包含源码、测试、Jupyter notebooks、Dockerfile 和详细 README，许可证明确，可通过 Docker Compose 运行，但缺少 CI 和更深层的技术文档。",
+      "links": [
+        {
+          "target": "content/production-agentic-rag-course",
+          "raw": "[[content/production-agentic-rag-course]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/qwen3-coder-next-weights",
       "type": "artifact",
       "slug": "qwen3-coder-next-weights",
@@ -183,6 +1335,307 @@
         {
           "target": "content/qwen3-coder-next",
           "raw": "[[content/qwen3-coder-next]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/ruview-repo",
+      "type": "artifact",
+      "slug": "ruview-repo",
+      "title": "Ruview Repo",
+      "file": "artifacts/ruview-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "ruview-repo",
+        "kind": "artifact",
+        "content": "ruview",
+        "artifact_type": "repo",
+        "url": "https://github.com/ruvnet/RuView",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n完整的开源项目，包含固件、模型、后端、前端，通过Docker或直接安装可快速运行模拟环境，实际部署需额外硬件。\n\n出处:https://github.com/ruvnet/ruview。See [[content/ruview]]。\n",
+      "excerpt": "完整的开源项目，包含固件、模型、后端、前端，通过Docker或直接安装可快速运行模拟环境，实际部署需额外硬件。",
+      "links": [
+        {
+          "target": "content/ruview",
+          "raw": "[[content/ruview]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/scrapling-repo",
+      "type": "artifact",
+      "slug": "scrapling-repo",
+      "title": "Scrapling Repo",
+      "file": "artifacts/scrapling-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "scrapling-repo",
+        "kind": "artifact",
+        "content": "scrapling",
+        "artifact_type": "repo",
+        "url": "https://github.com/D4Vinci/Scrapling",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "BSD-3-Clause",
+        "runnable": "yes",
+        "missing_parts": [
+          "缺少独立的 examples/ 演示目录",
+          "MCP 服务器未在顶层级独立提供（可能在 scrapling 包内）"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n功能完整的仓库，包含文档、测试、Dockerfile、CI 配置，无重大缺失。\n\n出处:https://github.com/d4vinci/scrapling。See [[content/scrapling]]。\n",
+      "excerpt": "功能完整的仓库，包含文档、测试、Dockerfile、CI 配置，无重大缺失。",
+      "links": [
+        {
+          "target": "content/scrapling",
+          "raw": "[[content/scrapling]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/skills-repo",
+      "type": "artifact",
+      "slug": "skills-repo",
+      "title": "Skills Repo",
+      "file": "artifacts/skills-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "skills-repo",
+        "kind": "artifact",
+        "content": "skills",
+        "artifact_type": "repo",
+        "url": "https://github.com/mattpocock/skills",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "自动化测试",
+          "持续集成配置",
+          "贡献指南"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个活跃的、MIT 许可的技能仓库，由 Matt Pocock 维护，可通过 npm 直接安装使用。所有内容以 Markdown 文件呈现，文档齐全，但缺乏测试和 CI 支持。\n\n出处:https://github.com/mattpocock/skills。See [[content/skills]]。\n",
+      "excerpt": "一个活跃的、MIT 许可的技能仓库，由 Matt Pocock 维护，可通过 npm 直接安装使用。所有内容以 Markdown 文件呈现，文档齐全，但缺乏测试和 CI 支持。",
+      "links": [
+        {
+          "target": "content/skills",
+          "raw": "[[content/skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/supermemory-repo",
+      "type": "artifact",
+      "slug": "supermemory-repo",
+      "title": "Supermemory Repo",
+      "file": "artifacts/supermemory-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "supermemory-repo",
+        "kind": "artifact",
+        "content": "supermemory",
+        "artifact_type": "repo",
+        "url": "https://github.com/supermemoryai/supermemory",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "自托管部署文档和配置示例",
+          "详细的系统架构图（仅提供了高层流程图）",
+          "多模态提取器的准确率和性能 benchmark",
+          "e2e 测试和单元测试代码"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n一个完整、高成熟度的 AI 记忆引擎仓库，包含全面的 README、Monorepo 结构和打包信息，但缺少测试代码和详细的自托管说明，可通过 app 或 SDK 直接运行试用。\n\n出处:https://github.com/supermemoryai/supermemory。See [[content/supermemory]]。\n",
+      "excerpt": "一个完整、高成熟度的 AI 记忆引擎仓库，包含全面的 README、Monorepo 结构和打包信息，但缺少测试代码和详细的自托管说明，可通过 app 或 SDK 直接运行试用。",
+      "links": [
+        {
+          "target": "content/supermemory",
+          "raw": "[[content/supermemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/taste-skill-repo",
+      "type": "artifact",
+      "slug": "taste-skill-repo",
+      "title": "Taste Skill Repo",
+      "file": "artifacts/taste-skill-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "taste-skill-repo",
+        "kind": "artifact",
+        "content": "taste-skill",
+        "artifact_type": "repo",
+        "url": "https://github.com/Leonxlnx/taste-skill",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "unknown",
+        "missing_parts": [],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n官方 repo:https://github.com/Leonxlnx/taste-skill; src=false; tests=false; docs=false; examples=true; license=MIT。\n\n出处:https://github.com/leonxlnx/taste-skill。See [[content/taste-skill]]。\n",
+      "excerpt": "官方 repo:https://github.com/Leonxlnx/taste-skill; src=false; tests=false; docs=false; examples=true; license=MIT。",
+      "links": [
+        {
+          "target": "content/taste-skill",
+          "raw": "[[content/taste-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/ui-tars-desktop-repo",
+      "type": "artifact",
+      "slug": "ui-tars-desktop-repo",
+      "title": "Ui Tars Desktop Repo",
+      "file": "artifacts/ui-tars-desktop-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "ui-tars-desktop-repo",
+        "kind": "artifact",
+        "content": "ui-tars-desktop",
+        "artifact_type": "repo",
+        "url": "https://github.com/bytedance/UI-TARS-desktop",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "tests/",
+          "安全性文档",
+          "详细的架构设计文档"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\n仓库活跃，关键文件完整，有文档和示例，但缺少测试和安全指南，版本 v0.3.0，整体功能可用\n\n出处:https://github.com/bytedance/ui-tars-desktop。See [[content/ui-tars-desktop]]。\n",
+      "excerpt": "仓库活跃，关键文件完整，有文档和示例，但缺少测试和安全指南，版本 v0.3.0，整体功能可用",
+      "links": [
+        {
+          "target": "content/ui-tars-desktop",
+          "raw": "[[content/ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/vibe-trading-repo",
+      "type": "artifact",
+      "slug": "vibe-trading-repo",
+      "title": "Vibe Trading Repo",
+      "file": "artifacts/vibe-trading-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "vibe-trading-repo",
+        "kind": "artifact",
+        "content": "vibe-trading",
+        "artifact_type": "repo",
+        "url": "https://github.com/HKUDS/Vibe-Trading",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未在顶层发现 tests 目录（可能位于 agent 内部）",
+          "缺少详细的架构图或文档"
+        ],
+        "last_checked": "2026-06-04"
+      },
+      "body": "\n## Artifact audit\n\n一个 Python 项目，配套前端，可通过 pip 安装并运行。仓库包含核心代理代码、工具、前端、Docker 配置，有 CI 和详细的 README。\n\n出处:https://github.com/hkuds/vibe-trading。See [[content/vibe-trading]]。\n",
+      "excerpt": "一个 Python 项目，配套前端，可通过 pip 安装并运行。仓库包含核心代理代码、工具、前端、Docker 配置，有 CI 和详细的 README。",
+      "links": [
+        {
+          "target": "content/vibe-trading",
+          "raw": "[[content/vibe-trading]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/voxcpm-repo",
+      "type": "artifact",
+      "slug": "voxcpm-repo",
+      "title": "Voxcpm Repo",
+      "file": "artifacts/voxcpm-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "voxcpm-repo",
+        "kind": "artifact",
+        "content": "voxcpm",
+        "artifact_type": "repo",
+        "url": "https://github.com/OpenBMB/VoxCPM",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "没有提供 Dockerfile，虽然推荐使用 vLLM-Omni 的 Docker 部署"
+        ],
+        "last_checked": "2026-06-03"
+      },
+      "body": "\n## Artifact audit\n\nOpenBMB 的官方 TTS 仓库，包含 VoxCPM2 模型代码、Python API、CLI 工具和 Web demo，模型权重托管在 Hugging Face。\n\n出处:https://github.com/openbmb/voxcpm。See [[content/voxcpm]]。\n",
+      "excerpt": "OpenBMB 的官方 TTS 仓库，包含 VoxCPM2 模型代码、Python API、CLI 工具和 Web demo，模型权重托管在 Hugging Face。",
+      "links": [
+        {
+          "target": "content/voxcpm",
+          "raw": "[[content/voxcpm]]"
         }
       ],
       "headings": [

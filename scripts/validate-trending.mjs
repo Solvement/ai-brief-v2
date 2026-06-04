@@ -34,7 +34,7 @@ function validateRepo(repo, path) {
     if (!rr || typeof rr !== "object") {
       fail(`${path}.rankingReason`, "must be an object");
     } else {
-      const validDecisions = ["boost", "cap-low-priority", "cap-non-core", "no-change"];
+      const validDecisions = ["boost", "cap-low-priority", "cap-non-core", "no-change", "deterministic", "gated"];
       if (!validDecisions.includes(rr.decision)) fail(`${path}.rankingReason.decision`, `must be one of ${validDecisions.join(", ")}`);
       for (const numKey of ["rawScore", "finalScore"]) {
         if (!isNumber(rr[numKey]) || rr[numKey] < 0 || rr[numKey] > 100) fail(`${path}.rankingReason.${numKey}`, "must be a number 0-100");

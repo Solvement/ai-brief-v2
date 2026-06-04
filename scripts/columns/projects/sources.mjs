@@ -10,6 +10,7 @@ const ROOT = path.resolve(__dirname, "..", "..", "..");
 const PUBLIC_TRENDING = path.join(ROOT, "public", "data", "trending.json");
 const BRIEF_WIKI_CONTENT = path.join(ROOT, "brief-wiki", "content");
 const DEFAULT_WINDOWS = ["daily", "weekly", "monthly"];
+const DEFAULT_TRENDING_BOARD_LIMIT = 25;
 const SEARCH_TERMS = ["agent", "rag", "mcp", "a2a", "memory", "eval", "ai coding", "coding agent"];
 const DEFAULT_USER_AGENT = "Mozilla/5.0 ai-brief-projects/0.3";
 const GITHUB_API_BASE = "https://api.github.com";
@@ -80,27 +81,26 @@ const MODEL_RE = /\b(model|models|llm|embedding|vector|checkpoint|hugging ?face|
 
 export async function discover(ctx = {}) {
   const options = ctx.options || {};
-  const limit = numberOption(options.limit, 30);
+  const trendingBoardLimit = numberOption(options.boardLimit, DEFAULT_TRENDING_BOARD_LIMIT);
   const topicLimit = numberOption(options.topicLimit, 0);
   const offline = isOffline(options);
   const discoveredAt = nowIso(options);
   const rows = [];
 
   if (offline) {
-    rows.push(...await loadOfflineTrending({ limit, discoveredAt }));
+    rows.push(...await loadOfflineTrending({ limit: trendingBoardLimit, discoveredAt }));
   } else {
-    rows.push(...await discoverTrending({ limit, discoveredAt, logger: ctx.logger }));
+    rows.push(...await discoverTrending({ limit: trendingBoardLimit, discoveredAt, logger: ctx.logger }));
     if (topicLimit > 0) rows.push(...await discoverTopicSearch({ topicLimit, discoveredAt, logger: ctx.logger, options }));
   }
 
   const mergedCandidates = mergeCandidates(rows);
   const deepDivedRepos = readBriefWikiDeepDivedProjectRepos(options.briefWikiContentDir || BRIEF_WIKI_CONTENT);
   const discoveryCap = options.cap == null ? null : numberOption(options.cap, null);
-  const notDeepDived = mergedCandidates.filter((candidate) => !matchesKnownRepo(candidate.raw, deepDivedRepos));
-  const candidates = notDeepDived.slice(0, discoveryCap || undefined);
-  const skipped = mergedCandidates.length - notDeepDived.length;
-  const capped = notDeepDived.length - candidates.length;
-  if (skipped) ctx.logger?.info?.(`projects discover skipped ${skipped} already deep-dived repo(s) from brief-wiki`);
+  const candidates = mergedCandidates.map((candidate) => annotateKnownDeepDive(candidate, deepDivedRepos)).slice(0, discoveryCap || undefined);
+  const reused = candidates.filter((candidate) => candidate.raw?.alreadyDeepDived).length;
+  const capped = mergedCandidates.length - candidates.length;
+  if (reused) ctx.logger?.info?.(`projects discover reused ${reused} already deep-dived repo(s) from brief-wiki`);
   if (capped) ctx.logger?.info?.(`projects discover capped ${capped} repo(s) by --cap debug limit`);
   if (options.db) {
     for (const candidate of candidates) options.db.upsertCandidate(candidate);
@@ -197,7 +197,7 @@ export function isOffline(options = {}, env = process.env) {
 }
 
 export function readBriefWikiDeepDivedProjectRepos(contentDir = BRIEF_WIKI_CONTENT) {
-  const repos = { urls: new Set(), fullNames: new Set() };
+  const repos = { urls: new Set(), fullNames: new Set(), slugsByUrl: new Map(), slugsByFullName: new Map() };
   try {
     if (!existsSync(contentDir)) return repos;
     for (const entry of readdirSync(contentDir, { withFileTypes: true })) {
@@ -211,14 +211,17 @@ export function readBriefWikiDeepDivedProjectRepos(contentDir = BRIEF_WIKI_CONTE
 
         const url = normalizeGitHubRepoUrl(frontmatter.url);
         const fullName = parseGitHubFullName(frontmatter.url);
+        const slug = normalizeFrontmatterScalar(frontmatter.slug) || entry.name.replace(/\.md$/i, "");
         if (url) repos.urls.add(url);
         if (fullName) repos.fullNames.add(fullName);
+        if (url && slug) repos.slugsByUrl.set(url, slug);
+        if (fullName && slug) repos.slugsByFullName.set(fullName, slug);
       } catch {
         continue;
       }
     }
   } catch {
-    return { urls: new Set(), fullNames: new Set() };
+    return { urls: new Set(), fullNames: new Set(), slugsByUrl: new Map(), slugsByFullName: new Map() };
   }
   return repos;
 }
@@ -241,6 +244,9 @@ async function fetchArtifactAudit(owner, name, { options = {}, logger, repo = {}
     const data = repoResult.data || {};
     audit.repo_full_name = normalizeRepoFullName(data.full_name) || audit.repo_full_name;
     audit.repo_url = normalizeGitHubRepoUrl(data.html_url) || audit.repo_url;
+    audit.description = valueOrNotFound(data.description);
+    audit.language = valueOrNotFound(data.language);
+    audit.owner_type = valueOrNotFound(data.owner?.type);
     audit.stargazers_count = valueOrNotFound(data.stargazers_count);
     audit.forks_count = valueOrNotFound(data.forks_count);
     audit.license_spdx_id = valueOrNotFound(data.license?.spdx_id);
@@ -282,6 +288,87 @@ async function fetchArtifactAudit(owner, name, { options = {}, logger, repo = {}
   return audit;
 }
 
+// --- Resilient fetch -------------------------------------------------------
+// Grounded, not improvised. Sources:
+//   - AWS "Exponential Backoff and Jitter" — Full Jitter formula:
+//       sleep = random_between(0, min(cap, base * 2^attempt))
+//     https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
+//   - GitHub REST API best practices — honor retry-after / x-ratelimit-reset,
+//     wait >= 1min fallback, throw after a bounded number of retries:
+//     https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api
+//   - Node/undici guidance — retry transient `fetch failed`/ECONNRESET/ETIMEDOUT,
+//     use a per-request timeout (AbortSignal.timeout). undici keeps connections
+//     alive by default, which itself reduces ECONNRESET.
+// One wrapper covers BOTH api.github.com and raw.githubusercontent.com.
+const RETRY_BASE_MS = 500;
+const RETRY_CAP_MS = 8000;
+const RETRY_MAX_ATTEMPTS = 4; // 1 initial try + 3 retries
+const REQUEST_TIMEOUT_MS = 15000;
+const RATE_LIMIT_WAIT_CAP_MS = 60000;
+
+const sleepMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export function isTransientNetworkError(error) {
+  if (!error) return false;
+  const code = error.code || error.cause?.code || "";
+  if ([
+    "ECONNRESET", "ETIMEDOUT", "ECONNREFUSED", "EAI_AGAIN", "EPIPE",
+    "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_SOCKET",
+  ].includes(code)) return true;
+  if (error.name === "TimeoutError") return true; // AbortSignal.timeout fired
+  const msg = String(error.message || "").toLowerCase();
+  return msg.includes("fetch failed") || msg.includes("terminated") || msg.includes("socket hang up");
+}
+
+function fullJitterDelay(attempt) {
+  // AWS Full Jitter: random_between(0, min(cap, base * 2^attempt))
+  const ceiling = Math.min(RETRY_CAP_MS, RETRY_BASE_MS * 2 ** attempt);
+  return Math.floor(Math.random() * ceiling);
+}
+
+function rateLimitWaitMs(response) {
+  // GitHub: honor retry-after; else if x-ratelimit-remaining === 0 wait until x-ratelimit-reset.
+  const retryAfter = Number(response.headers.get("retry-after"));
+  if (Number.isFinite(retryAfter) && retryAfter > 0) {
+    return Math.min(retryAfter * 1000, RATE_LIMIT_WAIT_CAP_MS);
+  }
+  if (response.headers.get("x-ratelimit-remaining") === "0") {
+    const reset = Number(response.headers.get("x-ratelimit-reset"));
+    if (Number.isFinite(reset)) {
+      const waitMs = reset * 1000 - Date.now();
+      if (waitMs > 0) return Math.min(waitMs, RATE_LIMIT_WAIT_CAP_MS);
+    }
+    return Math.min(60000, RATE_LIMIT_WAIT_CAP_MS); // GitHub fallback: wait >= 1 minute
+  }
+  return 0;
+}
+
+export async function fetchWithRetry(url, init = {}, { logger, label = String(url) } = {}) {
+  let lastError;
+  for (let attempt = 0; attempt < RETRY_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      // Fresh per-request timeout each attempt so a hung socket can't stall a slot.
+      const response = await fetch(url, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+      if (response.status === 403 || response.status === 429) {
+        const waitMs = rateLimitWaitMs(response);
+        if (waitMs > 0 && attempt < RETRY_MAX_ATTEMPTS - 1) {
+          logger?.warn?.(`rate limited ${label}: waiting ${Math.round(waitMs / 1000)}s (attempt ${attempt + 1})`);
+          await sleepMs(waitMs);
+          continue;
+        }
+      }
+      return response; // other non-ok statuses (404 etc.) are the caller's to interpret
+    } catch (error) {
+      lastError = error;
+      if (!isTransientNetworkError(error) || attempt === RETRY_MAX_ATTEMPTS - 1) throw error;
+      const delay = fullJitterDelay(attempt);
+      logger?.warn?.(`transient fetch ${label} (${error.code || error.name || error.message}); retry ${attempt + 1}/${RETRY_MAX_ATTEMPTS - 1} in ${delay}ms`);
+      await sleepMs(delay);
+    }
+  }
+  throw lastError;
+}
+
 async function fetchGitHubApiJson(pathname, { options = {}, logger, label = pathname, warn404 = true } = {}) {
   const headers = {
     accept: "application/vnd.github+json",
@@ -291,7 +378,7 @@ async function fetchGitHubApiJson(pathname, { options = {}, logger, label = path
   if (token) headers.authorization = `Bearer ${token}`;
 
   try {
-    const response = await fetch(new URL(pathname, GITHUB_API_BASE), { headers });
+    const response = await fetchWithRetry(new URL(pathname, GITHUB_API_BASE), { headers }, { logger, label });
     if (!response.ok) {
       if (warn404 || response.status !== 404) logger?.warn?.(`GitHub ${label} failed: ${response.status}`);
       return { ok: false, status: response.status };
@@ -402,15 +489,16 @@ export function buildEvidenceSignals(repo = {}, {
 
   return {
     owner: repo.owner || ownerFromFullName(repo.fullName),
+    owner_type: artifactAudit.owner_type || repo.ownerType || repo.owner_type || "",
     repo: repo.name || nameFromFullName(repo.fullName),
     url: repo.url || artifactAudit.repo_url || "",
     trend_sources: trendSourcesForRepo(repo, source),
     stars: Number(repo.stars ?? artifactAudit.stargazers_count) || 0,
     forks: Number(repo.forks ?? artifactAudit.forks_count) || 0,
     stars_today: Number(repo.starsGained ?? repo.stars_today ?? repo.starsToday) || 0,
-    language: repo.language || "",
+    language: repo.language || artifactAudit.language || "",
     topics,
-    description: repo.description || "",
+    description: repo.description || artifactAudit.description || artifactAudit.repo_description || "",
     created_at: firstFound(artifactAudit.created_at, repo.createdAt, repo.created_at),
     updated_at: firstFound(artifactAudit.updated_at, repo.updatedAt, repo.updated_at, artifactAudit.pushed_at),
     license: firstFound(artifactAudit.license_spdx_id, repo.license),
@@ -454,7 +542,7 @@ async function fetchGitHubRawReadme(owner, name, {
       const source = `${branch}/${fileName}`;
       const url = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(name)}/${encodeURIComponent(branch)}/${fileName}`;
       try {
-        const response = await fetch(url, { headers });
+        const response = await fetchWithRetry(url, { headers }, { label: `raw ${owner}/${name}@${source}` });
         if (response.status === 404) continue;
         if (!response.ok) {
           return { ok: false, source, status: response.status, readme_fetch_failed: true };
@@ -567,6 +655,10 @@ function repoApiPath(owner, name) {
 }
 
 function matchesKnownRepo(repo = {}, known = { urls: new Set(), fullNames: new Set() }) {
+  return Boolean(findKnownRepoBriefSlug(repo, known));
+}
+
+function findKnownRepoBriefSlug(repo = {}, known = { urls: new Set(), fullNames: new Set(), slugsByUrl: new Map(), slugsByFullName: new Map() }) {
   const fullNames = unique([
     normalizeRepoFullName(repo.fullName),
     parseGitHubFullName(repo.url),
@@ -575,7 +667,27 @@ function matchesKnownRepo(repo = {}, known = { urls: new Set(), fullNames: new S
     normalizeGitHubRepoUrl(repo.url),
     ...fullNames.map((fullName) => `https://github.com/${fullName}`),
   ]);
-  return fullNames.some((fullName) => known.fullNames.has(fullName)) || urls.some((url) => known.urls.has(url));
+  for (const fullName of fullNames) {
+    if (known.slugsByFullName?.has(fullName)) return known.slugsByFullName.get(fullName);
+  }
+  for (const url of urls) {
+    if (known.slugsByUrl?.has(url)) return known.slugsByUrl.get(url);
+  }
+  if (fullNames.some((fullName) => known.fullNames.has(fullName)) || urls.some((url) => known.urls.has(url))) return true;
+  return "";
+}
+
+function annotateKnownDeepDive(candidate, known) {
+  const slug = findKnownRepoBriefSlug(candidate?.raw, known);
+  if (!slug) return candidate;
+  return {
+    ...candidate,
+    raw: {
+      ...candidate.raw,
+      alreadyDeepDived: true,
+      briefSlug: slug === true ? candidate.raw?.briefSlug || null : slug,
+    },
+  };
 }
 
 function repoIdentityForApi(repo = {}) {
@@ -614,7 +726,7 @@ async function discoverTopicSearch({ topicLimit, discoveredAt, logger, options }
       repos.forEach((repo, index) => {
         rows.push(toCandidate(repo, {
           source: `github-search:${term}`,
-          window: "daily",
+          window: null,
           rank: 1000 + rows.length + index,
           discoveredAt,
           sourceTerm: term,
@@ -642,7 +754,7 @@ async function searchGitHubRepos(term, { limit, options }) {
   const token = options.githubToken || process.env.GITHUB_TOKEN;
   if (token) headers.authorization = `Bearer ${token}`;
 
-  const response = await fetch(url, { headers });
+  const response = await fetchWithRetry(url, { headers }, { logger: options.logger, label: `search ${term}` });
   if (!response.ok) throw new Error(`GitHub search ${response.status}`);
   const data = await response.json();
   return (data.items || []).map((item) => ({

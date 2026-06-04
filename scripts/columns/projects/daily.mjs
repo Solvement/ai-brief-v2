@@ -57,7 +57,7 @@ export function parseArgs(argv = []) {
     worthThreshold: 60,
     readmeMaxChars: 14000,
     lightMaxTokens: Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200,
-    deepDiveMaxTokens: Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 12000,
+    deepDiveMaxTokens: Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 16000,
     apiTimeoutMs: Number(process.env.DEEPSEEK_TIMEOUT_MS) || 180000,
   };
 
@@ -79,6 +79,9 @@ export function parseArgs(argv = []) {
       options.noLlm = true;
     } else if (arg === "--no-readme") {
       options.noReadme = true;
+    } else if (arg === "--skip-brief-authoring" || arg === "--no-brief-authoring") {
+      options.skipBriefAuthoring = true;
+      options.noProjectBriefAuthoring = true;
     } else if (arg === "--no-cache") {
       options.noCache = true;
     } else if (arg === "--cap") {
@@ -89,6 +92,10 @@ export function parseArgs(argv = []) {
       options.radarLimit = numberOption(nextValue(), options.radarLimit);
     } else if (arg.startsWith("--radar-limit=")) {
       options.radarLimit = numberOption(valueAfterEquals(arg), options.radarLimit);
+    } else if (arg === "--board-limit") {
+      options.boardLimit = numberOption(nextValue(), options.boardLimit);
+    } else if (arg.startsWith("--board-limit=")) {
+      options.boardLimit = numberOption(valueAfterEquals(arg), options.boardLimit);
     } else if (arg === "--limit") {
       options.limit = numberOption(nextValue(), options.limit);
     } else if (arg.startsWith("--limit=")) {
@@ -175,8 +182,10 @@ Runs the project daily chain:
 Flags:
   --cap N          Debug candidate cap before ranking. Default: no cap
   --radar-limit N  Max merged radar cards. Default: 30
+  --board-limit N  Optional safety cap per daily / weekly / monthly board. Default: real scraped window size
   --offline        No LLM calls; deterministic radar plus offline stub brief shape where selected
   --dry-run        Offline/no-LLM path for cheap shape verification
+  --skip-brief-authoring  Publish boards without generating analysis/deep brief-wiki files
   --wiki-root DIR  Brief wiki root. Default: brief-wiki
   --db PATH        SQLite DB path override
 `);

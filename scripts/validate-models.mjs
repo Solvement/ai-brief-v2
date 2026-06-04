@@ -7,6 +7,8 @@ const errors = [];
 
 const MODEL_KINDS = new Set(["open", "closed"]);
 const SOURCE_TYPES = new Set(["official", "third-party", "derived"]);
+const PARADIGM_BRANCHES = new Set(["new_model", "update", "variant_merged"]);
+const PARADIGM_TEMPLATES = new Set(["new_model_card", "version_update", "variant_merged"]);
 
 function fail(path, message) {
   errors.push(`${path}: ${message}`);
@@ -111,6 +113,74 @@ function validateBenchmarkItem(item, path) {
     validateString(item?.[key], `${path}.${key}`);
   }
   if (!SOURCE_TYPES.has(item?.sourceType)) fail(`${path}.sourceType`, "must be official, third-party, or derived");
+  if (item?.attribution !== undefined && !["自报", "实测"].includes(item.attribution)) {
+    fail(`${path}.attribution`, "must be 自报 or 实测 when present");
+  }
+}
+
+function validateParadigm(paradigm, path, kind) {
+  if (paradigm === undefined) {
+    fail(path, "must be present");
+    return;
+  }
+  if (!paradigm || typeof paradigm !== "object") {
+    fail(path, "must be an object when present");
+    return;
+  }
+  validateString(paradigm.tag, `${path}.tag`);
+  if (!PARADIGM_BRANCHES.has(paradigm.branch)) fail(`${path}.branch`, "must be new_model, update, or variant_merged");
+  if (paradigm.access !== kind) fail(`${path}.access`, `must match model kind ${kind}`);
+  if (!PARADIGM_TEMPLATES.has(paradigm.template)) fail(`${path}.template`, "must be new_model_card, version_update, or variant_merged");
+  if (paradigm.branch !== "variant_merged") validateParadigmCard(paradigm.card, `${path}.card`, kind);
+  if (paradigm.branch === "new_model") {
+    if (![0, 1, 2, 3].includes(paradigm.tier)) fail(`${path}.tier`, "must be 0, 1, 2, or 3 for new_model");
+    if (!paradigm.card || typeof paradigm.card !== "object") fail(`${path}.card`, "must be an object for new_model");
+  }
+  if (paradigm.branch === "update" && (!paradigm.update || typeof paradigm.update !== "object")) {
+    fail(`${path}.update`, "must be an object for update");
+  }
+}
+
+function validateParadigmCard(card, path, kind) {
+  if (!card || typeof card !== "object") {
+    fail(path, "must be an object");
+    return;
+  }
+  for (const key of ["名称", "厂商", "发布日", "开放度标签", "类型", "规模架构", "强弱一句", "一句话定位"]) {
+    validateString(card[key], `${path}.${key}`);
+  }
+  if (!Array.isArray(card["关键benchmark"]) || card["关键benchmark"].length === 0) {
+    fail(`${path}.关键benchmark`, "must have at least one item");
+  } else {
+    card["关键benchmark"].forEach((item, index) => {
+      const itemPath = `${path}.关键benchmark[${index}]`;
+      for (const key of ["名称", "分数", "对手", "标注", "解读"]) validateString(item?.[key], `${itemPath}.${key}`);
+      if (!["自报", "实测"].includes(item?.["标注"])) fail(`${itemPath}.标注`, "must be 自报 or 实测");
+    });
+  }
+  if (kind === "open") {
+    if (!card["许可证"] || typeof card["许可证"] !== "object") {
+      fail(`${path}.许可证`, "must be an object for open models");
+    } else {
+      validateString(card["许可证"]["名称"], `${path}.许可证.名称`);
+      validateString(card["许可证"]["能否商用"], `${path}.许可证.能否商用`);
+    }
+    validateString(card["自托管硬件"], `${path}.自托管硬件`);
+    validateStringArray(card["可用变体"], `${path}.可用变体`, { min: 1 });
+    validateString(card.base_model, `${path}.base_model`);
+  }
+  if (kind === "closed") {
+    if (!card["价格"] || typeof card["价格"] !== "object") {
+      fail(`${path}.价格`, "must be an object for closed models");
+    } else {
+      validateString(card["价格"]["输入每百万token"], `${path}.价格.输入每百万token`);
+      validateString(card["价格"]["输出每百万token"], `${path}.价格.输出每百万token`);
+    }
+    validateString(card["知识截止"], `${path}.知识截止`);
+    validateString(card["model string"], `${path}.model string`);
+    validateString(card["速率"], `${path}.速率`);
+    validateString(card["多模态I/O"], `${path}.多模态I/O`);
+  }
 }
 
 function validateBenchmark(benchmark, path) {
@@ -182,6 +252,7 @@ function validateModel(model, path) {
   validateStatusCard(model, path);
   validateDate(model?.analysisGeneratedAt, `${path}.analysisGeneratedAt`);
   validateString(model?.analysisAuthor, `${path}.analysisAuthor`);
+  validateParadigm(model?.paradigm, `${path}.paradigm`, model?.kind);
 
   if (model?.kind === "open") {
     if (model.isOpen !== true) fail(`${path}.isOpen`, "open models must have isOpen=true");

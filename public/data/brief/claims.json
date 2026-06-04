@@ -1,9 +1,89 @@
 {
-  "generatedAt": "2026-06-02T03:41:39.783Z",
+  "generatedAt": "2026-06-04T04:05:46.368Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 5,
+  "count": 43,
   "items": [
+    {
+      "id": "claim/9router-main-claim",
+      "type": "claim",
+      "slug": "9router-main-claim",
+      "title": "9router Main Claim",
+      "file": "claims/9router-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "RTK Token Saver 压缩 tool_result 内容，节省 20-40% token",
+        "slug": "9router-main-claim",
+        "kind": "claim",
+        "content": "9router",
+        "source_pointer": "README 中 Key Features 表格首行",
+        "evidence_strength": "medium",
+        "supports": [
+          "token-compression-middleware",
+          "local-api-gateway"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供压缩算法细节、剪裁规则、以及不同场景下的实测节省比例。",
+          "实际压缩效果可能因任务类型差异很大，过度压缩可能丢失关键信息。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n当 AI 助手执行命令如 git diff 返回大量无用文本时，9Router 会自动裁剪掉冗余部分，让请求少用 20-40% 的 token。\n\n证据:README 明确描述了该功能及其效果，但没有公开任何实际测试数据。。边界:未提供压缩算法细节、剪裁规则、以及不同场景下的实测节省比例。。风险:实际压缩效果可能因任务类型差异很大，过度压缩可能丢失关键信息。。See [[content/9router]]。\n",
+      "excerpt": "当 AI 助手执行命令如 git diff 返回大量无用文本时，9Router 会自动裁剪掉冗余部分，让请求少用 20-40% 的 token。",
+      "links": [
+        {
+          "target": "content/9router",
+          "raw": "[[content/9router]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/academic-research-skills-main-claim",
+      "type": "claim",
+      "slug": "academic-research-skills-main-claim",
+      "title": "Academic Research Skills Main Claim",
+      "file": "claims/academic-research-skills-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "提供从研究到出版的完整流水线，覆盖研究、写作、审稿、修订全阶段。",
+        "slug": "academic-research-skills-main-claim",
+        "kind": "claim",
+        "content": "academic-research-skills",
+        "source_pointer": "README 描述及展示的流水线产出物（最终论文、审稿报告等）",
+        "evidence_strength": "high",
+        "supports": [
+          "integrity-gate-with-blocking-checklist",
+          "claim-level-citation-audit"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "流水线的具体编排逻辑未在 README 中详述，需查阅架构文档。",
+          "多阶段串联可能因单点失败而传播错误，用户需逐一确认。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n这个工具不是只帮忙写论文中的一个部分，而是把整个学术流程都包了：找文献、写草稿、模拟审稿、修改回应，直到最后定稿。\n\n证据:README 详细列举了四个技能和各自的多种模式，示例展示了一个完整的10阶段运行产出的所有 PDF。。边界:流水线的具体编排逻辑未在 README 中详述，需查阅架构文档。。风险:多阶段串联可能因单点失败而传播错误，用户需逐一确认。。See [[content/academic-research-skills]]。\n",
+      "excerpt": "这个工具不是只帮忙写论文中的一个部分，而是把整个学术流程都包了：找文献、写草稿、模拟审稿、修改回应，直到最后定稿。",
+      "links": [
+        {
+          "target": "content/academic-research-skills",
+          "raw": "[[content/academic-research-skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
     {
       "id": "claim/agemem-unified-beats-modular",
       "type": "claim",
@@ -44,6 +124,126 @@
       ]
     },
     {
+      "id": "claim/agent-governance-toolkit-main-claim",
+      "type": "claim",
+      "slug": "agent-governance-toolkit-main-claim",
+      "title": "Agent Governance Toolkit Main Claim",
+      "file": "claims/agent-governance-toolkit-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "代理安全不能依赖提示词约束，AGT 用确定性应用层代码拦截实现“结构性不可能”的安全边界。",
+        "slug": "agent-governance-toolkit-main-claim",
+        "kind": "claim",
+        "content": "agent-governance-toolkit",
+        "source_pointer": "README 中“The Problem”章节，引用 OWASP LLM01:2025 和 Andriushchenko 等论文。",
+        "evidence_strength": "high",
+        "supports": [
+          "deterministic-policy-interception",
+          "zero-trust-agent-identity"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供 AGT 自身拦截效果的 benchmark，仅提供了原理性论证。",
+          "虽然原理正确，但若策略引擎本身有漏洞（如逃逸条件），该‘确定性’仍可被绕过。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n别指望在提示里让 GPT 听话，AGT 用代码在工具真正执行前掐死危险动作。\n\n证据:通过引用 ICLR 2025 论文（100% 攻击成功率）和微软红队经验支撑了提示词防御不可靠的观点。。边界:未提供 AGT 自身拦截效果的 benchmark，仅提供了原理性论证。。风险:虽然原理正确，但若策略引擎本身有漏洞（如逃逸条件），该‘确定性’仍可被绕过。。See [[content/agent-governance-toolkit]]。\n",
+      "excerpt": "别指望在提示里让 GPT 听话，AGT 用代码在工具真正执行前掐死危险动作。",
+      "links": [
+        {
+          "target": "content/agent-governance-toolkit",
+          "raw": "[[content/agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/agentmemory-main-claim",
+      "type": "claim",
+      "slug": "agentmemory-main-claim",
+      "title": "Agentmemory Main Claim",
+      "file": "claims/agentmemory-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "在 LongMemEval-S 上取得 95.2% R@5 召回率",
+        "slug": "agentmemory-main-claim",
+        "kind": "claim",
+        "content": "agentmemory",
+        "source_pointer": "README 中的 LongMemEval-S 表格",
+        "evidence_strength": "medium",
+        "supports": [
+          "external-memory-server",
+          "mcp-tool-server"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "只在特定数据集上验证，不代表所有真实编码场景",
+          "数据集可能已被系统针对优化，且未与其他系统完整对比（仅与 BM25 对比）"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n在标准长期记忆测试集上，前5个结果中能找到95.2%的正确答案。\n\n证据:系统具备优秀的检索准确度。边界:只在特定数据集上验证，不代表所有真实编码场景。风险:数据集可能已被系统针对优化，且未与其他系统完整对比（仅与 BM25 对比）。See [[content/agentmemory]]。\n",
+      "excerpt": "在标准长期记忆测试集上，前5个结果中能找到95.2%的正确答案。",
+      "links": [
+        {
+          "target": "content/agentmemory",
+          "raw": "[[content/agentmemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/ai-engineering-from-scratch-main-claim",
+      "type": "claim",
+      "slug": "ai-engineering-from-scratch-main-claim",
+      "title": "Ai Engineering From Scratch Main Claim",
+      "file": "claims/ai-engineering-from-scratch-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "课程包含 503 节课，20 个阶段。",
+        "slug": "ai-engineering-from-scratch-main-claim",
+        "kind": "claim",
+        "content": "ai-engineering-from-scratch",
+        "source_pointer": "README 徽章及目录列表（badge 显示 '503 lessons'，'20 phases'）。",
+        "evidence_strength": "high",
+        "supports": [
+          "agent-loop",
+          "mcp-server"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未验证每个目录下是否都有实际内容。",
+          "部分课程可能仍是空文件夹或模板。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n声称有 503 个独立课程单元，分为 20 个主题阶段。\n\n证据:徽章数字与目录中列出的课时数基本一致。。边界:未验证每个目录下是否都有实际内容。。风险:部分课程可能仍是空文件夹或模板。。See [[content/ai-engineering-from-scratch]]。\n",
+      "excerpt": "声称有 503 个独立课程单元，分为 20 个主题阶段。",
+      "links": [
+        {
+          "target": "content/ai-engineering-from-scratch",
+          "raw": "[[content/ai-engineering-from-scratch]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/ai-scientist-v2-main-claim",
       "type": "claim",
       "slug": "ai-scientist-v2-main-claim",
@@ -74,6 +274,686 @@
         {
           "target": "content/ai-scientist-v2",
           "raw": "[[content/ai-scientist-v2]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/airllm-main-claim",
+      "type": "claim",
+      "slug": "airllm-main-claim",
+      "title": "Airllm Main Claim",
+      "file": "claims/airllm-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "70B large language models to run inference on a single 4GB GPU card without quantization, distillation and pruning.",
+        "slug": "airllm-main-claim",
+        "kind": "claim",
+        "content": "airllm",
+        "source_pointer": "README 开头描述",
+        "evidence_strength": "medium",
+        "supports": [
+          "layer-wise-model-loading",
+          "weight-only-block-wise-quantization"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供内存占用曲线或峰值显存监控。",
+          "若模型加载方式过于理想化或实际模型版本差异，可能无法在严格的 4GB 限制下运行。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n70B 大模型可以在单张 4GB GPU 上推理，无需量化、蒸馏或剪枝。\n\n证据:核心价值主张，有 Colab notebook 示例（但未验证实际内存占用）。边界:未提供内存占用曲线或峰值显存监控。。风险:若模型加载方式过于理想化或实际模型版本差异，可能无法在严格的 4GB 限制下运行。。See [[content/airllm]]。\n",
+      "excerpt": "70B 大模型可以在单张 4GB GPU 上推理，无需量化、蒸馏或剪枝。",
+      "links": [
+        {
+          "target": "content/airllm",
+          "raw": "[[content/airllm]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/aitoearn-main-claim",
+      "type": "claim",
+      "slug": "aitoearn-main-claim",
+      "title": "Aitoearn Main Claim",
+      "file": "claims/aitoearn-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "AiToEarn 通过 AI Agent 自动化帮助一人公司和品牌在全球十多个主流平台上构建、分发并变现内容。",
+        "slug": "aitoearn-main-claim",
+        "kind": "claim",
+        "content": "aitoearn",
+        "source_pointer": "README 首段及核心功能描述",
+        "evidence_strength": "high",
+        "supports": [
+          "ai-agent-content-monetization",
+          "mcp-as-tool-gateway"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未能证明所有平台均完全自动化，部分可能基于模拟点击，稳定性未知。",
+          "若平台 API 变动或加强风控，自动化可能部分失效。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n系统用 AI 代理自动替你在抖音、小红书、YouTube 等平台发内容、互动和赚钱。\n\n证据:README 明确列出了支持的全部平台，并描述了四大 Agent 能力。。边界:未能证明所有平台均完全自动化，部分可能基于模拟点击，稳定性未知。。风险:若平台 API 变动或加强风控，自动化可能部分失效。。See [[content/aitoearn]]。\n",
+      "excerpt": "系统用 AI 代理自动替你在抖音、小红书、YouTube 等平台发内容、互动和赚钱。",
+      "links": [
+        {
+          "target": "content/aitoearn",
+          "raw": "[[content/aitoearn]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/anthropic-cybersecurity-skills-main-claim",
+      "type": "claim",
+      "slug": "anthropic-cybersecurity-skills-main-claim",
+      "title": "Anthropic Cybersecurity Skills Main Claim",
+      "file": "claims/anthropic-cybersecurity-skills-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "754 个结构化技能覆盖 26 个安全域",
+        "slug": "anthropic-cybersecurity-skills-main-claim",
+        "kind": "claim",
+        "content": "anthropic-cybersecurity-skills",
+        "source_pointer": "README.md 中明确列出 754 个技能，以及 26 个域的表格，技能数量与表格总和相符。",
+        "evidence_strength": "high",
+        "supports": [
+          "progressive-disclosure-for-agent-skills",
+          "cross-framework-mapping-for-security-ai"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供每个技能文件的直接清单，但数量声称与目录结构一致。",
+          "可能包含占位符或未完成的技能，但 README 未提及。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n仓库内包含 754 个不同的网络安全操作指南，每个指南是一个技能，分为 26 个专业领域。\n\n证据:定量声明，有详细表格支撑。。边界:未提供每个技能文件的直接清单，但数量声称与目录结构一致。。风险:可能包含占位符或未完成的技能，但 README 未提及。。See [[content/anthropic-cybersecurity-skills]]。\n",
+      "excerpt": "仓库内包含 754 个不同的网络安全操作指南，每个指南是一个技能，分为 26 个专业领域。",
+      "links": [
+        {
+          "target": "content/anthropic-cybersecurity-skills",
+          "raw": "[[content/anthropic-cybersecurity-skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/cloakbrowser-main-claim",
+      "type": "claim",
+      "slug": "cloakbrowser-main-claim",
+      "title": "Cloakbrowser Main Claim",
+      "file": "claims/cloakbrowser-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "CloakBrowser 通过 58 个 C++ 源码补丁修改 Chromium 指纹。",
+        "slug": "cloakbrowser-main-claim",
+        "kind": "claim",
+        "content": "cloakbrowser",
+        "source_pointer": "README: \"58 source-level C++ patches\"",
+        "evidence_strength": "medium",
+        "supports": [
+          "source-level-stealth",
+          "humanize"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "补丁内容未公开，无法独立验证。",
+          "补丁可能不完整或被夸大。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n在编译前对 Chromium 源代码打了 58 个补丁，直接修改浏览器底层行为。\n\n证据:声称的 stealth 能力源自底层修改。。边界:补丁内容未公开，无法独立验证。。风险:补丁可能不完整或被夸大。。See [[content/cloakbrowser]]。\n",
+      "excerpt": "在编译前对 Chromium 源代码打了 58 个补丁，直接修改浏览器底层行为。",
+      "links": [
+        {
+          "target": "content/cloakbrowser",
+          "raw": "[[content/cloakbrowser]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/codegraph-main-claim",
+      "type": "claim",
+      "slug": "codegraph-main-claim",
+      "title": "Codegraph Main Claim",
+      "file": "claims/codegraph-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "使用 CodeGraph 后，AI 助手平均节省 16% 费用、47% tokens、22% 时间、58% 工具调用。",
+        "slug": "codegraph-main-claim",
+        "kind": "claim",
+        "content": "codegraph",
+        "source_pointer": "README.md 中的 Benchmarks 表格和详细 breakdown",
+        "evidence_strength": "high",
+        "supports": [
+          "pre-indexed-knowledge-graph",
+          "mcp-tool-integration"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "仅测试了一种模型（Claude Opus 4.8）和一种查询类型（架构问题），可能不推广到所有场景。",
+          "新模型可能自带高效探索能力，缩小收益；或用户实际使用复杂查询时收益降低。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n在 7 个开源项目上测试，有 CodeGraph 比没有它整体更省。\n\n证据:给出了每项目具体数值、方法论、查询语句、模型版本，且数据一致。。边界:仅测试了一种模型（Claude Opus 4.8）和一种查询类型（架构问题），可能不推广到所有场景。。风险:新模型可能自带高效探索能力，缩小收益；或用户实际使用复杂查询时收益降低。。See [[content/codegraph]]。\n",
+      "excerpt": "在 7 个开源项目上测试，有 CodeGraph 比没有它整体更省。",
+      "links": [
+        {
+          "target": "content/codegraph",
+          "raw": "[[content/codegraph]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/codewhale-main-claim",
+      "type": "claim",
+      "slug": "codewhale-main-claim",
+      "title": "Codewhale Main Claim",
+      "file": "claims/codewhale-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "宪法提供九级法律体系，用户当前消息优先级高于过期项目指令。",
+        "slug": "codewhale-main-claim",
+        "kind": "claim",
+        "content": "codewhale",
+        "source_pointer": "README 中 'CodeWhale answers this with a Constitution... Article VII ranks nine tiers from the Constitution's own articles down to prior-session handoffs.'",
+        "evidence_strength": "high",
+        "supports": [
+          "constitution-governance",
+          "prefix-caching-exploitation"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "依赖于模型对宪法文本的准确理解和遵循，若模型理解偏差，优先级可能失效。",
+          "宪法内容过长可能导致前缀缓存失效或模型注意力稀释，实际效果未量化。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n模型接收到冲突指令时，有一个明确的先后排名，用户刚说的话比以前的项目说明更管用。\n\n证据:能够减少模型在长对话中因指令冲突产生的错误行为，增强可靠性。。边界:依赖于模型对宪法文本的准确理解和遵循，若模型理解偏差，优先级可能失效。。风险:宪法内容过长可能导致前缀缓存失效或模型注意力稀释，实际效果未量化。。See [[content/codewhale]]。\n",
+      "excerpt": "模型接收到冲突指令时，有一个明确的先后排名，用户刚说的话比以前的项目说明更管用。",
+      "links": [
+        {
+          "target": "content/codewhale",
+          "raw": "[[content/codewhale]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/easy-vibe-main-claim",
+      "type": "claim",
+      "slug": "easy-vibe-main-claim",
+      "title": "Easy Vibe Main Claim",
+      "file": "claims/easy-vibe-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Easy-Vibe 让任何人都能通过口头描述来构建应用程序",
+        "slug": "easy-vibe-main-claim",
+        "kind": "claim",
+        "content": "easy-vibe",
+        "source_pointer": "README Why Easy-Vibe 部分",
+        "evidence_strength": "medium",
+        "supports": [
+          "vibe-coding",
+          "llms-txt"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未展示具体的零基础用户独立完成复杂项目的验证流程。",
+          "该说法可能过度简化了开发过程，实际仍需掌握 AI 工具和基础调试技巧。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n项目声称，即使不会写代码，只要用自然语言说出需求，就能做出记账本、预约系统等应用。\n\n证据:提供了多个学习路径和真实用户故事作为支撑。。边界:未展示具体的零基础用户独立完成复杂项目的验证流程。。风险:该说法可能过度简化了开发过程，实际仍需掌握 AI 工具和基础调试技巧。。See [[content/easy-vibe]]。\n",
+      "excerpt": "项目声称，即使不会写代码，只要用自然语言说出需求，就能做出记账本、预约系统等应用。",
+      "links": [
+        {
+          "target": "content/easy-vibe",
+          "raw": "[[content/easy-vibe]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/ecc-main-claim",
+      "type": "claim",
+      "slug": "ecc-main-claim",
+      "title": "Ecc Main Claim",
+      "file": "claims/ecc-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "182K+ stars",
+        "slug": "ecc-main-claim",
+        "kind": "claim",
+        "content": "ecc",
+        "source_pointer": "README 顶部声明，同时 artifactAudit 显示当前 stars 为 204159",
+        "evidence_strength": "high",
+        "supports": [
+          "harness-hooks",
+          "agent-skills-catalog"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "无法证明 stars 都是活跃用户或实际使用",
+          "stars 可能有非自然增长，但当前数据超过声明，表示热度真实且持续增长"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n该项目在 GitHub 上获得了超过 18.2 万颗星\n\n证据:项目受欢迎程度高。边界:无法证明 stars 都是活跃用户或实际使用。风险:stars 可能有非自然增长，但当前数据超过声明，表示热度真实且持续增长。See [[content/ecc]]。\n",
+      "excerpt": "该项目在 GitHub 上获得了超过 18.2 万颗星",
+      "links": [
+        {
+          "target": "content/ecc",
+          "raw": "[[content/ecc]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/flowsint-main-claim",
+      "type": "claim",
+      "slug": "flowsint-main-claim",
+      "title": "Flowsint Main Claim",
+      "file": "claims/flowsint-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Flowsint 是一个开源的 OSINT 图谱探索工具，内置数十种自动数据丰富器。",
+        "slug": "flowsint-main-claim",
+        "kind": "claim",
+        "content": "flowsint",
+        "source_pointer": "README.md 开头介绍",
+        "evidence_strength": "high",
+        "supports": [
+          "enricher-pattern",
+          "graph-investigation-loop"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供丰富器的实现细节或第三方 API 需求列表。",
+          "丰富器依赖外部服务，如服务关停或 API 变更，功能将失效。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n用于数字调查的免费工具，能自动查询网站、IP、邮箱等信息并画成关系图。\n\n证据:README 列出了大量域、IP、邮箱等丰富器，并给出模块结构。。边界:未提供丰富器的实现细节或第三方 API 需求列表。。风险:丰富器依赖外部服务，如服务关停或 API 变更，功能将失效。。See [[content/flowsint]]。\n",
+      "excerpt": "用于数字调查的免费工具，能自动查询网站、IP、邮箱等信息并画成关系图。",
+      "links": [
+        {
+          "target": "content/flowsint",
+          "raw": "[[content/flowsint]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/funasr-main-claim",
+      "type": "claim",
+      "slug": "funasr-main-claim",
+      "title": "Funasr Main Claim",
+      "file": "claims/funasr-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "SenseVoice-Small 模型在 GPU 上达到 170 倍实时速度",
+        "slug": "funasr-main-claim",
+        "kind": "claim",
+        "content": "funasr",
+        "source_pointer": "README Benchmark 表格",
+        "evidence_strength": "high",
+        "supports": [
+          "automodel-pipeline",
+          "non-autoregressive-asr"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明具体 GPU 型号、CPU 型号、音频采样率、批次大小等条件",
+          "测试环境可能非典型，实际应用场景速度可能低于宣称；未提供端到端延迟（包括模型加载）"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n处理 1 小时的音频，该模型仅需要 21 秒（60×60/170）\n\n证据:表格中给出 GPU Speed 为 170x realtime，且注明对比 Whisper-large-v3 的 baseline 13x 快 13 倍。边界:未说明具体 GPU 型号、CPU 型号、音频采样率、批次大小等条件。风险:测试环境可能非典型，实际应用场景速度可能低于宣称；未提供端到端延迟（包括模型加载）。See [[content/funasr]]。\n",
+      "excerpt": "处理 1 小时的音频，该模型仅需要 21 秒（60×60/170）",
+      "links": [
+        {
+          "target": "content/funasr",
+          "raw": "[[content/funasr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/headroom-main-claim",
+      "type": "claim",
+      "slug": "headroom-main-claim",
+      "title": "Headroom Main Claim",
+      "file": "claims/headroom-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "可节省 60‑95% 的 token。",
+        "slug": "headroom-main-claim",
+        "kind": "claim",
+        "content": "headroom",
+        "source_pointer": "README 定位语、GIF 演示、Proof 表格",
+        "evidence_strength": "high",
+        "supports": [
+          "cachealigner",
+          "content-router"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "节省比例会随内容类型变化，部分场景（如代码探索）仅 47%，并非所有情况都能达到 90% 以上。",
+          "该数据可能来自精心挑选的样例，现实复杂场景可能达不到同样压缩比。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n输入给 LLM 的提示经过 Headroom 压缩后，token 数量能减少六到九成。\n\n证据:表格中的数据（如代码搜索从 17,765 token 降至 1,408 token）直接支撑该范围。。边界:节省比例会随内容类型变化，部分场景（如代码探索）仅 47%，并非所有情况都能达到 90% 以上。。风险:该数据可能来自精心挑选的样例，现实复杂场景可能达不到同样压缩比。。See [[content/headroom]]。\n",
+      "excerpt": "输入给 LLM 的提示经过 Headroom 压缩后，token 数量能减少六到九成。",
+      "links": [
+        {
+          "target": "content/headroom",
+          "raw": "[[content/headroom]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/herdr-main-claim",
+      "type": "claim",
+      "slug": "herdr-main-claim",
+      "title": "Herdr Main Claim",
+      "file": "claims/herdr-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Agent awareness works by reading foreground process and terminal output, zero config, no hooks required.",
+        "slug": "herdr-main-claim",
+        "kind": "claim",
+        "content": "herdr",
+        "source_pointer": "README.md 'agent awareness' section",
+        "evidence_strength": "medium",
+        "supports": [
+          "agent-awareness-via-output-parsing",
+          "terminal-multiplexing-for-agents"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供检测算法细节、准确率或边缘案例处理。",
+          "针对特定代理 CLI 的启发式可能在升级后失效，导致状态误报。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n代理状态检测通过读取进程名和终端输出实现，无需任何配置或钩子。\n\n证据:项目描述和列表显示支持多个代理开箱即用。。边界:未提供检测算法细节、准确率或边缘案例处理。。风险:针对特定代理 CLI 的启发式可能在升级后失效，导致状态误报。。See [[content/herdr]]。\n",
+      "excerpt": "代理状态检测通过读取进程名和终端输出实现，无需任何配置或钩子。",
+      "links": [
+        {
+          "target": "content/herdr",
+          "raw": "[[content/herdr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/hermes-agent-main-claim",
+      "type": "claim",
+      "slug": "hermes-agent-main-claim",
+      "title": "Hermes Agent Main Claim",
+      "file": "claims/hermes-agent-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "README 声称是唯一具有内置学习循环的 agent",
+        "slug": "hermes-agent-main-claim",
+        "kind": "claim",
+        "content": "hermes-agent",
+        "source_pointer": "README 第一段",
+        "evidence_strength": "low",
+        "supports": [
+          "agent-skills",
+          "closed-learning-loop"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "无独立测试数据证明唯一性",
+          "可能只是营销措辞，实际存在其他类似学习能力的 agent"
+        ],
+        "status": "untested"
+      },
+      "body": "\n## Claim\n\n他们强调自己的 agent 是市场上唯一能自我学习改进的。\n\n证据:宣传卖点。边界:无独立测试数据证明唯一性。风险:可能只是营销措辞，实际存在其他类似学习能力的 agent。See [[content/hermes-agent]]。\n",
+      "excerpt": "他们强调自己的 agent 是市场上唯一能自我学习改进的。",
+      "links": [
+        {
+          "target": "content/hermes-agent",
+          "raw": "[[content/hermes-agent]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/hermes-desktop-main-claim",
+      "type": "claim",
+      "slug": "hermes-desktop-main-claim",
+      "title": "Hermes Desktop Main Claim",
+      "file": "claims/hermes-desktop-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "提供 22 条斜杠命令以增强聊天交互",
+        "slug": "hermes-desktop-main-claim",
+        "kind": "claim",
+        "content": "hermes-desktop",
+        "source_pointer": "README Features 列表",
+        "evidence_strength": "high",
+        "supports": [
+          "desktop-agent-shell",
+          "provider-abstraction"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未列出完整命令列表及参数说明。",
+          "部分命令可能依赖于后端代理的支持，若后端实现不全则功能缺失。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n用户可在聊天中输入 /new、/clear 等命令快速执行操作。\n\n证据:证明桌面应用提供了丰富的快捷操作，降低学习曲线。。边界:未列出完整命令列表及参数说明。。风险:部分命令可能依赖于后端代理的支持，若后端实现不全则功能缺失。。See [[content/hermes-desktop]]。\n",
+      "excerpt": "用户可在聊天中输入 /new、/clear 等命令快速执行操作。",
+      "links": [
+        {
+          "target": "content/hermes-desktop",
+          "raw": "[[content/hermes-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/hermes-webui-main-claim",
+      "type": "claim",
+      "slug": "hermes-webui-main-claim",
+      "title": "Hermes Webui Main Claim",
+      "file": "claims/hermes-webui-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Hermes Agent 保持跨会话的持久记忆，包括用户画像、项目上下文和自学习技能。",
+        "slug": "hermes-webui-main-claim",
+        "kind": "claim",
+        "content": "hermes-webui",
+        "source_pointer": "README: Why Hermes 部分列出“Persistent memory”，特性表标注 Hermes 为 Yes。",
+        "evidence_strength": "high",
+        "supports": [
+          "self-hosted-agent-ui",
+          "persistent-memory-agent"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明记忆的具体技术实现（如向量数据库、长期存储策略），也不保证百分百精确回忆。",
+          "记忆容量和准确性可能受模型限制，若 Agent 内部记忆策略失效，WebUI 无法感知。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\nAgent 不会在每次对话结束时忘记一切，它能记住你是谁、你工作的项目和学会的技能。\n\n证据:表明具有持久记忆机制，这与多数聊天工具形成对比。。边界:未说明记忆的具体技术实现（如向量数据库、长期存储策略），也不保证百分百精确回忆。。风险:记忆容量和准确性可能受模型限制，若 Agent 内部记忆策略失效，WebUI 无法感知。。See [[content/hermes-webui]]。\n",
+      "excerpt": "Agent 不会在每次对话结束时忘记一切，它能记住你是谁、你工作的项目和学会的技能。",
+      "links": [
+        {
+          "target": "content/hermes-webui",
+          "raw": "[[content/hermes-webui]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/iii-main-claim",
+      "type": "claim",
+      "slug": "iii-main-claim",
+      "title": "Iii Main Claim",
+      "file": "claims/iii-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "iii 可通过 `iii worker add` 命令即时添加队列、代理、沙箱等多种能力",
+        "slug": "iii-main-claim",
+        "kind": "claim",
+        "content": "iii",
+        "source_pointer": "README 示例：`iii worker add queue/agent/sandbox`",
+        "evidence_strength": "medium",
+        "supports": [
+          "worker-function-trigger",
+          "live-catalog"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明安装背后的具体机制，是代码生成、容器拉取还是其他",
+          "可能依赖预定义的 Worker 模板或第三方注册表，灵活性有上限"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n只用一条命令就能给系统增加新功能，不用额外配置集成\n\n证据:演示了命令行安装 Worker 的用法。边界:未说明安装背后的具体机制，是代码生成、容器拉取还是其他。风险:可能依赖预定义的 Worker 模板或第三方注册表，灵活性有上限。See [[content/iii]]。\n",
+      "excerpt": "只用一条命令就能给系统增加新功能，不用额外配置集成",
+      "links": [
+        {
+          "target": "content/iii",
+          "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/markitdown-main-claim",
+      "type": "claim",
+      "slug": "markitdown-main-claim",
+      "title": "Markitdown Main Claim",
+      "file": "claims/markitdown-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "支持 PDF、PowerPoint、Word、Excel、图片、音频、HTML、CSV、JSON、XML、ZIP、EPub、YouTube 等格式转换",
+        "slug": "markitdown-main-claim",
+        "kind": "claim",
+        "content": "markitdown",
+        "source_pointer": "README 支持列表",
+        "evidence_strength": "high",
+        "supports": [
+          "file-to-markdown-converter",
+          "plugin-based-converter-architecture"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明每个格式的转换保真度或限制",
+          "实际效果可能受文件内部复杂度影响"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n可以转换十多种常见文件格式到 Markdown\n\n证据:明确列出支持格式和可选依赖。边界:未说明每个格式的转换保真度或限制。风险:实际效果可能受文件内部复杂度影响。See [[content/markitdown]]。\n",
+      "excerpt": "可以转换十多种常见文件格式到 Markdown",
+      "links": [
+        {
+          "target": "content/markitdown",
+          "raw": "[[content/markitdown]]"
         }
       ],
       "headings": [
@@ -126,6 +1006,245 @@
       ]
     },
     {
+      "id": "claim/microsoft-agent-governance-toolkit-main-claim",
+      "type": "claim",
+      "slug": "microsoft-agent-governance-toolkit-main-claim",
+      "title": "Microsoft Agent Governance Toolkit Main Claim",
+      "file": "claims/microsoft-agent-governance-toolkit-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Public Preview；production-quality, Microsoft-signed releases；GA 前可能有 breaking changes。",
+        "slug": "microsoft-agent-governance-toolkit-main-claim",
+        "kind": "claim",
+        "content": "microsoft-agent-governance-toolkit",
+        "source_pointer": "README Important block",
+        "evidence_strength": "medium",
+        "supports": [
+          "policy-enforcement-point",
+          "policy-decision-point"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "没有证明所有发布包都已经稳定、全部签名或适合生产无风险使用。",
+          "版本和 API 仍会变，企业集成要锁版本并做回归测试。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n这是公开预览，不应按稳定 GA 组件对待。\n\n证据:README 明确写 Public Preview 和 may have breaking changes before GA。。边界:没有证明所有发布包都已经稳定、全部签名或适合生产无风险使用。。风险:版本和 API 仍会变，企业集成要锁版本并做回归测试。。See [[content/microsoft-agent-governance-toolkit]]。\n",
+      "excerpt": "这是公开预览，不应按稳定 GA 组件对待。",
+      "links": [
+        {
+          "target": "content/microsoft-agent-governance-toolkit",
+          "raw": "[[content/microsoft-agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/moneyprinterturbo-main-claim",
+      "type": "claim",
+      "slug": "moneyprinterturbo-main-claim",
+      "title": "Moneyprinterturbo Main Claim",
+      "file": "claims/moneyprinterturbo-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "完整的 MVC 架构，代码结构清晰，易于维护，支持 API 和 Web 界面。",
+        "slug": "moneyprinterturbo-main-claim",
+        "kind": "claim",
+        "content": "moneyprinterturbo",
+        "source_pointer": "README 功能特性。",
+        "evidence_strength": "medium",
+        "supports": [
+          "video-generation-pipeline",
+          "llm-provider-adaptation"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未在 README/artifact 中看到关于 MVC 架构的具体模块说明或代码示例。",
+          "架构清晰性无法仅从 README 验证，需审查 app/ 内模块划分是否真正遵从 MVC。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n项目代码组织良好，提供 Web 界面和编程接口两种使用方式。\n\n证据:源码目录存在 app/、webui/ 等，README 有 WebUI 和 API 截图。。边界:未在 README/artifact 中看到关于 MVC 架构的具体模块说明或代码示例。。风险:架构清晰性无法仅从 README 验证，需审查 app/ 内模块划分是否真正遵从 MVC。。See [[content/moneyprinterturbo]]。\n",
+      "excerpt": "项目代码组织良好，提供 Web 界面和编程接口两种使用方式。",
+      "links": [
+        {
+          "target": "content/moneyprinterturbo",
+          "raw": "[[content/moneyprinterturbo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/ogulcancelik-herdr-main-claim",
+      "type": "claim",
+      "slug": "ogulcancelik-herdr-main-claim",
+      "title": "Ogulcancelik Herdr Main Claim",
+      "file": "claims/ogulcancelik-herdr-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Herdr 是面向 AI coding agents 的终端 workspace manager。",
+        "slug": "ogulcancelik-herdr-main-claim",
+        "kind": "claim",
+        "content": "ogulcancelik-herdr",
+        "source_pointer": "Cargo.toml package；README opening",
+        "evidence_strength": "high",
+        "supports": [
+          "ogulcancelik-herdr-terminal-multiplexing-for-agents",
+          "ogulcancelik-herdr-agent-awareness-via-output-parsing"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "没有证明它是模型推理框架、RAG 框架或多 agent 调度器核心。",
+          "项目定位容易被 radar 标签误读为 agent_framework。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n它管理终端里的 agent 进程和布局，而不是自己实现 LLM agent loop。\n\n证据:Cargo.toml description 写明“terminal workspace manager for AI coding agents”；源码包含 src/pty、src/ui、src/session、src/detect、src/integration。。边界:没有证明它是模型推理框架、RAG 框架或多 agent 调度器核心。。风险:项目定位容易被 radar 标签误读为 agent_framework。。See [[content/ogulcancelik-herdr]]。\n",
+      "excerpt": "它管理终端里的 agent 进程和布局，而不是自己实现 LLM agent loop。",
+      "links": [
+        {
+          "target": "content/ogulcancelik-herdr",
+          "raw": "[[content/ogulcancelik-herdr]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/oh-my-pi-main-claim",
+      "type": "claim",
+      "slug": "oh-my-pi-main-claim",
+      "title": "Oh My Pi Main Claim",
+      "file": "claims/oh-my-pi-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "hashline 编辑使 Grok 4 Fast 输出 token 减少 61%",
+        "slug": "oh-my-pi-main-claim",
+        "kind": "claim",
+        "content": "oh-my-pi",
+        "source_pointer": "README 中 '# Every tool, benchmaxxed.' 下的表格和 'Hashline: edit by content hash' 章节",
+        "evidence_strength": "medium",
+        "supports": [
+          "hashline-editing",
+          "time-traveling-stream-rules"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供对比基准细节（如原始输出 token 量、文件大小），也未说明其他模型上的效果。",
+          "可能只对特定长度的文件或编码风格有效，对其他模型可能不适用。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n通过让模型只写内容哈希而不是完整代码行，节省发送给 API 的输出 token 量。\n\n证据:表格列出 Grok 4 Fast: −61% tokens，用户报告一致。。边界:未提供对比基准细节（如原始输出 token 量、文件大小），也未说明其他模型上的效果。。风险:可能只对特定长度的文件或编码风格有效，对其他模型可能不适用。。See [[content/oh-my-pi]]。\n",
+      "excerpt": "通过让模型只写内容哈希而不是完整代码行，节省发送给 API 的输出 token 量。",
+      "links": [
+        {
+          "target": "content/oh-my-pi",
+          "raw": "[[content/oh-my-pi]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/open-llm-vtuber-main-claim",
+      "type": "claim",
+      "slug": "open-llm-vtuber-main-claim",
+      "title": "Open Llm Vtuber Main Claim",
+      "file": "claims/open-llm-vtuber-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "支持 Windows、macOS、Linux 并可以完全离线运行",
+        "slug": "open-llm-vtuber-main-claim",
+        "kind": "claim",
+        "content": "open-llm-vtuber",
+        "source_pointer": "README Features & Highlights",
+        "evidence_strength": "high",
+        "supports": [
+          "voice-interruption",
+          "live2d-avatar"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未列出具体硬件要求或离线运行的技术验证",
+          "某些组件（如 Whisper）在离线时需要提前下载模型，否则可能失败"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n不管什么系统，都能不联网在本地跑起来\n\n证据:跨平台和离线模式是核心卖点。边界:未列出具体硬件要求或离线运行的技术验证。风险:某些组件（如 Whisper）在离线时需要提前下载模型，否则可能失败。See [[content/open-llm-vtuber]]。\n",
+      "excerpt": "不管什么系统，都能不联网在本地跑起来",
+      "links": [
+        {
+          "target": "content/open-llm-vtuber",
+          "raw": "[[content/open-llm-vtuber]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/opendataloader-pdf-main-claim",
+      "type": "claim",
+      "slug": "opendataloader-pdf-main-claim",
+      "title": "Opendataloader Pdf Main Claim",
+      "file": "claims/opendataloader-pdf-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "opendataloader-pdf [hybrid] ranks #1 overall (0.907) across reading order, table, and heading extraction accuracy.",
+        "slug": "opendataloader-pdf-main-claim",
+        "kind": "claim",
+        "content": "opendataloader-pdf",
+        "source_pointer": "README Extraction Benchmarks 表格",
+        "evidence_strength": "medium",
+        "supports": [
+          "hybrid-pdf-pipeline"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "测试由项目方自行执行，未见到第三方独立验证",
+          "可能存在过拟合测试集的偏差"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n在自测的基准测试中，opendataloader-pdf 的混合模式整体提取准确率位列第一，得分为 0.907。\n\n证据:提供了详细数据，包含 12 款工具的对比。边界:测试由项目方自行执行，未见到第三方独立验证。风险:可能存在过拟合测试集的偏差。See [[content/opendataloader-pdf]]。\n",
+      "excerpt": "在自测的基准测试中，opendataloader-pdf 的混合模式整体提取准确率位列第一，得分为 0.907。",
+      "links": [
+        {
+          "target": "content/opendataloader-pdf",
+          "raw": "[[content/opendataloader-pdf]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/pi-agent-depth-in-plumbing",
       "type": "claim",
       "slug": "pi-agent-depth-in-plumbing",
@@ -155,6 +1274,86 @@
         {
           "target": "content/pi-agent",
           "raw": "[[content/pi-agent]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/pixelle-video-main-claim",
+      "type": "claim",
+      "slug": "pixelle-video-main-claim",
+      "title": "Pixelle Video Main Claim",
+      "file": "claims/pixelle-video-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "只需输入一个主题就能自动生成完整视频",
+        "slug": "pixelle-video-main-claim",
+        "kind": "claim",
+        "content": "pixelle-video",
+        "source_pointer": "README 开头描述：只需输入一个主题，Pixelle-Video 就能自动完成撰写文案、生成配图/视频、合成语音、添加背景音乐、一键合成视频",
+        "evidence_strength": "high",
+        "supports": [
+          "comfyui-workflow-integration",
+          "replaceable-media-pipeline"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供自动化程度的具体指标（如成功率、平均时长）",
+          "生成质量可能不稳定，或需要多次调整才能获得满意结果"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n用户给一个话题，AI 就能自动写出稿子、配上插图或视频、合成语音和背景音乐，最后生成一个完整的短片\n\n证据:README 提供了多个视频示例和流程图佐证这个端到端能力。边界:未提供自动化程度的具体指标（如成功率、平均时长）。风险:生成质量可能不稳定，或需要多次调整才能获得满意结果。See [[content/pixelle-video]]。\n",
+      "excerpt": "用户给一个话题，AI 就能自动写出稿子、配上插图或视频、合成语音和背景音乐，最后生成一个完整的短片",
+      "links": [
+        {
+          "target": "content/pixelle-video",
+          "raw": "[[content/pixelle-video]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/production-agentic-rag-course-main-claim",
+      "type": "claim",
+      "slug": "production-agentic-rag-course-main-claim",
+      "title": "Production Agentic Rag Course Main Claim",
+      "file": "claims/production-agentic-rag-course-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "该项目教你构建生产级 RAG 系统。",
+        "slug": "production-agentic-rag-course-main-claim",
+        "kind": "claim",
+        "content": "production-agentic-rag-course",
+        "source_pointer": "README 标题和描述：'production-grade RAG system using industry best practices'",
+        "evidence_strength": "medium",
+        "supports": [
+          "production-rag",
+          "hybrid-search"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供性能测试、SLA 指标或生产部署案例。",
+          "可能只是教学级别的代码，未经高负载验证，存在隐蔽性能瓶颈。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n课程声称你可以通过跟随每周的内容，搭建出一个可以用于实际生产环境的 RAG 系统。\n\n证据:提供了完整的代码、Docker 部署、监控和缓存组件。。边界:未提供性能测试、SLA 指标或生产部署案例。。风险:可能只是教学级别的代码，未经高负载验证，存在隐蔽性能瓶颈。。See [[content/production-agentic-rag-course]]。\n",
+      "excerpt": "课程声称你可以通过跟随每周的内容，搭建出一个可以用于实际生产环境的 RAG 系统。",
+      "links": [
+        {
+          "target": "content/production-agentic-rag-course",
+          "raw": "[[content/production-agentic-rag-course]]"
         }
       ],
       "headings": [
@@ -198,6 +1397,324 @@
         {
           "target": "evidence/qwen3-coder-next-results",
           "raw": "[[evidence/qwen3-coder-next-results]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/ruview-main-claim",
+      "type": "claim",
+      "slug": "ruview-main-claim",
+      "title": "Ruview Main Claim",
+      "file": "claims/ruview-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "RuView仅用WiFi信号即可实现穿墙存在检测、呼吸和心率监测。",
+        "slug": "ruview-main-claim",
+        "kind": "claim",
+        "content": "ruview",
+        "source_pointer": "README: 'Detect people, measure breathing and heart rate... through walls, in the dark, with no cameras or wearables.'",
+        "evidence_strength": "high",
+        "supports": [
+          "wifi-csi-sensing",
+          "self-supervised-contrastive-encoder"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供大样本临床验证数据，精度可能受环境影响。",
+          "如果用户WiFi环境干扰严重（如多AP、金属反射），精度可能下降，导致误判。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n该系统不用摄像头，靠分析WiFi无线电波的变化来感知墙后是否有人、测他们的呼吸和心跳。\n\n证据:提供了详细的信号处理方法（带通滤波、零交叉BPM）和ESP32硬件实现路径。。边界:未提供大样本临床验证数据，精度可能受环境影响。。风险:如果用户WiFi环境干扰严重（如多AP、金属反射），精度可能下降，导致误判。。See [[content/ruview]]。\n",
+      "excerpt": "该系统不用摄像头，靠分析WiFi无线电波的变化来感知墙后是否有人、测他们的呼吸和心跳。",
+      "links": [
+        {
+          "target": "content/ruview",
+          "raw": "[[content/ruview]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/scrapling-main-claim",
+      "type": "claim",
+      "slug": "scrapling-main-claim",
+      "title": "Scrapling Main Claim",
+      "file": "claims/scrapling-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "解析器能从网站变化中学习并自动重定位你的元素。",
+        "slug": "scrapling-main-claim",
+        "kind": "claim",
+        "content": "scrapling",
+        "source_pointer": "README: \"Its parser learns from website changes and automatically relocates your elements when pages update.\"",
+        "evidence_strength": "medium",
+        "supports": [
+          "adaptive-element-relocation",
+          "scrapling-mcp-tool-integration"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明如果元素完全消失或内容彻底改变时的行为。",
+          "签名匹配可能误判，带来错误数据。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n页面改版后，爬虫仍能找到之前定义的目标元素，无需修改代码。\n\n证据:auto_save 和 adaptive 参数示例。。边界:未说明如果元素完全消失或内容彻底改变时的行为。。风险:签名匹配可能误判，带来错误数据。。See [[content/scrapling]]。\n",
+      "excerpt": "页面改版后，爬虫仍能找到之前定义的目标元素，无需修改代码。",
+      "links": [
+        {
+          "target": "content/scrapling",
+          "raw": "[[content/scrapling]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/skills-main-claim",
+      "type": "claim",
+      "slug": "skills-main-claim",
+      "title": "Skills Main Claim",
+      "file": "claims/skills-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "The skills fix the common failure mode of misalignment between user and agent through grilling sessions.",
+        "slug": "skills-main-claim",
+        "kind": "claim",
+        "content": "skills",
+        "source_pointer": "README: #1: The Agent Didn't Do What I Want",
+        "evidence_strength": "medium",
+        "supports": [
+          "grilling-session",
+          "shared-language-memory"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供盘问如何减少不对齐的量化证据或对比实验。",
+          "主观经验，可能不适用于所有团队和项目类型。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n通过盘问会话，技能解决了用户和代理之间最常见的失败模式：需求不对齐。\n\n证据:详细描述了盘问作为对齐手段，并提供了具体命令 /grill-me 和 /grill-with-docs。。边界:未提供盘问如何减少不对齐的量化证据或对比实验。。风险:主观经验，可能不适用于所有团队和项目类型。。See [[content/skills]]。\n",
+      "excerpt": "通过盘问会话，技能解决了用户和代理之间最常见的失败模式：需求不对齐。",
+      "links": [
+        {
+          "target": "content/skills",
+          "raw": "[[content/skills]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/supermemory-main-claim",
+      "type": "claim",
+      "slug": "supermemory-main-claim",
+      "title": "Supermemory Main Claim",
+      "file": "claims/supermemory-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Supermemory 在 LongMemEval、LoCoMo、ConvoMem 三个基准上均排名第一。",
+        "slug": "supermemory-main-claim",
+        "kind": "claim",
+        "content": "supermemory",
+        "source_pointer": "README 的 Benchmarks 章节以及首页描述",
+        "evidence_strength": "high",
+        "supports": [
+          "stateful-memory-engine",
+          "user-profile-injection"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明具体评测配置（模型、算力、数据划分等），也未证明该成绩与真实应用的直接关联。",
+          "benchmark hacking 或过拟合风险；其他实现可能针对特定任务更好。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n目前公认的评价 AI 记忆能力的三大比赛，Supermemory 每一项都是冠军。\n\n证据:记忆引擎的技术领先性，能处理长程记忆、事实更新、个性化等核心指标。。边界:未说明具体评测配置（模型、算力、数据划分等），也未证明该成绩与真实应用的直接关联。。风险:benchmark hacking 或过拟合风险；其他实现可能针对特定任务更好。。See [[content/supermemory]]。\n",
+      "excerpt": "目前公认的评价 AI 记忆能力的三大比赛，Supermemory 每一项都是冠军。",
+      "links": [
+        {
+          "target": "content/supermemory",
+          "raw": "[[content/supermemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/taste-skill-main-claim",
+      "type": "claim",
+      "slug": "taste-skill-main-claim",
+      "title": "Taste Skill Main Claim",
+      "file": "claims/taste-skill-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "给 AI 编程助手 (Codex/Cursor/Claude Code) 用的前端 UI 品味提升技能包，通过可调参数和多种风格技能防止生成千篇一律的垃圾界面",
+        "slug": "taste-skill-main-claim",
+        "kind": "claim",
+        "content": "taste-skill",
+        "source_pointer": "https://github.com/Leonxlnx/taste-skill",
+        "evidence_strength": "low",
+        "supports": [
+          "taste-skill-agent-framework-pattern"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "deep: agent/workflow evidence, skills/hooks evidence, model/RAG evidence"
+        ],
+        "status": "untested"
+      },
+      "body": "\n## Claim\n\n给 AI 编程助手 (Codex/Cursor/Claude Code) 用的前端 UI 品味提升技能包，通过可调参数和多种风格技能防止生成千篇一律的垃圾界面\n\n证据:给 AI 编程助手 (Codex/Cursor/Claude Code) 用的前端 UI 品味提升技能包，通过可调参数和多种风格技能防止生成千篇一律的垃圾界面。边界:未在 README/artifact 说明。风险:deep: agent/workflow evidence, skills/hooks evidence, model/RAG evidence。See [[content/taste-skill]]。\n",
+      "excerpt": "给 AI 编程助手 (Codex/Cursor/Claude Code) 用的前端 UI 品味提升技能包，通过可调参数和多种风格技能防止生成千篇一律的垃圾界面",
+      "links": [
+        {
+          "target": "content/taste-skill",
+          "raw": "[[content/taste-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/ui-tars-desktop-main-claim",
+      "type": "claim",
+      "slug": "ui-tars-desktop-main-claim",
+      "title": "Ui Tars Desktop Main Claim",
+      "file": "claims/ui-tars-desktop-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Agent 内核构建在 MCP 之上，支持挂载外部 MCP 服务器",
+        "slug": "ui-tars-desktop-main-claim",
+        "kind": "claim",
+        "content": "ui-tars-desktop",
+        "source_pointer": "README Core Features: 'MCP Integration - The kernel is built on MCP and also supports mounting MCP Servers'",
+        "evidence_strength": "high",
+        "supports": [
+          "mcp-kernel-agent",
+          "event-driven-agent-loop"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明内核如何实现 MCP，也未列出实际可用的 MCP 服务器列表",
+          "MCP 协议本身仍在发展，兼容性可能随时间变化"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n这个 Agent 的工具调用不是硬编码的，它使用标准协议 MCP，所以你可以轻松接入任何已支持的第三方工具。\n\n证据:表明工具接口是统一且可扩展的。边界:未说明内核如何实现 MCP，也未列出实际可用的 MCP 服务器列表。风险:MCP 协议本身仍在发展，兼容性可能随时间变化。See [[content/ui-tars-desktop]]。\n",
+      "excerpt": "这个 Agent 的工具调用不是硬编码的，它使用标准协议 MCP，所以你可以轻松接入任何已支持的第三方工具。",
+      "links": [
+        {
+          "target": "content/ui-tars-desktop",
+          "raw": "[[content/ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/vibe-trading-main-claim",
+      "type": "claim",
+      "slug": "vibe-trading-main-claim",
+      "title": "Vibe Trading Main Claim",
+      "file": "claims/vibe-trading-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "v0.1.9 版本已有 36 MCP tools",
+        "slug": "vibe-trading-main-claim",
+        "kind": "claim",
+        "content": "vibe-trading",
+        "source_pointer": "README News 2026-06-01 v0.1.9 描述中明确写道 “36 MCP tools now”",
+        "evidence_strength": "medium",
+        "supports": [
+          "mandate-gated-trading",
+          "connector-first-broker-abstraction"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "工具的具体功能列表和实现细节未知",
+          "数字可能包含实验性或内部工具，实际可用数量可能不同；代码可能未与声明严格对齐"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n最新版暴露了 36 个 MCP 工具供代理使用\n\n证据:确实有 36 个 MCP 工具可调用。边界:工具的具体功能列表和实现细节未知。风险:数字可能包含实验性或内部工具，实际可用数量可能不同；代码可能未与声明严格对齐。See [[content/vibe-trading]]。\n",
+      "excerpt": "最新版暴露了 36 个 MCP 工具供代理使用",
+      "links": [
+        {
+          "target": "content/vibe-trading",
+          "raw": "[[content/vibe-trading]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/voxcpm-main-claim",
+      "type": "claim",
+      "slug": "voxcpm-main-claim",
+      "title": "Voxcpm Main Claim",
+      "file": "claims/voxcpm-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "VoxCPM 是无 tokenizer 的端到端 TTS",
+        "slug": "voxcpm-main-claim",
+        "kind": "claim",
+        "content": "voxcpm",
+        "source_pointer": "README 第一段",
+        "evidence_strength": "high",
+        "supports": [
+          "tokenizer-free-tts",
+          "voice-design"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供与传统 TTS 的主观对比实验",
+          "未公开详细架构和数据可能导致他人无法复现"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n直接生成连续语音，不经过离散音素等中间表示，语音更自然。\n\n证据:技术报告和架构描述（未在 README 详细给出，但提及 diffusion autoregressive 和 tokenizer-free）。边界:未提供与传统 TTS 的主观对比实验。风险:未公开详细架构和数据可能导致他人无法复现。See [[content/voxcpm]]。\n",
+      "excerpt": "直接生成连续语音，不经过离散音素等中间表示，语音更自然。",
+      "links": [
+        {
+          "target": "content/voxcpm",
+          "raw": "[[content/voxcpm]]"
         }
       ],
       "headings": [

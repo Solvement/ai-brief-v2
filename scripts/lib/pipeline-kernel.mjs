@@ -93,21 +93,33 @@ export async function runColumnPipeline(module, options = {}) {
     return defaultSelect(result.evals, options.select || {});
   });
 
-  result.analyses = await runStage(result, "analyze", () => mapLimit(
+  result.analyses = await runStage(result, "analyze", (record) => mapLimitRecovered(
     result.selected,
     stageConcurrency(options, "analyze"),
+    { stage: "analyze", record, logger },
     async (item, index) => ({
       ...item,
       analysis: await module.analyze(item, item.evidence, { ...ctx, stage: "analyze", index, item }),
     }),
+    (item, message) => ({
+      ...item,
+      analysis: null,
+      analysisError: message,
+    }),
   ));
 
-  result.qa = await runStage(result, "qaGate", () => mapLimit(
+  result.qa = await runStage(result, "qaGate", (record) => mapLimitRecovered(
     result.analyses,
     stageConcurrency(options, "qaGate"),
+    { stage: "qaGate", record, logger },
     async (item, index) => ({
       ...item,
       qa: await module.qaGate(item.analysis, item.evidence, { ...ctx, stage: "qaGate", index, item }),
+    }),
+    (item, message) => ({
+      ...item,
+      qa: null,
+      qaError: message,
     }),
   ));
 
@@ -158,12 +170,26 @@ export async function mapLimit(items, limit, fn) {
   return out;
 }
 
+async function mapLimitRecovered(items, limit, { stage, record, logger } = {}, fn, fallback) {
+  if (record) record.failures = 0;
+  return mapLimit(items, limit, async (item, index) => {
+    try {
+      return await fn(item, index);
+    } catch (error) {
+      const message = errorMessage(error);
+      if (record) record.failures += 1;
+      logger?.warn?.(`${stage} failed for ${itemLabel(item, index)}: ${message}`);
+      return fallback(item, message, error, index);
+    }
+  });
+}
+
 async function runStage(result, stage, fn) {
   const startedAt = new Date().toISOString();
   const record = { stage, status: "running", startedAt, finishedAt: null, count: null };
   result.stages.push(record);
   try {
-    const value = await fn();
+    const value = await fn(record);
     record.status = "pass";
     record.count = Array.isArray(value) ? value.length : value == null ? 0 : 1;
     return value;
@@ -188,4 +214,16 @@ function stageConcurrency(options, stage) {
 function stageMethod(stage) {
   if (stage === "evidence") return "collectEvidence";
   return stage;
+}
+
+function errorMessage(error) {
+  return error?.message || String(error);
+}
+
+function itemLabel(item, index) {
+  return item?.candidate?.raw?.fullName
+    || item?.candidate?.id
+    || item?.candidateId
+    || item?.id
+    || `item#${index}`;
 }

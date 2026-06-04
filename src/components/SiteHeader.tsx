@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
-export type NavKey = "home" | "models" | "projects" | "articles" | "podcast";
+export type NavKey = "home" | "models" | "projects" | "articles" | "podcast" | "news";
 
 interface Props {
   active: NavKey;
@@ -10,6 +10,7 @@ interface Props {
 
 const NAV_ITEMS: { key: NavKey; label: string; href: string }[] = [
   { key: "home", label: "Home", href: "/" },
+  { key: "news", label: "资讯", href: "/news" },
   { key: "articles", label: "Articles", href: "/articles" },
   { key: "models", label: "Models", href: "/models" },
   { key: "projects", label: "Projects", href: "/projects" },

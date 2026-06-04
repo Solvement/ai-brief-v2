@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classifyProjectIntent, evaluate } from "../columns/projects/evaluate.mjs";
+import { classifyProjectIntent, evaluate, normalizeLightResult } from "../columns/projects/evaluate.mjs";
 
 function candidate(overrides = {}) {
   return {
@@ -107,6 +107,65 @@ test("project evaluate treats finance as vertical agent evidence, not a hard cap
   assert.ok(result.tags.includes("mcp"));
   assert.ok(result.ranking_reasons.some((reason) => /MCP|agent/i.test(reason)));
   assert.ok(!result.rejection_reasons.includes("awesome_course_tutorial_or_resource_list"));
+});
+
+test("project evaluate writes concrete Chinese TLDR instead of English radar placeholders", async () => {
+  const result = await evaluate(candidate(), evidence(), { options: { noLlm: true } });
+
+  assert.match(result.tldr, /[\u4e00-\u9fff]/);
+  assert.doesNotMatch(result.tldr, /analysis candidate|deep radar candidate|light radar item|radar mention only/i);
+  assert.match(result.tldr, /智能体|MCP|工具|项目|流程/);
+});
+
+test("project evaluate grounds TLDR in this repo's GitHub description before README categories", async () => {
+  const description = "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.";
+  const result = await evaluate(candidate({
+    id: "project:affaan-m/ecc",
+    dedupeKey: "affaan-m/ECC",
+    raw: {
+      fullName: "affaan-m/ECC",
+      owner: "affaan-m",
+      name: "ECC",
+      url: "https://github.com/affaan-m/ECC",
+      description,
+    },
+  }), evidence({
+    content: "# ECC\n\nMentions markdown conversion in docs as unrelated neighboring evidence.",
+    evidenceSignals: {
+      owner: "affaan-m",
+      repo: "ECC",
+      description,
+      raw_readme: "# ECC\n\nMentions markdown conversion in docs as unrelated neighboring evidence.",
+      has_agents: true,
+      has_mcp: true,
+    },
+  }), { options: { noLlm: true } });
+
+  assert.match(result.tldr, /agent harness 性能优化系统/);
+  assert.doesNotMatch(result.tldr, /Markdown|围绕 MCP 或工具连接构建|面向智能体工作流/);
+});
+
+test("light normalization ignores cross-repo LLM TLDR when repo description exists", () => {
+  const description = "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.";
+  const normalized = normalizeLightResult({
+    tldr: "affaan-m/ECC 是把文件或文档转换成 Markdown 的工具，常用于 LLM 文本处理流程。",
+    light: "light paragraph",
+  }, {
+    fullName: "affaan-m/ECC",
+    name: "ECC",
+    description,
+  }, {
+    evidenceSignals: {
+      repo: "ECC",
+      description,
+    },
+  }, {
+    final_depth: "light",
+    ranking_score: 80,
+  });
+
+  assert.match(normalized.tldr, /agent harness 性能优化系统/);
+  assert.doesNotMatch(normalized.tldr, /Markdown/);
 });
 
 test("project evaluate marks README fetch failure as needs_enrichment, not empty README", async () => {

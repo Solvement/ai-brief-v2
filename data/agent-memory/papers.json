@@ -1,8 +1,622 @@
 {
   "schemaVersion": 1,
   "surface": "papers",
-  "updatedAt": "2026-05-31T19:21:56.526Z",
+  "updatedAt": "2026-06-01T15:41:43.580Z",
   "runs": [
+    {
+      "id": "papers-2026-06-01-1780328503582",
+      "surface": "papers",
+      "date": "2026-06-01",
+      "generatedAt": "2026-06-01T15:41:43.580Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "15 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "3 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "3 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-06-01T15:41:43.580Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "3 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has originalReading summaries",
+            "status": "pass",
+            "details": "3 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:url-https-openreview-net-forum",
+          "title": "Safety Alignment Should be Made More Than Just a Few Tokens Deep",
+          "score": 71,
+          "reason": "这篇论文指出当前大语言模型的安全对齐只深入了前几个 token（浅层对齐），导致多种攻击漏洞，并提出加深对齐的方向和正则化微调方法。"
+        },
+        {
+          "id": "paper:arxiv-2404-16019",
+          "title": "The PRISM Alignment Dataset: What Participatory, Representative and Individualised Human Feedback Reveals About the Subjective and Multicultural Alignment of Large Language Models",
+          "score": 60,
+          "reason": "一篇通过大规模参与式、代表性抽样构建的人类反馈数据集，旨在揭示大语言模型对齐中的主观性和跨文化差异。"
+        },
+        {
+          "id": "paper:url-https-doi-org-10-1609-aaai-v39i28-35372",
+          "title": "MerryQuery: A Trustworthy LLM-Powered Tool Providing Personalized Support for Educators and Students",
+          "score": 58,
+          "reason": "一篇演示论文，介绍了一个基于RAG和引导对话的AI教学助手，旨在通过引用来源和教师监控功能确保可信度，但缺乏实验评估。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 3 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
+    {
+      "id": "papers-2026-06-01-1780324763748",
+      "surface": "papers",
+      "date": "2026-06-01",
+      "generatedAt": "2026-06-01T14:39:23.744Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "15 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "4 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "4 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "4 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-06-01T14:39:23.739Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "4 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has originalReading summaries",
+            "status": "pass",
+            "details": "4 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-29115",
+          "title": "unix-ctf: Procedural Environments for Unix-Competence Reinforcement Learning",
+          "score": 92,
+          "reason": "This paper isolates Unix competence as a separable skill from general coding-in-a-terminal, builds a procedural CTF generator (unix-ctf) to produce training tasks, and shows that reinforcement learning on this surface improves downstream performance on InterCode-CTF forensics tasks."
+        },
+        {
+          "id": "paper:arxiv-2605-30314",
+          "title": "SpecBench: Evaluating Specification-Level Reasoning for Software Engineering LLM Agents",
+          "score": 88,
+          "reason": "SpecBench是一个用于评估软件工程LLM智能体在系统规格设计阶段推理能力的新基准，填补了现有实现级基准（如SWE-Bench）忽视规格设计环节的空白。"
+        },
+        {
+          "id": "paper:arxiv-2605-24812",
+          "title": "CoRe-Code: Collaborative Reinforcement Learning for Code Generation",
+          "score": 84,
+          "reason": "提出一种基于协作强化学习的多智能体代码生成框架CoRe-Code，通过Planner-Coder范式及GRPO优化提升代码准确性和效率。"
+        },
+        {
+          "id": "paper:arxiv-2605-31584",
+          "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+          "score": 69,
+          "reason": "提出利用搜索智能体轨迹构建高混淆度干扰文档，并设计实体级规则奖励来监督长上下文推理过程的方法。"
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 4 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
+    {
+      "id": "papers-2026-06-01-1780319884975",
+      "surface": "papers",
+      "date": "2026-06-01",
+      "generatedAt": "2026-06-01T13:18:04.970Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "15 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "3 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "3 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-06-01T13:18:04.964Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "3 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has originalReading summaries",
+            "status": "pass",
+            "details": "3 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-31584",
+          "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+          "score": 70,
+          "reason": "提出利用搜索智能体轨迹构建高混淆度干扰文档，并设计实体级规则奖励来监督长上下文推理过程的方法。"
+        },
+        {
+          "id": "paper:url-https-openreview-net-forum",
+          "title": "Safety Alignment Should be Made More Than Just a Few Tokens Deep",
+          "score": 69,
+          "reason": "本文指出当前LLM安全对齐仅影响前几个输出token，导致多种攻击漏洞，倡导将安全对齐深化至更深层token。"
+        },
+        {
+          "id": "paper:arxiv-2404-16019",
+          "title": "The PRISM Alignment Dataset: What Participatory, Representative and Individualised Human Feedback Reveals About the Subjective and Multicultural Alignment of Large Language Models",
+          "score": 62,
+          "reason": "A dataset paper providing participatory, representative, and individualised human feedback for LLM alignment, with a focus on subjective and multicultural perspectives."
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 3 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
+    {
+      "id": "papers-2026-06-01-1780318461714",
+      "surface": "papers",
+      "date": "2026-06-01",
+      "generatedAt": "2026-06-01T12:54:21.712Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "3 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "3 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "3 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "fail",
+        "checkedAt": "2026-06-01T12:54:21.710Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "3 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has originalReading summaries",
+            "status": "fail",
+            "details": "3 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-30117",
+          "title": "VLA-Trace: Diagnosing Vision-Language-Action Models through Representation and Behavior Tracing",
+          "score": 82,
+          "reason": "离线模式下只根据已收集证据保留《VLA-Trace: Diagnosing Vision-Language-Action Models through Representation and Behavior Tracing》的基础脉络。"
+        },
+        {
+          "id": "paper:arxiv-2605-30090",
+          "title": "DirectorBench: Diagnosing Long-Form Video Generation with Personalized Multi-Agent Evaluation",
+          "score": 80,
+          "reason": "离线模式下只根据已收集证据保留《DirectorBench: Diagnosing Long-Form Video Generation with Personalized Multi-Agent Evaluation》的基础脉络。"
+        },
+        {
+          "id": "paper:arxiv-2605-29491",
+          "title": "The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF",
+          "score": 80,
+          "reason": "Identifies a counter-intuitive failure mode: as LLMs scale, they become more susceptible to benign instruction-like noise in reference text, with RL offering a partial fix."
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 3 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
+    {
+      "id": "papers-2026-05-31-1780264709471",
+      "surface": "papers",
+      "date": "2026-05-31",
+      "generatedAt": "2026-05-31T21:58:29.468Z",
+      "sourceFiles": {
+        "articles": "public/data/articles.json",
+        "radar": "public/data/paper-radar.json",
+        "db": "data/ai-brief.db"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "15 paper candidate(s) from the papers kernel"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "6 analyzed candidate(s) with paper-text evidence"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "6 current analysis item(s) available after QA filtering"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "6 section-mirroring academic analysis item(s)"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "0 QA failure(s) excluded before publish"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "public/data/articles.json and public/data/paper-radar.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "SQLite runs table"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "papers",
+        "status": "pass",
+        "checkedAt": "2026-05-31T21:58:29.466Z",
+        "checks": [
+          {
+            "id": "papers-present",
+            "label": "articles.json contains at least one paper",
+            "status": "pass",
+            "details": "6 paper(s)"
+          },
+          {
+            "id": "section-shape",
+            "label": "every paper has section summaries",
+            "status": "pass",
+            "details": "6 paper(s) checked"
+          },
+          {
+            "id": "qa-fail-excluded",
+            "label": "QA fail verdicts are not published",
+            "status": "pass",
+            "details": "0 failed item(s) excluded"
+          },
+          {
+            "id": "qa-warnings",
+            "label": "published papers have no QA warnings",
+            "status": "pass",
+            "details": "0 warning(s)"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "paper:arxiv-2605-29491",
+          "title": "The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF",
+          "score": 100,
+          "reason": "Identifies a counter-intuitive failure mode: as LLMs scale, they become more susceptible to benign instruction-like noise in reference text, with RL offering a partial fix."
+        },
+        {
+          "id": "paper:arxiv-2605-29640",
+          "title": "VikingMem: A Memory Base Management System for Stateful LLM-based Applications",
+          "score": 94,
+          "reason": "一个面向有状态LLM应用的生产级内存管理系统，基于事件-实体抽象构建，并在长时记忆基准上进行了评估。"
+        },
+        {
+          "id": "paper:arxiv-2605-30090",
+          "title": "DirectorBench: Diagnosing Long-Form Video Generation with Personalized Multi-Agent Evaluation",
+          "score": 93,
+          "reason": "离线模式下只根据已收集证据保留《DirectorBench: Diagnosing Long-Form Video Generation with Personalized Multi-Agent Evaluation》的基础脉络。"
+        },
+        {
+          "id": "paper:arxiv-2605-23904",
+          "title": "SkillOpt: Executive Strategy for Self-Evolving Agent Skills",
+          "score": 93,
+          "reason": "离线模式下只根据已收集证据保留《SkillOpt: Executive Strategy for Self-Evolving Agent Skills》的基础脉络。"
+        },
+        {
+          "id": "paper:arxiv-2605-29341",
+          "title": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction",
+          "score": 91,
+          "reason": "离线模式下只根据已收集证据保留《WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction》的基础脉络。"
+        },
+        {
+          "id": "paper:arxiv-2603-04448",
+          "title": "SkillNet: Create, Evaluate, and Connect AI Skills",
+          "score": 89,
+          "reason": "SkillNet proposes an open infrastructure to systematically create, evaluate, and organize AI skills as reusable, composable units for agent systems."
+        }
+      ],
+      "archivedItems": [],
+      "highlights": [
+        "Papers published 6 article analysis item(s).",
+        "0 QA failure(s) were excluded."
+      ],
+      "nextActions": [
+        "Run node scripts/validate-articles.mjs before treating articles.json as stable.",
+        "Run node scripts/validate-papers-radar.mjs after publishing radar data."
+      ]
+    },
     {
       "id": "papers-2026-05-31-1780255316528",
       "surface": "papers",
@@ -716,136 +1330,226 @@
   ],
   "reusablePatterns": [
     {
+      "text": "Safety Alignment Should be Made More Than Just a Few Tokens Deep: 这篇论文指出当前大语言模型的安全对齐只深入了前几个 token（浅层对齐），导致多种攻击漏洞，并提出加深对齐的方向和正则化微调方法。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T15:41:43.580Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "The PRISM Alignment Dataset: What Participatory, Representative and Individualised Human Feedback Reveals About the Subjective and Multicultural Alignment of Large Language Models: 一篇通过大规模参与式、代表性抽样构建的人类反馈数据集，旨在揭示大语言模型对齐中的主观性和跨文化差异。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T15:41:43.580Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "MerryQuery: A Trustworthy LLM-Powered Tool Providing Personalized Support for Educators and Students: 一篇演示论文，介绍了一个基于RAG和引导对话的AI教学助手，旨在通过引用来源和教师监控功能确保可信度，但缺乏实验评估。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T15:41:43.580Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "unix-ctf: Procedural Environments for Unix-Competence Reinforcement Learning: This paper isolates Unix competence as a separable skill from general coding-in-a-terminal, builds a procedural CTF generator (unix-ctf) to produce training tasks, and shows that reinforcement learning on this surface improves downstream performance on InterCode-CTF forensics tasks.",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T14:39:23.744Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "SpecBench: Evaluating Specification-Level Reasoning for Software Engineering LLM Agents: SpecBench是一个用于评估软件工程LLM智能体在系统规格设计阶段推理能力的新基准，填补了现有实现级基准（如SWE-Bench）忽视规格设计环节的空白。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T14:39:23.744Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "CoRe-Code: Collaborative Reinforcement Learning for Code Generation: 提出一种基于协作强化学习的多智能体代码生成框架CoRe-Code，通过Planner-Coder范式及GRPO优化提升代码准确性和效率。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T14:39:23.744Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards: 提出利用搜索智能体轨迹构建高混淆度干扰文档，并设计实体级规则奖励来监督长上下文推理过程的方法。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T13:18:04.970Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "Safety Alignment Should be Made More Than Just a Few Tokens Deep: 本文指出当前LLM安全对齐仅影响前几个输出token，导致多种攻击漏洞，倡导将安全对齐深化至更深层token。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T13:18:04.970Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "The PRISM Alignment Dataset: What Participatory, Representative and Individualised Human Feedback Reveals About the Subjective and Multicultural Alignment of Large Language Models: A dataset paper providing participatory, representative, and individualised human feedback for LLM alignment, with a focus on subjective and multicultural perspectives.",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T13:18:04.970Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "VLA-Trace: Diagnosing Vision-Language-Action Models through Representation and Behavior Tracing: 离线模式下只根据已收集证据保留《VLA-Trace: Diagnosing Vision-Language-Action Models through Representation and Behavior Tracing》的基础脉络。",
+      "source": "papers",
+      "firstSeenAt": "2026-06-01T12:54:21.712Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "DirectorBench: Diagnosing Long-Form Video Generation with Personalized Multi-Agent Evaluation: 离线模式下只根据已收集证据保留《DirectorBench: Diagnosing Long-Form Video Generation with Personalized Multi-Agent Evaluation》的基础脉络。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T21:58:29.468Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF: Identifies a counter-intuitive failure mode: as LLMs scale, they become more susceptible to benign instruction-like noise in reference text, with RL offering a partial fix.",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T21:58:29.468Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "VikingMem: A Memory Base Management System for Stateful LLM-based Applications: 一个面向有状态LLM应用的生产级内存管理系统，基于事件-实体抽象构建，并在长时记忆基准上进行了评估。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T21:58:29.468Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "SkillOpt: Executive Strategy for Self-Evolving Agent Skills: 离线模式下只根据已收集证据保留《SkillOpt: Executive Strategy for Self-Evolving Agent Skills》的基础脉络。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T21:58:29.468Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
+      "text": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction: 离线模式下只根据已收集证据保留《WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction》的基础脉络。",
+      "source": "papers",
+      "firstSeenAt": "2026-05-31T21:58:29.468Z",
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
+    },
+    {
       "text": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems: 该论文提出Agent Lifespan Engineering (ALE)框架和AgingBench基准，将长生命周期AI代理的可靠性问题从单点快照评估转向纵向退化测量与诊断。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文重新定义了智能体AI的瓶颈，从模型扩展转向系统扩展，强调围绕基础模型的执行架构（harness）是下一个关键挑战。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Code as Agent Harness: A survey that reframes code as the operational substrate for agent AI, organizing the field into three layers.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 离线模式下只根据已收集证据保留《Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses》的基础脉络。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 离线模式下只根据已收集证据保留《Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation》的基础脉络。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T19:21:56.526Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Code as Agent Harness: 一份系统性综述，将代码从生成产物重新定义为智能体系统可执行、可检查、有状态的操作基础，并提供三层分类框架。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 一个用三项可观测性支柱自动演化编码智能体“马具”（harness）的闭环系统",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Auditing Agent Harness Safety: 这篇论文提出了一种以执行轨迹为中心的agent harness安全审计框架，将安全评估从最终输出转移到完整执行过程，揭示了任务完成与安全执行之间的系统性脱节。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Your Agents Are Aging Too: Agent Lifespan Engineering for Deployed Systems: 论文将AI Agent的可靠性问题从单次基准测试扩展到部署后的生命周期退化，提出系统化的老化机制分类和诊断框架。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: Harness-Bench 将执行层 (harness) 作为主要评估变量, 揭示了模型–harness 配置对代理性能的显著影响, 而非仅归因于基础模型。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:53:47.066Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Polar: Agentic RL on Any Harness at Scale: Polar proposes a proxy-based rollout framework to enable RL training on arbitrary agent harnesses without modification.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems: MOSS argues that source-level rewriting is a fundamentally more general medium for agent self-evolution than text-mutable artifacts, and implements a production system achieving it with a deterministic pipeline and safe deployment.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "MobileExplorer: Accelerating On-Device Inference for Mobile GUI Agents via Online Exploration: MobileExplorer proposes overlapping VLM inference with online UI exploration to reduce latency for on-device mobile GUI agents.",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Governed Evolution of Agent Runtimes through Executable Operational Cognition: 这篇论文为智能体运行时工件的演化提出了一个治理框架",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 本文提出一个诊断性基准Harness-Bench，用于系统评估不同harness配置（而非仅基础模型）对LLM agent在真实工作流中性能的影响，并揭示执行对齐失败模式。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T16:07:59.158Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Harness-Bench: Measuring Harness Effects across Models in Realistic Agent Workflows: 该论文引入了Harness-Bench，一个诊断基准，用于量化不同模型-配置组合下的harness效应。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "From Model Scaling to System Scaling: Scaling the Harness in Agentic AI: 本文提出系统缩放（缩放智能体 harness）而非仅模型缩放是智能体AI的下一个瓶颈，并开发了参考实现 CheetahClaws。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses: 本文提出通过三个可观测性支柱实现编码智能体套件的自动演化，将每一次编辑转化为可验证的合约。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 本文提出一个多智能体框架Ptah，用于生成可验证、图文交叉的深度研究报告。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Auditing Agent Harness Safety: 提出 HarnessAudit 框架，通过审计完整执行轨迹来评估 LLM agent 安全，而非仅检查最终输出。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T15:23:49.156Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "WorldMemArena: Evaluating Multimodal Agent Memory Through Action-World Interaction: WorldMemArena 将多模态智能体记忆评估从静态回忆转向四阶段行动-世界交互循环，提供了细粒度诊断。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T13:35:19.310Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     },
     {
       "text": "Towards Verifiable Multimodal Deep Research: A Multi-Agent Harness for Interleaved Report Generation: 提出一个多智能体系统Ptah，用于生成可验证、图文交织的多模态深度研究报告，并配以专门的评估协议PtahEval。",
       "source": "papers",
       "firstSeenAt": "2026-05-31T13:35:19.310Z",
-      "lastSeenAt": "2026-05-31T19:21:56.526Z"
+      "lastSeenAt": "2026-06-01T15:41:43.580Z"
     }
   ]
 }
