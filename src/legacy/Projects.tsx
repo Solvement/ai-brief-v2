@@ -4,7 +4,6 @@ import type { Board, TrendingData, TrendingWindow } from "../types";
 import { loadTrending } from "../lib/data";
 import { RepoCard } from "../components/RepoCard";
 import { SiteHeader } from "../components/SiteHeader";
-import { RefreshButton } from "../components/RefreshButton";
 
 const TITLES: Record<TrendingWindow, string> = { daily: "今日榜", weekly: "本周榜", monthly: "本月榜" };
 const SORT_LABEL = "综合排序";
@@ -94,12 +93,9 @@ export function Projects() {
         meta={data && (
           <>
             <span className="meta-text">数据更新于 {relativeTime(data.generatedAt)}</span>
-            {process.env.NODE_ENV === "development" && (
-              <button className="refresh-btn" onClick={() => refreshData(false)} disabled={ingest === "running"}>
-                {ingest === "running" ? "更新中..." : "本地重抓"}
-              </button>
-            )}
-            <RefreshButton column="projects" />
+            <button className="refresh-btn" onClick={() => refreshData(false)} disabled={ingest === "running"}>
+              {ingest === "running" ? "更新中..." : "立即更新"}
+            </button>
           </>
         )}
       />

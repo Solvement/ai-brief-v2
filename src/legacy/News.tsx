@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { SiteHeader } from "../components/SiteHeader";
-import { RefreshButton } from "../components/RefreshButton";
 
 interface NewsItem {
   title: string;
@@ -101,7 +100,7 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
 
   return (
     <>
-      <SiteHeader active="news" meta={<><span className="meta-text">资讯更新于 {formatDate(data.generatedAt)}</span><RefreshButton column="news" /></>} />
+      <SiteHeader active="news" meta={`资讯更新于 ${formatDate(data.generatedAt)}`} />
       <main className="page news-page">
         <section className="models-intro">
           <div>
