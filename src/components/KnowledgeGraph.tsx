@@ -43,10 +43,9 @@ interface SimNode extends KGNodeRaw {
   pinned: boolean;
 }
 
-const W = 1100;
-const H = 760;
+const W = 1200;
+const H = 820;
 
-// score axes for the JoJo-style ability panel
 const SCORE_AXES: { key: string; label: string }[] = [
   { key: "idea_novelty", label: "新颖" },
   { key: "system_design_value", label: "系统设计" },
@@ -64,9 +63,7 @@ const EDGE_STYLE: Record<string, { color: string; width: number; dash?: string; 
   shares_tag: { color: "#93c5fd", width: 1.2, dash: "4 4" },
   shares_principle: { color: "#a7f3d0", width: 1.2, dash: "2 4" },
 };
-function edgeStyle(t: string) {
-  return EDGE_STYLE[t] || { color: "#cbd5e1", width: 1.2 };
-}
+const edgeStyle = (t: string) => EDGE_STYLE[t] || { color: "#cbd5e1", width: 1.2 };
 
 function nodeColor(n: KGNodeRaw): string {
   if (n.type === "principle") return "#2f9e63";
@@ -75,14 +72,14 @@ function nodeColor(n: KGNodeRaw): string {
   return "#7c3aed";
 }
 function nodeRadius(n: KGNodeRaw): number {
-  if (n.type === "principle") return 6;
-  if (n.external) return 7;
-  return n.is_lineage_seed ? 13 : 11;
+  if (n.type === "principle") return 6.5;
+  if (n.external) return 8;
+  return n.is_lineage_seed ? 14 : 12;
 }
 function shortTitle(n: KGNodeRaw): string {
   if (n.type === "principle") return n.key || "";
   const t = (n.title || n.arxiv_id || "").replace(/[:：].*$/, "");
-  return t.length > 22 ? t.slice(0, 21) + "…" : t;
+  return t.length > 24 ? t.slice(0, 23) + "…" : t;
 }
 
 // ── ability radar (JoJo panel) ─────────────────────────────────────
@@ -93,7 +90,7 @@ function AbilityRadar({ scores }: { scores: Record<string, number> }) {
   const pts = SCORE_AXES.map((ax, i) => {
     const v = Math.max(0, Math.min(10, scores[ax.key] ?? 0)) / 10;
     const a = (i / SCORE_AXES.length) * Math.PI * 2 - Math.PI / 2;
-    return { x: cx + Math.cos(a) * R * v, y: cy + Math.sin(a) * R * v, ax, a, v };
+    return { x: cx + Math.cos(a) * R * v, y: cy + Math.sin(a) * R * v, ax };
   });
   const ring = (f: number) =>
     SCORE_AXES.map((_, i) => {
@@ -115,10 +112,8 @@ function AbilityRadar({ scores }: { scores: Record<string, number> }) {
       ))}
       {SCORE_AXES.map((ax, i) => {
         const a = (i / SCORE_AXES.length) * Math.PI * 2 - Math.PI / 2;
-        const lx = cx + Math.cos(a) * (R + 16);
-        const ly = cy + Math.sin(a) * (R + 16);
         return (
-          <text key={ax.key} x={lx} y={ly} className="kg-radar-label" textAnchor="middle" dominantBaseline="middle">
+          <text key={ax.key} x={cx + Math.cos(a) * (R + 16)} y={cy + Math.sin(a) * (R + 16)} className="kg-radar-label" textAnchor="middle" dominantBaseline="middle">
             {ax.label}
           </text>
         );
@@ -135,11 +130,16 @@ export function KnowledgeGraph() {
   const [hover, setHover] = useState<string | null>(null);
   const [, setTick] = useState(0);
   const [showPrinciples, setShowPrinciples] = useState(true);
+  // view = pan/zoom transform applied to the graph group
+  const [view, setView] = useState({ scale: 1, tx: 0, ty: 0 });
 
   const simRef = useRef<SimNode[]>([]);
   const edgesRef = useRef<KGEdge[]>([]);
   const alphaRef = useRef(1);
   const dragRef = useRef<string | null>(null);
+  const panRef = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null);
+  const viewRef = useRef(view);
+  viewRef.current = view;
   const svgRef = useRef<SVGSVGElement | null>(null);
   const rafRef = useRef<number>(0);
 
@@ -150,15 +150,15 @@ export function KnowledgeGraph() {
       .catch((e) => setErr(e.message || String(e)));
   }, []);
 
-  // init simulation when data arrives
+  // simulation
   useEffect(() => {
     if (!data) return;
     const cx = W / 2;
     const cy = H / 2;
     simRef.current = data.nodes.map((n, i) => {
       const a = (i / data.nodes.length) * Math.PI * 2;
-      const rr = n.type === "paper" && !n.external ? 90 : 230;
-      return { ...n, x: cx + Math.cos(a) * rr + (Math.random() - 0.5) * 40, y: cy + Math.sin(a) * rr + (Math.random() - 0.5) * 40, vx: 0, vy: 0, pinned: false };
+      const rr = n.type === "paper" && !n.external ? 110 : 280;
+      return { ...n, x: cx + Math.cos(a) * rr + (Math.random() - 0.5) * 50, y: cy + Math.sin(a) * rr + (Math.random() - 0.5) * 50, vx: 0, vy: 0, pinned: false };
     });
     edgesRef.current = data.edges;
     alphaRef.current = 1;
@@ -168,7 +168,7 @@ export function KnowledgeGraph() {
       const nodes = simRef.current;
       const edges = edgesRef.current;
       const alpha = alphaRef.current;
-      // charge repulsion (O(n^2), fine for ~50 nodes)
+      // charge repulsion (more spread → less hairball)
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const a = nodes[i];
@@ -178,51 +178,46 @@ export function KnowledgeGraph() {
           let d2 = dx * dx + dy * dy;
           if (d2 < 1) d2 = 1;
           const d = Math.sqrt(d2);
-          const f = (1500 * alpha) / d2;
-          const ux = dx / d;
-          const uy = dy / d;
-          a.vx += ux * f;
-          a.vy += uy * f;
-          b.vx -= ux * f;
-          b.vy -= uy * f;
+          const f = (2400 * alpha) / d2;
+          a.vx += (dx / d) * f;
+          a.vy += (dy / d) * f;
+          b.vx -= (dx / d) * f;
+          b.vy -= (dy / d) * f;
         }
       }
-      // link springs
+      // link springs (longer = more readable)
       for (const e of edges) {
         const ia = idIndex.get(e.source);
         const ib = idIndex.get(e.target);
         if (ia == null || ib == null) continue;
         const a = nodes[ia];
         const b = nodes[ib];
-        const L = e.type === "exhibits_principle" ? 72 : e.type === "forward_lineage" ? 150 : 116;
+        const L = e.type === "exhibits_principle" ? 92 : e.type === "forward_lineage" ? 185 : 145;
         let dx = b.x - a.x;
         let dy = b.y - a.y;
-        let d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
         const f = (d - L) * 0.045 * alpha;
-        const ux = (dx / d) * f;
-        const uy = (dy / d) * f;
-        a.vx += ux;
-        a.vy += uy;
-        b.vx -= ux;
-        b.vy -= uy;
+        a.vx += (dx / d) * f;
+        a.vy += (dy / d) * f;
+        b.vx -= (dx / d) * f;
+        b.vy -= (dy / d) * f;
       }
-      // centering + integrate
       for (const n of nodes) {
         if (n.pinned) {
           n.vx = 0;
           n.vy = 0;
           continue;
         }
-        n.vx += (W / 2 - n.x) * 0.011 * alpha;
-        n.vy += (H / 2 - n.y) * 0.011 * alpha;
+        n.vx += (W / 2 - n.x) * 0.009 * alpha;
+        n.vy += (H / 2 - n.y) * 0.009 * alpha;
         n.vx *= 0.85;
         n.vy *= 0.85;
         n.x += n.vx;
         n.y += n.vy;
-        n.x = Math.max(24, Math.min(W - 24, n.x));
-        n.y = Math.max(24, Math.min(H - 24, n.y));
+        n.x = Math.max(20, Math.min(W - 20, n.x));
+        n.y = Math.max(20, Math.min(H - 20, n.y));
       }
-      alphaRef.current = Math.max(0.015, alpha * 0.992);
+      alphaRef.current = Math.max(0.012, alpha * 0.992);
       setTick((t) => (t + 1) % 1000000);
       rafRef.current = requestAnimationFrame(step);
     };
@@ -230,13 +225,47 @@ export function KnowledgeGraph() {
     return () => cancelAnimationFrame(rafRef.current);
   }, [data]);
 
-  // pointer → svg coords
+  // pointer → viewBox coords
   const toSvg = useCallback((clientX: number, clientY: number) => {
     const svg = svgRef.current;
     if (!svg) return { x: 0, y: 0 };
     const rect = svg.getBoundingClientRect();
     return { x: ((clientX - rect.left) / rect.width) * W, y: ((clientY - rect.top) / rect.height) * H };
   }, []);
+  // viewBox → graph coords (undo pan/zoom)
+  const toGraph = useCallback((clientX: number, clientY: number) => {
+    const s = toSvg(clientX, clientY);
+    const v = viewRef.current;
+    return { x: (s.x - v.tx) / v.scale, y: (s.y - v.ty) / v.scale };
+  }, [toSvg]);
+
+  // wheel zoom toward cursor (native non-passive listener)
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      const px = ((e.clientX - rect.left) / rect.width) * W;
+      const py = ((e.clientY - rect.top) / rect.height) * H;
+      setView((v) => {
+        const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        const scale = Math.max(0.45, Math.min(4.5, v.scale * factor));
+        const k = scale / v.scale;
+        return { scale, tx: px - (px - v.tx) * k, ty: py - (py - v.ty) * k };
+      });
+    };
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const zoomBy = (f: number) =>
+    setView((v) => {
+      const scale = Math.max(0.45, Math.min(4.5, v.scale * f));
+      const k = scale / v.scale;
+      return { scale, tx: W / 2 - (W / 2 - v.tx) * k, ty: H / 2 - (H / 2 - v.ty) * k };
+    });
+  const resetView = () => setView({ scale: 1, tx: 0, ty: 0 });
 
   const onPointerDownNode = (id: string) => (e: React.PointerEvent) => {
     e.stopPropagation();
@@ -244,16 +273,29 @@ export function KnowledgeGraph() {
     dragRef.current = id;
     const n = simRef.current.find((m) => m.id === id);
     if (n) n.pinned = true;
-    alphaRef.current = Math.max(alphaRef.current, 0.5);
+    alphaRef.current = Math.max(alphaRef.current, 0.4);
     setSelected(id);
   };
+  const onSvgPointerDown = (e: React.PointerEvent) => {
+    if (dragRef.current) return;
+    panRef.current = { x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty };
+  };
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current) return;
-    const p = toSvg(e.clientX, e.clientY);
-    const n = simRef.current.find((m) => m.id === dragRef.current);
-    if (n) {
-      n.x = p.x;
-      n.y = p.y;
+    if (dragRef.current) {
+      const p = toGraph(e.clientX, e.clientY);
+      const n = simRef.current.find((m) => m.id === dragRef.current);
+      if (n) {
+        n.x = p.x;
+        n.y = p.y;
+      }
+      return;
+    }
+    if (panRef.current) {
+      const rect = svgRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const sx = ((e.clientX - panRef.current.x) / rect.width) * W;
+      const sy = ((e.clientY - panRef.current.y) / rect.height) * H;
+      setView((v) => ({ ...v, tx: panRef.current!.tx + sx, ty: panRef.current!.ty + sy }));
     }
   };
   const onPointerUp = () => {
@@ -262,13 +304,13 @@ export function KnowledgeGraph() {
       if (n) n.pinned = false;
       dragRef.current = null;
     }
+    panRef.current = null;
   };
 
   const nodes = simRef.current;
   const edges = edgesRef.current;
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes, data]);
 
-  // neighbor highlight set
   const active = hover || selected;
   const neighborSet = useMemo(() => {
     if (!active) return null;
@@ -292,6 +334,10 @@ export function KnowledgeGraph() {
   }, [selected, edges, byId]);
 
   const stats = data?.stats as { nodeByType?: Record<string, number>; edgeByType?: Record<string, number> } | undefined;
+  const tf = `translate(${view.tx},${view.ty}) scale(${view.scale})`;
+  // semantic-zoom thresholds: minor labels appear as you zoom in
+  const labelMinor = view.scale >= 1.35;
+  const labelPrinciple = view.scale >= 1.9;
 
   return (
     <>
@@ -301,17 +347,18 @@ export function KnowledgeGraph() {
           <div>
             <div className="eyebrow">Knowledge Graph</div>
             <h1>L0 知识图谱 · 大脑神经元网</h1>
-            <p>论文与设计原则是神经元，<b style={{ color: "#ea580c" }}>橙色边 = 后续演化（谁优化/替换了谁）</b>，灰边=论文体现的设计原则。拖动节点，点论文看能力面板。</p>
+            <p>论文与设计原则是神经元，<b style={{ color: "#ea580c" }}>橙色箭头 = 后续演化（谁优化/替换了谁）</b>，灰边=论文体现的设计原则。<b>滚轮缩放、拖空白平移、拖节点</b>，点论文看能力面板。</p>
           </div>
           <div className="kg-legend">
-            {stats?.nodeByType && (
-              <span className="kg-chip">论文 {stats.nodeByType.paper ?? 0} · 原则 {stats.nodeByType.principle ?? 0}</span>
-            )}
-            {stats?.edgeByType?.forward_lineage != null && (
-              <span className="kg-chip kg-chip-fwd">边效应 {stats.edgeByType.forward_lineage}</span>
-            )}
+            {stats?.nodeByType && <span className="kg-chip">论文 {stats.nodeByType.paper ?? 0} · 原则 {stats.nodeByType.principle ?? 0}</span>}
+            {stats?.edgeByType?.forward_lineage != null && <span className="kg-chip kg-chip-fwd">边效应 {stats.edgeByType.forward_lineage}</span>}
+            <div className="kg-zoom">
+              <button className="kg-toggle" onClick={() => zoomBy(1 / 1.25)} aria-label="缩小">−</button>
+              <button className="kg-toggle" onClick={() => zoomBy(1.25)} aria-label="放大">+</button>
+              <button className="kg-toggle" onClick={resetView}>重置</button>
+            </div>
             <button className="kg-toggle" onClick={() => setShowPrinciples((v) => !v)}>
-              {showPrinciples ? "隐藏原则节点" : "显示原则节点"}
+              {showPrinciples ? "隐藏原则" : "显示原则"}
             </button>
           </div>
         </div>
@@ -323,6 +370,7 @@ export function KnowledgeGraph() {
             ref={svgRef}
             className="kg-svg"
             viewBox={`0 0 ${W} ${H}`}
+            onPointerDown={onSvgPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
             onPointerLeave={onPointerUp}
@@ -333,77 +381,83 @@ export function KnowledgeGraph() {
                 <path d="M0,0 L10,5 L0,10 z" fill="#ea580c" />
               </marker>
             </defs>
-            {/* edges */}
-            <g>
-              {edges.map((e, i) => {
-                const a = byId.get(e.source);
-                const b = byId.get(e.target);
-                if (!a || !b) return null;
-                if (!showPrinciples && (a.type === "principle" || b.type === "principle")) return null;
-                const st = edgeStyle(e.type);
-                const dim = neighborSet && !(neighborSet.has(e.source) && neighborSet.has(e.target));
-                return (
-                  <line
-                    key={i}
-                    x1={a.x}
-                    y1={a.y}
-                    x2={b.x}
-                    y2={b.y}
-                    stroke={st.color}
-                    strokeWidth={st.width}
-                    strokeDasharray={st.dash}
-                    markerEnd={st.directed ? "url(#kg-arrow)" : undefined}
-                    opacity={dim ? 0.08 : st.color === "#d8d2c6" ? 0.55 : 0.85}
-                  />
-                );
-              })}
-            </g>
-            {/* nodes */}
-            <g>
-              {nodes.map((n) => {
-                if (!showPrinciples && n.type === "principle") return null;
-                const dim = neighborSet && !neighborSet.has(n.id);
-                const r = nodeRadius(n);
-                const isPaper = n.type === "paper";
-                const showLabel = (isPaper && !n.external) || active === n.id || hover === n.id;
-                return (
-                  <g
-                    key={n.id}
-                    transform={`translate(${n.x},${n.y})`}
-                    opacity={dim ? 0.25 : 1}
-                    style={{ cursor: "pointer" }}
-                    onPointerDown={onPointerDownNode(n.id)}
-                    onPointerEnter={() => setHover(n.id)}
-                    onPointerLeave={() => setHover(null)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelected(n.id);
-                    }}
-                  >
-                    <circle
-                      r={r}
-                      fill={nodeColor(n)}
-                      stroke={n.external ? "#94a3b8" : selected === n.id ? "#ea580c" : "#ffffff"}
-                      strokeWidth={selected === n.id ? 3 : n.external ? 1.5 : 2}
+            <g transform={tf}>
+              {/* edges */}
+              <g>
+                {edges.map((e, i) => {
+                  const a = byId.get(e.source);
+                  const b = byId.get(e.target);
+                  if (!a || !b) return null;
+                  if (!showPrinciples && (a.type === "principle" || b.type === "principle")) return null;
+                  const st = edgeStyle(e.type);
+                  const dim = neighborSet && !(neighborSet.has(e.source) && neighborSet.has(e.target));
+                  return (
+                    <line
+                      key={i}
+                      x1={a.x}
+                      y1={a.y}
+                      x2={b.x}
+                      y2={b.y}
+                      stroke={st.color}
+                      strokeWidth={st.width}
+                      strokeDasharray={st.dash}
+                      markerEnd={st.directed ? "url(#kg-arrow)" : undefined}
+                      opacity={dim ? 0.07 : st.color === "#d8d2c6" ? 0.5 : 0.85}
                     />
-                    {n.is_lineage_seed && <circle r={r + 3} fill="none" stroke="#2563eb" strokeWidth={1} opacity={0.5} />}
-                    {showLabel && (
-                      <text className={`kg-node-label ${n.type === "principle" ? "kg-label-pri" : ""}`} x={0} y={r + 12} textAnchor="middle">
-                        {shortTitle(n)}
-                      </text>
-                    )}
-                  </g>
-                );
-              })}
+                  );
+                })}
+              </g>
+              {/* nodes */}
+              <g>
+                {nodes.map((n) => {
+                  if (!showPrinciples && n.type === "principle") return null;
+                  const dim = neighborSet && !neighborSet.has(n.id);
+                  const r = nodeRadius(n);
+                  const isPaper = n.type === "paper";
+                  const showLabel =
+                    active === n.id ||
+                    hover === n.id ||
+                    (isPaper && !n.external) ||
+                    (isPaper && n.external && labelMinor) ||
+                    (n.type === "principle" && labelPrinciple);
+                  return (
+                    <g
+                      key={n.id}
+                      transform={`translate(${n.x},${n.y})`}
+                      opacity={dim ? 0.22 : 1}
+                      style={{ cursor: "pointer" }}
+                      onPointerDown={onPointerDownNode(n.id)}
+                      onPointerEnter={() => setHover(n.id)}
+                      onPointerLeave={() => setHover(null)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelected(n.id);
+                      }}
+                    >
+                      <circle
+                        r={r}
+                        fill={nodeColor(n)}
+                        stroke={n.external ? "#94a3b8" : selected === n.id ? "#ea580c" : "#ffffff"}
+                        strokeWidth={selected === n.id ? 3 : n.external ? 1.5 : 2}
+                      />
+                      {n.is_lineage_seed && <circle r={r + 3} fill="none" stroke="#2563eb" strokeWidth={1} opacity={0.5} />}
+                      {showLabel && (
+                        <text className={`kg-node-label ${n.type === "principle" ? "kg-label-pri" : ""}`} x={0} y={r + 13} textAnchor="middle">
+                          {shortTitle(n)}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })}
+              </g>
             </g>
           </svg>
 
-          {/* side panel */}
+          <div className="kg-zoom-readout">{Math.round(view.scale * 100)}%</div>
+
           {selectedNode && (
             <aside className="kg-panel">
-              <button className="kg-panel-close" onClick={() => setSelected(null)}>
-                ×
-              </button>
+              <button className="kg-panel-close" onClick={() => setSelected(null)}>×</button>
               {selectedNode.type === "paper" ? (
                 <>
                   <div className="kg-panel-kind">{selectedNode.external ? "外部 · 后续工作" : selectedNode.agent_relevant ? "Agent 论文" : "论文"}</div>
@@ -419,9 +473,10 @@ export function KnowledgeGraph() {
                     </>
                   )}
                   {!selectedNode.external && selectedNode.slug && (
-                    <a className="kg-panel-link" href={`/papers/${selectedNode.slug}`}>
-                      读深读 →
-                    </a>
+                    <a className="kg-panel-link" href={`/papers/${selectedNode.slug}`}>读深读 →</a>
+                  )}
+                  {selectedNode.external && selectedNode.arxiv_id && (
+                    <a className="kg-panel-link" href={`https://arxiv.org/abs/${selectedNode.arxiv_id}`} target="_blank" rel="noreferrer">arXiv ↗</a>
                   )}
                 </>
               ) : (

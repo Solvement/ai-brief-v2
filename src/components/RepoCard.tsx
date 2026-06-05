@@ -120,20 +120,29 @@ export function RepoCard({ repo }: Props) {
         </div>
         <span className="radar-foot-right">
           {action && <span className={`radar-action ${actionStrong ? "strong" : ""}`}>{action}</span>}
-          <span className={`radar-cta ${hasBrief ? "deep" : ""}`}>
-            {hasBrief ? `${tierLabel} →` : "看仓库 →"}
-          </span>
+          {repo.url && (
+            <a className="radar-repo-link" href={repo.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
+              仓库 ↗
+            </a>
+          )}
+          <span className="radar-cta deep">{hasBrief ? `${tierLabel} →` : "看分析 →"}</span>
         </span>
       </div>
     </>
   );
 
   const cls = `radar-card ${tierCls}${hasBrief ? " has-brief" : ""}${isIndex ? " radar-card--index" : ""}`;
+  // Card always links to an ANALYSIS page: brief-wiki if generated, else the universal
+  // per-repo Detail (/repo/owner/name). The original repo is a SEPARATE footer link.
+  const repoName = repo.name || (repo.fullName || "").split("/").slice(1).join("/");
+  const analysisHref = hasBrief
+    ? `/brief/${encodeURIComponent(slug)}`
+    : `/repo/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repoName)}`;
 
-  if (hasBrief) {
-    return <Link className={cls} href={`/brief/${encodeURIComponent(slug)}`}>{inner}</Link>;
-  }
   return (
-    <a className={cls} href={repo.url} target="_blank" rel="noreferrer">{inner}</a>
+    <div className={cls}>
+      <Link className="radar-card-cover" href={analysisHref} aria-label={`${repo.fullName} 分析`} />
+      {inner}
+    </div>
   );
 }
