@@ -1,0 +1,65 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你搭多 agent 系统时,最累、最玄学的就是"**拓扑**"——谁调谁、谁先谁后、加几个 agent。GPTSwarm 给了一个反直觉但很强的答案:**别手搭,把它变成可优化的图,让系统自己学连边、自己剪掉坏队友。** 这把"agent 编排"从手艺活升级成"可学习对象",是 agent 基建里很前沿、也很值钱的一类能力。对你想做的"越用越好的 agent"尤其关键。
+
+> [!key] 和我们北极星(L1 自进化)同源
+> "优化 agent 图的连边/提示"**本质就是结构层面的自进化**。我们的 L1(BriefEvolve)要让流水线自己变好——GPTSwarm 的"在 DAG 概率分布上用 REINFORCE 学拓扑 + 剪有害边"正是一张可借的现成蓝图。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 把 agent 系统抽象成图 | 节点=操作、边=信息流,单 agent 与 swarm 同一套抽象 | 把你现有的 agent 流水线画成 DAG,标清节点/边/输出 |
+| 拓扑优化(学连边) | 把"选哪些边"松弛成概率分布,用 RL 学 + 剪枝 | 实现一个最小边优化:给每条边一个保留概率,按任务得分更新 |
+| 节点级提示自改 | 节点存历史,用改写器迭代优化提示 | 写一个 prompt-improver:按历史输入输出迭代改某节点提示 |
+| 对坏 agent 鲁棒 | 优化器自动断开有害/对抗连边 | 故意塞一个捣乱 agent,验证优化后它被剪掉 |
+| 优化成本意识 | REINFORCE 要采样多图多跑,算 API 账 | 记录优化前后得分 vs 总 token,判断值不值 |
+
+## 系统设计心法
+
+一句话:**把 agent 编排当"可优化的图",而不是手搭的流程图。**
+- **结构即参数**:节点提示和节点间连边都是图上参数,能优化就别手调。
+- **学拓扑 > 加 agent**:实验证明"连对边"比"连更多边"更重要——别堆 agent,学连接。
+- **剪枝是鲁棒性**:让优化器自动断开坏队友,比人工挑队友更稳。
+- **离散→连续**:把"选不选这条边"松弛成概率,才能用梯度优化——这是把很多离散结构问题变可学的通用招。
+
+## 作品集角度(Portfolio angle)
+
+"自优化的 agent 编排"是非常硬核、好讲的方向。两条路:① 自己做一个 mini agent-graph optimizer(节点提示 + 边拓扑都能优化,带剪枝 demo),把"系统自己学连边"讲清楚;② 给 `metauto-ai/GPTSwarm` 提 PR(新环境/新优化器/新 agent 类型)。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Mini 边优化器 | 给一个 3-agent 群,每条边一个保留概率,按任务得分 REINFORCE 学拓扑 | 1 周 | 吃透"学连边 + 剪枝"的核心,可视化前后图 |
+| 节点提示自改器 | 节点存历史→改写器迭代优化提示,跑 HumanEval 子集看涨幅 | 3-5 天 | 复刻 0.76→0.88 那条线,讲清节点优化 |
+| 坏队友鲁棒性 demo | 塞一个对抗 agent,验证优化后其边被剪 | 2-3 天 | 把"系统对坏队友鲁棒"做成亮点 |
+| 给 GPTSwarm 提 PR | 加一个 environment/agent 类型 | 1-2 周 | merged PR 进前沿 agent-优化项目 |
+
+## 简历 / 面试故事
+
+诚实写法:
+- *"Built a graph-based multi-agent optimizer that learns the communication topology (edge probabilities via REINFORCE) and prunes harmful/adversarial connections, instead of hand-designing the agent graph."*
+- *"Implemented node-level prompt self-optimization (history → prompt-improver loop), reproducing the 'learn the right edges, not more edges' finding."*
+- *"(若做了 PR)Contributed a {new environment / agent type} to GPTSwarm (agents-as-optimizable-graphs framework)."*
+
+> [!key] 面试可讲
+> "多 agent 的拓扑该怎么定?"——用本文论证:**别手搭,把连边松弛成概率分布用 RL 学,并自动剪掉有害边;'连对边'比'连更多边'更重要**。这体现优化思维 + 把离散结构变可学的功力。
+
+## 学习清单
+
+**必学**
+- agent/swarm 的图抽象(节点/边/输出节点)
+- 边优化:离散选边→DAG 概率分布→REINFORCE + 剪枝
+- 节点优化:历史驱动的提示自改
+
+**有用**
+- "连对边 vs 连更多边"的密度对照思路
+- 对抗 agent 的自动剪枝(鲁棒性)
+
+**可选**
+- 优化的 API 成本权衡;超大 swarm 的可扩展性

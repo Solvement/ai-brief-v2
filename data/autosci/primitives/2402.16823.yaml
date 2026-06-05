@@ -1,0 +1,55 @@
+primitive_id: optimizable-agent-graph
+source_paper: "2402.16823"
+title: "GPTSwarm: Agents & Swarms as Optimizable Computational Graphs"
+relevance_level: direct_pattern_strong    # 优化 agent 图 = 结构层自进化,直接喂 L1(BriefEvolve)
+audience: ai_only                         # L1/L3 设计件,不进 Kevin 阅读 tab
+core_pattern: >
+  把单 agent 和多 agent 群都表示成有向无环图(节点=LLM/工具/动作,边=信息流,G=(N,E,F,o)),
+  然后在图上做两层优化:① 节点优化——节点存历史 h,用改写器 p←I(h,p,d) 迭代改提示;
+  ② 边优化——把"选哪些边"松弛成"所有可行 DAG 上的概率分布",用 REINFORCE 无偏梯度学拓扑,
+  自动剪掉无用/有害(对抗)连边。关键洞见:"连对边" > "连更多边",结构本身是可优化参数。
+problem_class: agent-orchestration-topology-and-prompts-should-be-learned-not-hand-designed
+components:
+  - graph_representation   # agent/swarm 统一成 DAG
+  - node_optimizer         # 历史驱动的提示自改 p←I(h,p,d)
+  - edge_optimizer         # DAG 概率分布 + REINFORCE 学拓扑 + 剪枝
+  - topological_executor   # 拓扑排序执行,节点拿前驱输出
+autosci_modules:
+  - self_evolve_controller # 边/节点优化 = 结构层自进化的核心引擎
+  - typed_memory           # 节点历史 h = 结构化记忆
+  - guard                  # 自动剪有害/对抗边 = 鲁棒性护栏
+  - cold_critic            # 任务得分作为优化信号(可换成独立评委)
+inputs:
+  - agent_graphs           # 一组 agent(各自一张图)
+  - task_with_score        # 可打分的任务(优化信号来源)
+  - edge_space             # 可行连边集合(待学的拓扑空间)
+outputs:
+  - optimized_swarm        # 学好提示 + 拓扑的群体图
+  - pruned_topology        # 剪枝后的连边(去掉有害/无用)
+  - improved_prompts       # 各节点优化后的提示
+implementation_idea: >
+  最小版:给一个 3-agent 群的每条候选边一个保留概率 θ;采样 M 张图各跑任务得分,
+  用 REINFORCE ∇θ E[u] ≈ (1/M)Σ û_i ∇θ log p_θ(G_i) 更新 θ;节点侧加一个 prompt-improver
+  按历史迭代改提示。先在一个可打分小任务(如 Crosswords 子集)跑通,验证"剪掉坏边/连对边"。
+small_experiment: >
+  对照 A=手搭固定拓扑 vs B=边优化学拓扑(+剪枝);再 A=仅边优化 vs B=边+节点优化,
+  比任务得分(复刻:边 0.575→边+节点 0.668);并塞一个对抗 agent 验证其边被剪。1-7 天。
+design_principles:                          # 跨篇沉淀的"怎么让 agent 系统自进化"零件(喂 L1/L3)
+  - id: agents-as-optimizable-structure
+    principle: "把 agent 系统(提示 + 拓扑)当图上参数,能优化就别手调——结构本身可学。"
+    transfers_to: "L1 BriefEvolve:把选稿/冷审流水线的连接与提示做成可优化对象。"
+  - id: learn-topology-not-handwire
+    principle: "'谁连谁'用 RL 学,且'连对边' > '连更多边';别堆 agent,学连接。"
+    transfers_to: "多 agent 流水线的结构搜索;避免盲目加角色。"
+  - id: continuous-relaxation-of-discrete
+    principle: "把离散结构选择松弛成概率分布,才能用梯度优化(REINFORCE)。"
+    transfers_to: "任何'选不选某模块/某边'的离散决策都可这样变可学。"
+  - id: prune-harmful-edges-for-robustness
+    principle: "让优化器自动断开有害/对抗连边,比人工挑队友更稳。"
+    transfers_to: "L1 的鲁棒性:自动剔除拖后腿的来源/模块。"
+risks:
+  - optimization_cost      # REINFORCE 采样多图多跑,API 贵 → 设预算/早退
+  - hardest_tasks_flat     # 最难任务(GAIA L3)零提升,拓扑优化有天花板
+  - tool_bottleneck        # 工具/浏览能力弱会盖过编排收益
+  - combinatorial_edges    # 边数随 agent 数组合爆炸,超大 swarm 可扩展性未充分验证
+status: extracted

@@ -1,0 +1,48 @@
+{
+  "paper_id": "2402.16823",
+  "arxiv_id": "2402.16823",
+  "title": "GPTSwarm: Language Agents as Optimizable Graphs",
+  "authors": [
+    "Mingchen Zhuge",
+    "Wenyi Wang",
+    "Louis Kirsch",
+    "Francesco Faccio",
+    "Dmitrii Khizbullin",
+    "Jürgen Schmidhuber"
+  ],
+  "date": "2024-02-26",
+  "huggingface_url": "https://huggingface.co/papers/2402.16823",
+  "paper_url": "https://arxiv.org/abs/2402.16823",
+  "code_url": "https://github.com/metauto-ai/GPTSwarm",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "source_rankings": ["lineage"],
+  "human_tabs": ["paper", "career"],
+  "autosci_primitive": "data/autosci/primitives/2402.16823.yaml",
+  "first_seen_date": "2026-06-04",
+  "topic": "agent",
+  "agent_relevant": true,
+  "tags": [
+    "multi-agent",
+    "agents-as-graphs",
+    "graph-optimization",
+    "edge-optimization",
+    "reinforce",
+    "prompt-optimization",
+    "self-improving-agent-lineage",
+    "swarm"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 9,
+    "system_design_value": 9,
+    "career_value": 8,
+    "autosci_reuse_value": 9,
+    "buildability": 7,
+    "evaluation_value": 8,
+    "breadth_value": 8,
+    "evidence_quality": 8
+  },
+  "one_sentence_judgment": "把语言 agent 与群体统一成可优化的计算图,用节点优化(改提示)+ 边优化(REINFORCE 在 DAG 概率分布上学拓扑、剪有害边)让 agent 系统自己变好——是结构层面自进化的直接蓝图,直喂我们的 L1;证据扎实(Mini Crosswords 0.465→0.668、HumanEval 0.76→0.88、GAIA 平均较 GPT-4-Turbo +90.2%,且'连对边'优于'连更多边'),代价是优化烧 API、最难任务(GAIA L3)零提升、工具/浏览能力拖后腿。"
+}
