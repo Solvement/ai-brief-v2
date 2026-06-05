@@ -1,0 +1,49 @@
+primitive_id: self-evolving-optimisation-loop
+source_paper: "2508.07407"
+title: "Comprehensive Self-Evolving Agents Survey: Four-Component Optimisation Loop"
+relevance_level: direct_map_for_north_star  # 四组件回路 = 直接可套进 L1 的工程骨架
+audience: ai_only
+core_pattern: >
+  把任意自进化 agent 系统统一成一个优化反馈回路:System Inputs(任务/数据)→ Agent System
+  (模型/提示/记忆/工具/工作流)→ Environment(行动并产生反馈)→ Optimisers(用反馈改 agent 系统)→ 循环。
+  再按"优化器改的对象"分类:单 agent 优化(提示/记忆/工具/训练)/ 多 agent 优化(自动构建+拓扑)/
+  领域专用 / 评估。与 2507.21046 的 What/When/How/Where 是互补的两把尺子(优化器视角 vs 过程视角)。
+problem_class: unifying-self-evolving-agents-under-one-optimisation-feedback-loop
+components:
+  - system_inputs          # 喂进来的任务/数据
+  - agent_system           # 被优化对象:模型+提示+记忆+工具+工作流
+  - environment            # 行动场所 + 反馈来源
+  - optimiser              # 用环境反馈改 agent 系统
+autosci_modules:
+  - self_evolve_controller # 整个回路 = BriefEvolve 的工程骨架
+  - cold_critic            # 环境反馈的一部分 = 冷审/质量门信号
+  - typed_memory           # agent system 的"记忆"优化对象
+  - guard                  # 评估 + 安全门
+inputs:
+  - daily_candidates       # （映射 L1）每日候选
+  - feedback_signal        # Kevin 阅读/反馈 + 质量门
+outputs:
+  - improved_agent_system  # 优化后的选稿/冷审流水线
+  - evaluation_result      # 基于基准 + 基于 LLM 的评估
+implementation_idea: >
+  把本站 L1 直接填进四组件:输入=每日候选;agent 系统=选稿+冷审流水线;环境=Kevin 反馈+质量门;
+  优化器=用反馈改口味记忆 + 提示/连边。先做单 agent 优化(提示/记忆),再上多 agent 优化(冷审团队拓扑)。
+small_experiment: >
+  搭一个最小四组件闭环:环境=一个可打分任务;优化器=按反馈迭代改提示(单 agent 优化);
+  比"进化前后"得分;再把优化对象换成多 agent 拓扑看差异(接 GPTSwarm 原语)。1-14 天。
+design_principles:                          # 喂 L1 的工程骨架(与 2507.21046 的四轴互补)
+  - id: model-self-improvement-as-a-loop
+    principle: "把自改进画成 输入→agent→环境→优化器 的闭环;没有清晰的环境反馈源就没有优化。"
+    transfers_to: "L1 先定'环境给什么信号'(Kevin 反馈+质量门),再谈优化。"
+  - id: choose-optimisation-target
+    principle: "优化对象决定成本/收益:单 agent(提示/记忆便宜)< 多 agent 拓扑 < 领域微调;先选对象再选方法。"
+    transfers_to: "L1 路线:先优化口味记忆/提示,再优化冷审团队拓扑。"
+  - id: two-lenses-stacked
+    principle: "优化器视角(本篇)+ What/When/How/Where(2507.21046)叠用,设计自进化最不漏环。"
+    transfers_to: "造 L1 时两张图对照,确保部件/时机/方法/对象都想清楚。"
+risks:
+  - survey_not_benchmark   # 综述不证明任何单一方法
+  - overlap_with_2507      # 与 2507.21046 高度重叠,价值在互补
+  - fulltext_unverified    # 本次 HTML/ar5iv 转换失败,框架取自摘要+官方 awesome-list,body 细节以 PDF 为准
+  - safety_unsolved        # 终身自改进的价值漂移/失控风险同样适用
+status: extracted
