@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "./SiteHeader";
-import { Markdown } from "./Markdown";
+import { MarkdownRich } from "./MarkdownRich";
 
 interface Episode {
   slug: string;
@@ -65,8 +65,8 @@ export function PodcastDetail({ slug }: { slug: string }) {
               <div className="pod-verdict"><b>值不值得听</b>{ep.verdict}</div>
             )}
 
-            <article className="md-body pod-body">
-              <Markdown text={body} />
+            <article className="pd-prose pod-body">
+              <MarkdownRich source={body} />
             </article>
 
             <p className="pod-foot">{ep.pipeline ? `来源管线：${ep.pipeline}` : ""}{ep.ingested ? ` · 整理于 ${ep.ingested}` : ""}</p>
