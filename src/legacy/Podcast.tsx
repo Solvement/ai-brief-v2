@@ -1,52 +1,92 @@
 "use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { SiteHeader } from "../components/SiteHeader";
 
+interface Episode {
+  slug: string;
+  title: string;
+  guest?: string;
+  source?: string;
+  lang?: string;
+  topic?: string;
+  url?: string;
+  duration?: string;
+  ingested?: string;
+  tldr?: string;
+  verdict?: string;
+  tags?: string[];
+}
+interface PodcastsData { generatedAt: string; count: number; episodes: Episode[] }
+
 const SOURCES = [
-  { name: "WhynotTV", lang: "中文", topic: "AI 技术与产品", note: "翁家翌 / 陈天奇 / 胡渊鸣 / 杨硕，每期 2–4 小时" },
-  { name: "张小珺·商业访谈录", lang: "中文", topic: "AI 商业", note: "资深财经媒体人视角" },
-  { name: "十字路口 Crossing", lang: "中文", topic: "AI 创业 / 海外观察", note: "" },
-  { name: "Lenny's Podcast", lang: "英文", topic: "产品经理 / 硅谷创投", note: "全球科技媒体 Top3" },
-  { name: "路浩制片人计划", lang: "中文", topic: "AI 播客", note: "" },
+  { name: "WhynotTV", lang: "中文", topic: "AI 技术与产品" },
+  { name: "张小珺·商业访谈录", lang: "中文", topic: "AI 商业" },
+  { name: "十字路口 Crossing", lang: "中文", topic: "AI 创业 / 海外" },
+  { name: "Lenny's Podcast", lang: "英文", topic: "产品 / 硅谷创投" },
+  { name: "路浩制片人计划", lang: "中文", topic: "AI 播客" },
 ];
 
 export function Podcast() {
+  const [data, setData] = useState<PodcastsData | null>(null);
+  useEffect(() => {
+    fetch("/data/podcasts.json").then((r) => (r.ok ? r.json() : null)).then(setData).catch(() => setData({ generatedAt: "", count: 0, episodes: [] }));
+  }, []);
+
+  const episodes = data?.episodes ?? [];
+  const doneSources = new Set(episodes.map((e) => e.source));
+
   return (
     <>
-      <SiteHeader active="podcast" />
-      <main className="page articles-page">
-        <section className="articles-intro">
-          <div>
-            <div className="eyebrow">Podcast · 播客</div>
-            <h1>把一两个小时的播客，蒸馏成你能刷的洞见</h1>
-            <p>
-              播客是消费成本最高的内容——一期一两个小时、音频、不能扫读。这一栏的活是：AI 听完，把废话滤掉、把真思路拎出来。
-              <b> 转录稿只当内部证据，呈现的是蒸馏后的洞见</b>，按集子类型走：技术集讲思路/方法，商业创投集讲判断/认知更新。
-            </p>
-          </div>
-          <div className="article-read-model">
-            <span>听完</span>
-            <span>蒸馏</span>
-            <span>洞见</span>
-          </div>
-        </section>
+      <SiteHeader active="podcast" meta={data?.generatedAt ? `更新于 ${data.generatedAt.slice(0, 10)}` : undefined} />
+      <main className="page radar-page">
+        <header className="radar-header">
+          <h1 className="radar-title">播客洞见</h1>
+          <p className="radar-subtitle">播客是消费成本最高的内容——一两小时、音频、不能扫读。这一栏把它蒸馏成你能刷的洞见：脉络 + 带时间戳的核心观点 + 金句 + 值不值得听。转录稿只当内部证据。</p>
+        </header>
 
-        <div className="notice">这一栏管线最重（中文长音频 → 抽音轨 → 转录 → 蒸馏），排在核心三栏之后建。下面是已策展的源清单。</div>
-
-        <section className="article-card-grid">
-          {SOURCES.map((s) => (
-            <div className="article-card" key={s.name}>
-              <div className="article-card-top">
-                <div className="article-card-source">
-                  <span>{s.lang}</span>
-                  <span className="muted-mono">{s.topic}</span>
+        {episodes.length > 0 && (
+          <>
+            <div className="paper-sec"><h2>最新蒸馏 <span className="paper-sec-n">{episodes.length}</span></h2><em>一两小时 → 一页洞见</em></div>
+            <div className="radar-grid">
+              {episodes.map((e) => (
+                <div className="radar-card paper-card" key={e.slug}>
+                  <Link className="radar-card-cover" href={`/podcast/${encodeURIComponent(e.slug)}`} aria-label={e.title} />
+                  <div className="radar-card-top">
+                    <div className="paper-card-badges">
+                      {e.source && <span className="paper-cat">{e.source}</span>}
+                      {e.lang && <span className="paper-rel">{e.lang}</span>}
+                    </div>
+                    {e.duration && <span className="pod-dur">{e.duration}</span>}
+                  </div>
+                  <h3 className="radar-name paper-name">{e.title}</h3>
+                  {e.guest && <div className="pod-guest">嘉宾 · {e.guest}</div>}
+                  {e.tldr && <p className="radar-summary">{e.tldr}</p>}
+                  <div className="radar-foot">
+                    <div className="radar-meta" />
+                    <span className="radar-foot-right">
+                      {e.url && <a className="radar-repo-link" href={e.url} target="_blank" rel="noreferrer" onClick={(ev) => ev.stopPropagation()}>▶ 原片</a>}
+                      <span className="radar-cta deep">看洞见 →</span>
+                    </span>
+                  </div>
                 </div>
-                <b className="tier-badge">待建</b>
+              ))}
+            </div>
+          </>
+        )}
+
+        <div className="paper-sec" style={{ marginTop: 38 }}><h2>策展源 <span className="paper-sec-n">{SOURCES.length}</span></h2><em>逐步接入</em></div>
+        <div className="radar-grid">
+          {SOURCES.map((s) => (
+            <div className={`radar-card paper-card pod-source${doneSources.has(s.name) ? " pod-source-live" : ""}`} key={s.name}>
+              <div className="radar-card-top">
+                <div className="paper-card-badges"><span className="paper-rel">{s.lang}</span><span className="paper-cat">{s.topic}</span></div>
+                <span className={`pod-status${doneSources.has(s.name) ? " live" : ""}`}>{doneSources.has(s.name) ? "已接入" : "待接入"}</span>
               </div>
-              <h2 className="article-title">{s.name}</h2>
-              {s.note ? <p className="article-lead">{s.note}</p> : null}
+              <h3 className="radar-name paper-name">{s.name}</h3>
             </div>
           ))}
-        </section>
+        </div>
       </main>
     </>
   );

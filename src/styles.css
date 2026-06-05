@@ -4389,6 +4389,32 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 .paper-archive { display: flex; flex-wrap: wrap; gap: 8px; }
 .paper-archive-item { font-size: 12.5px; font-weight: 600; color: var(--radar-ink-2); background: var(--radar-card); border: 1px solid var(--radar-line); border-radius: 999px; padding: 6px 12px; text-decoration: none; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .paper-archive-item:hover { color: var(--radar-blue-strong); border-color: var(--radar-blue-soft-2); }
+
+/* ── 播客 podcast (2026-06-05) ── */
+.pod-dur { font-size: 11px; font-weight: 700; color: var(--radar-ink-3); background: var(--radar-bg); border: 1px solid var(--radar-line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.pod-guest { font-size: 12.5px; font-weight: 650; color: var(--radar-ink-2); margin-top: 2px; }
+.pod-status { font-size: 10px; font-weight: 800; color: var(--radar-ink-3); background: var(--radar-bg); border: 1px solid var(--radar-line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.pod-status.live { color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
+.pod-source { opacity: .72; }
+.pod-source-live { opacity: 1; }
+/* detail */
+.pod-detail { max-width: 860px; }
+.pod-detail-head { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 8px; }
+.pod-detail-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pod-conf { font-size: 11px; color: var(--ink-3); }
+.pod-detail-head h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; margin: 12px 0 6px; color: var(--ink); }
+.pod-tldr { font-size: 15px; line-height: 1.75; color: var(--ink-2); margin: 10px 0 0; }
+.pod-listen { display: inline-flex; margin-top: 14px; font-size: 13px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 999px; padding: 7px 16px; }
+.pod-listen:hover { background: var(--accent-2); text-decoration: none; }
+.pod-verdict { margin: 18px 0; padding: 14px 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 3px solid #2f9e63; border-radius: 10px; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.pod-verdict b { color: #047857; margin-right: 8px; }
+.pod-body { margin-top: 8px; }
+.pod-body .md-h { font-size: 17px; font-weight: 800; color: var(--ink); margin: 26px 0 10px; letter-spacing: -0.01em; }
+.pod-body .md-p { font-size: 15px; line-height: 1.85; color: var(--ink-2); margin: 0 0 12px; }
+.pod-body .md-ul, .pod-body .md-ol { margin: 0 0 14px; padding-left: 20px; }
+.pod-body .md-ul li, .pod-body .md-ol li { font-size: 14.5px; line-height: 1.8; color: var(--ink-2); margin-bottom: 7px; }
+.pod-body .md-p strong, .pod-body li strong { color: var(--ink); }
+.pod-foot { margin-top: 26px; font-size: 12px; color: var(--ink-4); }
 .kg-stage { position: relative; border: 1px solid var(--line); border-radius: var(--radius-lg); background: radial-gradient(1100px 600px at 50% 0%, rgba(37,99,235,.045), transparent 70%), var(--paper); overflow: hidden; box-shadow: var(--shadow-1); }
 .kg-svg { display: block; width: 100%; height: auto; touch-action: none; }
 .kg-node-label { font-size: 11px; font-weight: 650; fill: var(--ink-2); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; pointer-events: none; }
