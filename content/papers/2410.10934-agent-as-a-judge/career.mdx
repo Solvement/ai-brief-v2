@@ -1,0 +1,65 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+做 agent 产品最难、也最缺人做的一环是**评估**:它到底做得好不好、好在哪步、怎么持续改。Agent-as-a-Judge 给了一套可落地的答案:**用一个带模块(建图/定位/读/检索/判定)的 agent 去看完整轨迹、逐需求打分,既比"LLM 当裁判"准得多,又只花人工约 1/40 的钱和时间**。而且它的"逐步反馈"能直接当**训练/优化 agent 的奖励信号**。会做 agent 评估,是当下非常稀缺、面试极加分的能力。
+
+> [!key] 这就是我们冷审门的同款思想
+> 我们站里的**深读冷审**(建结构层→定位来源→读原文→逐条核 claim)几乎就是一个小号 Agent-as-a-Judge。它的"过程级反馈当 reward"正是我们 L1 自进化要的信号源——你学这篇,等于在学怎么把我们的质量门和 L1 做硬。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| agent 评估设计 | 不只看终答,看完整轨迹、逐需求判定 | 给你自己的 agent 写一个"逐条需求是否满足"的判定器 |
+| 模块化裁判 agent | 建图/定位/读/检索/判定几个模块各司其职 | 实现 Locate+Read+Ask 三件套,评一个小工程 |
+| 细粒度需求基准 | 把任务拆成带依赖(DAG)的分层需求 | 给一个任务写 5-10 条可判定需求 + 依赖关系 |
+| 过程反馈即奖励 | 逐步反馈怎么变成训练/优化信号 | 把判定结果接成一个 per-step reward,喂给优化循环 |
+| 诚实做消融 | 哪些模块没用就砍(memory 会放大错误) | 加/减模块测一致性,别迷信"模块越多越好" |
+
+## 系统设计心法
+
+一句话:**把"评 agent"当成一个 agent 任务来设计——看轨迹、给过程反馈、当奖励用。**
+- **过程 > 结果**:复杂任务里,逐步反馈比一个总分有用得多(也才判得准)。
+- **模块化而非堆料**:有效组合(建图/定位/读/检索/判定)优于"上一堆模块";memory 这种会放大错误的要敢砍。
+- **反馈即燃料**:好的评估不只是打分,是给 agent 自改进的奖励信号——评估和训练是一条闭环。
+- **别把任一裁判当金标准**:人类个体也分歧 10–30%,要多数共识;agent 裁判准但仍有偏置。
+
+## 作品集角度(Portfolio angle)
+
+"agent 评估"是极稀缺、极好讲的方向。两条路:① 给某个开源 agent 搭一个 mini Agent-as-a-Judge(模块化、逐需求、出过程反馈),把"用 agent 评 agent"讲清楚;② 给 `metauto-ai/agent-as-a-judge`(773★)或 DevAI 提 PR/新任务。**"我做了一套能逼近人类、成本 1/40 的 agent 评估"** 是非常硬的简历点。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Mini Agent-as-a-Judge | Locate+Read+Ask 三模块,对一个小工程逐需求判定 | 1 周 | 吃透"用 agent 评 agent",可视化逐需求结果 |
+| 分层需求基准 | 给一个任务写带 DAG 依赖的 10 条需求 + 判定脚本 | 3-5 天 | 学会做细粒度可判定评测 |
+| 过程反馈→reward | 把逐步判定接成 per-step reward,驱动一个小优化循环 | 1 周 | 把"评估即奖励"的闭环跑通(L1 思路) |
+| 给项目提 PR | 加一个 DevAI 任务或一个判定模块 | 1-2 周 | merged PR 进 agent 评估前沿项目 |
+
+## 简历 / 面试故事
+
+诚实写法:
+- *"Built a modular Agent-as-a-Judge (graph / locate / read / ask) that evaluates a coding agent's full trajectory against hierarchical requirements, aligning with human judgment far better than LLM-as-a-Judge at a fraction of the cost."*
+- *"Designed a DAG-structured requirement benchmark and turned per-requirement judgments into step-level reward signals for agent self-improvement."*
+- *"(若做了 PR)Contributed a {new DevAI task / judge module} to agent-as-a-judge (Meta)."*
+
+> [!key] 面试可讲
+> "你怎么评一个多步 agent 好不好?"——用本文论证:**别只看终答,用一个模块化 agent 看完整轨迹、按分层需求逐条判定,并把过程反馈当奖励信号**;再点出"人类评审本身也分歧,agent 裁判准但有偏置"。体现评估思维 + 闭环思维 + 诚实。
+
+## 学习清单
+
+**必学**
+- agent 评估:轨迹级 + 逐需求判定
+- 模块化裁判 agent(建图/定位/读/检索/判定)
+- 过程反馈即奖励(评估↔训练闭环)
+
+**有用**
+- 分层需求 + DAG 依赖的基准设计
+- 诚实消融(砍掉拖后腿的模块,如 memory)
+
+**可选**
+- 灰盒 vs 黑盒评估的现实可得性权衡

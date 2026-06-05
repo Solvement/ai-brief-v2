@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-05T03:02:41.638Z",
+  "generatedAt": "2026-06-05T03:09:33.680Z",
   "date": "2026-06-04",
   "counts": {
-    "deepReads": 7,
+    "deepReads": 8,
     "radar": 10,
     "deepCandidates": 3
   },
@@ -198,6 +198,44 @@
       ],
       "one_sentence_judgment": "把'人的专长散落在零散轨迹里'做成 trace→可检视/可纠正/可版本化的 skill package(capability+behavior 双轨)的端到端工作流——是 AutoSci 把自身轨迹蒸馏成可复用技能(L1 自进化)的直接蓝本;但没有保真度实验(作者自认 fidelity 是 open),证据是 19k★ 采用度而非效果。",
       "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31264.png"
+    },
+    {
+      "slug": "2410.10934-agent-as-a-judge",
+      "arxiv_id": "2410.10934",
+      "title": "Agent-as-a-Judge: Evaluate Agents with Agents",
+      "date": "2024-10-14",
+      "authors": [
+        "Mingchen Zhuge",
+        "Changsheng Zhao",
+        "Dylan Ashley",
+        "Wenyi Wang",
+        "Dmitrii Khizbullin",
+        "Yunyang Xiong"
+      ],
+      "tags": [
+        "agent-as-a-judge",
+        "agent-evaluation",
+        "process-feedback",
+        "reward-signal",
+        "devai-benchmark",
+        "llm-as-a-judge",
+        "self-improving-agent-lineage"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 10,
+        "buildability": 8,
+        "evaluation_value": 10,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "lineage"
+      ],
+      "one_sentence_judgment": "用模块化 agent(建图/定位/读/检索/判定)看完整轨迹、按分层需求逐条评 agent——比 LLM 当裁判与人类共识对齐高得多(MetaGPT 92.07% vs 68.86%),且省 97.72% 时间/97.64% 成本,逐步反馈还能当自改进的 reward——与我们的冷审门和 L1 字面同源,复用价值极高;诚实暴露弱点(memory 模块放大错误被砍、灰盒轨迹现实难拿、被评 agent 仅满足约 29% 需求)。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2410.10934.png"
     },
     {
       "slug": "2402.16823-gptswarm-agents-as-graphs",

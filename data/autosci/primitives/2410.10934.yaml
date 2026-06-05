@@ -1,0 +1,56 @@
+primitive_id: agent-as-a-judge-trajectory-eval
+source_paper: "2410.10934"
+title: "Agent-as-a-Judge: Modular Agentic Evaluation of Agents with Process Feedback"
+relevance_level: direct_pattern_strong    # 字面就是我们的冷审门 + L1 的 reward 源
+audience: ai_only                         # L1/L3 与本站冷审门的设计件,不进 Kevin 阅读 tab
+core_pattern: >
+  用一个带模块的 agent 去评另一个 agent:Graph(建产出工程结构图)→ Locate(按需求定位文件)→
+  Read(读懂多格式)→ Retrieve(从长轨迹抽相关信息)→ Ask(逐条判定需求是否满足)。评估对象是
+  完整"想+做"轨迹而非仅最终输出,按分层需求(DAG 依赖)逐条给过程级反馈;该反馈可直接当训练/
+  优化 agent 的 reward。诚实消融:砍掉 search/planning/memory(memory 放大错误传播)。
+problem_class: evaluating-agents-needs-trajectory-level-modular-judging-not-final-output-only
+components:
+  - graph_builder          # 建产出工程结构图(文件/模块/依赖)
+  - locate                 # 按需求定位相关文件夹/文件
+  - read                   # 读懂多种格式(代码/图/文档)
+  - retrieve               # 从长轨迹抽相关信息
+  - ask                    # 逐条判定需求是否满足
+autosci_modules:
+  - cold_critic            # 本原语最直接落地:模块化独立评委(generator≠critic)
+  - self_evolve_controller # 逐步反馈 = per-step reward,驱动自改进
+  - typed_memory           # 工程结构图 + 分层需求 DAG = 结构化记忆
+  - guard                  # 逐需求判定 = 发布前的质量闸
+inputs:
+  - target_trajectory      # 被评 agent 的完整轨迹 + 产出
+  - hierarchical_requirements # 分层需求(DAG 依赖)
+  - judge_modules          # graph/locate/read/retrieve/ask
+outputs:
+  - per_requirement_verdict # 逐条满足/未满足
+  - process_feedback        # 过程级逐步反馈(可当 reward)
+  - alignment_score         # 与人类共识的一致性
+implementation_idea: >
+  最小版:Locate + Read + Ask 三模块,对一个小工程按 5-10 条需求逐条判定;把判定接成
+  per-requirement / per-step reward。先复刻"Agent 一致性 > LLM 一致性"的对照,再把过程反馈
+  接进一个优化循环。直接可改造成本站深读冷审的 Stage B(逐条核 claim)。
+small_experiment: >
+  对照 A=LLM 只看最终输出打分 vs B=模块化 agent 看完整轨迹逐需求判定,在一小批带依赖的任务上
+  比与"人类多数共识"的一致性(复刻:Agent 86–92% vs LLM 60–72%);消融加回 memory 看错误传播。1-7 天。
+design_principles:                          # 跨篇沉淀的"怎么评/怎么自改进 agent"零件(喂 L1/L3 与本站冷审门)
+  - id: evaluate-trajectory-not-outcome
+    principle: "评 agent 看完整'想+做'轨迹、逐需求判定,而非只看最终输出——复杂/有依赖任务才判得准。"
+    transfers_to: "冷审门 Stage B(逐条核 claim/逐需求);与 DRIFT 的 span 级诊断同族。"
+  - id: process-feedback-as-reward
+    principle: "过程级逐步反馈可直接当训练/优化 agent 的 reward——评估与自改进是一条闭环。"
+    transfers_to: "L1 BriefEvolve 的奖励信号源:用冷审反馈驱动选稿/提示自进化。"
+  - id: modular-judge-over-monolith
+    principle: "把裁判拆成 建图/定位/读/检索/判定 模块各司其职,优于一个大 prompt 硬判。"
+    transfers_to: "冷审门的可解释化(逐维度诊断,非标量),与 DRIFT 三模块呼应。"
+  - id: ablate-drop-harmful-modules
+    principle: "诚实消融:没用甚至有害的模块要敢砍(memory 放大错误传播)。"
+    transfers_to: "L1 模块设计:别迷信模块越多越好,留有效组合。"
+risks:
+  - graybox_trajectory_inaccessible # 最佳表现依赖人工中间轨迹,现实难拿
+  - judge_bias                      # 仍低于人类共识 95.08%,有偏置
+  - memory_error_propagation        # memory 模块放大错误(已砍)
+  - self_opt_unsolved               # 裁判自身提示/工作流自动优化尚未解决
+status: extracted
