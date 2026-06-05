@@ -24,7 +24,6 @@ const SOURCES = [
   { name: "张小珺·商业访谈录", lang: "中文", topic: "AI 商业" },
   { name: "十字路口 Crossing", lang: "中文", topic: "AI 创业 / 海外" },
   { name: "Lenny's Podcast", lang: "英文", topic: "产品 / 硅谷创投" },
-  { name: "路浩制片人计划", lang: "中文", topic: "AI 播客" },
 ];
 
 export function Podcast() {
