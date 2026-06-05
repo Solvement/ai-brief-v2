@@ -4358,6 +4358,37 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 .kg-zoom { display: inline-flex; gap: 4px; }
 .kg-zoom .kg-toggle { min-width: 32px; padding: 5px 9px; text-align: center; line-height: 1; }
 .kg-zoom-readout { position: absolute; left: 12px; bottom: 12px; z-index: 3; font-size: 11px; font-weight: 700; color: var(--ink-3); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; pointer-events: none; }
+
+/* ── 文章页 articles: radar-consistent card grid (2026-06-05 rewrite) ──
+   Reuses the project-radar card chrome + palette so the column matches the rest. */
+.paper-card { display: flex; flex-direction: column; gap: 10px; min-height: 12rem; padding: 16px 18px; }
+.paper-card .radar-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.paper-card-board { padding-top: 0; overflow: hidden; }
+.paper-card-badges { display: inline-flex; align-items: center; gap: 7px; min-width: 0; flex-wrap: wrap; }
+.paper-thumb { position: relative; width: calc(100% + 36px); margin: 0 -18px 6px; aspect-ratio: 16 / 8; background: var(--radar-bg); overflow: hidden; }
+.paper-thumb img { object-fit: cover; }
+.paper-thumb--empty { background: linear-gradient(135deg, var(--radar-blue-soft), var(--radar-bg)); }
+.paper-name { font-size: 15px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.paper-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--radar-ink-3); background: var(--radar-bg); border: 1px solid var(--radar-line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.paper-rel { font-size: 10px; font-weight: 700; color: var(--radar-blue-strong); background: var(--radar-blue-soft); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.paper-pending { font-size: 10px; font-weight: 700; color: #b45309; background: #fef3c7; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.paper-rank { font-size: 12px; font-weight: 800; color: var(--radar-ink-3); }
+.paper-authors { font-size: 12px; color: var(--radar-ink-3); -webkit-line-clamp: 1; }
+.paper-sec { display: flex; align-items: baseline; gap: 12px; margin: 34px 0 18px; flex-wrap: wrap; }
+.paper-sec h2 { margin: 0; font-size: 20px; font-weight: 800; color: var(--radar-ink); letter-spacing: -0.01em; }
+.paper-sec-n { font-size: 13px; font-weight: 800; color: #fff; background: var(--radar-blue); border-radius: 999px; padding: 2px 9px; }
+.paper-sec em { font-style: normal; font-size: 13px; color: var(--radar-ink-3); }
+.paper-catgroup { margin-bottom: 26px; scroll-margin-top: 84px; }
+.paper-cat-h { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--radar-ink-2); margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--radar-line); }
+.paper-cat-h span { font-size: 11px; color: var(--radar-ink-3); background: var(--radar-bg); border-radius: 999px; padding: 1px 8px; }
+.paper-more { text-align: center; margin: 28px 0 0; }
+.radar-more-btn { appearance: none; cursor: pointer; font-size: 13.5px; font-weight: 700; color: var(--radar-blue-strong); background: var(--radar-card); border: 1px solid var(--radar-blue-soft-2); border-radius: 999px; padding: 10px 28px; transition: background .15s; }
+.radar-more-btn:hover { background: var(--radar-blue-soft); }
+.radar-chip-static { cursor: default; }
+.paper-archive-sec { margin-top: 38px; border-top: 1px solid var(--radar-line); padding-top: 22px; }
+.paper-archive { display: flex; flex-wrap: wrap; gap: 8px; }
+.paper-archive-item { font-size: 12.5px; font-weight: 600; color: var(--radar-ink-2); background: var(--radar-card); border: 1px solid var(--radar-line); border-radius: 999px; padding: 6px 12px; text-decoration: none; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.paper-archive-item:hover { color: var(--radar-blue-strong); border-color: var(--radar-blue-soft-2); }
 .kg-stage { position: relative; border: 1px solid var(--line); border-radius: var(--radius-lg); background: radial-gradient(1100px 600px at 50% 0%, rgba(37,99,235,.045), transparent 70%), var(--paper); overflow: hidden; box-shadow: var(--shadow-1); }
 .kg-svg { display: block; width: 100%; height: auto; touch-action: none; }
 .kg-node-label { font-size: 11px; font-weight: 650; fill: var(--ink-2); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; pointer-events: none; }
