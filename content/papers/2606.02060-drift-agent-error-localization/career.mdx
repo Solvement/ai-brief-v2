@@ -1,0 +1,66 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你要做的是 **agent 产品**,而 agent 产品上线后第一杀手就是**不可靠**——它会自信地走错、还一路把错的当真。这篇恰恰把"**agent 为什么错、错在哪、怎么定位**"做成了可操作的工程框架。它教你的不是某个模型,而是 agent 时代最值钱的一类能力:**给 agent 建过程级的可靠性诊断与护栏**。
+
+> [!key] 和我们正在做的东西直接同源
+> 我们这个站的**冷审深读门**(作者写 → 独立冷审查证 → 逐维补差 → 收敛)本质就是一个 **Agent-as-a-Judge / DRIFT 式审计器**:把"分析"当 agent 轨迹,把每个数字/结论当 claim,去原文里查 support。**你学 DRIFT,等于在学怎么把我们自己的质量门做得更硬**——这就是"你学 + AI 自己也学"的同一块料。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 过程级评估(不止看终答) | 把 agent 一条轨迹拆成片段/主张去评,而不是只判最终答案对错 | 拿你自己 agent 的一条日志,手动切 span + 标 claim,看错从哪开始 |
+| claim→evidence→dependency 思维 | 记账(立了什么承诺)→查证(有没有证据)→追责(污染了答案吗)三步法 | 给一个 RAG 答案做"主张-证据"对照表,标 direct/weak/missing/conflicting |
+| 把"判错"做成可解释管线 | 不用黑箱分类器,用三模块串联,可解释"为什么判它错" | 实现一个最小 Claim Keeper:从一段轨迹抽出关键 claim + 复用链 |
+| agent eval harness 工程 | 怎么造长轨迹基准、定 span/first-error 指标、做 bare vs framework 对照 | 仿 TELBench 思路,搭一个 mini 评测:macro-F1 + first-error accuracy |
+| 把护栏放对地方 | 论文实证:错误集中在 decision/finalization,不是 retrieval | 在你 agent 的"承诺/合成"环节加校验,而不是只调检索 |
+
+## 系统设计心法
+
+一句话:**把 agent 的"中间承诺"当一等公民来治理,而不是只盯最终输出。**
+- **过程 > 结果**:可靠性问题几乎都藏在中间没核实的 claim 里;只看终答=放弃了所有可诊断信号。
+- **区分探索与承诺**:agent 试错很正常,真正危险的是"把没证据的东西当既定前提往下用"。护栏要卡在"承诺"那一刻。
+- **轨迹内一致 ≠ 真实为真**:DRIFT 的盲区(只查 agent 自己看到的证据)正是你做生产系统要补的——高影响 claim 要接**外部 verifier 重新取证**。
+- **错误会传播**:定位**首错**比"哪都可能错"有用一百倍;设计时就要留住"谁依赖谁"的链路。
+
+## 作品集角度(Portfolio angle)
+
+这能撑起一个 **"可靠 agent / agent 评测"** 方向的硬作品——这正是当下最缺、最好讲的方向:不是又一个 chatbot,而是"**让 agent 别乱来**"的基建。两条路都值钱:① 自己造一个过程级 agent 审计/护栏小系统;② 给 `NJU-LINK/DRIFT` 这类活跃项目提一个真实 PR(外部 verifier / 在线版 / 新数据源解析)。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Online-DRIFT 护栏 | agent 每形成一个关键 claim 就实时查 support,弱/缺则拦在进最终答案前 | 1-2 周 | 把"事后审计"变成"事前拦截",是真能上产品的护栏 |
+| External-Verifier 层 | 在 DRIFT 后接一个独立检索器重核高影响证据(补"轨迹内一致≠真"盲区) | 1 周 | 直击论文最大局限,讲故事极顺 |
+| Claim-aware RAG | 把 RAG 从 query→retrieve→answer 改成 query→retrieve→起草claims→逐条查证→answer | 4-7 天 | 把 DRIFT 思想用在**生成**而非审计,降幻觉 |
+| Process Reward Model | 用 TELBench 的 span 标签训一个 per-span 错误概率打分器 | 1-2 周 | 比每次跑多阶段 LLM 审计更便宜,可做在线 reward |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built an online claim-verification guardrail for a deep-research agent: tracks consequential claims, checks evidence support (direct/weak/missing/conflicting), and blocks unsupported commitments before they reach the final answer."*
+- *"Built a process-level agent eval harness (span-level F1 + first-error accuracy) on real long-horizon trajectories, showing errors concentrate in decision/finalization, not retrieval."*
+- *"(若做了 PR)Contributed an external-evidence verifier to NJU-LINK/DRIFT, addressing its trajectory-internal-consistency blind spot."*
+
+> [!key] 面试可讲
+> "你怎么让一个会多步推理的 agent 别越错越远?"——用本文论证:**别只看最终答案,要在'承诺'那一刻查证据、把护栏放在 decision/finalization**;并点出"轨迹内一致≠真实为真"这个生产级坑。体现的是过程思维 + 系统思维。
+
+## 学习清单
+
+**必学**
+- 过程级评估:span / first-error 指标,bare vs framework 对照
+- claim→evidence→dependency 三步审计法
+- 护栏放在 decision/finalization(论文实证的高危区)
+
+**有用**
+- 长轨迹基准的构造(归一执行单元 + 边界信号切段)
+- 轨迹内一致 vs 外部真值的区别 → 何时接外部 verifier
+
+**可选**
+- 多阶段审计的 token 成本权衡(53k vs 11k)→ 何时改用更便宜的 reward model

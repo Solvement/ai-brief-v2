@@ -11,6 +11,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchAllWindows } from "./hf-source.mjs";
 import { readLedger, writeLedger, upsertSeen, ledgerKey, isDone } from "./ledger.mjs";
+import { tagAgent } from "./agent-filter.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const PAPERS_DIR = path.join(ROOT, "data", "papers");
@@ -49,18 +50,28 @@ export async function main() {
     const done = isDone(record);
     if (done) doneSkipped += 1;
 
-    candidates.push({
+    candidates.push(tagAgent({
       ...item,
       ledger_key: ledgerKey(item),
       ledger_status: record.status,
       is_new: isNew,
       already_done: done, // deep_read/analyzed/published — exclude from new-candidate selection
       first_seen_date: record.first_seen_date,
-    });
+    }));
   }
 
-  // surface order: fresh first, then by upvotes (popularity is a tiebreak signal, not the ranker)
-  candidates.sort((a, b) => Number(b.is_new) - Number(a.is_new) || b.upvotes - a.upvotes);
+  // papers column = agent-only (Kevin 2026-06-04): surface priority self-improving-agent
+  // lineage first, then any agent paper, then fresh, then upvotes. Non-agent papers stay
+  // in the list (tagged agent_relevant:false) but sink to the bottom so selection skips them.
+  candidates.sort((a, b) =>
+    Number(b.priority_lineage) - Number(a.priority_lineage) ||
+    Number(b.agent_relevant) - Number(a.agent_relevant) ||
+    b.agent_score - a.agent_score ||
+    Number(b.is_new) - Number(a.is_new) ||
+    b.upvotes - a.upvotes,
+  );
+  const agentCount = candidates.filter((c) => c.agent_relevant).length;
+  const lineageCount = candidates.filter((c) => c.priority_lineage).length;
 
   await mkdir(PAPERS_DIR, { recursive: true });
   const outFile = path.join(PAPERS_DIR, `${date}-candidates.json`);
@@ -75,6 +86,8 @@ export async function main() {
       merged: merged.length,
       new: freshCount,
       already_done: doneSkipped,
+      agent_relevant: agentCount,
+      priority_lineage: lineageCount,
     },
     candidates,
   }, null, 2) + "\n", "utf8");
@@ -82,6 +95,7 @@ export async function main() {
   await writeLedger(ledger);
 
   console.log(`[curate] ${freshCount} new · ${candidates.length - freshCount} seen-before · ${doneSkipped} already deep-read/analyzed (excluded from new selection)`);
+  console.log(`[curate] agent-relevant ${agentCount}/${candidates.length} (papers column = agent-only); priority self-improving-agent lineage ${lineageCount}`);
   console.log(`[curate] wrote ${path.relative(ROOT, outFile)} + updated ledger (${ledger.size} total)`);
 }
 

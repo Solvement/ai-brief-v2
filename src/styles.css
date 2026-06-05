@@ -5009,6 +5009,39 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 .pd-mermaid svg { max-width: 100%; height: auto; }
 .pd-mermaid-fallback { background: #0f1729; color: #e6edf3; border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 12.5px; }
 
+/* heading anchor offset so TOC jumps don't tuck under the top */
+.pd-prose h2, .pd-prose h3 { scroll-margin-top: 84px; }
+
+/* footnotes (来源做脚注不内联) */
+.pd-prose sup a,
+.pd-prose [data-footnote-ref] { color: var(--radar-blue-strong); font-weight: 700; text-decoration: none; padding: 0 1px; }
+.pd-prose [data-footnote-ref]:hover { text-decoration: underline; }
+.pd-prose .footnotes { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--radar-line); font-size: 12.5px; line-height: 1.6; color: var(--radar-ink-3); }
+.pd-prose .footnotes h2 { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.pd-prose .footnotes::before { content: "来源 / Sources"; display: block; font-size: 13px; font-weight: 700; color: var(--radar-ink-2); margin-bottom: 8px; }
+.pd-prose .footnotes ol { padding-left: 20px; margin: 0; }
+.pd-prose .footnotes li { margin: 5px 0; }
+.pd-prose .footnotes li::marker { color: var(--radar-ink-3); }
+.pd-prose .footnotes a[data-footnote-backref] { margin-left: 4px; text-decoration: none; }
+
+/* sticky TOC — left rail on wide screens, hidden when there isn't room */
+.pd-body { position: relative; }
+.pd-toc { display: none; }
+@media (min-width: 1300px) {
+  .pd-toc {
+    display: block; position: fixed; top: 128px;
+    left: calc((100vw - 860px) / 2 - 216px);
+    width: 200px; max-height: 72vh; overflow-y: auto;
+    padding-right: 6px;
+  }
+  .pd-toc-title { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--radar-ink-3); margin-bottom: 10px; }
+  .pd-toc ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--radar-line); }
+  .pd-toc li { margin: 0; }
+  .pd-toc a { display: block; padding: 4px 0 4px 12px; margin-left: -1px; border-left: 2px solid transparent; font-size: 12.5px; line-height: 1.4; color: var(--radar-ink-3); text-decoration: none; }
+  .pd-toc a:hover { color: var(--radar-blue-strong); border-left-color: var(--radar-blue); }
+  .pd-toc-sub a { padding-left: 24px; font-size: 12px; color: var(--radar-ink-3); }
+}
+
 @media (max-width: 640px) {
   .pd-title { font-size: 22px; }
   .pd-tab { padding: 10px 12px; font-size: 14px; }

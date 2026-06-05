@@ -1,0 +1,57 @@
+primitive_id: claim-centric-trajectory-audit
+source_paper: "2606.02060"
+title: "DRIFT: Claim-Centric Span-Level Error Localization in Agent Trajectories"
+relevance_level: direct_pattern_strong    # 直接就是"agent 审 agent",可几乎原样接进我们的冷审/自进化门
+audience: ai_only                         # 给 L1/L3 与本站冷审门吃的设计件,不进 Kevin 阅读 tab
+core_pattern: >
+  把"判断一条 agent 轨迹哪里错"重构成三步可解释审计:① Claim Keeper 通读全轨,记一本 claim 账本
+  (每条 claim 的引入处 / 首次变关键处 bk / 复用链 / 类型状态);② Support Seeker 只对"关键(consequential)
+  claim"查证据档位(direct/weak/missing/conflicting),此步只暴露风险不下判;③ Dependency Tracer 只把
+  被 commit/reuse/amplify/finalize 进答案路径的"无证据/被矛盾的关键 claim"标为有害片段,并取最早者为首错。
+  关键开关 = 区分"探索"(query 里试候选)与"承诺"(把候选当既定前提),只追承诺。
+problem_class: long-noisy-agent-trajectory-needs-explainable-process-level-error-attribution
+components:
+  - claim_keeper           # 记账:claim ledger(引入/变关键/复用链)
+  - support_seeker         # 查证:每条关键 claim 的 4 档证据支持
+  - dependency_tracer      # 追责:只标被当真且污染答案的关键 claim
+  - span_segmenter         # 预处理:归一执行单元 + 按 5 类边界信号切 span
+autosci_modules:
+  - cold_critic            # 本原语最直接落地:独立冷评委按 claim 查证(generator≠critic)
+  - typed_memory          # claim 账本 = 一种结构化记忆 S
+  - self_evolve_controller # first-error/依赖链 → 定位最该改的环节(精修信号)
+  - guard                  # Online 版 = 关键 claim 进最终答案前的 support 闸
+inputs:
+  - trajectory_or_artifact # 待审的 agent 轨迹(或我们站里的一篇深读分析)
+  - source_evidence        # 轨迹内证据 /（生产版）外部重检索
+  - claim_extraction_rule  # 何为关键 claim 的判据(原文未给形式化算法,需自定)
+outputs:
+  - harmful_spans          # 有害片段集合
+  - first_error_span       # 最早错点(最有调试价值,也最难)
+  - claim_support_ledger   # 每条关键 claim 的证据档位 + 依赖链(可审计 trace)
+implementation_idea: >
+  100~200 行实现领域无关版:Claim 对象 + ledger;一个 LLM 提示做 support 分档;一个依赖图把
+  commit/reuse/amplify/finalize 连起来。先在单条轨迹(或本站一篇深读)跑通"记账→查证→追责",
+  再接进冷审门当 Stage B 的结构化诊断器。
+small_experiment: >
+  对照 A=把整条轨迹/整篇分析丢给 LLM 直接找错(bare) vs B=claim 账本+查证+依赖追责,
+  在一小批带已知错点的轨迹上比 span-F1 与 first-error accuracy;消融去掉"探索 vs 承诺"区分看误报涨多少
+  (复刻 DRIFT 主结论:claim 中心 >> bare,通用 agent 包装不稳)。1-7 天。
+design_principles:                          # 跨篇沉淀的"怎么造 agent"零件(喂 L1/L3,也反哺本站冷审门)
+  - id: process-credit-over-outcome
+    principle: "评 agent 看过程级信用分配(哪一步开始坏)而非只看最终对错;36.9% 成功轨迹仍含错=终答正确≠过程可靠。"
+    transfers_to: "本站冷审门 / L1 自进化的奖励信号 / 任何 agent eval。"
+  - id: exploration-vs-commitment
+    principle: "只对'被当成既定前提'的承诺追责,弱支持/试探本身不算错——护栏卡在'承诺'那一刻。"
+    transfers_to: "Online guard:关键 claim 进答案前查 support。"
+  - id: internal-consistency-not-truth
+    principle: "轨迹内证据一致 ≠ 真实为真;高影响 claim 需外部 verifier 重新取证。"
+    transfers_to: "深读忠实度门:数字/结论要回原文核(我们已做),生产 agent 要接外部核查。"
+  - id: explainable-three-stage-audit
+    principle: "把'判错'拆成 记录→查证→追责 三段,而非黑箱打分,才能解释'为什么判它错'。"
+    transfers_to: "冷审门的逐维度诊断(非标量)/ Agent-as-a-Judge 的可解释化。"
+risks:
+  - consequential_underdefined   # "关键 claim"无形式化算法,自定规则影响可比性
+  - cost_blowup                  # 多阶段审计 token 翻数倍(53k vs 11k)→ 设预算/早退/或蒸成 reward model
+  - first_error_hard             # 首错定位仍低,别承诺"精准定位最早错点"
+  - over_trust_internal          # 别把"轨迹内 supported"当"真实正确"
+status: extracted

@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SiteHeader } from "./SiteHeader";
-import { MarkdownRich } from "./MarkdownRich";
+import { MarkdownRich, buildToc } from "./MarkdownRich";
 
 interface PaperMeta {
   paper_id: string;
@@ -34,6 +34,8 @@ type Tab = "paper" | "career";
 export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper: string; career: string }) {
   const [tab, setTab] = useState<Tab>("paper");
   const scores = meta.scores || {};
+  const source = tab === "paper" ? paper : career;
+  const toc = useMemo(() => buildToc(source), [source]);
 
   return (
     <>
@@ -74,9 +76,23 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
           <button className={`pd-tab${tab === "career" ? " active" : ""}`} onClick={() => setTab("career")} role="tab" aria-selected={tab === "career"}>职业</button>
         </div>
 
-        <article className="pd-body">
-          {tab === "paper" ? <MarkdownRich source={paper} /> : <MarkdownRich source={career} />}
-        </article>
+        <div className="pd-body">
+          {toc.length > 2 && (
+            <nav className="pd-toc" aria-label="目录">
+              <div className="pd-toc-title">目录</div>
+              <ul>
+                {toc.map((t, i) => (
+                  <li key={`${t.slug}-${i}`} className={t.level === 3 ? "pd-toc-sub" : undefined}>
+                    <a href={`#${t.slug}`}>{t.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+          <article className="pd-article">
+            <MarkdownRich source={source} />
+          </article>
+        </div>
       </main>
     </>
   );

@@ -1,12 +1,52 @@
 {
-  "generatedAt": "2026-06-04T22:57:04.925Z",
+  "generatedAt": "2026-06-05T02:30:52.139Z",
   "date": "2026-06-04",
   "counts": {
-    "deepReads": 4,
+    "deepReads": 5,
     "radar": 10,
     "deepCandidates": 3
   },
   "deepReads": [
+    {
+      "slug": "2606.02060-drift-agent-error-localization",
+      "arxiv_id": "2606.02060",
+      "title": "Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in Agent Trajectories",
+      "date": "2026-06-01",
+      "authors": [
+        "Jiaming Wang",
+        "Ziteng Feng",
+        "Jiangtao Wu",
+        "Ruihao Li",
+        "Qianqian Xie",
+        "Yuxiang Ren"
+      ],
+      "tags": [
+        "agent-reliability",
+        "deep-research-agent",
+        "span-level-error-localization",
+        "claim-evidence-dependency",
+        "agent-as-a-judge",
+        "trajectory-analysis",
+        "process-level-evaluation",
+        "self-improving-agent",
+        "benchmark"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 9,
+        "breadth_value": 7,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "daily"
+      ],
+      "one_sentence_judgment": "把深研 agent 的失败分析从'最终答案对错'推进到 span 级/claim 级/依赖级——以 claim 账本→证据查证(direct/weak/missing/conflicting)→只对被当真并污染答案的关键 claim 追责为骨架,是可直接迁移到我们自己冷审/自进化门的可解释审计原语;证据扎实(真实长轨迹+7专家精标+对照 bare/Codex/Claude Code 全胜,DRIFT F1 较 bare +17~33),代价是审计 token 翻数倍、首错定位仍低、且只查轨迹内一致而非真实为真。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02060.png"
+    },
     {
       "slug": "2605.28556-taste",
       "arxiv_id": "2605.28556",
