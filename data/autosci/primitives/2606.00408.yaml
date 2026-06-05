@@ -1,0 +1,90 @@
+primitive_id: regime-aware-observation-masking
+source_paper: "2606.00408"
+title: "Regime-Aware Observation Masking for Long-Horizon Search Agents"
+relevance_level: direct_pattern_strong
+audience: ai_only
+core_pattern: >
+  Treat context management for long-horizon search agents as a regime-dependent
+  control problem, not a default compression heuristic. Keep reasoning traces
+  and tool-call structure visible, mask only stale observations outside a
+  retention window, preserve tool errors for self-repair, and decouple visible
+  context from a persistent page pool so masked evidence can be re-opened by
+  cursor/id/URL. Enable masking only when retrieval has surfaced enough signal
+  but the model is not yet able to filter that signal from noisy observations;
+  disable or protect evidence when the model is saturated and external masking
+  risks evicting useful signal.
+problem_class: long-horizon-agent-context-grows-with-retrieved-observation-noise
+components:
+  - trajectory_renderer
+  - stale_observation_masker
+  - persistent_page_pool
+  - exact_url_cursor_interface
+  - tool_error_retention
+  - regime_diagnostics
+  - rescue_harm_transition_eval
+autosci_modules:
+  - l1_research_agent
+  - typed_memory
+  - retriever_controller
+  - context_budget_manager
+  - cold_critic
+  - guard
+inputs:
+  - agent_trajectory
+  - tool_observations
+  - tool_call_errors
+  - page_pool_records
+  - retriever_recall_or_proxy
+  - no_cm_baseline_accuracy
+  - task_level_rescue_harm_labels
+outputs:
+  - rendered_context_with_masked_stale_observations
+  - preserved_reasoning_and_action_trace
+  - reopenable_page_pool
+  - cm_gain_harm_report
+  - regime_assignment
+implementation_idea: >
+  Implement the minimal controller first: keep the most recent K observation
+  turns visible, replace older non-error observations with placeholders, never
+  mask reasoning/tool-call records, never mask tool errors, and store every
+  fetched page in an append-only page pool with stable cursor and exact URL.
+  Add an evaluator that runs paired No-CM/CM trajectories and reports
+  wrong->correct, correct->wrong, extra calls/query, rolling input tokens, and
+  final accuracy. Use this report to choose among three actions: fix retriever
+  first, enable masking, or disable masking/add evidence pinning for saturated
+  settings.
+small_experiment: >
+  On 50-200 deep-search tasks, run the same scaffold with and without
+  observation masking. Bucket tasks by a retriever-quality proxy and No-CM
+  accuracy. Measure wrong->correct, correct->wrong, delta calls/query, and
+  rolling input tokens. Ablate preserving tool errors and exact URL/cursor
+  rendering. Expected pattern from the source paper: masking helps most in the
+  retrieval-strong/model-mid regime, helps little when retriever signal is weak,
+  and can harm saturated readers by evicting evidence.
+design_principles:
+  - id: cm-is-regime-dependent
+    principle: "Context management is not a default on/off optimization; it should be gated by retriever signal and model filtering capacity."
+    transfers_to: "L1 research agent should decide whether to mask based on task/system state, not only context length."
+  - id: mask-observations-not-state
+    principle: "Mask stale observation content from visible context while preserving reasoning, tool-call structure, tool errors, and page-pool state."
+    transfers_to: "Typed memory should separate volatile prompt context from durable evidence/artifact storage."
+  - id: preserve-reopenability
+    principle: "Any masked evidence must remain addressable by stable cursor/id/URL; masking must be reversible through tools."
+    transfers_to: "Agent tools should expose exact addresses, not force the model to reconstruct pages from fuzzy titles."
+  - id: evaluate-rescue-and-harm
+    principle: "Average accuracy hides the mechanism; evaluate wrong->correct and correct->wrong transitions plus extra tool calls and rolling token cost."
+    transfers_to: "Cold audits and self-evolution loops should track both fixes and regressions when a control policy changes."
+  - id: protect-saturated-model-evidence
+    principle: "For high-baseline agents, external masking can remove evidence the model would have used; add evidence pinning or disable masking in saturated regimes."
+    transfers_to: "High-capability AutoSci agents need evidence-preservation guards more than aggressive pruning."
+  - id: retriever-before-pruning
+    principle: "When the retriever is the bottleneck, context pruning cannot amplify absent signal; improve retrieval quality before tuning masking."
+    transfers_to: "L1 should route low-SNR failures to retriever/query reformulation work, not context-compression work."
+risks:
+  - descriptive_not_predictive
+  - frontier_model_coverage_missing
+  - evidence_eviction_in_saturated_regime
+  - extra_tool_call_cost
+  - masking_safety_or_edge_case_context
+  - cannot_fix_intrinsic_hallucination
+status: extracted

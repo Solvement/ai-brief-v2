@@ -1,0 +1,56 @@
+{
+  "paper_id": "2606.00408",
+  "arxiv_id": "2606.00408",
+  "title": "Masking Stale Observations Helps Search Agents -- Until It Doesn't: A Regime Map and Its Mechanism",
+  "authors": [
+    "Haoxiang Zhang",
+    "Qixin Xu",
+    "Zhuofeng Li",
+    "Lei Zhang",
+    "Pengcheng Jiang",
+    "Yu Zhang",
+    "Julian McAuley"
+  ],
+  "date": "2026-05-29",
+  "huggingface_url": "https://huggingface.co/papers/2606.00408",
+  "paper_url": "https://arxiv.org/abs/2606.00408",
+  "code_url": "https://github.com/i-DeepSearch/observation-masking",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "source_rankings": [
+    "daily"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.00408.yaml",
+  "first_seen_date": "2026-06-05",
+  "topic": "agent",
+  "agent_relevant": true,
+  "tags": [
+    "agent-context-management",
+    "observation-masking",
+    "deep-research-agent",
+    "agentic-search",
+    "retrieval",
+    "long-context",
+    "regime-map",
+    "scaffold-design",
+    "trajectory-analysis",
+    "autosci-direct"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 9,
+    "career_value": 9,
+    "autosci_reuse_value": 9,
+    "buildability": 8,
+    "evaluation_value": 8,
+    "breadth_value": 8,
+    "evidence_quality": 8
+  },
+  "one_sentence_judgment": "这篇把长程搜索 agent 的旧观测遮罩从默认省上下文技巧重构成 regime-dependent 控制器：检索器弱时收益低，强检索+中等模型时最高收益，模型饱和时会因误删证据而坍塌；证据来自多模型/多检索器/多 benchmark 的系统扫表、Trace-SNR probe、attention 与工具重开行为分析，适合直接迁移到 AutoSci/Deep Research agent 的上下文管理与可靠性评测，但边界是只研究最小 turn-based masking、未覆盖闭源前沿模型、regime map 仍是描述性而非可上线预测器。"
+}

@@ -1,0 +1,102 @@
+# Career & Learning · 求职与成长
+
+> 假设你已经读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / AI PM / FDE / AI-app 开发者**有什么用。
+
+## 为什么这对我重要
+
+如果你在做 deep research agent、企业搜索 agent、代码检索 agent、科研助理 agent，迟早会遇到同一个问题：agent 的历史越来越长，里面大部分都是工具输出。你不能无限塞上下文，也不能随手删历史，因为旧网页里可能有最终答案需要的证据。
+
+这篇给你的不是一个“压缩技巧”，而是一套产品判断：**什么时候应该帮模型清噪，什么时候应该相信模型自己读上下文，什么时候该把预算投给 retriever 而不是 context pruning。**
+
+> [!key] 对应用建造者的核心启发
+> context management 不是一个全局开关。它应该是**按系统状态启用的控制器**：弱检索先修 retriever，中等模型加遮罩/重开机制，强模型谨慎遮罩并保护关键证据。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| agent context accounting | 把轨迹拆成 reasoning / tool call / observation / error / final answer，而不是当一坨文本 | 给自己的 agent 日志写一个 renderer，统计每类 token 占比 |
+| observation masking | 只遮旧观测，不遮推理、不遮工具调用结构、不遮错误反馈 | 实现 `K=5` 的最小遮罩策略，并保留占位符 |
+| page pool 设计 | 把“可见上下文”和“历史网页存储”解耦 | 所有打开页面存 cursor/URL/text，即使上下文遮罩也能重开 |
+| regime-based eval | 不只看平均 accuracy，要按 retriever / model / baseline accuracy 分桶 | 同一 agent 跑 No-CM vs CM，记录 correct->wrong / wrong->correct |
+| trace diagnostics | 用轨迹复杂度、证据密度、工具调用数判断遮罩是否有用 | 做一个轻量 probe：输入 turns、URL 数、observation tokens，输出“可能被 CM rescue” |
+| scaffold reliability | URL、错误消息、工具 schema 都是模型可用性的组成部分 | 消融“精确 URL vs 标题”“保留错误 vs 遮罩错误”，看 open error rate |
+
+## 系统设计心法
+
+一句话：**别把上下文压缩当省钱工具，要把它当可靠性控制面。**
+
+- **先判区间，再开策略。** 检索器弱时，遮罩救不了证据缺失；中等模型加遮罩最划算；强模型要警惕误删证据。
+- **遮罩不是删除。** 生产系统里必须有 page pool / artifact store / cursor 机制，否则遮罩会变成不可逆的信息丢失。
+- **错误反馈是状态，不是噪声。** 工具调用错误、网络失败、参数格式报错要留给 agent 修正；遮掉错误会提高后续工具错误率。
+- **强模型也会被坏 UI 拖累。** 模糊标题让模型猜页面，精确 URL / cursor 能把寻址负担从模型转移到系统。
+- **成本要按整条轨迹算。** CM 可能降低单轮可见上下文，但增加搜索/打开次数；要看 rolling input tokens 和额外工具调用，而不是只看最终 context size。
+
+## 对 AI PM / FDE 的产品判断
+
+这篇特别适合转化成产品 checklist：
+
+| 产品问题 | 该问的诊断问题 |
+| --- | --- |
+| “我们要不要默认压缩 agent 历史？” | No-CM baseline 已经多强？压缩后 correct->wrong 有多少？ |
+| “agent 读不到证据怎么办？” | 是 retriever 没召回，还是召回了但模型被噪声淹没？ |
+| “为什么小模型加压缩有用，大模型没用？” | 大模型可能已经能过滤上下文；外部遮罩只是增加工具调用和误删风险 |
+| “为什么用户说答案变差？” | 查是否遮掉了早期关键 distinction，例如月份/定义/边界条件 |
+| “怎样让遮罩更安全？” | 保留错误、保留工具调用结构、保留 cursor/URL、对高影响证据加 pin/protect |
+
+## 可造（Build ideas）
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Regime-aware CM toggle | 对每个任务记录 No-CM baseline、retriever recall proxy、工具调用增长，自动决定是否启用遮罩 | 1-2 周 | 直接把本文区间图做成产品控制器 |
+| Page-pool research agent | 上下文只显示最近观测，所有页面进持久池，可按 cursor 重开 | 3-5 天 | 复现本文最关键的 scaffold 思想 |
+| Evidence pinning layer | 一旦某段观测被引用进候选答案，就 pin 住不遮罩 | 3-5 天 | 专门补模型饱和区“误删关键证据”的坑 |
+| CM harm dashboard | 展示 wrong->correct、correct->wrong、额外 calls/q、rolling tokens | 4-7 天 | 让 PM 能看到遮罩是赚钱还是亏钱 |
+| Tool-error retention test | 对比遮罩/保留工具错误反馈后的 open/search/find error rate | 1-2 天 | 小而硬，能证明 scaffold 细节影响可靠性 |
+
+## 作品集角度（Portfolio angle）
+
+这篇能支撑一个很像真实基础设施的作品：**一个带区间诊断的 deep research agent context manager**。
+
+不要只做“我实现了记忆压缩”。更好的叙事是：
+
+- 我先构建了 No-CM 强 baseline；
+- 我把历史拆成 reasoning / action / observation / error；
+- 我实现了 turn-based masking + page pool；
+- 我按模型和检索质量画出 CM gain / harm；
+- 我发现遮罩在某些区间救回答案，在强模型区间会误删证据；
+- 我加了 evidence pinning / error retention / exact URL rendering 来降低损伤。
+
+这比普通 RAG demo 更像 FDE/AI infra 工作，因为它讨论的是系统可靠性、评测分桶、成本和失败机制。
+
+## 简历 / 面试故事
+
+诚实写法：
+
+- *"Built a regime-aware context manager for long-horizon search agents: masks stale observations while preserving tool-call structure, errors, and a persistent page pool for re-opening evidence."*
+- *"Evaluated context management by query transitions (wrong->correct, correct->wrong), extra tool calls, and rolling input tokens instead of only final accuracy."*
+- *"Added evidence pinning and exact-URL rendering to reduce context-management regressions in saturated agent settings."*
+
+> [!key] 面试可讲
+> “你怎么决定 agent 历史该不该压缩？”不要回答“超过 token limit 就摘要”。用本文的答案：先看检索器是否把证据召回，再看模型 No-CM 基线是否已饱和；只有在证据够多但模型过滤能力不足的错配区间，遮罩才是正收益。
+
+## 学习清单
+
+**必学**
+
+- ReAct / deep research agent 的 trajectory 渲染方式
+- context management：truncation / masking / summarization / retrieval
+- retriever recall vs model filtering capacity 的系统分解
+- correct->wrong / wrong->correct 这种 transition-level eval
+
+**有用**
+
+- page pool / cursor / exact URL 的工具接口设计
+- LLM-as-Judge + human audit 的评测可靠性做法
+- Trace-SNR 这类轨迹诊断 probe
+
+**可选**
+
+- attention hook / vLLM instrumentation
+- learned / semantic-adaptive context compression
+- 高风险领域下的 evidence pinning 与 human-in-the-loop validation
