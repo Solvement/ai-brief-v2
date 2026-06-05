@@ -1,0 +1,56 @@
+primitive_id: self-evolving-agent-taxonomy
+source_paper: "2507.21046"
+title: "Self-Evolving Agents Survey: What/When/How/Where Taxonomy as an L1 Design Map"
+relevance_level: direct_map_for_north_star  # 这不是单篇方法,是 L1/L2/L3 的总设计图
+audience: ai_only                           # 北极星设计件,不进 Kevin 阅读 tab
+core_pattern: >
+  把"让 agent 自我进化"形式化成 f(Π,τ,r)=Π′(把 agent 系统 Π=(架构Γ,模型ψ,上下文C,工具W)
+  按轨迹 τ 与反馈 r 升级),并用四轴决策框架覆盖整片领域:What(进化哪个部件)、When(任务内/任务间)、
+  How(奖励式/模仿/群体进化)、Where(通用/专用域),配五维评估(适应/保持/泛化/效率/安全)与安全清单
+  (价值漂移/灾难性遗忘/奖励错配)。= 造自进化系统的目录 + 决策树。
+problem_class: how-to-make-an-agent-continually-self-improve-design-space-map
+components:
+  - what_axis              # 进化对象:模型/上下文/工具/架构
+  - when_axis              # 时机:intra-test-time vs inter-test-time
+  - how_axis               # 方法:奖励式/模仿/群体进化;on-off-policy
+  - where_axis             # 落点:通用域 + 编程/GUI/金融/医疗/教育
+  - evaluation_dims        # 适应/保持/泛化/效率/安全
+  - safety_checklist       # 价值漂移/灾难性遗忘/奖励错配
+autosci_modules:
+  - self_evolve_controller # 整张图就是 SciEvolve→BriefEvolve 的设计来源
+  - typed_memory           # "上下文/记忆进化"轴 = 我们 typed memory 的进化策略
+  - guard                  # 安全清单 = 自更新的护栏(价值漂移/遗忘回归门)
+  - cold_critic            # "奖励式(外部/隐式反馈)" = 用冷审反馈当 reward
+inputs:
+  - agent_system           # Π=(Γ,ψ,C,W)
+  - trajectory_feedback    # τ, r(经历与反馈)
+  - evolution_choice       # 在四轴上选:动哪个部件/何时/用什么方法
+outputs:
+  - improved_system        # Π′(持久、改变策略的升级)
+  - evaluation_profile     # 适应/保持/泛化/效率/安全 五维画像
+implementation_idea: >
+  把本站 L1 BriefEvolve 直接映射到四轴:What=上下文(选稿口味记忆)+架构(冷审流水线连边);
+  When=inter-test-time(跨天积累);How=奖励式(用冷审/Kevin 反馈当 reward);Where=通用域(论文选读)。
+  先落"记忆进化 + 回归护栏"这条最便宜的线,再逐步上提示/连边自优化。
+small_experiment: >
+  给本站选稿器加一个会进化的"口味记忆":每天用 Kevin 的阅读/反馈更新偏好向量(inter-test-time,
+  奖励式),并设"学新不忘旧"的回归门(挡灾难性遗忘);比进化前后选稿与 Kevin 偏好的一致性。1-14 天。
+design_principles:                          # 四轴本身就是喂 L1/L3 的设计原则地图
+  - id: cheapest-evolution-first
+    principle: "进化成本阶梯:改上下文/记忆 < 改提示 < 改工具/架构 < 改模型参数;能记忆解决就别微调。"
+    transfers_to: "L1 先做记忆进化,再上架构自优化。"
+  - id: inter-over-intra-test-time
+    principle: "真正复利来自跨任务积累(inter-test-time),不是单次任务内调一调。"
+    transfers_to: "BriefEvolve 跨天累积选稿口味,而非单篇内优化。"
+  - id: reward-from-feedback
+    principle: "外部/隐式反馈可当自进化 reward(连接 Agent-as-a-Judge:过程反馈即奖励)。"
+    transfers_to: "用冷审门 + Kevin 反馈当 L1 的 reward 信号。"
+  - id: evolve-needs-guardrails
+    principle: "自改进的最大风险是价值漂移 + 灾难性遗忘,每次自更新都要过'学新不忘旧 + 安全'回归门。"
+    transfers_to: "L1 每次自更新前后跑回归/安全门(我们的质量门天然适配)。"
+risks:
+  - survey_not_benchmark   # 综述不证明任何单一方法,效果要回原论文
+  - safety_unsolved        # 价值漂移/遗忘/奖励错配是公开难题
+  - eval_immature          # 长程终身学习评估仍早期
+  - asi_framing_aspirational # "通往 ASI"是愿景叙事,非已达成结论
+status: extracted
