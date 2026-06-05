@@ -1,0 +1,65 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+"多 agent 协作"是你做 agent 产品迟早要碰的硬骨头,而 MetaGPT 是这条线上**最被广泛抄作业的工程范式**(68.5k★)。它给你的不是某个模型,而是一套可直接套用的答案:**怎么让一群 agent 分工而不互相带偏**——用 SOP 约束流程、用结构化产物代替闲聊、用消息池+订阅协作、用"真跑代码"的可执行反馈纠错。你做任何"多步骤、多角色"的 AI 工作流,这四招都能直接迁移。
+
+> [!key] 和我们正在做的东西同源
+> 我们站里的**深读作者→冷审→补差**也是一支微型 agent 团队。MetaGPT 的"结构化产物代替对话""可执行反馈闭环""按角色订阅"——正是把我们这条流水线做得更稳的现成零件。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 多 agent 编排 | 用角色专精 + SOP 把一个复杂任务拆给多个 agent,而不是塞进一个超级 prompt | 仿它搭"产品→架构→工程→测试"四角色,跑通一个小需求 |
+| 结构化通信 | agent 之间传带 schema 的工件(PRD/接口/任务单),不传大白话 | 给每个角色定义输入/输出 schema,用 JSON/pydantic 强约束 |
+| 消息池 + 发布订阅 | 用公共消息总线 + 按角色订阅,替代一对一传话 | 实现一个最小 message pool,角色按 tag 订阅 |
+| 可执行反馈闭环 | 让 agent 真运行产物、按报错自纠(设重试上限) | 工程师 agent 跑测试→读 traceback→改→再跑,封顶 3 轮 |
+| 成本/质量权衡 | 多 agent 更贵(token↑),要会判断什么时候值 | 对同一任务测单 agent vs 多 agent 的 token 与人工修订 |
+
+## 系统设计心法
+
+一句话:**多 agent 不是"多请几个 LLM 聊天",是"把人类成熟流程 + 结构化产物 + 运行反馈"工程化。**
+- **流程 > 自由对话**:让 agent 照 SOP 办事、产出可验收的中间工件,从源头压住级联幻觉。
+- **结构 > 大白话**:角色间传 schema 化文档,歧义低、可机器校验、可订阅。
+- **运行 > 评审**:能真跑就别只靠 LLM 互评——可执行反馈是质量的最大来源。
+- **订阅 > 广播**:每个角色只拿自己关心的,防信息过载(这也是省 token 的关键)。
+
+## 作品集角度(Portfolio angle)
+
+"多 agent 工程"是当下极好讲的方向。两条路都硬:① 自己搭一个小型 role-based 多 agent 流水线(带消息池 + 可执行反馈),把"agent 不互相带偏"讲清楚;② 给 `FoundationAgents/MetaGPT`(68.5k★)提一个真实 PR(新角色/新 Action/新数据源)——**给头部 agent 框架 merged PR** 是很硬的简历点。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Mini role-based 团队 | 产品→架构→工程→测试四角色 + 消息池 + 订阅,跑一句话需求 | 1 周 | 吃透多 agent 编排核心,产出能讲清的 repo |
+| 可执行反馈组件 | 工程师 agent 跑测试→读报错→改→再跑(≤3 轮)的独立小库 | 3-4 天 | 把"用运行结果纠错"做成可复用件 |
+| SOP-as-config | 把流程/角色/schema 抽成可配置 SOP,换领域只改配置 | 1 周 | 体现"Code = SOP(Team)"的工程抽象力 |
+| 给 MetaGPT 提 PR | 加一个角色或一个工具 Action | 1-2 周 | merged PR 进 68.5k★ 项目 |
+
+## 简历 / 面试故事
+
+诚实写法:
+- *"Built a role-based multi-agent pipeline (PM → Architect → Engineer → QA) with a shared message pool and role-based subscription, plus an executable-feedback loop that runs generated code and self-corrects on errors (capped retries)."*
+- *"Reduced cascading-hallucination errors in a multi-agent workflow by replacing free-form chat with schema-constrained artifacts (PRD/design/task) and validating intermediate outputs per role."*
+- *"(若做了 PR)Contributed a {new role / tool Action} to MetaGPT (~68.5k★ multi-agent framework)."*
+
+> [!key] 面试可讲
+> "多个 agent 怎么协作才不互相带偏?"——用本文论证:**SOP 约束流程 + 结构化产物代替对话 + 可执行反馈纠错 + 按角色订阅**;并点出"多 agent 更贵,要算 token/质量账"。体现流程思维 + 系统思维 + 成本意识。
+
+## 学习清单
+
+**必学**
+- 多 agent 角色专精 + SOP 编排
+- 结构化通信(schema 化工件)+ 消息池/订阅
+- 可执行反馈闭环(运行→纠错→重试上限)
+
+**有用**
+- 多 agent 的 token/质量成本权衡
+- "Code = SOP(Team)"式可配置流程抽象
+
+**可选**
+- 与单 agent / ChatDev 等其它范式的横向对比

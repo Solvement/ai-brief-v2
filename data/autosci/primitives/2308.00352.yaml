@@ -1,0 +1,56 @@
+primitive_id: sop-structured-multi-agent-team
+source_paper: "2308.00352"
+title: "MetaGPT: SOP-Encoded Role-Specialized Multi-Agent Team with Executable Feedback"
+relevance_level: direct_pattern_strong    # 多 agent 编排骨架,可直接接进我们的深读→冷审团队
+audience: ai_only                         # 给 L1/L3 与本站流水线吃的设计件,不进 Kevin 阅读 tab
+core_pattern: >
+  把一个复杂任务交给一支"角色专精 + SOP 约束"的 agent 团队:每个角色(产品/架构/项目/工程/QA)
+  产出带 schema 的结构化工件(PRD/设计/任务单/代码/测试),通过共享消息池 + 按角色发布订阅协作
+  (不自由对话、不一对一索要);工程师角色用"可执行反馈"真跑产物、按报错对照历史自纠(≤3 轮)。
+  关键开关 = 用人类成熟流程(SOP)+ 结构化产物 + 运行反馈,从源头压住级联幻觉。
+problem_class: multi-agent-collaboration-needs-structure-to-avoid-cascading-hallucination
+components:
+  - role_agents            # 角色专精:PM/architect/PJM/engineer/QA,各有职责与工件
+  - shared_message_pool    # 公共产物池
+  - role_subscription      # 按角色订阅,防信息过载
+  - structured_artifact    # schema 化的 PRD/设计/任务单(typed memory)
+  - executable_feedback    # 跑产物→读报错→自纠→重试(refine 闭环)
+autosci_modules:
+  - refine_harness         # 可执行反馈 = plan→render→diagnose→refine 的一种实例
+  - typed_memory           # 结构化工件 + 消息池 = 一种结构化记忆
+  - cold_critic            # QA 角色 = 独立验收(可演化为 generator≠critic)
+  - self_evolve_controller # 重试上限/收敛控制
+inputs:
+  - task_spec              # 一句话需求 / 目标
+  - role_profiles          # 各角色画像 + 该产出的工件 schema
+  - sop                    # 流程顺序与验收标准
+outputs:
+  - structured_artifacts   # PRD/设计/代码/测试
+  - message_trace          # 消息池里的协作轨迹(可审计/可学习)
+implementation_idea: >
+  100~200 行最小版:一个 message pool(list + tag 订阅)+ 若干 role(各自 prompt + 输出 schema)+
+  一个 executable_feedback 包装(跑代码→读 traceback→改→再跑,封顶 3 轮)。先用"产品→架构→工程→测试"
+  四角色跑一个小需求,再抽象成与领域无关的 role/SOP 配置。
+small_experiment: >
+  对照 A=单 super-agent 一把梭 vs B=四角色 SOP 团队 + 可执行反馈,在一组小编程任务上比可执行性、
+  人工修订次数与 token;消融去掉"可执行反馈"看可执行性掉多少(复刻 MetaGPT 消融:角色 1.0→4.0,
+  可执行反馈 HumanEval +4.2%)。1-7 天。
+design_principles:                          # 跨篇沉淀的"怎么造 agent 团队"零件(喂 L1/L3,也反哺本站流水线)
+  - id: sop-over-freeform
+    principle: "用人类成熟流程(SOP)约束 agent 协作,而非自由对话——中间结果可被角色检查,压住级联幻觉。"
+    transfers_to: "我们的深读→冷审流水线:每步产物有明确验收,不自由发挥。"
+  - id: structured-artifacts-over-chat
+    principle: "agent 间传 schema 化工件而非大白话:降歧义、可机器校验、可订阅。"
+    transfers_to: "深读的 metadata/primitive 结构层 + 冷审的诊断 JSON。"
+  - id: publish-subscribe-message-pool
+    principle: "公共消息池 + 按角色订阅 > 一对一传话:防信息过载、省 token。"
+    transfers_to: "多 agent 流水线的消息总线设计;L1 多模块通信。"
+  - id: executable-feedback-loop
+    principle: "能真跑就别只靠 LLM 互评——用运行结果纠错是质量最大来源(与 DRIFT/Crafter 的 refine 同族)。"
+    transfers_to: "凡产物可执行/可校验的环节,都接一个 run→diagnose→fix→retry 闭环。"
+risks:
+  - token_cost_blowup      # 多 agent 更贵(31,255 vs ChatDev 19,292),要算质量/成本账
+  - context_window_limit   # 角色可见信息受窗口限制
+  - rigid_protocol         # 通信接口本身不演化(作者承认),换任务可能要重设 schema
+  - hallucination_persists # 结构化只缓解不根除
+status: extracted

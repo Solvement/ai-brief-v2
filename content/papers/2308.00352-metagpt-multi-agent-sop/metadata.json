@@ -1,0 +1,52 @@
+{
+  "paper_id": "2308.00352",
+  "arxiv_id": "2308.00352",
+  "title": "MetaGPT: Meta Programming for a Multi-Agent Collaborative Framework",
+  "authors": [
+    "Sirui Hong",
+    "Mingchen Zhuge",
+    "Jiaqi Chen",
+    "Xiawu Zheng",
+    "Yuheng Cheng",
+    "Jinlin Wang",
+    "Ceyao Zhang",
+    "Chenglin Wu",
+    "Jürgen Schmidhuber"
+  ],
+  "date": "2023-08-01",
+  "huggingface_url": "https://huggingface.co/papers/2308.00352",
+  "paper_url": "https://arxiv.org/abs/2308.00352",
+  "code_url": "https://github.com/FoundationAgents/MetaGPT",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "source_rankings": ["lineage"],
+  "human_tabs": ["paper", "career"],
+  "autosci_primitive": "data/autosci/primitives/2308.00352.yaml",
+  "first_seen_date": "2026-06-04",
+  "topic": "agent",
+  "agent_relevant": true,
+  "tags": [
+    "multi-agent",
+    "sop",
+    "role-specialization",
+    "shared-message-pool",
+    "publish-subscribe",
+    "executable-feedback",
+    "code-generation",
+    "agent-framework",
+    "self-improving-agent-lineage"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 10,
+    "career_value": 9,
+    "autosci_reuse_value": 9,
+    "buildability": 9,
+    "evaluation_value": 7,
+    "breadth_value": 8,
+    "evidence_quality": 8
+  },
+  "one_sentence_judgment": "多 agent 协作的奠基工程范式:用 SOP 把人类软件流程注入角色专精的 agent 团队,以结构化产物 + 共享消息池/订阅 + 可执行反馈闭环压住级联幻觉——四个设计都可直接迁移到任意多步多角色 AI 工作流(含我们自己的深读→冷审环);证据扎实(HumanEval 85.9%/MBPP 87.7%,SoftwareDev 可执行性 3.75、人工修订降到 0.83,消融证明角色与可执行反馈各自有效),代价是 token 更贵、任务范围有限、协议偏僵、幻觉未根除。"
+}
