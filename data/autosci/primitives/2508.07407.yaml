@@ -4,10 +4,13 @@ title: "Comprehensive Self-Evolving Agents Survey: Four-Component Optimisation L
 relevance_level: direct_map_for_north_star  # 四组件回路 = 直接可套进 L1 的工程骨架
 audience: ai_only
 core_pattern: >
-  把任意自进化 agent 系统统一成一个优化反馈回路:System Inputs(任务/数据)→ Agent System
-  (模型/提示/记忆/工具/工作流)→ Environment(行动并产生反馈)→ Optimisers(用反馈改 agent 系统)→ 循环。
-  再按"优化器改的对象"分类:单 agent 优化(提示/记忆/工具/训练)/ 多 agent 优化(自动构建+拓扑)/
-  领域专用 / 评估。与 2507.21046 的 What/When/How/Where 是互补的两把尺子(优化器视角 vs 过程视角)。
+  把任意自进化 agent 系统统一成一个优化反馈回路:System Inputs(数据/任务)→ Agent System
+  (被优化对象:模型/提示/记忆/工具/工作流)→ Environment(提供反馈信号)→ Optimisers(驱动进化的算法,用反馈改 agent 系统)→ 循环。
+  外加一条四阶段发展路线 MOP(模型离线预训练)→MOA(模型在线适配)→MAO(多 agent 编排)→MASE(多 agent 自进化),
+  和一组带优先级的自进化三定律 Endure(安全)> Excel(性能)> Evolve(进化)做护栏。
+  再按"优化器改的对象"分类:单 agent 优化(LLM行为/提示/记忆/工具/统一)/ 多 agent 优化(自动构建+MAS优化)/
+  领域专用(生物医药/编程/科研/金融法律)/ 评估(基准+LLM+安全)。
+  与 2507.21046 的 What/When/How/Where 是互补的两把尺子(优化器+安全视角 vs 过程视角)。
 problem_class: unifying-self-evolving-agents-under-one-optimisation-feedback-loop
 components:
   - system_inputs          # 喂进来的任务/数据
@@ -35,15 +38,21 @@ design_principles:                          # 喂 L1 的工程骨架(与 2507.21
   - id: model-self-improvement-as-a-loop
     principle: "把自改进画成 输入→agent→环境→优化器 的闭环;没有清晰的环境反馈源就没有优化。"
     transfers_to: "L1 先定'环境给什么信号'(Kevin 反馈+质量门),再谈优化。"
+  - id: safety-first-three-laws
+    principle: "自进化三定律带优先级:Endure(安全)> Excel(性能)> Evolve(进化);自动改动不得为刷分牺牲安全/稳定。"
+    transfers_to: "L1 硬约束:任何自动改连边/提示必须先过冷审+质量门(Endure)才生效,进化(Evolve)最低优先级。"
   - id: choose-optimisation-target
     principle: "优化对象决定成本/收益:单 agent(提示/记忆便宜)< 多 agent 拓扑 < 领域微调;先选对象再选方法。"
     transfers_to: "L1 路线:先优化口味记忆/提示,再优化冷审团队拓扑。"
+  - id: stage-your-system-mop-to-mase
+    principle: "四阶段发展路线 MOP→MOA→MAO→MASE:从冻结模型→参数微调→多 agent 编排→闭环自进化;先给系统定阶段再补下一步。"
+    transfers_to: "L1 现处 MAO→MASE 过渡(已有多 agent 协作,缺闭环自改进);下一步=补优化器闭环。"
   - id: two-lenses-stacked
-    principle: "优化器视角(本篇)+ What/When/How/Where(2507.21046)叠用,设计自进化最不漏环。"
-    transfers_to: "造 L1 时两张图对照,确保部件/时机/方法/对象都想清楚。"
+    principle: "优化器+安全视角(本篇)+ What/When/How/Where(2507.21046)叠用,设计自进化最不漏环。"
+    transfers_to: "造 L1 时两张图对照,确保部件/时机/方法/对象+护栏都想清楚。"
 risks:
   - survey_not_benchmark   # 综述不证明任何单一方法
   - overlap_with_2507      # 与 2507.21046 高度重叠,价值在互补
-  - fulltext_unverified    # 本次 HTML/ar5iv 转换失败,框架取自摘要+官方 awesome-list,body 细节以 PDF 为准
-  - safety_unsolved        # 终身自改进的价值漂移/失控风险同样适用
+  - body_numbers_unread    # 框架/路线/三定律已多源互证;仅 body 级逐节数字因 HTML 转换失败未读,以 PDF 为准、不臆造
+  - safety_unsolved        # 终身自改进的价值漂移/失控风险同样适用(三定律是约束不是解)
 status: extracted

@@ -4012,6 +4012,47 @@ button { font-family: inherit; cursor: pointer; }
 .feature-item h4 { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .benchmark-lens .benchmark-chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
 
+/* ============================================================
+   模型详情页 — relaxed editorial restyle (2026-06-05)
+   Scoped under .model-detail. Local purple "model" accent +
+   more whitespace / larger type to de-densify the changelog wall.
+   Inspired by AI-Brief v3 editorial layout (NOT a copy).
+   ============================================================ */
+.model-detail {
+  --m-accent: #7c3aed; --m-accent-strong: #6d28d9;
+  --m-accent-soft: #f5f2ff; --m-accent-line: #e6dcfb;
+  --m-shadow: 0 1px 2px rgba(24,22,18,.04), 0 12px 32px -22px rgba(76,29,149,.30);
+}
+/* — rhythm: more air between sections — */
+.model-detail .section { margin-top: 48px; }
+.model-detail .section-kicker { color: var(--m-accent); font-size: 12.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.model-detail .section > h3 { font-size: 22px; line-height: 1.3; letter-spacing: -0.01em; margin: 6px 0 18px; }
+.model-detail .eyebrow { color: var(--m-accent); font-weight: 750; }
+/* — right meta rail: lighter, purple-tinted — */
+.model-detail .model-status-panel { background: var(--m-accent-soft); border-color: var(--m-accent-line); border-radius: 14px; padding: 20px; }
+/* — changelog "wall" → relaxed timeline cards — */
+.model-detail .feature-list { gap: 18px; }
+.model-detail .feature-item { padding: 22px 24px; border-left: 3px solid var(--m-accent); border-radius: 14px; box-shadow: var(--m-shadow); }
+.model-detail .feature-item h4 { font-size: 18px; margin: 0 0 14px; padding: 0; border-bottom: none; letter-spacing: -0.01em; }
+.model-detail .feature-item p { font-size: 15px; line-height: 1.85; margin: 0 0 10px; }
+.model-detail .feature-item p:last-child { margin-bottom: 0; }
+.model-detail .feature-item p b { color: var(--m-accent-strong); font-weight: 750; }
+/* — open-view cards: same relaxed treatment — */
+.model-detail .unlock-grid, .model-detail .model-applied-grid { gap: 18px; }
+.model-detail .unlock-card, .model-detail .applied-tile { padding: 22px 24px; border-radius: 14px; }
+.model-detail .unlock-card { border-left: 3px solid var(--m-accent); }
+.model-detail .unlock-card h4, .model-detail .applied-tile h4 { font-size: 16px; margin-bottom: 12px; }
+.model-detail .unlock-card p, .model-detail .applied-tile p { font-size: 15px; line-height: 1.8; }
+/* — paradigm (version update / new model) card: calmer — */
+.model-detail .paradigm-card { padding: 24px 26px; border-radius: 14px; }
+.model-detail .pcard-head h3 { font-size: 20px; }
+/* — desktop-only spacious hero — */
+@media (min-width: 900px) {
+  .model-detail .model-hero { padding: 34px 36px; gap: 32px; }
+  .model-detail .model-hero h1 { font-size: 38px; line-height: 1.08; letter-spacing: -0.02em; }
+  .model-detail .model-hero-tldr { font-size: 16px; line-height: 1.75; }
+}
+
 /* ===== Projects radar depth tiers (2026-06-03) ===== */
 .depth-badge { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.1; }
 .depth-badge b { font-size: 13px; }
@@ -4298,6 +4339,47 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 }
 .radar-action.strong { color: var(--radar-blue-strong); background: var(--radar-blue-soft); border-color: var(--radar-blue-soft-2); }
 .radar-gained { color: #15803d; font-weight: 700; }
+
+/* ============================================================
+   Knowledge Graph (L0 DAG) — force-net + JoJo ability radar (2026-06-05)
+   Critically adapted from Obsidian graph / JoJo stat-panel: edges encode
+   real relations (orange = forward-lineage "edge effect"), radar = the
+   builder-judgment scores (informative, not decorative).
+   ============================================================ */
+.kg-page { max-width: 1280px; }
+.kg-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
+.kg-head h1 { margin: 4px 0 6px; font-size: 30px; letter-spacing: -0.02em; }
+.kg-head p { margin: 0; max-width: 760px; color: var(--ink-2); font-size: 14px; line-height: 1.65; }
+.kg-legend { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kg-chip { font-size: 12px; font-weight: 700; color: var(--ink-2); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; }
+.kg-chip-fwd { color: #c2410c; background: #fff7ed; border-color: #fed7aa; }
+.kg-toggle { font-size: 12px; font-weight: 700; color: var(--ink-2); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; }
+.kg-toggle:hover { border-color: var(--line-strong); }
+.kg-stage { position: relative; border: 1px solid var(--line); border-radius: var(--radius-lg); background: radial-gradient(1100px 600px at 50% 0%, rgba(37,99,235,.045), transparent 70%), var(--paper); overflow: hidden; box-shadow: var(--shadow-1); }
+.kg-svg { display: block; width: 100%; height: auto; touch-action: none; }
+.kg-node-label { font-size: 11px; font-weight: 650; fill: var(--ink-2); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; pointer-events: none; }
+.kg-label-pri { font-size: 9.5px; fill: #2f9e63; }
+.kg-radar { width: 100%; height: auto; }
+.kg-radar-label { font-size: 9px; fill: var(--ink-3); font-weight: 700; }
+.kg-panel { position: absolute; top: 14px; right: 14px; width: 300px; max-height: calc(100% - 28px); overflow-y: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--shadow-3); }
+.kg-panel-close { position: absolute; top: 10px; right: 12px; border: none; background: none; font-size: 20px; line-height: 1; color: var(--ink-4); cursor: pointer; }
+.kg-panel-kind { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: #7c3aed; }
+.kg-panel h3 { margin: 6px 0 8px; font-size: 16px; line-height: 1.35; color: var(--ink); padding-right: 16px; }
+.kg-panel-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11.5px; color: var(--ink-3); font-weight: 600; }
+.kg-seed { color: #1d4ed8; }
+.kg-panel-sub { margin: 14px 0 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: var(--ink-3); }
+.kg-panel-principle { margin: 6px 0 0; font-size: 13px; line-height: 1.7; color: var(--ink-2); }
+.kg-panel-link { display: inline-flex; margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--accent); }
+.kg-panel-conn { margin-top: 8px; }
+.kg-conn-row { display: grid; gap: 2px; width: 100%; text-align: left; border: none; background: none; padding: 8px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.kg-conn-row:hover .kg-conn-title { color: var(--accent); }
+.kg-conn-type { font-size: 10.5px; font-weight: 800; color: var(--ink-3); }
+.kg-conn-forward_lineage { color: #c2410c; }
+.kg-conn-title { font-size: 13px; font-weight: 650; color: var(--ink); }
+.kg-conn-what { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); }
+@media (max-width: 720px) {
+  .kg-panel { position: static; width: auto; max-height: none; margin-top: 12px; box-shadow: none; }
+}
 
 /* footer stats line under grid */
 .radar-footstats {

@@ -1,0 +1,1170 @@
+{
+  "generatedAt": "2026-06-05T13:23:10.592Z",
+  "note": "L0 knowledge-graph DAG. forward_lineage = verified 'edge effect' only.",
+  "stats": {
+    "nodes": 51,
+    "edges": 48,
+    "nodeByType": {
+      "paper": 26,
+      "principle": 25
+    },
+    "edgeByType": {
+      "exhibits_principle": 25,
+      "shares_tag": 2,
+      "forward_lineage": 21
+    },
+    "forwardSource": "forward-edges.json (21 edges)"
+  },
+  "nodes": [
+    {
+      "id": "paper:2308.00352",
+      "type": "paper",
+      "arxiv_id": "2308.00352",
+      "slug": "2308.00352-metagpt-multi-agent-sop",
+      "title": "MetaGPT: Meta Programming for a Multi-Agent Collaborative Framework",
+      "date": "2023-08-01",
+      "authors": [
+        "Sirui Hong",
+        "Mingchen Zhuge",
+        "Jiaqi Chen",
+        "Xiawu Zheng",
+        "Yuheng Cheng",
+        "Jinlin Wang",
+        "Ceyao Zhang",
+        "Chenglin Wu",
+        "Jürgen Schmidhuber"
+      ],
+      "tags": [
+        "multi-agent",
+        "sop",
+        "role-specialization",
+        "shared-message-pool",
+        "publish-subscribe",
+        "executable-feedback",
+        "code-generation",
+        "agent-framework",
+        "self-improving-agent-lineage"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 10,
+        "career_value": 9,
+        "autosci_reuse_value": 9,
+        "buildability": 9,
+        "evaluation_value": 7,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": true,
+      "seed_priority": 1,
+      "primitive": "sop-structured-multi-agent-team",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
+    },
+    {
+      "id": "paper:2402.16823",
+      "type": "paper",
+      "arxiv_id": "2402.16823",
+      "slug": "2402.16823-gptswarm-agents-as-graphs",
+      "title": "GPTSwarm: Language Agents as Optimizable Graphs",
+      "date": "2024-02-26",
+      "authors": [
+        "Mingchen Zhuge",
+        "Wenyi Wang",
+        "Louis Kirsch",
+        "Francesco Faccio",
+        "Dmitrii Khizbullin",
+        "Jürgen Schmidhuber"
+      ],
+      "tags": [
+        "multi-agent",
+        "agents-as-graphs",
+        "graph-optimization",
+        "edge-optimization",
+        "reinforce",
+        "prompt-optimization",
+        "self-improving-agent-lineage",
+        "swarm"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 9,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 8,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": true,
+      "seed_priority": 1,
+      "primitive": "optimizable-agent-graph",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
+    },
+    {
+      "id": "paper:2410.10934",
+      "type": "paper",
+      "arxiv_id": "2410.10934",
+      "slug": "2410.10934-agent-as-a-judge",
+      "title": "Agent-as-a-Judge: Evaluate Agents with Agents",
+      "date": "2024-10-14",
+      "authors": [
+        "Mingchen Zhuge",
+        "Changsheng Zhao",
+        "Dylan Ashley",
+        "Wenyi Wang",
+        "Dmitrii Khizbullin",
+        "Yunyang Xiong",
+        "Zechun Liu",
+        "Ernie Chang",
+        "Raghuraman Krishnamoorthi",
+        "Yuandong Tian",
+        "Yangyang Shi",
+        "Vikas Chandra",
+        "Jürgen Schmidhuber"
+      ],
+      "tags": [
+        "agent-as-a-judge",
+        "agent-evaluation",
+        "process-feedback",
+        "reward-signal",
+        "devai-benchmark",
+        "llm-as-a-judge",
+        "self-improving-agent-lineage"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 10,
+        "buildability": 8,
+        "evaluation_value": 10,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": true,
+      "seed_priority": 1,
+      "primitive": "agent-as-a-judge-trajectory-eval",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
+    },
+    {
+      "id": "paper:2507.21046",
+      "type": "paper",
+      "arxiv_id": "2507.21046",
+      "slug": "2507.21046-self-evolving-agents-survey",
+      "title": "A Survey of Self-Evolving Agents: On Path to Artificial Super Intelligence",
+      "date": "2025-07-28",
+      "authors": [
+        "Huan-ang Gao",
+        "Jiayi Geng",
+        "Wenyue Hua",
+        "Mengkang Hu",
+        "Xinzhe Juan",
+        "Cheng Qian",
+        "Qingyun Wu",
+        "Heng Ji",
+        "Mengdi Wang",
+        "et al. (27 authors)"
+      ],
+      "tags": [
+        "survey",
+        "self-evolving-agent",
+        "lifelong-learning",
+        "what-when-how-where",
+        "agent-architecture",
+        "continual-learning",
+        "self-improving-agent-lineage"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 10,
+        "buildability": 6,
+        "evaluation_value": 8,
+        "breadth_value": 10,
+        "evidence_quality": 7
+      },
+      "is_lineage_seed": true,
+      "seed_priority": 1,
+      "primitive": "self-evolving-agent-taxonomy",
+      "external": false,
+      "primitive_relevance": "direct_map_for_north_star"
+    },
+    {
+      "id": "paper:2508.07407",
+      "type": "paper",
+      "arxiv_id": "2508.07407",
+      "slug": "2508.07407-comprehensive-self-evolving-agents-survey",
+      "title": "A Comprehensive Survey of Self-Evolving AI Agents: A New Paradigm Bridging Foundation Models and Lifelong Agentic Systems",
+      "date": "2025-08-10",
+      "authors": [
+        "Jinyuan Fang",
+        "Yanwen Peng",
+        "Xi Zhang",
+        "Yingxu Wang",
+        "Xinhao Yi",
+        "Guibin Zhang",
+        "Yi Xu",
+        "Bin Wu",
+        "Siwei Liu",
+        "Zihao Li",
+        "Zhaochun Ren",
+        "Nikos Aletras",
+        "Xi Wang",
+        "Han Zhou",
+        "Zaiqiao Meng"
+      ],
+      "tags": [
+        "survey",
+        "self-evolving-agent",
+        "optimisation-loop",
+        "single-agent-optimisation",
+        "multi-agent-optimisation",
+        "lifelong-agentic-systems",
+        "self-improving-agent-lineage"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 6,
+        "evaluation_value": 7,
+        "breadth_value": 9,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": true,
+      "seed_priority": 1,
+      "primitive": "self-evolving-optimisation-loop",
+      "external": false,
+      "primitive_relevance": "direct_map_for_north_star"
+    },
+    {
+      "id": "paper:2605.28556",
+      "type": "paper",
+      "arxiv_id": "2605.28556",
+      "slug": "2605.28556-taste",
+      "title": "A Matter of TASTE: Improving Coverage and Difficulty of Agent Benchmarks",
+      "date": "2026-05-28",
+      "authors": [
+        "Tomer Keren",
+        "Nitay Calderon",
+        "Asaf Yehudai",
+        "Yotam Perlitz",
+        "Michal Shmueli-Scheuer",
+        "Roi Reichart"
+      ],
+      "tags": [
+        "agent-benchmark",
+        "evaluation",
+        "coverage",
+        "task-synthesis",
+        "tool-use",
+        "llm-as-judge",
+        "difficulty-evolution"
+      ],
+      "topic": "",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 7,
+        "autosci_reuse_value": 9,
+        "buildability": 6,
+        "evaluation_value": 9,
+        "breadth_value": 7,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "reverse-synthesis-coverage-aware-eval",
+      "external": false,
+      "primitive_relevance": "direct"
+    },
+    {
+      "id": "paper:2605.29707",
+      "type": "paper",
+      "arxiv_id": "2605.29707",
+      "slug": "2605.29707-domino",
+      "title": "Domino: Decoupling Causal Modeling from Autoregressive Drafting in Speculative Decoding",
+      "date": "2026-05-28",
+      "authors": [
+        "Jianuo Huang",
+        "Yaojie Zhang",
+        "Qituan Zhang",
+        "Hao Lin",
+        "Hanlin Xu",
+        "Linfeng Zhang"
+      ],
+      "tags": [
+        "speculative-decoding",
+        "inference-systems",
+        "serving",
+        "low-rank-correction",
+        "breadth"
+      ],
+      "topic": "",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 7,
+        "career_value": 6,
+        "autosci_reuse_value": 4,
+        "buildability": 4,
+        "evaluation_value": 7,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "decouple-expensive-parallel-cheap-serial",
+      "external": false,
+      "primitive_relevance": "indirect"
+    },
+    {
+      "id": "paper:2605.30611",
+      "type": "paper",
+      "arxiv_id": "2605.30611",
+      "slug": "2605.30611-crafter-multi-agent-harness",
+      "title": "Crafter: A Multi-Agent Harness for Editable Scientific Figure Generation from Diverse Inputs",
+      "date": "2026-05-28",
+      "authors": [
+        "Haozhe Zhao",
+        "Shuzheng Si",
+        "Zhenhailong Wang",
+        "Zheng Wang",
+        "Liang Chen",
+        "Xiaotong Li",
+        "Zhixiang Liang",
+        "Maosong Sun"
+      ],
+      "tags": [
+        "multi-agent-harness",
+        "agentic-refinement",
+        "structured-memory",
+        "directive-critic",
+        "VLM-as-judge",
+        "verify-then-refine",
+        "figure-generation"
+      ],
+      "topic": "",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 7,
+        "breadth_value": 7,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "engine-agnostic-refine-harness",
+      "external": false,
+      "primitive_relevance": "indirect_pattern_strong"
+    },
+    {
+      "id": "paper:2605.31264",
+      "type": "paper",
+      "arxiv_id": "2605.31264",
+      "slug": "2605.31264-colleague-skill",
+      "title": "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation",
+      "date": "2026-05-28",
+      "authors": [
+        "Tianyi Zhou",
+        "Dongrui Liu",
+        "Leitao Yuan",
+        "Jing Shao",
+        "Xia Hu"
+      ],
+      "tags": [
+        "trace-to-skill",
+        "knowledge-distillation",
+        "agent-skills",
+        "correction-lifecycle",
+        "versioned-artifact",
+        "person-grounded-agent"
+      ],
+      "topic": "",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 4,
+        "breadth_value": 7,
+        "evidence_quality": 5
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "trace-to-skill-distillation",
+      "external": false,
+      "primitive_relevance": "direct"
+    },
+    {
+      "id": "paper:2606.02060",
+      "type": "paper",
+      "arxiv_id": "2606.02060",
+      "slug": "2606.02060-drift-agent-error-localization",
+      "title": "Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in Agent Trajectories",
+      "date": "2026-06-01",
+      "authors": [
+        "Jiaming Wang",
+        "Ziteng Feng",
+        "Jiangtao Wu",
+        "Ruihao Li",
+        "Qianqian Xie",
+        "Yuxiang Ren",
+        "He Zhu",
+        "Xueming Han",
+        "Fanyu Meng",
+        "Junlan Feng",
+        "Jiaheng Liu"
+      ],
+      "tags": [
+        "agent-reliability",
+        "deep-research-agent",
+        "span-level-error-localization",
+        "claim-evidence-dependency",
+        "agent-as-a-judge",
+        "trajectory-analysis",
+        "process-level-evaluation",
+        "self-improving-agent",
+        "benchmark"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 9,
+        "breadth_value": 7,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "claim-centric-trajectory-audit",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
+    },
+    {
+      "id": "principle:sop-over-freeform",
+      "type": "principle",
+      "key": "sop-over-freeform",
+      "principle": "用人类成熟流程(SOP)约束 agent 协作,而非自由对话——中间结果可被角色检查,压住级联幻觉。",
+      "papers": [
+        "2308.00352"
+      ]
+    },
+    {
+      "id": "principle:structured-artifacts-over-chat",
+      "type": "principle",
+      "key": "structured-artifacts-over-chat",
+      "principle": "agent 间传 schema 化工件而非大白话:降歧义、可机器校验、可订阅。",
+      "papers": [
+        "2308.00352"
+      ]
+    },
+    {
+      "id": "principle:publish-subscribe-message-pool",
+      "type": "principle",
+      "key": "publish-subscribe-message-pool",
+      "principle": "公共消息池 + 按角色订阅 > 一对一传话:防信息过载、省 token。",
+      "papers": [
+        "2308.00352"
+      ]
+    },
+    {
+      "id": "principle:executable-feedback-loop",
+      "type": "principle",
+      "key": "executable-feedback-loop",
+      "principle": "能真跑就别只靠 LLM 互评——用运行结果纠错是质量最大来源(与 DRIFT/Crafter 的 refine 同族)。",
+      "papers": [
+        "2308.00352"
+      ]
+    },
+    {
+      "id": "principle:agents-as-optimizable-structure",
+      "type": "principle",
+      "key": "agents-as-optimizable-structure",
+      "principle": "把 agent 系统(提示 + 拓扑)当图上参数,能优化就别手调——结构本身可学。",
+      "papers": [
+        "2402.16823"
+      ]
+    },
+    {
+      "id": "principle:learn-topology-not-handwire",
+      "type": "principle",
+      "key": "learn-topology-not-handwire",
+      "principle": "'谁连谁'用 RL 学,且'连对边' > '连更多边';别堆 agent,学连接。",
+      "papers": [
+        "2402.16823"
+      ]
+    },
+    {
+      "id": "principle:continuous-relaxation-of-discrete",
+      "type": "principle",
+      "key": "continuous-relaxation-of-discrete",
+      "principle": "把离散结构选择松弛成概率分布,才能用梯度优化(REINFORCE)。",
+      "papers": [
+        "2402.16823"
+      ]
+    },
+    {
+      "id": "principle:prune-harmful-edges-for-robustness",
+      "type": "principle",
+      "key": "prune-harmful-edges-for-robustness",
+      "principle": "让优化器自动断开有害/对抗连边,比人工挑队友更稳。",
+      "papers": [
+        "2402.16823"
+      ]
+    },
+    {
+      "id": "principle:evaluate-trajectory-not-outcome",
+      "type": "principle",
+      "key": "evaluate-trajectory-not-outcome",
+      "principle": "评 agent 看完整'想+做'轨迹、逐需求判定,而非只看最终输出——复杂/有依赖任务才判得准。",
+      "papers": [
+        "2410.10934"
+      ]
+    },
+    {
+      "id": "principle:process-feedback-as-reward",
+      "type": "principle",
+      "key": "process-feedback-as-reward",
+      "principle": "过程级逐步反馈可直接当训练/优化 agent 的 reward——评估与自改进是一条闭环。",
+      "papers": [
+        "2410.10934"
+      ]
+    },
+    {
+      "id": "principle:modular-judge-over-monolith",
+      "type": "principle",
+      "key": "modular-judge-over-monolith",
+      "principle": "把裁判拆成 建图/定位/读/检索/判定 模块各司其职,优于一个大 prompt 硬判。",
+      "papers": [
+        "2410.10934"
+      ]
+    },
+    {
+      "id": "principle:ablate-drop-harmful-modules",
+      "type": "principle",
+      "key": "ablate-drop-harmful-modules",
+      "principle": "诚实消融:没用甚至有害的模块要敢砍(memory 放大错误传播)。",
+      "papers": [
+        "2410.10934"
+      ]
+    },
+    {
+      "id": "principle:cheapest-evolution-first",
+      "type": "principle",
+      "key": "cheapest-evolution-first",
+      "principle": "进化成本阶梯:改上下文/记忆 < 改提示 < 改工具/架构 < 改模型参数;能记忆解决就别微调。",
+      "papers": [
+        "2507.21046"
+      ]
+    },
+    {
+      "id": "principle:inter-over-intra-test-time",
+      "type": "principle",
+      "key": "inter-over-intra-test-time",
+      "principle": "真正复利来自跨任务积累(inter-test-time),不是单次任务内调一调。",
+      "papers": [
+        "2507.21046"
+      ]
+    },
+    {
+      "id": "principle:reward-from-feedback",
+      "type": "principle",
+      "key": "reward-from-feedback",
+      "principle": "外部/隐式反馈可当自进化 reward(连接 Agent-as-a-Judge:过程反馈即奖励)。",
+      "papers": [
+        "2507.21046"
+      ]
+    },
+    {
+      "id": "principle:evolve-needs-guardrails",
+      "type": "principle",
+      "key": "evolve-needs-guardrails",
+      "principle": "自改进的最大风险是价值漂移 + 灾难性遗忘,每次自更新都要过'学新不忘旧 + 安全'回归门。",
+      "papers": [
+        "2507.21046"
+      ]
+    },
+    {
+      "id": "principle:model-self-improvement-as-a-loop",
+      "type": "principle",
+      "key": "model-self-improvement-as-a-loop",
+      "principle": "把自改进画成 输入→agent→环境→优化器 的闭环;没有清晰的环境反馈源就没有优化。",
+      "papers": [
+        "2508.07407"
+      ]
+    },
+    {
+      "id": "principle:safety-first-three-laws",
+      "type": "principle",
+      "key": "safety-first-three-laws",
+      "principle": "自进化三定律带优先级:Endure(安全)> Excel(性能)> Evolve(进化);自动改动不得为刷分牺牲安全/稳定。",
+      "papers": [
+        "2508.07407"
+      ]
+    },
+    {
+      "id": "principle:choose-optimisation-target",
+      "type": "principle",
+      "key": "choose-optimisation-target",
+      "principle": "优化对象决定成本/收益:单 agent(提示/记忆便宜)< 多 agent 拓扑 < 领域微调;先选对象再选方法。",
+      "papers": [
+        "2508.07407"
+      ]
+    },
+    {
+      "id": "principle:stage-your-system-mop-to-mase",
+      "type": "principle",
+      "key": "stage-your-system-mop-to-mase",
+      "principle": "四阶段发展路线 MOP→MOA→MAO→MASE:从冻结模型→参数微调→多 agent 编排→闭环自进化;先给系统定阶段再补下一步。",
+      "papers": [
+        "2508.07407"
+      ]
+    },
+    {
+      "id": "principle:two-lenses-stacked",
+      "type": "principle",
+      "key": "two-lenses-stacked",
+      "principle": "优化器+安全视角(本篇)+ What/When/How/Where(2507.21046)叠用,设计自进化最不漏环。",
+      "papers": [
+        "2508.07407"
+      ]
+    },
+    {
+      "id": "principle:process-credit-over-outcome",
+      "type": "principle",
+      "key": "process-credit-over-outcome",
+      "principle": "评 agent 看过程级信用分配(哪一步开始坏)而非只看最终对错;36.9% 成功轨迹仍含错=终答正确≠过程可靠。",
+      "papers": [
+        "2606.02060"
+      ]
+    },
+    {
+      "id": "principle:exploration-vs-commitment",
+      "type": "principle",
+      "key": "exploration-vs-commitment",
+      "principle": "只对'被当成既定前提'的承诺追责,弱支持/试探本身不算错——护栏卡在'承诺'那一刻。",
+      "papers": [
+        "2606.02060"
+      ]
+    },
+    {
+      "id": "principle:internal-consistency-not-truth",
+      "type": "principle",
+      "key": "internal-consistency-not-truth",
+      "principle": "轨迹内证据一致 ≠ 真实为真;高影响 claim 需外部 verifier 重新取证。",
+      "papers": [
+        "2606.02060"
+      ]
+    },
+    {
+      "id": "principle:explainable-three-stage-audit",
+      "type": "principle",
+      "key": "explainable-three-stage-audit",
+      "principle": "把'判错'拆成 记录→查证→追责 三段,而非黑箱打分,才能解释'为什么判它错'。",
+      "papers": [
+        "2606.02060"
+      ]
+    },
+    {
+      "id": "paper:2410.10762",
+      "type": "paper",
+      "arxiv_id": "2410.10762",
+      "title": "AFlow: Automating Agentic Workflow Generation",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2601.19290",
+      "type": "paper",
+      "arxiv_id": "2601.19290",
+      "title": "MetaGen: Self-Evolving Roles and Topologies for Multi-Agent LLM Reasoning",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2507.22606",
+      "type": "paper",
+      "arxiv_id": "2507.22606",
+      "title": "MetaAgent: Auto-Constructing Multi-Agent Systems via FSM",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2402.18679",
+      "type": "paper",
+      "arxiv_id": "2402.18679",
+      "title": "Data Interpreter: An LLM Agent for Data Science",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2502.06855",
+      "type": "paper",
+      "arxiv_id": "2502.06855",
+      "title": "SPO: Self-Supervised Prompt Optimization",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2406.07155",
+      "type": "paper",
+      "arxiv_id": "2406.07155",
+      "title": "MacNet: Scaling LLM Multi-Agent Collaboration",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2603.02701",
+      "type": "paper",
+      "arxiv_id": "2603.02701",
+      "title": "Graph-GRPO: Stabilizing Multi-Agent Topology Learning via GRPO",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2502.02533",
+      "type": "paper",
+      "arxiv_id": "2502.02533",
+      "title": "MASS: Multi-Agent Design — Optimizing Prompts and Topologies",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2601.05111",
+      "type": "paper",
+      "arxiv_id": "2601.05111",
+      "title": "A Survey on Agent-as-a-Judge",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2508.02994",
+      "type": "paper",
+      "arxiv_id": "2508.02994",
+      "title": "When AIs Judge AIs: The Rise of Agent-as-a-Judge Evaluation",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2507.21028",
+      "type": "paper",
+      "arxiv_id": "2507.21028",
+      "title": "Multi-Agent-as-Judge (MAJ-EVAL)",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2505.22954",
+      "type": "paper",
+      "arxiv_id": "2505.22954",
+      "title": "Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2602.21230",
+      "type": "paper",
+      "arxiv_id": "2602.21230",
+      "title": "TRACE: Trajectory-Aware Comprehensive Evaluation for Deep Research Agents",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2505.08638",
+      "type": "paper",
+      "arxiv_id": "2505.08638",
+      "title": "TRAIL: Trace Reasoning and Agentic Issue Localization",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2602.02475",
+      "type": "paper",
+      "arxiv_id": "2602.02475",
+      "title": "AgentRx: Diagnosing AI Agent Failures from Execution Trajectories",
+      "external": true,
+      "tags": []
+    },
+    {
+      "id": "paper:2601.22984",
+      "type": "paper",
+      "arxiv_id": "2601.22984",
+      "title": "Why Your Deep Research Agent Fails? On Hallucination Evaluation",
+      "external": true,
+      "tags": []
+    }
+  ],
+  "edges": [
+    {
+      "source": "paper:2308.00352",
+      "target": "principle:sop-over-freeform",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "principle:structured-artifacts-over-chat",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "principle:publish-subscribe-message-pool",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "principle:executable-feedback-loop",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "principle:agents-as-optimizable-structure",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "principle:learn-topology-not-handwire",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "principle:continuous-relaxation-of-discrete",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "principle:prune-harmful-edges-for-robustness",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "principle:evaluate-trajectory-not-outcome",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "principle:process-feedback-as-reward",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "principle:modular-judge-over-monolith",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "principle:ablate-drop-harmful-modules",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2507.21046",
+      "target": "principle:cheapest-evolution-first",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2507.21046",
+      "target": "principle:inter-over-intra-test-time",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2507.21046",
+      "target": "principle:reward-from-feedback",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2507.21046",
+      "target": "principle:evolve-needs-guardrails",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2508.07407",
+      "target": "principle:model-self-improvement-as-a-loop",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2508.07407",
+      "target": "principle:safety-first-three-laws",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2508.07407",
+      "target": "principle:choose-optimisation-target",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2508.07407",
+      "target": "principle:stage-your-system-mop-to-mase",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2508.07407",
+      "target": "principle:two-lenses-stacked",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "principle:process-credit-over-outcome",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "principle:exploration-vs-commitment",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "principle:internal-consistency-not-truth",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "principle:explainable-three-stage-audit",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "paper:2402.16823",
+      "type": "shares_tag",
+      "weight": 2,
+      "tags": [
+        "multi-agent",
+        "self-improving-agent-lineage"
+      ]
+    },
+    {
+      "source": "paper:2507.21046",
+      "target": "paper:2508.07407",
+      "type": "shares_tag",
+      "weight": 2,
+      "tags": [
+        "self-evolving-agent",
+        "self-improving-agent-lineage"
+      ]
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "paper:2410.10762",
+      "type": "forward_lineage",
+      "subtype": "optimized_by",
+      "what_changed": "用 MCTS 在代码化工作流空间搜索，取代手写 SOP；+5.7% 平均，GPT-4o 级 HumanEval 仅 4.55% 推理成本",
+      "confidence": "中",
+      "evidence": "arxiv:2410.10762 (摘要已核实数字; 'ICLR Oral' 未核实已剔除)"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "paper:2601.19290",
+      "type": "forward_lineage",
+      "subtype": "optimized_by",
+      "what_changed": "推理时按每条 query 自进化角色与拓扑；全文 Table1 对 MetaGPT/GPTSwarm 基线大幅领先",
+      "confidence": "高",
+      "evidence": "arxiv:2601.19290 (全文 Table1/2 核实)"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "paper:2507.22606",
+      "type": "forward_lineage",
+      "subtype": "optimized_by",
+      "what_changed": "用有限状态机自动构建多智能体系统，替代人工设计的 SOP 工作流",
+      "confidence": "中",
+      "evidence": "arxiv:2507.22606 (与 MetaGPT 的对比需正文核实)"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "paper:2402.18679",
+      "type": "forward_lineage",
+      "subtype": "extended_by",
+      "what_changed": "MetaGPT 团队的领域落地：动态分层图规划，DABench 75.9%→94.9%",
+      "confidence": "高",
+      "evidence": "arxiv:2402.18679 (同团队; 摘要数字核实)"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "paper:2502.06855",
+      "type": "forward_lineage",
+      "subtype": "extended_by",
+      "what_changed": "MetaGPT 团队的提示自优化，1.1%–5.6% 的现有方法成本",
+      "confidence": "高",
+      "evidence": "arxiv:2502.06855 (共享作者; 摘要数字核实)"
+    },
+    {
+      "source": "paper:2308.00352",
+      "target": "paper:2406.07155",
+      "type": "forward_lineage",
+      "subtype": "extended_by",
+      "what_changed": "用 DAG 组织 1000+ 智能体协作，规模化 MetaGPT 式协作",
+      "confidence": "中",
+      "evidence": "arxiv:2406.07155 (对比关系摘要未点名)"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "paper:2601.19290",
+      "type": "forward_lineage",
+      "subtype": "optimized_by",
+      "what_changed": "GPTSwarm 离线优化静态图 → MetaGen 推理时重写角色+拓扑：HumanEval 95.1% vs 69.6%(+25.5pp)、MMLU 93.5% vs 60.1%(+33.4pp)、token −85.7%",
+      "confidence": "高",
+      "evidence": "arxiv:2601.19290 (全文 Table1/2 核实)"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "paper:2603.02701",
+      "type": "forward_lineage",
+      "subtype": "optimized_by",
+      "what_changed": "用 GRPO 替代 GPTSwarm 的 REINFORCE 优化通信图拓扑（具体数字需正文核实，已剔除）",
+      "confidence": "中",
+      "evidence": "arxiv:2603.02701 (定性核实; 数字未在摘要)"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "paper:2502.02533",
+      "type": "forward_lineage",
+      "subtype": "optimized_by",
+      "what_changed": "三阶段优化（块级 prompt + workflow 拓扑 + 全局 prompt），改进图/拓扑优化路线",
+      "confidence": "中",
+      "evidence": "arxiv:2502.02533"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "paper:2410.10762",
+      "type": "forward_lineage",
+      "subtype": "optimized_by",
+      "what_changed": "以代码化工作流 + MCTS 搜索替代图结构边优化",
+      "confidence": "中",
+      "evidence": "arxiv:2410.10762"
+    },
+    {
+      "source": "paper:2402.16823",
+      "target": "paper:2406.07155",
+      "type": "forward_lineage",
+      "subtype": "extended_by",
+      "what_changed": "DAG 组织 1000+ 智能体，延伸图式多智能体规模",
+      "confidence": "中",
+      "evidence": "arxiv:2406.07155"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "paper:2601.05111",
+      "type": "forward_lineage",
+      "subtype": "standardized_into",
+      "what_changed": "成为‘agentic 评测’子领域的首篇综述起点（LLM-as-a-Judge → Agent-as-a-Judge）",
+      "confidence": "高",
+      "evidence": "arxiv:2601.05111"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "paper:2508.02994",
+      "type": "forward_lineage",
+      "subtype": "standardized_into",
+      "what_changed": "围绕 Agent-as-a-Judge 组织的综述，内容完全一致",
+      "confidence": "高",
+      "evidence": "arxiv:2508.02994"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "paper:2507.21028",
+      "type": "forward_lineage",
+      "subtype": "extended_by",
+      "what_changed": "多智能体辩论评判，对齐多维人类评估，扩展（非替换）Agent-as-a-Judge",
+      "confidence": "中",
+      "evidence": "arxiv:2507.21028"
+    },
+    {
+      "source": "paper:2410.10934",
+      "target": "paper:2606.02060",
+      "type": "forward_lineage",
+      "subtype": "extended_by",
+      "what_changed": "claim-centric 审计：把‘用智能体审计轨迹’推进到 span/claim 级（本站已深读）",
+      "confidence": "中",
+      "evidence": "arxiv:2606.02060 (语料内节点)"
+    },
+    {
+      "source": "paper:2507.21046",
+      "target": "paper:2508.07407",
+      "type": "forward_lineage",
+      "subtype": "complements",
+      "what_changed": "姊妹综述：四组件优化回路视角，与 What/When/How/Where 互补（本站已深读）",
+      "confidence": "高",
+      "evidence": "arxiv:2508.07407 (语料内节点)"
+    },
+    {
+      "source": "paper:2507.21046",
+      "target": "paper:2505.22954",
+      "type": "forward_lineage",
+      "subtype": "cites_example",
+      "what_changed": "自修改代码 + 树状归档的开放式自进化，被综述列为代表方向",
+      "confidence": "中",
+      "evidence": "arxiv:2505.22954"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "paper:2602.21230",
+      "type": "forward_lineage",
+      "subtype": "related_to",
+      "what_changed": "并行赛道：层级轨迹效用函数评估深研 agent（WWW 2026）",
+      "confidence": "高",
+      "evidence": "arxiv:2602.21230 (WWW 2026 核实)"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "paper:2505.08638",
+      "type": "forward_lineage",
+      "subtype": "related_to",
+      "what_changed": "先行工作：148 条人工标注轨迹 + 错误分类体系",
+      "confidence": "高",
+      "evidence": "arxiv:2505.08638"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "paper:2602.02475",
+      "type": "forward_lineage",
+      "subtype": "related_to",
+      "what_changed": "并行工作：跨域（API/incident/web）失败步骤定位",
+      "confidence": "高",
+      "evidence": "arxiv:2602.02475"
+    },
+    {
+      "source": "paper:2606.02060",
+      "target": "paper:2601.22984",
+      "type": "forward_lineage",
+      "subtype": "related_to",
+      "what_changed": "先行工作：全研究轨迹幻觉评估 + PING 分类 + DeepHalluBench",
+      "confidence": "中",
+      "evidence": "arxiv:2601.22984"
+    }
+  ]
+}
