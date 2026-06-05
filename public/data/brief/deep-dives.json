@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T21:35:38.701Z",
+  "generatedAt": "2026-06-05T15:27:43.614Z",
   "entity": "deep-dive",
   "directory": "deep-dives",
-  "count": 45,
+  "count": 48,
   "items": [
     {
       "id": "deep-dive/9router-deep-dive",
@@ -811,6 +811,239 @@
         {
           "depth": 2,
           "text": "Memory card"
+        }
+      ]
+    },
+    {
+      "id": "deep-dive/agent-reach-deep-dive",
+      "type": "deep-dive",
+      "slug": "agent-reach-deep-dive",
+      "title": "Agent-Reach — 深度拆解",
+      "file": "deep-dives/agent-reach-deep-dive.md",
+      "directory": "deep-dives",
+      "meta": {
+        "content": "agent-reach",
+        "kind": "deep-dive",
+        "shape": "agent-build",
+        "project_type": "agent_framework",
+        "title": "Agent-Reach — 深度拆解",
+        "tier_template": {
+          "tier": 2,
+          "bucket": "真·新项目",
+          "tag": "[Tier 2｜真·新项目]",
+          "one_sentence_positioning": "给你的 AI Agent 一键装上互联网眼，零成本搜索和阅读十几家社交、视频、技术平台。",
+          "what_it_does": "Agent Reach 是一个脚手架工具，通过自动安装和配置上游开源 CLI 与 MCP 服务，让 Claude Code、Cursor、OpenClaw 等 Agent 能够调用命令行直接搜索和阅读 Twitter、Reddit、YouTube、B站、小红书等平台内容，无需付费 API。",
+          "metadata": {
+            "language": "Python",
+            "total_stars": "21361",
+            "stars_in_period": "127",
+            "author": "Panniantong"
+          },
+          "labels": [
+            "agent/推理/工具/数据/infra"
+          ],
+          "pain_point": "AI Agent 需要访问互联网信息，但每个平台都有自己的门槛：Twitter API 付费，Reddit 服务器 IP 被封，小红书必须登录，YouTube 字幕提取麻烦，B 站海外屏蔽，网页抓取干净内容复杂。开发者要逐一折腾配置，光是让 Agent 能读个推特就得花半天。",
+          "core_capabilities": [
+            "一键安装与配置：通过一句自然语言指令让 Agent 自动执行 pip install agent-reach 并运行 agent-reach install，自动安装 twitter-cli、rdt-cli、yt-dlp、gh CLI 等工具以及 mcporter MCP 服务，完成后 agent-reach doctor 可检查所有渠道状态。",
+            "多平台可插拔渠道：支持网页、YouTube、RSS、GitHub、Twitter、B站、Reddit、小红书、抖音、LinkedIn、微信、微博、V2EX、雪球、小宇宙播客等 16 个平台（README 列表实际列出 16 行），每个渠道由一个 Python 文件（如 channels/twitter.py）负责检测上游工具可用性，可替换底层实现而不影响其他渠道。",
+            "安全与诊断内置：本地凭据加密存储于 ~/.agent-reach/config.yaml（权限 600），支持 --safe 模式和 --dry-run 预览，提供 agent-reach doctor 健康检查，并建议使用专用小号降低封号风险。"
+          ],
+          "how_to_run": {
+            "install_command": "pip install agent-reach",
+            "minimal_example": "安装后，直接告诉 AI Agent ：「帮我看看这条推文」→ Agent 会执行 twitter tweet URL；或「这个视频讲了什么」→ Agent 调用 yt-dlp --dump-json URL 提取字幕。"
+          },
+          "maturity_signals": {
+            "star_velocity": "127 stars/day (daily trending)",
+            "recent_commit": "2026-05-18 (last push)",
+            "releases": "v1.4.0 (2026-03-31)",
+            "issue_activity": "47 open issues"
+          },
+          "comparison": "对比 Browserbase：Browserbase 提供无头浏览器自动化，侧重于渲染和操作网页，Agent Reach 则通过命令行工具（非浏览器自动化）覆盖社交平台，且完全免费、零 API 费用。; 对比 Firecrawl：Firecrawl 专注于网站内容抓取和知识库构建，Agent Reach 集成了多个现成工具，覆盖视频字幕、RSS、搜索等更多场景，强调开箱即用和可替换性。",
+          "trajectory_note": "appears_in_tabs: daily，短期爆发型项目，2026年2月创建，4个月内达到 21k stars，势头极猛，但长期维护取决于作者个人投入。",
+          "manual_confirmation": false,
+          "how_it_works_with_analogy": "",
+          "essential_design_difference": "",
+          "practitioner_meaning": "",
+          "cross_links": [],
+          "prose_body": ""
+        },
+        "reasoning_trace": {
+          "paper_type_decision": "project_type=agent_framework，因为其核心是为 AI Agent 提供可插拔的互联网工具集成与配置，虽非传统框架，但定义了 Agent 的工具接口和技能注册层。",
+          "central_contribution": "提出“Agent 工具脚手架”模式：通过 SKILL.md 映射和健康检查接口，将分散的上游 CLI 工具零成本集成给 AI Agent，实现开箱即用的全网感知。",
+          "inspected": [
+            "README",
+            "topic tags",
+            "directory structure (channels/, config/, docs/)",
+            "pyproject.toml",
+            "contributing docs"
+          ],
+          "top_claims": [
+            "完全免费，零 API 费用（README 自述）",
+            "支持 16 个平台（README 表格实际列出16行）",
+            "可插拔架构，不满意换掉对应文件（README 设计理念）",
+            "安装只需一句话，Agent 自驱动（README 快速上手）"
+          ],
+          "evidence_needed": [
+            "渠道检测器的单元测试覆盖",
+            "上游工具版本锁定与兼容性矩阵",
+            "长期维护计划和社区贡献活跃度"
+          ],
+          "main_threats": [
+            "上游工具停更或平台反爬升级导致大量渠道失效",
+            "个人维护项目，缺乏 bus-factor 保障",
+            "热度可能昙花一现，星星增长不可持续"
+          ],
+          "transfer_decision": "复用其渠道检测 + SKILL.md 映射模式，但需自行实现更健壮的版本管理和上游监控，避免完全依赖作者个人维护。"
+        },
+        "project_verdict": {
+          "verdict": "deep_dive",
+          "relevance_to_ai_engineer": 5,
+          "engineering_depth": 4,
+          "reuse_value": 5,
+          "maturity": 4,
+          "main_risk": "上游工具链条脆弱，维护依赖个人"
+        },
+        "next_actions": [
+          "star",
+          "clone-and-run",
+          "extract-pattern(channel-health-check + SKILL.md registration)"
+        ],
+        "unknowns": [
+          "各渠道 check() 方法的具体实现细节和异常处理逻辑",
+          "SKILL.md 的完整内容和映射规则",
+          "如何确保上游工具版本与 Agent Reach 的兼容性（无自动化测试覆盖）",
+          "自定义渠道注册的 formal 流程（README 只说“让你的 Agent clone 下来改”）",
+          "大规模部署时凭据管理和权限隔离的实践"
+        ],
+        "builder_reuse": {
+          "pattern": "Agent 工具脚手架模式（Agent Tool Scaffolding）",
+          "copy": "1) 渠道健康检查接口（check() 返回 {status, tool}）；2) SKILL.md 注册机制，让 Agent 通过自然语言映射到具体命令行；3) 本地凭据隔离存储（~/.agent-reach/config.yaml + 600 权限）；4) 可插拔的 channels/ 目录结构。",
+          "skip": "不要自行实现平台抓取/解析逻辑，应优先封装成熟的开源工具；不要追求统一 API，保持松散耦合，让每个工具保持原生命令行接口。",
+          "why_it_matters": "为构建 Agent 的“互联网感官”提供了一套低摩擦、可维护的集成范式，使开发者能快速组装而非重新发明轮子，特别适合需要覆盖多平台但预算有限的场景。"
+        },
+        "dependency_platform_risk": {
+          "dependency": "上游开源工具（twitter-cli、rdt-cli、yt-dlp、Jina Reader、Exa、mcporter、xhs-cli 等）及平台 Cookie 认证机制",
+          "what_if_change": "任何上游工具停更或接口变更，渠道检测将失败，相应平台功能不可用；如果 Twitter、Reddit 等平台加固反爬或要求新认证方式，现有 Cookie 方式可能失效。",
+          "exposure": "high",
+          "mitigation_or_unknown": "README 声称作者会持续追踪更新，渠道可替换（如 Twitter 可换官方 API），但未提供自动守护或紧急切换机制。"
+        },
+        "claim_ledger": [
+          {
+            "claim": "完全免费，零 API 费用",
+            "plain_english": "所有工具开源，不需要付费 API Keys，唯一可能花钱的是服务器代理（约 $1/月）",
+            "source": "README 费用说明和 Is this free? FAQ",
+            "attribution": "自称",
+            "evidence_strength": "high",
+            "supports": "项目集成的所有后端确实都是开源且无需付费 API，如 twitter-cli、rdt-cli、Jina Reader",
+            "does_not_support": "仅限工具本身，若平台自身限制访问（如 IP 封锁），可能需要额外代理费用",
+            "threat": "若上游工具转向付费模式，则此宣称失效"
+          },
+          {
+            "claim": "支持 16 个平台",
+            "plain_english": "表格中列出了网页、YouTube、RSS、GitHub、Twitter、B站、Reddit、小红书、抖音、LinkedIn、微信、微博、V2EX、雪球、小宇宙播客，还有全网搜索，共16行",
+            "source": "README 支持的平台表格, 共16个条目",
+            "attribution": "自称",
+            "evidence_strength": "high",
+            "supports": "表格清晰，每个平台都有启用条件说明",
+            "does_not_support": "部分平台需要额外配置（如Cookie），并非全部装好即用",
+            "threat": "若上游工具失效，部分平台可能实际不可用"
+          },
+          {
+            "claim": "可插拔架构，不满意换掉就行",
+            "plain_english": "每个渠道对应一个 Python 文件，只负责检测上游工具，可以替换底层实现",
+            "source": "README 设计理念 - 每个渠道都是可插拔的",
+            "attribution": "自称",
+            "evidence_strength": "medium",
+            "supports": "channels/ 目录结构独立，check() 模式简单",
+            "does_not_support": "没有提供扩展指南或插件注册机制，替换需要修改源码",
+            "threat": "普通用户可能不知如何替换，实际可替换性不高"
+          }
+        ],
+        "render_warnings": [
+          "faithfulness.unknown_assertion line 11 term \"Agent Reach\": Agent Reach 是一个脚手架工具，通过自动安装和配置上游开源 CLI 与 MCP 服务，让 Claude Code、Cursor、OpenClaw 等 Agent 能够调用命令行直接搜索和阅读 Twitter、Reddit、YouTube、B站、小红书等平台内容，无...",
+          "faithfulness.unknown_assertion line 56 term \"Agent Reach\": 对比 Browserbase：Browserbase 提供无头浏览器自动化，侧重于渲染和操作网页，Agent Reach 则通过命令行工具（非浏览器自动化）覆盖社交平台，且完全免费、零 API 费用。; 对比 Firecrawl：Firecrawl 专注于网站内容抓取和知识..."
+        ],
+        "artifact_audit": {
+          "official_repo": "https://github.com/Panniantong/Agent-Reach",
+          "official_data": "not_found",
+          "evaluation_code": "artifactAudit.has_tests=true",
+          "prompts_or_rubrics": "not_found",
+          "benchmark_tasks": "not_found",
+          "model_checkpoints": "not_found",
+          "appendix": "not_found",
+          "license": "MIT",
+          "minimal_demo": "artifactAudit.has_examples/has_docs=true",
+          "closed_dependencies": [],
+          "third_party_dependencies": [],
+          "broken_links": [],
+          "hardware": "未在 README/artifact 说明",
+          "reproducibility_status": "partial"
+        }
+      },
+      "body": "\n## [Tier 2｜真·新项目]（来源：README/artifactAudit）\n\n## 一句话定位\n\n给你的 AI Agent 一键装上互联网眼，零成本搜索和阅读十几家社交、视频、技术平台。\n\n（来源：README/artifactAudit）\n\n## 干什么\n\nAgent Reach 是一个脚手架工具，通过自动安装和配置上游开源 CLI 与 MCP 服务，让 Claude Code、Cursor、OpenClaw 等 Agent 能够调用命令行直接搜索和阅读 Twitter、Reddit、YouTube、B站、小红书等平台内容，无需付费 API。\n\n（来源：README/artifactAudit）\n\n## 元数据\n\n| 项 | 值 |\n| --- | --- |\n| language | Python |\n| total_stars | 21361 |\n| stars_in_period | 127 |\n| author | Panniantong |\n\n## 标签\n\n- agent/推理/工具/数据/infra（来源：数据不足）\n\n## 解决什么痛点\n\nAI Agent 需要访问互联网信息，但每个平台都有自己的门槛：Twitter API 付费，Reddit 服务器 IP 被封，小红书必须登录，YouTube 字幕提取麻烦，B 站海外屏蔽，网页抓取干净内容复杂。开发者要逐一折腾配置，光是让 Agent 能读个推特就得花半天。\n\n（来源：README/artifactAudit）\n\n## 核心能力\n\n- 一键安装与配置：通过一句自然语言指令让 Agent 自动执行 pip install agent-reach 并运行 agent-reach install，自动安装 twitter-cli、rdt-cli、yt-dlp、gh CLI 等工具以及 mcporter MCP 服务，完成后 agent-reach doctor 可检查所有渠道状态。（来源：数据不足）\n- 多平台可插拔渠道：支持网页、YouTube、RSS、GitHub、Twitter、B站、Reddit、小红书、抖音、LinkedIn、微信、微博、V2EX、雪球、小宇宙播客等 16 个平台（README 列表实际列出 16 行），每个渠道由一个 Python 文件（如 channels/twitter.py）负责检测上游工具可用性，可替换底层实现而不影响其他渠道。（来源：数据不足）\n- 安全与诊断内置：本地凭据加密存储于 ~/.agent-reach/config.yaml（权限 600），支持 --safe 模式和 --dry-run 预览，提供 agent-reach doctor 健康检查，并建议使用专用小号降低封号风险。（来源：数据不足）\n\n## 怎么跑起来\n\n- 安装命令：pip install agent-reach（来源：README/artifactAudit）\n- 最小可运行示例：安装后，直接告诉 AI Agent ：「帮我看看这条推文」→ Agent 会执行 twitter tweet URL；或「这个视频讲了什么」→ Agent 调用 yt-dlp --dump-json URL 提取字幕。（来源：README/artifactAudit）\n\n## 成熟度信号\n\n| 项 | 值 |\n| --- | --- |\n| star_velocity | 127 stars/day (daily trending) |\n| recent_commit | 2026-05-18 (last push) |\n| releases | v1.4.0 (2026-03-31) |\n| issue_activity | 47 open issues |\n\n## 和同类的区别\n\n对比 Browserbase：Browserbase 提供无头浏览器自动化，侧重于渲染和操作网页，Agent Reach 则通过命令行工具（非浏览器自动化）覆盖社交平台，且完全免费、零 API 费用。; 对比 Firecrawl：Firecrawl 专注于网站内容抓取和知识库构建，Agent Reach 集成了多个现成工具，覆盖视频字幕、RSS、搜索等更多场景，强调开箱即用和可替换性。\n\n（来源：README/artifactAudit）\n\n## 轨迹备注\n\nappears_in_tabs: daily，短期爆发型项目，2026年2月创建，4个月内达到 21k stars，势头极猛，但长期维护取决于作者个人投入。\n\n（来源：README/artifactAudit）\n\n可复用范式落库:[[concepts/tool-scaffolding]]、[[concepts/channel-health-check]]。另见 [[content/agent-reach]]、[[claims/agent-reach-main-claim]]。\n",
+      "excerpt": "给你的 AI Agent 一键装上互联网眼，零成本搜索和阅读十几家社交、视频、技术平台。",
+      "links": [
+        {
+          "target": "concepts/tool-scaffolding",
+          "raw": "[[concepts/tool-scaffolding]]"
+        },
+        {
+          "target": "concepts/channel-health-check",
+          "raw": "[[concepts/channel-health-check]]"
+        },
+        {
+          "target": "content/agent-reach",
+          "raw": "[[content/agent-reach]]"
+        },
+        {
+          "target": "claims/agent-reach-main-claim",
+          "raw": "[[claims/agent-reach-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "[Tier 2｜真·新项目]（来源：README/artifactAudit）"
+        },
+        {
+          "depth": 2,
+          "text": "一句话定位"
+        },
+        {
+          "depth": 2,
+          "text": "干什么"
+        },
+        {
+          "depth": 2,
+          "text": "元数据"
+        },
+        {
+          "depth": 2,
+          "text": "标签"
+        },
+        {
+          "depth": 2,
+          "text": "解决什么痛点"
+        },
+        {
+          "depth": 2,
+          "text": "核心能力"
+        },
+        {
+          "depth": 2,
+          "text": "怎么跑起来"
+        },
+        {
+          "depth": 2,
+          "text": "成熟度信号"
+        },
+        {
+          "depth": 2,
+          "text": "和同类的区别"
+        },
+        {
+          "depth": 2,
+          "text": "轨迹备注"
         }
       ]
     },
@@ -5273,6 +5506,254 @@
       ]
     },
     {
+      "id": "deep-dive/mempalace-deep-dive",
+      "type": "deep-dive",
+      "slug": "mempalace-deep-dive",
+      "title": "mempalace — 深度拆解",
+      "file": "deep-dives/mempalace-deep-dive.md",
+      "directory": "deep-dives",
+      "meta": {
+        "content": "mempalace",
+        "kind": "deep-dive",
+        "shape": "agent-build",
+        "project_type": "agent_framework",
+        "title": "mempalace — 深度拆解",
+        "tier_template": {
+          "tier": 2,
+          "bucket": "真·新项目",
+          "tag": "[Tier 2｜真·新项目]",
+          "one_sentence_positioning": "本地优先的 AI 记忆系统，逐字存储对话历史，可插拔后端，无 API 调用实现高召回检索。",
+          "what_it_does": "MemPalace 将对话历史作为逐字文本存储，通过语义搜索检索，提供结构化索引（wings/rooms/drawers）和可插拔后端（默认 ChromaDB），强调本地运行和零 API 调用。",
+          "metadata": {
+            "language": "Python",
+            "total_stars": "53701",
+            "stars_in_period": "228",
+            "author": "MemPalace"
+          },
+          "labels": [
+            "memory",
+            "agent",
+            "infra"
+          ],
+          "pain_point": "数据不足",
+          "core_capabilities": [
+            "逐字储存与语义检索：不摘要、不提取、不释义，完整保留原始对话，通过嵌入模型（embeddinggemma-300m 或 all-MiniLM-L6-v2）进行语义搜索（来源：README What it is）",
+            "结构化索引与范围搜索：将人和项目映射为 wings，主题映射为 rooms，原始内容映射为 drawers，支持按结构范围搜索而非扁平语料库检索（来源：README What it is）",
+            "可插拔后端与本地嵌入：默认使用 ChromaDB 作为向量存储，定义抽象接口（`mempalace/backends/base.py`），可替换其他后端，所有数据保存在本地（来源：README What it is，Requirements）"
+          ],
+          "how_to_run": {
+            "install_command": "uv tool install mempalace",
+            "minimal_example": "mempalace init ~/projects/myapp mempalace mine ~/projects/myapp mempalace mine ~/.claude/projects/ --mode convos mempalace search \"why did we switch to GraphQL\" mempalace wake-up"
+          },
+          "maturity_signals": {
+            "star_velocity": "今日获得 228 星（来源：artifactAudit）",
+            "recent_commit": "最近推送于 2026-06-05（来源：artifactAudit pushed_at）",
+            "releases": "最新发布 v3.3.5，发布于 2026-05-10（来源：artifactAudit latest_release）",
+            "issue_activity": "开放 issues 600 个（来源：artifactAudit open_issues_count），活跃讨论"
+          },
+          "comparison": "数据不足",
+          "trajectory_note": "出现在 GitHub Trending daily 列表，在 2026-06-05 获得 228 星（来源：artifactAudit stars_in_period）",
+          "manual_confirmation": false,
+          "how_it_works_with_analogy": "",
+          "essential_design_difference": "",
+          "practitioner_meaning": "",
+          "cross_links": [],
+          "prose_body": ""
+        },
+        "reasoning_trace": {
+          "paper_type_decision": "project_type=agent_framework，因核心是 AI 记忆系统且深度集成 agent 工具链（MCP、钩子）。",
+          "central_contribution": "提出 wings/rooms/drawers 三级索引与纯语义检索流水线，在本地零 API 条件下实现 LongMemEval 高召回。",
+          "inspected": [
+            "README.md (全部章节)",
+            "artifactAudit (stars, forks, topics, dirs, key files, release)",
+            "顶部目录结构 (mempalace, benchmarks, tests, docs, etc.)",
+            "package_files: pyproject.toml 存在"
+          ],
+          "top_claims": [
+            "README 自称“The best-benchmarked open-source AI memory system”",
+            "README 声称 Raw semantic search R@5 96.6% on LongMemEval (500 questions)",
+            "README 声称 Hybrid v4 held-out R@5 98.4% (450 questions)",
+            "README 声称 Hybrid v4 + LLM rerank ≥99% on full 500",
+            "README 声称 29 MCP tools covering reads/writes, knowledge-graph, cross-wing navigation, drawer management, agent diaries"
+          ],
+          "evidence_needed": [
+            "benchmarks/BENCHMARKS.md 和 results 文件可复现声称分数",
+            "mempalace/backends/base.py 确认可插拔接口存在",
+            "mempalace 目录结构确认 CLI 和 MCP 实现",
+            "tests 目录验证测试覆盖"
+          ],
+          "main_threats": [
+            "benchmark 结果可能只在特定环境和参数下成立",
+            "MCP 工具完整性和文档质量未知",
+            "wings/rooms/drawers 的创建、管理逻辑未在 README 提及，可能复杂难用"
+          ],
+          "transfer_decision": "可复用结构化索引思维和多级检索架构，但需注意后端和钩子适配成本。"
+        },
+        "project_verdict": {
+          "verdict": "deep_dive",
+          "relevance_to_ai_engineer": 5,
+          "engineering_depth": 5,
+          "reuse_value": 5,
+          "maturity": 5,
+          "main_risk": "后端依赖 ChromaDB 且无官方备选实现，benchmark 声称结果可能受配置影响。"
+        },
+        "next_actions": [
+          "clone-and-run",
+          "extract-pattern(结构化记忆索引)",
+          "extract-pattern(多级检索流水线)",
+          "read-docs"
+        ],
+        "unknowns": [
+          "wings/rooms/drawers 的具体数据结构和存储格式未在 README 公开",
+          "如何进行 wings/rooms 的自动发现或手动创建，未详述",
+          "MCP 工具的完整清单未列出（仅总数 29）",
+          "多用户支持能力不明确",
+          "大规模（百万级抽屉）下的性能表现未提及",
+          "与 Gemini CLI、本地模型的具体集成步骤仅提供外部链接，未在 README 详述"
+        ],
+        "builder_reuse": {
+          "pattern": "分层命名空间记忆系统 + 多级检索流水线",
+          "copy": "复制 wings/rooms/drawers 三层逻辑索引模型，将实体（人/项目）、主题和内容分开管理；复制纯语义搜索 + 混合提升 + LLM 重排序的多级检索架构；复制可插拔后端接口设计（`mempalace/backends/base.py`）。",
+          "skip": "具体的 ChromaDB 依赖可替换；自动保存钩子专属 Claude Code，可改造为通用 session hook；知识图谱的时间窗口机制可能需根据场景调整。",
+          "why_it_matters": "为构建可扩展、隐私友好的 AI 记忆系统提供了现成的架构参考，尤其适合需要本地部署、精确召回的 agent 型应用。"
+        },
+        "dependency_platform_risk": {
+          "dependency": "ChromaDB 作为默认向量后端",
+          "what_if_change": "如果 ChromaDB 弃用或大幅修改 API，需要重新实现 `mempalace/backends/base.py` 接口，但已留出抽象层，影响可控；若社区不提供新后端，用户需自行开发。",
+          "exposure": "medium",
+          "mitigation_or_unknown": "接口抽象层降低了迁移成本；README 未提供其它后端的官方实现，但社区可能贡献。"
+        },
+        "claim_ledger": [
+          {
+            "claim": "The best-benchmarked open-source AI memory system",
+            "plain_english": "在开源 AI 记忆系统中，基准测试得分最佳。",
+            "source": "README description 和 Benchmark 章节",
+            "attribution": "自称",
+            "evidence_strength": "medium",
+            "supports": "LongMemEval、LoCoMo、ConvoMem、MemBench 多项分数展示",
+            "does_not_support": "未提供与其它系统的直接对比或第三方独立评测",
+            "threat": "自评最佳缺乏外部验证，可能夸大。"
+          },
+          {
+            "claim": "Raw semantic search achieves 96.6% R@5 on LongMemEval with zero API calls",
+            "plain_english": "纯语义搜索在 LongMemEval 数据集上达到 96.6% 的前五召回率，完全本地运行，无需 API。",
+            "source": "README Benchmark 表格（Raw mode）",
+            "attribution": "自称",
+            "evidence_strength": "medium",
+            "supports": "已提供复现命令和结果文件路径",
+            "does_not_support": "未说明使用何种嵌入模型、具体参数和数据集分割细节",
+            "threat": "结果可能不可复现或对数据集有适配倾向。"
+          },
+          {
+            "claim": "Pluggable backend via abstract interface in mempalace/backends/base.py",
+            "plain_english": "通过 mempalace/backends/base.py 定义的抽象接口实现可插拔后端，默认使用 ChromaDB。",
+            "source": "README What it is",
+            "attribution": "自称",
+            "evidence_strength": "high",
+            "supports": "明确提到了该文件路径和可替换能力",
+            "does_not_support": "未展示如何植入新后端的示例",
+            "threat": "若接口设计不完善，实际替换可能困难。"
+          },
+          {
+            "claim": "29 MCP tools cover palace reads/writes, knowledge-graph operations, cross-wing navigation, drawer management, and agent diaries",
+            "plain_english": "提供 29 个 MCP 工具，覆盖记忆读写、知识图谱、跨翼导航、抽屉管理和代理日记。",
+            "source": "README MCP server 章节",
+            "attribution": "自称",
+            "evidence_strength": "low",
+            "supports": "只声明了数量和覆盖范围",
+            "does_not_support": "未列出工具名称或功能详情，无法验证。",
+            "threat": "工具可能不完整或文档缺失。"
+          }
+        ],
+        "render_warnings": [
+          "faithfulness.unknown_assertion line 11 term \"wings/rooms/drawers\": MemPalace 将对话历史作为逐字文本存储，通过语义搜索检索，提供结构化索引（wings/rooms/drawers）和可插拔后端（默认 ChromaDB），强调本地运行和零 API 调用。",
+          "faithfulness.unknown_assertion line 39 term \"drawers\": - 结构化索引与范围搜索：将人和项目映射为 wings，主题映射为 rooms，原始内容映射为 drawers，支持按结构范围搜索而非扁平语料库检索（来源：README What it is）"
+        ],
+        "artifact_audit": {
+          "official_repo": "https://github.com/MemPalace/mempalace",
+          "official_data": "not_found",
+          "evaluation_code": "artifactAudit.has_tests=true",
+          "prompts_or_rubrics": "not_found",
+          "benchmark_tasks": "not_found",
+          "model_checkpoints": "not_found",
+          "appendix": "not_found",
+          "license": "MIT",
+          "minimal_demo": "artifactAudit.has_examples/has_docs=true",
+          "closed_dependencies": [],
+          "third_party_dependencies": [],
+          "broken_links": [],
+          "hardware": "未在 README/artifact 说明",
+          "reproducibility_status": "partial"
+        }
+      },
+      "body": "\n## [Tier 2｜真·新项目]（来源：README/artifactAudit）\n\n## 一句话定位\n\n本地优先的 AI 记忆系统，逐字存储对话历史，可插拔后端，无 API 调用实现高召回检索。\n\n（来源：README/artifactAudit）\n\n## 干什么\n\nMemPalace 将对话历史作为逐字文本存储，通过语义搜索检索，提供结构化索引（wings/rooms/drawers）和可插拔后端（默认 ChromaDB），强调本地运行和零 API 调用。\n\n（来源：README/artifactAudit）\n\n## 元数据\n\n| 项 | 值 |\n| --- | --- |\n| language | Python |\n| total_stars | 53701 |\n| stars_in_period | 228 |\n| author | MemPalace |\n\n## 标签\n\n- memory（来源：数据不足）\n- agent（来源：数据不足）\n- infra（来源：数据不足）\n\n## 解决什么痛点\n\n数据不足\n\n（来源：README/artifactAudit）\n\n## 核心能力\n\n- 逐字储存与语义检索：不摘要、不提取、不释义，完整保留原始对话，通过嵌入模型（embeddinggemma-300m 或 all-MiniLM-L6-v2）进行语义搜索（来源：README What it is）\n- 结构化索引与范围搜索：将人和项目映射为 wings，主题映射为 rooms，原始内容映射为 drawers，支持按结构范围搜索而非扁平语料库检索（来源：README What it is）\n- 可插拔后端与本地嵌入：默认使用 ChromaDB 作为向量存储，定义抽象接口（`mempalace/backends/base.py`），可替换其他后端，所有数据保存在本地（来源：README What it is，Requirements）\n\n## 怎么跑起来\n\n- 安装命令：uv tool install mempalace（来源：README/artifactAudit）\n- 最小可运行示例：mempalace init ~/projects/myapp mempalace mine ~/projects/myapp mempalace mine ~/.claude/projects/ --mode convos mempalace search \"why did we switch to GraphQL\" mempalace wake-up（来源：README/artifactAudit）\n\n## 成熟度信号\n\n| 项 | 值 |\n| --- | --- |\n| star_velocity | 今日获得 228 星（来源：artifactAudit） |\n| recent_commit | 最近推送于 2026-06-05（来源：artifactAudit pushed_at） |\n| releases | 最新发布 v3.3.5，发布于 2026-05-10（来源：artifactAudit latest_release） |\n| issue_activity | 开放 issues 600 个（来源：artifactAudit open_issues_count），活跃讨论 |\n\n## 和同类的区别\n\n数据不足\n\n（来源：README/artifactAudit）\n\n## 轨迹备注\n\n出现在 GitHub Trending daily 列表，在 2026-06-05 获得 228 星（来源：artifactAudit stars_in_period）\n\n可复用范式落库:[[concepts/verbatim-memory]]、[[concepts/structured-memory-index]]。另见 [[content/mempalace]]、[[claims/mempalace-main-claim]]。\n",
+      "excerpt": "本地优先的 AI 记忆系统，逐字存储对话历史，可插拔后端，无 API 调用实现高召回检索。",
+      "links": [
+        {
+          "target": "concepts/verbatim-memory",
+          "raw": "[[concepts/verbatim-memory]]"
+        },
+        {
+          "target": "concepts/structured-memory-index",
+          "raw": "[[concepts/structured-memory-index]]"
+        },
+        {
+          "target": "content/mempalace",
+          "raw": "[[content/mempalace]]"
+        },
+        {
+          "target": "claims/mempalace-main-claim",
+          "raw": "[[claims/mempalace-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "[Tier 2｜真·新项目]（来源：README/artifactAudit）"
+        },
+        {
+          "depth": 2,
+          "text": "一句话定位"
+        },
+        {
+          "depth": 2,
+          "text": "干什么"
+        },
+        {
+          "depth": 2,
+          "text": "元数据"
+        },
+        {
+          "depth": 2,
+          "text": "标签"
+        },
+        {
+          "depth": 2,
+          "text": "解决什么痛点"
+        },
+        {
+          "depth": 2,
+          "text": "核心能力"
+        },
+        {
+          "depth": 2,
+          "text": "怎么跑起来"
+        },
+        {
+          "depth": 2,
+          "text": "成熟度信号"
+        },
+        {
+          "depth": 2,
+          "text": "和同类的区别"
+        },
+        {
+          "depth": 2,
+          "text": "轨迹备注"
+        }
+      ]
+    },
+    {
       "id": "deep-dive/microsoft-agent-governance-toolkit-deep-dive",
       "type": "deep-dive",
       "slug": "microsoft-agent-governance-toolkit-deep-dive",
@@ -8743,6 +9224,248 @@
         {
           "depth": 2,
           "text": "Memory card"
+        }
+      ]
+    },
+    {
+      "id": "deep-dive/understand-anything-deep-dive",
+      "type": "deep-dive",
+      "slug": "understand-anything-deep-dive",
+      "title": "Understand-Anything — 深度拆解",
+      "file": "deep-dives/understand-anything-deep-dive.md",
+      "directory": "deep-dives",
+      "meta": {
+        "content": "understand-anything",
+        "kind": "deep-dive",
+        "shape": "agent-build",
+        "project_type": "agent_framework",
+        "title": "Understand-Anything — 深度拆解",
+        "tier_template": {
+          "tier": 2,
+          "bucket": "真·新项目",
+          "tag": "[Tier 2｜真·新项目]",
+          "one_sentence_positioning": "一个可接入 Claude Code、Copilot 等 AI 编程助理的代码库知识图谱生成器，让你可视化浏览、搜索和理解任何代码库的结构与业务逻辑。",
+          "what_it_does": "Understand-Anything 把一个代码库（或知识库）自动分析、抽取出所有文件、函数、类和依赖关系，构建成交互式知识图谱并提供可视化仪表盘，支持探索、搜索、提问及差异影响分析。",
+          "metadata": {
+            "language": "TypeScript",
+            "total_stars": "52691",
+            "stars_in_period": "40734",
+            "author": "Lum1104"
+          },
+          "labels": [
+            "agent",
+            "infra"
+          ],
+          "pain_point": "加入新团队面对 20 万行代码，不知道从哪读起；传统依赖静态分析工具或 grep 只能给出碎片化信息，而直接让 LLM 阅读代码上下文窗口不够且缺乏结构；开发者需要一种既能看到宏观架构又能下钻细节、且能随代码库持续更新的知识“地图”。",
+          "core_capabilities": [
+            "通过 Tree-sitter 确定性解析与 LLM 语义分析混合管道，生成包含函数、类、依赖等节点的可交互知识图谱（来源：README Under the Hood）",
+            "支持多智能体流水线（项目扫描、文件分析、架构层识别、导览构建、图谱审查等），并发、增量更新，并可自动随提交更新（来源：README Multi-Agent Pipeline）",
+            "提供可视化仪表盘，支持分层着色、模糊/语义搜索、差异影响分析、个性化详细程度，并允许将图谱 JSON 提交到仓库供团队共享（来源：README Features）"
+          ],
+          "how_to_run": {
+            "install_command": "/plugin marketplace add Lum1104/Understand-Anything ; /plugin install understand-anything",
+            "minimal_example": "/understand ; /understand-dashboard"
+          },
+          "maturity_signals": {
+            "star_velocity": "30 天内涨星 40734（周涨 9895）",
+            "recent_commit": "2026-06-04",
+            "releases": "最新版本 v2.7.3（2026-05-19）",
+            "issue_activity": "162 个开放 Issue"
+          },
+          "comparison": "与 Sourcegraph 等代码智能工具相比，Understand-Anything 更侧重通过多智能体自动生成文本描述和导览，而非单纯的代码搜索；与直接从 LLM 对话窗口分析代码相比，它提供持久化、可共享、可增量更新的知识图谱，且能与多种 AI 编程平台集成。数据不足：未在 README/artifact 找到与具体类似开源项目的横向对比。",
+          "trajectory_note": "该项目在 weekly 和 monthly 趋势榜同时出现，近期热度极高，且仅创建于 2026-03-15，属于快速崛起的 AI 编程辅助工具。",
+          "manual_confirmation": false,
+          "how_it_works_with_analogy": "",
+          "essential_design_difference": "",
+          "practitioner_meaning": "",
+          "cross_links": [],
+          "prose_body": ""
+        },
+        "reasoning_trace": {
+          "paper_type_decision": "该项目自身为 AI 编码助理的插件，核心价值是通过多智能体自动构建知识图谱，因此归类为 agent_framework。",
+          "central_contribution": "为 AI 编程平台提供了一个可跨平台、自动生成可解释代码知识图谱的插件，采用 Tree-sitter 与 LLM 混合分析保证结构准确性与语义可读性。",
+          "inspected": [
+            "README.md",
+            "package.json",
+            "top_level_dirs",
+            "topics",
+            "artifact 目录结构"
+          ],
+          "top_claims": [
+            "README 称通过多智能体流水线分析代码库，构建交互式知识图谱（来源：README Quick Start 与 Under the Hood）",
+            "README 称支持 15 个 AI 编程平台（来源：README 平台兼容性表格）",
+            "README 称使用 Tree-sitter 确定性解析与 LLM 混合，保证结构可复现并生成语义描述（来源：README Tree-sitter + LLM hybrid）",
+            "README 称图谱可提交到 Git 供团队共享，实现“文档即代码”（来源：README Share the Graph）"
+          ],
+          "evidence_needed": [
+            "实际运行 /understand 命令后的输出样例或演示视频（README 提供了 live demo 链接）",
+            "多智能体间通信的源码证据或设计文档",
+            "LLM 调用的成本与延迟数据",
+            "生成的知识图谱 JSON schema 文档"
+          ],
+          "main_threats": [
+            "LLM 输出不可控，可能导致错误知识传播；",
+            "若宿主平台取消插件支持，项目价值骤降；",
+            "未开源智能体实现细节，社区贡献和深度定制受限"
+          ],
+          "transfer_decision": "可复用其混合分析架构与跨平台插件分发模式；智能体通信细节暂不可知，不宜直接复刻内部实现。"
+        },
+        "project_verdict": {
+          "verdict": "deep_dive",
+          "relevance_to_ai_engineer": 5,
+          "engineering_depth": 4,
+          "reuse_value": 5,
+          "maturity": 4,
+          "main_risk": "LLM 幻觉导致知识图谱不准确，且多平台插件依赖带来维护负担。"
+        },
+        "next_actions": [
+          "star",
+          "clone-and-run",
+          "extract-pattern(multi-agent-hybrid-analysis)"
+        ],
+        "unknowns": [
+          "智能体间通信的具体协议与协调机制未在 README 说明",
+          "LLM 调用所采用的模型、提示工程细节和成本数据未披露",
+          "对超大代码库（如百万行以上）的分析性能边界与资源消耗未提及",
+          "图谱冲突解决策略：多人同时修改并提交图谱 JSON 时的合并逻辑未说明",
+          "向导式导览的生成算法和评价标准未说明",
+          "语义搜索的 embedding 方案与实现（本地向量模型还是远程 API）未说明"
+        ],
+        "builder_reuse": {
+          "pattern": "静态解析与 LLM 语义分析混合管道 + 多智能体流程图",
+          "copy": "可借鉴其将 Tree-sitter 解析结果作为结构化事实传给 LLM 的做法，保证图谱结构可复现、避免 LLM 幻觉破坏关系；可复用其增量指纹与 importMap 预计算策略以优化重复分析性能；可参考其跨平台插件安装脚本生成与平台适配模式。",
+          "skip": "未在 README/artifact 说明其智能体间的通信协议与调度实现细节，故无法准确复制；也未披露 LLM 调用模型、成本控制策略，直接仿制可能面临性能与成本陷阱。",
+          "why_it_matters": "为任何需要构建“代码可解释性”或“代码知识库”的应用提供了验证过的架构模式，尤其适合需要同时保证准确性和可读性的场景，大幅降低从零摸索的成本。"
+        },
+        "dependency_platform_risk": {
+          "dependency": "Claude Code、Cursor、VS Code 等 AI 编程平台的插件系统",
+          "what_if_change": "若某一平台修改插件 API 或弃用插件机制，依赖该平台的用户将无法安装或使用 Understand-Anything；同时安装脚本中的符号链接逻辑也可能失效。由于项目同时支持多个平台，风险部分交叉覆盖，但核心安装和命令分发仍与各平台接口耦合。",
+          "exposure": "medium",
+          "mitigation_or_unknown": "README 未说明多平台接口抽象层或降级策略，但平台兼容性表显示已适配 15 个平台，多样性提供一定冗余。开发者需持续监控各平台插件接口变更。"
+        },
+        "claim_ledger": [
+          {
+            "claim": "将任何代码库转换为交互式知识图谱，可探索、搜索、提问。",
+            "plain_english": "能够自动分析代码库，生成带有节点和边的知识图谱，并提供仪表盘进行可视化探索和搜索。",
+            "source": "README 描述与 Features 部分",
+            "attribution": "自称",
+            "evidence_strength": "medium",
+            "supports": "README 详细描述了功能并提供了 live demo 链接，但无图谱准确性指标。",
+            "does_not_support": "未给出生成的图谱示例或准确性证明。",
+            "threat": "实际生成质量可能因代码库而异，LLM 输出不稳定。"
+          },
+          {
+            "claim": "支持 Claude Code, Codex, Cursor 等 15 个平台。",
+            "plain_english": "可以在多种 AI 编程助手中安装和运行。",
+            "source": "README 平台兼容性表格，列出 15 行平台条目",
+            "attribution": "自称",
+            "evidence_strength": "high",
+            "supports": "表格中每个平台都有状态和安装方法，但未提供所有平台的实际运行截图。",
+            "does_not_support": "不能证明在最新各平台版本上均无问题。",
+            "threat": "平台 API 变更后可能失效。"
+          },
+          {
+            "claim": "使用 Tree-sitter 进行确定性解析，保证相同输入→相同输出。",
+            "plain_english": "静态分析部分可复现，不会因解析器变化导致结构丢失。",
+            "source": "README Tree-sitter + LLM hybrid 部分",
+            "attribution": "自称",
+            "evidence_strength": "medium",
+            "supports": "描述了 importMap 预解析和指纹增量更新机制，但未展示具体测试或证明。",
+            "does_not_support": "未提供 Tree-sitter 的配置或 grammar 列表，实际支持的语言种类未知。",
+            "threat": "若 Tree-sitter 语法不准确，可能导致结构提取错误，但该项目未说明如何处理语法错误。"
+          },
+          {
+            "claim": "图谱仅 JSON，可提交到仓库让团队成员直接使用。",
+            "plain_english": "知识图谱是一个 JSON 文件，可以被版本管理，新成员无需重新分析。",
+            "source": "README Share the Graph with Your Team 部分",
+            "attribution": "自称",
+            "evidence_strength": "high",
+            "supports": "给出了 gitignore 建议和 git-lfs 配置示例，且提供示例仓库链接。",
+            "does_not_support": "未说明多人同时修改图谱时的冲突解决，也未说明图谱文件大小限制。",
+            "threat": "大图谱可能导致 Git 仓库膨胀，虽然建议了 git-lfs，但未提及其他存储方案。"
+          }
+        ],
+        "artifact_audit": {
+          "official_repo": "https://github.com/Lum1104/Understand-Anything",
+          "official_data": "not_found",
+          "evaluation_code": "artifactAudit.has_tests=true",
+          "prompts_or_rubrics": "not_found",
+          "benchmark_tasks": "not_found",
+          "model_checkpoints": "not_found",
+          "appendix": "not_found",
+          "license": "MIT",
+          "minimal_demo": "artifactAudit.has_examples/has_docs=true",
+          "closed_dependencies": [],
+          "third_party_dependencies": [],
+          "broken_links": [],
+          "hardware": "未在 README/artifact 说明",
+          "reproducibility_status": "partial"
+        }
+      },
+      "body": "\n## [Tier 2｜真·新项目]（来源：README/artifactAudit）\n\n## 一句话定位\n\n一个可接入 Claude Code、Copilot 等 AI 编程助理的代码库知识图谱生成器，让你可视化浏览、搜索和理解任何代码库的结构与业务逻辑。\n\n（来源：README/artifactAudit）\n\n## 干什么\n\nUnderstand-Anything 把一个代码库（或知识库）自动分析、抽取出所有文件、函数、类和依赖关系，构建成交互式知识图谱并提供可视化仪表盘，支持探索、搜索、提问及差异影响分析。\n\n（来源：README/artifactAudit）\n\n## 元数据\n\n| 项 | 值 |\n| --- | --- |\n| language | TypeScript |\n| total_stars | 52691 |\n| stars_in_period | 40734 |\n| author | Lum1104 |\n\n## 标签\n\n- agent（来源：数据不足）\n- infra（来源：数据不足）\n\n## 解决什么痛点\n\n加入新团队面对 20 万行代码，不知道从哪读起；传统依赖静态分析工具或 grep 只能给出碎片化信息，而直接让 LLM 阅读代码上下文窗口不够且缺乏结构；开发者需要一种既能看到宏观架构又能下钻细节、且能随代码库持续更新的知识“地图”。\n\n（来源：README/artifactAudit）\n\n## 核心能力\n\n- 通过 Tree-sitter 确定性解析与 LLM 语义分析混合管道，生成包含函数、类、依赖等节点的可交互知识图谱（来源：README Under the Hood）\n- 支持多智能体流水线（项目扫描、文件分析、架构层识别、导览构建、图谱审查等），并发、增量更新，并可自动随提交更新（来源：README Multi-Agent Pipeline）\n- 提供可视化仪表盘，支持分层着色、模糊/语义搜索、差异影响分析、个性化详细程度，并允许将图谱 JSON 提交到仓库供团队共享（来源：README Features）\n\n## 怎么跑起来\n\n- 安装命令：/plugin marketplace add Lum1104/Understand-Anything ; /plugin install understand-anything（来源：README/artifactAudit）\n- 最小可运行示例：/understand ; /understand-dashboard（来源：README/artifactAudit）\n\n## 成熟度信号\n\n| 项 | 值 |\n| --- | --- |\n| star_velocity | 30 天内涨星 40734（周涨 9895） |\n| recent_commit | 2026-06-04 |\n| releases | 最新版本 v2.7.3（2026-05-19） |\n| issue_activity | 162 个开放 Issue |\n\n## 和同类的区别\n\n与 Sourcegraph 等代码智能工具相比，Understand-Anything 更侧重通过多智能体自动生成文本描述和导览，而非单纯的代码搜索；与直接从 LLM 对话窗口分析代码相比，它提供持久化、可共享、可增量更新的知识图谱，且能与多种 AI 编程平台集成。数据不足：未在 README/artifact 找到与具体类似开源项目的横向对比。\n\n（来源：README/artifactAudit）\n\n## 轨迹备注\n\n该项目在 weekly 和 monthly 趋势榜同时出现，近期热度极高，且仅创建于 2026-03-15，属于快速崛起的 AI 编程辅助工具。\n\n（来源：README/artifactAudit）\n\n可复用范式落库:[[concepts/knowledge-graph-codebase]]、[[concepts/understand-anything-multi-agent-pipeline]]。另见 [[content/understand-anything]]、[[claims/understand-anything-main-claim]]。\n",
+      "excerpt": "一个可接入 Claude Code、Copilot 等 AI 编程助理的代码库知识图谱生成器，让你可视化浏览、搜索和理解任何代码库的结构与业务逻辑。",
+      "links": [
+        {
+          "target": "concepts/knowledge-graph-codebase",
+          "raw": "[[concepts/knowledge-graph-codebase]]"
+        },
+        {
+          "target": "concepts/understand-anything-multi-agent-pipeline",
+          "raw": "[[concepts/understand-anything-multi-agent-pipeline]]"
+        },
+        {
+          "target": "content/understand-anything",
+          "raw": "[[content/understand-anything]]"
+        },
+        {
+          "target": "claims/understand-anything-main-claim",
+          "raw": "[[claims/understand-anything-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "[Tier 2｜真·新项目]（来源：README/artifactAudit）"
+        },
+        {
+          "depth": 2,
+          "text": "一句话定位"
+        },
+        {
+          "depth": 2,
+          "text": "干什么"
+        },
+        {
+          "depth": 2,
+          "text": "元数据"
+        },
+        {
+          "depth": 2,
+          "text": "标签"
+        },
+        {
+          "depth": 2,
+          "text": "解决什么痛点"
+        },
+        {
+          "depth": 2,
+          "text": "核心能力"
+        },
+        {
+          "depth": 2,
+          "text": "怎么跑起来"
+        },
+        {
+          "depth": 2,
+          "text": "成熟度信号"
+        },
+        {
+          "depth": 2,
+          "text": "和同类的区别"
+        },
+        {
+          "depth": 2,
+          "text": "轨迹备注"
         }
       ]
     },

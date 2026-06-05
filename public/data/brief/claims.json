@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T21:35:38.701Z",
+  "generatedAt": "2026-06-05T15:27:43.614Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 45,
+  "count": 48,
   "items": [
     {
       "id": "claim/9router-main-claim",
@@ -154,6 +154,46 @@
         {
           "target": "content/agent-governance-toolkit",
           "raw": "[[content/agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/agent-reach-main-claim",
+      "type": "claim",
+      "slug": "agent-reach-main-claim",
+      "title": "Agent Reach Main Claim",
+      "file": "claims/agent-reach-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "完全免费，零 API 费用",
+        "slug": "agent-reach-main-claim",
+        "kind": "claim",
+        "content": "agent-reach",
+        "source_pointer": "README 费用说明和 Is this free? FAQ",
+        "evidence_strength": "high",
+        "supports": [
+          "tool-scaffolding",
+          "channel-health-check"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "仅限工具本身，若平台自身限制访问（如 IP 封锁），可能需要额外代理费用",
+          "若上游工具转向付费模式，则此宣称失效"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n所有工具开源，不需要付费 API Keys，唯一可能花钱的是服务器代理（约 $1/月）\n\n证据:项目集成的所有后端确实都是开源且无需付费 API，如 twitter-cli、rdt-cli、Jina Reader。边界:仅限工具本身，若平台自身限制访问（如 IP 封锁），可能需要额外代理费用。风险:若上游工具转向付费模式，则此宣称失效。See [[content/agent-reach]]。\n",
+      "excerpt": "所有工具开源，不需要付费 API Keys，唯一可能花钱的是服务器代理（约 $1/月）",
+      "links": [
+        {
+          "target": "content/agent-reach",
+          "raw": "[[content/agent-reach]]"
         }
       ],
       "headings": [
@@ -1045,6 +1085,46 @@
       ]
     },
     {
+      "id": "claim/mempalace-main-claim",
+      "type": "claim",
+      "slug": "mempalace-main-claim",
+      "title": "Mempalace Main Claim",
+      "file": "claims/mempalace-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "The best-benchmarked open-source AI memory system",
+        "slug": "mempalace-main-claim",
+        "kind": "claim",
+        "content": "mempalace",
+        "source_pointer": "README description 和 Benchmark 章节",
+        "evidence_strength": "medium",
+        "supports": [
+          "verbatim-memory",
+          "structured-memory-index"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未提供与其它系统的直接对比或第三方独立评测",
+          "自评最佳缺乏外部验证，可能夸大。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n在开源 AI 记忆系统中，基准测试得分最佳。\n\n证据:LongMemEval、LoCoMo、ConvoMem、MemBench 多项分数展示。边界:未提供与其它系统的直接对比或第三方独立评测。风险:自评最佳缺乏外部验证，可能夸大。。See [[content/mempalace]]。\n",
+      "excerpt": "在开源 AI 记忆系统中，基准测试得分最佳。",
+      "links": [
+        {
+          "target": "content/mempalace",
+          "raw": "[[content/mempalace]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/microsoft-agent-governance-toolkit-main-claim",
       "type": "claim",
       "slug": "microsoft-agent-governance-toolkit-main-claim",
@@ -1674,6 +1754,46 @@
         {
           "target": "content/ui-tars-desktop",
           "raw": "[[content/ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/understand-anything-main-claim",
+      "type": "claim",
+      "slug": "understand-anything-main-claim",
+      "title": "Understand Anything Main Claim",
+      "file": "claims/understand-anything-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "将任何代码库转换为交互式知识图谱，可探索、搜索、提问。",
+        "slug": "understand-anything-main-claim",
+        "kind": "claim",
+        "content": "understand-anything",
+        "source_pointer": "README 描述与 Features 部分",
+        "evidence_strength": "medium",
+        "supports": [
+          "knowledge-graph-codebase",
+          "understand-anything-multi-agent-pipeline"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未给出生成的图谱示例或准确性证明。",
+          "实际生成质量可能因代码库而异，LLM 输出不稳定。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n能够自动分析代码库，生成带有节点和边的知识图谱，并提供仪表盘进行可视化探索和搜索。\n\n证据:README 详细描述了功能并提供了 live demo 链接，但无图谱准确性指标。。边界:未给出生成的图谱示例或准确性证明。。风险:实际生成质量可能因代码库而异，LLM 输出不稳定。。See [[content/understand-anything]]。\n",
+      "excerpt": "能够自动分析代码库，生成带有节点和边的知识图谱，并提供仪表盘进行可视化探索和搜索。",
+      "links": [
+        {
+          "target": "content/understand-anything",
+          "raw": "[[content/understand-anything]]"
         }
       ],
       "headings": [

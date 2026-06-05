@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T21:35:38.701Z",
+  "generatedAt": "2026-06-05T15:27:43.614Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 45,
+  "count": 48,
   "items": [
     {
       "id": "artifact/9router-repo",
@@ -147,6 +147,45 @@
         {
           "target": "content/agent-governance-toolkit",
           "raw": "[[content/agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/agent-reach-repo",
+      "type": "artifact",
+      "slug": "agent-reach-repo",
+      "title": "Agent Reach Repo",
+      "file": "artifacts/agent-reach-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "agent-reach-repo",
+        "kind": "artifact",
+        "content": "agent-reach",
+        "artifact_type": "repo",
+        "url": "https://github.com/Panniantong/Agent-Reach",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "详细渠道开发文档",
+          "上游工具版本兼容矩阵",
+          "自动化回归测试"
+        ],
+        "last_checked": "2026-06-05"
+      },
+      "body": "\n## Artifact audit\n\n仓库完整，包含核心代码、测试、文档和多语言 README，可以 pip 安装运行，但深度测试和长期维护证据有限。\n\n出处:https://github.com/panniantong/agent-reach。See [[content/agent-reach]]。\n",
+      "excerpt": "仓库完整，包含核心代码、测试、文档和多语言 README，可以 pip 安装运行，但深度测试和长期维护证据有限。",
+      "links": [
+        {
+          "target": "content/agent-reach",
+          "raw": "[[content/agent-reach]]"
         }
       ],
       "headings": [
@@ -996,6 +1035,41 @@
       ]
     },
     {
+      "id": "artifact/mempalace-repo",
+      "type": "artifact",
+      "slug": "mempalace-repo",
+      "title": "Mempalace Repo",
+      "file": "artifacts/mempalace-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "mempalace-repo",
+        "kind": "artifact",
+        "content": "mempalace",
+        "artifact_type": "repo",
+        "url": "https://github.com/MemPalace/mempalace",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [],
+        "last_checked": "2026-06-05"
+      },
+      "body": "\n## Artifact audit\n\n完整的 Python 项目，包含核心记忆系统、CLI、MCP 服务器、测试、文档、基准测试和 CI 配置，MIT 许可。\n\n出处:https://github.com/mempalace/mempalace。See [[content/mempalace]]。\n",
+      "excerpt": "完整的 Python 项目，包含核心记忆系统、CLI、MCP 服务器、测试、文档、基准测试和 CI 配置，MIT 许可。",
+      "links": [
+        {
+          "target": "content/mempalace",
+          "raw": "[[content/mempalace]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/microsoft-agent-governance-toolkit-repo",
       "type": "artifact",
       "slug": "microsoft-agent-governance-toolkit-repo",
@@ -1600,6 +1674,43 @@
         {
           "target": "content/ui-tars-desktop",
           "raw": "[[content/ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/understand-anything-repo",
+      "type": "artifact",
+      "slug": "understand-anything-repo",
+      "title": "Understand Anything Repo",
+      "file": "artifacts/understand-anything-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "understand-anything-repo",
+        "kind": "artifact",
+        "content": "understand-anything",
+        "artifact_type": "repo",
+        "url": "https://github.com/lum1104/understand-anything",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未找到 src 目录（可能代码在包内或仅通过 npm 发布）"
+        ],
+        "last_checked": "2026-06-05"
+      },
+      "body": "\n## Artifact audit\n\n完整的 GitHub 仓库，包含 README、测试、安装脚本、插件配置和文档；许可证 MIT；最新发布 v2.7.3。\n\n出处:https://github.com/lum1104/understand-anything。See [[content/understand-anything]]。\n",
+      "excerpt": "完整的 GitHub 仓库，包含 README、测试、安装脚本、插件配置和文档；许可证 MIT；最新发布 v2.7.3。",
+      "links": [
+        {
+          "target": "content/understand-anything",
+          "raw": "[[content/understand-anything]]"
         }
       ],
       "headings": [

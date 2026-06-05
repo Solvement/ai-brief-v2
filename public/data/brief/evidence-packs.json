@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T21:35:38.701Z",
+  "generatedAt": "2026-06-05T15:27:43.614Z",
   "entity": "evidence-pack",
   "directory": "evidence-packs",
-  "count": 45,
+  "count": 48,
   "items": [
     {
       "id": "evidence-pack/9router-evidence-pack",
@@ -340,6 +340,93 @@
         {
           "target": "content/agent-governance-toolkit",
           "raw": "[[content/agent-governance-toolkit]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/agent-reach-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "agent-reach-evidence-pack",
+      "title": "Agent-Reach — Evidence Pack",
+      "file": "evidence-packs/agent-reach-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "agent-reach",
+        "kind": "evidence-pack",
+        "title": "Agent-Reach — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "给你的 AI Agent 一键安装互联网访问能力的脚手架工具，让 Agent 免费搜索和阅读 Twitter、Reddit、YouTube、B站、小红书等十多个平台。",
+            "internal_logic": "### 定位：Agent 工具脚手架，而非 Agent 框架\n\nAgent Reach 本身不实现 agent loop、规划器或状态管理，而是一个**工具集成与配置层**。它代替用户完成“这个平台该用什么 CLI”“如何安装和认证”“让 Agent 何时调用”三个环节。\n\n### 核心流程：安装 → 配置 → 注册 skill → 直接调用\n\n1. **安装触发**  \n   用户将 `帮我安装 Agent Reach：https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md` 发给 Agent，Agent 读取该文档并执行安装步骤（来源：README 快速上手）。该文档指导 Agent 运行 `pip install agent-reach` 安装 CLI，随后执行 `agent-reach install`。\n2. **环境自动化**  \n   `agent-reach install` 会自动检测系统类型（本地 or 服务器），并安装依赖：Node.js、gh CLI、mcporter、twitter-cli、rdt-cli、xhs-cli、yt-dlp 等（来源：README 安装流程）。同时通过 mcporter 接入 Exa 搜索（免费，无需 Key）。\n3. **SKILL.md 注册**  \n   安装程序将 `SKILL.md` 复制到 Agent 的 skills 目录（如 `~/.claude/skills/`），该文件是平台工具集的“字典”，告诉 Agent 当遇到“搜推特”“看视频”等意图时，应调用哪个上游工具及参数格式（来源：README 安装过程第5步）。\n4. **运行时调用**  \n   Agent 在对话中直接执行命令，不经过 Agent Reach 包装。例如：  \n   - Twitter 搜索：`twitter search \"关键词\"`  \n   - Reddit 搜索：`rdt search \"关键词\"`  \n   - YouTube 字幕：`yt-dlp --dump-json URL`  \n   - 网页阅读：`curl https://r.jina.ai/URL`  \n   这些命令由 SKILL.md 映射而来，Agent 自己组合（来源：README 装好就能用示例）。\n\n### 渠道架构：检查器 + 上游工具\n\n每个平台对应 `channels/` 目录下的一个 Python 模块，例如 `twitter.py`、`reddit.py`。每个模块实现 `check()` 方法，检测对应 CLI 是否已安装、认证是否就绪，供 `agent-reach doctor` 读取状态（来源：README 可插拔渠道说明）。但实际的数据抓取和搜索完全由上游工具完成，Agent Reach 不内置爬虫。\n\n例如 `channels/twitter.py` 可能类似：  \n```python\nimport subprocess\ndef check():\n    try:\n        subprocess.run([\"twitter\", \"--version\"], capture_output=True, check=True)\n        return {\"status\": \"ok\", \"tool\": \"twitter-cli\"}\n    except:\n        return {\"status\": \"missing\"}\n```\n\n这种**松散耦合**确保底层工具可随时替换（如将 `twitter-cli` 换成官方 API），只需更新渠道文件，不影响其他平台。\n\n### 安全边界\n\n- **凭据隔离**：Cookie 和 Token 存储在 `~/.agent-reach/config.yaml`，文件权限 600，不上传第三方（来源：README 安全性）。\n- **安装沙箱**：`--safe` 模式只显示需要安装的包，不自动执行；`--dry-run` 预览全部操作（来源：README 安装方式）。\n- **平台风险隔离**：每个渠道独立，一个工具被封不会影响其他渠道，且底层工具可快速替换（来源：README 可插拔架构）。\n\n### MCP 集成\n\n全网搜索通过 **Exa** 的 MCP 服务接入，由 `mcporter` 统一管理（`mcporter call 'exa.search(...)'`），同样无需 API Key。小红书、抖音等也通过 `mcporter` 调用对应的 MCP 服务（如 `douyin.parse_douyin_video_info`），保持一致的调用方式（来源：README 选型表与 FAQ 抖音部分）。\n\n### 诊断命令\n\n`agent-reach doctor` 遍历所有检测器，输出每个渠道的可用状态，快速定位问题（来源：README 自带诊断）。",
+            "failure_mode": "重度依赖上游工具，若多个工具同时失效，项目价值将骤降",
+            "source_pointer": "https://github.com/panniantong/agent-reach"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v1.4.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/agent-reach-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/agent-reach-repo]]"
+        ],
+        "metrics": [
+          "stars=21362",
+          "forks=1851",
+          "open_issues=47",
+          "latest_release=v1.4.0",
+          "pushed_at=2026-05-18T12:39:22Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "重度依赖上游工具，若多个工具同时失效，项目价值将骤降",
+          "Cookie 认证平台存在封号风险，而项目建议使用小号但并非所有用户都有多余账号",
+          "项目由个人 vibe coding 产出，代码质量、测试覆盖和长期维护能力存疑",
+          "热度集中于短期 star 爆发，若作者热情消退，项目可能停滞"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/panniantong/agent-reach"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agent-reach-main-claim]],官方 artifact 落库为 [[artifacts/agent-reach-repo]]。See [[content/agent-reach]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agent-reach-main-claim]],官方 artifact 落库为 [[artifacts/agent-reach-repo]]。See [[content/agent-reach]]。",
+      "links": [
+        {
+          "target": "claims/agent-reach-main-claim",
+          "raw": "[[claims/agent-reach-main-claim]]"
+        },
+        {
+          "target": "artifacts/agent-reach-repo",
+          "raw": "[[artifacts/agent-reach-repo]]"
+        },
+        {
+          "target": "claims/agent-reach-main-claim",
+          "raw": "[[claims/agent-reach-main-claim]]"
+        },
+        {
+          "target": "artifacts/agent-reach-repo",
+          "raw": "[[artifacts/agent-reach-repo]]"
+        },
+        {
+          "target": "content/agent-reach",
+          "raw": "[[content/agent-reach]]"
         }
       ],
       "headings": [
@@ -2257,6 +2344,91 @@
       ]
     },
     {
+      "id": "evidence-pack/mempalace-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "mempalace-evidence-pack",
+      "title": "mempalace — Evidence Pack",
+      "file": "evidence-packs/mempalace-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "mempalace",
+        "kind": "evidence-pack",
+        "title": "mempalace — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "本地优先的 AI 记忆系统，逐字存储对话历史，可插拔后端，无 API 调用实现高召回检索。",
+            "internal_logic": "### 核心记忆模型：Wings、Rooms、Drawers\n\nMemPalace 将对话历史映射为一个类似宫殿的结构（来源：README What it is）：\n- **Wings（翼）**：代表人或项目，如“Alice”、“project-alpha”。\n- **Rooms（房间）**：代表主题，如“前端框架选择”、“数据库迁移”。\n- **Drawers（抽屉）**：存放原始对话文本，每个抽屉保存一段逐字内容。\n\n搜索时可直接限定在特定 wing 或 room，避免扁平语料库的低效全文扫描（来源：README What it is）。具体的数据结构未在 README 公开，但 CLI 和 Python API 提供了创建、查询这些实体的功能。\n\n### 检索流程：从嵌入到语义搜索\n\n1. **嵌入生成**：使用本地嵌入模型，用户可在首次启动时通过 `python -m mempalace.onboarding` 选择 `embeddinggemma-300m`（多语言，~300 MB）或 `all-MiniLM-L6-v2`（仅英文，~30 MB）。模型会在本地运行，不调用外部 API（来源：README Requirements）。\n2. **向量存储**：生成的向量存入默认后端 ChromaDB。后端接口定义在 `mempalace/backends/base.py`，可替换为其它向量库（来源：README What it is）。\n3. **原始语义搜索**：纯基于余弦相似度的语义搜索，无需任何启发式规则或 LLM，在 LongMemEval 500 问题集上达到 R@5 96.6%（来源：README Benchmarks）。\n4. **混合检索（hybrid）**：在语义搜索基础上加入关键词提升、时间邻近度提升、偏好模式抽取，R@5 可提升至 98.4%（held-out 450q）（来源：README Benchmarks）。\n5. **LLM 重排序**：从 top-20 候选中用任意 LLM（如 Claude Haiku、Sonnet、minimax-m2.7）选出最佳答案，可将指标推至 ≥99%，但 README 强调不宣传 100% 以避免过拟合嫌疑（来源：README Benchmarks）。\n\n### 工具与集成：CLI、MCP、Agent\n\n- **CLI**：提供 `mine`（导入内容）、`search`（检索）、`wake-up`（加载上下文）等命令（来源：README Quickstart）。\n- **MCP 服务器**：对外暴露 29 个 MCP 工具，覆盖记忆读写、知识图谱操作、跨 wing 导航、抽屉管理和 agent 日记等（来源：README MCP server）。\n- **Agent 支持**：每个专家 agent 在 palace 中获得专属 wing 和 diary，可通过 `mempalace_list_agents` 运行时发现，避免系统提示词膨胀（来源：README Agents）。\n- **自动保存**：为 Claude Code 提供两个钩子，定期保存对话和上下文压缩前保存，防止会话丢失（来源：README Auto-save hooks）。\n\n### 数据持久化与状态管理\n\n记忆库以本地文件形式持久化，嵌入模型和 ChromaDB 数据都留在用户设备。导入操作（`mine`）支持项目文件和 Claude Code 对话转录，可通过 `--wing` 参数指定所属 wing。此外，`sweep` 命令能将转录逐条消息拆分存储，保证幂等和可断点续传（来源：README Auto-save hooks）。\n\n### 知识图谱\n\n内建一个时间感知的实体关系图，支持添加、查询、失效和时间线操作，采用 SQLite 存储（来源：README Knowledge graph）。该图可用于记录事实（如“user X worked on project Y from date1 to date2”），并与记忆检索配合使用。\n\n### 安全与可插拔性\n\n- 数据本地化，绝不外传，除非用户明确配置（来源：README What it is）。\n- 后端可插拔：抽象基类 `mempalace/backends/base.py` 定义了向量存储接口，允许替换为 FAISS、Qdrant 等。但当前仅提供 ChromaDB 作为默认实现。\n- 依赖项仅 Python 3.9+、ChromaDB 和嵌入模型，无需额外 API 密钥（基本检索场景）（来源：README Requirements）。",
+            "failure_mode": "默认依赖 ChromaDB，若其停止维护，需社区接手支持新后端；当前抽象层虽存在，但无官方备选方案。",
+            "source_pointer": "https://github.com/mempalace/mempalace"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/MIT/v3.3.5"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/mempalace-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/mempalace-repo]]"
+        ],
+        "metrics": [
+          "stars=53701",
+          "forks=7068",
+          "open_issues=600",
+          "latest_release=v3.3.5",
+          "pushed_at=2026-06-05T07:54:12Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "默认依赖 ChromaDB，若其停止维护，需社区接手支持新后端；当前抽象层虽存在，但无官方备选方案。",
+          "嵌入模型的选择影响检索质量和资源占用，但用户可能缺乏调优经验。",
+          "README 自评的 benchmark 结果仅限当前模型和数据集，不能保证其他场景同样优秀。",
+          "自动保存钩子目前专属 Claude Code，如切换到其他 IDE 或 agent 框架需重新适配。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/mempalace/mempalace"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/mempalace-main-claim]],官方 artifact 落库为 [[artifacts/mempalace-repo]]。See [[content/mempalace]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/mempalace-main-claim]],官方 artifact 落库为 [[artifacts/mempalace-repo]]。See [[content/mempalace]]。",
+      "links": [
+        {
+          "target": "claims/mempalace-main-claim",
+          "raw": "[[claims/mempalace-main-claim]]"
+        },
+        {
+          "target": "artifacts/mempalace-repo",
+          "raw": "[[artifacts/mempalace-repo]]"
+        },
+        {
+          "target": "claims/mempalace-main-claim",
+          "raw": "[[claims/mempalace-main-claim]]"
+        },
+        {
+          "target": "artifacts/mempalace-repo",
+          "raw": "[[artifacts/mempalace-repo]]"
+        },
+        {
+          "target": "content/mempalace",
+          "raw": "[[content/mempalace]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/microsoft-agent-governance-toolkit-evidence-pack",
       "type": "evidence-pack",
       "slug": "microsoft-agent-governance-toolkit-evidence-pack",
@@ -3628,6 +3800,91 @@
         {
           "target": "content/ui-tars-desktop",
           "raw": "[[content/ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/understand-anything-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "understand-anything-evidence-pack",
+      "title": "Understand-Anything — Evidence Pack",
+      "file": "evidence-packs/understand-anything-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "understand-anything",
+        "kind": "evidence-pack",
+        "title": "Understand-Anything — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个可接入 Claude Code、Copilot 等 AI 编程助理的代码库知识图谱生成器，让你可视化浏览、搜索和理解任何代码库的结构与业务逻辑。",
+            "internal_logic": "这是一个以插件形式嵌入 AI 编程助理的多智能体系统，核心流程如下：\n\n### 多智能体流水线与知识图谱构建\n- **命令入口**：用户在 AI 编程环境（如 Claude Code）中输入 `/understand`，触发插件主命令（来源：README Quick Start）。\n- **智能体编排**：调度器启动 5 个专职智能体（project-scanner, file-analyzer, architecture-analyzer, tour-builder, graph-reviewer），分析业务域时再增加 domain-analyzer 或 article-analyzer（来源：README Multi-Agent Pipeline 表格）。\n- **并行扫描**：project-scanner 发现文件并检测语言/框架，随后 file-analyzer 并发运行（最多 5 个并行，每批 20-30 个文件），提取函数、类、导入关系，构建图谱节点和边（来源：README Multi-Agent Pipeline）。\n- **混合分析**：file-analyzer 调用 Tree-sitter 进行确定性语法解析，得到 import/export、函数定义、调用点等；同时将解析后的 AST 与源码一起传给 LLM，生成自然语言摘要、标签、架构层分配等语义信息。Tree-sitter 输出保证结构可复现，LLM 负责理解“有什么用”（来源：README Tree-sitter + LLM hybrid）。\n- **架构与导览**：architecture-analyzer 将节点归入 API、Service、Data、UI、Utility 等层；tour-builder 按依赖顺序生成导览路径；graph-reviewer 检查完整性（可开启全面审查模式）（来源：README Multi-Agent Pipeline）。\n- **输出**：最终产物为 `.understand-anything/knowledge-graph.json`，是一个包含节点和边的 JSON 文件，可供仪表盘渲染或团队提交到 Git（来源：README Share the Graph）。\n\n### 工具接口与状态/记忆\n- **插件钩子**：项目通过 `.claude-plugin`, `.copilot-plugin`, `.cursor-plugin` 等目录定义各平台的插件元数据，实现跨平台适配（来源：artifact 目录结构）。\n- **状态持久化**：分析结果（知识图谱 JSON）、用户语言偏好（`.understand-anything/config.json`）和增量指纹都存储在项目本地 `.understand-anything/` 目录，支持增量更新（来源：README Quick Start 和 Under the Hood）。\n- **差异化更新**：`/understand-diff` 利用图谱和当前工作区变更计算影响范围；`/understand --auto-update` 在 post-commit hook 中自动增量修补图谱（来源：README Features 和 Quick Start）。\n\n### 安全边界\nREADME 未说明沙箱机制或代码安全审查策略，仅提到可用 `--review` 触发 graph-reviewer 的 LLM 审查。项目本身作为本地分析工具，不涉及远程代码执行，但其 LLM 调用可能将部分代码发送至模型服务商，需要使用者注意数据隐私。\n\n### 规划器\n未见显式规划器组件；分析流程是固定编排的，但各智能体之间通过图谱状态接力，形成数据驱动的流水线。",
+            "failure_mode": "LLM 生成的语义描述可能出现不准确或幻觉，若不经人工审查直接用于决策，可能误导开发者（来源：README 声称 LLM 负责语义，但 graph-reviewer 仅在开启时进行全面审查，默认仅内联检查）。",
+            "source_pointer": "https://github.com/lum1104/understand-anything"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v2.7.3"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/understand-anything-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/understand-anything-repo]]"
+        ],
+        "metrics": [
+          "stars=52691",
+          "forks=4319",
+          "open_issues=162",
+          "latest_release=v2.7.3",
+          "pushed_at=2026-06-04T05:46:14Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "LLM 生成的语义描述可能出现不准确或幻觉，若不经人工审查直接用于决策，可能误导开发者（来源：README 声称 LLM 负责语义，但 graph-reviewer 仅在开启时进行全面审查，默认仅内联检查）。",
+          "依赖多个外部 AI 编程平台，每个平台的插件接口变更都可能导致功能中断，维护负担重。",
+          "知识图谱 JSON 若包含敏感代码摘要，提交到公开仓库可能泄露知识产权，README 仅建议保护 intermediate 目录，未特别提醒图谱中的语义描述可能泄露敏感信息。",
+          "增量更新依赖文件指纹，若文件因格式化、换行等非语义变化被标记为已更改，会导致不必要的 LLM 重新分析，消耗成本。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/lum1104/understand-anything"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/understand-anything-main-claim]],官方 artifact 落库为 [[artifacts/understand-anything-repo]]。See [[content/understand-anything]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/understand-anything-main-claim]],官方 artifact 落库为 [[artifacts/understand-anything-repo]]。See [[content/understand-anything]]。",
+      "links": [
+        {
+          "target": "claims/understand-anything-main-claim",
+          "raw": "[[claims/understand-anything-main-claim]]"
+        },
+        {
+          "target": "artifacts/understand-anything-repo",
+          "raw": "[[artifacts/understand-anything-repo]]"
+        },
+        {
+          "target": "claims/understand-anything-main-claim",
+          "raw": "[[claims/understand-anything-main-claim]]"
+        },
+        {
+          "target": "artifacts/understand-anything-repo",
+          "raw": "[[artifacts/understand-anything-repo]]"
+        },
+        {
+          "target": "content/understand-anything",
+          "raw": "[[content/understand-anything]]"
         }
       ],
       "headings": [
