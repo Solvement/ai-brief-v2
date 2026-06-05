@@ -556,7 +556,82 @@ function repoForBoard(item, window, rank, options = {}) {
   if (item.briefSlug) out.briefSlug = item.briefSlug;
   if (item.briefSlug) out.brief_slug = item.briefSlug;
   if (!isBriefWikiProjectPipeline(options) && item.deep) out.deep = item.deep;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // deep_status — single source of truth for "does this Tier 2/3 card actually
+  // HAVE the deep analysis its badge implies?" (PM-reviewed fix, 2026-06-05.)
+  //
+  // ROOT CAUSE this guards: deep authoring is decoupled (index.mjs analyze()
+  // returns `pending_codex_authoring` for final_depth==="deep"; the real write
+  // happens later in codex-deepdive.mjs). If that decoupled pass never runs /
+  // fails / is skipped, the repo still serializes here as Tier 3 with only the
+  // deterministic STUB tier_template (every narrative field === "数据不足") and
+  // no briefSlug + no `deep` object. The card then badges it 深扒/分析 but links
+  // to /repo/... which renders "为什么没有 Deep Dive" — the tier OVERSTATES the
+  // analysis. deep_status makes that gap explicit + machine-checkable instead of
+  // silent, so the frontend never claims analysis it lacks and a backfill sweep
+  // can query exactly which repos are "queued".
+  //
+  // Deterministic + idempotent: derived purely from fields already on `out`
+  // (briefSlug / deep / tier_template), so re-running the pipeline on unchanged
+  // input always yields the same value and never mutates upstream state.
+  out.deep_status = computeDeepStatus(out);
   return out;
+}
+
+/**
+ * Classify whether a serialized project card actually carries the deep-dive its
+ * tier promises. Used to set `deep_status` so a Tier 2/3 badge never overstates.
+ *
+ *   "available"  — a real deep-dive exists to link to: a brief-wiki slug, OR a
+ *                  structured `deep` object, OR a tier_template whose Tier 2/3
+ *                  narrative fields carry real (non-sentinel) content.
+ *   "queued"     — Tier 2/3 (deserves a deep-dive) but only the deterministic
+ *                  stub exists; the decoupled authoring pass still owes this one.
+ *   "not_applicable" — Tier 0/1 (索引/速读); no deep-dive is expected.
+ */
+function computeDeepStatus(out = {}) {
+  const tier = Number(out.project_tier ?? projectTierForDepth(out.final_depth));
+  const deservesDeep = tier === 2 || tier === 3
+    || out.final_depth === "analysis" || out.final_depth === "deep";
+  if (!deservesDeep) return "not_applicable";
+
+  const hasSlug = Boolean(out.briefSlug || out.brief_slug);
+  const hasDeepObject = Boolean(out.deep);
+  if (hasSlug || hasDeepObject) return "available";
+
+  // No slug / no `deep`: the only remaining real content would be a tier_template
+  // that was actually AUTHORED (not the deterministic stub). The stub fills every
+  // Tier 2/3 narrative field with the no-fabrication sentinel "数据不足", so if any
+  // of those fields carries real prose, a human/codex authored it → "available".
+  return tierTemplateHasAuthoredBody(out.tier_template) ? "available" : "queued";
+}
+
+/** No-fabrication sentinels the deterministic stub emits when it has nothing real. */
+const DEEP_BODY_SENTINELS = ["数据不足", "官方未披露"];
+
+/** True iff `s` is real authored prose (not empty / not just a sentinel). */
+function isAuthoredText(s) {
+  if (typeof s !== "string") return false;
+  const t = s.trim();
+  if (!t) return false;
+  return !DEEP_BODY_SENTINELS.some((sentinel) => t === sentinel || t.startsWith(sentinel));
+}
+
+/**
+ * The Tier 2/3 narrative fields the deep-dive renderer reads. If ANY of them
+ * holds authored prose, the tier_template is a real deep-dive, not the stub.
+ */
+function tierTemplateHasAuthoredBody(tpl) {
+  if (!tpl || typeof tpl !== "object") return false;
+  const narrativeFields = [
+    tpl.pain_point,
+    tpl.comparison,
+    tpl.how_it_works_with_analogy,
+    tpl.essential_design_difference,
+    tpl.practitioner_meaning,
+  ];
+  return narrativeFields.some(isAuthoredText);
 }
 
 async function publishBriefWikiMirror({ options = {}, logger = console } = {}) {

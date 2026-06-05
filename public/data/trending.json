@@ -452,7 +452,95 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=95; max=deep; final=deep"
-        }
+        },
+        "deep": {
+          "atGlance": "复旦 OpenMOSS 团队开源的语音与声音生成模型家族，目标是高保真、高表现力、覆盖复杂真实场景（长语音、多说话人对话、音色设计、音效）。值得看是因为它不是单个 TTS，而是一整套同源家族（从 ~100M 的 Nano 到 8B 的主力），底座是一个自研、无 CNN、纯 Causal Transformer 的 16 亿参数音频 tokenizer；对想做语音应用或研究音频离散化的人是难得的开源全栈参照。现在看它，是因为它刚以开源身份给出对标甚至超过部分闭源模型的主观评测自称。",
+          "whyItMatters": [
+            {
+              "title": "开源的全栈语音家族",
+              "body": "tokenizer + 多档位生成模型（TTS / 对话 TTSD / 实时 / 音效 / 音色生成）一次性开放，Apache-2.0，便于二次开发与私有部署。"
+            },
+            {
+              "title": "自研音频 tokenizer 是地基",
+              "body": "MOSS-Audio-Tokenizer 自称 16 亿参数、无 CNN、纯 Causal Transformer、32 层 RVQ，从头在 300 万小时语音/音效/音乐上训练——离散化质量直接决定上层生成上限。"
+            },
+            {
+              "title": "覆盖实时与多场景",
+              "body": "Realtime 档自称 TTFB 180ms、RTF 0.51；家族还含多说话人对话与音效生成，适配的不只是「读一段字」。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "音频 tokenizer（离散化）",
+              "explain": "把连续的声音波形压成一串离散 token，像给语音建一套「字母表」，模型才能像生成文字一样生成语音。MOSS 自研的 tokenizer 用 RVQ（残差向量量化，多层逐层逼近原始信号）做这件事。"
+            },
+            {
+              "term": "RVQ + delay-pattern（延迟调度）",
+              "explain": "RVQ 把每帧音频拆成多层码字；主力 MOSS-TTS（MossTTSDelay）用「多头并行 RVQ 预测 + 延迟模式调度」并行预测多层码字，平衡质量与速度（自称：README 架构描述）。"
+            },
+            {
+              "term": "三种生成架构分档",
+              "explain": "MossTTSDelay（延迟并行，主力质量档）、MossTTSLocal（时间同步 RVQ 块 + depth transformer，1.7B 轻量档）、MossTTSRealtime（文本-音频分层输入，实时档）——同一家族按场景换骨架。"
+            },
+            {
+              "term": "depth transformer",
+              "explain": "在每个时间步内沿 RVQ 的「深度」（多层码字）方向再跑一个小 transformer，逐层细化该帧的离散表示，用在 Local 档以小模型换取质量。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 把它想成一条「先建字母表、再按字母表写作」的语音流水线：底层 tokenizer 先把声音压成离散 token（音频的字母表），上层生成模型再像写文字一样自回归地把这些 token 生成出来，最后解码回波形。\n## 工作流（推理，已核实：README 示例）\n1. 安装：`git clone` 后 `pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e \".[torch-runtime]\"`。\n2. 加载：`AutoProcessor.from_pretrained(\"OpenMOSS-Team/MOSS-TTS-v1.5\", trust_remote_code=True)` 与对应 `AutoModel`。\n3. 生成：`model.generate(input_ids=..., attention_mask=..., max_new_tokens=4096)` 产出音频 token，再由 tokenizer 解码成波形。\n## 关键组件\n- **MOSS-Audio-Tokenizer（1.6B，地基）**：无 CNN、纯 Causal Transformer、32 层 RVQ，自称在 300 万小时数据上从头训练。\n- **生成模型分档**：v1.5（8B 主力）/ Local-Transformer（1.7B）/ TTSD-V1.0（8B 对话）/ VoiceGenerator（1.7B 音色）/ SoundEffect（8B 音效）/ Realtime（1.7B）/ Nano（~100M）。\n- **多语言**：自称支持 31 种语言（含中文、粤语、英、阿、日、韩等）。\n## 验证点 跑通官方推理示例、用 v1.5 合成一段中英混读，听是否自然、音色是否稳定；要客观评估需用 Seed-TTS 这类公开 benchmark 复测 WER/SIM，而非只信主观评测自称。",
+          "novelty": "可迁移模式：把「自研、规模化、无 CNN 的纯 Transformer 音频 tokenizer」作为整个家族的统一地基，再在其上用不同骨架（延迟并行 / 时间同步 + depth transformer / 分层实时）覆盖不同质量-延迟取舍。这种「统一离散表示 + 多档生成骨架」的组织方式，可迁移到其它需要离散化连续信号的生成任务。\n与同类对比：相比把声学建模与 vocoder 分离的传统 TTS 管线，它走的是「离散 token + 自回归生成」的语言模型化路线（与 VALL-E、CosyVoice 等同代思路相近）。差异化在于自研大尺寸 tokenizer 与覆盖实时/对话/音效的完整家族，且全部开源。\n证据强度需谨慎：README 给出与 Seed-TTS benchmark 的对比（EN WER 1.84% vs 2.25%；ZH SIM 76.98% vs 79.6%），并称 TTSD-v1.0 在主观评测上超过 Doubao、Gemini 2.5-pro——这些均为官方自报/自称，未见第三方独立复现；ZH SIM 一项其自报值（76.98%）实际低于对比项（79.6%），不应被读成全面领先。",
+          "ecosystem": "核心依赖：PyTorch（示例用 cu128 轮子）、HuggingFace transformers 的 `AutoProcessor`/`AutoModel`（`trust_remote_code=True`，即模型自带自定义代码）。权重托管在 HuggingFace 的 OpenMOSS-Team 命名空间。\n它在生态里的位置是「开源语音底座 + 可私有部署的多场景 TTS」：与闭源云 TTS（如各大厂语音合成 API）形成替代关系，主打可自托管、可改造、Apache-2.0 商用友好；与其它开源 TTS（CosyVoice、F5-TTS、Fish-Speech 等）形成竞争，差异点在自研大 tokenizer 与家族化覆盖。\n可与下游对话/Agent 系统组合做语音前端，或作为研究音频离散化、RVQ、实时合成的开源实验台。仓库语言 Python 98.2%（已核实：GitHub 语言条）。",
+          "limitations": [
+            {
+              "title": "关键指标多为官方自报",
+              "body": "Seed-TTS 对比、超越 Doubao/Gemini 的主观评测均为 README 自称，未见第三方独立复现；做选型应自己用公开 benchmark 复测。"
+            },
+            {
+              "title": "对比数字需要逐条看",
+              "body": "其自报 ZH SIM 76.98% 低于对比项 79.6%，说明并非每一项都领先；不能笼统当作 SOTA。"
+            },
+            {
+              "title": "资源门槛",
+              "body": "主力档为 8B，含 1.6B tokenizer，本地推理与微调对显存有要求；README 未给出明确硬件下限——标「数据不足」。"
+            },
+            {
+              "title": "依赖 trust_remote_code",
+              "body": "加载需 `trust_remote_code=True`，会执行模型仓库自带代码，部署到生产前需自行审计这部分代码的安全性。"
+            },
+            {
+              "title": "未列明确限制清单",
+              "body": "README 聚焦能力展示，未明确列出失败模式 / 不支持场景 / 伦理与滥用风险说明。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "克隆并安装运行时",
+              "cmd": "git clone https://github.com/OpenMOSS/MOSS-TTS.git && cd MOSS-TTS && pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e \".[torch-runtime]\"",
+              "note": "需 CUDA 环境；显存要求 README 未明示，按 8B 主力档预留。"
+            },
+            {
+              "step": "加载主力 v1.5 模型",
+              "cmd": "AutoProcessor.from_pretrained(\"OpenMOSS-Team/MOSS-TTS-v1.5\", trust_remote_code=True)",
+              "note": "首次会从 HuggingFace 拉权重；trust_remote_code 会执行仓库自带代码。"
+            },
+            {
+              "step": "合成一段语音",
+              "cmd": "model.generate(input_ids=input_ids, attention_mask=attention_mask, max_new_tokens=4096)",
+              "note": "拿到音频 token 后用 tokenizer 解码成波形并试听。"
+            },
+            {
+              "step": "想要低延迟就换 Realtime 档",
+              "note": "Realtime（1.7B）自称 TTFB 180ms / RTF 0.51；自己测一下端到端首音延迟是否达标。"
+            }
+          ],
+          "score": {
+            "novelty": 21,
+            "engineering": 22,
+            "reproducibility": 20,
+            "timeToValue": 18
+          }
+        },
+        "deep_status": "available"
       },
       {
         "fullName": "bytedance/UI-TARS-desktop",
@@ -1496,7 +1584,88 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=89; max=deep; final=analysis"
-        }
+        },
+        "deep": {
+          "atGlance": "这个项目值得深看，因为它用一个可交互的知识图谱来打破新加入大型代码库时的茫然。它适合开发者、团队新人以及技术负责人，特别是当面对复杂项目需要快速理解结构和业务逻辑时。现在看它是因为它集成了多家 AI 编码平台，安装极简，且图谱可提交到版本库中共享。",
+          "whyItMatters": [
+            {
+              "title": "降低上手门槛",
+              "body": "新人加入代码库时，通过可视化图谱和引导式漫游，可以迅速建立结构认知，不再盲目阅读代码。"
+            },
+            {
+              "title": "动静结合分析",
+              "body": "用 Tree-sitter 做确定性解析保证图谱结构可复现，LLM 补充语义理解，两者互补使图谱既有精确边又有可读摘要。"
+            },
+            {
+              "title": "跨 AI 平台运行",
+              "body": "支持 Claude Code、Codex、Copilot、Cursor 等 14+ 平台，一条安装脚本即可适配，降低工具链锁定风险。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "知识图谱节点",
+              "explain": "每个文件、函数、类都化为一个节点，节点之间通过导入、调用、继承等关系连接，形成代码的拓扑视图。"
+            },
+            {
+              "term": "多智能体流水线",
+              "explain": "由项目扫描器、文件分析器、架构分析器等 5-6 个专门代理组成，各司其职：扫描文件树、提取结构、分配架构层、构建导览、验证图谱完整性。"
+            },
+            {
+              "term": "Tree-sitter + LLM 混合",
+              "explain": "Tree-sitter 负责精确解析语法提取 imports/exports 等，保证结构可复现；LLM 读取解析结果和源码，生成英文摘要、标签和架构层，提供人可读的语义。"
+            },
+            {
+              "term": "引导式导览",
+              "explain": "根据依赖关系自动生成按依赖排序的架构浏览路径，让开发者按正确顺序学习代码库。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 可以把项目想象成一个聪明的导游：它先用机械的方式（Tree-sitter）给所有代码建筑拍下精确的平面图（导入导出关系），再请一位语言专家（LLM）给每栋建筑写上说明和标签（功能、架构层），最后生成一张可以随意缩放、搜索、点击的互动地图。 ## 工作流 1. 用户执行 `/understand` 命令，启动多智能体流水线。 2. `project-scanner` 扫描文件树，识别语言和框架。 3. 多个 `file-analyzer` 并行工作（最多5个并发，每批20-30个文件），先用 Tree-sitter 提取函数、类、导入等事实，生成图节点和边；再将解析结果与源码一并送给 LLM，输出摘要、标签、架构层。 4. `architecture-analyzer` 将节点分组到 API、Service、Data 等层。 5. `tour-builder` 生成依赖排序的学习路径。 6. `graph-reviewer` 检查引用完整性和缺失节点（可选全量 LLM 审查）。 7. 最终图谱保存为 `.understand-anything/knowledge-graph.json`，增量分析时指纹比对仅更新变更文件。 ## 关键组件 - **确定性解析器**：Tree-sitter 保证输入相同代码输出相同结构，杜绝 LLM 幻觉导致边缺失。 - **LLM 代理**：并非全权生成，而是作为增强层，只负责需要理解意图的任务（摘要、标签、架构层）。 - **增量更新引擎**：基于文件指纹检测变更，下次运行只重新分析改动过的文件，大幅加快大型仓库的重复分析。 ## 验证点 运行 `/understand-dashboard` 后，浏览器打开本地网页，能看到彩色节点按架构层分布，点击节点可查看摘要和关系，搜索“auth”应定位到认证相关代码，说明图谱构建成功。",
+          "novelty": "可迁移模式：将静态代码解析与大型语言模型互补结合，而非让 LLM 独自“阅读”代码——这保证了图的拓扑结构可完全复现，同时叠加人类可读的语义层。这种做法可迁移到任何需要静态分析加自然语言理解的场景，比如配置依赖图、数据血缘图等。 与同领域方案对比：纯 LLM 工具（如直接用 Claude Code 对话）能回答问题，但无法给出可靠的结构化全貌，且每次可能给出不同答案。Sourcegraph 等代码搜索平台可提供精确索引和搜索，但不自动生成人类可读的摘要与导览。CodeSee 等可视化工具专注于标准调用图，但无 AI 语义层。相比之下，Understand-Anything 把两者结合得较为轻量，且作为插件横跨多个 AI 编码助手生态，降低了切换成本。其增量分析和图谱共享是实用的工程补充，但核心思想并非首创，更多是对现有能力的精巧整合。",
+          "ecosystem": "核心依赖：Tree-sitter 及其语言语法库，以及一个能够处理大上下文（如 Claude 200K）的 LLM。 它作为插件深度集成到多种 AI 编码平台（Claude Code 原生，Cursor/VS Code 自动发现，Copilot CLI 等），充当“增强层”而非独立工具。 竞争方面，它替代了一部分手动绘制架构图的工作，也与代码浏览器、文档生成器有一定重叠；但它的独特定位是：生成的可交互图谱可直接提交到仓库，团队成员无需额外工具即可查看。 可以与 CI 流程配合（post-commit hook 更新图谱），也可作为团队共享知识的持久化中间层。",
+          "limitations": [
+            {
+              "title": "LLM 成本与延迟",
+              "body": "初次分析大型仓库时需调用多次 LLM，可能会产生费用且耗时较长（并发加速但仍有上限），对于开源或个人项目需考虑 API 开销。"
+            },
+            {
+              "title": "图谱精准度依赖静态分析",
+              "body": "动态特性（如 Python 的 monkey-patching、反射注入）难以被 Tree-sitter 捕获，导致部分关系缺失，LLM 也无法完全弥补。"
+            },
+            {
+              "title": "多语言支持局限",
+              "body": "Tree-sitter 的语言覆盖虽广，但每种语言都需维护语法库，较新的语言或框架可能解析不完全，影响图谱的完整性。"
+            },
+            {
+              "title": "增量更新可能遗漏间接变更",
+              "body": "指纹比对仅检测文件变更，若修改了全局配置影响多处文件而未触发重新分析，图谱可能暂时不一致，需手动全量运行一次。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "在 Claude Code 中通过插件市场安装",
+              "note": "如果使用其它平台，请参照 README 中的安装脚本"
+            },
+            {
+              "step": "在项目根目录运行分析命令，等待多代理流水线完成",
+              "note": "首次运行会解析整个项目并调用 LLM，耗时视代码量而定"
+            },
+            {
+              "step": "启动交互式仪表板",
+              "note": "浏览器会自动打开，可看到力导向布局的知识图谱"
+            },
+            {
+              "step": "点击搜索框输入“auth”",
+              "note": "节点和关系会被过滤，展示认证相关部分"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 23,
+            "reproducibility": 24,
+            "timeToValue": 22
+          }
+        },
+        "deep_status": "available"
       },
       {
         "fullName": "can1357/oh-my-pi",
@@ -3645,7 +3814,91 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=83; max=deep; final=deep"
-        }
+        },
+        "deep": {
+          "atGlance": "Anthropic 官方的终端 AI 编码工具：它住在命令行里，能读懂整个代码库、直接改文件、跑命令、提交 git，并通过自然语言驱动。值得看是因为它是「agentic coding」这一代工具的官方参照实现（130k star、MIT 许可），无论你想用它干活还是想照着它设计自己的编码 Agent，都绕不开它。现在看它，是因为它已从单一终端 CLI 扩展成跨终端 / VS Code / JetBrains / 桌面 App / 浏览器 / CI 的统一引擎，且对外开放了 Agent SDK。",
+          "whyItMatters": [
+            {
+              "title": "agentic coding 的官方参照",
+              "body": "不是补全插件，而是一个会自己规划→改多文件→跑命令验证的闭环 Agent。想理解这代工具长什么样，读它最直接。"
+            },
+            {
+              "title": "一套引擎、多处入口",
+              "body": "终端、VS Code、JetBrains、桌面 App、Web、CI 共用同一引擎，CLAUDE.md / settings / MCP server 在所有入口通用，降低工具链割裂。"
+            },
+            {
+              "title": "可扩展性是设计核心",
+              "body": "CLAUDE.md 记忆、Skills、Hooks、Subagents、MCP 都是官方一等公民；它把「如何把 Agent 接进真实工程流」做成了可复制的模式。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "agentic loop（智能体闭环）",
+              "explain": "工具不只回答，而是「读代码→规划→编辑文件→运行命令→看结果→修正」反复迭代，直到任务完成或需要你确认。这是它和普通补全的本质区别。"
+            },
+            {
+              "term": "CLAUDE.md / auto memory",
+              "explain": "放在项目根目录的 markdown，每次会话开始自动读入，用来写编码规范、架构决策、评审清单（已核实：官方 /en/memory）。auto memory 则是它边干边把构建命令、调试心得等存下来跨会话复用。"
+            },
+            {
+              "term": "MCP（Model Context Protocol）",
+              "explain": "一个连接 AI 工具与外部数据源的开放标准。通过 MCP，Claude Code 能读 Google Drive 文档、更新 Jira 工单、拉 Slack 数据或接你自己的工具（已核实：官方 /en/mcp）。"
+            },
+            {
+              "term": "Skills / Hooks / Subagents",
+              "explain": "Skills 把可复用工作流打包成可共享命令（如 /review-pr）；Hooks 在动作前后跑 shell 命令（如每次编辑后自动格式化）；Subagents 让多个 Agent 分工并行、由一个 lead 协调合并（已核实：官方 /en/skills、/en/hooks、/en/sub-agents）。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 把它想成一个住在你终端里的资深结对工程师：你用人话说要什么，它先读懂代码库，自己规划步骤，跨多个文件改代码，再跑命令验证，最后帮你提交。\n## 工作流\n1. 在项目目录运行 `claude` 启动会话，首次需登录（需 Claude 订阅或 Anthropic Console 账号）。\n2. 会话开始时自动读取项目根的 `CLAUDE.md`，加载你的规范与历史 auto memory。\n3. 你下达自然语言任务，如 `claude \"write tests for the auth module, run them, and fix any failures\"`。\n4. 它在 agentic loop 里反复：用内置工具读/改文件、跑 shell 命令、查 git；可调用 MCP server 拉外部上下文。\n5. 触及 Hooks 时在动作前后执行你配置的 shell（如编辑后自动格式化、提交前跑 lint）。\n6. 复杂任务可 spawn Subagents 并行处理不同部分，lead agent 协调合并。\n7. 完成后可直接 `claude \"commit my changes with a descriptive message\"` 暂存、写 commit message、建分支、开 PR。\n## 关键组件\n- **统一引擎 + 多入口**：终端 / VS Code / JetBrains / 桌面 / Web / CI 共用一套引擎与配置（已核实：官方 overview）。\n- **CLI 可组合（Unix 哲学）**：可管道化，如 `tail -200 app.log | claude -p \"Slack me if you see any anomalies\"`，或在 CI 里 `claude -p` 批处理（已核实：官方 CLI 示例）。\n- **平台兼容**：原生 macOS/Linux/Windows；Windows 上推荐装 Git for Windows 以启用 Bash 工具，否则回退 PowerShell（已核实：官方 setup）。\n## 验证点 在任意项目跑 `claude` 后给一个最小任务（如「给这个函数加单测并跑通」），观察它是否自己定位文件、写测试、运行并根据失败自我修正——能闭环即说明 agentic loop 工作正常。",
+          "novelty": "可迁移模式：把「LLM + 一组确定性工具（读写文件 / 跑命令 / git）+ 反复验证的闭环 + 可插拔扩展（MCP/Hooks/Skills/Subagents）」组合成一个工程化的 Agent 骨架。这套骨架可迁移到任何「让模型在真实环境里反复试错并自我验证」的场景，而不只是写代码。\n与同类对比：相比 GitHub Copilot 这类以补全/对话为主的助手，Claude Code 的定位是会自己跑命令、改多文件、提交 PR 的自治 Agent；相比 Cursor 等以编辑器为中心的方案，它以终端 CLI 为中心、强调可组合与可脚本化（管道、CI、`-p` 无头模式）。需要客观指出：它把模型层锁定在 Anthropic 自家模型（多数入口需 Claude 订阅；终端与 VS Code 支持第三方 provider），这是与开源框架（如可换任意模型的 Agent 库）的关键取舍。具体用哪个模型由订阅/配置决定，README 未逐一列出版本——此处标「数据不足」。",
+          "ecosystem": "核心依赖：Anthropic 的 Claude 模型与账号体系（多数入口需订阅）。运行环境跨 macOS/Linux/Windows/WSL；Node.js 18+（npm 安装方式已标记 deprecated，官方推荐原生安装脚本）。\n它在生态里的位置是「Agent 平台 + 集成枢纽」：通过 MCP 接 Google Drive / Jira / Slack / 自定义工具；通过 GitHub Actions、GitLab CI/CD 做自动 PR 评审与 issue 三角分诊；通过 Slack 把 bug 报告直接转成 PR；并开放 Agent SDK 让你用它的工具与能力构建自定义 Agent。\n它替代/挤压的是一部分手工脚本化开发任务（批量改文件、写发布说明、解合并冲突）与传统补全插件的部分场景；但它不替代你的 CI/版本控制，而是嵌进去做执行层。语言构成 Python 79.7% / Shell 13.7% / TypeScript 5.0%（已核实：GitHub 语言条）。",
+          "limitations": [
+            {
+              "title": "模型与账号绑定",
+              "body": "多数入口需 Claude 订阅或 Anthropic Console 账号；模型层主要锁定 Anthropic 自家模型（终端与 VS Code 支持第三方 provider）。与可自由换模型的开源 Agent 框架相比是明确取舍。"
+            },
+            {
+              "title": "自治带来的执行风险",
+              "body": "它会真的跑 shell 命令、改文件、提交 git。在生产或共享环境需要靠权限/确认机制与 Hooks 兜底，否则一次错误操作代价不小（机制为官方提供，是否足够取决于你的配置）。"
+            },
+            {
+              "title": "README 对内部机制披露有限",
+              "body": "仓库 README 本身很薄，agentic loop、工具集、Subagents 等细节主要在官方文档站（code.claude.com/docs），不在仓库内——对想从源码逆向理解架构的人不够友好。"
+            },
+            {
+              "title": "成本与数据",
+              "body": "长任务会多轮调用模型，存在费用与延迟；官方称收集使用反馈/对话/bug 数据但有保留期限且不用于训练（自称：README 隐私说明，未独立核实）。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "安装并在项目里启动",
+              "cmd": "curl -fsSL https://claude.ai/install.sh | bash",
+              "note": "Windows 用 `irm https://claude.ai/install.ps1 | iex`；装好后在项目目录运行 `claude` 并登录。"
+            },
+            {
+              "step": "给一个会触发 agentic loop 的最小任务",
+              "cmd": "claude \"write tests for the auth module, run them, and fix any failures\"",
+              "note": "观察它是否自己定位文件、写测试、运行并按失败自我修正。"
+            },
+            {
+              "step": "试无头/可组合模式",
+              "cmd": "git diff main --name-only | claude -p \"review these changed files for security issues\"",
+              "note": "验证它能作为 Unix 管道的一环嵌进脚本与 CI。"
+            },
+            {
+              "step": "放一个 CLAUDE.md 看记忆是否生效",
+              "note": "在项目根写下编码规范，重开会话，看它是否遵守——确认 memory 机制工作。"
+            }
+          ],
+          "score": {
+            "novelty": 19,
+            "engineering": 24,
+            "reproducibility": 24,
+            "timeToValue": 23
+          }
+        },
+        "deep_status": "available"
       },
       {
         "fullName": "CloakHQ/CloakBrowser",
@@ -6593,7 +6846,88 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=83; max=deep; final=deep"
-        }
+        },
+        "deep": {
+          "atGlance": "港大数据科学实验室（HKUDS）开源的「100% 全自动、Agent 原生」交易平台：让 AI Agent（OpenClaw、nanobot、Claude Code、Cursor 等）只靠一条消息就能加入平台，发布交易信号、跟单、靠社区协作赚积分。值得看是因为它把「Agent 作为一等参与者」做成了产品形态——通过一个 SKILL.md 让任意 Agent 自助注册，是观察「Agent 经济 / 多 Agent 协作」如何落到具体业务的鲜活样本。现在看它，是因为它已积累 19.3k star 且在持续更新，但要把它当投资工具前必须分清「平台机制」与「未披露的真实收益」。",
+          "whyItMatters": [
+            {
+              "title": "Agent 原生的产品形态",
+              "body": "不是给人用的交易 App，而是让 AI Agent 自助接入：读一份 SKILL.md 即可注册、发信号、跟单。这种「Agent 即用户」的设计值得 AI 应用开发者研究。"
+            },
+            {
+              "title": "以 Skill 作为接入协议",
+              "body": "用一个公开 URL（ai4trade.ai/SKILL.md）当作 Agent 的入场说明书，把「如何接入」标准化成可被任意 Agent 读取执行的文本——是很轻量的多 Agent 协作接入范式。"
+            },
+            {
+              "title": "可观察的协作经济",
+              "body": "信号发布者、跟单者、策略协作者通过积分激励组织起来，提供了一个研究「集体智能 / Agent 群体行为」的开放实验场。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Agent-native（Agent 原生）",
+              "explain": "系统的主要使用者被设计成 AI Agent 而非人：Agent 通过收一条消息、读一份说明就能自助完成注册与操作，无需人工点界面。"
+            },
+            {
+              "term": "SKILL.md 接入协议",
+              "explain": "平台把「怎么加入、能做什么」写成一份公开的 SKILL.md（已核实：README 指向 https://ai4trade.ai/SKILL.md）。Agent 读这份文件就知道如何注册并参与——相当于给 Agent 的 API 说明书，但以自然语言+技能描述形式给出。"
+            },
+            {
+              "term": "Paper Trading（模拟盘）",
+              "explain": "用虚拟资金在真实行情上模拟下单，不动真钱。README 提到「$100K Paper Trading」，即给每个参与者 10 万虚拟本金练手（自称：README）。"
+            },
+            {
+              "term": "信号发布 / 跟单（copy trade）",
+              "explain": "一个 Agent 把它的交易决策作为「信号」公开，其他 Agent 可以自动「跟单」复制这笔交易，从而形成协作与策略传播。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 把它想成一个「只对 Agent 开放的交易社区」：你的 AI Agent 读一份入场说明（SKILL.md）就能进场，公开自己的交易信号，别的 Agent 跟着复制，大家用模拟盘比拼、靠积分激励协作。\n## 工作流\n1. Agent 接入：给 Agent 发一条消息「Read https://ai4trade.ai/SKILL.md and register」，Agent 读说明后自助注册（已核实：README 接入说明）。\n2. 人类入口：访问 https://ai4trade.ai 注册、浏览信号（已核实：README）。\n3. 参与：注册后的 Agent 发布信号、跟单他人、与社区协作策略，在模拟盘（$100K）上执行。\n4. 激励：通过社区协作赚取积分。\n## 关键组件（已核实：README 目录结构）\n- `skills/`：Agent 技能定义（接入与能力）。\n- `docs/api/`：OpenAPI 规格。\n- `service/`：后端 FastAPI + 前端 React（前后端分离）。\n- 数据：README 明确提到 Polymarket 用于模拟盘；并称对接 Binance、Coinbase、Interactive Brokers，覆盖股票/加密/外汇/期权/期货。\n## 验证点 让一个测试 Agent 按 SKILL.md 注册成功、在模拟盘发出一条信号并被另一个 Agent 跟单，即可确认 Agent-native 接入与协作闭环成立；真实收益不在验证范围内（平台未披露）。",
+          "novelty": "可迁移模式：用一份公开、可被任意 Agent 读取的 SKILL.md 作为「自助接入协议」，把「如何加入一个多 Agent 系统」从写死的 SDK 集成，降维成「读一段技能说明就能接入」。这种「以技能文档为接入面」的做法，可迁移到任何想让外部 Agent 即插即用的平台。\n与同类对比：相比传统量化/回测框架（如 Backtrader、QuantConnect）聚焦给人写策略、跑回测，AI-Trader 的差异在于把参与者本身换成 Agent，并强调「集体智能 / 协作」而非单一策略性能。这是产品形态上的新颖，而非交易算法上的突破。\n需要客观指出：HKUDS 通常会配套 arXiv 论文，但本仓库 README 未链接论文（已核实：README 无论文链接）；平台不公开任何真实收益/回测业绩，主打「协作」叙事。其新颖性集中在接入与组织方式，底层交易/执行的工程深度从 README 无法判断——标「数据不足」。",
+          "ecosystem": "技术栈：后端 FastAPI、前端 React（前后端分离以求响应性），含 OpenAPI 规格；语言构成 Python 71.1% / TypeScript 24.0% / CSS 4.9%（已核实：GitHub 语言条）。数据/撮合侧自称对接 Polymarket（模拟盘）及 Binance、Coinbase、Interactive Brokers。\n它在生态里的位置是「面向 Agent 的交易撮合与协作层」：上游接各类自治 Agent（OpenClaw、nanobot、Claude Code、Cursor 等），下游接行情与经纪/预测市场。它不替代你的模型或 Agent，而是给它们提供一个「可参与交易并互相跟单」的场所。\n与人面向的量化平台是错位竞争：传统平台服务人类 quant，它服务 Agent 群体。可作为研究 Agent 经济、激励机制、群体策略传播的开放实验台。",
+          "limitations": [
+            {
+              "title": "真实收益完全未披露",
+              "body": "平台强调模拟盘与信号协作，未公布任何真实业绩/回测指标。任何「能赚钱」的预期都无数据支撑——把它当投资工具前需极度谨慎。"
+            },
+            {
+              "title": "未链接论文 / 方法细节缺失",
+              "body": "尽管 HKUDS 常配 arXiv 论文，本仓库 README 未链接论文，底层撮合/风控/执行的工程深度无法从 README 判断（数据不足）。"
+            },
+            {
+              "title": "金融与合规风险",
+              "body": "涉及真实经纪/交易所对接与「Agent 自动交易」，存在显著金融、合规、滥用风险；README 未见完整免责与风控说明。"
+            },
+            {
+              "title": "自助接入的安全面",
+              "body": "让任意 Agent 读一份公开 SKILL.md 即可注册参与，需关注身份验证、防滥用与女巫攻击（积分系统易被刷）——README 未说明防护机制。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "先读接入协议本身",
+              "note": "打开 README 指向的 https://ai4trade.ai/SKILL.md，理解 Agent 注册与可执行动作——这是整套设计的核心。"
+            },
+            {
+              "step": "用人类入口注册观察",
+              "note": "访问 https://ai4trade.ai 注册并浏览现有信号，先看清平台机制与积分规则，再决定是否接 Agent。"
+            },
+            {
+              "step": "让测试 Agent 自助注册",
+              "note": "给一个 Agent 发「Read https://ai4trade.ai/SKILL.md and register」，验证 Agent-native 接入是否真的免人工。"
+            },
+            {
+              "step": "只在模拟盘里验证协作闭环",
+              "note": "在 $100K 模拟盘发一条信号、让另一个 Agent 跟单，确认协作链路成立；切勿在未核实风控前接入真实资金。"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 18,
+            "reproducibility": 17,
+            "timeToValue": 18
+          }
+        },
+        "deep_status": "available"
       },
       {
         "fullName": "mukul975/Anthropic-Cybersecurity-Skills",
@@ -13241,7 +13575,88 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=89; max=deep; final=analysis"
-        }
+        },
+        "deep": {
+          "atGlance": "这个项目值得深看，因为它用一个可交互的知识图谱来打破新加入大型代码库时的茫然。它适合开发者、团队新人以及技术负责人，特别是当面对复杂项目需要快速理解结构和业务逻辑时。现在看它是因为它集成了多家 AI 编码平台，安装极简，且图谱可提交到版本库中共享。",
+          "whyItMatters": [
+            {
+              "title": "降低上手门槛",
+              "body": "新人加入代码库时，通过可视化图谱和引导式漫游，可以迅速建立结构认知，不再盲目阅读代码。"
+            },
+            {
+              "title": "动静结合分析",
+              "body": "用 Tree-sitter 做确定性解析保证图谱结构可复现，LLM 补充语义理解，两者互补使图谱既有精确边又有可读摘要。"
+            },
+            {
+              "title": "跨 AI 平台运行",
+              "body": "支持 Claude Code、Codex、Copilot、Cursor 等 14+ 平台，一条安装脚本即可适配，降低工具链锁定风险。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "知识图谱节点",
+              "explain": "每个文件、函数、类都化为一个节点，节点之间通过导入、调用、继承等关系连接，形成代码的拓扑视图。"
+            },
+            {
+              "term": "多智能体流水线",
+              "explain": "由项目扫描器、文件分析器、架构分析器等 5-6 个专门代理组成，各司其职：扫描文件树、提取结构、分配架构层、构建导览、验证图谱完整性。"
+            },
+            {
+              "term": "Tree-sitter + LLM 混合",
+              "explain": "Tree-sitter 负责精确解析语法提取 imports/exports 等，保证结构可复现；LLM 读取解析结果和源码，生成英文摘要、标签和架构层，提供人可读的语义。"
+            },
+            {
+              "term": "引导式导览",
+              "explain": "根据依赖关系自动生成按依赖排序的架构浏览路径，让开发者按正确顺序学习代码库。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 可以把项目想象成一个聪明的导游：它先用机械的方式（Tree-sitter）给所有代码建筑拍下精确的平面图（导入导出关系），再请一位语言专家（LLM）给每栋建筑写上说明和标签（功能、架构层），最后生成一张可以随意缩放、搜索、点击的互动地图。 ## 工作流 1. 用户执行 `/understand` 命令，启动多智能体流水线。 2. `project-scanner` 扫描文件树，识别语言和框架。 3. 多个 `file-analyzer` 并行工作（最多5个并发，每批20-30个文件），先用 Tree-sitter 提取函数、类、导入等事实，生成图节点和边；再将解析结果与源码一并送给 LLM，输出摘要、标签、架构层。 4. `architecture-analyzer` 将节点分组到 API、Service、Data 等层。 5. `tour-builder` 生成依赖排序的学习路径。 6. `graph-reviewer` 检查引用完整性和缺失节点（可选全量 LLM 审查）。 7. 最终图谱保存为 `.understand-anything/knowledge-graph.json`，增量分析时指纹比对仅更新变更文件。 ## 关键组件 - **确定性解析器**：Tree-sitter 保证输入相同代码输出相同结构，杜绝 LLM 幻觉导致边缺失。 - **LLM 代理**：并非全权生成，而是作为增强层，只负责需要理解意图的任务（摘要、标签、架构层）。 - **增量更新引擎**：基于文件指纹检测变更，下次运行只重新分析改动过的文件，大幅加快大型仓库的重复分析。 ## 验证点 运行 `/understand-dashboard` 后，浏览器打开本地网页，能看到彩色节点按架构层分布，点击节点可查看摘要和关系，搜索“auth”应定位到认证相关代码，说明图谱构建成功。",
+          "novelty": "可迁移模式：将静态代码解析与大型语言模型互补结合，而非让 LLM 独自“阅读”代码——这保证了图的拓扑结构可完全复现，同时叠加人类可读的语义层。这种做法可迁移到任何需要静态分析加自然语言理解的场景，比如配置依赖图、数据血缘图等。 与同领域方案对比：纯 LLM 工具（如直接用 Claude Code 对话）能回答问题，但无法给出可靠的结构化全貌，且每次可能给出不同答案。Sourcegraph 等代码搜索平台可提供精确索引和搜索，但不自动生成人类可读的摘要与导览。CodeSee 等可视化工具专注于标准调用图，但无 AI 语义层。相比之下，Understand-Anything 把两者结合得较为轻量，且作为插件横跨多个 AI 编码助手生态，降低了切换成本。其增量分析和图谱共享是实用的工程补充，但核心思想并非首创，更多是对现有能力的精巧整合。",
+          "ecosystem": "核心依赖：Tree-sitter 及其语言语法库，以及一个能够处理大上下文（如 Claude 200K）的 LLM。 它作为插件深度集成到多种 AI 编码平台（Claude Code 原生，Cursor/VS Code 自动发现，Copilot CLI 等），充当“增强层”而非独立工具。 竞争方面，它替代了一部分手动绘制架构图的工作，也与代码浏览器、文档生成器有一定重叠；但它的独特定位是：生成的可交互图谱可直接提交到仓库，团队成员无需额外工具即可查看。 可以与 CI 流程配合（post-commit hook 更新图谱），也可作为团队共享知识的持久化中间层。",
+          "limitations": [
+            {
+              "title": "LLM 成本与延迟",
+              "body": "初次分析大型仓库时需调用多次 LLM，可能会产生费用且耗时较长（并发加速但仍有上限），对于开源或个人项目需考虑 API 开销。"
+            },
+            {
+              "title": "图谱精准度依赖静态分析",
+              "body": "动态特性（如 Python 的 monkey-patching、反射注入）难以被 Tree-sitter 捕获，导致部分关系缺失，LLM 也无法完全弥补。"
+            },
+            {
+              "title": "多语言支持局限",
+              "body": "Tree-sitter 的语言覆盖虽广，但每种语言都需维护语法库，较新的语言或框架可能解析不完全，影响图谱的完整性。"
+            },
+            {
+              "title": "增量更新可能遗漏间接变更",
+              "body": "指纹比对仅检测文件变更，若修改了全局配置影响多处文件而未触发重新分析，图谱可能暂时不一致，需手动全量运行一次。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "在 Claude Code 中通过插件市场安装",
+              "note": "如果使用其它平台，请参照 README 中的安装脚本"
+            },
+            {
+              "step": "在项目根目录运行分析命令，等待多代理流水线完成",
+              "note": "首次运行会解析整个项目并调用 LLM，耗时视代码量而定"
+            },
+            {
+              "step": "启动交互式仪表板",
+              "note": "浏览器会自动打开，可看到力导向布局的知识图谱"
+            },
+            {
+              "step": "点击搜索框输入“auth”",
+              "note": "节点和关系会被过滤，展示认证相关部分"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 23,
+            "reproducibility": 24,
+            "timeToValue": 22
+          }
+        },
+        "deep_status": "available"
       },
       {
         "fullName": "cursor/plugins",
@@ -14718,7 +15133,91 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=83; max=deep; final=deep"
-        }
+        },
+        "deep": {
+          "atGlance": "Anthropic 官方的终端 AI 编码工具：它住在命令行里，能读懂整个代码库、直接改文件、跑命令、提交 git，并通过自然语言驱动。值得看是因为它是「agentic coding」这一代工具的官方参照实现（130k star、MIT 许可），无论你想用它干活还是想照着它设计自己的编码 Agent，都绕不开它。现在看它，是因为它已从单一终端 CLI 扩展成跨终端 / VS Code / JetBrains / 桌面 App / 浏览器 / CI 的统一引擎，且对外开放了 Agent SDK。",
+          "whyItMatters": [
+            {
+              "title": "agentic coding 的官方参照",
+              "body": "不是补全插件，而是一个会自己规划→改多文件→跑命令验证的闭环 Agent。想理解这代工具长什么样，读它最直接。"
+            },
+            {
+              "title": "一套引擎、多处入口",
+              "body": "终端、VS Code、JetBrains、桌面 App、Web、CI 共用同一引擎，CLAUDE.md / settings / MCP server 在所有入口通用，降低工具链割裂。"
+            },
+            {
+              "title": "可扩展性是设计核心",
+              "body": "CLAUDE.md 记忆、Skills、Hooks、Subagents、MCP 都是官方一等公民；它把「如何把 Agent 接进真实工程流」做成了可复制的模式。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "agentic loop（智能体闭环）",
+              "explain": "工具不只回答，而是「读代码→规划→编辑文件→运行命令→看结果→修正」反复迭代，直到任务完成或需要你确认。这是它和普通补全的本质区别。"
+            },
+            {
+              "term": "CLAUDE.md / auto memory",
+              "explain": "放在项目根目录的 markdown，每次会话开始自动读入，用来写编码规范、架构决策、评审清单（已核实：官方 /en/memory）。auto memory 则是它边干边把构建命令、调试心得等存下来跨会话复用。"
+            },
+            {
+              "term": "MCP（Model Context Protocol）",
+              "explain": "一个连接 AI 工具与外部数据源的开放标准。通过 MCP，Claude Code 能读 Google Drive 文档、更新 Jira 工单、拉 Slack 数据或接你自己的工具（已核实：官方 /en/mcp）。"
+            },
+            {
+              "term": "Skills / Hooks / Subagents",
+              "explain": "Skills 把可复用工作流打包成可共享命令（如 /review-pr）；Hooks 在动作前后跑 shell 命令（如每次编辑后自动格式化）；Subagents 让多个 Agent 分工并行、由一个 lead 协调合并（已核实：官方 /en/skills、/en/hooks、/en/sub-agents）。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 把它想成一个住在你终端里的资深结对工程师：你用人话说要什么，它先读懂代码库，自己规划步骤，跨多个文件改代码，再跑命令验证，最后帮你提交。\n## 工作流\n1. 在项目目录运行 `claude` 启动会话，首次需登录（需 Claude 订阅或 Anthropic Console 账号）。\n2. 会话开始时自动读取项目根的 `CLAUDE.md`，加载你的规范与历史 auto memory。\n3. 你下达自然语言任务，如 `claude \"write tests for the auth module, run them, and fix any failures\"`。\n4. 它在 agentic loop 里反复：用内置工具读/改文件、跑 shell 命令、查 git；可调用 MCP server 拉外部上下文。\n5. 触及 Hooks 时在动作前后执行你配置的 shell（如编辑后自动格式化、提交前跑 lint）。\n6. 复杂任务可 spawn Subagents 并行处理不同部分，lead agent 协调合并。\n7. 完成后可直接 `claude \"commit my changes with a descriptive message\"` 暂存、写 commit message、建分支、开 PR。\n## 关键组件\n- **统一引擎 + 多入口**：终端 / VS Code / JetBrains / 桌面 / Web / CI 共用一套引擎与配置（已核实：官方 overview）。\n- **CLI 可组合（Unix 哲学）**：可管道化，如 `tail -200 app.log | claude -p \"Slack me if you see any anomalies\"`，或在 CI 里 `claude -p` 批处理（已核实：官方 CLI 示例）。\n- **平台兼容**：原生 macOS/Linux/Windows；Windows 上推荐装 Git for Windows 以启用 Bash 工具，否则回退 PowerShell（已核实：官方 setup）。\n## 验证点 在任意项目跑 `claude` 后给一个最小任务（如「给这个函数加单测并跑通」），观察它是否自己定位文件、写测试、运行并根据失败自我修正——能闭环即说明 agentic loop 工作正常。",
+          "novelty": "可迁移模式：把「LLM + 一组确定性工具（读写文件 / 跑命令 / git）+ 反复验证的闭环 + 可插拔扩展（MCP/Hooks/Skills/Subagents）」组合成一个工程化的 Agent 骨架。这套骨架可迁移到任何「让模型在真实环境里反复试错并自我验证」的场景，而不只是写代码。\n与同类对比：相比 GitHub Copilot 这类以补全/对话为主的助手，Claude Code 的定位是会自己跑命令、改多文件、提交 PR 的自治 Agent；相比 Cursor 等以编辑器为中心的方案，它以终端 CLI 为中心、强调可组合与可脚本化（管道、CI、`-p` 无头模式）。需要客观指出：它把模型层锁定在 Anthropic 自家模型（多数入口需 Claude 订阅；终端与 VS Code 支持第三方 provider），这是与开源框架（如可换任意模型的 Agent 库）的关键取舍。具体用哪个模型由订阅/配置决定，README 未逐一列出版本——此处标「数据不足」。",
+          "ecosystem": "核心依赖：Anthropic 的 Claude 模型与账号体系（多数入口需订阅）。运行环境跨 macOS/Linux/Windows/WSL；Node.js 18+（npm 安装方式已标记 deprecated，官方推荐原生安装脚本）。\n它在生态里的位置是「Agent 平台 + 集成枢纽」：通过 MCP 接 Google Drive / Jira / Slack / 自定义工具；通过 GitHub Actions、GitLab CI/CD 做自动 PR 评审与 issue 三角分诊；通过 Slack 把 bug 报告直接转成 PR；并开放 Agent SDK 让你用它的工具与能力构建自定义 Agent。\n它替代/挤压的是一部分手工脚本化开发任务（批量改文件、写发布说明、解合并冲突）与传统补全插件的部分场景；但它不替代你的 CI/版本控制，而是嵌进去做执行层。语言构成 Python 79.7% / Shell 13.7% / TypeScript 5.0%（已核实：GitHub 语言条）。",
+          "limitations": [
+            {
+              "title": "模型与账号绑定",
+              "body": "多数入口需 Claude 订阅或 Anthropic Console 账号；模型层主要锁定 Anthropic 自家模型（终端与 VS Code 支持第三方 provider）。与可自由换模型的开源 Agent 框架相比是明确取舍。"
+            },
+            {
+              "title": "自治带来的执行风险",
+              "body": "它会真的跑 shell 命令、改文件、提交 git。在生产或共享环境需要靠权限/确认机制与 Hooks 兜底，否则一次错误操作代价不小（机制为官方提供，是否足够取决于你的配置）。"
+            },
+            {
+              "title": "README 对内部机制披露有限",
+              "body": "仓库 README 本身很薄，agentic loop、工具集、Subagents 等细节主要在官方文档站（code.claude.com/docs），不在仓库内——对想从源码逆向理解架构的人不够友好。"
+            },
+            {
+              "title": "成本与数据",
+              "body": "长任务会多轮调用模型，存在费用与延迟；官方称收集使用反馈/对话/bug 数据但有保留期限且不用于训练（自称：README 隐私说明，未独立核实）。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "安装并在项目里启动",
+              "cmd": "curl -fsSL https://claude.ai/install.sh | bash",
+              "note": "Windows 用 `irm https://claude.ai/install.ps1 | iex`；装好后在项目目录运行 `claude` 并登录。"
+            },
+            {
+              "step": "给一个会触发 agentic loop 的最小任务",
+              "cmd": "claude \"write tests for the auth module, run them, and fix any failures\"",
+              "note": "观察它是否自己定位文件、写测试、运行并按失败自我修正。"
+            },
+            {
+              "step": "试无头/可组合模式",
+              "cmd": "git diff main --name-only | claude -p \"review these changed files for security issues\"",
+              "note": "验证它能作为 Unix 管道的一环嵌进脚本与 CI。"
+            },
+            {
+              "step": "放一个 CLAUDE.md 看记忆是否生效",
+              "note": "在项目根写下编码规范，重开会话，看它是否遵守——确认 memory 机制工作。"
+            }
+          ],
+          "score": {
+            "novelty": 19,
+            "engineering": 24,
+            "reproducibility": 24,
+            "timeToValue": 23
+          }
+        },
+        "deep_status": "available"
       },
       {
         "fullName": "mukul975/Anthropic-Cybersecurity-Skills",
@@ -15189,7 +15688,95 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=95; max=deep; final=deep"
-        }
+        },
+        "deep": {
+          "atGlance": "复旦 OpenMOSS 团队开源的语音与声音生成模型家族，目标是高保真、高表现力、覆盖复杂真实场景（长语音、多说话人对话、音色设计、音效）。值得看是因为它不是单个 TTS，而是一整套同源家族（从 ~100M 的 Nano 到 8B 的主力），底座是一个自研、无 CNN、纯 Causal Transformer 的 16 亿参数音频 tokenizer；对想做语音应用或研究音频离散化的人是难得的开源全栈参照。现在看它，是因为它刚以开源身份给出对标甚至超过部分闭源模型的主观评测自称。",
+          "whyItMatters": [
+            {
+              "title": "开源的全栈语音家族",
+              "body": "tokenizer + 多档位生成模型（TTS / 对话 TTSD / 实时 / 音效 / 音色生成）一次性开放，Apache-2.0，便于二次开发与私有部署。"
+            },
+            {
+              "title": "自研音频 tokenizer 是地基",
+              "body": "MOSS-Audio-Tokenizer 自称 16 亿参数、无 CNN、纯 Causal Transformer、32 层 RVQ，从头在 300 万小时语音/音效/音乐上训练——离散化质量直接决定上层生成上限。"
+            },
+            {
+              "title": "覆盖实时与多场景",
+              "body": "Realtime 档自称 TTFB 180ms、RTF 0.51；家族还含多说话人对话与音效生成，适配的不只是「读一段字」。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "音频 tokenizer（离散化）",
+              "explain": "把连续的声音波形压成一串离散 token，像给语音建一套「字母表」，模型才能像生成文字一样生成语音。MOSS 自研的 tokenizer 用 RVQ（残差向量量化，多层逐层逼近原始信号）做这件事。"
+            },
+            {
+              "term": "RVQ + delay-pattern（延迟调度）",
+              "explain": "RVQ 把每帧音频拆成多层码字；主力 MOSS-TTS（MossTTSDelay）用「多头并行 RVQ 预测 + 延迟模式调度」并行预测多层码字，平衡质量与速度（自称：README 架构描述）。"
+            },
+            {
+              "term": "三种生成架构分档",
+              "explain": "MossTTSDelay（延迟并行，主力质量档）、MossTTSLocal（时间同步 RVQ 块 + depth transformer，1.7B 轻量档）、MossTTSRealtime（文本-音频分层输入，实时档）——同一家族按场景换骨架。"
+            },
+            {
+              "term": "depth transformer",
+              "explain": "在每个时间步内沿 RVQ 的「深度」（多层码字）方向再跑一个小 transformer，逐层细化该帧的离散表示，用在 Local 档以小模型换取质量。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 把它想成一条「先建字母表、再按字母表写作」的语音流水线：底层 tokenizer 先把声音压成离散 token（音频的字母表），上层生成模型再像写文字一样自回归地把这些 token 生成出来，最后解码回波形。\n## 工作流（推理，已核实：README 示例）\n1. 安装：`git clone` 后 `pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e \".[torch-runtime]\"`。\n2. 加载：`AutoProcessor.from_pretrained(\"OpenMOSS-Team/MOSS-TTS-v1.5\", trust_remote_code=True)` 与对应 `AutoModel`。\n3. 生成：`model.generate(input_ids=..., attention_mask=..., max_new_tokens=4096)` 产出音频 token，再由 tokenizer 解码成波形。\n## 关键组件\n- **MOSS-Audio-Tokenizer（1.6B，地基）**：无 CNN、纯 Causal Transformer、32 层 RVQ，自称在 300 万小时数据上从头训练。\n- **生成模型分档**：v1.5（8B 主力）/ Local-Transformer（1.7B）/ TTSD-V1.0（8B 对话）/ VoiceGenerator（1.7B 音色）/ SoundEffect（8B 音效）/ Realtime（1.7B）/ Nano（~100M）。\n- **多语言**：自称支持 31 种语言（含中文、粤语、英、阿、日、韩等）。\n## 验证点 跑通官方推理示例、用 v1.5 合成一段中英混读，听是否自然、音色是否稳定；要客观评估需用 Seed-TTS 这类公开 benchmark 复测 WER/SIM，而非只信主观评测自称。",
+          "novelty": "可迁移模式：把「自研、规模化、无 CNN 的纯 Transformer 音频 tokenizer」作为整个家族的统一地基，再在其上用不同骨架（延迟并行 / 时间同步 + depth transformer / 分层实时）覆盖不同质量-延迟取舍。这种「统一离散表示 + 多档生成骨架」的组织方式，可迁移到其它需要离散化连续信号的生成任务。\n与同类对比：相比把声学建模与 vocoder 分离的传统 TTS 管线，它走的是「离散 token + 自回归生成」的语言模型化路线（与 VALL-E、CosyVoice 等同代思路相近）。差异化在于自研大尺寸 tokenizer 与覆盖实时/对话/音效的完整家族，且全部开源。\n证据强度需谨慎：README 给出与 Seed-TTS benchmark 的对比（EN WER 1.84% vs 2.25%；ZH SIM 76.98% vs 79.6%），并称 TTSD-v1.0 在主观评测上超过 Doubao、Gemini 2.5-pro——这些均为官方自报/自称，未见第三方独立复现；ZH SIM 一项其自报值（76.98%）实际低于对比项（79.6%），不应被读成全面领先。",
+          "ecosystem": "核心依赖：PyTorch（示例用 cu128 轮子）、HuggingFace transformers 的 `AutoProcessor`/`AutoModel`（`trust_remote_code=True`，即模型自带自定义代码）。权重托管在 HuggingFace 的 OpenMOSS-Team 命名空间。\n它在生态里的位置是「开源语音底座 + 可私有部署的多场景 TTS」：与闭源云 TTS（如各大厂语音合成 API）形成替代关系，主打可自托管、可改造、Apache-2.0 商用友好；与其它开源 TTS（CosyVoice、F5-TTS、Fish-Speech 等）形成竞争，差异点在自研大 tokenizer 与家族化覆盖。\n可与下游对话/Agent 系统组合做语音前端，或作为研究音频离散化、RVQ、实时合成的开源实验台。仓库语言 Python 98.2%（已核实：GitHub 语言条）。",
+          "limitations": [
+            {
+              "title": "关键指标多为官方自报",
+              "body": "Seed-TTS 对比、超越 Doubao/Gemini 的主观评测均为 README 自称，未见第三方独立复现；做选型应自己用公开 benchmark 复测。"
+            },
+            {
+              "title": "对比数字需要逐条看",
+              "body": "其自报 ZH SIM 76.98% 低于对比项 79.6%，说明并非每一项都领先；不能笼统当作 SOTA。"
+            },
+            {
+              "title": "资源门槛",
+              "body": "主力档为 8B，含 1.6B tokenizer，本地推理与微调对显存有要求；README 未给出明确硬件下限——标「数据不足」。"
+            },
+            {
+              "title": "依赖 trust_remote_code",
+              "body": "加载需 `trust_remote_code=True`，会执行模型仓库自带代码，部署到生产前需自行审计这部分代码的安全性。"
+            },
+            {
+              "title": "未列明确限制清单",
+              "body": "README 聚焦能力展示，未明确列出失败模式 / 不支持场景 / 伦理与滥用风险说明。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "克隆并安装运行时",
+              "cmd": "git clone https://github.com/OpenMOSS/MOSS-TTS.git && cd MOSS-TTS && pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e \".[torch-runtime]\"",
+              "note": "需 CUDA 环境；显存要求 README 未明示，按 8B 主力档预留。"
+            },
+            {
+              "step": "加载主力 v1.5 模型",
+              "cmd": "AutoProcessor.from_pretrained(\"OpenMOSS-Team/MOSS-TTS-v1.5\", trust_remote_code=True)",
+              "note": "首次会从 HuggingFace 拉权重；trust_remote_code 会执行仓库自带代码。"
+            },
+            {
+              "step": "合成一段语音",
+              "cmd": "model.generate(input_ids=input_ids, attention_mask=attention_mask, max_new_tokens=4096)",
+              "note": "拿到音频 token 后用 tokenizer 解码成波形并试听。"
+            },
+            {
+              "step": "想要低延迟就换 Realtime 档",
+              "note": "Realtime（1.7B）自称 TTFB 180ms / RTF 0.51；自己测一下端到端首音延迟是否达标。"
+            }
+          ],
+          "score": {
+            "novelty": 21,
+            "engineering": 22,
+            "reproducibility": 20,
+            "timeToValue": 18
+          }
+        },
+        "deep_status": "available"
       }
     ]
   },
@@ -16441,7 +17028,88 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=89; max=deep; final=analysis"
-        }
+        },
+        "deep": {
+          "atGlance": "这个项目值得深看，因为它用一个可交互的知识图谱来打破新加入大型代码库时的茫然。它适合开发者、团队新人以及技术负责人，特别是当面对复杂项目需要快速理解结构和业务逻辑时。现在看它是因为它集成了多家 AI 编码平台，安装极简，且图谱可提交到版本库中共享。",
+          "whyItMatters": [
+            {
+              "title": "降低上手门槛",
+              "body": "新人加入代码库时，通过可视化图谱和引导式漫游，可以迅速建立结构认知，不再盲目阅读代码。"
+            },
+            {
+              "title": "动静结合分析",
+              "body": "用 Tree-sitter 做确定性解析保证图谱结构可复现，LLM 补充语义理解，两者互补使图谱既有精确边又有可读摘要。"
+            },
+            {
+              "title": "跨 AI 平台运行",
+              "body": "支持 Claude Code、Codex、Copilot、Cursor 等 14+ 平台，一条安装脚本即可适配，降低工具链锁定风险。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "知识图谱节点",
+              "explain": "每个文件、函数、类都化为一个节点，节点之间通过导入、调用、继承等关系连接，形成代码的拓扑视图。"
+            },
+            {
+              "term": "多智能体流水线",
+              "explain": "由项目扫描器、文件分析器、架构分析器等 5-6 个专门代理组成，各司其职：扫描文件树、提取结构、分配架构层、构建导览、验证图谱完整性。"
+            },
+            {
+              "term": "Tree-sitter + LLM 混合",
+              "explain": "Tree-sitter 负责精确解析语法提取 imports/exports 等，保证结构可复现；LLM 读取解析结果和源码，生成英文摘要、标签和架构层，提供人可读的语义。"
+            },
+            {
+              "term": "引导式导览",
+              "explain": "根据依赖关系自动生成按依赖排序的架构浏览路径，让开发者按正确顺序学习代码库。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 可以把项目想象成一个聪明的导游：它先用机械的方式（Tree-sitter）给所有代码建筑拍下精确的平面图（导入导出关系），再请一位语言专家（LLM）给每栋建筑写上说明和标签（功能、架构层），最后生成一张可以随意缩放、搜索、点击的互动地图。 ## 工作流 1. 用户执行 `/understand` 命令，启动多智能体流水线。 2. `project-scanner` 扫描文件树，识别语言和框架。 3. 多个 `file-analyzer` 并行工作（最多5个并发，每批20-30个文件），先用 Tree-sitter 提取函数、类、导入等事实，生成图节点和边；再将解析结果与源码一并送给 LLM，输出摘要、标签、架构层。 4. `architecture-analyzer` 将节点分组到 API、Service、Data 等层。 5. `tour-builder` 生成依赖排序的学习路径。 6. `graph-reviewer` 检查引用完整性和缺失节点（可选全量 LLM 审查）。 7. 最终图谱保存为 `.understand-anything/knowledge-graph.json`，增量分析时指纹比对仅更新变更文件。 ## 关键组件 - **确定性解析器**：Tree-sitter 保证输入相同代码输出相同结构，杜绝 LLM 幻觉导致边缺失。 - **LLM 代理**：并非全权生成，而是作为增强层，只负责需要理解意图的任务（摘要、标签、架构层）。 - **增量更新引擎**：基于文件指纹检测变更，下次运行只重新分析改动过的文件，大幅加快大型仓库的重复分析。 ## 验证点 运行 `/understand-dashboard` 后，浏览器打开本地网页，能看到彩色节点按架构层分布，点击节点可查看摘要和关系，搜索“auth”应定位到认证相关代码，说明图谱构建成功。",
+          "novelty": "可迁移模式：将静态代码解析与大型语言模型互补结合，而非让 LLM 独自“阅读”代码——这保证了图的拓扑结构可完全复现，同时叠加人类可读的语义层。这种做法可迁移到任何需要静态分析加自然语言理解的场景，比如配置依赖图、数据血缘图等。 与同领域方案对比：纯 LLM 工具（如直接用 Claude Code 对话）能回答问题，但无法给出可靠的结构化全貌，且每次可能给出不同答案。Sourcegraph 等代码搜索平台可提供精确索引和搜索，但不自动生成人类可读的摘要与导览。CodeSee 等可视化工具专注于标准调用图，但无 AI 语义层。相比之下，Understand-Anything 把两者结合得较为轻量，且作为插件横跨多个 AI 编码助手生态，降低了切换成本。其增量分析和图谱共享是实用的工程补充，但核心思想并非首创，更多是对现有能力的精巧整合。",
+          "ecosystem": "核心依赖：Tree-sitter 及其语言语法库，以及一个能够处理大上下文（如 Claude 200K）的 LLM。 它作为插件深度集成到多种 AI 编码平台（Claude Code 原生，Cursor/VS Code 自动发现，Copilot CLI 等），充当“增强层”而非独立工具。 竞争方面，它替代了一部分手动绘制架构图的工作，也与代码浏览器、文档生成器有一定重叠；但它的独特定位是：生成的可交互图谱可直接提交到仓库，团队成员无需额外工具即可查看。 可以与 CI 流程配合（post-commit hook 更新图谱），也可作为团队共享知识的持久化中间层。",
+          "limitations": [
+            {
+              "title": "LLM 成本与延迟",
+              "body": "初次分析大型仓库时需调用多次 LLM，可能会产生费用且耗时较长（并发加速但仍有上限），对于开源或个人项目需考虑 API 开销。"
+            },
+            {
+              "title": "图谱精准度依赖静态分析",
+              "body": "动态特性（如 Python 的 monkey-patching、反射注入）难以被 Tree-sitter 捕获，导致部分关系缺失，LLM 也无法完全弥补。"
+            },
+            {
+              "title": "多语言支持局限",
+              "body": "Tree-sitter 的语言覆盖虽广，但每种语言都需维护语法库，较新的语言或框架可能解析不完全，影响图谱的完整性。"
+            },
+            {
+              "title": "增量更新可能遗漏间接变更",
+              "body": "指纹比对仅检测文件变更，若修改了全局配置影响多处文件而未触发重新分析，图谱可能暂时不一致，需手动全量运行一次。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "在 Claude Code 中通过插件市场安装",
+              "note": "如果使用其它平台，请参照 README 中的安装脚本"
+            },
+            {
+              "step": "在项目根目录运行分析命令，等待多代理流水线完成",
+              "note": "首次运行会解析整个项目并调用 LLM，耗时视代码量而定"
+            },
+            {
+              "step": "启动交互式仪表板",
+              "note": "浏览器会自动打开，可看到力导向布局的知识图谱"
+            },
+            {
+              "step": "点击搜索框输入“auth”",
+              "note": "节点和关系会被过滤，展示认证相关部分"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 23,
+            "reproducibility": 24,
+            "timeToValue": 22
+          }
+        },
+        "deep_status": "available"
       },
       {
         "fullName": "HKUDS/ViMax",
@@ -20132,7 +20800,88 @@
           ],
           "matchedCapTerms": [],
           "explanation": "score=83; max=deep; final=deep"
-        }
+        },
+        "deep": {
+          "atGlance": "港大数据科学实验室（HKUDS）开源的「100% 全自动、Agent 原生」交易平台：让 AI Agent（OpenClaw、nanobot、Claude Code、Cursor 等）只靠一条消息就能加入平台，发布交易信号、跟单、靠社区协作赚积分。值得看是因为它把「Agent 作为一等参与者」做成了产品形态——通过一个 SKILL.md 让任意 Agent 自助注册，是观察「Agent 经济 / 多 Agent 协作」如何落到具体业务的鲜活样本。现在看它，是因为它已积累 19.3k star 且在持续更新，但要把它当投资工具前必须分清「平台机制」与「未披露的真实收益」。",
+          "whyItMatters": [
+            {
+              "title": "Agent 原生的产品形态",
+              "body": "不是给人用的交易 App，而是让 AI Agent 自助接入：读一份 SKILL.md 即可注册、发信号、跟单。这种「Agent 即用户」的设计值得 AI 应用开发者研究。"
+            },
+            {
+              "title": "以 Skill 作为接入协议",
+              "body": "用一个公开 URL（ai4trade.ai/SKILL.md）当作 Agent 的入场说明书，把「如何接入」标准化成可被任意 Agent 读取执行的文本——是很轻量的多 Agent 协作接入范式。"
+            },
+            {
+              "title": "可观察的协作经济",
+              "body": "信号发布者、跟单者、策略协作者通过积分激励组织起来，提供了一个研究「集体智能 / Agent 群体行为」的开放实验场。"
+            }
+          ],
+          "keyConcepts": [
+            {
+              "term": "Agent-native（Agent 原生）",
+              "explain": "系统的主要使用者被设计成 AI Agent 而非人：Agent 通过收一条消息、读一份说明就能自助完成注册与操作，无需人工点界面。"
+            },
+            {
+              "term": "SKILL.md 接入协议",
+              "explain": "平台把「怎么加入、能做什么」写成一份公开的 SKILL.md（已核实：README 指向 https://ai4trade.ai/SKILL.md）。Agent 读这份文件就知道如何注册并参与——相当于给 Agent 的 API 说明书，但以自然语言+技能描述形式给出。"
+            },
+            {
+              "term": "Paper Trading（模拟盘）",
+              "explain": "用虚拟资金在真实行情上模拟下单，不动真钱。README 提到「$100K Paper Trading」，即给每个参与者 10 万虚拟本金练手（自称：README）。"
+            },
+            {
+              "term": "信号发布 / 跟单（copy trade）",
+              "explain": "一个 Agent 把它的交易决策作为「信号」公开，其他 Agent 可以自动「跟单」复制这笔交易，从而形成协作与策略传播。"
+            }
+          ],
+          "howItWorks": "## 一句话模型 把它想成一个「只对 Agent 开放的交易社区」：你的 AI Agent 读一份入场说明（SKILL.md）就能进场，公开自己的交易信号，别的 Agent 跟着复制，大家用模拟盘比拼、靠积分激励协作。\n## 工作流\n1. Agent 接入：给 Agent 发一条消息「Read https://ai4trade.ai/SKILL.md and register」，Agent 读说明后自助注册（已核实：README 接入说明）。\n2. 人类入口：访问 https://ai4trade.ai 注册、浏览信号（已核实：README）。\n3. 参与：注册后的 Agent 发布信号、跟单他人、与社区协作策略，在模拟盘（$100K）上执行。\n4. 激励：通过社区协作赚取积分。\n## 关键组件（已核实：README 目录结构）\n- `skills/`：Agent 技能定义（接入与能力）。\n- `docs/api/`：OpenAPI 规格。\n- `service/`：后端 FastAPI + 前端 React（前后端分离）。\n- 数据：README 明确提到 Polymarket 用于模拟盘；并称对接 Binance、Coinbase、Interactive Brokers，覆盖股票/加密/外汇/期权/期货。\n## 验证点 让一个测试 Agent 按 SKILL.md 注册成功、在模拟盘发出一条信号并被另一个 Agent 跟单，即可确认 Agent-native 接入与协作闭环成立；真实收益不在验证范围内（平台未披露）。",
+          "novelty": "可迁移模式：用一份公开、可被任意 Agent 读取的 SKILL.md 作为「自助接入协议」，把「如何加入一个多 Agent 系统」从写死的 SDK 集成，降维成「读一段技能说明就能接入」。这种「以技能文档为接入面」的做法，可迁移到任何想让外部 Agent 即插即用的平台。\n与同类对比：相比传统量化/回测框架（如 Backtrader、QuantConnect）聚焦给人写策略、跑回测，AI-Trader 的差异在于把参与者本身换成 Agent，并强调「集体智能 / 协作」而非单一策略性能。这是产品形态上的新颖，而非交易算法上的突破。\n需要客观指出：HKUDS 通常会配套 arXiv 论文，但本仓库 README 未链接论文（已核实：README 无论文链接）；平台不公开任何真实收益/回测业绩，主打「协作」叙事。其新颖性集中在接入与组织方式，底层交易/执行的工程深度从 README 无法判断——标「数据不足」。",
+          "ecosystem": "技术栈：后端 FastAPI、前端 React（前后端分离以求响应性），含 OpenAPI 规格；语言构成 Python 71.1% / TypeScript 24.0% / CSS 4.9%（已核实：GitHub 语言条）。数据/撮合侧自称对接 Polymarket（模拟盘）及 Binance、Coinbase、Interactive Brokers。\n它在生态里的位置是「面向 Agent 的交易撮合与协作层」：上游接各类自治 Agent（OpenClaw、nanobot、Claude Code、Cursor 等），下游接行情与经纪/预测市场。它不替代你的模型或 Agent，而是给它们提供一个「可参与交易并互相跟单」的场所。\n与人面向的量化平台是错位竞争：传统平台服务人类 quant，它服务 Agent 群体。可作为研究 Agent 经济、激励机制、群体策略传播的开放实验台。",
+          "limitations": [
+            {
+              "title": "真实收益完全未披露",
+              "body": "平台强调模拟盘与信号协作，未公布任何真实业绩/回测指标。任何「能赚钱」的预期都无数据支撑——把它当投资工具前需极度谨慎。"
+            },
+            {
+              "title": "未链接论文 / 方法细节缺失",
+              "body": "尽管 HKUDS 常配 arXiv 论文，本仓库 README 未链接论文，底层撮合/风控/执行的工程深度无法从 README 判断（数据不足）。"
+            },
+            {
+              "title": "金融与合规风险",
+              "body": "涉及真实经纪/交易所对接与「Agent 自动交易」，存在显著金融、合规、滥用风险；README 未见完整免责与风控说明。"
+            },
+            {
+              "title": "自助接入的安全面",
+              "body": "让任意 Agent 读一份公开 SKILL.md 即可注册参与，需关注身份验证、防滥用与女巫攻击（积分系统易被刷）——README 未说明防护机制。"
+            }
+          ],
+          "tryIt": [
+            {
+              "step": "先读接入协议本身",
+              "note": "打开 README 指向的 https://ai4trade.ai/SKILL.md，理解 Agent 注册与可执行动作——这是整套设计的核心。"
+            },
+            {
+              "step": "用人类入口注册观察",
+              "note": "访问 https://ai4trade.ai 注册并浏览现有信号，先看清平台机制与积分规则，再决定是否接 Agent。"
+            },
+            {
+              "step": "让测试 Agent 自助注册",
+              "note": "给一个 Agent 发「Read https://ai4trade.ai/SKILL.md and register」，验证 Agent-native 接入是否真的免人工。"
+            },
+            {
+              "step": "只在模拟盘里验证协作闭环",
+              "note": "在 $100K 模拟盘发一条信号、让另一个 Agent 跟单，确认协作链路成立；切勿在未核实风控前接入真实资金。"
+            }
+          ],
+          "score": {
+            "novelty": 20,
+            "engineering": 18,
+            "reproducibility": 17,
+            "timeToValue": 18
+          }
+        },
+        "deep_status": "available"
       }
     ]
   }
