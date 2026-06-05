@@ -19,8 +19,14 @@
   "dataset_url": "https://huggingface.co/datasets (CraftBench, 279 samples)",
   "model_url": "",
   "space_url": "",
-  "source_rankings": ["weekly", "monthly"],
-  "human_tabs": ["paper", "career"],
+  "source_rankings": [
+    "weekly",
+    "monthly"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
   "autosci_primitive": "data/autosci/primitives/2605.30611.yaml",
   "first_seen_date": "2026-06-04",
   "tags": [
@@ -43,5 +49,10 @@
     "breadth_value": 7,
     "evidence_quality": 8
   },
-  "one_sentence_judgment": "把'生成科学配图'重构成'给现成图像生成器套一层带结构化记忆(typed-edit spec)的编排 harness'——它的 plan→render→diagnose→refine 循环 + 指令式批评家 + best-so-far 回退,是可直接迁移到 AutoSci 自改进骨架的系统模式;证据扎实(每个组件消融都掉分、对基线 +16~22 分),代价是约 4× 推理成本且主指标依赖 VLM 自评。"
+  "one_sentence_judgment": "把'生成科学配图'重构成'给现成图像生成器套一层带结构化记忆(typed-edit spec)的编排 harness'——它的 plan→render→diagnose→refine 循环 + 指令式批评家 + best-so-far 回退,是可直接迁移到 AutoSci 自改进骨架的系统模式;证据扎实(每个组件消融都掉分、对基线 +16~22 分),代价是约 4× 推理成本且主指标依赖 VLM 自评。",
+  "cold_audit": {
+    "status": "grandfathered",
+    "audited_at": "2026-06-05T14:00:50.595Z",
+    "note": "pre-gate deep-read; not retro-audited"
+  }
 }

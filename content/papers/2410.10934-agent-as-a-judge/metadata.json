@@ -24,8 +24,13 @@
   "dataset_url": "https://huggingface.co/datasets/DEVAI-benchmark/DevAI",
   "model_url": "",
   "space_url": "",
-  "source_rankings": ["lineage"],
-  "human_tabs": ["paper", "career"],
+  "source_rankings": [
+    "lineage"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
   "autosci_primitive": "data/autosci/primitives/2410.10934.yaml",
   "first_seen_date": "2026-06-04",
   "topic": "agent",
@@ -50,5 +55,10 @@
     "breadth_value": 8,
     "evidence_quality": 8
   },
-  "one_sentence_judgment": "用模块化 agent(建图/定位/读/检索/判定)看完整轨迹、按分层需求逐条评 agent——比 LLM 当裁判与人类共识对齐高得多(MetaGPT 92.07% vs 68.86%),且省 97.72% 时间/97.64% 成本,逐步反馈还能当自改进的 reward——与我们的冷审门和 L1 字面同源,复用价值极高;诚实暴露弱点(memory 模块放大错误被砍、灰盒轨迹现实难拿、被评 agent 仅满足约 29% 需求)。"
+  "one_sentence_judgment": "用模块化 agent(建图/定位/读/检索/判定)看完整轨迹、按分层需求逐条评 agent——比 LLM 当裁判与人类共识对齐高得多(MetaGPT 92.07% vs 68.86%),且省 97.72% 时间/97.64% 成本,逐步反馈还能当自改进的 reward——与我们的冷审门和 L1 字面同源,复用价值极高;诚实暴露弱点(memory 模块放大错误被砍、灰盒轨迹现实难拿、被评 agent 仅满足约 29% 需求)。",
+  "cold_audit": {
+    "status": "grandfathered",
+    "audited_at": "2026-06-05T14:00:50.587Z",
+    "note": "pre-gate deep-read; not retro-audited"
+  }
 }
