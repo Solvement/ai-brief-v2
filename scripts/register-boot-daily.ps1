@@ -28,7 +28,7 @@ $settings = New-ScheduledTaskSettingsSet `
 # Specifying an explicit -Principal with a UserId requires admin; we don't need it.
 Register-ScheduledTask -TaskName "AI-Brief Daily" `
   -Action $action -Trigger @($tLogon, $tDaily) -Settings $settings `
-  -Description "Daily deterministic refresh (news/papers/projects/models) + gate + push. Triggers: logon(+5m) and 09:00; once/day via marker. Deep-read = supervised: npm run papers:deepread" `
+  -Description "Daily refresh: deterministic (news/papers/projects/models) + full-auto deep-read gated by cross-model cold-audit (needs_human->ready_to_publish/HOLD) + quality gate + push. Triggers: logon(+5m) and 09:00; once/day via marker." `
   -Force | Out-Null
 
 Write-Output "Registered 'AI-Brief Daily' (logon+5m AND daily 09:00; restart 3x; 2h limit; once/day via marker)."

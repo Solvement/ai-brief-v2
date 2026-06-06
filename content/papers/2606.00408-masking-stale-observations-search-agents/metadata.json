@@ -52,5 +52,10 @@
     "breadth_value": 8,
     "evidence_quality": 8
   },
-  "one_sentence_judgment": "这篇把长程搜索 agent 的旧观测遮罩从默认省上下文技巧重构成 regime-dependent 控制器：检索器弱时收益低，强检索+中等模型时最高收益，模型饱和时会因误删证据而坍塌；证据来自多模型/多检索器/多 benchmark 的系统扫表、Trace-SNR probe、attention 与工具重开行为分析，适合直接迁移到 AutoSci/Deep Research agent 的上下文管理与可靠性评测，但边界是只研究最小 turn-based masking、未覆盖闭源前沿模型、regime map 仍是描述性而非可上线预测器。"
+  "one_sentence_judgment": "这篇把长程搜索 agent 的旧观测遮罩从默认省上下文技巧重构成 regime-dependent 控制器：检索器弱时收益低，强检索+中等模型时最高收益，模型饱和时会因误删证据而坍塌；证据来自多模型/多检索器/多 benchmark 的系统扫表、Trace-SNR probe、attention 与工具重开行为分析，适合直接迁移到 AutoSci/Deep Research agent 的上下文管理与可靠性评测，但边界是只研究最小 turn-based masking、未覆盖闭源前沿模型、regime map 仍是描述性而非可上线预测器。",
+  "cold_audit": {
+    "status": "grandfathered",
+    "audited_at": "2026-06-06T21:19:00.898Z",
+    "note": "pre-gate deep-read; not retro-audited"
+  }
 }

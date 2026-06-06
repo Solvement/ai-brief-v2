@@ -1,9 +1,11 @@
 # AI-Brief daily boot task (P0-2, deterministic part). Runs once on first logon each day.
 #   git pull -> npm run daily (deterministic: news / papers curation / projects / models + build-index)
 #   -> quality gate -> commit + push -> live site ai-brief-v2.vercel.app updates.
-# NOTE: the paper DEEP-READ authoring is a strong-model (open-ended agent) step. Per the project's
-#   red line ("no open-ended agent in the daily pipeline; it must be a deterministic script"), it is
-#   NOT in this unattended task. Run it supervised after boot:  npm run papers:deepread
+# DEEP-READ is now FULL-AUTO (Kevin 2026-06-06, option A) but gated: new deep-reads are authored as
+#   cold_audit.status="needs_human" (build-index excludes them) -> the CROSS-MODEL cold-audit gate
+#   (codex author / claude audit) flips PASS->"ready_to_publish" (published) or HOLD (excluded+alert).
+#   RED LINE (no unreviewed auto-publish) holds: only ready_to_publish/grandfathered reach the index.
+#   The author/gate stage is BEST-EFFORT (non-fatal) so a failure never blocks the deterministic push.
 # Register: scripts\register-boot-daily.ps1   Logs: logs\boot-daily-<date>.log   Remove: schtasks /Delete /TN "AI-Brief Daily" /F
 $ErrorActionPreference = "Stop"
 $proj = "C:\Users\Ykw18\OneDrive\Desktop\Study\Project\AI-Brief v2"
@@ -23,6 +25,18 @@ try {
   Log "deterministic daily (npm run daily: news / papers-curation / projects / models + build-index)..."
   npm run daily 2>&1 | Tee-Object -FilePath $log -Append
 
+  # --- full-auto deep-read + cold-audit gate (best-effort; never blocks the deterministic push) ---
+  # New reads are authored as needs_human, then the cross-model gate flips PASS->ready_to_publish
+  # (published) or HOLD (excluded + alert). Review held items: logs\papers-cold-audit\digest-<date>.md
+  try {
+    Log "deep-read authoring (strong model, full-text; new reads = needs_human)..."
+    npm run papers:deepread 2>&1 | Tee-Object -FilePath $log -Append
+    Log "cold-audit gate (cross-model: codex author / claude audit; cap 3; PASS->publishable, HOLD->held)..."
+    npm run papers:cold-audit 2>&1 | Tee-Object -FilePath $log -Append
+    Log "rebuild index (apply gate statuses: ready_to_publish in, hold/needs_human out)..."
+    node scripts/columns/papers/build-index.mjs 2>&1 | Tee-Object -FilePath $log -Append
+  } catch { Log "WARN deep-read/cold-audit stage failed (non-fatal; deterministic refresh still publishes): $($_.Exception.Message)" }
+
   Log "quality gate (fail => no push)..."
   npm run lint 2>&1 | Tee-Object -FilePath $log -Append; $lintOk = ($LASTEXITCODE -eq 0)
   npm run validate 2>&1 | Tee-Object -FilePath $log -Append; $valOk = ($LASTEXITCODE -eq 0)
@@ -37,8 +51,8 @@ try {
     Log "pushed -> Vercel production updates"
   } else { Log "no data changes, nothing to push" }
 
-  $cand = Join-Path $proj "content\deep-dive-candidates\$today.md"
-  if (Test-Path $cand) { Log "NOTE: today's deep-read candidates ready ($cand). When present, run:  npm run papers:deepread  (strong model, supervised)." }
+  $digest = Join-Path $proj "logs\papers-cold-audit\digest-$today.md"
+  if (Test-Path $digest) { Log "NOTE: cold-audit review digest ready ($digest) - held (needs-human) deep-reads listed there." }
 
   New-Item -ItemType File -Force -Path $marker | Out-Null
   Log "=== deterministic daily done ==="

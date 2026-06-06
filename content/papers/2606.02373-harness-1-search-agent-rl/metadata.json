@@ -58,5 +58,10 @@
     "breadth_value": 6,
     "evidence_quality": 7
   },
-  "one_sentence_judgment": "把搜索 agent 训练的范式从「模型边搜边自己记账」改成「状态外置成可编辑接口(候选池+重要性标签精选集+证据图+核实记录+预算渲染),策略只做语义决策(搜什么/留哪个/核什么/何时停),再用 SFT→on-policy CISPO RL 教它用好接口」——核心立论 stateful cognitive offloading:agent 性能一大半藏在接口里不只在权重里(同模型换 harness 差几十分);用 20B 的 gpt-oss + LoRA 在八基准做到开源最强精选召回 0.730、比次强开源 Tongyi DeepResearch +11.4 分、平均压过 Sonnet-4.6/Kimi-K2.5/gpt-oss-120B(仅 Opus-4.6 平均领先),且在留出迁移基准涨幅反而更大(机制指纹=把行为先验搬进接口而非死记分布),消融显示拆掉 harness 策略会退化成又宽又浅的乱搜;诚实之处:dedup 关掉反而名义升召回(它是省 token 非提召回机制,如实报告)、差距主要是 selection 而非 discovery、verify 只查轨迹内一致非真实为真、证据图是正则非实体链接、任务面限于证据寻找型检索(广度调研/报告/弃答在外);代价=需热启动+多样性奖励才训得动、reward 逐项系数与逐格 Table 数值以原文附录为准(本次 PDF 数字层未能可靠抽取);全套(权重+harness+数据管线+recipe)开源——对要造可靠搜索/研究 agent 与本站 L1 外置大脑的人是直接可抄的环境层蓝本。"
+  "one_sentence_judgment": "把搜索 agent 训练的范式从「模型边搜边自己记账」改成「状态外置成可编辑接口(候选池+重要性标签精选集+证据图+核实记录+预算渲染),策略只做语义决策(搜什么/留哪个/核什么/何时停),再用 SFT→on-policy CISPO RL 教它用好接口」——核心立论 stateful cognitive offloading:agent 性能一大半藏在接口里不只在权重里(同模型换 harness 差几十分);用 20B 的 gpt-oss + LoRA 在八基准做到开源最强精选召回 0.730、比次强开源 Tongyi DeepResearch +11.4 分、平均压过 Sonnet-4.6/Kimi-K2.5/gpt-oss-120B(仅 Opus-4.6 平均领先),且在留出迁移基准涨幅反而更大(机制指纹=把行为先验搬进接口而非死记分布),消融显示拆掉 harness 策略会退化成又宽又浅的乱搜;诚实之处:dedup 关掉反而名义升召回(它是省 token 非提召回机制,如实报告)、差距主要是 selection 而非 discovery、verify 只查轨迹内一致非真实为真、证据图是正则非实体链接、任务面限于证据寻找型检索(广度调研/报告/弃答在外);代价=需热启动+多样性奖励才训得动、reward 逐项系数与逐格 Table 数值以原文附录为准(本次 PDF 数字层未能可靠抽取);全套(权重+harness+数据管线+recipe)开源——对要造可靠搜索/研究 agent 与本站 L1 外置大脑的人是直接可抄的环境层蓝本。",
+  "cold_audit": {
+    "status": "grandfathered",
+    "audited_at": "2026-06-06T21:19:00.906Z",
+    "note": "pre-gate deep-read; not retro-audited"
+  }
 }

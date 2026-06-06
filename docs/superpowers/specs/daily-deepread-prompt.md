@@ -12,7 +12,7 @@
 3. **写文件**(完全仿照已有样板 `content/papers/2605.31264-colleague-skill/` 的结构和风格):
    - `content/papers/<arxiv_id>-<slug>/paper.mdx` —— Paper 栏:一句话/问题/关键术语表/核心方法/架构(**Mermaid 源码块**)/创新点表/实验证据(真实数字)/限制风险/先读什么。
    - `content/papers/<arxiv_id>-<slug>/career.mdx` —— Career 栏:对应用型 AI 工程师/FDE 的价值、该学技能表、系统设计心法、作品集角度、可造表、诚实简历句、学习清单。
-   - `content/papers/<arxiv_id>-<slug>/metadata.json` —— 仿样板字段(scores 8 维、one_sentence_judgment、human_tabs:["paper","career"]、autosci_primitive 指针、source_rankings、tags、status:"deep_read")。
+   - `content/papers/<arxiv_id>-<slug>/metadata.json` —— 仿样板字段(scores 8 维、one_sentence_judgment、human_tabs:["paper","career"]、autosci_primitive 指针、source_rankings、tags、status:"deep_read")。**HF 论文 `track:"hf"`(顶会最佳才 `track:"conference"`+`venue`)。`cold_audit:{ "status": "needs_human" }`**——这样它在过冷审门前**不会被 build-index 发布**(全自动流水线的硬门:禁未过审自动发布);冷审门通过会自动翻成 `ready_to_publish`。
    - `data/autosci/primitives/<arxiv_id>.yaml` —— AI-only 原语,仿 `data/autosci/primitives/2605.31264.yaml`(audience: ai_only;core_pattern 抽可复用模式;映射 AutoSci 模块;小实验;风险)。
 4. **更新账本**:把该 arxiv_id 的记录 `status="deep_read"`、`analysis_file="content/papers/<arxiv_id>-<slug>"`、补 notes。
 
