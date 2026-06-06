@@ -1,5 +1,5 @@
 import { PapersPage } from "@/components/PapersPage";
 
 export default function Page() {
-  return <PapersPage track="hf" />;
+  return <PapersPage track="conference" />;
 }

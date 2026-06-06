@@ -6,12 +6,13 @@ import Link from "next/link";
 // All colors are hardcoded hex (no --radar-* vars — they resolve to nothing outside
 // their scoped page containers, which previously caused white-on-white).
 
-export type ShellNavKey = "home" | "news" | "articles" | "models" | "projects" | "graph" | "podcast";
+export type ShellNavKey = "home" | "news" | "articles" | "conference" | "models" | "projects" | "graph" | "podcast";
 
 const NAV: { key: ShellNavKey; label: string; href: string; icon: string }[] = [
   { key: "home", label: "Home", href: "/", icon: "home" },
   { key: "news", label: "News", href: "/news", icon: "news" },
-  { key: "articles", label: "Articles", href: "/articles", icon: "articles" },
+  { key: "articles", label: "HF 论文", href: "/articles", icon: "articles" },
+  { key: "conference", label: "顶会最佳", href: "/conference", icon: "conference" },
   { key: "models", label: "Models", href: "/models", icon: "models" },
   { key: "projects", label: "Projects", href: "/projects", icon: "projects" },
   { key: "graph", label: "Graph", href: "/graph", icon: "graph" },
@@ -87,6 +88,7 @@ function NavIcon({ name }: { name: string }) {
     models: "M12 3 20 7.5v9L12 21l-8-4.5v-9L12 3Z M12 12l8-4.5 M12 12v9 M12 12 4 7.5",
     projects: "M4 7h16M7 7v13M17 7v13M6 4h12a2 2 0 0 1 2 2v14H4V6a2 2 0 0 1 2-2Z",
     articles: "M6 4h9l3 3v13H6z M9 11h6 M9 15h6 M9 7h3",
+    conference: "M8 4h8v3a4 4 0 0 1-8 0V4Z M8 5H5v2a3 3 0 0 0 3 3 M16 5h3v2a3 3 0 0 1-3 3 M12 11v4 M9 19h6 M10 19l.5-4h3l.5 4",
     podcast: "M6 13a6 6 0 0 1 12 0v5a2 2 0 0 1-2 2h-1v-7h3M6 13v7h3v-7H6M9 13a3 3 0 0 1 6 0",
     graph: "M12 4v16M4 12h16M7 7l10 10M17 7 7 17",
   };

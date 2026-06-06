@@ -5,9 +5,21 @@ import Image from "next/image";
 import { loadPapersIndex, type PapersIndex } from "../lib/data";
 
 type Win = "daily" | "weekly" | "monthly";
-type Mode = "curated" | "board";
+type Track = "hf" | "conference";
+type Mode = "deep" | "board";
 const WIN_LABEL: Record<Win, string> = { daily: "日榜", weekly: "周榜", monthly: "月榜" };
 const REL_LABEL: Record<string, string> = { direct: "AutoSci 直接", indirect: "AutoSci 间接", inspiration: "AutoSci 启发", none: "" };
+
+const TRACK_COPY: Record<Track, { title: string; sub: string }> = {
+  hf: {
+    title: "HF 论文",
+    sub: "HuggingFace 日 / 周 / 月榜里高赞的论文 → 机器之心式精读。每天只看当天精读的那几篇，历史按精读日期收在标签里。",
+  },
+  conference: {
+    title: "顶会最佳论文",
+    sub: "AI 顶会(CVPR / NeurIPS / ICML…)最佳论文的人工策展精读。HF 当天没有高赞好货时，它就是「当日必读」的兜底。按精读日期切换。",
+  },
+};
 
 function thumbUrl(arxivId: string) {
   return arxivId ? `https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/${arxivId}.png` : "";
@@ -45,7 +57,7 @@ function PaperCard({
         <div className="radar-meta">{foot}</div>
         <span className="radar-foot-right">
           {hfHref && (
-            <a className="radar-repo-link" href={hfHref} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>HF ↗</a>
+            <a className="radar-repo-link" href={hfHref} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>{external ? "HF ↗" : "arXiv ↗"}</a>
           )}
           <span className="radar-cta deep">{ctaLabel}</span>
         </span>
@@ -72,15 +84,43 @@ function SecHead({ label, n, hint }: { label: string; n: number; hint: string })
   );
 }
 
-export function PapersPage() {
+function dateKey(s?: string): string {
+  return (s || "").split("T")[0] || "";
+}
+function tabLabel(key: string): string {
+  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+  if (key === today) return "今天";
+  if (key === yesterday) return "昨天";
+  const m = /^\d{4}-(\d{2})-(\d{2})$/.exec(key);
+  return m ? `${Number(m[1])}月${Number(m[2])}日` : (key || "未知");
+}
+
+export function PapersPage({ track = "hf" }: { track?: Track }) {
   const [data, setData] = useState<PapersIndex | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>("curated");
+  const [mode, setMode] = useState<Mode>("deep");
   const [win, setWin] = useState<Win>("daily");
   const [limit, setLimit] = useState(18);
+  const [activeDate, setActiveDate] = useState<string>("");
 
   useEffect(() => { loadPapersIndex().then(setData).catch((e) => setErr(e?.message || String(e))); }, []);
   useEffect(() => { setLimit(18); }, [win]);
+
+  // Deep reads for THIS track, grouped by 精读日期 (first_seen_date) — newest day first.
+  // Like the News column: each day shows only its own reads; history sits behind date tabs.
+  const groups = useMemo(() => {
+    if (!data) return [] as Array<{ key: string; items: PapersIndex["deepReads"] }>;
+    const map = new Map<string, PapersIndex["deepReads"]>();
+    for (const d of data.deepReads) {
+      if ((d.track || "hf") !== track) continue;
+      const k = dateKey(d.first_seen_date || d.date) || "未知";
+      (map.get(k) || map.set(k, []).get(k)!).push(d);
+    }
+    return [...map.entries()]
+      .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+      .map(([key, items]) => ({ key, items }));
+  }, [data, track]);
 
   const radarGroups = useMemo(() => {
     if (!data) return [] as Array<[string, PapersIndex["radar"]]>;
@@ -93,24 +133,32 @@ export function PapersPage() {
     return [...m.entries()].sort((a, b) => b[1].length - a[1].length);
   }, [data]);
 
-  if (err) return (<><main className="page"><div className="notice error">加载论文数据失败：{err}</div></main></>);
-  if (!data) return (<><main className="page radar-page"><div className="loading">正在加载论文…</div></main></>);
+  if (err) return (<main className="page"><div className="notice error">加载论文数据失败：{err}</div></main>);
+  if (!data) return (<main className="page radar-page"><div className="loading">正在加载论文…</div></main>);
 
   const deepSlugByArxiv = new Map(data.deepReads.map((d) => [d.arxiv_id, d.slug]));
   const board = data.board[win] || [];
   const boardShown = board.slice(0, limit);
+  const current = groups.find((g) => g.key === activeDate) || groups[0] || null;
+  const isLatestDay = Boolean(current && groups[0] && current.key === groups[0].key);
+  const totalDeep = groups.reduce((n, g) => n + g.items.length, 0);
+  // HF candidates already selected (high-upvote) but not yet deep-read.
+  const pendingCandidates = data.deepCandidates.filter((c) => !(c.deep_slug || deepSlugByArxiv.get(c.arxiv_id)));
+
+  const copy = TRACK_COPY[track];
+  const showDeep = track === "conference" || mode === "deep";
 
   return (
-    <>
-      <main className="page radar-page">
-        <header className="radar-header">
-          <h1 className="radar-title">文章雷达</h1>
-          <p className="radar-subtitle">HuggingFace 日 / 周 / 月榜的高赞论文 → 机器之心式解读。每天精读 1-3 篇值得读全文的，其余按主题扫想法即可。</p>
-        </header>
+    <main className="page radar-page">
+      <header className="radar-header">
+        <h1 className="radar-title">{copy.title}</h1>
+        <p className="radar-subtitle">{copy.sub}</p>
+      </header>
 
+      {track === "hf" && (
         <div className="radar-filters">
           <div className="radar-chip-group">
-            <button className={`radar-chip${mode === "curated" ? " active" : ""}`} onClick={() => setMode("curated")}>精选</button>
+            <button className={`radar-chip${mode === "deep" ? " active" : ""}`} onClick={() => setMode("deep")}>按日精读</button>
             <button className={`radar-chip${mode === "board" ? " active" : ""}`} onClick={() => setMode("board")}>HF 全榜</button>
           </div>
           {mode === "board" && (
@@ -123,128 +171,133 @@ export function PapersPage() {
             </div>
           )}
           <div className="radar-chip-group radar-chip-group-right">
-            <span className="radar-chip radar-chip-static">{data.counts.deepReads} 已深读</span>
+            <span className="radar-chip radar-chip-static">{totalDeep} 篇精读</span>
           </div>
         </div>
+      )}
 
-        {mode === "curated" ? (
+      {showDeep ? (
+        groups.length === 0 ? (
+          <div className="notice">{track === "conference" ? "暂无顶会精读。" : "暂无精读。"}</div>
+        ) : (
           <>
-            {(() => {
-              // 当日必读:今天新增的深读(must_read 置顶,或 first_seen 是今天)。HF 当天没高赞时,
-              // 这里就是手工策展的顶会最佳论文(如 CVPR D4RT)——不折叠进归档,直接顶在最上面。
-              const todays = [...data.deepReads].filter((d) => d.must_read || (d.first_seen_date && d.first_seen_date === data.date));
-              if (!todays.length) return null;
-              return (
-                <>
-                  <SecHead label="当日必读 · 顶会/精选深读" n={todays.length} hint="今天新增,别错过" />
-                  <div className="radar-grid">
-                    {todays.map((d) => (
-                      <PaperCard
-                        key={d.slug}
-                        href={`/papers/${encodeURIComponent(d.slug)}`}
-                        score={d.scores?.evidence_quality}
-                        category={d.tags?.[0]}
-                        title={d.title}
-                        line={d.one_sentence_judgment}
-                        ctaLabel="深读 →"
-                        hfHref={`https://arxiv.org/abs/${d.arxiv_id}`}
-                      />
-                    ))}
-                  </div>
-                </>
-              );
-            })()}
-            <SecHead label="今日精读" n={data.deepCandidates.length} hint="值得读全文" />
-            {data.deepCandidates.length === 0 ? <div className="notice">今日无高赞新论文，精读空。</div> : (
-              <div className="radar-grid">
-                {data.deepCandidates.map((c) => {
-                  const slug = c.deep_slug || deepSlugByArxiv.get(c.arxiv_id) || null;
-                  return (
+            <div className="news-datebar" role="tablist" aria-label="按精读日期切换">
+              {groups.map((g) => (
+                <button
+                  key={g.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={current?.key === g.key}
+                  className={`news-datetab${current?.key === g.key ? " active" : ""}`}
+                  onClick={() => setActiveDate(g.key)}
+                >
+                  {tabLabel(g.key)}<span className="news-datetab-n">{g.items.length}</span>
+                </button>
+              ))}
+            </div>
+
+            {current && (
+              <>
+                <SecHead label={`${tabLabel(current.key)} · 精读`} n={current.items.length} hint="点开读全文解读" />
+                <div className="radar-grid">
+                  {current.items.map((d) => (
+                    <PaperCard
+                      key={d.slug}
+                      href={`/papers/${encodeURIComponent(d.slug)}`}
+                      score={d.scores?.evidence_quality}
+                      category={d.tags?.[0]}
+                      title={d.title}
+                      line={d.one_sentence_judgment}
+                      ctaLabel="深读 →"
+                      hfHref={`https://arxiv.org/abs/${d.arxiv_id}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* HF latest-day extras: today's selected-but-not-yet-deep-read candidates + the idea radar. */}
+            {track === "hf" && isLatestDay && pendingCandidates.length > 0 && (
+              <>
+                <SecHead label="今日候选 · 待深读" n={pendingCandidates.length} hint="高赞已选中，深读稍后补上" />
+                <div className="radar-grid">
+                  {pendingCandidates.map((c) => (
                     <PaperCard
                       key={c.arxiv_id}
-                      href={slug ? `/papers/${encodeURIComponent(slug)}` : `https://huggingface.co/papers/${c.arxiv_id}`}
-                      external={!slug}
+                      href={`https://huggingface.co/papers/${c.arxiv_id}`}
+                      external
                       score={c.final_score}
                       category={c.category}
                       rel={c.autosci_relevance}
-                      pending={!slug}
+                      pending
                       title={c.title}
                       line={c.one_line}
-                      ctaLabel={slug ? "深读 →" : "看论文 →"}
+                      ctaLabel="看论文 →"
                       hfHref={`https://huggingface.co/papers/${c.arxiv_id}`}
                     />
-                  );
-                })}
-              </div>
-            )}
-
-            <SecHead label="想法雷达 · 按主题" n={data.counts.radar} hint="扫想法即可，不必深读" />
-            {data.radarEmpty || radarGroups.length === 0 ? <div className="notice">今日雷达空。</div> : (
-              radarGroups.map(([cat, items]) => (
-                <div className="paper-catgroup" key={cat} id={`cat-${cat}`}>
-                  <div className="paper-cat-h">{cat} <span>{items.length}</span></div>
-                  <div className="radar-grid">
-                    {items.map((r) => {
-                      const slug = r.deep_slug || deepSlugByArxiv.get(r.arxiv_id) || null;
-                      return (
-                        <PaperCard
-                          key={r.arxiv_id}
-                          href={slug ? `/papers/${encodeURIComponent(slug)}` : `https://huggingface.co/papers/${r.arxiv_id}`}
-                          external={!slug}
-                          score={r.final_score}
-                          category={r.category}
-                          title={r.title}
-                          line={r.one_line}
-                          ctaLabel={slug ? "深读 →" : "看论文 →"}
-                          hfHref={`https://huggingface.co/papers/${r.arxiv_id}`}
-                        />
-                      );
-                    })}
-                  </div>
+                  ))}
                 </div>
-              ))
+              </>
             )}
-          </>
-        ) : (
-          <>
-            <SecHead label={`${WIN_LABEL[win]} · HF 全榜`} n={board.length} hint="原始榜单，未分类" />
-            <div className="radar-grid">
-              {boardShown.map((b, i) => (
-                <a key={b.arxiv_id} className="radar-card paper-card paper-card-board" href={b.hf_paper_url} target="_blank" rel="noreferrer">
-                  <Thumb src={b.thumbnail_url || thumbUrl(b.arxiv_id)} alt={b.title} />
-                  <div className="radar-card-top">
-                    <div className="paper-card-badges">
-                      <span className="paper-rank">#{i + 1}</span>
-                      <span className="radar-score">▲{b.upvotes}</span>
-                    </div>
-                    {b.already_done && <span className="paper-rel">已深读</span>}
-                  </div>
-                  <h3 className="radar-name paper-name">{b.title}</h3>
-                  {b.authors.length > 0 && <p className="radar-summary paper-authors">{b.authors.join(", ")}</p>}
-                  <div className="radar-foot">
-                    <div className="radar-meta" />
-                    <span className="radar-foot-right"><span className="radar-cta deep">看论文 →</span></span>
-                  </div>
-                </a>
-              ))}
-            </div>
-            {limit < board.length && (
-              <div className="paper-more"><button className="radar-more-btn" onClick={() => setLimit((l) => l + 18)}>加载更多（{board.length - limit}）</button></div>
-            )}
-          </>
-        )}
 
-        {data.deepReads.length > 0 && (
-          <section className="paper-archive-sec">
-            <div className="paper-cat-h">已深读归档 <span>{data.deepReads.length}</span></div>
-            <div className="paper-archive">
-              {data.deepReads.map((d) => (
-                <Link key={d.slug} className="paper-archive-item" href={`/papers/${encodeURIComponent(d.slug)}`}>{d.title}</Link>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-    </>
+            {track === "hf" && isLatestDay && !data.radarEmpty && radarGroups.length > 0 && (
+              <>
+                <SecHead label="想法雷达 · 按主题" n={data.counts.radar} hint="扫想法即可，不必深读" />
+                {radarGroups.map(([cat, items]) => (
+                  <div className="paper-catgroup" key={cat} id={`cat-${cat}`}>
+                    <div className="paper-cat-h">{cat} <span>{items.length}</span></div>
+                    <div className="radar-grid">
+                      {items.map((r) => {
+                        const slug = r.deep_slug || deepSlugByArxiv.get(r.arxiv_id) || null;
+                        return (
+                          <PaperCard
+                            key={r.arxiv_id}
+                            href={slug ? `/papers/${encodeURIComponent(slug)}` : `https://huggingface.co/papers/${r.arxiv_id}`}
+                            external={!slug}
+                            score={r.final_score}
+                            category={r.category}
+                            title={r.title}
+                            line={r.one_line}
+                            ctaLabel={slug ? "深读 →" : "看论文 →"}
+                            hfHref={`https://huggingface.co/papers/${r.arxiv_id}`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        )
+      ) : (
+        <>
+          <SecHead label={`${WIN_LABEL[win]} · HF 全榜`} n={board.length} hint="原始榜单，未分类" />
+          <div className="radar-grid">
+            {boardShown.map((b, i) => (
+              <a key={b.arxiv_id} className="radar-card paper-card paper-card-board" href={b.hf_paper_url} target="_blank" rel="noreferrer">
+                <Thumb src={b.thumbnail_url || thumbUrl(b.arxiv_id)} alt={b.title} />
+                <div className="radar-card-top">
+                  <div className="paper-card-badges">
+                    <span className="paper-rank">#{i + 1}</span>
+                    <span className="radar-score">▲{b.upvotes}</span>
+                  </div>
+                  {b.already_done && <span className="paper-rel">已深读</span>}
+                </div>
+                <h3 className="radar-name paper-name">{b.title}</h3>
+                {b.authors.length > 0 && <p className="radar-summary paper-authors">{b.authors.join(", ")}</p>}
+                <div className="radar-foot">
+                  <div className="radar-meta" />
+                  <span className="radar-foot-right"><span className="radar-cta deep">看论文 →</span></span>
+                </div>
+              </a>
+            ))}
+          </div>
+          {limit < board.length && (
+            <div className="paper-more"><button className="radar-more-btn" onClick={() => setLimit((l) => l + 18)}>加载更多（{board.length - limit}）</button></div>
+          )}
+        </>
+      )}
+    </main>
   );
 }

@@ -1,0 +1,52 @@
+primitive_id: knowledge-driven-skill-tiered-data-factory
+source_paper: "2606.05259"
+title: "VideoKR: Towards Knowledge- and Reasoning-Intensive Video Understanding"
+relevance_level: direct                      # 自进化系统造自己训练/评测数据的直接蓝本
+audience: ai_only
+core_pattern: >
+  把"领域能力训练数据"当成可控流水线端到端生产:先建分层知识库(范围定义)→把知识点
+  场景化成可检索查询去采真实素材(而非讲解材料)→按"技能维度"分层定向合成样本并配 CoT→
+  三重过滤(自洽性重答一致 / 去捷径:少量上下文还能答对就删 / 独立强模型逐步验证 CoT 证据支撑)→
+  管线级质控(多模型池 + 每步抽样人验准入门槛 + 去评测污染)。关键内核是「生成器≠评判器 +
+  去捷径 + 模型选型量化准入」三件套,把"模型造的数据"逼到可信。
+problem_class: synthesize-trustworthy-domain-training-and-eval-data-without-single-model-bias-or-shortcuts
+components:
+  - knowledge_bank_builder   # 分层知识库 Subject->Course->Lecture->KnowledgePoint 定义能力范围
+  - scenario_query_maker     # 知识点->真实场景->搜索关键词 (采"隐含知识的真实素材"而非讲解)
+  - source_collector         # 按查询采集+多重相关性/安全/许可过滤
+  - skill_tiered_generator   # 按技能维度(基础/知识增强感知/知识密集推理)分层定向生成样本+CoT
+  - self_consistency_filter  # 重答一致才留, 顺便产出推理链
+  - shortcut_filter          # 只给少量上下文(单帧/纯文本)还能答对则删 = 去捷径
+  - cot_verifier             # 独立强模型逐步检查推理链每步是否被证据/知识支撑
+  - model_qualification_gate # 多模型池 + 每步抽100条专家评错, 错误率<=阈值才准入该步
+  - decontaminator           # 与评测集去重(ID匹配 + 感知哈希近重复)防泄漏
+autosci_modules:
+  - self_corpus_factory      # AutoSci 给自己造领域训练/评测语料的主流水线
+  - cold_critic              # cot_verifier + shortcut_filter = 独立冷审(生成器≠评判器)的具体形态
+  - typed_memory             # 分层知识库即结构化记忆: 能力范围的显式索引
+  - quality_gate             # model_qualification_gate + decontaminator = 入库前量化质控门
+  - self_eval_builder        # 去捷径评测集构造 = AutoSci 自测能力时的"防自欺"基准生成器
+inputs:
+  - domain_scope             # 目标领域 + 能力维度(技能分层)定义
+  - model_pool               # 候选模型池 + 各步人验准入阈值
+  - source_pool              # 可采集的素材来源(受许可/安全约束)
+outputs:
+  - train_corpus             # 分层、带 CoT、去捷径、去污染的训练语料
+  - eval_benchmark           # 去捷径的评测集(逼真考能力, 防单帧/文本捷径)
+  - qualification_table      # 每步×每模型的错误率与准入记录(可审计)
+implementation_idea: >
+  Mini 版(文本或图文, 不必视频):选一个小垂直域 → knowledge_bank_builder 列 20 知识点 →
+  scenario_query_maker 生成检索词采 50 条真实素材 → skill_tiered_generator 按 3 技能各出题 →
+  self_consistency_filter + shortcut_filter(只喂题不喂关键证据, 答对就删) + cot_verifier →
+  最后用 model_qualification_gate(每步抽 20 条人评错定准入)。200-400 行可跑通一条端到端管线。
+small_experiment: >
+  对照"有去捷径过滤 vs 无"两版数据各训一个小模型, 在同一个去捷径评测集上比知识密集准确率;
+  再做"单模型生成 vs 多模型池生成"对照, 看下游泛化差异;并量化最终语料的残噪率(抽样人核),
+  与"人工种子错误率"对齐当可接受基线。3-14 天。
+risks:
+  - generator_equals_critic  # 多数验证步仍是模型自验 → 系统性盲区难尽除, 须保留独立冷审/专家抽检
+  - residual_noise           # 抽检仍约 4% CoT 有错(2% 改答案)→ 下游会吸收噪声, 需持续监测残噪率
+  - specialization_tax       # 专精数据牺牲通用能力 → 配比要显式权衡专才/通才
+  - cost_and_human_load      # 构建约 7 万美元推理 + 34 名专家 → 可迁移的是"管线设计"而非"再跑的钱"
+  - release_unverified       # 原文承诺开源但未给链接 → 复用前须确认数据/代码是否真公开及形式
+status: extracted

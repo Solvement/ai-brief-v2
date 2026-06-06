@@ -1,0 +1,59 @@
+{
+  "paper_id": "2606.02800",
+  "arxiv_id": "2606.02800",
+  "title": "Cosmos 3: Omnimodal World Models for Physical AI",
+  "authors": [
+    "Aditi",
+    "Niket Agarwal",
+    "Arslan Ali",
+    "Jon Allen",
+    "Martin Antolini",
+    "NVIDIA Cosmos Team (290+ contributors, full list in Appendix G)"
+  ],
+  "date": "2026-06",
+  "huggingface_url": "https://huggingface.co/papers/2606.02800",
+  "paper_url": "https://arxiv.org/abs/2606.02800",
+  "code_url": "https://github.com/nvidia/cosmos",
+  "dataset_url": "https://huggingface.co/collections/nvidia/cosmos3",
+  "model_url": "https://huggingface.co/collections/nvidia/cosmos3",
+  "space_url": "",
+  "project_url": "https://research.nvidia.com/labs/cosmos-lab/cosmos3",
+  "source_rankings": [
+    "weekly",
+    "monthly"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.02800.yaml",
+  "first_seen_date": "2026-06-06",
+  "must_read": false,
+  "track": "hf",
+  "topic": "multimodal",
+  "agent_relevant": false,
+  "tags": [
+    "world-model",
+    "omnimodal",
+    "physical-ai",
+    "mixture-of-transformers",
+    "autoregressive-diffusion",
+    "vision-language-action",
+    "video-generation",
+    "robot-policy",
+    "nvidia-cosmos",
+    "open-weights"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 7,
+    "system_design_value": 9,
+    "career_value": 6,
+    "autosci_reuse_value": 4,
+    "buildability": 5,
+    "evaluation_value": 7,
+    "breadth_value": 9,
+    "evidence_quality": 8
+  },
+  "one_sentence_judgment": "NVIDIA 的物理 AI 大报告:把语言/图像/视频/音频/动作五模态的「理解 + 生成」统一进一个双塔 Mixture-of-Transformers 底座(前段自回归 + 后段扩散),靠「换 token 摆法即换工作模式」不改架构就能当 VLM/文生图/视频生成/世界模拟器/机器人策略,并把代码+权重(Nano 16B、Super 65B)+合成数据+基准全按 OpenMDW-1.1 开源;实测在驾驶/智慧基建/物理一致性(Physics-IQ I2V 48.9、V2V 63.4)与机器人策略(RoboLab specific 39.7%)等垂直域反超开源与闭源对照,文生图(UniGenBench 91.36)/图生视频更拿下 Artificial Analysis 开源权重第 1(撰稿时快照),但综合通识仍落后 Gemini 3.1 Pro(73.7 vs 77.5)、底层音频保真落后 Seedance/Veo,且大量评测靠自家基准 + LLM 裁判、Super 64B 训练吃 2048 张 GB200——非 agent 主线,对应用者的价值在「可薅的开源世界模型权重 + 统一多模态接口设计范式」而非研究机制深度。"
+}

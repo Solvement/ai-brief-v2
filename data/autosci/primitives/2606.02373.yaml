@@ -1,0 +1,56 @@
+primitive_id: state-externalizing-harness-rl
+source_paper: "2606.02373"
+title: "Harness-1: Reinforcement Learning for Search Agents with State-Externalizing Harnesses"
+relevance_level: direct                     # AutoSci L1 自进化的直接蓝本:接口/状态外置 + RL-on-decisions
+audience: ai_only
+core_pattern: >
+  把 agent 的"可恢复记账"从策略上下文里卸载到环境侧的可编辑持久状态(stateful cognitive offloading),
+  策略只保留语义决策;动作 = 编辑状态(curate/verify/reviewdocs)而非 append 文字;
+  同一状态渲染器贯穿 teacher 数据生成 / RL replay / 评测;
+  并用三条可训练性要求让"富接口"真的训得动:warm-started 热启动(避免早期奖励无法区分)、
+  compact derived-state rendering 紧凑派生状态(避免和证据抢上下文)、diversity-preserving incentives 保多样性激励(避免塌缩成单一动作);
+  奖励显式分"发现 vs 选择"(trajectory 项 vs curated 项 + answer-miss 罚找到却没提升)。
+  关键立论:agent 性能一大半藏在接口里——同模型换 harness 差几十分;行为先验搬进接口 → 小模型也能跨域迁移。
+problem_class: offload-recoverable-state-to-editable-environment-interface-then-RL-the-semantic-policy
+components:
+  - state_renderer          # 把当前状态压缩渲染给策略(候选池/精选集带重要性标签/搜索历史/证据图摘要/核实记录/预算标记)
+  - working_memory_two_tier # 内层摘要进 prompt + 外层 docstore 存全文,经 reviewdocs 回看
+  - curate_op               # 增删 + 重要性标签,第一次成功搜索后自动热启动(warm-start)
+  - verify_op               # 把策略写下的主张用判别器对照已记住文档(verify-before-promote)
+  - evidence_graph          # 抽实体/日期/桥接实体提示下一步线索(注意:正则近似,非实体链接)
+  - observation_compressor  # 句子级压缩 + MinHash-LSH 去重,控 token 预算
+  - reward_shaper           # 终局奖励=搜索质量+答案证据+工具多样性+回合惩罚;空精选集短路下限;召回权重 4x 精度
+  - rl_trainer              # SFT(LoRA 窄监督教接口用法)→ on-policy CISPO + 组内优势归一 + 丢常数奖励组
+autosci_modules:
+  - typed_memory            # harness 的可编辑持久状态 = AutoSci 的结构化 typed memory 工件
+  - self_evolve_controller  # 把"记账卸载到环境 + RL 优化语义决策"映射成自进化的"环境-策略分工"
+  - tool_interface_layer    # harness engineering = AutoSci 自身工具/接口层设计(接口是性能主因之一)
+  - cold_critic             # verify_op 的"轨迹内一致≠真"盲区 → 高影响主张需独立冷评委重新取证
+  - reward_designer         # 发现 vs 选择的分项奖励 + 可训练性三要求,可复用到 AutoSci 任务奖励设计
+inputs:
+  - task_query              # 一个待解任务/研究问题
+  - retrieval_backend       # 语料/检索后端(混合 BM25+dense → reranker)
+  - editable_state_schema   # 状态接口的字段定义(哪些环境维护、哪些策略决策)
+outputs:
+  - curated_set             # 带重要性标签的精选证据集(可检视、可审计、喂下游生成器)
+  - verification_records    # 每条关键主张的核实记录(direct/weak/missing/conflicting 思路)
+  - trained_policy          # 学会用好接口的语义决策策略(小模型即可)
+implementation_idea: >
+  Mini 版(无需训练,先验证接口价值):给一个现成模型套上"状态外置接口"——
+  动作集 = search / readdocs / curate(加重要性标签) / verify / stop,
+  state_renderer 每步渲染候选池+精选集+证据图摘要+核实记录;实现 warm-start(首次成功搜索自动种精选集)
+  + observation_compressor(去重压缩)。100-300 行可跑通,直接对比"有接口 vs 裸 ReAct"的 curated recall。
+  进阶版:再接 SFT(窄监督教接口用法)→ 一段 on-policy RL,reward 分发现/选择项 + answer-miss 罚。
+small_experiment: >
+  取一个证据寻找型检索任务集(可用 BrowseComp+ 或自建多跳)→ 同时报 curated recall / trajectory recall /
+  final-answer recall + 一个留出迁移集;对照"裸 agent vs 状态外置 harness",验证 ① 接口本身是否提召回、
+  ② 失败是 selection 还是 discovery(轨迹召回高但精选召回低=选择问题);再做消融:逐个关掉重要性标签/热启动/
+  证据图/句子压缩,看策略是否退化成又宽又浅的乱搜。1-14 天。
+risks:
+  - trajectory_internal_only  # verify 只查 agent 自己看到的证据,非真实为真 → 高影响主张需外部独立重核
+  - engineered_brittleness    # 证据图=正则、压缩=句子级 BM25、verify=LLM 判别器,跨域质量可能波动
+  - trainability_overhead     # 富接口不会自动可训练,需热启动+多样性激励+丢常数奖励组,换任务要重调
+  - narrow_task_scope         # 仅证据寻找型检索;广度调研/报告生成/弃答/对抗 web 不在范围,迁移到这些场景未验证
+  - eval_annotation_limits    # 基准规模/qrels 覆盖有限,近重复金文档会扰动召回类指标,数字非真实可靠性度量
+  - number_extraction_gap     # 本次 PDF 数字层未能可靠抽取逐格 Table 与 reward 系数,复用须回原文附录核对
+status: extracted

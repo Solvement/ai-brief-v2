@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T19:40:47.020Z",
+  "generatedAt": "2026-06-06T20:22:01.600Z",
   "date": "2026-06-06",
   "counts": {
-    "deepReads": 12,
+    "deepReads": 15,
     "radar": 10,
     "deepCandidates": 3
   },
@@ -14,6 +14,7 @@
       "date": "2026-06-01",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Jiaming Wang",
         "Ziteng Feng",
@@ -50,12 +51,150 @@
       "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02060.png"
     },
     {
+      "slug": "2606.02373-harness-1-search-agent-rl",
+      "arxiv_id": "2606.02373",
+      "title": "Harness-1: Reinforcement Learning for Search Agents with State-Externalizing Harnesses",
+      "date": "2026-06",
+      "first_seen_date": "2026-06-06",
+      "must_read": false,
+      "track": "hf",
+      "authors": [
+        "Pengcheng Jiang",
+        "Zhiyi Shi",
+        "Kelly Hong",
+        "Xueqiang Xu",
+        "Jiashuo Sun",
+        "Jimeng Sun"
+      ],
+      "tags": [
+        "search-agent",
+        "agentic-rag",
+        "reinforcement-learning",
+        "state-externalization",
+        "harness-engineering",
+        "cognitive-offloading",
+        "gpt-oss-20b",
+        "cispo",
+        "curated-recall",
+        "evidence-graph",
+        "transfer-generalization"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 8,
+        "breadth_value": 6,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "把搜索 agent 训练的范式从「模型边搜边自己记账」改成「状态外置成可编辑接口(候选池+重要性标签精选集+证据图+核实记录+预算渲染),策略只做语义决策(搜什么/留哪个/核什么/何时停),再用 SFT→on-policy CISPO RL 教它用好接口」——核心立论 stateful cognitive offloading:agent 性能一大半藏在接口里不只在权重里(同模型换 harness 差几十分);用 20B 的 gpt-oss + LoRA 在八基准做到开源最强精选召回 0.730、比次强开源 Tongyi DeepResearch +11.4 分、平均压过 Sonnet-4.6/Kimi-K2.5/gpt-oss-120B(仅 Opus-4.6 平均领先),且在留出迁移基准涨幅反而更大(机制指纹=把行为先验搬进接口而非死记分布),消融显示拆掉 harness 策略会退化成又宽又浅的乱搜;诚实之处:dedup 关掉反而名义升召回(它是省 token 非提召回机制,如实报告)、差距主要是 selection 而非 discovery、verify 只查轨迹内一致非真实为真、证据图是正则非实体链接、任务面限于证据寻找型检索(广度调研/报告/弃答在外);代价=需热启动+多样性奖励才训得动、reward 逐项系数与逐格 Table 数值以原文附录为准(本次 PDF 数字层未能可靠抽取);全套(权重+harness+数据管线+recipe)开源——对要造可靠搜索/研究 agent 与本站 L1 外置大脑的人是直接可抄的环境层蓝本。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02373.png"
+    },
+    {
+      "slug": "2606.02800-cosmos-3-world-model",
+      "arxiv_id": "2606.02800",
+      "title": "Cosmos 3: Omnimodal World Models for Physical AI",
+      "date": "2026-06",
+      "first_seen_date": "2026-06-06",
+      "must_read": false,
+      "track": "hf",
+      "authors": [
+        "Aditi",
+        "Niket Agarwal",
+        "Arslan Ali",
+        "Jon Allen",
+        "Martin Antolini",
+        "NVIDIA Cosmos Team (290+ contributors, full list in Appendix G)"
+      ],
+      "tags": [
+        "world-model",
+        "omnimodal",
+        "physical-ai",
+        "mixture-of-transformers",
+        "autoregressive-diffusion",
+        "vision-language-action",
+        "video-generation",
+        "robot-policy",
+        "nvidia-cosmos",
+        "open-weights"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 6,
+        "autosci_reuse_value": 4,
+        "buildability": 5,
+        "evaluation_value": 7,
+        "breadth_value": 9,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "NVIDIA 的物理 AI 大报告:把语言/图像/视频/音频/动作五模态的「理解 + 生成」统一进一个双塔 Mixture-of-Transformers 底座(前段自回归 + 后段扩散),靠「换 token 摆法即换工作模式」不改架构就能当 VLM/文生图/视频生成/世界模拟器/机器人策略,并把代码+权重(Nano 16B、Super 65B)+合成数据+基准全按 OpenMDW-1.1 开源;实测在驾驶/智慧基建/物理一致性(Physics-IQ I2V 48.9、V2V 63.4)与机器人策略(RoboLab specific 39.7%)等垂直域反超开源与闭源对照,文生图(UniGenBench 91.36)/图生视频更拿下 Artificial Analysis 开源权重第 1(撰稿时快照),但综合通识仍落后 Gemini 3.1 Pro(73.7 vs 77.5)、底层音频保真落后 Seedance/Veo,且大量评测靠自家基准 + LLM 裁判、Super 64B 训练吃 2048 张 GB200——非 agent 主线,对应用者的价值在「可薅的开源世界模型权重 + 统一多模态接口设计范式」而非研究机制深度。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02800.png"
+    },
+    {
+      "slug": "2606.05259-videokr-video-understanding",
+      "arxiv_id": "2606.05259",
+      "title": "VideoKR: Towards Knowledge- and Reasoning-Intensive Video Understanding",
+      "date": "2026-06",
+      "first_seen_date": "2026-06-06",
+      "must_read": false,
+      "track": "hf",
+      "authors": [
+        "Lin Fu",
+        "Zheyuan Yang",
+        "Yang Wang",
+        "Tingyu Song",
+        "Arman Cohan",
+        "Yilun Zhao"
+      ],
+      "tags": [
+        "video-understanding",
+        "data-centric",
+        "synthetic-data-pipeline",
+        "human-in-the-loop",
+        "knowledge-intensive-reasoning",
+        "chain-of-thought",
+        "sft-grpo",
+        "rlvr",
+        "shortcut-removal",
+        "benchmark-construction",
+        "multi-model-pool",
+        "cc-licensed-dataset"
+      ],
+      "scores": {
+        "idea_novelty": 6,
+        "system_design_value": 8,
+        "career_value": 7,
+        "autosci_reuse_value": 8,
+        "buildability": 6,
+        "evaluation_value": 8,
+        "breadth_value": 5,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "daily"
+      ],
+      "one_sentence_judgment": "一篇克制扎实的 data-centric 工作:不改架构不卷 RL 奖励,而是用「知识库→知识点场景化采集→VidR/KnowVid/KnowVidR 技能分层合成→自洽/去捷径/独立CoT验证→七模型池+专家人验门槛(每步抽100条错误率≤3%才准入)」的人在环流水线,从零新采 14.5 万条全 CC 授权专业视频、合成 31.5 万条带 CoT 样本(SFT-201K + RL-114K),并造了去单帧捷径的评测集 VideoKR-Eval(把旧基准 MMVU 单帧可解率从 49.7% 压到 10.7%);在最标准 SFT→GRPO 下让 Qwen2.5-VL-7B 知识密集均分 41.9→46.6(+4.7)、Qwen3-VL-8B 48.5→51.5 超同量级 SOTA(50.0),证明数据设计才是主瓶颈。代价与短板要标清:换专精牺牲通用能力(通用普遍微跌)、抽检仍约 4% 推理链有错(2% 改答案)、构建花 7 万美元推理+34 名专家、且正文承诺开源但全文未给数据集/代码链接(发布状态=数据不足);是 CV/数据工作非 agent 主线,对应用开发者的价值在「可整条迁移的领域数据工厂 + 去捷径评测设计模式」。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05259.png"
+    },
+    {
       "slug": "2606.00408-masking-stale-observations-search-agents",
       "arxiv_id": "2606.00408",
       "title": "Masking Stale Observations Helps Search Agents -- Until It Doesn't: A Regime Map and Its Mechanism",
       "date": "2026-05-29",
       "first_seen_date": "2026-06-05",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Haoxiang Zhang",
         "Qixin Xu",
@@ -99,6 +238,7 @@
       "date": "2026-05-28",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Tomer Keren",
         "Nitay Calderon",
@@ -140,6 +280,7 @@
       "date": "2026-05-28",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Jianuo Huang",
         "Yaojie Zhang",
@@ -179,6 +320,7 @@
       "date": "2026-05-28",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Haozhe Zhao",
         "Shuzheng Si",
@@ -220,6 +362,7 @@
       "date": "2026-05-28",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Tianyi Zhou",
         "Dongrui Liu",
@@ -259,6 +402,7 @@
       "date": "2025-12",
       "first_seen_date": "2026-06-06",
       "must_read": true,
+      "track": "conference",
       "authors": [
         "Chuhan Zhang",
         "Guillaume Le Moing",
@@ -300,6 +444,7 @@
       "date": "2025-08-10",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Jinyuan Fang",
         "Yanwen Peng",
@@ -340,6 +485,7 @@
       "date": "2025-07-28",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Huan-ang Gao",
         "Jiayi Geng",
@@ -380,6 +526,7 @@
       "date": "2024-10-14",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Mingchen Zhuge",
         "Changsheng Zhao",
@@ -420,6 +567,7 @@
       "date": "2024-02-26",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Mingchen Zhuge",
         "Wenyi Wang",
@@ -461,6 +609,7 @@
       "date": "2023-08-01",
       "first_seen_date": "2026-06-04",
       "must_read": false,
+      "track": "hf",
       "authors": [
         "Sirui Hong",
         "Mingchen Zhuge",
@@ -515,7 +664,7 @@
         "evidence_quality": 3
       },
       "one_line": "统一语言、图像、视频、音频和动作的多模态世界模型，为Physical AI提供框架",
-      "deep_slug": null
+      "deep_slug": "2606.02800-cosmos-3-world-model"
     },
     {
       "arxiv_id": "2606.02373",
@@ -534,7 +683,7 @@
         "evidence_quality": 4
       },
       "one_line": "将搜索agent的状态管理外化到环境，用强化学习专注语义决策，提升训练效率。",
-      "deep_slug": null
+      "deep_slug": "2606.02373-harness-1-search-agent-rl"
     },
     {
       "arxiv_id": "2606.05259",
@@ -553,7 +702,7 @@
         "evidence_quality": 7
       },
       "one_line": "人机协同技能导向数据生成流程，可迁移至自进化数据管线",
-      "deep_slug": null
+      "deep_slug": "2606.05259-videokr-video-understanding"
     }
   ],
   "radar": [

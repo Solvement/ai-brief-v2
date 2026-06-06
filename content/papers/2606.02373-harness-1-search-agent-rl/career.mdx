@@ -1,0 +1,71 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你要造的是**搜索 / 研究类 agent**(RAG、deep-research、给问题找证据并交答案)。这类产品上线后最值钱、最难的不是"能不能搜到",而是"**搜到了能不能选对、记牢、核实、不越搜越乱**"。这篇把这件事拆成了一个可直接抄的工程范式:**别把状态管理塞进模型的上下文里,把它外置成一个可编辑的接口(harness),模型只做语义决策,再用 RL 教它用好这个接口。** 它教你的不是某个模型,而是 agent 时代最稀缺的一类能力:**设计 agent 的"环境层",并让强化学习在这层上发力。**
+
+> [!key] 和我们正在做的东西直接同源
+> 我们这个站要造的学习 agent(L1 自进化),核心就是**"哪些该让 agent 自己想、哪些该让环境/语料替它记"**——这正是本文的 stateful cognitive offloading。我们的"外置大脑"语料、typed memory、把工具变成"记得 Kevin"的东西,本质都是**把状态外置成可编辑接口**。Harness-1 给了一个被 RL 验证过的具体样板:**重要性标签 + 证据图 + 核实记录 + 预算渲染**——可以直接映射进 AutoSci 的记忆与自进化模块。你学它,等于在学怎么把我们自己的 agent 接口做得"既可训练又可迁移"。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 接口/环境层设计(harness engineering) | 同模型换 harness 差几十分;先设计状态接口,再让策略学着用 | 给你现有 agent 画一张"状态表":哪几项由环境维护、哪几项是模型的语义决策 |
+| 状态外置 = 可编辑而非追加 | 把动作从"往流水账加文字"改成"编辑持久状态(curate/verify/reviewdocs)" | 把一个 RAG agent 的工具改成 add/remove/tag/verify/review,而不是只 search/read |
+| 把行为先验搬进接口 | 接口承担记账 → 监督先验只需教"工具格式 + 搜-选节奏 + 核实-再提升" | 用少量高质量轨迹做窄 SFT,看模型是否就学会了"会用接口" |
+| RL on agents 的可训练性 | 热启动、紧凑状态、保多样性奖励;丢弃常数奖励组;reward 分"发现 vs 选择" | 给奖励拆成 trajectory 项 + curated 项 + answer-miss 罚,观察是否还塌缩成乱搜 |
+| 过程级 vs 终答评测 | curated recall / trajectory recall / final-answer recall 三件套;迁移基准看泛化 | 自己 agent 上同时报这三个指标 + 一个留出迁移集,定位是发现问题还是选择问题 |
+
+## 系统设计心法
+
+一句话:**把 agent 的"状态"当一等公民来治理,且明确划清"模型该想的 vs 环境该记的"那条线。**
+- **接口 > 权重(至少同等重要)**:你的 agent 不行,先别急着换更大模型;先问"是不是接口让它每步都在重建状态、在和证据抢上下文"。
+- **动作是编辑状态,不是堆文字**:append-only 的对话流水账是 agent 不可靠的温床;让动作落在持久、可回看、可核实的状态上。
+- **发现 ≠ 选择**:很多失败是"看见了却没留住"。诊断时分开看轨迹召回和精选召回;护栏卡在"提升/承诺"那一刻(verify-before-promote)。
+- **轨迹内一致 ≠ 真实为真**:`verify` 只对照 agent 自己看到的证据——生产里高影响主张要接**外部独立 verifier 重新取证**。这正是你能补的差异化价值。
+- **富接口未必可训练**:加机制前先想"它会不会让早期奖励无法区分 / 抢上下文 / 诱导塌缩",并配套热启动 + 多样性激励。
+
+## 作品集角度(Portfolio angle)
+
+这能撑起一个**"可靠搜索/研究 agent 的环境层 + RL"**方向的硬作品——正是当下最缺、最好讲的方向:不是又一个 chatbot 或 RAG demo,而是"**让搜索 agent 选得准、记得牢、不乱搜**"的基建。两条路都值钱:① 自己造一个"状态外置 + verify-before-promote"的搜索 agent harness;② 给 `pat-jj/harness-1`(模型权重 + harness 代码 + 数据生成管线全开源)提一个真实 PR——比如把正则证据图换成学习式实体链接,或加一层外部 verifier。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Stateful-RAG harness(无需训练版) | 把现有 RAG 的工具改成 curate/verify/reviewdocs + 重要性标签 + 两层记忆,只靠 prompt 让一个现成模型用起来 | 1 周 | 不训练就能验证"接口本身带来的召回提升",最快出活 |
+| Verify-before-promote 护栏 | 文档进精选集前先 verify(对照证据)+ 标 direct/weak/missing | 4-7 天 | 直击"selection gap":看见了却没留住,是这类 agent 第一杀手 |
+| External-Verifier 层 | 在 verify 之后接一个独立检索器重核高影响证据,补"轨迹内一致≠真"盲区 | 1 周 | 直接补 Harness-1 最大局限,讲故事极顺 |
+| 过程级评测 harness | 同时报 curated/trajectory/final-answer recall + 一个留出迁移集 | 4-7 天 | 能区分"发现 vs 选择"问题,是优化 agent 的前提 |
+| 小模型 + harness 复现 | 拉 `gpt-oss-20b` + 开源 harness/数据管线,跑通 SFT→RL 一段 | 1-2 周 | 亲手验证"行为先验搬进接口"为何能让小模型迁移更好 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built a stateful search-agent harness that offloads bookkeeping (candidate pool, importance-tagged curated set, evidence graph, verification records) to the environment, so the model only makes semantic decisions (search/keep/verify/stop)."*
+- *"Added a verify-before-promote guardrail with an external-evidence verifier, addressing the trajectory-internal-consistency blind spot of curated-set retrieval."*
+- *"Built a process-level retrieval eval (curated / trajectory / final-answer recall) on a held-out transfer set, isolating selection gaps from discovery gaps."*
+- *"(若做了 PR)Contributed learned entity-linking for the evidence graph in pat-jj/harness-1, replacing the regex extractor."*
+
+> [!key] 面试可讲
+> "怎么让一个搜索 agent 别越搜越乱?"——用本文论证:**别让模型在流水账里自己记账,把状态外置成可编辑接口;模型只做语义决策,再用 RL 教它用好接口;护栏卡在'提升进精选集'那一刻。** 再点出两个生产级洞见:① 同模型换 harness 差几十分(接口是主因);② 轨迹内一致 ≠ 真实为真(高影响证据要外部重核)。体现的是环境层思维 + 系统思维。
+
+## 学习清单
+
+**必学**
+- harness/环境层设计:状态表(环境维护 vs 策略决策)
+- 状态外置 = 可编辑动作(curate/verify/reviewdocs),不是 append-only
+- verify-before-promote;护栏放在"选择/提升"环节
+- 三件套召回指标 + 留出迁移集区分发现 vs 选择
+
+**有用**
+- RL on agents 的可训练性:热启动 + 紧凑状态 + 保多样性激励;丢常数奖励组;reward 分发现/选择
+- 模块化 RAG 评测:精选集喂冻结生成器,隔离"精选集质量"这一变量
+
+**可选**
+- CISPO / 组内优势归一化等策略梯度细节(要做训练才需要)
+- 两层记忆 + 观察压缩去重(MinHash-LSH)的上下文预算工程

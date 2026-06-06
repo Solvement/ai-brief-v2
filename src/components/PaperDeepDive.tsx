@@ -16,6 +16,7 @@ interface PaperMeta {
   tags?: string[];
   scores?: Record<string, number>;
   one_sentence_judgment?: string;
+  track?: string;
 }
 
 const SCORE_LABEL: Record<string, string> = {
@@ -66,7 +67,7 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
   return (
     <>
       <main className="page pd-page">
-        <a className="pd-back" href="/articles">← 论文</a>
+        <a className="pd-back" href={meta.track === "conference" ? "/conference" : "/articles"}>{meta.track === "conference" ? "← 顶会最佳" : "← HF 论文"}</a>
 
         <header className="pd-header">
           <div className="pd-kicker">
