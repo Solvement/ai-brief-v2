@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SiteHeader } from "./SiteHeader";
 import { loadPapersIndex, type PapersIndex } from "../lib/data";
 
 type Win = "daily" | "weekly" | "monthly";
@@ -94,8 +93,8 @@ export function PapersPage() {
     return [...m.entries()].sort((a, b) => b[1].length - a[1].length);
   }, [data]);
 
-  if (err) return (<><SiteHeader active="articles" /><main className="page"><div className="notice error">加载论文数据失败：{err}</div></main></>);
-  if (!data) return (<><SiteHeader active="articles" /><main className="page radar-page"><div className="loading">正在加载论文…</div></main></>);
+  if (err) return (<><main className="page"><div className="notice error">加载论文数据失败：{err}</div></main></>);
+  if (!data) return (<><main className="page radar-page"><div className="loading">正在加载论文…</div></main></>);
 
   const deepSlugByArxiv = new Map(data.deepReads.map((d) => [d.arxiv_id, d.slug]));
   const board = data.board[win] || [];
@@ -103,7 +102,6 @@ export function PapersPage() {
 
   return (
     <>
-      <SiteHeader active="articles" meta={`更新于 ${data.date}`} />
       <main className="page radar-page">
         <header className="radar-header">
           <h1 className="radar-title">文章雷达</h1>

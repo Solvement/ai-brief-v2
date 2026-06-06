@@ -8,7 +8,6 @@ import type {
   PaperReadingSection,
 } from "../types";
 import { loadArticles } from "../lib/data";
-import { SiteHeader } from "../components/SiteHeader";
 import { ProseMarkdown } from "../components/ProseMarkdown";
 
 interface Props {
@@ -53,7 +52,6 @@ export function Articles({ paperId }: Props) {
   if (err) {
     return (
       <>
-        <SiteHeader active="articles" />
         <main className="page"><div className="notice error">加载 Articles 数据失败：{err}</div></main>
       </>
     );
@@ -61,7 +59,6 @@ export function Articles({ paperId }: Props) {
   if (!data || !sorted) {
     return (
       <>
-        <SiteHeader active="articles" />
         <main className="page"><div className="loading">正在加载 Articles...</div></main>
       </>
     );
@@ -69,7 +66,6 @@ export function Articles({ paperId }: Props) {
   if (paperId && !paper) {
     return (
       <>
-        <SiteHeader active="articles" />
         <main className="page">
           <div className="breadcrumb"><a href="/articles">Articles</a><span className="sep">/</span><span>{paperId}</span></div>
           <div className="notice">还没有这篇论文的分析。</div>
@@ -121,20 +117,6 @@ function ArticlesIndex({ data }: { data: ArticlesData }) {
 
   return (
     <>
-      <SiteHeader
-        active="articles"
-        meta={(
-          <>
-            <span className="meta-text">Articles 更新于 {formatDate(data.generatedAt)} · {data.papers.length} 篇</span>
-            <button className="refresh-btn" onClick={() => runStream("/__publish-papers")} disabled={refresh === "running"}>
-              {refresh === "running" ? "运行中..." : "重跑分析"}
-            </button>
-            <button className="refresh-btn" onClick={() => runStream("/__refresh-paper-radar")} disabled={refresh === "running"}>
-              {refresh === "running" ? "运行中..." : "刷新 Radar"}
-            </button>
-          </>
-        )}
-      />
       <main className="page articles-page">
         <section className="articles-intro">
           <div>
@@ -238,7 +220,6 @@ function ArticleDetail({ paper, generatedAt }: { paper: AcademicPaperAnalysis; g
   const reading = paper.originalReading || [];
   return (
     <>
-      <SiteHeader active="articles" meta={`Articles 更新于 ${formatDate(generatedAt)}`} />
       <main className="detail article-detail">
         <div className="breadcrumb">
           <a href="/articles">Articles</a><span className="sep">/</span><span>{paper.title}</span>
@@ -335,7 +316,6 @@ function PaperDetailV2({ paper, generatedAt }: { paper: AcademicPaperAnalysis; g
   const resultBody = pa.resultFirst?.body;
   return (
     <>
-      <SiteHeader active="articles" meta={`Articles 更新于 ${formatDate(generatedAt)}`} />
       <main className="detail article-detail paper-v2">
         <div className="breadcrumb">
           <a href="/articles">Articles</a><span className="sep">/</span><span>{paper.title}</span>
@@ -405,7 +385,6 @@ function PaperDetailLight({ paper, generatedAt }: { paper: AcademicPaperAnalysis
   const lookahead = paper.paradigm?.lookahead?.length ? paper.paradigm.lookahead : paper.lookahead;
   return (
     <>
-      <SiteHeader active="articles" meta={`Articles 更新于 ${formatDate(generatedAt)}`} />
       <main className="detail article-detail paper-light-detail">
         <div className="breadcrumb">
           <a href="/articles">Articles</a><span className="sep">/</span><span>{paper.title}</span>

@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import type { AnalyzedRepo, ScoreBreakdown, TrendingData, TrendingWindow, LimitationItem, TryStep } from "../types";
 import { loadTrending } from "../lib/data";
 import { Markdown } from "../components/Markdown";
-import { SiteHeader } from "../components/SiteHeader";
 
 interface Props { owner: string; name: string }
 
@@ -195,7 +194,7 @@ export function Detail({ owner, name }: Props) {
 }
 
 function Header() {
-  return <SiteHeader active="projects" />;
+  return null;
 }
 
 function LiteProjectDetail({ repo }: { repo: AnalyzedRepo }) {

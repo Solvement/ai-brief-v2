@@ -3,17 +3,19 @@
 //
 // These are the seams the README marks "stubbed (PM/codex to wire)":
 //   - buildPrompt        → the codex AUTHOR / REVISE prompt (round 1 authors, round >1 revises per fixes)
-//   - buildAuditPrompt   → the Claude COLD-AUDIT prompt (two-stage: A blind retell, B open-book diff)
+//   - buildStageAPrompt  → the Claude COLD-AUDIT Stage A prompt (BLIND retell; artifact ONLY, no source)
+//   - buildStageBPrompt  → the Claude COLD-AUDIT Stage B prompt (open-book diff; artifact + source + stageA)
 //   - loadSource         → loads the paper's full text (+ repo URL) for Stage B
 //
 // They are kept OUT of orchestrator.mjs on purpose: orchestrator.mjs owns mechanics
 // (loop / gate / hold / files); this file owns paradigm prompt content + I/O for the source.
-// All three are PURE STRING/OBJECT builders (no CLI spend) so they're unit-testable and the
+// All are PURE STRING/OBJECT builders (no CLI spend) so they're unit-testable and the
 // orchestrator's real seams (makeCodexAuthorFn / makeClaudeAuditFn) just embed their output.
 //
 // 铁律 (cold-audit-prompt.md): author = codex GPT-5.5 high reading the FULL source;
-// auditor = Claude in a FRESH context. The audit prompt must FORBID reusing author context,
-// gate Stage B behind Stage A, and demand strict JSON matching the diagnosis schema.
+// auditor = Claude in a FRESH context. The audit is run as TWO SEPARATE model calls so "blind"
+// is STRUCTURALLY enforced, not just instructed: Stage A's prompt contains NO source at all, so
+// the auditor physically cannot peek before committing its blind retell. Both demand strict JSON.
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -185,47 +187,90 @@ function summarizePrevArtifact(prevArtifact) {
 }
 
 // ---------------------------------------------------------------------------
-// buildAuditPrompt — Claude COLD-AUDIT prompt (two-stage)
+// buildStageAPrompt / buildStageBPrompt — TWO-CALL cold audit
 // ---------------------------------------------------------------------------
+//
+// 铁律 (cold-audit-prompt.md): the "blind" Stage A must be ENFORCED, not merely instructed.
+// A single model call that embeds BOTH the artifact and the source can never be blind — the
+// model has the source in context before it writes stageA. So the orchestrator makes TWO
+// SEPARATE model calls:
+//   call 1 (Stage A): artifact ONLY, NO source in context → produces + persists stageA.
+//   call 2 (Stage B): artifact + source + the persisted stageA → produces the faithfulness diff.
+// `buildStageAPrompt` therefore contains NO source; `buildStageBPrompt` carries the source plus
+// the stageA the auditor already committed to, so it can only diff (not retro-fit) the retell.
+
+const STAGE_A_RUBRIC = `# 铁律
+- 永不替作者补全:原文没披露的,标「数据不足 / 原文未披露」,不脑补。
+- 你**没有**这篇深读的任何生成历史,不许复用作者的任何上下文或假设。`;
 
 /**
- * Build the two-stage cold-audit prompt for the auditor (Claude, fresh cross-model context).
+ * Stage A prompt — BLIND retell. Contains ONLY the artifact; the source is structurally absent.
+ * The auditor cannot see the original here, so its retell/confusions are honestly blind.
  *
- * Hard requirements (cold-audit-prompt.md):
- *  (a) FORBID reusing any author/generation context — you are a fresh independent cold auditor.
- *  (b) GATE Stage B behind Stage A: do the BLIND retell first, seeing ONLY the analysis, THEN open
- *      the source. (We can't enforce ordering inside one model call, so we instruct it explicitly
- *      and make Stage A's blind retell a required, separately-reported field so cheating is visible.)
- *  (c) Demand STRICT JSON ONLY matching the diagnosis schema.
- *  (d) Reference the rubric's 5 criteria + the DRIFT gold sample.
- *
- * @param {object} artifact   the deep-read being audited ({ paperMdx, careerMdx, metadata } or string)
- * @param {object} source     from loadSource() ({ fullText, fullTextUrl, repoUrl, available, note })
+ * @param {object} artifact   the deep-read ({ paperMdx, careerMdx, metadata } or string)
  * @param {object} ctx        { round, paper }
  * @returns {string}
  */
-export function buildAuditPrompt(artifact, source = {}, ctx = {}) {
+export function buildStageAPrompt(artifact, ctx = {}) {
+  const { round = 1, paper = {} } = ctx;
+  const id = paper.arxivId || paper.arxiv_id || paper.id || "?";
+  const artifactText = renderArtifactForAudit(artifact);
+
+  return `你是一个【独立冷审 agent】,跨模型、全新上下文。这是【两段式冷审的第一段 Stage A —— 盲读】。
+现在**只**给你【待审深读】,**没有原文/源码**(下一段才会给)。所以这一段是真正的盲读:你只能凭这篇分析本身判断。
+
+${STAGE_A_RUBRIC}
+
+# Stage A —— 盲读 · 可教性
+1. 用你自己的话复述:① 解决什么问题 ② 用什么机制 ③ 关键证据。
+2. 列出「没懂 / 没解释 / 跟不上」的点。
+这是诚实测「学生只拿这篇分析能不能学会」。你此刻看不到原文,所以无法作弊。
+
+# 输出:严格 JSON,只输出 JSON,不要任何解释性散文、不要 markdown 围栏。Schema:
+{
+  "stageA": { "retell": "盲读复述(问题/机制/证据)", "confusions": ["没懂/跟不上的点", "..."] }
+}
+本轮 round=${round}。
+
+# ====== 待审深读(arxiv ${id}) ======
+${artifactText}`;
+}
+
+/**
+ * Stage B prompt — OPEN-BOOK faithfulness diff. Carries the artifact + the source + the stageA
+ * the auditor already committed to in call 1, so it diffs (never retro-fits) the blind retell.
+ *
+ * Hard requirements (cold-audit-prompt.md):
+ *  (a) FORBID reusing any author/generation context.
+ *  (b) The blind retell is FIXED (from call 1); Stage B only diffs it against the source.
+ *  (c) Demand STRICT JSON ONLY matching the diagnosis schema.
+ *  (d) Reference the rubric's 5 criteria + the DRIFT gold sample.
+ *
+ * @param {object} artifact   the deep-read being audited (same as Stage A)
+ * @param {object} source     from loadSource() ({ fullText, fullTextUrl, repoUrl, available, note })
+ * @param {object} stageA     the persisted Stage A result ({ retell, confusions }) from call 1
+ * @param {object} ctx        { round, paper }
+ * @returns {string}
+ */
+export function buildStageBPrompt(artifact, source = {}, stageA = {}, ctx = {}) {
   const { round = 1, paper = {} } = ctx;
   const id = paper.arxivId || paper.arxiv_id || paper.id || "?";
   const artifactText = renderArtifactForAudit(artifact);
   const sourceText = renderSourceForAudit(source);
+  const stageAText = JSON.stringify(stageA ?? {}, null, 2);
 
-  return `你是一个【独立冷审 agent】,跨模型、全新上下文。你**没有**这篇深读的任何生成历史,不许复用作者的任何上下文或假设。
+  return `你是一个【独立冷审 agent】,跨模型、全新上下文。这是【两段式冷审的第二段 Stage B —— 开卷忠实对账】。
+你在 Stage A 已经做完盲读复述(见下方【已固定的 Stage A 盲读】,不许改它,只能拿它去对账)。
 你的唯一职责:按下面的 rubric 审这篇论文深读,判它能不能进 L0 地基。宁可少一篇,不可带病入库。
 
 # 铁律
 - 永不替作者补全:原文没披露的,标「数据不足 / 原文未披露」,不脑补。
 - 只对【重大】缺口要求返工。重大 = 会误导读者,或读者无法理解/复述某个核心要素。次要(锦上添花)放过,不要正向追完美。
 - 自报(README/作者自称)当事实 → 标「自称」,要求走源码核。
+- 不许复用作者的任何上下文或假设。
 
-# 两段式(顺序不可颠倒)
-## Stage A —— 盲读 · 可教性(此刻只看下方【待审深读】,先不要看【原始来源】)
-1. 用你自己的话复述:① 解决什么问题 ② 用什么机制 ③ 关键证据。
-2. 列出「没懂 / 没解释 / 跟不上」的点。
-这是诚实测「学生只拿这篇分析能不能学会」。**Stage A 的复述必须只基于深读本身**;若你提前看了原文,此测作废。把盲读结果写进输出的 stageA 字段。
-
-## Stage B —— 开卷 · 忠实对账(现在放出【原始来源】:全文 + 仓库)
-拿 Stage A 的盲读复述去 diff 原文/源码:
+# Stage B —— 开卷 · 忠实对账(现在放出【原始来源】:全文 + 仓库)
+拿【已固定的 Stage A 盲读】去 diff 原文/源码:
 - 复述错了/串了 → 教错(清晰度/忠实度差)。
 - 复述漏了原文要点 → 覆盖缺口。
 - 分析里有原文不支持的话 / 数字对不上 → 忠实度失败(零容忍,永不许「差不多」)。
@@ -242,7 +287,6 @@ export function buildAuditPrompt(artifact, source = {}, ctx = {}) {
 
 # 输出:严格 JSON,只输出 JSON,不要任何解释性散文、不要 markdown 围栏。Schema:
 {
-  "stageA": { "retell": "盲读复述(问题/机制/证据)", "confusions": ["没懂/跟不上的点", "..."] },
   "stageB": { "faithful": true, "notes": "对账要点(错/漏/编造/自称)" },
   "perCriterion": [
     { "criterion": "retellable|faithful|mechanism|concrete|judgment",
@@ -252,12 +296,15 @@ export function buildAuditPrompt(artifact, source = {}, ctx = {}) {
   ],
   "verdict": "pass|revise|hold"
 }
-说明:5 个 criterion 都要给一条;有重大缺口 severity=major;裁判以 severity=major 为准(不以 verdict 字段为准)。本轮 round=${round}。
+说明:5 个 criterion 必须全部各给一条(retellable/faithful/mechanism/concrete/judgment 一个都不能少);有重大缺口 severity=major;裁判以 severity=major 为准(不以 verdict 字段为准)。本轮 round=${round}。
+
+# ====== 已固定的 Stage A 盲读(不可改,只拿来对账) ======
+${stageAText}
 
 # ====== 待审深读(arxiv ${id}) ======
 ${artifactText}
 
-# ====== 原始来源(Stage B 才看;全文 + 仓库) ======
+# ====== 原始来源(全文 + 仓库) ======
 ${sourceText}`;
 }
 

@@ -10,7 +10,6 @@ import type {
   ModelSource,
 } from "../types";
 import { loadModels } from "../lib/data";
-import { SiteHeader } from "../components/SiteHeader";
 
 interface Props {
   modelId?: string;
@@ -75,7 +74,6 @@ export function Models({ modelId }: Props) {
   if (err) {
     return (
       <>
-        <SiteHeader active="models" />
         <main className="page"><div className="notice error">加载 Models 数据失败：{err}</div></main>
       </>
     );
@@ -84,7 +82,6 @@ export function Models({ modelId }: Props) {
   if (!data) {
     return (
       <>
-        <SiteHeader active="models" />
         <main className="page"><div className="loading">正在加载 Models...</div></main>
       </>
     );
@@ -93,7 +90,6 @@ export function Models({ modelId }: Props) {
   if (modelId && !entry) {
     return (
       <>
-        <SiteHeader active="models" />
         <main className="page">
           <div className="breadcrumb"><a href="/models">Models</a><span className="sep">/</span><span>{modelId}</span></div>
           <div className="notice">还没有这个模型的档案。点刷新或换一个。</div>
@@ -134,7 +130,6 @@ function StatusChips({ entry, inCard }: { entry: ModelEntry; inCard?: boolean })
 function ModelsIndex({ data, onRefresh, refreshing }: { data: ModelsData; onRefresh: () => void; refreshing: boolean }) {
   return (
     <>
-      <SiteHeader active="models" meta={`Models 更新于 ${formatDate(data.generatedAt)}`} />
       <main className="page models-page">
         <section className="models-intro">
           <div>
@@ -191,7 +186,6 @@ function RefreshButton({ onRefresh, refreshing, lastChecked }: { onRefresh: () =
 function ModelDetail({ entry, generatedAt, onRefresh, refreshing }: { entry: ModelEntry; generatedAt: string; onRefresh: () => void; refreshing: boolean }) {
   return (
     <>
-      <SiteHeader active="models" meta={`Models 更新于 ${formatDate(generatedAt)}`} />
       <main className="detail model-detail">
         <div className="breadcrumb"><a href="/models">Models</a><span className="sep">/</span><span>{entry.name}</span></div>
 

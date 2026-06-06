@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { SiteHeader } from "../components/SiteHeader";
 
 interface Episode {
   slug: string;
@@ -19,13 +18,6 @@ interface Episode {
 }
 interface PodcastsData { generatedAt: string; count: number; episodes: Episode[] }
 
-const SOURCES = [
-  { name: "WhynotTV", lang: "中文", topic: "AI 技术与产品" },
-  { name: "张小珺·商业访谈录", lang: "中文", topic: "AI 商业" },
-  { name: "十字路口 Crossing", lang: "中文", topic: "AI 创业 / 海外" },
-  { name: "Lenny's Podcast", lang: "英文", topic: "产品 / 硅谷创投" },
-];
-
 export function Podcast() {
   const [data, setData] = useState<PodcastsData | null>(null);
   useEffect(() => {
@@ -33,11 +25,9 @@ export function Podcast() {
   }, []);
 
   const episodes = data?.episodes ?? [];
-  const doneSources = new Set(episodes.map((e) => e.source));
 
   return (
     <>
-      <SiteHeader active="podcast" meta={data?.generatedAt ? `更新于 ${data.generatedAt.slice(0, 10)}` : undefined} />
       <main className="page radar-page">
         <header className="radar-header">
           <h1 className="radar-title">播客洞见</h1>
@@ -74,18 +64,6 @@ export function Podcast() {
           </>
         )}
 
-        <div className="paper-sec" style={{ marginTop: 38 }}><h2>策展源 <span className="paper-sec-n">{SOURCES.length}</span></h2><em>逐步接入</em></div>
-        <div className="radar-grid">
-          {SOURCES.map((s) => (
-            <div className={`radar-card paper-card pod-source${doneSources.has(s.name) ? " pod-source-live" : ""}`} key={s.name}>
-              <div className="radar-card-top">
-                <div className="paper-card-badges"><span className="paper-rel">{s.lang}</span><span className="paper-cat">{s.topic}</span></div>
-                <span className={`pod-status${doneSources.has(s.name) ? " live" : ""}`}>{doneSources.has(s.name) ? "已接入" : "待接入"}</span>
-              </div>
-              <h3 className="radar-name paper-name">{s.name}</h3>
-            </div>
-          ))}
-        </div>
       </main>
     </>
   );

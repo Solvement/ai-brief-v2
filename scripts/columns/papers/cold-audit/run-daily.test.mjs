@@ -271,6 +271,44 @@ test("runDaily: no candidates → no batch, returns cleanly", async () => {
   assert.equal(out.batch, null);
 });
 
+test("runDaily: artifact LOAD FAILURE → force-HOLD + alert, never audits the thin author handle", async () => {
+  // Fix #4: a paper whose on-disk artifact can't be read must NOT fall back to the in-memory
+  // author handle. It is force-held, alerted, and never reaches the auditor.
+  const records = [deepRead("loadfail"), deepRead("ok")];
+  const audited = [];
+  const notified = [];
+  const marks = [];
+  const out = await runDaily({
+    dailyCap: 5,
+    writeFiles: false,
+    logger: silent(),
+    now: () => new Date("2026-06-05T08:00:00Z"),
+    scan: async () => records,
+    loadArtifactFn: async (dir) => {
+      if (dir.includes("loadfail")) throw new Error("ENOENT paper.mdx gone");
+      return { paperMdx: "ON-DISK", careerMdx: "", metadata: {} };
+    },
+    loadSourceFn: async () => ({ fullText: "t", available: true }),
+    authorFn: makeMockAuthorFn({ author: (p, c) => ({ thin: "author-handle", round: c.round }) }),
+    auditFn: makeMockAuditFn({
+      audit: (artifact) => {
+        audited.push(artifact);
+        return passDiagnosis();
+      },
+    }),
+    notify: async (a) => notified.push(a),
+    markFn: async (rec, gate) => marks.push({ slug: rec.slug, status: gate.status }),
+  });
+
+  // the auditor was NEVER handed the thin author handle for the load-fail paper.
+  assert.ok(!audited.some((a) => a && a.thin === "author-handle"), "thin author handle never audited");
+  // load-fail paper is HELD with an alert; the healthy one passed.
+  const byId = Object.fromEntries(out.batch.results.map((r) => [r.paperId, r.status]));
+  assert.equal(byId["loadfail"], "hold");
+  assert.equal(byId["ok"], "ready_to_publish");
+  assert.ok(notified.some((n) => n.paperId === "loadfail"), "load-failure raised a HOLD alert");
+});
+
 test("runDaily: auditor reads the on-disk artifact (Stage A), not the author handle", async () => {
   const records = [deepRead("p")];
   let auditedArtifact = null;

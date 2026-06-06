@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { SiteHeader } from "./SiteHeader";
 import { MarkdownRich } from "./MarkdownRich";
 
 interface Episode {
@@ -41,7 +40,6 @@ export function PodcastDetail({ slug }: { slug: string }) {
 
   return (
     <>
-      <SiteHeader active="podcast" />
       <main className="page detail pod-detail">
         <div className="breadcrumb"><a href="/podcast">← 播客</a></div>
         {state === "loading" && <div className="loading">正在加载…</div>}

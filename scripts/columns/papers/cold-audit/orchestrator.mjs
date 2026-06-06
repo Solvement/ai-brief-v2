@@ -41,14 +41,34 @@ export const CRITERIA = ["retellable", "faithful", "mechanism", "concrete", "jud
 // ---- pure gate logic (no I/O, fully unit-testable) -------------------------
 
 /**
- * Does this diagnosis contain at least one MAJOR gap?
+ * Is this auditor response UNTRUSTWORTHY (degenerate / malformed-but-parseable)?
+ * A degenerate response cannot be trusted to clear the gate — we must NOT let it pass.
+ * Untrustworthy iff ANY of:
+ *   - not an object, OR
+ *   - perCriterion is missing / not an array / EMPTY, OR
+ *   - any of the 5 REQUIRED criteria is absent from perCriterion.
+ * (A model that "passes" by returning {} or [] is a failure mode, not a pass.)
+ */
+export function isUntrustworthyDiagnosis(diagnosis) {
+  if (!diagnosis || typeof diagnosis !== "object") return true;
+  const perCriterion = Array.isArray(diagnosis.perCriterion) ? diagnosis.perCriterion : null;
+  if (!perCriterion || perCriterion.length === 0) return true; // empty/missing perCriterion = can't trust
+  const present = new Set(perCriterion.map((e) => e && e.criterion).filter(Boolean));
+  // every one of the 5 required criteria must be explicitly present.
+  return CRITERIA.some((c) => !present.has(c));
+}
+
+/**
+ * Does this diagnosis BLOCK publication?
+ * Blocks iff it is untrustworthy (degenerate audit → cannot trust → hold) OR it has a MAJOR gap.
  * MAJOR = misleads the reader, or the reader cannot understand/retell a core element.
  * Minor (nice-to-have) gaps never block.
  */
 export function hasMajorGap(diagnosis) {
-  if (!diagnosis || typeof diagnosis !== "object") return true; // malformed audit = treat as blocking
-  const perCriterion = Array.isArray(diagnosis.perCriterion) ? diagnosis.perCriterion : [];
-  return perCriterion.some((entry) => entry && entry.severity === "major");
+  // A degenerate/untrustworthy audit is treated as blocking — never let a malformed-but-parseable
+  // response (empty perCriterion, missing required criteria) silently PASS the gate.
+  if (isUntrustworthyDiagnosis(diagnosis)) return true;
+  return diagnosis.perCriterion.some((entry) => entry && entry.severity === "major");
 }
 
 /**
@@ -341,15 +361,21 @@ export function makeCodexAuthorFn(config = {}) {
 
 /**
  * REAL auditor seam: shell out to Claude in a FRESH context (cross-model, no generation history)
- * to run the two-stage cold audit. This is the heart of generator ≠ critic.
+ * to run the cold audit. This is the heart of generator ≠ critic.
  *
- * INTENDED COMMAND (headless, JSON-only output):
- *   claude -p "<two-stage cold-audit prompt>" --output-format json
- *   (Stage A: blind retell seeing ONLY the artifact; Stage B: open-book faithfulness diff vs
- *    full text + repo. Returns the per-criterion diagnosis JSON. See docs/.../cold-audit-prompt.md.)
+ * "Blind" is enforced STRUCTURALLY via TWO SEPARATE claude calls (not one combined prompt):
+ *   call 1 (Stage A): `buildStageAPrompt(artifact, ctx)` — artifact ONLY, NO source in the prompt
+ *                     → the auditor physically cannot peek; returns { stageA }.
+ *   call 2 (Stage B): `buildStageBPrompt(artifact, source, stageA, ctx)` — artifact + source + the
+ *                     persisted stageA → open-book faithfulness diff; returns { stageB, perCriterion, verdict }.
+ * The two are merged into the canonical diagnosis. See docs/.../cold-audit-prompt.md.
  *
- * The prompt MUST: (a) forbid reusing any author context, (b) gate Stage B behind Stage A so the
- * blind retell is honest, (c) demand strict JSON matching the diagnosis schema below.
+ * INTENDED COMMAND (headless, JSON-only output, prompt piped on STDIN — NOT argv, because the
+ * prompt embeds full-text and can reach ~180k chars which blows the Windows command-line limit):
+ *   claude -p --output-format json   (prompt written to child.stdin)
+ *
+ * Each stage's prompt MUST: (a) forbid reusing any author context, (b) Stage A be source-free,
+ * (c) demand strict JSON matching the diagnosis schema below.
  *
  * Returns: { stageA, stageB, perCriterion:[{criterion,severity,gap,fix}], verdict }.
  */
@@ -357,49 +383,67 @@ export function makeClaudeAuditFn(config = {}) {
   const {
     claudeBin = "claude",
     timeoutMs = 20 * 60 * 1000,
-    buildAuditPrompt, // (artifact, source, { round, paper }) => string. REQUIRED for live use.
+    // Two-call seam: Stage A (blind, source-free) then Stage B (open-book). Both REQUIRED for live use.
+    buildStageAPrompt, // (artifact, ctx) => string
+    buildStageBPrompt, // (artifact, source, stageA, ctx) => string
     cwd = ROOT,
     logger = console,
+    // Injectable per-call runner (prompt, label, ctx) => Promise<parsed JSON>. Defaults to the real
+    // stdin-piped claude spawn below; tests inject a fake to assert the two-call sequence without spend.
+    runClaude,
   } = config;
 
-  return async function claudeAuditFn(artifact, source, ctx = {}) {
-    if (typeof buildAuditPrompt !== "function") {
-      throw new Error("makeClaudeAuditFn: buildAuditPrompt(artifact,source,ctx) is required for live runs");
-    }
-    const prompt = buildAuditPrompt(artifact, source, ctx);
-    // -p = headless print mode; --output-format json wraps the result for reliable parsing.
-    const args = ["-p", prompt, "--output-format", "json"];
-    logger.log?.(`[cold-audit] auditor(claude) round ${ctx.round ?? "?"}: ${claudeBin} -p <prompt> --output-format json`);
-
-    const result = await spawnWithInput(claudeBin, args, "", { cwd, timeoutMs });
+  // One headless claude call: prompt is PIPED ON STDIN (never argv) so giant prompts start reliably
+  // on Windows. `--output-format json` wraps the result for reliable parsing; we unwrap both layers.
+  const callClaude = runClaude || (async function callClaude(prompt, label, ctx) {
+    // -p with no positional prompt = headless print mode reading the prompt from stdin.
+    const args = ["-p", "--output-format", "json"];
+    logger.log?.(`[cold-audit] auditor(claude) ${label} round ${ctx.round ?? "?"}: ${claudeBin} -p --output-format json (prompt on stdin)`);
+    const result = await spawnWithInput(claudeBin, args, prompt, { cwd, timeoutMs });
     if (result.code !== 0) {
-      throw new Error(`claude audit exited ${result.code}: ${lastLines(result.stderr || result.stdout, 8)}`);
+      throw new Error(`claude audit (${label}) exited ${result.code}: ${lastLines(result.stderr || result.stdout, 8)}`);
     }
-    // `claude --output-format json` emits an envelope { result: "<text>", ... }. The auditor's
-    // text is itself JSON (the diagnosis). Unwrap both layers defensively.
+    // `claude --output-format json` emits an envelope { result: "<text>", ... }; the auditor's text
+    // is itself JSON. Unwrap both layers defensively.
     const envelope = parseJsonLoose(result.stdout);
-    const inner = typeof envelope?.result === "string" ? parseJsonLoose(envelope.result) : envelope;
-    return normalizeDiagnosis(inner);
+    return typeof envelope?.result === "string" ? parseJsonLoose(envelope.result) : envelope;
+  });
+
+  return async function claudeAuditFn(artifact, source, ctx = {}) {
+    if (typeof buildStageAPrompt !== "function" || typeof buildStageBPrompt !== "function") {
+      throw new Error("makeClaudeAuditFn: buildStageAPrompt and buildStageBPrompt are required for live runs");
+    }
+    // ---- call 1: Stage A (BLIND — no source in the prompt) ----
+    const stageARaw = await callClaude(buildStageAPrompt(artifact, ctx), "stageA", ctx);
+    const stageA = stageARaw?.stageA ?? stageARaw ?? null;
+
+    // ---- call 2: Stage B (open-book — artifact + source + the committed stageA) ----
+    const stageBRaw = await callClaude(buildStageBPrompt(artifact, source, stageA, ctx), "stageB", ctx);
+
+    // Merge: Stage A owns stageA; Stage B owns the diff + perCriterion + verdict.
+    return normalizeDiagnosis({ ...stageBRaw, stageA });
   };
 }
 
-/** Coerce a raw auditor payload into the canonical diagnosis shape used by the gate. */
+/**
+ * Coerce a raw auditor payload into the canonical diagnosis shape used by the gate.
+ *
+ * CRITICAL: we do NOT backfill missing criteria as severity:"none". Backfilling would hide a
+ * degenerate response (e.g. the auditor returned {} or only 2 of 5 criteria) by manufacturing a
+ * full, all-"none" perCriterion that the gate would read as "no major gap → pass". Instead we
+ * preserve EXACTLY the criteria the auditor actually returned (normalized), so
+ * isUntrustworthyDiagnosis() can detect missing required criteria and HOLD. A trustworthy auditor
+ * is instructed (buildStageBPrompt) to always emit all 5.
+ */
 export function normalizeDiagnosis(raw = {}) {
   const perCriterionIn = Array.isArray(raw.perCriterion) ? raw.perCriterion : [];
-  const byCriterion = new Map(perCriterionIn.map((e) => [e?.criterion, e]));
-  // Ensure every criterion is represented (missing = treated as none/no-gap, but surfaced).
-  const perCriterion = CRITERIA.map((criterion) => {
-    const e = byCriterion.get(criterion) || {};
-    const severity = e.severity === "major" || e.severity === "minor" ? e.severity : "none";
-    return { criterion, severity, gap: e.gap || "", fix: e.fix || "" };
-  });
-  // Also keep any extra criteria the auditor invented (defensive).
-  for (const e of perCriterionIn) {
-    if (e && e.criterion && !CRITERIA.includes(e.criterion)) {
+  // Normalize only the entries the auditor actually provided — never invent missing ones.
+  const perCriterion = perCriterionIn
+    .filter((e) => e && e.criterion)
+    .map((e) => {
       const severity = e.severity === "major" || e.severity === "minor" ? e.severity : "none";
-      perCriterion.push({ criterion: e.criterion, severity, gap: e.gap || "", fix: e.fix || "" });
-    }
-  }
+      return { criterion: e.criterion, severity, gap: e.gap || "", fix: e.fix || "" };
+    });
   return {
     stageA: raw.stageA ?? null,
     stageB: raw.stageB ?? null,

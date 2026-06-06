@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { SiteHeader } from "./SiteHeader";
 
 // ── types ──────────────────────────────────────────────────────────
 interface KGNodeRaw {
@@ -341,7 +340,6 @@ export function KnowledgeGraph() {
 
   return (
     <>
-      <SiteHeader active="graph" />
       <main className="page kg-page">
         <div className="kg-head">
           <div>

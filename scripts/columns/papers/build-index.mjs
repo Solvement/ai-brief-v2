@@ -31,13 +31,28 @@ async function latestDated(prefixSuffix) {
   return dated[0] ? path.join(PAPERS_DATA, dated[0].f) : null;
 }
 
-async function collectDeepReads() {
+// Cold-audit gate (CLAUDE.md 红线「禁未过审内容自动落库/上线」): a deep-read that the cold-audit
+// gate HELD (or flagged for a human) must NOT ship. Publish only when cold_audit is absent (legacy),
+// "grandfathered" (pre-gate corpus), or "ready_to_publish" (passed). "hold"/"needs_human" → excluded.
+const COLD_AUDIT_PUBLISHABLE = new Set(["grandfathered", "ready_to_publish"]);
+
+export function coldAuditAllowsPublish(meta) {
+  const state = meta?.cold_audit?.status;
+  if (!state) return true; // absent = legacy/pre-gate → allowed (back-compat).
+  return COLD_AUDIT_PUBLISHABLE.has(state); // "hold"/"needs_human"/unknown → blocked.
+}
+
+export async function collectDeepReads(deps = {}) {
+  const readdirFn = deps.readdirFn || ((p, o) => readdir(p, o));
+  const readJsonFn = deps.readJsonFn || readJson;
+  const contentDir = deps.contentDir || CONTENT;
   let dirs = [];
-  try { dirs = (await readdir(CONTENT, { withFileTypes: true })).filter((d) => d.isDirectory()); } catch { return []; }
+  try { dirs = (await readdirFn(contentDir, { withFileTypes: true })).filter((d) => d.isDirectory()); } catch { return []; }
   const out = [];
   for (const d of dirs) {
-    const meta = await readJson(path.join(CONTENT, d.name, "metadata.json"));
+    const meta = await readJsonFn(path.join(contentDir, d.name, "metadata.json"));
     if (!meta || meta.status !== "deep_read") continue;
+    if (!coldAuditAllowsPublish(meta)) continue; // HELD / needs-human deep-read → never publish.
     out.push({
       slug: d.name,
       arxiv_id: meta.arxiv_id || meta.paper_id || "",

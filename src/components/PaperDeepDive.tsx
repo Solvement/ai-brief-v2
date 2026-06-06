@@ -1,7 +1,7 @@
 "use client";
-import { useMemo, useState } from "react";
-import { SiteHeader } from "./SiteHeader";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MarkdownRich, buildToc } from "./MarkdownRich";
+import { FeedbackWidget } from "./FeedbackWidget";
 
 interface PaperMeta {
   paper_id: string;
@@ -37,9 +37,34 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
   const source = tab === "paper" ? paper : career;
   const toc = useMemo(() => buildToc(source), [source]);
 
+  // 目录 scroll-spy：高亮当前视口最靠上的小节。直接 toggle DOM class（比 React
+  // state 稳、且每次滚动不触发 re-render）。
+  const tocRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const heads = toc.map((t) => document.getElementById(t.slug)).filter(Boolean) as HTMLElement[];
+    if (!heads.length) return;
+    const visible = new Set<HTMLElement>();
+    const apply = (id: string) => {
+      tocRef.current?.querySelectorAll<HTMLAnchorElement>("a[data-slug]").forEach((a) => {
+        a.classList.toggle("pd-toc-active", a.dataset.slug === id);
+      });
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) visible.add(e.target as HTMLElement);
+        else visible.delete(e.target as HTMLElement);
+      }
+      if (!visible.size) return;
+      const topMost = [...visible].sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
+      apply(topMost.id);
+    }, { rootMargin: "-80px 0px 0px 0px", threshold: 0 });
+    heads.forEach((h) => io.observe(h));
+    return () => io.disconnect();
+  }, [toc]);
+
   return (
     <>
-      <SiteHeader active="articles" />
       <main className="page pd-page">
         <a className="pd-back" href="/articles">← 论文</a>
 
@@ -78,12 +103,12 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
 
         <div className="pd-body">
           {toc.length > 2 && (
-            <nav className="pd-toc" aria-label="目录">
+            <nav className="pd-toc" aria-label="目录" ref={tocRef}>
               <div className="pd-toc-title">目录</div>
               <ul>
                 {toc.map((t, i) => (
                   <li key={`${t.slug}-${i}`} className={t.level === 3 ? "pd-toc-sub" : undefined}>
-                    <a href={`#${t.slug}`}>{t.text}</a>
+                    <a href={`#${t.slug}`} data-slug={t.slug}>{t.text}</a>
                   </li>
                 ))}
               </ul>
@@ -93,6 +118,8 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
             <MarkdownRich source={source} />
           </article>
         </div>
+
+        <FeedbackWidget itemType="paper" itemId={meta.arxiv_id} itemTitle={meta.title} />
       </main>
     </>
   );

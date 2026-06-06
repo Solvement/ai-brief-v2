@@ -10,11 +10,11 @@ interface Props {
 
 const NAV_ITEMS: { key: NavKey; label: string; href: string }[] = [
   { key: "home", label: "Home", href: "/" },
-  { key: "news", label: "资讯", href: "/news" },
+  { key: "news", label: "News", href: "/news" },
   { key: "articles", label: "Articles", href: "/articles" },
   { key: "models", label: "Models", href: "/models" },
   { key: "projects", label: "Projects", href: "/projects" },
-  { key: "graph", label: "图谱", href: "/graph" },
+  { key: "graph", label: "Graph", href: "/graph" },
   { key: "podcast", label: "Podcast", href: "/podcast" },
 ];
 

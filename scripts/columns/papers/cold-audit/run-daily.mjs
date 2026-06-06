@@ -15,7 +15,7 @@
 // SELECTION (new-only, cap, skip-existing) is a PURE function `selectUnaudited(...)` so it's
 // unit-tested with mocks. Real I/O (readdir/readFile) and the real CLIs sit behind injectable deps.
 
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -25,7 +25,19 @@ import {
   makeCodexAuthorFn,
   runBatch,
 } from "./orchestrator.mjs";
-import { buildAuditPrompt, buildPrompt, loadArtifact, loadSource } from "./seams.mjs";
+import { buildPrompt, buildStageAPrompt, buildStageBPrompt, loadArtifact, loadSource } from "./seams.mjs";
+
+// Local slug (mirror of orchestrator's, kept private here for the force-HOLD status dir path).
+function slugify(value) {
+  return (
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9.]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .replace(/-{2,}/g, "-") || "paper"
+  );
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..", "..");
@@ -267,27 +279,37 @@ export async function runDaily(deps = {}) {
   // Resolve the gate seams: default to the REAL cross-model CLIs (codex author / claude auditor),
   // each wired with our prompt builders. Tests inject mock authorFn/auditFn instead.
   const authorFn = deps.authorFn || makeCodexAuthorFn({ buildPrompt: (paper, ctx) => buildPrompt(paper, ctx), logger });
-  const auditFn = deps.auditFn || makeClaudeAuditFn({ buildAuditPrompt, logger });
+  const auditFn =
+    deps.auditFn || makeClaudeAuditFn({ buildStageAPrompt, buildStageBPrompt, logger });
 
-  // Map records → papers, and pre-load each artifact so the auditFn sees the on-disk deep-read
-  // (Stage A) regardless of what the authorFn returns. loadSource is shared by the gate.
   const recBySlug = new Map(selected.map((r) => [r.slug, r]));
   const papers = selected.map(recordToPaper);
 
-  const batch = await runBatch(papers, {
+  // 红线 (Fix #4): the auditor must audit the ON-DISK artifact, NEVER a possibly-thin in-memory
+  // author handle. We PRE-LOAD each paper's artifact up front. A load failure is NOT recoverable by
+  // falling back to the author handle (that would audit thin content and could wrongly PASS) — it
+  // BLOCKS: the paper is force-HELD + alerted, and never enters the gate at all.
+  const auditPapers = [];
+  const preloaded = new Map(); // slug → loaded on-disk artifact
+  const loadFailed = []; // [{ rec, paper, error }]
+  for (const paper of papers) {
+    const rec = recBySlug.get(paper.slug);
+    try {
+      const artifact = await loadArtifactFn(rec.contentDir);
+      preloaded.set(paper.slug, artifact);
+      auditPapers.push(paper);
+    } catch (error) {
+      logger.warn?.(`[cold-audit:daily] artifact load FAILED for ${paper.slug} → HOLD (not audited): ${error.message}`);
+      loadFailed.push({ rec, paper, error });
+    }
+  }
+
+  const batch = await runBatch(auditPapers, {
     authorFn,
-    // Wrap auditFn so the auditor always reads the on-disk artifact for the paper under audit,
-    // even when the (mock or real) authorFn returns a thin handle. Falls back to the gate artifact.
+    // The auditor ALWAYS reads the pre-loaded on-disk artifact (Stage A source of truth). No
+    // fallback to the author handle: if it isn't on disk, the paper was force-held above.
     auditFn: async (artifact, source, ctx) => {
-      let toAudit = artifact;
-      const rec = recBySlug.get(ctx?.paper?.slug);
-      if (rec && deps.preloadArtifact !== false) {
-        try {
-          toAudit = await loadArtifactFn(rec.contentDir);
-        } catch {
-          toAudit = artifact;
-        }
-      }
+      const toAudit = preloaded.get(ctx?.paper?.slug) ?? artifact;
       return auditFn(toAudit, source, ctx);
     },
     loadSource: loadSourceFn,
@@ -298,6 +320,48 @@ export async function runDaily(deps = {}) {
     logger,
     ...(notify ? { notify } : {}),
   });
+
+  // Force-HOLD every load-failure paper: persist status/alert + fire the alert, mirroring runBatch's
+  // HOLD path. These never reached the gate, so we synthesize a clear "artifact load failure" gap.
+  const loadHeldResults = [];
+  for (const { rec, paper, error } of loadFailed) {
+    const id = recordToPaper(rec).arxivId;
+    const gen = now().toISOString();
+    const majorGaps = [{ criterion: "artifact", gap: `深读产物无法从磁盘读取(${error.message})` }];
+    const status = {
+      paperId: id,
+      title: paper.title || "",
+      status: "hold",
+      rounds: 0,
+      generatedAt: gen,
+      finalVerdict: "hold",
+      majorGaps,
+      history: [],
+      reason: "artifact_load_failure",
+    };
+    const alert = {
+      kind: "cold-audit-hold",
+      paperId: id,
+      title: paper.title || "",
+      rounds: 0,
+      majorGaps,
+      message: `深读冷审 HOLD(产物无法读取,未送审,未发布): ${id}`,
+      generatedAt: gen,
+    };
+    if (writeFiles) {
+      const itemDir = path.join(auditRoot, slugify(id));
+      await mkdir(itemDir, { recursive: true });
+      await writeFile(path.join(itemDir, "status.json"), `${JSON.stringify(status, null, 2)}\n`, "utf8");
+      await writeFile(path.join(itemDir, "alert.json"), `${JSON.stringify(alert, null, 2)}\n`, "utf8");
+    }
+    try {
+      if (notify) await notify(alert);
+    } catch (e) {
+      logger.warn?.(`[cold-audit:daily] notify failed for load-hold ${id} (non-fatal): ${e.message}`);
+    }
+    batch.results.push({ ...status });
+    loadHeldResults.push(status);
+  }
 
   // Mark each processed paper's metadata with the outcome (status only; never publishes content).
   const audited = [];

@@ -13,7 +13,9 @@ import {
   collectFixes,
   decideOutcome,
   hasMajorGap,
+  isUntrustworthyDiagnosis,
   majorDiagnosis,
+  makeClaudeAuditFn,
   makeMockAuditFn,
   makeMockAuthorFn,
   minorDiagnosis,
@@ -22,17 +24,66 @@ import {
   runBatch,
   runColdAuditGate,
 } from "./orchestrator.mjs";
+import { buildStageAPrompt, buildStageBPrompt } from "./seams.mjs";
 
 const PAPER = { arxivId: "2606.02060", title: "DRIFT span-level error localization" };
 
 // ---- pure gate logic -------------------------------------------------------
 
-test("hasMajorGap: malformed diagnosis is treated as blocking", () => {
+test("hasMajorGap: malformed/degenerate diagnosis is treated as blocking", () => {
   assert.equal(hasMajorGap(null), true);
-  assert.equal(hasMajorGap({}), false); // no perCriterion array → no major gap
+  // empty/missing perCriterion is now UNTRUSTWORTHY → blocking (a degenerate audit must not pass).
+  assert.equal(hasMajorGap({}), true);
+  assert.equal(hasMajorGap({ perCriterion: [] }), true);
   assert.equal(hasMajorGap(passDiagnosis()), false);
   assert.equal(hasMajorGap(majorDiagnosis()), true);
   assert.equal(hasMajorGap(minorDiagnosis()), false);
+});
+
+test("isUntrustworthyDiagnosis: empty/partial perCriterion → untrustworthy, full set → trusted", () => {
+  assert.equal(isUntrustworthyDiagnosis(null), true);
+  assert.equal(isUntrustworthyDiagnosis({}), true);
+  assert.equal(isUntrustworthyDiagnosis({ perCriterion: [] }), true);
+  // only 2 of the 5 required criteria → still untrustworthy.
+  assert.equal(
+    isUntrustworthyDiagnosis({
+      perCriterion: [
+        { criterion: "retellable", severity: "none" },
+        { criterion: "faithful", severity: "none" },
+      ],
+    }),
+    true,
+  );
+  // all 5 present → trusted.
+  assert.equal(isUntrustworthyDiagnosis(passDiagnosis()), false);
+});
+
+test("gate HOLDS a malformed-but-parseable audit (missing criteria) — never passes", async () => {
+  // A degenerate response with an empty perCriterion would, pre-fix, read as "no major gap → pass".
+  // Now it must HOLD (after exhausting rounds) instead of slipping through.
+  const authorFn = makeMockAuthorFn({ artifacts: [{ v: "a1" }, { v: "a2" }, { v: "a3" }] });
+  const auditFn = makeMockAuditFn({ audit: () => ({ stageA: {}, stageB: {}, perCriterion: [] }) });
+
+  const out = await runColdAuditGate(PAPER, { authorFn, auditFn, logger: silent() });
+  assert.equal(out.status, "hold", "empty perCriterion must not pass the gate");
+  assert.equal(out.rounds, MAX_ROUNDS);
+});
+
+test("gate HOLDS when only a subset of the 5 criteria is returned", async () => {
+  const partial = {
+    stageA: { retell: "x" },
+    stageB: { faithful: true },
+    perCriterion: [
+      { criterion: "retellable", severity: "none" },
+      { criterion: "faithful", severity: "none" },
+    ],
+    verdict: "pass",
+  };
+  const authorFn = makeMockAuthorFn({ artifacts: [{ v: "a1" }, { v: "a2" }, { v: "a3" }] });
+  const auditFn = makeMockAuditFn({ audit: () => partial });
+
+  const out = await runColdAuditGate(PAPER, { authorFn, auditFn, logger: silent() });
+  assert.equal(out.status, "hold", "subset-of-criteria audit must not pass the gate");
 });
 
 test("decideOutcome: major-vs-minor gating + round exhaustion", () => {
@@ -267,7 +318,9 @@ test("batch writes status, alert, and digest files", async () => {
 
 // ---- normalizeDiagnosis ----------------------------------------------------
 
-test("normalizeDiagnosis fills all 5 criteria and keeps extras", () => {
+test("normalizeDiagnosis preserves only the criteria the auditor returned (no backfill)", () => {
+  // CRITICAL (Fix #5): we must NOT manufacture missing criteria as severity:"none" — that would
+  // mask a degenerate audit. Only the auditor's actual entries are kept (normalized).
   const d = normalizeDiagnosis({
     perCriterion: [
       { criterion: "faithful", severity: "major", gap: "g", fix: "f" },
@@ -275,12 +328,64 @@ test("normalizeDiagnosis fills all 5 criteria and keeps extras", () => {
     ],
     verdict: "revise",
   });
+  // returned criteria are kept...
+  assert.ok(d.perCriterion.find((e) => e.criterion === "faithful"), "returned criterion kept");
+  assert.ok(d.perCriterion.find((e) => e.criterion === "novel-extra"), "extra criterion kept");
+  // ...but the 4 NOT returned are NOT backfilled.
+  assert.equal(d.perCriterion.length, 2, "no missing criteria invented");
+  assert.equal(d.perCriterion.find((e) => e.criterion === "mechanism"), undefined);
+  // and such a partial diagnosis is correctly flagged untrustworthy.
+  assert.equal(isUntrustworthyDiagnosis(d), true);
+});
+
+test("normalizeDiagnosis: a complete auditor response stays trustworthy", () => {
+  const d = normalizeDiagnosis(passDiagnosis());
   for (const c of CRITERIA) {
     assert.ok(d.perCriterion.find((e) => e.criterion === c), `criterion ${c} present`);
   }
-  assert.ok(d.perCriterion.find((e) => e.criterion === "novel-extra"), "extra criterion kept");
-  // unspecified criteria default to severity none
-  assert.equal(d.perCriterion.find((e) => e.criterion === "mechanism").severity, "none");
+  assert.equal(isUntrustworthyDiagnosis(d), false);
+});
+
+// ---- makeClaudeAuditFn: TWO-CALL blind sequence (Stage A before Stage B sees source) -------
+
+test("makeClaudeAuditFn: makes 2 calls; Stage A prompt has NO source and runs BEFORE Stage B", async () => {
+  const artifact = { paperMdx: "深读正文 ARTIFACT_MARKER", careerMdx: "", metadata: {} };
+  const SOURCE_MARKER = "FULL_SOURCE_TEXT_MARKER";
+  const source = { fullText: SOURCE_MARKER, fullTextUrl: "u", repoUrl: "r", available: true };
+
+  const calls = [];
+  // Fake runClaude: record (label, prompt), return per-stage JSON. Stage A returns ONLY stageA;
+  // Stage B returns the diff + a full, trustworthy perCriterion.
+  const runClaude = async (prompt, label /*, ctx */) => {
+    calls.push({ label, prompt });
+    if (label === "stageA") {
+      // At Stage A time, Stage B must NOT have run yet (blind ordering).
+      assert.deepEqual(calls.map((c) => c.label), ["stageA"], "Stage A is the first call");
+      return { stageA: { retell: "blind retell", confusions: [] } };
+    }
+    return {
+      stageB: { faithful: true },
+      perCriterion: CRITERIA.map((criterion) => ({ criterion, severity: "none", gap: "", fix: "" })),
+      verdict: "pass",
+    };
+  };
+
+  const auditFn = makeClaudeAuditFn({ buildStageAPrompt, buildStageBPrompt, runClaude, logger: silent() });
+  const diagnosis = await auditFn(artifact, source, { round: 1, paper: { arxivId: "x" } });
+
+  // exactly two calls, in order
+  assert.deepEqual(calls.map((c) => c.label), ["stageA", "stageB"]);
+  // STRUCTURAL BLINDNESS: the Stage A prompt must not contain the source text anywhere.
+  const stageAPrompt = calls[0].prompt;
+  assert.ok(stageAPrompt.includes("ARTIFACT_MARKER"), "Stage A sees the artifact");
+  assert.ok(!stageAPrompt.includes(SOURCE_MARKER), "Stage A prompt MUST NOT contain the source");
+  // Stage B DOES carry both the source and the committed stageA retell.
+  const stageBPrompt = calls[1].prompt;
+  assert.ok(stageBPrompt.includes(SOURCE_MARKER), "Stage B sees the source");
+  assert.ok(stageBPrompt.includes("blind retell"), "Stage B carries the committed Stage A");
+  // merged diagnosis carries the blind stageA + the open-book result, and passes (trustworthy + clean).
+  assert.equal(diagnosis.stageA.retell, "blind retell");
+  assert.equal(hasMajorGap(diagnosis), false);
 });
 
 function silent() {

@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { SiteHeader } from "../components/SiteHeader";
 import { Markdown } from "../components/Markdown";
 import { loadBriefEntity } from "../lib/data";
 import { LightSpineDeepDive } from "../components/LightSpineDeepDive";
@@ -258,7 +257,6 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
 function Shell({ children, mode }: { children: React.ReactNode; mode?: "lightspine" }) {
   return (
     <div className="page">
-      <SiteHeader active={mode === "lightspine" ? "projects" : "articles"} />
       <main className={`workbench-main brief-deepdive${mode === "lightspine" ? " dd-page" : ""}`}>{children}</main>
     </div>
   );

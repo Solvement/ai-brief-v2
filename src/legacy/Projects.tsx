@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import type { Board, TrendingData, TrendingWindow } from "../types";
 import { loadTrending } from "../lib/data";
 import { RepoCard } from "../components/RepoCard";
-import { SiteHeader } from "../components/SiteHeader";
 
 const TITLES: Record<TrendingWindow, string> = { daily: "今日榜", weekly: "本周榜", monthly: "本月榜" };
 const SORT_LABEL = "综合排序";
@@ -88,18 +87,6 @@ export function Projects() {
 
   return (
     <>
-      <SiteHeader
-        active="projects"
-        meta={data && (
-          <>
-            <span className="meta-text">数据更新于 {relativeTime(data.generatedAt)}</span>
-            <button className="refresh-btn" onClick={() => refreshData(false)} disabled={ingest === "running"}>
-              {ingest === "running" ? "更新中..." : "立即更新"}
-            </button>
-          </>
-        )}
-      />
-
       <main className="page radar-page">
         <header className="radar-header">
           <h1 className="radar-title">项目雷达</h1>

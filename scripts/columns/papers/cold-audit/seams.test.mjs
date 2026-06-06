@@ -8,8 +8,9 @@ import test from "node:test";
 import {
   CRITERIA,
   GOLD_SAMPLE_DIR,
-  buildAuditPrompt,
   buildPrompt,
+  buildStageAPrompt,
+  buildStageBPrompt,
   loadArtifact,
   loadSource,
 } from "./seams.mjs";
@@ -56,27 +57,49 @@ test("buildPrompt round 2 with no fixes: falls back to five-criteria self-check"
   assert.match(prompt, /retellable\/faithful\/mechanism\/concrete\/judgment/);
 });
 
-// ---- buildAuditPrompt (two-stage) ------------------------------------------
+// ---- buildStageAPrompt / buildStageBPrompt (TWO-CALL blind audit) -----------
 
-test("buildAuditPrompt: forbids author context, gates Stage B behind Stage A, demands JSON", () => {
+test("buildStageAPrompt: BLIND — embeds the artifact but contains NO source text at all", () => {
+  const artifact = { paperMdx: "## 一句话\n深读正文 ARTIFACT_MARKER", careerMdx: "职业角度", metadata: { scores: {} } };
+  const sourceMarker = "FULL_PAPER_SOURCE_TEXT_MARKER";
+  const prompt = buildStageAPrompt(artifact, { round: 1, paper: PAPER });
+
+  // forbids author context + names itself the blind first stage
+  assert.match(prompt, /独立冷审/);
+  assert.match(prompt, /不许复用作者/);
+  assert.match(prompt, /Stage A/);
+  assert.match(prompt, /盲读/);
+  // the artifact IS embedded (the auditor must retell it)
+  assert.ok(prompt.includes("ARTIFACT_MARKER"), "artifact embedded in Stage A");
+  // STRUCTURAL BLINDNESS: the source must NOT appear anywhere in the Stage A prompt.
+  assert.ok(!prompt.includes(sourceMarker), "Stage A prompt must contain NO source");
+  assert.ok(!prompt.includes("原始来源"), "Stage A prompt must not even mention the original source section");
+  // Stage A only asks for the stageA JSON; no perCriterion/verdict in the blind call.
+  assert.match(prompt, /"stageA"/);
+  assert.ok(!prompt.includes("perCriterion"), "Stage A must not solicit perCriterion");
+});
+
+test("buildStageBPrompt: open-book — embeds artifact + source + the committed stageA, demands JSON", () => {
   const artifact = { paperMdx: "## 一句话\n深读正文", careerMdx: "职业角度", metadata: { scores: {} } };
   const source = { fullText: "FULL PAPER TEXT", fullTextUrl: PAPER.paperUrl, repoUrl: PAPER.codeUrl, available: true };
-  const prompt = buildAuditPrompt(artifact, source, { round: 1, paper: PAPER });
+  const stageA = { retell: "盲读复述内容 STAGEA_MARKER", confusions: ["没懂A"] };
+  const prompt = buildStageBPrompt(artifact, source, stageA, { round: 1, paper: PAPER });
 
   // (a) forbid reusing author context
   assert.match(prompt, /独立冷审/);
   assert.match(prompt, /不许复用作者/);
-  // (b) two-stage, ordered, blind-before-open
-  assert.match(prompt, /Stage A/);
+  // (b) Stage B carries the FIXED stageA so it can only diff (not retro-fit) the blind retell
   assert.match(prompt, /Stage B/);
-  assert.match(prompt, /先不要看.*原始来源|此刻只看/);
+  assert.ok(prompt.includes("STAGEA_MARKER"), "committed stageA embedded in Stage B");
+  assert.match(prompt, /不许改它|不可改/);
   // (c) strict JSON only
   assert.match(prompt, /严格 JSON/);
   assert.match(prompt, /"perCriterion"/);
   assert.match(prompt, /"verdict": "pass\|revise\|hold"/);
-  // (d) rubric criteria + gold sample
-  for (const c of CRITERIA) assert.ok(prompt.includes(c), `criterion ${c} named in audit prompt`);
+  // (d) rubric criteria + gold sample + all-5 requirement
+  for (const c of CRITERIA) assert.ok(prompt.includes(c), `criterion ${c} named in Stage B prompt`);
   assert.match(prompt, new RegExp(GOLD_SAMPLE_DIR.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.match(prompt, /一个都不能少/); // must emit all 5 criteria
   // gate keys off severity:major, not the verdict label
   assert.match(prompt, /以 severity=major 为准/);
   // the artifact + source are both embedded
@@ -84,10 +107,10 @@ test("buildAuditPrompt: forbids author context, gates Stage B behind Stage A, de
   assert.match(prompt, /FULL PAPER TEXT/);
 });
 
-test("buildAuditPrompt: when source unavailable, instructs no-fabrication on the gap", () => {
+test("buildStageBPrompt: when source unavailable, instructs no-fabrication on the gap", () => {
   const artifact = "整篇深读字符串";
   const source = { fullText: "", available: false, note: "全文未取到", repoUrl: "" };
-  const prompt = buildAuditPrompt(artifact, source, { round: 2, paper: PAPER });
+  const prompt = buildStageBPrompt(artifact, source, { retell: "x", confusions: [] }, { round: 2, paper: PAPER });
   assert.match(prompt, /全文未取到/);
   assert.match(prompt, /数据不足/);
   assert.match(prompt, /round=2/);

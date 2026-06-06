@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import { SiteHeader } from "../components/SiteHeader";
+import { AppShell } from "../components/AppShell";
 
 interface NewsItem {
   title: string;
@@ -22,11 +21,6 @@ interface NewsData {
   items: NewsItem[];
 }
 
-function formatDate(iso: string): string {
-  const day = (iso || "").split("T")[0];
-  if (/^\d{4}-\d{2}-\d{2}$/.test(day)) return day.replaceAll("-", ".");
-  return iso || "—";
-}
 function dateKey(iso: string): string {
   return (iso || "").split("T")[0] || "未知日期";
 }
@@ -59,12 +53,6 @@ function sourceTypeClass(t: string): string {
 }
 const zh = (i: NewsItem) => i.titleZh || i.title;
 
-/** consistent monogram fallback when an item has no usable image (never a broken img) */
-function Monogram({ item }: { item: NewsItem }) {
-  const ch = (item.source || "?").trim().charAt(0).toUpperCase();
-  return <div className={`news-mono ${sourceTypeClass(item.sourceType)}`} aria-hidden>{ch}</div>;
-}
-
 export function News({ initial = null }: { initial?: NewsData | null }) {
   const [data, setData] = useState<NewsData | null>(initial);
   const [err, setErr] = useState<string | null>(null);
@@ -77,6 +65,7 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
       .catch((e) => setErr((e as Error)?.message || String(e)));
   }, [initial]);
 
+  // Group by day; each day = a full-width content-card grid.
   const groups = useMemo(() => {
     if (!data?.items) return [];
     const map = new Map<string, NewsItem[]>();
@@ -86,83 +75,58 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
     }
     return Array.from(map.entries())
       .sort((a, b) => (a[0] < b[0] ? 1 : -1))
-      .map(([key, items]) => {
-        const sorted = items.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
-        // hero = up to 3 items that actually have an image; rest = clean rows
-        const heroes = sorted.filter((i) => i.imageUrl).slice(0, 3);
-        const heroSet = new Set(heroes);
-        return { key, heroes, rows: sorted.filter((i) => !heroSet.has(i)) };
-      });
+      .map(([key, items]) => ({ key, items: items.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1)) }));
   }, [data]);
 
-  if (err) return (<><SiteHeader active="news" /><main className="page"><div className="notice error">加载资讯数据失败：{err}</div></main></>);
-  if (!data) return (<><SiteHeader active="news" /><main className="page"><div className="loading">正在加载资讯...</div></main></>);
-
   return (
-    <>
-      <SiteHeader active="news" meta={`资讯更新于 ${formatDate(data.generatedAt)}`} />
-      <main className="page news-page">
-        <section className="models-intro">
-          <div>
-            <div className="eyebrow">News · 资讯</div>
-            <h1>每天的 AI 动态，一屏扫完</h1>
-            <p>聚合官方公告、媒体报道与社区热帖，自动中译。点卡片跳原文。</p>
+    <AppShell active="news">
+      <section className="column-shell">
+        <header className="column-hero column-hero-news">
+          <div className="section-kicker">Timeline</div>
+          <h1 className="column-hero-title">新闻</h1>
+          <p className="column-hero-sub">聚合官方公告、媒体报道与社区热帖，自动中译，只保留需要快速知道的事实、影响和后续观察点。点卡片跳原文。</p>
+        </header>
+
+        {err ? <div className="column-notice column-notice-error">加载资讯数据失败：{err}</div> : null}
+        {!err && !data ? <div className="column-notice">正在加载资讯...</div> : null}
+        {!err && data && groups.length === 0 ? <div className="column-notice">暂无资讯。</div> : null}
+
+        {groups.map((group) => (
+          <section className="column-day" key={group.key}>
+            <div className="column-day-head">
+              <span className="column-day-label">{friendlyDate(group.key)}</span>
+              <span className="column-day-count">{group.items.length} 条</span>
+            </div>
+            <div className="home-card-grid home-card-grid-articles">
+              {group.items.map((item, i) => <NewsCard key={`${item.url}-${i}`} item={item} />)}
+            </div>
+          </section>
+        ))}
+      </section>
+    </AppShell>
+  );
+}
+
+function NewsCard({ item }: { item: NewsItem }) {
+  const typeClass = sourceTypeClass(item.sourceType);
+  // Only items with a real image get the image hero. Imageless items (the majority)
+  // render as compact text cards — avoids a wall of identical gradient placeholders.
+  const hasImage = Boolean(item.imageUrl);
+  return (
+    <article className={`content-card content-card-news${hasImage ? "" : " content-card-textonly"}`}>
+      <a className="content-card-shell" href={item.url} target="_blank" rel="noreferrer">
+        {hasImage ? <img className="content-card-visual-image" src={item.imageUrl} alt="" /> : null}
+        <div className="content-card-copy">
+          <span className="content-card-title">{zh(item)}</span>
+          {item.summaryZh ? <p className="content-card-summary">{item.summaryZh}</p> : null}
+          <div className="content-card-meta">
+            <span className={`news-source-badge ${typeClass}`}>{SOURCE_TYPE_LABEL[item.sourceType] || "来源"}</span>
+            <span>{item.source}</span>
+            {typeof item.points === "number" ? <span>▲ {item.points}</span> : null}
+            <span>{relativeTime(item.publishedAt)}</span>
           </div>
-        </section>
-
-        {groups.length === 0 ? <div className="notice">暂无资讯。</div> : (
-          <div className="news-feed">
-            {groups.map((group) => (
-              <section className="news-day" key={group.key}>
-                <div className="news-day-head">
-                  <span className="news-day-label">{friendlyDate(group.key)}</span>
-                  <span className="news-day-count">{group.heroes.length + group.rows.length} 条</span>
-                </div>
-
-                {group.heroes.length > 0 && (
-                  <div className="news-hero-grid">
-                    {group.heroes.map((item, i) => (
-                      <a className="news-hero" key={`h-${item.url}-${i}`} href={item.url} target="_blank" rel="noreferrer">
-                        <div className="news-hero-media">
-                          <Image src={item.imageUrl!} alt="" fill sizes="(max-width: 900px) 100vw, 33vw" priority={i === 0} />
-                        </div>
-                        <div className="news-hero-body">
-                          <div className="news-hero-title">{zh(item)}</div>
-                          {item.summaryZh && <div className="news-hero-summary">{item.summaryZh}</div>}
-                          <div className="news-row-meta">
-                            <span className={`news-source-badge ${sourceTypeClass(item.sourceType)}`}>{SOURCE_TYPE_LABEL[item.sourceType] || "来源"}</span>
-                            <span className="news-source-name">{item.source}</span>
-                            <span className="news-time">{relativeTime(item.publishedAt)}</span>
-                          </div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                )}
-
-                <div className="news-day-items">
-                  {group.rows.map((item, i) => (
-                    <a className="news-row" key={`${item.url}-${i}`} href={item.url} target="_blank" rel="noreferrer">
-                      <Monogram item={item} />
-                      <div className="news-row-main">
-                        <div className="news-row-title">{zh(item)}</div>
-                        {item.summaryZh && <div className="news-row-summary">{item.summaryZh}</div>}
-                        <div className="news-row-meta">
-                          <span className={`news-source-badge ${sourceTypeClass(item.sourceType)}`}>{SOURCE_TYPE_LABEL[item.sourceType] || "来源"}</span>
-                          <span className="news-source-name">{item.source}</span>
-                          {typeof item.points === "number" && <span className="news-points">▲ {item.points}</span>}
-                          <span className="news-time">{relativeTime(item.publishedAt)}</span>
-                        </div>
-                      </div>
-                      <span className="news-row-arrow" aria-hidden>↗</span>
-                    </a>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        )}
-      </main>
-    </>
+        </div>
+      </a>
+    </article>
   );
 }
