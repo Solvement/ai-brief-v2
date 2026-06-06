@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-06-05T17:40:00.000Z",
+  "date": "2026-06-05",
+  "readMinutes": 3,
+  "source": "hand-authored",
+  "lede": "今天的主线是「搜索/深研 agent 怎么变得可靠」——从轨迹里定位错误、给上下文做规矩、把评测做难、再把人的专长蒸馏成可复用技能，几乎所有高赞论文都在补 agent 这条链上的某一环；GitHub 这边清一色是「给编码 agent 省 token / 省上下文」的新工具，资讯也在算「token 账单」。一句话：大家不再只追能力，开始追可靠和成本。",
+  "clusters": [
+    {
+      "id": "search-agent-reliability",
+      "theme": "搜索 / 深研 agent 的可靠性与评测",
+      "why_it_matters": "你要造的 AutoSci 本质就是一个深研 agent，今天这批论文正好覆盖它最痛的几环：错在哪（span 级定位）、上下文怎么管（旧观测遮罩的倒 U 型）、评测怎么做难（围着工具序列反向合成任务），都能直接迁进你的冷审门和自评。",
+      "items": [
+        { "kind": "paper", "title": "DRIFT：深研 agent 的 span 级错误定位", "one_line": "把失败分析从「答案对错」推进到 claim/证据/依赖级——可直接迁移到冷审与自进化门的可解释审计原语。", "href": "/papers/2606.02060-drift-agent-error-localization", "score": 8.5 },
+        { "kind": "paper", "title": "遮罩旧观测对搜索 agent 的帮助呈倒 U 型", "one_line": "把「省上下文」从默认技巧重构成 regime-dependent 控制器：检索强、模型中等时收益最大，模型饱和会因误删证据而坍塌。", "href": "/papers/2606.00408-masking-stale-observations-search-agents", "score": 8.5 },
+        { "kind": "paper", "title": "TASTE：反向合成把 agent 评测做难", "one_line": "先采样多样工具序列、再围着它造任务——让近饱和模型大跌，是 AutoSci 自评的直接蓝本。", "href": "/papers/2605.28556-taste" },
+        { "kind": "paper", "title": "GrepSeek：让搜索 agent 直接对语料跑 shell", "one_line": "训练 agent 用 shell 命令直接检索语料库，绕开检索器中间层。", "href": "/articles" },
+        { "kind": "paper", "title": "Reward Hacking in Rubric-Based RL：重现与检测", "one_line": "在可控环境里复现 rubric-based RL 的奖励黑客，并给出检测与缓解——rubric 奖励正是你的评分管线在用的。", "href": "/articles" }
+      ]
+    },
+    {
+      "id": "self-evolving-agents",
+      "theme": "自进化 agent / 技能蒸馏（L1 脉络）",
+      "why_it_matters": "这是你 L0→L1 自进化的零件目录：两篇综述给坐标系（What/When/How/Where 四轴 + 四组件优化回路），COLLEAGUE.SKILL / GPTSwarm / MetaGPT / Agent-as-a-Judge 给可落地的结构——把轨迹蒸馏成可版本化技能、把 agent 系统当可优化图来自我变好。",
+      "items": [
+        { "kind": "paper", "title": "COLLEAGUE.SKILL：从轨迹蒸馏可版本化技能", "one_line": "把散落在轨迹里的专长做成可检视/可纠正/可版本化的 skill package——AutoSci 把自身轨迹蒸馏成可复用技能的直接蓝本。", "href": "/papers/2605.31264-colleague-skill" },
+        { "kind": "paper", "title": "Agent-as-a-Judge：用 agent 评 agent", "one_line": "模块化 agent 看完整轨迹逐条评判，与人类共识对齐远高于 LLM 裁判，且省 97% 时间/成本——与你的冷审门字面同源。", "href": "/papers/2410.10934-agent-as-a-judge" },
+        { "kind": "paper", "title": "自进化 AI agent 综述（四组件优化回路）", "one_line": "把自进化统一成 输入→agent→环境→优化器 的回路，配护栏三定律（Endure>Excel>Evolve）——可直接套进 L1 工程骨架。", "href": "/papers/2508.07407-comprehensive-self-evolving-agents-survey" },
+        { "kind": "paper", "title": "GPTSwarm：把语言 agent 当可优化图", "one_line": "节点优化（改提示）+ 边优化（REINFORCE 学拓扑、剪有害边）让 agent 系统自己变好——结构层面自进化的蓝图。", "href": "/papers/2402.16823-gptswarm-agents-as-graphs" }
+      ]
+    },
+    {
+      "id": "ai-coding-agent-tooling",
+      "theme": "给编码 agent 省 token / 省上下文的新工具",
+      "why_it_matters": "今天月榜清一色是「真·新项目」且全在做同一件事：在内容到达 LLM 之前压缩它——代码知识图、工具输出压缩、持久记忆。这正是 agent 落地的成本瓶颈，也是你做 AI 应用最直接能抄的工程模式。",
+      "items": [
+        { "kind": "project", "title": "codegraph — 预索引代码知识图", "one_line": "给 Claude Code / Codex / Cursor 等的预索引代码知识图，更少 token、更少工具调用、100% 本地。★+40k。", "href": "/brief/codegraph", "score": 89 },
+        { "kind": "project", "title": "headroom — LLM 前置上下文压缩", "one_line": "工具输出/日志/文件/RAG 块在进 LLM 前压缩 60–95%，直击 agent 的上下文成本。★+10k。", "href": "/brief/headroom" },
+        { "kind": "project", "title": "agentmemory — 编码 agent 的持久记忆", "one_line": "号称基于真实 benchmark 的 #1 持久记忆层，给 AI 编码 agent 跨会话记忆。★+19k。", "href": "/brief/agentmemory" },
+        { "kind": "project", "title": "UI-TARS-desktop — 开源多模态 agent 栈", "one_line": "字节开源的多模态 GUI agent 栈，连接前沿模型与 agent 基建。★+6.6k。", "href": "/brief/ui-tars-desktop" }
+      ]
+    },
+    {
+      "id": "models-and-cost",
+      "theme": "模型版本 + 成本焦虑",
+      "why_it_matters": "能力之外，行业话题正在转向「token 账单怎么管」。模型栏这周值得看的是 Claude Opus 4.8 上线；资讯里多条都在算 token 成本、压 token——和今天论文/项目的「可靠+省钱」主线完全合流。",
+      "items": [
+        { "kind": "model", "title": "Claude Opus 4.8 上线（Anthropic）", "one_line": "Anthropic 闭源旗舰更新到 Opus 4.8（2026-05-28），是本项目深读/审稿用的强模型。", "href": "/models" },
+        { "kind": "news", "title": "token 账单到期：行业争相管控 AI 失控成本", "one_line": "话题从「tokenmaxxing、求快」转向「要护栏、怎么控成本」——和今天的可靠性主线同频。", "href": "/news" },
+        { "kind": "news", "title": "Lowfat：可插拔 CLI 过滤器，省了我 91.8% 的 LLM token", "one_line": "Show HN：在内容进 LLM 前过滤，省 91.8% token——与 headroom/codegraph 同一思路。", "href": "/news" }
+      ]
+    },
+    {
+      "id": "podcast-people",
+      "theme": "播客 · 人与判断",
+      "why_it_matters": "想做 AI PM/FDE，光看论文不够，还要看从业者怎么判断节奏。今天可挑一期听：理性看待 AI 的采用周期，或一线研究者怎么训模型、怎么看 2026 的能力预期。",
+      "items": [
+        { "kind": "podcast", "title": "Benedict Evans 谈理性看待 AI", "one_line": "AI 与互联网/移动的类比、采用周期、模型层 vs 应用层的价值分配——给做应用的人定节奏。", "href": "/podcast" },
+        { "kind": "podcast", "title": "姚顺宇：在 Anthropic、Gemini 训模型", "one_line": "从理论物理到 AI、agentic coding、2026 模型能力预期、预训练与后训练。", "href": "/podcast" }
+      ]
+    }
+  ],
+  "audio": {
+    "available": false,
+    "note": "音频简报（NotebookLM 式 TTS）即将上线，引擎待定。"
+  }
+}

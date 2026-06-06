@@ -1,8 +1,582 @@
 {
   "schemaVersion": 1,
   "surface": "projects",
-  "updatedAt": "2026-06-04T21:35:39.001Z",
+  "updatedAt": "2026-06-06T13:29:02.354Z",
   "runs": [
+    {
+      "id": "projects-2026-06-06-1780752542356",
+      "surface": "projects",
+      "date": "2026-06-06",
+      "generatedAt": "2026-06-06T13:29:02.354Z",
+      "sourceFiles": {
+        "public": "public/data/trending.json",
+        "db": "data/ai-brief.db",
+        "briefWiki": "brief-wiki",
+        "briefMirror": "public/data/brief"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "52 repos from GitHub Trending plus topic/search supplements"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "52 README + artifactAudit + evidence_signals records in SQLite"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "canonical Tier 0/1/2/3 rank; Tier 3 has no count cap and is scarce only because the bar is high"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "0 brief-wiki project analysis/deep briefs with separate reviewer pass, 30 radar cards"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "Reviewer LLM pass per analysis/deep brief; BriefGuard layer-A brief:lint after generation"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "brief:build public/data/brief/*.json + public/data/trending.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "brief-wiki status:deep_dived + SQLite runs + data/agent-memory/projects.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "projects",
+        "status": "pass",
+        "checkedAt": "2026-06-06T13:29:01.358Z",
+        "checks": [
+          {
+            "id": "boards-present",
+            "label": "daily / weekly / monthly boards exist",
+            "status": "pass",
+            "details": "windows=daily,weekly,monthly"
+          },
+          {
+            "id": "cards-have-tldr",
+            "label": "every project card has a TL;DR",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "worth-scores",
+            "label": "every project has a numeric worthDeepDive score",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "depth-fields",
+            "label": "every project card has final_depth and ranking_score",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "daily-radar-target",
+            "label": "radar carries the daily target count",
+            "status": "pass",
+            "details": "30 radar repos"
+          },
+          {
+            "id": "deep-quality-gate",
+            "label": "deep count is quality-gate only, not quota-limited",
+            "status": "pass",
+            "details": "14 deep candidates"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [],
+      "archivedItems": [
+        {
+          "id": "bytedance/UI-TARS-desktop",
+          "title": "bytedance/UI-TARS-desktop",
+          "score": 95,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "chopratejas/headroom",
+          "title": "chopratejas/headroom",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "can1357/oh-my-pi",
+          "title": "can1357/oh-my-pi",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "OpenBMB/VoxCPM",
+          "title": "OpenBMB/VoxCPM",
+          "score": 85,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "revfactory/harness",
+          "title": "revfactory/harness",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "affaan-m/ECC",
+          "title": "affaan-m/ECC",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "EveryInc/compound-engineering-plugin",
+          "title": "EveryInc/compound-engineering-plugin",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "Leonxlnx/taste-skill",
+          "title": "Leonxlnx/taste-skill",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "run-llama/liteparse",
+          "title": "run-llama/liteparse",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "anthropics/claude-code",
+          "title": "anthropics/claude-code",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "nesquena/hermes-webui",
+          "title": "nesquena/hermes-webui",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "NousResearch/hermes-agent",
+          "title": "NousResearch/hermes-agent",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        }
+      ],
+      "highlights": [
+        "Projects refreshed 30 radar repo cards.",
+        "0 repos generated analysis/deep brief-wiki output."
+      ],
+      "nextActions": [
+        "Run npm run brief:lint before treating the brief mirror as clean.",
+        "Point project deep cards to the brief-wiki mirror in the frontend."
+      ]
+    },
+    {
+      "id": "projects-2026-06-06-1780704944693",
+      "surface": "projects",
+      "date": "2026-06-06",
+      "generatedAt": "2026-06-06T00:15:44.691Z",
+      "sourceFiles": {
+        "public": "public/data/trending.json",
+        "db": "data/ai-brief.db",
+        "briefWiki": "brief-wiki",
+        "briefMirror": "public/data/brief"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "48 repos from GitHub Trending plus topic/search supplements"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "48 README + artifactAudit + evidence_signals records in SQLite"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "canonical Tier 0/1/2/3 rank; Tier 3 has no count cap and is scarce only because the bar is high"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "0 brief-wiki project analysis/deep briefs with separate reviewer pass, 30 radar cards"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "Reviewer LLM pass per analysis/deep brief; BriefGuard layer-A brief:lint after generation"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "brief:build public/data/brief/*.json + public/data/trending.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "brief-wiki status:deep_dived + SQLite runs + data/agent-memory/projects.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "projects",
+        "status": "pass",
+        "checkedAt": "2026-06-06T00:15:43.566Z",
+        "checks": [
+          {
+            "id": "boards-present",
+            "label": "daily / weekly / monthly boards exist",
+            "status": "pass",
+            "details": "windows=daily,weekly,monthly"
+          },
+          {
+            "id": "cards-have-tldr",
+            "label": "every project card has a TL;DR",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "worth-scores",
+            "label": "every project has a numeric worthDeepDive score",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "depth-fields",
+            "label": "every project card has final_depth and ranking_score",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "daily-radar-target",
+            "label": "radar carries the daily target count",
+            "status": "pass",
+            "details": "30 radar repos"
+          },
+          {
+            "id": "deep-quality-gate",
+            "label": "deep count is quality-gate only, not quota-limited",
+            "status": "pass",
+            "details": "12 deep candidates"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [],
+      "archivedItems": [
+        {
+          "id": "bytedance/UI-TARS-desktop",
+          "title": "bytedance/UI-TARS-desktop",
+          "score": 95,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "chopratejas/headroom",
+          "title": "chopratejas/headroom",
+          "score": 93,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "affaan-m/ECC",
+          "title": "affaan-m/ECC",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "can1357/oh-my-pi",
+          "title": "can1357/oh-my-pi",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "Lum1104/Understand-Anything",
+          "title": "Lum1104/Understand-Anything",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "colbymchenry/codegraph",
+          "title": "colbymchenry/codegraph",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "OpenBMB/VoxCPM",
+          "title": "OpenBMB/VoxCPM",
+          "score": 85,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "revfactory/harness",
+          "title": "revfactory/harness",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "run-llama/liteparse",
+          "title": "run-llama/liteparse",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "EveryInc/compound-engineering-plugin",
+          "title": "EveryInc/compound-engineering-plugin",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "ogulcancelik/herdr",
+          "title": "ogulcancelik/herdr",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "cursor/plugins",
+          "title": "cursor/plugins",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        }
+      ],
+      "highlights": [
+        "Projects refreshed 30 radar repo cards.",
+        "0 repos generated analysis/deep brief-wiki output."
+      ],
+      "nextActions": [
+        "Run npm run brief:lint before treating the brief mirror as clean.",
+        "Point project deep cards to the brief-wiki mirror in the frontend."
+      ]
+    },
+    {
+      "id": "projects-2026-06-05-1780673263875",
+      "surface": "projects",
+      "date": "2026-06-05",
+      "generatedAt": "2026-06-05T15:27:43.873Z",
+      "sourceFiles": {
+        "public": "public/data/trending.json",
+        "db": "data/ai-brief.db",
+        "briefWiki": "brief-wiki",
+        "briefMirror": "public/data/brief"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "47 repos from GitHub Trending plus topic/search supplements"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "47 README + artifactAudit + evidence_signals records in SQLite"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "canonical Tier 0/1/2/3 rank; Tier 3 has no count cap and is scarce only because the bar is high"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "3 brief-wiki project analysis/deep briefs with separate reviewer pass, 30 radar cards"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "Reviewer LLM pass per analysis/deep brief; BriefGuard layer-A brief:lint after generation"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "brief:build public/data/brief/*.json + public/data/trending.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "brief-wiki status:deep_dived + SQLite runs + data/agent-memory/projects.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "projects",
+        "status": "pass",
+        "checkedAt": "2026-06-05T15:27:43.199Z",
+        "checks": [
+          {
+            "id": "boards-present",
+            "label": "daily / weekly / monthly boards exist",
+            "status": "pass",
+            "details": "windows=daily,weekly,monthly"
+          },
+          {
+            "id": "cards-have-tldr",
+            "label": "every project card has a TL;DR",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "worth-scores",
+            "label": "every project has a numeric worthDeepDive score",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "depth-fields",
+            "label": "every project card has final_depth and ranking_score",
+            "status": "pass",
+            "details": "30 repos checked"
+          },
+          {
+            "id": "daily-radar-target",
+            "label": "radar carries the daily target count",
+            "status": "pass",
+            "details": "30 radar repos"
+          },
+          {
+            "id": "deep-quality-gate",
+            "label": "deep count is quality-gate only, not quota-limited",
+            "status": "pass",
+            "details": "13 deep candidates"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [
+        {
+          "id": "Lum1104/Understand-Anything",
+          "title": "Lum1104/Understand-Anything",
+          "score": 89,
+          "reason": "brief-wiki:understand-anything"
+        },
+        {
+          "id": "Panniantong/Agent-Reach",
+          "title": "Panniantong/Agent-Reach",
+          "score": 75,
+          "reason": "brief-wiki:agent-reach"
+        },
+        {
+          "id": "MemPalace/mempalace",
+          "title": "MemPalace/mempalace",
+          "score": 75,
+          "reason": "brief-wiki:mempalace"
+        }
+      ],
+      "archivedItems": [
+        {
+          "id": "bytedance/UI-TARS-desktop",
+          "title": "bytedance/UI-TARS-desktop",
+          "score": 95,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "chopratejas/headroom",
+          "title": "chopratejas/headroom",
+          "score": 93,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "affaan-m/ECC",
+          "title": "affaan-m/ECC",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "can1357/oh-my-pi",
+          "title": "can1357/oh-my-pi",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "colbymchenry/codegraph",
+          "title": "colbymchenry/codegraph",
+          "score": 89,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "OpenBMB/VoxCPM",
+          "title": "OpenBMB/VoxCPM",
+          "score": 85,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "revfactory/harness",
+          "title": "revfactory/harness",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "run-llama/liteparse",
+          "title": "run-llama/liteparse",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "EveryInc/compound-engineering-plugin",
+          "title": "EveryInc/compound-engineering-plugin",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "ogulcancelik/herdr",
+          "title": "ogulcancelik/herdr",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "cursor/plugins",
+          "title": "cursor/plugins",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        },
+        {
+          "id": "anthropics/claude-code",
+          "title": "anthropics/claude-code",
+          "score": 83,
+          "reason": "light read or below deep-dive threshold"
+        }
+      ],
+      "highlights": [
+        "Projects refreshed 30 radar repo cards.",
+        "3 repos generated analysis/deep brief-wiki output."
+      ],
+      "nextActions": [
+        "Run npm run brief:lint before treating the brief mirror as clean.",
+        "Point project deep cards to the brief-wiki mirror in the frontend."
+      ]
+    },
     {
       "id": "projects-2026-06-04-1780608939003",
       "surface": "projects",
@@ -5339,838 +5913,218 @@
         "Run npm run validate before treating the refresh as published.",
         "Spot-check Projects detail pages for the selected deep dives."
       ]
-    },
-    {
-      "id": "projects-2026-05-24-1779590444610",
-      "surface": "projects",
-      "date": "2026-05-24",
-      "generatedAt": "2026-05-24T02:40:44.598Z",
-      "sourceFiles": {
-        "public": "public/data/trending.json",
-        "cache": ".cache/analyses.json"
-      },
-      "agentFlow": [
-        {
-          "stage": "discover",
-          "role": "Discoverer",
-          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-          "signal": "45 repos from GitHub Trending daily/weekly/monthly"
-        },
-        {
-          "stage": "evidence",
-          "role": "Evidence Collector",
-          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-          "signal": "45 README fetch attempts, cache entries 40"
-        },
-        {
-          "stage": "rank",
-          "role": "Ranker",
-          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-          "signal": "worthDeepDive threshold 60, cap 6"
-        },
-        {
-          "stage": "review",
-          "role": "Teacher Reviewer",
-          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-          "signal": "18 project deep dives, 27 light reads"
-        },
-        {
-          "stage": "verify",
-          "role": "Verifier",
-          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
-          "signal": "validate-trending + text encoding gate"
-        },
-        {
-          "stage": "publish",
-          "role": "Publisher",
-          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
-          "signal": "public/data/trending.json"
-        },
-        {
-          "stage": "archive",
-          "role": "Archivist",
-          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
-          "signal": ".cache/analyses.json + data/agent-memory/projects.json"
-        }
-      ],
-      "qualityGate": {
-        "schemaVersion": 1,
-        "surface": "projects",
-        "status": "pass",
-        "checkedAt": "2026-05-24T02:40:44.591Z",
-        "checks": [
-          {
-            "id": "boards-present",
-            "label": "daily / weekly / monthly boards exist",
-            "status": "pass",
-            "details": "windows=daily,weekly,monthly"
-          },
-          {
-            "id": "cards-have-tldr",
-            "label": "every project card has a TL;DR",
-            "status": "pass",
-            "details": "45 repos checked"
-          },
-          {
-            "id": "worth-scores",
-            "label": "every project has a numeric worthDeepDive score",
-            "status": "pass",
-            "details": "45 repos checked"
-          },
-          {
-            "id": "deep-dive-coverage",
-            "label": "at least one high-value project gets a deep dive",
-            "status": "pass",
-            "details": "18 deep dives selected"
-          }
-        ]
-      },
-      "trace": null,
-      "reflection": null,
-      "selectedItems": [
-        {
-          "id": "Lum1104/Understand-Anything",
-          "title": "Lum1104/Understand-Anything",
-          "score": 91,
-          "reason": "这是一个多代理代码理解工具，用于将任意代码库转换为可搜索、可对话的知识图谱，特别在结合静态解析与LLM语义分析，并支持增量更新和多平台集成。"
-        },
-        {
-          "id": "colbymchenry/codegraph",
-          "title": "colbymchenry/codegraph",
-          "score": 91,
-          "reason": "这是一个MCP工具，用来为AI编程代理提供预索引代码知识图谱，特别在显著降低token消耗和工具调用次数。"
-        },
-        {
-          "id": "rohitg00/ai-engineering-from-scratch",
-          "title": "rohitg00/ai-engineering-from-scratch",
-          "score": 91,
-          "reason": "这是一个系统性AI工程课程仓库，用来从零构建完整AI系统，特别在每个课程产出可复用的agent、MCP server等实用工具。"
-        },
-        {
-          "id": "ChromeDevTools/chrome-devtools-mcp",
-          "title": "ChromeDevTools/chrome-devtools-mcp",
-          "score": 100,
-          "reason": "这是一个 MCP 服务器，让 AI 编码代理能够控制 Chrome 浏览器并进行深度调试与性能分析，特别在于集成了完整的 Chrome DevTools 工具集。"
-        },
-        {
-          "id": "presenton/presenton",
-          "title": "presenton/presenton",
-          "score": 96,
-          "reason": "这是一个自托管的AI演示文稿生成器，支持多模型和MCP协议，重点在于数据隐私和完全控制。"
-        },
-        {
-          "id": "NVlabs/LongLive",
-          "title": "NVlabs/LongLive",
-          "score": 96,
-          "reason": "这是一个并行基础设施，用于长视频生成的训练和推理，特别在支持NVFP4低精度量化、序列并行和多镜头功能。"
-        },
-        {
-          "id": "colbymchenry/codegraph",
-          "title": "colbymchenry/codegraph",
-          "score": 97,
-          "reason": "这是一个MCP工具，用来为AI编程代理提供预索引代码知识图谱，特别在显著降低token消耗和工具调用次数。"
-        },
-        {
-          "id": "tinyhumansai/openhuman",
-          "title": "tinyhumansai/openhuman",
-          "score": 100,
-          "reason": "这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。"
-        },
-        {
-          "id": "ruvnet/RuView",
-          "title": "ruvnet/RuView",
-          "score": 100,
-          "reason": "这是一个WiFi感知平台，利用CSI信号从ESP32实现穿墙人体检测、生命体征监测和姿态估计，无需摄像头或穿戴设备。"
-        },
-        {
-          "id": "rohitg00/agentmemory",
-          "title": "rohitg00/agentmemory",
-          "score": 100,
-          "reason": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。"
-        },
-        {
-          "id": "rohitg00/ai-engineering-from-scratch",
-          "title": "rohitg00/ai-engineering-from-scratch",
-          "score": 97,
-          "reason": "这是一个系统性AI工程课程仓库，用来从零构建完整AI系统，特别在每个课程产出可复用的agent、MCP server等实用工具。"
-        },
-        {
-          "id": "can1357/oh-my-pi",
-          "title": "can1357/oh-my-pi",
-          "score": 100,
-          "reason": "这是一个终端AI编码代理，用于通过hash-anchored编辑和LSP集成提升代码修改精度，特别在支持子代理和实时调试。"
-        },
-        {
-          "id": "colbymchenry/codegraph",
-          "title": "colbymchenry/codegraph",
-          "score": 100,
-          "reason": "这是一个MCP工具，用来为AI编程代理提供预索引代码知识图谱，特别在显著降低token消耗和工具调用次数。"
-        },
-        {
-          "id": "CloakHQ/CloakBrowser",
-          "title": "CloakHQ/CloakBrowser",
-          "score": 94,
-          "reason": "这是一个开源Stealth Chromium浏览器，用于绕过网站反爬检测，特点是在C++源码层修改指纹，而非JS注入或配置补丁。"
-        },
-        {
-          "id": "rohitg00/agentmemory",
-          "title": "rohitg00/agentmemory",
-          "score": 100,
-          "reason": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。"
-        },
-        {
-          "id": "Alishahryar1/free-claude-code",
-          "title": "Alishahryar1/free-claude-code",
-          "score": 82,
-          "reason": "这是一个Claude Code API代理，用来免费使用其他模型的编码助手，特别在支持多种免费/本地模型提供者和管理UI。"
-        },
-        {
-          "id": "AIDC-AI/Pixelle-Video",
-          "title": "AIDC-AI/Pixelle-Video",
-          "score": 77,
-          "reason": "这是一个AI全自动短视频生成引擎，输入主题即可完成文案、配图、语音、音乐合成，特别在基于ComfyUI工作流的模块化设计，支持多种模型灵活组合。"
-        },
-        {
-          "id": "ruvnet/ruflo",
-          "title": "ruvnet/ruflo",
-          "score": 74,
-          "reason": "这是一个多智能体编排平台，用来协调Claude Code中的100+专业代理，特别在自学习群智能、联邦通信和RAG记忆集成。"
-        }
-      ],
-      "archivedItems": [
-        {
-          "id": "anthropics/claude-plugins-official",
-          "title": "anthropics/claude-plugins-official",
-          "score": 56,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "Fincept-Corporation/FinceptTerminal",
-          "title": "Fincept-Corporation/FinceptTerminal",
-          "score": 39,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "multica-ai/andrej-karpathy-skills",
-          "title": "multica-ai/andrej-karpathy-skills",
-          "score": 39,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "dotnet/skills",
-          "title": "dotnet/skills",
-          "score": 39,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "mukul975/Anthropic-Cybersecurity-Skills",
-          "title": "mukul975/Anthropic-Cybersecurity-Skills",
-          "score": 39,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "multica-ai/multica",
-          "title": "multica-ai/multica",
-          "score": 39,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "trimstray/the-book-of-secret-knowledge",
-          "title": "trimstray/the-book-of-secret-knowledge",
-          "score": 20,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "odoo/odoo",
-          "title": "odoo/odoo",
-          "score": 20,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "yt-dlp/yt-dlp",
-          "title": "yt-dlp/yt-dlp",
-          "score": 31,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "Imbad0202/academic-research-skills",
-          "title": "Imbad0202/academic-research-skills",
-          "score": 39,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "supertone-inc/supertonic",
-          "title": "supertone-inc/supertonic",
-          "score": 81,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "HKUDS/ViMax",
-          "title": "HKUDS/ViMax",
-          "score": 91,
-          "reason": "light read or below deep-dive threshold"
-        }
-      ],
-      "highlights": [
-        "Projects refreshed 45 repos from GitHub Trending.",
-        "18 repos passed the deep-dive threshold."
-      ],
-      "nextActions": [
-        "Open Projects page and verify cards are not blank.",
-        "Run npm run validate before treating the refresh as published."
-      ]
-    },
-    {
-      "id": "projects-2026-05-20-1779324654541",
-      "surface": "projects",
-      "date": "2026-05-20",
-      "generatedAt": "2026-05-21T00:50:54.540Z",
-      "sourceFiles": {
-        "public": "public/data/trending.json"
-      },
-      "agentFlow": [
-        {
-          "stage": "discover",
-          "role": "Discoverer",
-          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-          "signal": "24 repos already present in public trending data"
-        },
-        {
-          "stage": "evidence",
-          "role": "Evidence Collector",
-          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-          "signal": "GitHub Trending metadata, README cache, light/deep analysis"
-        },
-        {
-          "stage": "rank",
-          "role": "Ranker",
-          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-          "signal": "worthDeepDive scores from current trending data"
-        },
-        {
-          "stage": "review",
-          "role": "Teacher Reviewer",
-          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-          "signal": "3 deep dives, 21 light reads"
-        },
-        {
-          "stage": "verify",
-          "role": "Verifier",
-          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
-          "signal": "validate-trending + validate-text-encoding"
-        },
-        {
-          "stage": "publish",
-          "role": "Publisher",
-          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
-          "signal": "public/data/trending.json"
-        },
-        {
-          "stage": "archive",
-          "role": "Archivist",
-          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
-          "signal": ".cache/analyses.json + data/agent-memory/projects.json"
-        }
-      ],
-      "qualityGate": {
-        "schemaVersion": 1,
-        "surface": "projects",
-        "status": "pass",
-        "checkedAt": "2026-05-21T00:50:54.539Z",
-        "checks": [
-          {
-            "id": "boards-present",
-            "label": "daily / weekly / monthly boards exist",
-            "status": "pass",
-            "details": "24 repos present"
-          },
-          {
-            "id": "cards-have-tldr",
-            "label": "every project card has a TL;DR",
-            "status": "pass",
-            "details": "24 repos checked"
-          },
-          {
-            "id": "deep-dive-coverage",
-            "label": "at least one high-value project gets a deep dive",
-            "status": "pass",
-            "details": "3 deep dives selected"
-          }
-        ]
-      },
-      "selectedItems": [
-        {
-          "id": "colbymchenry/codegraph",
-          "title": "colbymchenry/codegraph",
-          "score": 96,
-          "reason": "这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。"
-        },
-        {
-          "id": "tinyhumansai/openhuman",
-          "title": "tinyhumansai/openhuman",
-          "score": 100,
-          "reason": "这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。"
-        },
-        {
-          "id": "rohitg00/agentmemory",
-          "title": "rohitg00/agentmemory",
-          "score": 97,
-          "reason": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。"
-        }
-      ],
-      "archivedItems": [
-        {
-          "id": "Imbad0202/academic-research-skills",
-          "title": "Imbad0202/academic-research-skills",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "multica-ai/andrej-karpathy-skills",
-          "title": "multica-ai/andrej-karpathy-skills",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "rohitg00/ai-engineering-from-scratch",
-          "title": "rohitg00/ai-engineering-from-scratch",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "HKUDS/CLI-Anything",
-          "title": "HKUDS/CLI-Anything",
-          "score": 96,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "can1357/oh-my-pi",
-          "title": "can1357/oh-my-pi",
-          "score": 94,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "obra/superpowers",
-          "title": "obra/superpowers",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "CloakHQ/CloakBrowser",
-          "title": "CloakHQ/CloakBrowser",
-          "score": 76,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "ruvnet/RuView",
-          "title": "ruvnet/RuView",
-          "score": 100,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "Imbad0202/academic-research-skills",
-          "title": "Imbad0202/academic-research-skills",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "oven-sh/bun",
-          "title": "oven-sh/bun",
-          "score": 21,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "facebook/pyrefly",
-          "title": "facebook/pyrefly",
-          "score": 58,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "mattpocock/skills",
-          "title": "mattpocock/skills",
-          "score": 39,
-          "reason": "light read in current public data"
-        }
-      ],
-      "highlights": [
-        "Projects currently expose 24 repos and 3 deep dives."
-      ],
-      "nextActions": [
-        "Use Projects refresh to update this memory from a live GitHub Trending run."
-      ]
-    },
-    {
-      "id": "projects-2026-05-20-1779324615000",
-      "surface": "projects",
-      "date": "2026-05-20",
-      "generatedAt": "2026-05-21T00:50:15.000Z",
-      "sourceFiles": {
-        "public": "public/data/trending.json"
-      },
-      "agentFlow": [
-        {
-          "stage": "discover",
-          "role": "Discoverer",
-          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-          "signal": "24 repos already present in public trending data"
-        },
-        {
-          "stage": "evidence",
-          "role": "Evidence Collector",
-          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-          "signal": "GitHub Trending metadata, README cache, light/deep analysis"
-        },
-        {
-          "stage": "rank",
-          "role": "Ranker",
-          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-          "signal": "worthDeepDive scores from current trending data"
-        },
-        {
-          "stage": "review",
-          "role": "Teacher Reviewer",
-          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-          "signal": "3 deep dives, 21 light reads"
-        },
-        {
-          "stage": "verify",
-          "role": "Verifier",
-          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
-          "signal": "validate-trending + validate-text-encoding"
-        },
-        {
-          "stage": "publish",
-          "role": "Publisher",
-          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
-          "signal": "public/data/trending.json"
-        },
-        {
-          "stage": "archive",
-          "role": "Archivist",
-          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
-          "signal": ".cache/analyses.json + data/agent-memory/projects.json"
-        }
-      ],
-      "qualityGate": {
-        "schemaVersion": 1,
-        "surface": "projects",
-        "status": "pass",
-        "checkedAt": "2026-05-21T00:50:14.999Z",
-        "checks": [
-          {
-            "id": "boards-present",
-            "label": "daily / weekly / monthly boards exist",
-            "status": "pass",
-            "details": "24 repos present"
-          },
-          {
-            "id": "cards-have-tldr",
-            "label": "every project card has a TL;DR",
-            "status": "pass",
-            "details": "24 repos checked"
-          },
-          {
-            "id": "deep-dive-coverage",
-            "label": "at least one high-value project gets a deep dive",
-            "status": "pass",
-            "details": "3 deep dives selected"
-          }
-        ]
-      },
-      "selectedItems": [
-        {
-          "id": "colbymchenry/codegraph",
-          "title": "colbymchenry/codegraph",
-          "score": 96,
-          "reason": "这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。"
-        },
-        {
-          "id": "tinyhumansai/openhuman",
-          "title": "tinyhumansai/openhuman",
-          "score": 100,
-          "reason": "这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。"
-        },
-        {
-          "id": "rohitg00/agentmemory",
-          "title": "rohitg00/agentmemory",
-          "score": 97,
-          "reason": "这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。"
-        }
-      ],
-      "archivedItems": [
-        {
-          "id": "Imbad0202/academic-research-skills",
-          "title": "Imbad0202/academic-research-skills",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "tinyhumansai/openhuman",
-          "title": "tinyhumansai/openhuman",
-          "score": 96,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "multica-ai/andrej-karpathy-skills",
-          "title": "multica-ai/andrej-karpathy-skills",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "rohitg00/ai-engineering-from-scratch",
-          "title": "rohitg00/ai-engineering-from-scratch",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "HKUDS/CLI-Anything",
-          "title": "HKUDS/CLI-Anything",
-          "score": 96,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "can1357/oh-my-pi",
-          "title": "can1357/oh-my-pi",
-          "score": 94,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "obra/superpowers",
-          "title": "obra/superpowers",
-          "score": 39,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "rohitg00/agentmemory",
-          "title": "rohitg00/agentmemory",
-          "score": 91,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "colbymchenry/codegraph",
-          "title": "colbymchenry/codegraph",
-          "score": 100,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "CloakHQ/CloakBrowser",
-          "title": "CloakHQ/CloakBrowser",
-          "score": 76,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "ruvnet/RuView",
-          "title": "ruvnet/RuView",
-          "score": 100,
-          "reason": "light read in current public data"
-        },
-        {
-          "id": "Imbad0202/academic-research-skills",
-          "title": "Imbad0202/academic-research-skills",
-          "score": 39,
-          "reason": "light read in current public data"
-        }
-      ],
-      "highlights": [
-        "Projects currently expose 24 repos and 3 deep dives."
-      ],
-      "nextActions": [
-        "Use Projects refresh to update this memory from a live GitHub Trending run."
-      ]
     }
   ],
   "reusablePatterns": [
     {
+      "text": "Lum1104/Understand-Anything: brief-wiki/understand-anything",
+      "source": "projects",
+      "firstSeenAt": "2026-06-05T15:27:43.873Z",
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
+    },
+    {
+      "text": "Panniantong/Agent-Reach: brief-wiki/agent-reach",
+      "source": "projects",
+      "firstSeenAt": "2026-06-05T15:27:43.873Z",
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
+    },
+    {
+      "text": "MemPalace/mempalace: brief-wiki/mempalace",
+      "source": "projects",
+      "firstSeenAt": "2026-06-05T15:27:43.873Z",
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
+    },
+    {
       "text": "NVlabs/LongLive: 这是一个并行基础设施，用于长视频生成的训练和推理，特别在支持NVFP4低精度量化、序列并行和多镜头功能。",
       "source": "projects",
       "firstSeenAt": "2026-06-04T20:01:08.247Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "presenton/presenton: 这是一个自托管的AI演示文稿生成器，支持多模型和MCP协议，重点在于数据隐私和完全控制。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "ChromeDevTools/chrome-devtools-mcp: 这是一个 MCP 服务器，让 AI 编码代理能够控制 Chrome 浏览器并进行深度调试与性能分析，特别在于集成了完整的 Chrome DevTools 工具集。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "OpenMOSS/MOSS-TTS: OpenMOSS/MOSS-TTS：MOSS-TTS 开源语音和声音生成模型家族，覆盖长语音、多说话人对话、声音设计、环境音效和实时流式 TTS。",
       "source": "projects",
       "firstSeenAt": "2026-06-04T20:01:08.247Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "bytedance/UI-TARS-desktop: bytedance/UI-TARS-desktop：开源多模态 AI Agent 技术栈，用于连接前沿 AI 模型和 Agent 基础设施。",
       "source": "projects",
       "firstSeenAt": "2026-06-04T20:01:08.247Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "NousResearch/hermes-agent: brief-wiki/hermes-agent",
       "source": "projects",
       "firstSeenAt": "2026-06-04T03:47:52.137Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "opendataloader-project/opendataloader-pdf: brief-wiki/opendataloader-pdf",
       "source": "projects",
       "firstSeenAt": "2026-06-04T03:47:52.137Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "lyogavin/airllm: brief-wiki/airllm",
       "source": "projects",
       "firstSeenAt": "2026-06-04T00:42:41.678Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "HKUDS/Vibe-Trading: brief-wiki/vibe-trading",
       "source": "projects",
       "firstSeenAt": "2026-06-04T03:47:52.137Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "HKUDS/ViMax: brief-wiki/vimax",
       "source": "projects",
       "firstSeenAt": "2026-06-04T00:42:41.678Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "fathah/hermes-desktop: brief-wiki/hermes-desktop",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "modelscope/FunASR: brief-wiki/funasr",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "mukul975/Anthropic-Cybersecurity-Skills: brief-wiki/anthropic-cybersecurity-skills",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "nesquena/hermes-webui: brief-wiki/hermes-webui",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "Open-LLM-VTuber/Open-LLM-VTuber: brief-wiki/open-llm-vtuber",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "chopratejas/headroom: brief-wiki/headroom",
       "source": "projects",
       "firstSeenAt": "2026-06-02T14:08:28.835Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "microsoft/markitdown: 微软开源的轻量级文件转Markdown工具，专为LLM数据预处理设计，支持多格式和插件扩展。",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "nesquena/hermes-webui: Hermes WebUI提供Hermes Agent的全功能浏览器界面，支持持久记忆、调度和消息平台，无需构建步骤。",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "supermemoryai/supermemory: 开源记忆引擎，提供RAG、用户画像和MCP集成，AI代理无需自建记忆系统",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "harry0703/MoneyPrinterTurbo: 一键AI短视频生成工具，支持自动文案、素材、字幕、音乐合成",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "D4Vinci/Scrapling: 自适应网页抓取框架，智能元素定位，内置反爬绕过，支持MCP与AI Agent集成。",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "harry0703/MoneyPrinterTurbo: 一键AI短视频生成工具，集成多种LLM，自动文案、字幕、配音，提供Web界面和API。",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "microsoft/markitdown: 轻量级 Python 工具，将多种文件转换为 Markdown，便于 LLM 处理",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "D4Vinci/Scrapling: 自适应Web抓取框架，支持反爬虫绕过、动态元素追踪、Spider爬虫和MCP集成。",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "nesquena/hermes-webui: Hermes 自治代理的轻量级 Web 界面，支持持久记忆、调度和多平台访问。",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "EveryInc/compound-engineering-plugin: AI coding assistant plugin implementing compound engineering workflow: plan, review, compound knowledge.",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "Lum1104/Understand-Anything: 这是一个多代理代码理解工具，用于将任意代码库转换为可搜索、可对话的知识图谱，特别在结合静态解析与LLM语义分析，并支持增量更新和多平台集成。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "colbymchenry/codegraph: 这是一个MCP工具，用来为AI编程代理提供预索引代码知识图谱，特别在显著降低token消耗和工具调用次数。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "rohitg00/ai-engineering-from-scratch: 这是一个系统性AI工程课程仓库，用来从零构建完整AI系统，特别在每个课程产出可复用的agent、MCP server等实用工具。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "colbymchenry/codegraph: 这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。",
       "source": "projects",
       "firstSeenAt": "2026-05-21T00:50:08.792Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "tinyhumansai/openhuman: 这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。",
       "source": "projects",
       "firstSeenAt": "2026-05-21T00:50:08.792Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     },
     {
       "text": "rohitg00/agentmemory: 这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。",
       "source": "projects",
       "firstSeenAt": "2026-05-21T00:50:08.792Z",
-      "lastSeenAt": "2026-06-04T21:35:39.001Z"
+      "lastSeenAt": "2026-06-06T13:29:02.354Z"
     }
   ]
 }

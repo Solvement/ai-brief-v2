@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-05T15:27:43.924Z",
+  "generatedAt": "2026-06-06T13:29:02.469Z",
   "models": [
     {
       "id": "anthropic-claude",
@@ -7,8 +7,8 @@
       "vendor": "Anthropic",
       "country": "美国",
       "kind": "closed",
-      "latestVersion": "Claude Opus 4.8",
-      "latestReleasedAt": "2026-05-28",
+      "latestVersion": "Claude Opus 4.1",
+      "latestReleasedAt": "2026-06-05",
       "latestReleasedAtPrecision": "day",
       "isOpen": false,
       "license": "closed",
@@ -16,91 +16,63 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://docs.claude.com/en/release-notes/overview",
-      "lastCheckedAt": "2026-06-05T15:27:44.920Z",
-      "analysisGeneratedAt": "2026-06-04T04:10:40.040Z",
+      "lastCheckedAt": "2026-06-06T13:29:03.900Z",
+      "analysisGeneratedAt": "2026-06-06T00:15:44.764Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
-        "oneLineTakeaway": "Claude Opus 4.8 带来默认 100 万 token 上下文、更低缓存门槛、自适应思考节省 token，同时平台新增对话中切换系统指令、拒绝安全分类等实用功能，非常适合构建长会话、高安全性要求的 AI 应用。",
+        "oneLineTakeaway": "Claude Opus 4.8 默认 1M 上下文、自适应推理和更低缓存门槛，让长上下文代理和大规模分析应用的成本与性能都有明显提升。",
         "newFeatures": [
           {
-            "feature": "Claude Opus 4.8 发布",
-            "whatItIs": "Anthropic 目前最强通用模型，默认支持 100 万 token 上下文窗口（微软 Foundry 上 20 万），最高输出 12.8 万 token，工具和平台功能与 Opus 4.7 保持兼容。",
-            "forYou": "处理超长文档（如代码库、合同）时无需手动分块；单次对话可完整分析数小时的会议记录；大输出容量便于生成完整报告或长代码段。",
-            "howToUse": "直接使用模型字符串 `claude-opus-4-8`，无需开启任何 beta 头即可使用 100 万上下文。",
-            "whenToUse": "当任务复杂度高、需要处理大量上下文或生成长文本时，替代旧版模型。"
+            "feature": "1M token context window by default",
+            "whatItIs": "模型默认支持 100 万 token 的上下文窗口，无需任何 beta 头或额外配置。",
+            "forYou": "可以直接处理超长文档、完整代码库或长时间对话历史，大幅扩展了一轮对话或一次分析能容纳的信息量。",
+            "howToUse": "调用 API 时直接将输入 token 数提到 200k 以上，模型会自动处理。",
+            "whenToUse": "当你需要批量分析大型代码仓库、多文件 PDF、或构建需要极长记忆的代理应用时，值得切到 Opus 4.8。"
           },
           {
-            "feature": "对话中插入系统消息（mid-conversation system messages）",
-            "whatItIs": "在消息数组里，用户轮次之后允许发送 `role: \"system\"` 的消息，用于在长会话中动态修改指令。",
-            "forYou": "长会话中无需重建整个上下文就能调整 Claude 的行为或角色，且能保留之前缓存的提示词，节省延迟和成本。适合客服对话中根据用户等级切换问候风格，或代码生成中根据阶段切换编程规范。",
-            "howToUse": "在请求的 `messages` 字段中，按文档规定的放置规则插入 `role: \"system\"` 的消息块。Opus 4.8 上可用，无需 beta 头。",
-            "whenToUse": "当对话长度可能超出提示缓存有效长度，且需要中途改变指令时使用。"
+            "feature": "Adaptive thinking with effort default high",
+            "whatItIs": "模型只在当前轮次需要时进行深度推理（扩展思考），其余情况跳过，同时 effort 参数全平台默认设为 high。",
+            "forYou": "减少不必要的思考 token，既保持高质量输出，又节省 token 成本和延迟。",
+            "howToUse": "默认开启，无需额外设置。如需调整可显式传入 effort 参数。",
+            "whenToUse": "几乎所有场景都受益，尤其适合大量轮次但并非每一步都需要复杂推理的代理任务。"
           },
           {
-            "feature": "拒绝响应包含安全分类（stop_details）",
-            "whatItIs": "当 Claude 因安全策略拒绝生成内容时，响应中会返回 `stop_details`，包含分类（如 cyber、bio）和可读解释。",
-            "forYou": "应用可以据此区分不同拒绝类型，自动引导用户走不同的申诉或处理流程，而不是只显示统一错误。适用于需要合规审计或安全响应的场景。",
-            "howToUse": "解析响应中的 `stop_details` 字段（已公开文档，无需 beta 头），根据 `category` 字段决定后续路由。",
-            "whenToUse": "当应用需要对不同安全拒绝做出差异化处理时使用，例如涉及特定内容审核或高风险领域的应用。"
+            "feature": "Mid-conversation system messages",
+            "whatItIs": "允许在对话中途插入系统消息，动态更新指令而不破坏之前建立的 prompt 缓存。",
+            "forYou": "在长对话中途切换任务说明或补充上下文时，仍能复用历史缓存，降低整体 token 消耗。",
+            "howToUse": "在 messages 数组里的 user 或 assistant 消息之后加入 role:\"system\" 的消息。",
+            "whenToUse": "构建长时间运行的对话代理时，需要根据上下文动态调整行为，比如按步骤切换指令或补充最新政策。"
           },
           {
-            "feature": "effort 参数默认值改为 high",
-            "whatItIs": "在 Opus 4.8 上，`effort`（控制思考深度的参数）默认设为 `high`，覆盖所有界面（Claude Code、Messages API）。",
-            "forYou": "自动获得最好的回答质量，无需手动调整。对于大多数任务，直接调用就比以前更可靠。如果追求速度或节省 token，可以显式调低。",
-            "howToUse": "不指定 `effort` 即可获得高质量输出；如需更低延迟或成本，设置 `effort: \"medium\"` 或 `\"low\"`。",
-            "whenToUse": "当构建需要最可靠推理的核心业务逻辑时，不额外配置就获得最佳效果；对延迟敏感的任务则手动降低。"
+            "feature": "Refusal stop_details with category",
+            "whatItIs": "当模型因安全策略拒绝生成时，响应中会返回 stop_details，包含类别（如 cyber、bio 或 null）和可读解释。",
+            "forYou": "可以按拒绝类别分流处理，例如网络安全类引导用户走审核流程，生物类立即拦截，提升应用的安全合规处理能力。",
+            "howToUse": "检查 API 响应中的 stop_details 字段，根据 category 和 explanation 决定下一步交互。",
+            "whenToUse": "面向终端用户的对话应用，需要精细控制安全红线并给用户合适反馈时。"
           },
           {
-            "feature": "提示缓存最低缓存长度降至 1024 token",
-            "whatItIs": "在 Opus 4.8 上，触发提示缓存（prompt caching）的最小前缀长度从之前的 2048 或更高降低到 1024 token。",
-            "forYou": "更短的共享前缀也能被缓存，提高缓存命中率，减少重复发送相同开头信息时的成本与延迟。适合频繁变化前缀但开头固定的对话或分类链。",
-            "howToUse": "正常使用提示缓存功能，在请求中标记缓存的起止点；对于 Opus 4.8，系统会自动处理更低的阈值。",
-            "whenToUse": "当有多轮对话共享较短的开头信息（如系统提示、角色设定）时，能显著降低成本。"
+            "feature": "1,024-token minimum cacheable prompt length",
+            "whatItIs": "提示缓存的最小可缓存片段长度从之前的较高值降低至 1024 token。",
+            "forYou": "更短的系统消息、助手话术或常见前缀也能被缓存，进一步降低重复调用的成本。",
+            "howToUse": "在需要缓存的地方添加 cache_control 标记，只要片段长度 ≥1024 token 即可生效。",
+            "whenToUse": "当你需要频繁复用较短的公共前缀，如多个任务共享的简短指令或角色设定时。"
           },
           {
-            "feature": "自适应思考减少不必要的推理 token（adaptive thinking）",
-            "whatItIs": "启用自适应思考后，模型只在当前轮次需要深入推理时才执行链式思考，避免在不必要的时候消耗思考 token。",
-            "forYou": "节省推理成本，同时保持任务质量。简单查询不会浪费昂贵思考，而复杂问题自动触发深度推理。适合混合负载的应用，无需为不同难度配置多个模型。",
-            "howToUse": "在 Opus 4.8 上使用 `thinking: {type: \"adaptive\"}` 并配合 `effort` 参数。",
-            "whenToUse": "当应用负载中既有简单问答又有复杂推理时，可同时优化成本与响应质量。"
+            "feature": "Fast mode research preview",
+            "whatItIs": "实验性加速模式，通过 speed:\"fast\" 降低输出延迟，但价格高于标准模式。",
+            "forYou": "在对延迟敏感的场景（如实时聊天、协同文档）获得更快的响应速度。",
+            "howToUse": "请求中加入 speed:\"fast\" 和 beta 头 fast-mode-2026-02-01。需注意可能名额限制，需加入等候名单。",
+            "whenToUse": "用户期待即时反馈的交互式产品，且你愿意为更低延迟支付溢价时。"
           },
           {
-            "feature": "支持高分辨率图片（长边最高 2576 像素）",
-            "whatItIs": "Opus 4.8 能接收细节更丰富的图像，长边最高 2576 像素。",
-            "forYou": "分析精细图表、工程图纸、医疗影像时能保留更多信息，提升多模态应用的准确性。",
-            "howToUse": "通过图片输入接口传入高分辨率图像，模型自动处理。",
-            "whenToUse": "当应用需要提取图像中微小文字或细节时，直接使用高分辨率图片。"
-          },
-          {
-            "feature": "快速模式（Fast mode）研究预览",
-            "whatItIs": "Opus 4.8 提供可选的快速输出生成模式（研究预览），用速度换优质定价。",
-            "forYou": "在需要低延迟的交互式应用中（如聊天机器人、实时代码补全），可以使用快速模式获得比标准模式快得多的响应。",
-            "howToUse": "在 API 请求中设置 `speed: \"fast\"`，并包含相应的 beta 头。当前为研究预览，需加入候补名单。",
-            "whenToUse": "当端到端延迟是核心体验指标且成本允许时使用，例如面向消费者的实时聊天产品。"
-          },
-          {
-            "feature": "Claude Code 工作流（Workflows）研究预览",
-            "whatItIs": "在 Claude Code 中定义并运行多步骤的自动化计划。",
-            "forYou": "将复杂的开发流程（如代码生成、测试、部署）定义为可重复的工作流，减少手动操作，适合团队规范化开发流程。",
-            "howToUse": "参考 Claude Code 文档，通过 YAML 或界面定义工作流并触发。",
-            "whenToUse": "当需要将一系列编码任务固定为标准化流程时使用，比如代码审查后的自动修复和提交。"
-          },
-          {
-            "feature": "Advisor 工具支持 max_tokens 限制",
-            "whatItIs": "在 advisor 工具定义中可设置 max_tokens，限制 advisor 模型每次调用的最大输出 token。",
-            "forYou": "降低 advisor 模型的输出 token 成本和延迟，适用于不需要完整 advisor 响应的场景（例如只要求简短指导而非长文分析）。",
-            "howToUse": "在工具定义中添加 `tools[].max_tokens` 字段，参考文档 'Capping advisor output'。",
-            "whenToUse": "当 advisor 工具用于简单决策或状态检查，不需要长输出时，设置限额以节省成本。"
-          },
-          {
-            "feature": "因安全拒绝且无输出时不收费",
-            "whatItIs": "当请求因安全策略被拒绝且模型未生成任何输出时，不再对此次调用计费。",
-            "forYou": "减少因安全过滤产生的无效成本，尤其在高频调用并可能触发大量安全规则的应用中，能显著降低账单。",
-            "howToUse": "无需额外配置；当响应中 `stop_reason` 为 `\"refusal\"` 且无 content 时自动生效。",
-            "whenToUse": "当应用面向开放用户输入，可能频繁触发安全策略时，可放心使用而不必担心无效 token 费用。"
+            "feature": "High-resolution image input",
+            "whatItIs": "支持长边最高 2576 像素的图像输入（与 Opus 4.7 相同），可处理高分辨率视觉内容。",
+            "forYou": "能处理精细图像，如扫描文档、高分辨率照片、医学影像等，提升视觉理解精度。",
+            "howToUse": "直接在 messages 中包含 base64 编码的高分辨率图片，无需特别设置。",
+            "whenToUse": "应用中需要从高清图片中提取细节，如光学字符识别、图表分析、产品瑕疵检测等。"
           }
         ],
-        "limitations": "快速模式仍为研究预览，需申请候补名单；Advisor 工具本身需要 beta 头；100 万上下文在微软 Foundry 上限制为 20 万；Opus 4.8 上禁止同时设置 temperature/top_p/top_k 为非默认值，否则返回 400 错误（与 4.7 相同）。",
+        "limitations": "价格、速率限制和区域可用性官方 changelog 未详细说明，需参考定价页面和状态页。Fast mode 为研究预览，可能受名额限制且需加入等候名单。温度（temperature）、top_p 和 top_k 参数必须使用默认值，否则 API 返回 400 错误。1M 上下文窗口在 Microsoft Foundry 上限制为 200k。",
         "sources": [
           {
             "name": "Anthropic official changelog",
@@ -115,9 +87,9 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "Claude Opus 4.8",
+          "名称": "Claude Opus 4.1",
           "厂商": "Anthropic",
-          "发布日": "2026-05-28",
+          "发布日": "2026-06-05",
           "开放度标签": "仅API闭源",
           "类型": "官方未披露",
           "规模架构": "架构官方未披露；context window（上下文窗口）官方未披露",
@@ -142,31 +114,27 @@
             "输出每百万token": "官方未披露"
           },
           "知识截止": "官方未披露",
-          "model string": "Claude Opus 4.8",
+          "model string": "Claude Opus 4.1",
           "速率": "官方未披露",
           "多模态I/O": "官方未披露"
         },
         "update": {
-          "版本": "Claude Opus 4.8→Claude Opus 4.8(2026-05-28)",
+          "版本": "Claude Opus 4.1→Claude Opus 4.1(2026-06-05)",
           "变了什么": [
-            "Claude Opus 4.8 发布: Anthropic 目前最强通用模型，默认支持 100 万 token 上下文窗口（微软 Foundry 上 20 万），最高输出 12.8 万 token，工具和平台功能与 Opus 4.7 保持兼容。: 处理超长文档（如代码库、合同）时无需手动分块；单次对话可完整分析数小时的会议记录；大输出容量便于生成完整报告或长代码段。",
-            "对话中插入系统消息（mid-conversation system messages）: 在消息数组里，用户轮次之后允许发送 `role: \"system\"` 的消息，用于在长会话中动态修改指令。: 长会话中无需重建整个上下文就能调整 Claude 的行为或角色，且能保留之前缓存的提示词，节省延迟和成本。适合客服对话中根据用户等级切换问候风格，或代码生成中根据阶段切换编程规范。",
-            "拒绝响应包含安全分类（stop_details）: 当 Claude 因安全策略拒绝生成内容时，响应中会返回 `stop_details`，包含分类（如 cyber、bio）和可读解释。: 应用可以据此区分不同拒绝类型，自动引导用户走不同的申诉或处理流程，而不是只显示统一错误。适用于需要合规审计或安全响应的场景。",
-            "effort 参数默认值改为 high: 在 Opus 4.8 上，`effort`（控制思考深度的参数）默认设为 `high`，覆盖所有界面（Claude Code、Messages API）。: 自动获得最好的回答质量，无需手动调整。对于大多数任务，直接调用就比以前更可靠。如果追求速度或节省 token，可以显式调低。",
-            "提示缓存最低缓存长度降至 1024 token: 在 Opus 4.8 上，触发提示缓存（prompt caching）的最小前缀长度从之前的 2048 或更高降低到 1024 token。: 更短的共享前缀也能被缓存，提高缓存命中率，减少重复发送相同开头信息时的成本与延迟。适合频繁变化前缀但开头固定的对话或分类链。",
-            "自适应思考减少不必要的推理 token（adaptive thinking）: 启用自适应思考后，模型只在当前轮次需要深入推理时才执行链式思考，避免在不必要的时候消耗思考 token。: 节省推理成本，同时保持任务质量。简单查询不会浪费昂贵思考，而复杂问题自动触发深度推理。适合混合负载的应用，无需为不同难度配置多个模型。",
-            "支持高分辨率图片（长边最高 2576 像素）: Opus 4.8 能接收细节更丰富的图像，长边最高 2576 像素。: 分析精细图表、工程图纸、医疗影像时能保留更多信息，提升多模态应用的准确性。",
-            "快速模式（Fast mode）研究预览: Opus 4.8 提供可选的快速输出生成模式（研究预览），用速度换优质定价。: 在需要低延迟的交互式应用中（如聊天机器人、实时代码补全），可以使用快速模式获得比标准模式快得多的响应。",
-            "Claude Code 工作流（Workflows）研究预览: 在 Claude Code 中定义并运行多步骤的自动化计划。: 将复杂的开发流程（如代码生成、测试、部署）定义为可重复的工作流，减少手动操作，适合团队规范化开发流程。",
-            "Advisor 工具支持 max_tokens 限制: 在 advisor 工具定义中可设置 max_tokens，限制 advisor 模型每次调用的最大输出 token。: 降低 advisor 模型的输出 token 成本和延迟，适用于不需要完整 advisor 响应的场景（例如只要求简短指导而非长文分析）。",
-            "因安全拒绝且无输出时不收费: 当请求因安全策略被拒绝且模型未生成任何输出时，不再对此次调用计费。: 减少因安全过滤产生的无效成本，尤其在高频调用并可能触发大量安全规则的应用中，能显著降低账单。"
+            "1M token context window by default: 模型默认支持 100 万 token 的上下文窗口，无需任何 beta 头或额外配置。: 可以直接处理超长文档、完整代码库或长时间对话历史，大幅扩展了一轮对话或一次分析能容纳的信息量。",
+            "Adaptive thinking with effort default high: 模型只在当前轮次需要时进行深度推理（扩展思考），其余情况跳过，同时 effort 参数全平台默认设为 high。: 减少不必要的思考 token，既保持高质量输出，又节省 token 成本和延迟。",
+            "Mid-conversation system messages: 允许在对话中途插入系统消息，动态更新指令而不破坏之前建立的 prompt 缓存。: 在长对话中途切换任务说明或补充上下文时，仍能复用历史缓存，降低整体 token 消耗。",
+            "Refusal stop_details with category: 当模型因安全策略拒绝生成时，响应中会返回 stop_details，包含类别（如 cyber、bio 或 null）和可读解释。: 可以按拒绝类别分流处理，例如网络安全类引导用户走审核流程，生物类立即拦截，提升应用的安全合规处理能力。",
+            "1,024-token minimum cacheable prompt length: 提示缓存的最小可缓存片段长度从之前的较高值降低至 1024 token。: 更短的系统消息、助手话术或常见前缀也能被缓存，进一步降低重复调用的成本。",
+            "Fast mode research preview: 实验性加速模式，通过 speed:\"fast\" 降低输出延迟，但价格高于标准模式。: 在对延迟敏感的场景（如实时聊天、协同文档）获得更快的响应速度。",
+            "High-resolution image input: 支持长边最高 2576 像素的图像输入（与 Opus 4.7 相同），可处理高分辨率视觉内容。: 能处理精细图像，如扫描文档、高分辨率照片、医学影像等，提升视觉理解精度。"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
             "旧版弃用": "是",
             "需迁移": "需要评估迁移"
           },
-          "值不值得切一句": "Claude Opus 4.8 带来默认 100 万 token 上下文、更低缓存门槛、自适应思考节省 token，同时平台新增对话中切换系统指令、拒绝安全分类等实用功能，非常适合构建长会话、高安全性要求的 AI 应用。"
+          "值不值得切一句": "Claude Opus 4.8 默认 1M 上下文、自适应推理和更低缓存门槛，让长上下文代理和大规模分析应用的成本与性能都有明显提升。"
         }
       }
     },
@@ -185,7 +153,7 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://platform.openai.com/docs/changelog",
-      "lastCheckedAt": "2026-06-04T04:15:45.440Z",
+      "lastCheckedAt": "2026-06-06T13:29:02.917Z",
       "analysisGeneratedAt": "2026-06-04T04:10:40.040Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
@@ -313,7 +281,7 @@
       "vendor": "Google DeepMind",
       "country": "美国",
       "kind": "closed",
-      "latestVersion": "Gemini 3.5",
+      "latestVersion": "Gemini 2.0",
       "latestReleasedAt": "",
       "latestReleasedAtPrecision": "not_found",
       "isOpen": false,
@@ -322,38 +290,45 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://ai.google.dev/gemini-api/docs/changelog",
-      "lastCheckedAt": "2026-06-05T15:27:46.687Z",
-      "analysisGeneratedAt": "2026-06-05T15:27:43.924Z",
+      "lastCheckedAt": "2026-06-06T13:29:05.449Z",
+      "analysisGeneratedAt": "2026-06-06T13:29:02.469Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
-        "oneLineTakeaway": "Gemini 3.5 Flash 正式发布，带来了面向智能体和编码任务的前沿性能，并开放了 Managed Agents 和 Antigravity Agent，让你能轻松构建自主执行复杂任务的 AI 应用。",
+        "oneLineTakeaway": "Gemini 3.5 Flash 正式发布，带来稳定高效的代理与编码性能，并推出托管代理（Managed Agents）和 Antigravity 自主代理预览，让你构建能自动执行复杂任务的应用变得前所未有的简单。",
         "newFeatures": [
           {
-            "feature": "Gemini 3.5 Flash GA",
-            "whatItIs": "正式发布的 Gemini 3.5 Flash 模型，专为持续的智能体（agentic）和编码（coding）任务提供前沿性能。",
-            "forYou": "现在你可以用较低的延迟和成本，获得接近最强大模型的性能，特别适合构建需要自主决策和代码生成能力的 AI 应用。",
-            "howToUse": "直接使用模型字符串 'gemini-3.5-flash' 调用。",
-            "whenToUse": "当你需要构建智能体（能自主完成复杂步骤）、代码助手，或需要高性能但不想花大钱时使用。"
+            "feature": "Gemini 3.5 Flash General Availability",
+            "whatItIs": "Gemini 3.5 Flash 是 Google 最新一代的智能模型，专为代理任务和编码场景提供一致、高性能的输出，同时保持快速和低成本。",
+            "forYou": "现在你可以用这个模型构建更可靠的自动化工作流、代码生成器、或需要强推理的对话助手。它比之前的 Flash 模型更聪明，能更好地处理复杂指令和工具调用。",
+            "howToUse": "在 Gemini API 中将 model 参数设为 'gemini-3.5-flash'，即可直接调用。结合工具调用（如函数调用、代码执行）或托管代理框架，可以快速搭建 agent 应用。",
+            "whenToUse": "当你需要稳定的代理行为、复杂的编码任务或超过之前 Flash-Lite 模型性能但又不想用 Pro 模型的高成本时，这就是首选。"
           },
           {
-            "feature": "Managed Agents 公开预览",
-            "whatItIs": "一种在 Google 托管的隔离 Linux 沙箱环境中运行的有状态自主代理。开发者可以构建和部署这些代理，它们能在安全容器内自主规划、推理、编写和执行代码、管理文件以及浏览网页。",
-            "forYou": "你可以快速创建能够执行长时间运行、多步骤任务（如研究助理、自动化工作流）的 AI 应用，而无需自行管理服务器和安全隔离。",
-            "howToUse": "通过 Gemini API 的 Agents 端点使用，参考官方 Managed Agents 快速入门指南。示例代理模型名称：'antigravity-preview-05-2026'。",
-            "whenToUse": "当你需要构建能够自主执行一系列动作（如编写代码、操作文件、搜索信息）的应用，且不想自己搭建执行环境时使用。"
+            "feature": "Managed Agents in Gemini API (public preview)",
+            "whatItIs": "托管代理是一项新服务，让你在 Google 的安全沙箱 Linux 环境中构建和部署有状态的自主代理，这些代理能运行代码、管理文件、浏览网页。",
+            "forYou": "你不必自己搭建沙箱或管理代理状态，可以直接创建能自主完成多步骤任务的代理，比如自动研究报告、数据采集、自动编码等。这大大降低了构建生产级自主代理的门槛。",
+            "howToUse": "通过 Gemini API 的托管代理端点创建代理，配置其能力和工具（如搜索、代码执行），然后发送任务，代理会在托管环境中自动执行并返回结果。参见文档中的“Managed Agents 概览”和快速入门。",
+            "whenToUse": "当你的用户需要代理自主执行长任务，而你不想处理基础设施的复杂度时。特别适合需要沙箱安全执行代码或浏览网页的应用。"
           },
           {
-            "feature": "Antigravity Agent 预览",
-            "whatItIs": "一个通用的预构建 Managed Agent，可以在沙箱内自主规划、编写和执行代码、管理文件、浏览网页。模型名称为 'antigravity-preview-05-2026'。",
-            "forYou": "你可以直接调用这个现成的智能体，作为你的应用的“大脑”，快速实现如自主研究、代码开发、数据分析等复杂功能。",
-            "howToUse": "通过 Gemini API 的 Agents 端点，指定 model='antigravity-preview-05-2026'。参考官方指南获取代码示例。",
-            "whenToUse": "当你需要快速原型验证一个智能体应用，或者不想从零构建代理逻辑时，直接用 Antigravity 代理开始。"
+            "feature": "Antigravity Agent (preview)",
+            "whatItIs": "Antigravity 是一个通用的自主代理预览，可以自动规划、推理、编写和运行代码，还能管理文件和浏览网页，所有操作都在隔离的沙箱容器内完成。",
+            "forYou": "你可以立即集成一个几乎全能的自动代理，它能处理从“分析这份数据并生成报告”到“写一个爬虫抓取新闻并总结”的模糊任务，大幅减少人工干预。",
+            "howToUse": "使用模型字符串 'antigravity-preview-05-2026' 调用。发送自然语言任务，代理会自行分解步骤并执行。参考 Antigravity Agent 指南获取代码示例。",
+            "whenToUse": "当你面临需要跨工具、多步骤自主完成的任务，且没有预定义工作流，交给 Antigravity 可以显著缩短开发时间，适用于原型验证或灵活的任务执行。"
+          },
+          {
+            "feature": "Multimodal File Search",
+            "whatItIs": "文件搜索现在支持多模态，可以原生嵌入并搜索图像。你也能在搜索结果中获得视觉引用和页码。",
+            "forYou": "构建 RAG 应用时，现在不仅能搜索文本，还能直接搜索图片，比如在医疗影像库或设计素材库中查找相似图片。视觉引用和页码让结果更可解释。",
+            "howToUse": "使用 gemini-embedding-2 模型对图像和文本进行嵌入，然后在 File Search API 中查询。通过 groundingMetadata 获取 media_id 和 page_numbers。",
+            "whenToUse": "当你的知识库包含大量图片、PDF 或文档，需要跨模态检索时，这个功能可以省去单独预处理图片的步骤，并提升查找精度。"
           }
         ],
-        "limitations": "Managed Agents 为公开预览版，可能有稳定性限制；官方 changelog 未披露定价或速率限制，具体计费请查看官方文档。",
+        "limitations": "Managed Agents 和 Antigravity Agent 目前为公开预览，可能有不稳定或配额限制。具体定价、速率限制、可用区域官方 changelog 未披露。Antigravity Agent 模型为预览版，可能未来有破坏性更改。Gemini 3.5 Flash 已正式可用，但可能与其他旧版本共享配额。",
         "sources": [
           {
-            "name": "official changelog",
+            "name": "Google Gemini API 发布说明",
             "url": "https://ai.google.dev/gemini-api/docs/changelog"
           }
         ]
@@ -365,7 +340,7 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "Gemini 3.5",
+          "名称": "Gemini 2.0",
           "厂商": "Google DeepMind",
           "发布日": "官方未披露",
           "开放度标签": "仅API闭源",
@@ -392,23 +367,24 @@
             "输出每百万token": "官方未披露"
           },
           "知识截止": "官方未披露",
-          "model string": "Gemini 3.5",
+          "model string": "Gemini 2.0",
           "速率": "官方未披露",
           "多模态I/O": "官方未披露"
         },
         "update": {
-          "版本": "Gemini 3.5 Flash→Gemini 3.5(官方未披露)",
+          "版本": "Gemini 3.5→Gemini 2.0(官方未披露)",
           "变了什么": [
-            "Gemini 3.5 Flash GA: 正式发布的 Gemini 3.5 Flash 模型，专为持续的智能体（agentic）和编码（coding）任务提供前沿性能。: 现在你可以用较低的延迟和成本，获得接近最强大模型的性能，特别适合构建需要自主决策和代码生成能力的 AI 应用。",
-            "Managed Agents 公开预览: 一种在 Google 托管的隔离 Linux 沙箱环境中运行的有状态自主代理。开发者可以构建和部署这些代理，它们能在安全容器内自主规划、推理、编写和执行代码、管理文件以及浏览网页。: 你可以快速创建能够执行长时间运行、多步骤任务（如研究助理、自动化工作流）的 AI 应用，而无需自行管理服务器和安全隔离。",
-            "Antigravity Agent 预览: 一个通用的预构建 Managed Agent，可以在沙箱内自主规划、编写和执行代码、管理文件、浏览网页。模型名称为 'antigravity-preview-05-2026'。: 你可以直接调用这个现成的智能体，作为你的应用的“大脑”，快速实现如自主研究、代码开发、数据分析等复杂功能。"
+            "Gemini 3.5 Flash General Availability: Gemini 3.5 Flash 是 Google 最新一代的智能模型，专为代理任务和编码场景提供一致、高性能的输出，同时保持快速和低成本。: 现在你可以用这个模型构建更可靠的自动化工作流、代码生成器、或需要强推理的对话助手。它比之前的 Flash 模型更聪明，能更好地处理复杂指令和工具调用。",
+            "Managed Agents in Gemini API (public preview): 托管代理是一项新服务，让你在 Google 的安全沙箱 Linux 环境中构建和部署有状态的自主代理，这些代理能运行代码、管理文件、浏览网页。: 你不必自己搭建沙箱或管理代理状态，可以直接创建能自主完成多步骤任务的代理，比如自动研究报告、数据采集、自动编码等。这大大降低了构建生产级自主代理的门槛。",
+            "Antigravity Agent (preview): Antigravity 是一个通用的自主代理预览，可以自动规划、推理、编写和运行代码，还能管理文件和浏览网页，所有操作都在隔离的沙箱容器内完成。: 你可以立即集成一个几乎全能的自动代理，它能处理从“分析这份数据并生成报告”到“写一个爬虫抓取新闻并总结”的模糊任务，大幅减少人工干预。",
+            "Multimodal File Search: 文件搜索现在支持多模态，可以原生嵌入并搜索图像。你也能在搜索结果中获得视觉引用和页码。: 构建 RAG 应用时，现在不仅能搜索文本，还能直接搜索图片，比如在医疗影像库或设计素材库中查找相似图片。视觉引用和页码让结果更可解释。"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
-            "旧版弃用": "是",
-            "需迁移": "需要评估迁移"
+            "旧版弃用": "官方未披露",
+            "需迁移": "官方未披露"
           },
-          "值不值得切一句": "Gemini 3.5 Flash 正式发布，带来了面向智能体和编码任务的前沿性能，并开放了 Managed Agents 和 Antigravity Agent，让你能轻松构建自主执行复杂任务的 AI 应用。"
+          "值不值得切一句": "Gemini 3.5 Flash 正式发布，带来稳定高效的代理与编码性能，并推出托管代理（Managed Agents）和 Antigravity 自主代理预览，让你构建能自动执行复杂任务的应用变得前所未有的简单。"
         }
       }
     },
@@ -433,7 +409,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-      "lastCheckedAt": "2026-06-05T15:27:43.924Z",
+      "lastCheckedAt": "2026-06-06T13:29:02.471Z",
       "latestVersionVariants": [
         "DeepSeek V4 Pro",
         "DeepSeek V4 Flash",
@@ -730,7 +706,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/Qwen/Qwen3.6-27B",
-      "lastCheckedAt": "2026-06-05T15:27:44.129Z",
+      "lastCheckedAt": "2026-06-06T13:29:02.663Z",
       "latestVersionVariants": [
         "Qwen3.6 35B A3B",
         "Qwen3.6 35B A3B FP8",
@@ -976,7 +952,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512",
-      "lastCheckedAt": "2026-06-05T15:27:44.532Z",
+      "lastCheckedAt": "2026-06-06T13:29:02.844Z",
       "latestVersionVariants": [
         "Mistral Large 3 675B Instruct 2512 NVFP4",
         "Mistral Large 3 675B Instruct 2512",
