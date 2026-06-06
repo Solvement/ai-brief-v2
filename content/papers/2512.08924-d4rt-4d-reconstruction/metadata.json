@@ -1,0 +1,67 @@
+{
+  "paper_id": "2512.08924",
+  "arxiv_id": "2512.08924",
+  "title": "Efficiently Reconstructing Dynamic Scenes One D4RT at a Time",
+  "authors": [
+    "Chuhan Zhang",
+    "Guillaume Le Moing",
+    "Skanda Koppula",
+    "Ignacio Rocco",
+    "Liliane Momeni",
+    "Junyu Xie",
+    "Shuyang Sun",
+    "Rahul Sukthankar",
+    "Joëlle K. Barral",
+    "Raia Hadsell",
+    "Zoubin Ghahramani",
+    "Andrew Zisserman",
+    "Junlin Zhang",
+    "Mehdi S. M. Sajjadi"
+  ],
+  "date": "2025-12",
+  "huggingface_url": "https://huggingface.co/papers/2512.08924",
+  "paper_url": "https://arxiv.org/abs/2512.08924",
+  "code_url": "",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "project_url": "https://d4rt-paper.github.io/",
+  "source_rankings": [],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "",
+  "first_seen_date": "2026-06-06",
+  "topic": "perception",
+  "agent_relevant": false,
+  "tags": [
+    "cvpr-2026-best-paper",
+    "4d-reconstruction",
+    "dynamic-scene",
+    "feedforward",
+    "query-based-decoder",
+    "point-tracking",
+    "depth-estimation",
+    "camera-pose",
+    "video-transformer",
+    "spatial-ai"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 9,
+    "career_value": 6,
+    "autosci_reuse_value": 5,
+    "buildability": 4,
+    "evaluation_value": 8,
+    "breadth_value": 8,
+    "evidence_quality": 9
+  },
+  "one_sentence_judgment": "CVPR 2026 最佳论文:把动态场景 4D 重建(深度+时空对应/3D 点轨迹+相机位姿)从「多专用模型拼接 + 测试时优化」统一成一个前馈 transformer——编码器一次看完整段视频出全局表示,解码器用一个「可独立查询任意 像素×时刻×相机视角 的 3D 位置」接口,按需出轨迹/点云/深度/位姿;靠查询独立 + 稀疏训练 + 占用网格把速度做到比 VGGT 快 9×、比 MegaSaM 快 100×(一分钟视频约 5 秒、单 TPU),并在 TAPVid-3D/深度/位姿多基准刷到 SOTA(AP_D3D 0.345 vs SpatialTrackerV2 0.100)。代价:巨型模型(ViT-g + 64 TPU 训 2 天)、需 GT 监督、官方未明确公开代码/权重;且是 CV 感知工作而非 agent 主线——对应用开发者的价值在「可迁移的统一查询解码设计模式」+「实时 4D 感知正在解锁的具身/视频/空间类应用」。",
+  "cold_audit": {
+    "status": "ready_to_publish",
+    "audited_at": "2026-06-06T00:00:00.000Z",
+    "note": "作者自审(verify-before-bless:逐条结论/数字比对 arXiv:2512.08924 全文,并用 DeepMind 官方博客交叉核对效率数字);非独立冷审 agent。CV 感知论文,非 agent 主线,已在正文显著标注。代码/权重是否公开=数据不足,已标。"
+  }
+}
