@@ -5,21 +5,11 @@ import Image from "next/image";
 import { loadPapersIndex, type PapersIndex } from "../lib/data";
 
 type Win = "daily" | "weekly" | "monthly";
-type Track = "hf" | "conference";
-type Mode = "deep" | "board";
+type Mode = "hf" | "conference" | "board";
+type DeepRead = PapersIndex["deepReads"][number];
 const WIN_LABEL: Record<Win, string> = { daily: "日榜", weekly: "周榜", monthly: "月榜" };
+const MODE_LABEL: Record<Mode, string> = { hf: "HF 精读", conference: "顶会最佳", board: "HF 全榜" };
 const REL_LABEL: Record<string, string> = { direct: "AutoSci 直接", indirect: "AutoSci 间接", inspiration: "AutoSci 启发", none: "" };
-
-const TRACK_COPY: Record<Track, { title: string; sub: string }> = {
-  hf: {
-    title: "HF 论文",
-    sub: "HuggingFace 日 / 周 / 月榜里高赞的论文 → 机器之心式精读。每天只看当天精读的那几篇，历史按精读日期收在标签里。",
-  },
-  conference: {
-    title: "顶会最佳论文",
-    sub: "AI 顶会(CVPR / NeurIPS / ICML…)最佳论文的人工策展精读。HF 当天没有高赞好货时，它就是「当日必读」的兜底。按精读日期切换。",
-  },
-};
 
 function thumbUrl(arxivId: string) {
   return arxivId ? `https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/${arxivId}.png` : "";
@@ -84,6 +74,21 @@ function SecHead({ label, n, hint }: { label: string; n: number; hint: string })
   );
 }
 
+/** A deep-read rendered as a card (shared by HF 精读 + 顶会最佳). */
+function DeepCard({ d }: { d: DeepRead }) {
+  return (
+    <PaperCard
+      href={`/papers/${encodeURIComponent(d.slug)}`}
+      score={d.scores?.evidence_quality}
+      category={d.tags?.[0]}
+      title={d.title}
+      line={d.one_sentence_judgment}
+      ctaLabel="深读 →"
+      hfHref={`https://arxiv.org/abs/${d.arxiv_id}`}
+    />
+  );
+}
+
 function dateKey(s?: string): string {
   return (s || "").split("T")[0] || "";
 }
@@ -96,22 +101,25 @@ function tabLabel(key: string): string {
   return m ? `${Number(m[1])}月${Number(m[2])}日` : (key || "未知");
 }
 
-export function PapersPage({ track = "hf" }: { track?: Track }) {
+export function PapersPage() {
   const [data, setData] = useState<PapersIndex | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>("deep");
+  const [mode, setMode] = useState<Mode>("hf");
   const [win, setWin] = useState<Win>("daily");
   const [limit, setLimit] = useState(18);
   const [activeDate, setActiveDate] = useState<string>("");
 
   useEffect(() => { loadPapersIndex().then(setData).catch((e) => setErr(e?.message || String(e))); }, []);
   useEffect(() => { setLimit(18); }, [win]);
+  useEffect(() => { setActiveDate(""); }, [mode]); // each mode starts at its own latest day
 
-  // Deep reads for THIS track, grouped by 精读日期 (first_seen_date) — newest day first.
+  const track = mode === "conference" ? "conference" : "hf";
+
+  // Deep reads for the active track, grouped by 精读日期 (first_seen_date), newest day first.
   // Like the News column: each day shows only its own reads; history sits behind date tabs.
   const groups = useMemo(() => {
-    if (!data) return [] as Array<{ key: string; items: PapersIndex["deepReads"] }>;
-    const map = new Map<string, PapersIndex["deepReads"]>();
+    if (!data) return [] as Array<{ key: string; items: DeepRead[] }>;
+    const map = new Map<string, DeepRead[]>();
     for (const d of data.deepReads) {
       if ((d.track || "hf") !== track) continue;
       const k = dateKey(d.first_seen_date || d.date) || "未知";
@@ -142,43 +150,52 @@ export function PapersPage({ track = "hf" }: { track?: Track }) {
   const current = groups.find((g) => g.key === activeDate) || groups[0] || null;
   const isLatestDay = Boolean(current && groups[0] && current.key === groups[0].key);
   const totalDeep = groups.reduce((n, g) => n + g.items.length, 0);
-  // HF candidates already selected (high-upvote) but not yet deep-read.
   const pendingCandidates = data.deepCandidates.filter((c) => !(c.deep_slug || deepSlugByArxiv.get(c.arxiv_id)));
 
-  const copy = TRACK_COPY[track];
-  const showDeep = track === "conference" || mode === "deep";
+  // 顶会最佳: within the selected day, also group by 会议名称 (venue).
+  const venueGroups = (() => {
+    if (mode !== "conference" || !current) return [] as Array<[string, DeepRead[]]>;
+    const m = new Map<string, DeepRead[]>();
+    for (const d of current.items) {
+      const v = d.venue || "其他顶会";
+      (m.get(v) || m.set(v, []).get(v)!).push(d);
+    }
+    return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  })();
+
+  const showDeep = mode === "hf" || mode === "conference";
+  const countLabel = mode === "board" ? `${board.length} 篇` : mode === "conference" ? `${totalDeep} 篇顶会` : `${totalDeep} 篇精读`;
 
   return (
     <main className="page radar-page">
       <header className="radar-header">
-        <h1 className="radar-title">{copy.title}</h1>
-        <p className="radar-subtitle">{copy.sub}</p>
+        <h1 className="radar-title">文章</h1>
+        <p className="radar-subtitle">HF 高赞论文的机器之心式精读为主线，AI 顶会最佳论文人工策展兜底。每天只看当天精读的，历史按精读日期收在标签里。</p>
       </header>
 
-      {track === "hf" && (
-        <div className="radar-filters">
-          <div className="radar-chip-group">
-            <button className={`radar-chip${mode === "deep" ? " active" : ""}`} onClick={() => setMode("deep")}>按日精读</button>
-            <button className={`radar-chip${mode === "board" ? " active" : ""}`} onClick={() => setMode("board")}>HF 全榜</button>
-          </div>
-          {mode === "board" && (
-            <div className="radar-chip-group">
-              {(["daily", "weekly", "monthly"] as Win[]).map((w) => (
-                <button key={w} className={`radar-chip${win === w ? " active" : ""}`} onClick={() => setWin(w)}>
-                  {WIN_LABEL[w]}<span className="radar-chip-count">{data.board[w].length}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="radar-chip-group radar-chip-group-right">
-            <span className="radar-chip radar-chip-static">{totalDeep} 篇精读</span>
-          </div>
+      <div className="radar-filters">
+        <div className="radar-chip-group">
+          {(["hf", "conference", "board"] as Mode[]).map((m) => (
+            <button key={m} className={`radar-chip${mode === m ? " active" : ""}`} onClick={() => setMode(m)}>{MODE_LABEL[m]}</button>
+          ))}
         </div>
-      )}
+        {mode === "board" && (
+          <div className="radar-chip-group">
+            {(["daily", "weekly", "monthly"] as Win[]).map((w) => (
+              <button key={w} className={`radar-chip${win === w ? " active" : ""}`} onClick={() => setWin(w)}>
+                {WIN_LABEL[w]}<span className="radar-chip-count">{data.board[w].length}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="radar-chip-group radar-chip-group-right">
+          <span className="radar-chip radar-chip-static">{countLabel}</span>
+        </div>
+      </div>
 
       {showDeep ? (
         groups.length === 0 ? (
-          <div className="notice">{track === "conference" ? "暂无顶会精读。" : "暂无精读。"}</div>
+          <div className="notice">{mode === "conference" ? "暂无顶会精读。" : "暂无精读。"}</div>
         ) : (
           <>
             <div className="news-datebar" role="tablist" aria-label="按精读日期切换">
@@ -198,26 +215,26 @@ export function PapersPage({ track = "hf" }: { track?: Track }) {
 
             {current && (
               <>
-                <SecHead label={`${tabLabel(current.key)} · 精读`} n={current.items.length} hint="点开读全文解读" />
-                <div className="radar-grid">
-                  {current.items.map((d) => (
-                    <PaperCard
-                      key={d.slug}
-                      href={`/papers/${encodeURIComponent(d.slug)}`}
-                      score={d.scores?.evidence_quality}
-                      category={d.tags?.[0]}
-                      title={d.title}
-                      line={d.one_sentence_judgment}
-                      ctaLabel="深读 →"
-                      hfHref={`https://arxiv.org/abs/${d.arxiv_id}`}
-                    />
-                  ))}
-                </div>
+                <SecHead
+                  label={`${tabLabel(current.key)} · ${mode === "conference" ? "顶会精读" : "精读"}`}
+                  n={current.items.length}
+                  hint={mode === "conference" ? "按会议分组" : "点开读全文解读"}
+                />
+                {mode === "conference" ? (
+                  venueGroups.map(([venue, items]) => (
+                    <div className="paper-catgroup" key={venue}>
+                      <div className="paper-cat-h">{venue} <span>{items.length}</span></div>
+                      <div className="radar-grid">{items.map((d) => <DeepCard key={d.slug} d={d} />)}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="radar-grid">{current.items.map((d) => <DeepCard key={d.slug} d={d} />)}</div>
+                )}
               </>
             )}
 
             {/* HF latest-day extras: today's selected-but-not-yet-deep-read candidates + the idea radar. */}
-            {track === "hf" && isLatestDay && pendingCandidates.length > 0 && (
+            {mode === "hf" && isLatestDay && pendingCandidates.length > 0 && (
               <>
                 <SecHead label="今日候选 · 待深读" n={pendingCandidates.length} hint="高赞已选中，深读稍后补上" />
                 <div className="radar-grid">
@@ -240,7 +257,7 @@ export function PapersPage({ track = "hf" }: { track?: Track }) {
               </>
             )}
 
-            {track === "hf" && isLatestDay && !data.radarEmpty && radarGroups.length > 0 && (
+            {mode === "hf" && isLatestDay && !data.radarEmpty && radarGroups.length > 0 && (
               <>
                 <SecHead label="想法雷达 · 按主题" n={data.counts.radar} hint="扫想法即可，不必深读" />
                 {radarGroups.map(([cat, items]) => (

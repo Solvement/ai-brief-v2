@@ -37,6 +37,7 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
   const scores = meta.scores || {};
   const source = tab === "paper" ? paper : career;
   const toc = useMemo(() => buildToc(source), [source]);
+  const hasToc = toc.length > 2;
 
   // 目录 scroll-spy：高亮当前视口最靠上的小节。直接 toggle DOM class（比 React
   // state 稳、且每次滚动不触发 re-render）。
@@ -66,8 +67,8 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
 
   return (
     <>
-      <main className="page pd-page">
-        <a className="pd-back" href={meta.track === "conference" ? "/conference" : "/articles"}>{meta.track === "conference" ? "← 顶会最佳" : "← HF 论文"}</a>
+      <main className={`page pd-page${hasToc ? " pd-page--toc" : ""}`}>
+        <a className="pd-back" href="/articles">← 文章</a>
 
         <header className="pd-header">
           <div className="pd-kicker">
@@ -103,7 +104,7 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
         </div>
 
         <div className="pd-body">
-          {toc.length > 2 && (
+          {hasToc && (
             <nav className="pd-toc" aria-label="目录" ref={tocRef}>
               <div className="pd-toc-title">目录</div>
               <ul>

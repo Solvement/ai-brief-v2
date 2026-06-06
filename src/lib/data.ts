@@ -119,7 +119,7 @@ export interface PapersIndex {
   generatedAt: string;
   date: string;
   counts: { deepReads: number; radar: number; deepCandidates: number };
-  deepReads: Array<{ slug: string; arxiv_id: string; title: string; date: string; first_seen_date?: string; must_read?: boolean; track?: string; authors: string[]; tags: string[]; scores: Record<string, number>; source_rankings: string[]; one_sentence_judgment: string; thumbnail_url: string }>;
+  deepReads: Array<{ slug: string; arxiv_id: string; title: string; date: string; first_seen_date?: string; must_read?: boolean; track?: string; venue?: string; authors: string[]; tags: string[]; scores: Record<string, number>; source_rankings: string[]; one_sentence_judgment: string; thumbnail_url: string }>;
   deepCandidates: Array<{ arxiv_id: string; title: string; final_score: number; category: string; autosci_relevance: string; one_line: string; deep_slug: string | null }>;
   radar: Array<{ arxiv_id: string; title: string; final_score: number; category: string; one_line: string; deep_slug: string | null }>;
   radarEmpty: boolean;

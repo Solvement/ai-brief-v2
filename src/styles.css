@@ -5209,21 +5209,22 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 /* sticky TOC — left rail on wide screens, hidden when there isn't room */
 .pd-body { position: relative; }
 .pd-toc { display: none; }
-@media (min-width: 1300px) {
+@media (min-width: 1200px) {
+  /* TOC is an in-flow sticky LEFT column inside the content area, so it can never overlap
+     the AppShell sidebar. (The old position:fixed + 100vw-centered math assumed no sidebar
+     and rendered the TOC on top of the nav.) Only widen + grid when a TOC actually exists. */
+  .pd-page--toc { max-width: 1140px; }
+  .pd-page--toc .pd-body { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 48px; align-items: start; }
   .pd-toc {
-    display: block; position: fixed; top: 128px;
-    left: calc((100vw - 860px) / 2 - 216px);
-    width: 200px; max-height: 72vh; overflow-y: auto;
-    padding-right: 6px;
+    display: block; position: sticky; top: 88px;
+    max-height: calc(100vh - 120px); overflow-y: auto; padding-right: 6px;
   }
   .pd-toc-title { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--radar-ink-3); margin-bottom: 10px; }
   .pd-toc ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--radar-line); }
-  .pd-toc li { margin: 0; }
-  .pd-toc a { display: block; padding: 4px 0 4px 12px; margin-left: -1px; border-left: 2px solid transparent; font-size: 12.5px; line-height: 1.4; color: var(--radar-ink-3); text-decoration: none; }
+  .pd-toc li { margin: 3px 0; }
+  .pd-toc a { display: block; padding: 6px 0 6px 12px; margin-left: -1px; border-left: 2px solid transparent; font-size: 12.5px; line-height: 1.4; color: var(--radar-ink-3); text-decoration: none; transition: color .15s, border-color .15s, background .15s; }
   .pd-toc a:hover { color: var(--radar-blue-strong); border-left-color: var(--radar-blue); }
   .pd-toc-sub a { padding-left: 24px; font-size: 12px; color: var(--radar-ink-3); }
-  .pd-toc li { margin: 3px 0; }
-  .pd-toc a { padding: 6px 0 6px 12px; transition: color .15s, border-color .15s, background .15s; }
   .pd-toc a.pd-toc-active { color: var(--radar-blue-strong); border-left-color: var(--radar-blue); background: var(--radar-blue-soft); font-weight: 700; border-radius: 0 6px 6px 0; }
 }
 
