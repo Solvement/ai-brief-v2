@@ -11,7 +11,7 @@ export type ShellNavKey = "home" | "news" | "articles" | "models" | "projects" |
 const NAV: { key: ShellNavKey; label: string; href: string; icon: string }[] = [
   { key: "home", label: "Home", href: "/", icon: "home" },
   { key: "news", label: "News", href: "/news", icon: "news" },
-  { key: "articles", label: "文章", href: "/articles", icon: "articles" },
+  { key: "articles", label: "Articles", href: "/articles", icon: "articles" },
   { key: "models", label: "Models", href: "/models", icon: "models" },
   { key: "projects", label: "Projects", href: "/projects", icon: "projects" },
   { key: "graph", label: "Graph", href: "/graph", icon: "graph" },
