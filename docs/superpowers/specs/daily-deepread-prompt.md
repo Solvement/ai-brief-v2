@@ -7,7 +7,8 @@
 
 ## 对每个候选(最多 3 篇)
 1. **去重**:若 `content/papers/<arxiv_id>-<slug>/` 已存在,或账本里该 arxiv_id 的 `status ∈ {deep_read,analyzed,published}` → **跳过**(已写过)。
-2. **读全文(硬规矩,不可省)**:依次试 ① `hf papers read <arxiv_id>` ② arXiv HTML `https://arxiv.org/html/<arxiv_id>` ③ 用 `node --input-type=module -e` 调 `scripts/columns/papers/sources.mjs` 的 `fetchFullPaperText({arxivId})` 抽 PDF。再 `hf papers info <arxiv_id> --format json` 拿 GitHub/作者/upvotes。**全文真拿不到就跳过该篇并在输出说明,绝不靠摘要硬编。**
+2. **读全文(硬规矩,不可省)**:依次试 ① `hf papers read <arxiv_id>` ② arXiv HTML `https://arxiv.org/html/<arxiv_id>`(刚提交的新论文常未渲染→404,可试 ar5iv) ③ 用 `node --input-type=module -e` 调 `scripts/columns/papers/sources.mjs` 的 `fetchFullPaperText({arxivId})` 抽 PDF。再 `hf papers info <arxiv_id> --format json` 拿 GitHub/作者/upvotes。**全文真拿不到就跳过该篇并在输出说明,绝不靠摘要硬编。**
+   - **抽取质量坑(2026-06-06 实测)**:`hf papers read` 给的表格文本最干净,但**不是每个 id 都有**(如 2606.02373 报 not found);**PDF 路线(fetchFullPaperText)会丢表格里的数字字形**——逐格 Table 数值抽不出。优先级=hf read > HTML/ar5iv > PDF;只拿到 PDF 时,正文/摘要里的 headline 数字照写,**逐格表值标「以原文 Table/附录为准」,绝不臆造**。
 3. **写文件**(完全仿照已有样板 `content/papers/2605.31264-colleague-skill/` 的结构和风格):
    - `content/papers/<arxiv_id>-<slug>/paper.mdx` —— Paper 栏:一句话/问题/关键术语表/核心方法/架构(**Mermaid 源码块**)/创新点表/实验证据(真实数字)/限制风险/先读什么。
    - `content/papers/<arxiv_id>-<slug>/career.mdx` —— Career 栏:对应用型 AI 工程师/FDE 的价值、该学技能表、系统设计心法、作品集角度、可造表、诚实简历句、学习清单。
