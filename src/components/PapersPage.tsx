@@ -129,6 +129,31 @@ export function PapersPage() {
 
         {mode === "curated" ? (
           <>
+            {(() => {
+              // 当日必读:今天新增的深读(must_read 置顶,或 first_seen 是今天)。HF 当天没高赞时,
+              // 这里就是手工策展的顶会最佳论文(如 CVPR D4RT)——不折叠进归档,直接顶在最上面。
+              const todays = [...data.deepReads].filter((d) => d.must_read || (d.first_seen_date && d.first_seen_date === data.date));
+              if (!todays.length) return null;
+              return (
+                <>
+                  <SecHead label="当日必读 · 顶会/精选深读" n={todays.length} hint="今天新增,别错过" />
+                  <div className="radar-grid">
+                    {todays.map((d) => (
+                      <PaperCard
+                        key={d.slug}
+                        href={`/papers/${encodeURIComponent(d.slug)}`}
+                        score={d.scores?.evidence_quality}
+                        category={d.tags?.[0]}
+                        title={d.title}
+                        line={d.one_sentence_judgment}
+                        ctaLabel="深读 →"
+                        hfHref={`https://arxiv.org/abs/${d.arxiv_id}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
             <SecHead label="今日精读" n={data.deepCandidates.length} hint="值得读全文" />
             {data.deepCandidates.length === 0 ? <div className="notice">今日无高赞新论文，精读空。</div> : (
               <div className="radar-grid">

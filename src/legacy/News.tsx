@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AppShell } from "../components/AppShell";
 
 interface NewsItem {
@@ -37,12 +37,13 @@ function relativeTime(iso: string): string {
   if (days < 30) return `${days} 天前`;
   return `${Math.round(days / 30)} 个月前`;
 }
-function friendlyDate(key: string): string {
+function tabLabel(key: string): string {
   const today = new Date().toISOString().split("T")[0];
   const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
   if (key === today) return "今天";
   if (key === yesterday) return "昨天";
-  return key.replaceAll("-", ".");
+  const m = /^\d{4}-(\d{2})-(\d{2})$/.exec(key);
+  return m ? `${Number(m[1])}月${Number(m[2])}日` : key;
 }
 
 const SOURCE_TYPE_LABEL: Record<string, string> = { official: "官方", press: "媒体", community: "社区", reddit: "社区" };
@@ -56,6 +57,7 @@ const zh = (i: NewsItem) => i.titleZh || i.title;
 export function News({ initial = null }: { initial?: NewsData | null }) {
   const [data, setData] = useState<NewsData | null>(initial);
   const [err, setErr] = useState<string | null>(null);
+  const [activeDate, setActiveDate] = useState<string>("");
 
   useEffect(() => {
     if (initial?.items?.length) return; // SSR provided data
@@ -65,7 +67,8 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
       .catch((e) => setErr((e as Error)?.message || String(e)));
   }, [initial]);
 
-  // Group by day; each day = a full-width content-card grid.
+  // Group by day (newest first). History stays collapsed behind date tabs — only the
+  // selected day renders, so the page is one tidy screen instead of an endless scroll.
   const groups = useMemo(() => {
     if (!data?.items) return [];
     const map = new Map<string, NewsItem[]>();
@@ -78,30 +81,43 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
       .map(([key, items]) => ({ key, items: items.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1)) }));
   }, [data]);
 
+  const current = groups.find((g) => g.key === activeDate) || groups[0] || null;
+
   return (
     <AppShell active="news">
       <section className="column-shell">
         <header className="column-hero column-hero-news">
           <div className="section-kicker">Timeline</div>
           <h1 className="column-hero-title">新闻</h1>
-          <p className="column-hero-sub">聚合官方公告、媒体报道与社区热帖，自动中译，只保留需要快速知道的事实、影响和后续观察点。点卡片跳原文。</p>
+          <p className="column-hero-sub">聚合官方公告、媒体报道与社区热帖，自动中译。按日期切换，每天只看当天该知道的事，历史收在标签里。点卡片跳原文。</p>
         </header>
 
         {err ? <div className="column-notice column-notice-error">加载资讯数据失败：{err}</div> : null}
         {!err && !data ? <div className="column-notice">正在加载资讯...</div> : null}
         {!err && data && groups.length === 0 ? <div className="column-notice">暂无资讯。</div> : null}
 
-        {groups.map((group) => (
-          <section className="column-day" key={group.key}>
-            <div className="column-day-head">
-              <span className="column-day-label">{friendlyDate(group.key)}</span>
-              <span className="column-day-count">{group.items.length} 条</span>
-            </div>
-            <div className="home-card-grid home-card-grid-articles">
-              {group.items.map((item, i) => <NewsCard key={`${item.url}-${i}`} item={item} />)}
-            </div>
-          </section>
-        ))}
+        {groups.length > 0 && (
+          <div className="news-datebar" role="tablist" aria-label="按日期切换">
+            {groups.map((g) => (
+              <button
+                key={g.key}
+                type="button"
+                role="tab"
+                aria-selected={(current?.key) === g.key}
+                className={`news-datetab${(current?.key) === g.key ? " active" : ""}`}
+                onClick={() => setActiveDate(g.key)}
+              >
+                {tabLabel(g.key)}<span className="news-datetab-n">{g.items.length}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {current && (
+          <div className="news-list">
+            {current.items.map((item, i) => <NewsCard key={`${item.url}-${i}`} item={item} />)}
+          </div>
+        )}
       </section>
     </AppShell>
   );
@@ -109,22 +125,19 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
 
 function NewsCard({ item }: { item: NewsItem }) {
   const typeClass = sourceTypeClass(item.sourceType);
-  // Only items with a real image get the image hero. Imageless items (the majority)
-  // render as compact text cards — avoids a wall of identical gradient placeholders.
-  const hasImage = Boolean(item.imageUrl);
+  // Uniform text cards across the board: news og:images are sparse (≈1 in 8) and
+  // inconsistent, so a hero image on some cards and not others looks ragged. Drop
+  // them entirely — clean, scannable, same shape every time.
   return (
-    <article className={`content-card content-card-news${hasImage ? "" : " content-card-textonly"}`}>
-      <a className="content-card-shell" href={item.url} target="_blank" rel="noreferrer">
-        {hasImage ? <img className="content-card-visual-image" src={item.imageUrl} alt="" /> : null}
-        <div className="content-card-copy">
-          <span className="content-card-title">{zh(item)}</span>
-          {item.summaryZh ? <p className="content-card-summary">{item.summaryZh}</p> : null}
-          <div className="content-card-meta">
-            <span className={`news-source-badge ${typeClass}`}>{SOURCE_TYPE_LABEL[item.sourceType] || "来源"}</span>
-            <span>{item.source}</span>
-            {typeof item.points === "number" ? <span>▲ {item.points}</span> : null}
-            <span>{relativeTime(item.publishedAt)}</span>
-          </div>
+    <article className="news-card">
+      <a className="news-card-link" href={item.url} target="_blank" rel="noreferrer">
+        <span className="news-card-title">{zh(item)}</span>
+        {item.summaryZh ? <p className="news-card-summary">{item.summaryZh}</p> : null}
+        <div className="news-card-meta">
+          <span className={`news-source-badge ${typeClass}`}>{SOURCE_TYPE_LABEL[item.sourceType] || "来源"}</span>
+          <span>{item.source}</span>
+          {typeof item.points === "number" ? <span>▲ {item.points}</span> : null}
+          <span>{relativeTime(item.publishedAt)}</span>
         </div>
       </a>
     </article>

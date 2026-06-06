@@ -58,6 +58,8 @@ export async function collectDeepReads(deps = {}) {
       arxiv_id: meta.arxiv_id || meta.paper_id || "",
       title: meta.title || d.name,
       date: meta.date || meta.first_seen_date || "",
+      first_seen_date: meta.first_seen_date || meta.date || "",
+      must_read: Boolean(meta.must_read),
       authors: (meta.authors || []).slice(0, 6),
       tags: meta.tags || [],
       scores: meta.scores || {},
