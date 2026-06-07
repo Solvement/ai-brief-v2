@@ -23,7 +23,7 @@
     "verify": "npm run lint && npm run test && npm run build",
     "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs && node scripts/validate-papers-deepread.mjs && node scripts/validate-daily-digest.mjs",
     "digest:daily": "node --env-file-if-exists=.env.local --no-warnings scripts/columns/digest/daily.mjs",
-    "test": "node --test scripts/__tests__/*.test.mjs && npm run validate",
+    "test": "node --test scripts/**/*.test.mjs && npm run validate",
     "preview": "next start",
     "ingest": "node --no-warnings scripts/ingest.mjs",
     "ingest:force": "node --no-warnings scripts/ingest.mjs --no-cache",
