@@ -37,10 +37,12 @@ try {
     node scripts/columns/papers/build-index.mjs 2>&1 | Tee-Object -FilePath $log -Append
   } catch { Log "WARN deep-read/cold-audit stage failed (non-fatal; deterministic refresh still publishes): $($_.Exception.Message)" }
 
-  Log "quality gate (fail => no push)..."
-  npm run lint 2>&1 | Tee-Object -FilePath $log -Append; $lintOk = ($LASTEXITCODE -eq 0)
-  npm run validate 2>&1 | Tee-Object -FilePath $log -Append; $valOk = ($LASTEXITCODE -eq 0)
-  if (-not ($lintOk -and $valOk)) { Log "!!! gate failed (lint=$lintOk val=$valOk) => no push, keep last good (no done-marker, can rerun)"; exit 1 }
+  # Machine gate before deploy = `npm run verify` (ESLint + content lint, node:test unit
+  # tests, content validate, next build). Lighthouse perf/a11y + visual-regression are
+  # MANUAL/periodic (run via /browse), NOT auto-gated here; see specs/quality-gate.md.
+  Log "quality gate (npm run verify = lint + test + validate + build; fail => no push)..."
+  npm run verify 2>&1 | Tee-Object -FilePath $log -Append; $gateOk = ($LASTEXITCODE -eq 0)
+  if (-not $gateOk) { Log "!!! gate failed (npm run verify) => no push, keep last good (no done-marker, can rerun)"; exit 1 }
 
   Log "commit + push (deploy)..."
   git add -A 2>&1 | Out-Null
