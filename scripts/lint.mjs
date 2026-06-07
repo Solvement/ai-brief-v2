@@ -2,7 +2,10 @@ import { readdir, readFile } from "node:fs/promises";
 import { join, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const sourceRoot = fileURLToPath(new URL("../src", import.meta.url));
+const sourceRoots = [
+  fileURLToPath(new URL("../app", import.meta.url)),
+  fileURLToPath(new URL("../src", import.meta.url)),
+];
 const violations = [];
 
 async function walk(dir) {
@@ -26,7 +29,9 @@ async function walk(dir) {
   }
 }
 
-await walk(sourceRoot);
+for (const sourceRoot of sourceRoots) {
+  await walk(sourceRoot);
+}
 
 if (violations.length > 0) {
   throw new Error(violations.join("\n"));
