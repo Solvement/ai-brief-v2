@@ -1,9 +1,9 @@
 import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
 
 const file = new URL("../public/data/trending.json", import.meta.url);
-const raw = await readFile(file, "utf8");
-const data = JSON.parse(raw);
-const errors = [];
+let errors = [];
+const DATA_INSUFFICIENT = "数据不足";
 
 function fail(path, message) {
   errors.push(`${path}: ${message}`);
@@ -15,6 +15,43 @@ function isIso(value) {
 
 function isNumber(value) {
   return typeof value === "number" && Number.isFinite(value);
+}
+
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim() !== "";
+}
+
+function validateTierTemplateComparison(repo, path) {
+  if (![2, 3].includes(repo.project_tier)) return;
+  if (!repo.tier_template || typeof repo.tier_template !== "object") return;
+
+  const template = repo.tier_template;
+  if (!Object.hasOwn(template, "comparison_table")) return;
+
+  const table = template.comparison_table;
+  const tablePath = `${path}.tier_template.comparison_table`;
+  if (!Array.isArray(table)) {
+    fail(tablePath, "must be an array when present");
+    return;
+  }
+
+  if (table.length === 0) {
+    if (typeof template.comparison !== "string" || template.comparison.trim() !== DATA_INSUFFICIENT) {
+      fail(tablePath, `empty comparison_table requires tier_template.comparison to be ${DATA_INSUFFICIENT}`);
+    }
+    return;
+  }
+
+  table.forEach((item, index) => {
+    const itemPath = `${tablePath}[${index}]`;
+    if (!item || typeof item !== "object") {
+      fail(itemPath, "must be an object");
+      return;
+    }
+    for (const key of ["alternative", "difference"]) {
+      if (!isNonEmptyString(item[key])) fail(`${itemPath}.${key}`, "must be a non-empty string");
+    }
+  });
 }
 
 function validateRepo(repo, path) {
@@ -65,6 +102,8 @@ function validateRepo(repo, path) {
       }
     }
   }
+
+  validateTierTemplateComparison(repo, path);
 }
 
 function validateAgentFlow(flow, path) {
@@ -100,29 +139,45 @@ function validateQualityGate(gate, path) {
   });
 }
 
-if (!data || typeof data !== "object") fail("$", "must be an object");
-if (!isIso(data.generatedAt)) fail("$.generatedAt", "must be an ISO date");
-validateAgentFlow(data.agentFlow, "$.agentFlow");
-validateQualityGate(data.qualityGate, "$.qualityGate");
+export function validateTrendingData(data) {
+  errors = [];
 
-for (const windowName of ["daily", "weekly", "monthly"]) {
-  const board = data[windowName];
-  if (!board || typeof board !== "object") {
-    fail(`$.${windowName}`, "must exist");
-    continue;
+  if (!data || typeof data !== "object") fail("$", "must be an object");
+  if (!isIso(data.generatedAt)) fail("$.generatedAt", "must be an ISO date");
+  validateAgentFlow(data.agentFlow, "$.agentFlow");
+  validateQualityGate(data.qualityGate, "$.qualityGate");
+
+  for (const windowName of ["daily", "weekly", "monthly"]) {
+    const board = data[windowName];
+    if (!board || typeof board !== "object") {
+      fail(`$.${windowName}`, "must exist");
+      continue;
+    }
+    if (board.window !== windowName) fail(`$.${windowName}.window`, `must be ${windowName}`);
+    if (!isIso(board.generatedAt)) fail(`$.${windowName}.generatedAt`, "must be an ISO date");
+    if (!Array.isArray(board.repos)) {
+      fail(`$.${windowName}.repos`, "must be an array");
+      continue;
+    }
+    if (board.repos.length === 0) fail(`$.${windowName}.repos`, "must not be empty");
+    board.repos.forEach((repo, index) => validateRepo(repo, `$.${windowName}.repos[${index}]`));
   }
-  if (board.window !== windowName) fail(`$.${windowName}.window`, `must be ${windowName}`);
-  if (!isIso(board.generatedAt)) fail(`$.${windowName}.generatedAt`, "must be an ISO date");
-  if (!Array.isArray(board.repos)) {
-    fail(`$.${windowName}.repos`, "must be an array");
-    continue;
+
+  if (errors.length > 0) {
+    throw new Error(`trending.json validation failed:\n${errors.join("\n")}`);
   }
-  if (board.repos.length === 0) fail(`$.${windowName}.repos`, "must not be empty");
-  board.repos.forEach((repo, index) => validateRepo(repo, `$.${windowName}.repos[${index}]`));
+
+  return data;
 }
 
-if (errors.length > 0) {
-  throw new Error(`trending.json validation failed:\n${errors.join("\n")}`);
+export async function validateTrendingFile(target = file) {
+  const raw = await readFile(target, "utf8");
+  const data = JSON.parse(raw);
+  validateTrendingData(data);
+  console.log("trending.json validation passed");
+  return data;
 }
 
-console.log("trending.json validation passed");
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await validateTrendingFile();
+}

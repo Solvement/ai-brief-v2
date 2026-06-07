@@ -11,7 +11,13 @@ export const PROJECT_DEEP_DIVE_OUTPUT_SCHEMA = {
     core_capabilities: ["Tier2+: 3条具体功能"],
     how_to_run: { install_command: "真实命令或 数据不足", minimal_example: "真实示例或 数据不足" },
     maturity_signals: { star_velocity: "string", recent_commit: "string", releases: "string", issue_activity: "string" },
-    comparison: "Tier2+: 横向对比1-2个已有方案; 数据不足写 数据不足",
+    comparison: "Tier2+: 将 comparison_table 汇总成一段中文 prose; 表为空时必须写 数据不足",
+    comparison_table: [{
+      alternative: "Tier2+: 具名替代品(如 mem0 / Letta); 没有真实依据时留空数组 []",
+      difference: "和本项目的具体差异点(机制/范围/接口),不是泛泛而谈; 禁止只点名",
+      maturity_vs: "成熟度对比(star/活跃/release/生产就绪 谁更成熟); 证据不足写 数据不足",
+      tradeoff: "选它 vs 选本项目的取舍; 证据不足写 数据不足",
+    }],
     trajectory_note: "appears_in_tabs 轨迹判断",
     manual_confirmation: "Tier3 必须 true",
     how_it_works_with_analogy: "Tier3+: 核心机制+类比",
@@ -119,8 +125,8 @@ const OUTPUT_SCHEMA_TEXT = JSON.stringify(PROJECT_DEEP_DIVE_OUTPUT_SCHEMA, null,
 export function projectDeepDiveSystemPrompt(projectType = "", finalDepth = "deep") {
   const focus = PROJECT_TYPE_TECH_FOCUS[projectType] || "先按 project_type 判断技术拆解重点;不能确定时写 未在 README/artifact 说明。";
   const depthContract = finalDepth === "analysis"
-    ? "Depth contract: deterministic final_depth=analysis / Tier 2. Do not upgrade to Tier 3. Fill tier_template with Tier2 fields: pain point, 3 concrete capabilities, install command + minimal runnable example if present, maturity signals, horizontal comparison, trajectory note. If any field lacks evidence, write 数据不足."
-    : "Depth contract: deterministic final_depth=deep / Tier 3. Deep is quality-gated, not quota-gated. Mark tier_template.manual_confirmation=true and fill all Tier2 fields plus how it works + analogy, essential design tradeoff, practitioner meaning, and cross-links. Tier3 uses codex GPT-5.5 high in the decoupled path.";
+    ? "Depth contract: deterministic final_depth=analysis / Tier 2. Do not upgrade to Tier 3. Fill tier_template with Tier2 fields: pain point, 3 concrete capabilities, install command + minimal runnable example if present, maturity signals, horizontal comparison_table + comparison prose summary, trajectory note. comparison_table must contain 1-2 named alternatives with real difference/maturity_vs/tradeoff; if no comparable evidence exists, use comparison_table=[] and comparison=\"数据不足\". If any field lacks evidence, write 数据不足."
+    : "Depth contract: deterministic final_depth=deep / Tier 3. Deep is quality-gated, not quota-gated. Mark tier_template.manual_confirmation=true and fill all Tier2 fields, including comparison_table + comparison prose summary, plus how it works + analogy, essential design tradeoff, practitioner meaning, and cross-links. Tier3 uses codex GPT-5.5 high in the decoupled path.";
 
   return `你是 AI-Brief 的 project-analyst,负责把 GitHub 项目写成 brief-wiki typed memory。
 
@@ -154,7 +160,7 @@ ${depthContract}
 - Standard: "more useful than a full translation." Preserve the concrete details a raw translation would carry, then organize and judge them. Any section with only a framework/category and no concrete example/number/snippet/command/path is a failure.
 - If a section fails that concreteness standard, add a top-level render_warnings array explaining which section is too abstract and why.
 - Concreteness must not reintroduce fabrication. Every concrete specific must be sourced inline and attributed. If a concrete detail cannot be found, write unknown / not explained by README/docs/tree; do not invent.
-- Canonical Projects paradigm: every output must include tier_template. Tier2/3 are invalid unless they include maturity judgment + horizontal comparison. If comparison or maturity evidence is insufficient, the field must say 数据不足 instead of inventing.
+- Canonical Projects paradigm: every output must include tier_template. Tier2/3 are invalid unless they include maturity judgment + horizontal comparison. Tier2/3 must emit tier_template.comparison_table: 1-2 named alternatives, each with real difference, maturity_vs, and tradeoff; similar projects that are only named without differences do not count as horizontal comparison and are invalid. If no comparable evidence exists, set comparison_table=[] and comparison="数据不足"; do not invent.
 
 技术拆解必须按 project_type 分诊。本项目 project_type=${projectType || "unknown"};本次重点:${focus}
 
