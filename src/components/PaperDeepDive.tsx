@@ -36,7 +36,18 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
   const [tab, setTab] = useState<Tab>("paper");
   const scores = meta.scores || {};
   const source = tab === "paper" ? paper : career;
-  const toc = useMemo(() => buildToc(source), [source]);
+  // Fold the deep "技术细节(选读)" read-on layer by default (progressive disclosure).
+  const foldHeading = tab === "paper" ? "技术细节" : undefined;
+  const toc = useMemo(() => {
+    const all = buildToc(source);
+    if (!foldHeading) return all;
+    // Drop the folded layer's sub-headings from the main-spine TOC so it stays short.
+    let inFold = false;
+    return all.filter((t) => {
+      if (t.level === 2) { inFold = t.text.startsWith(foldHeading); return true; }
+      return !inFold;
+    });
+  }, [source, foldHeading]);
   const hasToc = toc.length > 2;
 
   // 目录 scroll-spy：高亮当前视口最靠上的小节。直接 toggle DOM class（比 React
@@ -117,7 +128,7 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
             </nav>
           )}
           <article className="pd-article">
-            <MarkdownRich source={source} />
+            <MarkdownRich source={source} collapsibleHeading={foldHeading} />
           </article>
         </div>
 
