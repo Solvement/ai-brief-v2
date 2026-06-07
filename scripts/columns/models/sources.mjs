@@ -317,13 +317,23 @@ export function detectLatestClosedRelease(text, model = {}) {
   ].filter(Boolean);
 
   for (const pattern of patterns) {
-    const regex = new RegExp(pattern, "i");
-    const match = regex.exec(cleaned);
-    if (!match) continue;
-    const around = cleaned.slice(Math.max(0, match.index - 240), Math.min(cleaned.length, match.index + 240));
+    const regex = new RegExp(pattern, "gi"); // global: collect ALL matches, not just the first
+    const matches = [...cleaned.matchAll(regex)];
+    if (!matches.length) continue;
+    // Pick the HIGHEST version (the actual "latest"), NOT the first textual match — release-notes
+    // pages routinely mention an older version (nav link, "since X.Y") before the newest one, so
+    // regex.exec()'s first hit was selecting e.g. "Claude Opus 4.1" over "Claude Opus 4.8".
+    // Ties keep the earliest occurrence (usually the most prominent heading).
+    let best = matches[0];
+    let bestKey = releaseVersionKey(best[0]);
+    for (const m of matches) {
+      const key = releaseVersionKey(m[0]);
+      if (key > bestKey) { best = m; bestKey = key; }
+    }
+    const around = cleaned.slice(Math.max(0, best.index - 240), Math.min(cleaned.length, best.index + 240));
     const date = detectDate(around);
     return {
-      name: cleanReleaseName(match[0]),
+      name: cleanReleaseName(best[0]),
       date: date.value,
       datePrecision: date.precision,
       source: "official-changelog-best-effort",
@@ -337,6 +347,15 @@ export function detectLatestClosedRelease(text, model = {}) {
     datePrecision: date.precision,
     source: "official-changelog-fallback",
   };
+}
+
+/** Numeric sort key from a release name's version so 4.8 > 4.1 > 4, and 4.10 > 4.9.
+ *  e.g. "Claude Opus 4.8" -> 4008000, "Gemini 2.0" -> 2000000. No version -> -1. */
+export function releaseVersionKey(name) {
+  const m = /([0-9]+(?:\.[0-9]+)*)/.exec(String(name || ""));
+  if (!m) return -1;
+  const [major = 0, minor = 0, patch = 0] = m[1].split(".").map((n) => Number(n) || 0);
+  return major * 1_000_000 + minor * 1_000 + patch;
 }
 
 function cleanReleaseName(value) {
