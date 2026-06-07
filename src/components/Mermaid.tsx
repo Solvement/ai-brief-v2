@@ -32,5 +32,5 @@ export function Mermaid({ chart }: { chart: string }) {
 
   // graceful fallback: show the mermaid source as a code block if render fails
   if (failed) return <pre className="pd-mermaid-fallback">{chart}</pre>;
-  return <div className="pd-mermaid" ref={ref} aria-label="diagram" />;
+  return <div className="pd-mermaid" ref={ref} role="img" aria-label="diagram" />;
 }

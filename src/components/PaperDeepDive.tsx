@@ -98,12 +98,12 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
           )}
         </header>
 
-        <div className="pd-tabs" role="tablist">
-          <button className={`pd-tab${tab === "paper" ? " active" : ""}`} onClick={() => setTab("paper")} role="tab" aria-selected={tab === "paper"}>论文</button>
-          <button className={`pd-tab${tab === "career" ? " active" : ""}`} onClick={() => setTab("career")} role="tab" aria-selected={tab === "career"}>职业</button>
+        <div className="pd-tabs" role="tablist" aria-label="解读视角">
+          <button id="pd-tab-paper" type="button" className={`pd-tab${tab === "paper" ? " active" : ""}`} onClick={() => setTab("paper")} role="tab" aria-selected={tab === "paper"} aria-controls="pd-panel" tabIndex={tab === "paper" ? 0 : -1}>论文</button>
+          <button id="pd-tab-career" type="button" className={`pd-tab${tab === "career" ? " active" : ""}`} onClick={() => setTab("career")} role="tab" aria-selected={tab === "career"} aria-controls="pd-panel" tabIndex={tab === "career" ? 0 : -1}>职业</button>
         </div>
 
-        <div className="pd-body">
+        <div className="pd-body" id="pd-panel" role="tabpanel" aria-labelledby={`pd-tab-${tab}`} tabIndex={0}>
           {hasToc && (
             <nav className="pd-toc" aria-label="目录" ref={tocRef}>
               <div className="pd-toc-title">目录</div>

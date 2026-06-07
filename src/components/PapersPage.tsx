@@ -202,9 +202,12 @@ export function PapersPage() {
               {groups.map((g) => (
                 <button
                   key={g.key}
+                  id={`paper-datetab-${g.key}`}
                   type="button"
                   role="tab"
                   aria-selected={current?.key === g.key}
+                  aria-controls="paper-date-panel"
+                  tabIndex={current?.key === g.key ? 0 : -1}
                   className={`news-datetab${current?.key === g.key ? " active" : ""}`}
                   onClick={() => setActiveDate(g.key)}
                 >
@@ -214,7 +217,7 @@ export function PapersPage() {
             </div>
 
             {current && (
-              <>
+              <div id="paper-date-panel" role="tabpanel" aria-labelledby={`paper-datetab-${current.key}`} tabIndex={0}>
                 <SecHead
                   label={`${tabLabel(current.key)} · ${mode === "conference" ? "顶会精读" : "精读"}`}
                   n={current.items.length}
@@ -230,7 +233,7 @@ export function PapersPage() {
                 ) : (
                   <div className="radar-grid">{current.items.map((d) => <DeepCard key={d.slug} d={d} />)}</div>
                 )}
-              </>
+              </div>
             )}
 
             {/* HF latest-day extras: today's selected-but-not-yet-deep-read candidates + the idea radar. */}

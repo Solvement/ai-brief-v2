@@ -85,7 +85,7 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
 
   return (
     <AppShell active="news">
-      <section className="column-shell">
+      <main className="column-shell">
         <header className="column-hero column-hero-news">
           <div className="section-kicker">Timeline</div>
           <h1 className="column-hero-title">新闻</h1>
@@ -101,9 +101,12 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
             {groups.map((g) => (
               <button
                 key={g.key}
+                id={`news-datetab-${g.key}`}
                 type="button"
                 role="tab"
                 aria-selected={(current?.key) === g.key}
+                aria-controls="news-date-panel"
+                tabIndex={(current?.key) === g.key ? 0 : -1}
                 className={`news-datetab${(current?.key) === g.key ? " active" : ""}`}
                 onClick={() => setActiveDate(g.key)}
               >
@@ -114,11 +117,11 @@ export function News({ initial = null }: { initial?: NewsData | null }) {
         )}
 
         {current && (
-          <div className="news-list">
+          <div className="news-list" id="news-date-panel" role="tabpanel" aria-labelledby={`news-datetab-${current.key}`} tabIndex={0}>
             {current.items.map((item, i) => <NewsCard key={`${item.url}-${i}`} item={item} />)}
           </div>
         )}
-      </section>
+      </main>
     </AppShell>
   );
 }
