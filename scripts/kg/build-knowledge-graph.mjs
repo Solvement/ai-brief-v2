@@ -12,7 +12,7 @@
 // See memory: knowledge-graph-dag-core.
 // ------------------------------------------------------------------
 import { readFileSync, readdirSync, writeFileSync, existsSync, statSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 
@@ -30,6 +30,7 @@ const SHARED_TAG_THRESHOLD = 2;
 const readJSON = (p) => JSON.parse(readFileSync(p, "utf8"));
 const paperNodeId = (arxiv) => `paper:${arxiv}`;
 
+export async function main() {
 const nodes = new Map();
 const edges = [];
 
@@ -150,3 +151,12 @@ console.log("[kg] built knowledge-graph.json");
 console.log(`[kg] nodes: ${nodes.size}`, nodeByType);
 console.log(`[kg] edges: ${edges.length}`, byType);
 console.log(`[kg] forward_lineage: ${forwardSource}`);
+return out;
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error.stack || error.message);
+    process.exitCode = 1;
+  });
+}

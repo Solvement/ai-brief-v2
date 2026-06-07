@@ -19,7 +19,30 @@ const INDEX = path.join(ROOT, "public", "data", "papers-index.json");
 const errors = [];
 const fail = (m) => errors.push(m);
 
+export const GRANDFATHERED_NO_DESIGN_PRINCIPLES = new Set([
+  "decouple-expensive-parallel-cheap-serial",
+  "engine-agnostic-refine-harness",
+  "knowledge-driven-skill-tiered-data-factory",
+  "reverse-synthesis-coverage-aware-eval",
+  "state-externalizing-harness-rl",
+  "trace-to-skill-distillation",
+  "unified-omnimodal-backbone-mode-by-arrangement",
+]);
+
 async function exists(p) { try { await readFile(p); return true; } catch { return false; } }
+
+function hasNonEmptyDesignPrinciples(primitive) {
+  return Array.isArray(primitive?.design_principles) && primitive.design_principles.length > 0;
+}
+
+export function validatePrimitiveDesignPrinciples(primitive, where = "primitive") {
+  const primitiveId = typeof primitive?.primitive_id === "string" ? primitive.primitive_id : "";
+  if (GRANDFATHERED_NO_DESIGN_PRINCIPLES.has(primitiveId)) return [];
+  if (!hasNonEmptyDesignPrinciples(primitive)) {
+    return [`${where}: design_principles must be a non-empty array`];
+  }
+  return [];
+}
 
 function checkMermaidBalanced(md, where) {
   const opens = (md.match(/```mermaid/g) || []).length;
@@ -65,18 +88,34 @@ async function checkPrimitives() {
   let files = [];
   try { files = (await readdir(PRIMITIVES)).filter((f) => f.endsWith(".yaml")); } catch { return; }
   for (const f of files) {
-    try { parseYaml(await readFile(path.join(PRIMITIVES, f), "utf8")); }
+    let primitive;
+    try {
+      primitive = parseYaml(await readFile(path.join(PRIMITIVES, f), "utf8"));
+      for (const message of validatePrimitiveDesignPrinciples(primitive, `data/autosci/primitives/${f}`)) fail(message);
+    }
     catch (e) { fail(`data/autosci/primitives/${f}: YAML 解析失败 ${e.message}`); }
   }
 }
 
-await checkIndex();
-await checkDeepReads();
-await checkPrimitives();
+export async function validatePapersDeepread() {
+  errors.length = 0;
+  await checkIndex();
+  await checkDeepReads();
+  await checkPrimitives();
+  return [...errors];
+}
 
-if (errors.length) {
+const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isCli) {
+  await validatePapersDeepread();
+}
+
+if (isCli && errors.length) {
   console.error(`[validate-papers-deepread] ✗ ${errors.length} 个问题:`);
   for (const e of errors) console.error(`  - ${e}`);
   process.exit(1);
 }
-console.log("[validate-papers-deepread] ✓ 论文深读语料 + 索引 校验通过");
+if (isCli) {
+  console.log("[validate-papers-deepread] ✓ 论文深读语料 + 索引 校验通过");
+}

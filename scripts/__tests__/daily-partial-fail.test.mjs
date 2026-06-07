@@ -67,6 +67,7 @@ test("main supports allow-partial for partial failures only", async () => {
     papers: () => {
       throw new Error("boom");
     },
+    kg: async () => ({ ok: true }),
     projects: async () => ({ ok: true }),
     models: async () => ({ ok: true }),
   };

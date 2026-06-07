@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-06-05T13:23:10.592Z",
+  "generatedAt": "2026-06-07T21:47:40.940Z",
   "note": "L0 knowledge-graph DAG. forward_lineage = verified 'edge effect' only.",
   "stats": {
-    "nodes": 51,
-    "edges": 48,
+    "nodes": 62,
+    "edges": 55,
     "nodeByType": {
-      "paper": 26,
-      "principle": 25
+      "paper": 31,
+      "principle": 31
     },
     "edgeByType": {
-      "exhibits_principle": 25,
-      "shares_tag": 2,
+      "exhibits_principle": 31,
+      "shares_tag": 3,
       "forward_lineage": 21
     },
     "forwardSource": "forward-edges.json (21 edges)"
@@ -258,6 +258,59 @@
       "primitive_relevance": "direct_map_for_north_star"
     },
     {
+      "id": "paper:2512.08924",
+      "type": "paper",
+      "arxiv_id": "2512.08924",
+      "slug": "2512.08924-d4rt-4d-reconstruction",
+      "title": "Efficiently Reconstructing Dynamic Scenes One D4RT at a Time",
+      "date": "2025-12",
+      "authors": [
+        "Chuhan Zhang",
+        "Guillaume Le Moing",
+        "Skanda Koppula",
+        "Ignacio Rocco",
+        "Liliane Momeni",
+        "Junyu Xie",
+        "Shuyang Sun",
+        "Rahul Sukthankar",
+        "Joëlle K. Barral",
+        "Raia Hadsell",
+        "Zoubin Ghahramani",
+        "Andrew Zisserman",
+        "Junlin Zhang",
+        "Mehdi S. M. Sajjadi"
+      ],
+      "tags": [
+        "cvpr-2026-best-paper",
+        "4d-reconstruction",
+        "dynamic-scene",
+        "feedforward",
+        "query-based-decoder",
+        "point-tracking",
+        "depth-estimation",
+        "camera-pose",
+        "video-transformer",
+        "spatial-ai"
+      ],
+      "topic": "perception",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 6,
+        "autosci_reuse_value": 5,
+        "buildability": 4,
+        "evaluation_value": 8,
+        "breadth_value": 8,
+        "evidence_quality": 9
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": null,
+      "external": false
+    },
+    {
       "id": "paper:2605.28556",
       "type": "paper",
       "arxiv_id": "2605.28556",
@@ -428,6 +481,53 @@
       "primitive_relevance": "direct"
     },
     {
+      "id": "paper:2606.00408",
+      "type": "paper",
+      "arxiv_id": "2606.00408",
+      "slug": "2606.00408-masking-stale-observations-search-agents",
+      "title": "Masking Stale Observations Helps Search Agents -- Until It Doesn't: A Regime Map and Its Mechanism",
+      "date": "2026-05-29",
+      "authors": [
+        "Haoxiang Zhang",
+        "Qixin Xu",
+        "Zhuofeng Li",
+        "Lei Zhang",
+        "Pengcheng Jiang",
+        "Yu Zhang",
+        "Julian McAuley"
+      ],
+      "tags": [
+        "agent-context-management",
+        "observation-masking",
+        "deep-research-agent",
+        "agentic-search",
+        "retrieval",
+        "long-context",
+        "regime-map",
+        "scaffold-design",
+        "trajectory-analysis",
+        "autosci-direct"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 8,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "regime-aware-observation-masking",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
+    },
+    {
       "id": "paper:2606.02060",
       "type": "paper",
       "arxiv_id": "2606.02060",
@@ -476,6 +576,149 @@
       "primitive": "claim-centric-trajectory-audit",
       "external": false,
       "primitive_relevance": "direct_pattern_strong"
+    },
+    {
+      "id": "paper:2606.02373",
+      "type": "paper",
+      "arxiv_id": "2606.02373",
+      "slug": "2606.02373-harness-1-search-agent-rl",
+      "title": "Harness-1: Reinforcement Learning for Search Agents with State-Externalizing Harnesses",
+      "date": "2026-06",
+      "authors": [
+        "Pengcheng Jiang",
+        "Zhiyi Shi",
+        "Kelly Hong",
+        "Xueqiang Xu",
+        "Jiashuo Sun",
+        "Jimeng Sun",
+        "Hammad Bashir",
+        "Jiawei Han"
+      ],
+      "tags": [
+        "search-agent",
+        "agentic-rag",
+        "reinforcement-learning",
+        "state-externalization",
+        "harness-engineering",
+        "cognitive-offloading",
+        "gpt-oss-20b",
+        "cispo",
+        "curated-recall",
+        "evidence-graph",
+        "transfer-generalization"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 8,
+        "breadth_value": 6,
+        "evidence_quality": 7
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "state-externalizing-harness-rl",
+      "external": false,
+      "primitive_relevance": "direct"
+    },
+    {
+      "id": "paper:2606.02800",
+      "type": "paper",
+      "arxiv_id": "2606.02800",
+      "slug": "2606.02800-cosmos-3-world-model",
+      "title": "Cosmos 3: Omnimodal World Models for Physical AI",
+      "date": "2026-06",
+      "authors": [
+        "Aditi",
+        "Niket Agarwal",
+        "Arslan Ali",
+        "Jon Allen",
+        "Martin Antolini",
+        "NVIDIA Cosmos Team (290+ contributors, full list in Appendix G)"
+      ],
+      "tags": [
+        "world-model",
+        "omnimodal",
+        "physical-ai",
+        "mixture-of-transformers",
+        "autoregressive-diffusion",
+        "vision-language-action",
+        "video-generation",
+        "robot-policy",
+        "nvidia-cosmos",
+        "open-weights"
+      ],
+      "topic": "multimodal",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 6,
+        "autosci_reuse_value": 4,
+        "buildability": 5,
+        "evaluation_value": 7,
+        "breadth_value": 9,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "unified-omnimodal-backbone-mode-by-arrangement",
+      "external": false,
+      "primitive_relevance": "indirect"
+    },
+    {
+      "id": "paper:2606.05259",
+      "type": "paper",
+      "arxiv_id": "2606.05259",
+      "slug": "2606.05259-videokr-video-understanding",
+      "title": "VideoKR: Towards Knowledge- and Reasoning-Intensive Video Understanding",
+      "date": "2026-06",
+      "authors": [
+        "Lin Fu",
+        "Zheyuan Yang",
+        "Yang Wang",
+        "Tingyu Song",
+        "Arman Cohan",
+        "Yilun Zhao"
+      ],
+      "tags": [
+        "video-understanding",
+        "data-centric",
+        "synthetic-data-pipeline",
+        "human-in-the-loop",
+        "knowledge-intensive-reasoning",
+        "chain-of-thought",
+        "sft-grpo",
+        "rlvr",
+        "shortcut-removal",
+        "benchmark-construction",
+        "multi-model-pool",
+        "cc-licensed-dataset"
+      ],
+      "topic": "data",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 6,
+        "system_design_value": 8,
+        "career_value": 7,
+        "autosci_reuse_value": 8,
+        "buildability": 6,
+        "evaluation_value": 8,
+        "breadth_value": 5,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "knowledge-driven-skill-tiered-data-factory",
+      "external": false,
+      "primitive_relevance": "direct"
     },
     {
       "id": "principle:sop-over-freeform",
@@ -664,6 +907,60 @@
       "principle": "优化器+安全视角(本篇)+ What/When/How/Where(2507.21046)叠用,设计自进化最不漏环。",
       "papers": [
         "2508.07407"
+      ]
+    },
+    {
+      "id": "principle:cm-is-regime-dependent",
+      "type": "principle",
+      "key": "cm-is-regime-dependent",
+      "principle": "Context management is not a default on/off optimization; it should be gated by retriever signal and model filtering capacity.",
+      "papers": [
+        "2606.00408"
+      ]
+    },
+    {
+      "id": "principle:mask-observations-not-state",
+      "type": "principle",
+      "key": "mask-observations-not-state",
+      "principle": "Mask stale observation content from visible context while preserving reasoning, tool-call structure, tool errors, and page-pool state.",
+      "papers": [
+        "2606.00408"
+      ]
+    },
+    {
+      "id": "principle:preserve-reopenability",
+      "type": "principle",
+      "key": "preserve-reopenability",
+      "principle": "Any masked evidence must remain addressable by stable cursor/id/URL; masking must be reversible through tools.",
+      "papers": [
+        "2606.00408"
+      ]
+    },
+    {
+      "id": "principle:evaluate-rescue-and-harm",
+      "type": "principle",
+      "key": "evaluate-rescue-and-harm",
+      "principle": "Average accuracy hides the mechanism; evaluate wrong->correct and correct->wrong transitions plus extra tool calls and rolling token cost.",
+      "papers": [
+        "2606.00408"
+      ]
+    },
+    {
+      "id": "principle:protect-saturated-model-evidence",
+      "type": "principle",
+      "key": "protect-saturated-model-evidence",
+      "principle": "For high-baseline agents, external masking can remove evidence the model would have used; add evidence pinning or disable masking in saturated regimes.",
+      "papers": [
+        "2606.00408"
+      ]
+    },
+    {
+      "id": "principle:retriever-before-pruning",
+      "type": "principle",
+      "key": "retriever-before-pruning",
+      "principle": "When the retriever is the bottleneck, context pruning cannot amplify absent signal; improve retrieval quality before tuning masking.",
+      "papers": [
+        "2606.00408"
       ]
     },
     {
@@ -938,6 +1235,36 @@
       "type": "exhibits_principle"
     },
     {
+      "source": "paper:2606.00408",
+      "target": "principle:cm-is-regime-dependent",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.00408",
+      "target": "principle:mask-observations-not-state",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.00408",
+      "target": "principle:preserve-reopenability",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.00408",
+      "target": "principle:evaluate-rescue-and-harm",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.00408",
+      "target": "principle:protect-saturated-model-evidence",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.00408",
+      "target": "principle:retriever-before-pruning",
+      "type": "exhibits_principle"
+    },
+    {
       "source": "paper:2606.02060",
       "target": "principle:process-credit-over-outcome",
       "type": "exhibits_principle"
@@ -975,6 +1302,16 @@
       "tags": [
         "self-evolving-agent",
         "self-improving-agent-lineage"
+      ]
+    },
+    {
+      "source": "paper:2606.00408",
+      "target": "paper:2606.02060",
+      "type": "shares_tag",
+      "weight": 2,
+      "tags": [
+        "deep-research-agent",
+        "trajectory-analysis"
       ]
     },
     {

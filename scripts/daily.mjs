@@ -6,6 +6,7 @@ import { main as runModelsDaily } from "./columns/models/daily.mjs";
 import { main as runNewsDaily } from "./columns/news/daily.mjs";
 import { main as runPapersHfDaily } from "./columns/papers/daily-hf.mjs";
 import { main as runProjectsDaily } from "./columns/projects/daily.mjs";
+import { main as runKgBuild } from "./kg/build-knowledge-graph.mjs";
 
 export async function main(argv = process.argv.slice(2), { runners } = {}) {
   const options = parseArgs(argv);
@@ -16,9 +17,10 @@ export async function main(argv = process.argv.slice(2), { runners } = {}) {
   }
 
   const results = [];
-  const want = (c) => options.only === "all" || options.only === c;   // --only news|papers|projects|models
+  const want = (c) => options.only === "all" || options.only === c;   // --only news|papers|kg|projects|models
   if (want("news")) results.push(await runColumn("news", runners?.news ?? (() => runNewsDaily(passThroughArgs(options)))));
   if (want("papers")) results.push(await runColumn("papers", runners?.papers ?? (() => runPapersHfDaily())));
+  if (want("kg")) results.push(await runColumn("kg", runners?.kg ?? (() => runKgBuild())));
   // Full 30-per-board radar by default (spec target); pass-through flags (offline/dry-run/cap) still apply.
   if (want("projects")) results.push(await runColumn("projects", runners?.projects ?? (() => runProjectsDaily(["--limit", "30", "--radar-limit", "30", ...passThroughArgs(options)]))));
   if (want("models")) results.push(await runColumn("models", runners?.models ?? (() => runModelsDaily(passThroughArgs(options)))));
@@ -148,6 +150,7 @@ function printUsage() {
 Runs daily checks in sequence:
   news     -> scripts/columns/news/daily.mjs
   papers   -> scripts/columns/papers/daily.mjs
+  kg       -> scripts/kg/build-knowledge-graph.mjs
   projects -> scripts/columns/projects/daily.mjs
   models   -> scripts/columns/models/daily.mjs
 
