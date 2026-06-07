@@ -7,7 +7,7 @@ import { main as runNewsDaily } from "./columns/news/daily.mjs";
 import { main as runPapersHfDaily } from "./columns/papers/daily-hf.mjs";
 import { main as runProjectsDaily } from "./columns/projects/daily.mjs";
 
-export async function main(argv = process.argv.slice(2)) {
+export async function main(argv = process.argv.slice(2), { runners } = {}) {
   const options = parseArgs(argv);
 
   if (options.help) {
@@ -17,22 +17,32 @@ export async function main(argv = process.argv.slice(2)) {
 
   const results = [];
   const want = (c) => options.only === "all" || options.only === c;   // --only news|papers|projects|models
-  if (want("news")) results.push(await runColumn("news", () => runNewsDaily(passThroughArgs(options))));
-  if (want("papers")) results.push(await runColumn("papers", () => runPapersHfDaily()));
+  if (want("news")) results.push(await runColumn("news", runners?.news ?? (() => runNewsDaily(passThroughArgs(options)))));
+  if (want("papers")) results.push(await runColumn("papers", runners?.papers ?? (() => runPapersHfDaily())));
   // Full 30-per-board radar by default (spec target); pass-through flags (offline/dry-run/cap) still apply.
-  if (want("projects")) results.push(await runColumn("projects", () => runProjectsDaily(["--limit", "30", "--radar-limit", "30", ...passThroughArgs(options)])));
-  if (want("models")) results.push(await runColumn("models", () => runModelsDaily(passThroughArgs(options))));
+  if (want("projects")) results.push(await runColumn("projects", runners?.projects ?? (() => runProjectsDaily(["--limit", "30", "--radar-limit", "30", ...passThroughArgs(options)]))));
+  if (want("models")) results.push(await runColumn("models", runners?.models ?? (() => runModelsDaily(passThroughArgs(options)))));
   if (results.length === 0) { console.warn(`[daily] --only '${options.only}' matched no column`); return []; }
 
   printCombinedSummary(results);
 
-  if (results.every((result) => result.status === "failed")) {
-    const error = new Error("daily: all columns failed");
+  const outcome = evaluateRunOutcome(results, { allowPartial: options.allowPartial });
+  if (outcome.shouldFail) {
+    const failedColumns = outcome.failed.join(", ");
+    console.error(`daily: FAILED columns: ${failedColumns}`);
+    const error = new Error(`daily: failed columns: ${failedColumns}`);
     error.results = results;
     throw error;
   }
 
   return results;
+}
+
+export function evaluateRunOutcome(results, { allowPartial = false } = {}) {
+  const failed = results.filter((r) => r.status === "failed").map((r) => r.name);
+  const allFailed = results.length > 0 && failed.length === results.length;
+  const shouldFail = allowPartial ? allFailed : failed.length > 0;
+  return { failed, allFailed, shouldFail };
 }
 
 export function parseArgs(argv = []) {
@@ -41,6 +51,7 @@ export function parseArgs(argv = []) {
     dryRun: false,
     cap: 0,
     only: "all",
+    allowPartial: false,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -56,6 +67,8 @@ export function parseArgs(argv = []) {
       options.offline = true;
     } else if (arg === "--dry-run") {
       options.dryRun = true;
+    } else if (arg === "--allow-partial") {
+      options.allowPartial = true;
     } else if (arg === "--cap") {
       options.cap = numberOption(nextValue(), options.cap);
     } else if (arg.startsWith("--cap=")) {
@@ -141,6 +154,7 @@ Runs daily checks in sequence:
 Flags:
   --offline  Pass offline/no-LLM mode through to columns that support it
   --dry-run  Pass dry-run mode through to columns that support it
+  --allow-partial  Only fail the combined daily run when every selected column fails
   --cap N    Pass cap through to columns that support it
 `);
 }
