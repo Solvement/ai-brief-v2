@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T13:29:02.469Z",
+  "generatedAt": "2026-06-07T14:12:42.742Z",
   "models": [
     {
       "id": "anthropic-claude",
@@ -16,7 +16,7 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://docs.claude.com/en/release-notes/overview",
-      "lastCheckedAt": "2026-06-06T13:29:03.900Z",
+      "lastCheckedAt": "2026-06-07T14:12:43.212Z",
       "analysisGeneratedAt": "2026-06-06T00:15:44.764Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
@@ -153,7 +153,7 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://platform.openai.com/docs/changelog",
-      "lastCheckedAt": "2026-06-06T13:29:02.917Z",
+      "lastCheckedAt": "2026-06-07T14:12:42.998Z",
       "analysisGeneratedAt": "2026-06-04T04:10:40.040Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
@@ -281,7 +281,7 @@
       "vendor": "Google DeepMind",
       "country": "美国",
       "kind": "closed",
-      "latestVersion": "Gemini 2.0",
+      "latestVersion": "Gemini 3.5",
       "latestReleasedAt": "",
       "latestReleasedAtPrecision": "not_found",
       "isOpen": false,
@@ -290,45 +290,38 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://ai.google.dev/gemini-api/docs/changelog",
-      "lastCheckedAt": "2026-06-06T13:29:05.449Z",
-      "analysisGeneratedAt": "2026-06-06T13:29:02.469Z",
+      "lastCheckedAt": "2026-06-07T14:12:45.143Z",
+      "analysisGeneratedAt": "2026-06-07T14:12:42.742Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
-        "oneLineTakeaway": "Gemini 3.5 Flash 正式发布，带来稳定高效的代理与编码性能，并推出托管代理（Managed Agents）和 Antigravity 自主代理预览，让你构建能自动执行复杂任务的应用变得前所未有的简单。",
+        "oneLineTakeaway": "Gemini 3.5 Flash 专为编码与 Agent 场景增强性能，并首次推出托管代理（Managed Agents）功能，允许开发者在 Google 托管的沙箱中运行自主 Agent，极大简化复杂工作流自动化。",
         "newFeatures": [
           {
-            "feature": "Gemini 3.5 Flash General Availability",
-            "whatItIs": "Gemini 3.5 Flash 是 Google 最新一代的智能模型，专为代理任务和编码场景提供一致、高性能的输出，同时保持快速和低成本。",
-            "forYou": "现在你可以用这个模型构建更可靠的自动化工作流、代码生成器、或需要强推理的对话助手。它比之前的 Flash 模型更聪明，能更好地处理复杂指令和工具调用。",
-            "howToUse": "在 Gemini API 中将 model 参数设为 'gemini-3.5-flash'，即可直接调用。结合工具调用（如函数调用、代码执行）或托管代理框架，可以快速搭建 agent 应用。",
-            "whenToUse": "当你需要稳定的代理行为、复杂的编码任务或超过之前 Flash-Lite 模型性能但又不想用 Pro 模型的高成本时，这就是首选。"
+            "feature": "Gemini 3.5 Flash 模型",
+            "whatItIs": "Gemini 3.5 Flash 是 Google 最新推出的高性价比模型，在代码生成和自主代理任务上大幅提升，提供接近大模型的性能但成本更低。",
+            "forYou": "如果你在构建需要密集编码（如代码生成、调试、自动编程）或需要 Agent 自主执行多步骤任务的应用，该模型能显著提高输出质量与任务完成率，同时保持低延迟和低成本。",
+            "howToUse": "通过 Gemini API 调用 `gemini-3.5-flash` 模型字符串即可。兼容现有的 SDK 和请求格式，可直接替换你当前使用的 Flash 模型。",
+            "whenToUse": "当你的应用涉及代码生成、调试、Agent 流程（如自动化办公、数据处理流水线）或需要高性价比推理时，建议优先使用。"
           },
           {
-            "feature": "Managed Agents in Gemini API (public preview)",
-            "whatItIs": "托管代理是一项新服务，让你在 Google 的安全沙箱 Linux 环境中构建和部署有状态的自主代理，这些代理能运行代码、管理文件、浏览网页。",
-            "forYou": "你不必自己搭建沙箱或管理代理状态，可以直接创建能自主完成多步骤任务的代理，比如自动研究报告、数据采集、自动编码等。这大大降低了构建生产级自主代理的门槛。",
-            "howToUse": "通过 Gemini API 的托管代理端点创建代理，配置其能力和工具（如搜索、代码执行），然后发送任务，代理会在托管环境中自动执行并返回结果。参见文档中的“Managed Agents 概览”和快速入门。",
-            "whenToUse": "当你的用户需要代理自主执行长任务，而你不想处理基础设施的复杂度时。特别适合需要沙箱安全执行代码或浏览网页的应用。"
+            "feature": "托管代理（Managed Agents）",
+            "whatItIs": "Managed Agents 是一项早期公开预览功能，允许开发者在 Google 托管的、安全的 Linux 沙箱环境中创建有状态、长时间运行的自主 Agent。Agent 可以访问文件、执行代码、浏览网页等。",
+            "forYou": "为你省去自建 Agent 运行环境的复杂性（如服务器、沙箱安全、状态持久化），直接在云端运行安全隔离的 Agent，快速落地复杂的自主任务（如研究助理、自动数据采集）。",
+            "howToUse": "在 Gemini API 中启用 Managed Agents 功能，配置 Agent 的环境和工具，然后通过 API 下达任务。具体可参考 Google 提供的快速入门指南。",
+            "whenToUse": "当你的应用需要长时间运行的自主 Agent（如持续监控、自动报表生成、深度研究）且你希望避免自行管理基础设施和安全隔离时，非常有价值。"
           },
           {
-            "feature": "Antigravity Agent (preview)",
-            "whatItIs": "Antigravity 是一个通用的自主代理预览，可以自动规划、推理、编写和运行代码，还能管理文件和浏览网页，所有操作都在隔离的沙箱容器内完成。",
-            "forYou": "你可以立即集成一个几乎全能的自动代理，它能处理从“分析这份数据并生成报告”到“写一个爬虫抓取新闻并总结”的模糊任务，大幅减少人工干预。",
-            "howToUse": "使用模型字符串 'antigravity-preview-05-2026' 调用。发送自然语言任务，代理会自行分解步骤并执行。参考 Antigravity Agent 指南获取代码示例。",
-            "whenToUse": "当你面临需要跨工具、多步骤自主完成的任务，且没有预定义工作流，交给 Antigravity 可以显著缩短开发时间，适用于原型验证或灵活的任务执行。"
-          },
-          {
-            "feature": "Multimodal File Search",
-            "whatItIs": "文件搜索现在支持多模态，可以原生嵌入并搜索图像。你也能在搜索结果中获得视觉引用和页码。",
-            "forYou": "构建 RAG 应用时，现在不仅能搜索文本，还能直接搜索图片，比如在医疗影像库或设计素材库中查找相似图片。视觉引用和页码让结果更可解释。",
-            "howToUse": "使用 gemini-embedding-2 模型对图像和文本进行嵌入，然后在 File Search API 中查询。通过 groundingMetadata 获取 media_id 和 page_numbers。",
-            "whenToUse": "当你的知识库包含大量图片、PDF 或文档，需要跨模态检索时，这个功能可以省去单独预处理图片的步骤，并提升查找精度。"
+            "feature": "Antigravity Agent（通用预览 Agent）",
+            "whatItIs": "Antigravity Agent（`antigravity-preview-05-2026`）是一个预先构建的通用 Managed Agent，能在沙箱中自主完成计划、推理、编写代码、管理文件和网页浏览。",
+            "forYou": "无需从零构建 Agent 逻辑，直接调用一个强大的开箱即用 Agent，快速实现复杂任务的自动化，如批量信息抓取、报告生成、数据分析。",
+            "howToUse": "通过 Gemini API 调用 `antigravity-preview-05-2026` 模型字符串，或在 Managed Agents 环境中指定该 Agent 类型，然后给出自然语言任务描述。",
+            "whenToUse": "需要快速验证自主 Agent 场景或没有资源开发自定义 Agent 时，用它作为起步方案；也适合与自定义工具配合扩展。"
           }
         ],
-        "limitations": "Managed Agents 和 Antigravity Agent 目前为公开预览，可能有不稳定或配额限制。具体定价、速率限制、可用区域官方 changelog 未披露。Antigravity Agent 模型为预览版，可能未来有破坏性更改。Gemini 3.5 Flash 已正式可用，但可能与其他旧版本共享配额。",
+        "limitations": "官方 changelog 未说明价格、速率限制、区域可用性等。Managed Agents 和 Antigravity Agent 目前处于早期公开预览，可能存在稳定性或功能限制。",
         "sources": [
           {
-            "name": "Google Gemini API 发布说明",
+            "name": "official changelog",
             "url": "https://ai.google.dev/gemini-api/docs/changelog"
           }
         ]
@@ -340,7 +333,7 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "Gemini 2.0",
+          "名称": "Gemini 3.5",
           "厂商": "Google DeepMind",
           "发布日": "官方未披露",
           "开放度标签": "仅API闭源",
@@ -367,24 +360,23 @@
             "输出每百万token": "官方未披露"
           },
           "知识截止": "官方未披露",
-          "model string": "Gemini 2.0",
+          "model string": "Gemini 3.5",
           "速率": "官方未披露",
           "多模态I/O": "官方未披露"
         },
         "update": {
-          "版本": "Gemini 3.5→Gemini 2.0(官方未披露)",
+          "版本": "Gemini 2.0→Gemini 3.5(官方未披露)",
           "变了什么": [
-            "Gemini 3.5 Flash General Availability: Gemini 3.5 Flash 是 Google 最新一代的智能模型，专为代理任务和编码场景提供一致、高性能的输出，同时保持快速和低成本。: 现在你可以用这个模型构建更可靠的自动化工作流、代码生成器、或需要强推理的对话助手。它比之前的 Flash 模型更聪明，能更好地处理复杂指令和工具调用。",
-            "Managed Agents in Gemini API (public preview): 托管代理是一项新服务，让你在 Google 的安全沙箱 Linux 环境中构建和部署有状态的自主代理，这些代理能运行代码、管理文件、浏览网页。: 你不必自己搭建沙箱或管理代理状态，可以直接创建能自主完成多步骤任务的代理，比如自动研究报告、数据采集、自动编码等。这大大降低了构建生产级自主代理的门槛。",
-            "Antigravity Agent (preview): Antigravity 是一个通用的自主代理预览，可以自动规划、推理、编写和运行代码，还能管理文件和浏览网页，所有操作都在隔离的沙箱容器内完成。: 你可以立即集成一个几乎全能的自动代理，它能处理从“分析这份数据并生成报告”到“写一个爬虫抓取新闻并总结”的模糊任务，大幅减少人工干预。",
-            "Multimodal File Search: 文件搜索现在支持多模态，可以原生嵌入并搜索图像。你也能在搜索结果中获得视觉引用和页码。: 构建 RAG 应用时，现在不仅能搜索文本，还能直接搜索图片，比如在医疗影像库或设计素材库中查找相似图片。视觉引用和页码让结果更可解释。"
+            "Gemini 3.5 Flash 模型: Gemini 3.5 Flash 是 Google 最新推出的高性价比模型，在代码生成和自主代理任务上大幅提升，提供接近大模型的性能但成本更低。: 如果你在构建需要密集编码（如代码生成、调试、自动编程）或需要 Agent 自主执行多步骤任务的应用，该模型能显著提高输出质量与任务完成率，同时保持低延迟和低成本。",
+            "托管代理（Managed Agents）: Managed Agents 是一项早期公开预览功能，允许开发者在 Google 托管的、安全的 Linux 沙箱环境中创建有状态、长时间运行的自主 Agent。Agent 可以访问文件、执行代码、浏览网页等。: 为你省去自建 Agent 运行环境的复杂性（如服务器、沙箱安全、状态持久化），直接在云端运行安全隔离的 Agent，快速落地复杂的自主任务（如研究助理、自动数据采集）。",
+            "Antigravity Agent（通用预览 Agent）: Antigravity Agent（`antigravity-preview-05-2026`）是一个预先构建的通用 Managed Agent，能在沙箱中自主完成计划、推理、编写代码、管理文件和网页浏览。: 无需从零构建 Agent 逻辑，直接调用一个强大的开箱即用 Agent，快速实现复杂任务的自动化，如批量信息抓取、报告生成、数据分析。"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
             "旧版弃用": "官方未披露",
             "需迁移": "官方未披露"
           },
-          "值不值得切一句": "Gemini 3.5 Flash 正式发布，带来稳定高效的代理与编码性能，并推出托管代理（Managed Agents）和 Antigravity 自主代理预览，让你构建能自动执行复杂任务的应用变得前所未有的简单。"
+          "值不值得切一句": "Gemini 3.5 Flash 专为编码与 Agent 场景增强性能，并首次推出托管代理（Managed Agents）功能，允许开发者在 Google 托管的沙箱中运行自主 Agent，极大简化复杂工作流自动化。"
         }
       }
     },
@@ -409,7 +401,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-      "lastCheckedAt": "2026-06-06T13:29:02.471Z",
+      "lastCheckedAt": "2026-06-07T14:12:42.743Z",
       "latestVersionVariants": [
         "DeepSeek V4 Pro",
         "DeepSeek V4 Flash",
@@ -706,7 +698,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/Qwen/Qwen3.6-27B",
-      "lastCheckedAt": "2026-06-06T13:29:02.663Z",
+      "lastCheckedAt": "2026-06-07T14:12:42.869Z",
       "latestVersionVariants": [
         "Qwen3.6 35B A3B",
         "Qwen3.6 35B A3B FP8",
@@ -952,7 +944,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512",
-      "lastCheckedAt": "2026-06-06T13:29:02.844Z",
+      "lastCheckedAt": "2026-06-07T14:12:42.961Z",
       "latestVersionVariants": [
         "Mistral Large 3 675B Instruct 2512 NVFP4",
         "Mistral Large 3 675B Instruct 2512",

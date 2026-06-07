@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T13:29:01.858Z",
+  "generatedAt": "2026-06-07T14:12:42.383Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 48,
+  "count": 49,
   "items": [
     {
       "id": "claim/9router-main-claim",
@@ -1714,6 +1714,46 @@
         {
           "target": "content/taste-skill",
           "raw": "[[content/taste-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/tolaria-main-claim",
+      "type": "claim",
+      "slug": "tolaria-main-claim",
+      "title": "Tolaria Main Claim",
+      "file": "claims/tolaria-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "Tolaria 提供 files-first 知识库管理",
+        "slug": "tolaria-main-claim",
+        "kind": "claim",
+        "content": "tolaria",
+        "source_pointer": "README Principles - 📑 Files-first",
+        "evidence_strength": "high",
+        "supports": [
+          "mcp-knowledge-base",
+          "file-first-knowledge"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未说明对非 Markdown 文件的支持",
+          "如果 Markdown 解析器有 bug，可能影响使用"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n笔记是纯 Markdown 文件，不锁定在专有格式中\n\n证据:用户能直接访问文件系统，与任何编辑器兼容。边界:未说明对非 Markdown 文件的支持。风险:如果 Markdown 解析器有 bug，可能影响使用。See [[content/tolaria]]。\n",
+      "excerpt": "笔记是纯 Markdown 文件，不锁定在专有格式中",
+      "links": [
+        {
+          "target": "content/tolaria",
+          "raw": "[[content/tolaria]]"
         }
       ],
       "headings": [

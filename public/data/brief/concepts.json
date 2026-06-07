@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T13:29:01.858Z",
+  "generatedAt": "2026-06-07T14:12:42.383Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 90,
+  "count": 92,
   "items": [
     {
       "id": "concept/adaptive-element-relocation",
@@ -1468,6 +1468,63 @@
       ]
     },
     {
+      "id": "concept/file-first-knowledge",
+      "type": "concept",
+      "slug": "file-first-knowledge",
+      "title": "File First Knowledge",
+      "file": "concepts/file-first-knowledge.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "File-First Knowledge Management",
+        "slug": "file-first-knowledge",
+        "kind": "concept",
+        "tags": [
+          "knowledge-management",
+          "offline-first",
+          "markdown"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "tolaria",
+        "related_content": [
+          "tolaria"
+        ],
+        "related_concepts": [],
+        "explanation": "以文件系统为基础的知识管理方法，强调数据可移植性、离线可用性和标准格式（Markdown）。",
+        "examples": [
+          "Obsidian (local-first, but not AI-native)",
+          "Tolaria"
+        ],
+        "common_misunderstandings": [
+          "并不是必须用特定编辑器；文件可以被任何工具读取和写入"
+        ],
+        "open_questions": [
+          "如何在大规模文件时保持高效搜索和索引？"
+        ]
+      },
+      "body": "\n## Explanation\n\n以文件系统为基础的知识管理方法，强调数据可移植性、离线可用性和标准格式（Markdown）。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。\n\n## Supported by\n- [[claims/tolaria-main-claim]]\n",
+      "excerpt": "以文件系统为基础的知识管理方法，强调数据可移植性、离线可用性和标准格式（Markdown）。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。",
+      "links": [
+        {
+          "target": "content/tolaria",
+          "raw": "[[content/tolaria]]"
+        },
+        {
+          "target": "claims/tolaria-main-claim",
+          "raw": "[[claims/tolaria-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/file-to-markdown-converter",
       "type": "concept",
       "slug": "file-to-markdown-converter",
@@ -2531,6 +2588,63 @@
         {
           "target": "claims/ui-tars-desktop-main-claim",
           "raw": "[[claims/ui-tars-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-knowledge-base",
+      "type": "concept",
+      "slug": "mcp-knowledge-base",
+      "title": "Mcp Knowledge Base",
+      "file": "concepts/mcp-knowledge-base.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP-Connected Knowledge Base",
+        "slug": "mcp-knowledge-base",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "knowledge-base",
+          "agent-tool"
+        ],
+        "maturity": "active",
+        "first_seen_in": "tolaria",
+        "related_content": [
+          "tolaria"
+        ],
+        "related_concepts": [],
+        "explanation": "通过 MCP 协议将本地知识库暴露给 AI 代理的工具模式，使代理能搜索和修改作为文件的笔记。",
+        "examples": [
+          "Tolaria's mcp-server directory"
+        ],
+        "common_misunderstandings": [
+          "这不是一个 AI 写作助手，而是让外部 AI 代理可以操作的知识源"
+        ],
+        "open_questions": [
+          "如何控制代理的写入权限？",
+          "如何处理多代理并发写入？"
+        ]
+      },
+      "body": "\n## Explanation\n\n通过 MCP 协议将本地知识库暴露给 AI 代理的工具模式，使代理能搜索和修改作为文件的笔记。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。\n\n## Supported by\n- [[claims/tolaria-main-claim]]\n",
+      "excerpt": "通过 MCP 协议将本地知识库暴露给 AI 代理的工具模式，使代理能搜索和修改作为文件的笔记。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。",
+      "links": [
+        {
+          "target": "content/tolaria",
+          "raw": "[[content/tolaria]]"
+        },
+        {
+          "target": "claims/tolaria-main-claim",
+          "raw": "[[claims/tolaria-main-claim]]"
         }
       ],
       "headings": [
