@@ -4,6 +4,8 @@ import { pathToFileURL } from "node:url";
 const file = new URL("../public/data/trending.json", import.meta.url);
 let errors = [];
 const DATA_INSUFFICIENT = "数据不足";
+const CLAIM_ATTRIBUTIONS = new Set(["自报", "已核实", "不适用"]);
+const SELF_REPORTED_SOURCE_RE = /README|artifact|官网|self|自述|自称/i;
 
 function fail(path, message) {
   errors.push(`${path}: ${message}`);
@@ -52,6 +54,36 @@ function validateTierTemplateComparison(repo, path) {
       if (!isNonEmptyString(item[key])) fail(`${itemPath}.${key}`, "must be a non-empty string");
     }
   });
+}
+
+function validateClaimLedgerAttribution(repo, path) {
+  if (!repo.tier_template || typeof repo.tier_template !== "object") return;
+
+  const ledgers = [];
+  if (Array.isArray(repo.claim_ledger)) {
+    ledgers.push({ items: repo.claim_ledger, path: `${path}.claim_ledger` });
+  }
+  if (Array.isArray(repo.tier_template.claim_ledger)) {
+    ledgers.push({ items: repo.tier_template.claim_ledger, path: `${path}.tier_template.claim_ledger` });
+  }
+
+  for (const ledger of ledgers) {
+    ledger.items.forEach((item, index) => {
+      if (!item || typeof item !== "object") return;
+      if (!Object.hasOwn(item, "attribution")) return;
+
+      const itemPath = `${ledger.path}[${index}]`;
+      if (!CLAIM_ATTRIBUTIONS.has(item.attribution)) {
+        fail(`${itemPath}.attribution`, `must be one of ${Array.from(CLAIM_ATTRIBUTIONS).join(", ")}`);
+        return;
+      }
+
+      if (item.attribution !== "已核实") return;
+      if (!isNonEmptyString(item.source) || SELF_REPORTED_SOURCE_RE.test(item.source)) {
+        fail(`${itemPath}.source`, "已核实 需具名独立来源，不能来自 README 自述");
+      }
+    });
+  }
 }
 
 function validateRepo(repo, path) {
@@ -104,6 +136,7 @@ function validateRepo(repo, path) {
   }
 
   validateTierTemplateComparison(repo, path);
+  validateClaimLedgerAttribution(repo, path);
 }
 
 function validateAgentFlow(flow, path) {

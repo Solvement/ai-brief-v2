@@ -83,6 +83,7 @@ export const PROJECT_DEEP_DIVE_OUTPUT_SCHEMA = {
     supports: "what the evidence supports",
     does_not_support: "boundary",
     threat: "risk/threat",
+    attribution: "自报|已核实|不适用",
   }],
   concepts: [{
     slug: "lowercase-hyphen-slug",
@@ -138,6 +139,7 @@ ${depthContract}
 - 数字只服务结论,不要堆热度数字。
 - 所有判断必须落在 README 和 artifactAudit 上;不能使用你自己的常识补全。
 - 归因纪律:凡是来自 README、官网营销文案、徽章/badge、benchmark、覆盖率、"supports N"、百分比、最快/最佳/唯一等自我宣传的说法,必须写成归因,不能写成事实。写「README 自称覆盖 10/10 OWASP」「README 声称比 Whisper 快 170x」「README 称支持 10+ 平台」,不要写「覆盖 10/10」「快 170x」「支持 14 个平台」。
+- claim_ledger.attribution 硬约束:每条带数字/benchmark/覆盖率/百分比/"supports N"/最快/最佳/唯一的 claim_ledger 项必须填写 attribution。README/artifact/官网/徽章/badge/作者自述/项目自称来源 => "自报";只有具名独立来源(第三方 leaderboard/评测/论文,非本项目自己)可写 "已核实";非指标类主张写 "不适用"。只点名来源但不做 attribution 不算落实。
 - 数字纪律:绝不发明、四舍五入、补齐或推断数量/指标。必须引用来源的原始措辞;如果 README 写「10+」且列表实际列出 13 个,就写「README 称 10+，列表实际列出 13 个」,不能写 14 个。数不清时只写「至少/约」并带来源。
 - 上面两条也适用于 reasoning_trace.top_claims、claim_ledger.claim、claim_ledger.plain_english,不允许在结构化字段里裸写营销数字。
 - README/artifact 没写的内容,统一写「未在 README/artifact 说明」。
@@ -195,7 +197,7 @@ export function projectDeepDiveUser(candidate, evidence, triage, options = {}) {
     evidence_signals: evidence?.evidenceSignals || evidence?.evidence_signals || evidence?.metadata?.evidenceSignals || evidence?.metadata?.evidence_signals || null,
     readme: String(evidence?.content || "").slice(0, maxReadmeChars),
     review_issues_to_fix: Array.isArray(options.reviewIssues) ? options.reviewIssues : [],
-    instruction: "按 deterministic final_depth 生成 JSON;正文实质断言必须带内联来源锚点;README/营销/badge/benchmark/覆盖率/supports N/百分比/最高最快等说法必须写成 README 自称/声称/称,不能当事实,reasoning_trace 与 claim_ledger 也一样;不要发明、补齐、四舍五入或推断数量,逐字保留来源数字;所有缺失事实写 未在 README/artifact 说明 或放进 unknowns;unknowns 中的对象/机制/计数不得在正文当事实断言;输出中不要出现 可能/也许/应该/看起来/大概;不准超过 max_allowed_depth。",
+    instruction: "按 deterministic final_depth 生成 JSON;正文实质断言必须带内联来源锚点;README/营销/badge/benchmark/覆盖率/supports N/百分比/最高最快等说法必须写成 README 自称/声称/称,不能当事实,reasoning_trace 与 claim_ledger 也一样;每条 claim_ledger 必须按来源填写 attribution:README/artifact/官网/徽章/作者自述=>自报,具名第三方=>已核实,非指标=>不适用;不要发明、补齐、四舍五入或推断数量,逐字保留来源数字;所有缺失事实写 未在 README/artifact 说明 或放进 unknowns;unknowns 中的对象/机制/计数不得在正文当事实断言;输出中不要出现 可能/也许/应该/看起来/大概;不准超过 max_allowed_depth。",
   });
 }
 
