@@ -7,6 +7,8 @@ import { fetchModelStatus } from "../../../../scripts/columns/models/sources.mjs
 import { generateModelEntry } from "../../../../scripts/columns/models/generate.mjs";
 // @ts-ignore Local ESM pipeline module has no TypeScript declarations.
 import { getModelConfig } from "../../../../scripts/columns/models/registry.mjs";
+// @ts-ignore Local ESM pipeline module has no TypeScript declarations.
+import { isAuthorizedRefreshToken } from "../../../../scripts/lib/refresh-auth.mjs";
 
 export const runtime = "nodejs";
 
@@ -35,8 +37,7 @@ export async function POST(req: Request) {
   const body = await readRequestJson(req).catch(() => null);
   if (!body) return json({ ok: false, error: "invalid JSON body" }, 400);
 
-  const token = typeof body.token === "string" ? body.token : "";
-  if (!token || token !== process.env.REFRESH_TOKEN) {
+  if (!isAuthorizedRefreshToken(body.token)) {
     return json({ ok: false, error: "unauthorized" }, 401);
   }
 

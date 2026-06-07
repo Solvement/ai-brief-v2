@@ -5,6 +5,8 @@ import path from "node:path";
 import { checkAllModelStatuses } from "../../../../scripts/columns/models/sources.mjs";
 // @ts-ignore Local ESM pipeline module has no TypeScript declarations.
 import { MODEL_REGISTRY } from "../../../../scripts/columns/models/registry.mjs";
+// @ts-ignore Local ESM pipeline module has no TypeScript declarations.
+import { isAuthorizedRefreshToken } from "../../../../scripts/lib/refresh-auth.mjs";
 
 export const runtime = "nodejs";
 
@@ -46,11 +48,16 @@ type ModelsDoc = {
 
 type RefreshBody = {
   only?: unknown;
+  token?: unknown;
 };
 
 export async function POST(req: Request) {
   const body = await readRequestJson(req).catch(() => null);
   if (!body) return json({ ok: false, error: "invalid JSON body" }, 400);
+
+  if (!isAuthorizedRefreshToken(body.token)) {
+    return json({ ok: false, error: "unauthorized" }, 401);
+  }
 
   try {
     const selected = selectModels(body.only);
