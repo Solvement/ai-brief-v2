@@ -2,18 +2,16 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "./AppShell";
-import { loadPapersIndex, loadTrending, type PapersIndex } from "../lib/data";
-import type { TrendingData, AnalyzedRepo } from "../types";
+import { loadPapersIndex, type PapersIndex } from "../lib/data";
+import type { HomeRepo } from "../lib/home";
 
 // Home is deliberately ONE simple screen: today's must-read + a plain name list of
 // today's papers and projects. Everything else lives in the left-nav columns.
 interface HomeProps {
   initialPapers?: PapersIndex | null;
-  initialTrending?: TrendingData | null;
-  // accepted for prop-compat with app/page.tsx; intentionally unused on the simple home.
-  initialNews?: unknown;
-  initialDigest?: unknown;
-  initialModels?: unknown;
+  // Pre-selected (≤8) slim projects from the server, so the full ~720KB
+  // trending.json never enters the client payload. See src/lib/home.ts.
+  initialProjects?: HomeRepo[] | null;
 }
 
 /** YYYY-MM-DD → 「2026 年 6 月 6 日」; falls back to the raw string. */
@@ -26,14 +24,12 @@ function zhDate(d?: string): string {
 const newest = (a: { first_seen_date?: string; date: string }, b: { first_seen_date?: string; date: string }) =>
   String(b.first_seen_date || b.date).localeCompare(String(a.first_seen_date || a.date));
 
-export function HomePage({ initialPapers = null, initialTrending = null }: HomeProps) {
+export function HomePage({ initialPapers = null, initialProjects = null }: HomeProps) {
   const [papers, setPapers] = useState<PapersIndex | null>(initialPapers);
-  const [trending, setTrending] = useState<TrendingData | null>(initialTrending);
 
   useEffect(() => {
     if (!initialPapers) loadPapersIndex().then(setPapers).catch(() => {});
-    if (!initialTrending) loadTrending().then(setTrending).catch(() => {});
-  }, [initialPapers, initialTrending]);
+  }, [initialPapers]);
 
   const deepReads = useMemo(() => papers?.deepReads ?? [], [papers]);
   const candidates = papers?.deepCandidates ?? [];
@@ -48,14 +44,8 @@ export function HomePage({ initialPapers = null, initialTrending = null }: HomeP
     [deepReads, mustRead],
   );
 
-  const projects = useMemo<AnalyzedRepo[]>(() => {
-    if (!trending) return [];
-    const all = [...new Map([
-      ...(trending.daily?.repos || []), ...(trending.weekly?.repos || []), ...(trending.monthly?.repos || []),
-    ].map((r) => [r.fullName, r])).values()];
-    const deep = all.filter((r) => r.final_depth === "deep" || r.project_tier === 3);
-    return (deep.length ? deep : all).slice(0, 8);
-  }, [trending]);
+  // Already selected + slimmed server-side (src/lib/home.ts); render as-is.
+  const projects = initialProjects ?? [];
 
   const todayZh = zhDate(papers?.date);
 
