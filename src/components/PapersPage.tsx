@@ -93,6 +93,7 @@ function dateKey(s?: string): string {
   return (s || "").split("T")[0] || "";
 }
 function tabLabel(key: string): string {
+  if (key === "foundational") return "奠基论文";
   const today = new Date().toISOString().split("T")[0];
   const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
   if (key === today) return "今天";
@@ -120,14 +121,21 @@ export function PapersPage() {
   const groups = useMemo(() => {
     if (!data) return [] as Array<{ key: string; items: DeepRead[] }>;
     const map = new Map<string, DeepRead[]>();
+    const foundational: DeepRead[] = [];
     for (const d of data.deepReads) {
       if ((d.track || "hf") !== track) continue;
+      // Foundational (one-time backfilled seminal papers, e.g. MetaGPT) are NOT "a given day's
+      // reads" — keep them out of the daily date tabs and behind their own 奠基 tab so the date
+      // tabs reflect genuine daily curation.
+      if (d.foundational) { foundational.push(d); continue; }
       const k = dateKey(d.first_seen_date || d.date) || "未知";
       (map.get(k) || map.set(k, []).get(k)!).push(d);
     }
-    return [...map.entries()]
+    const dated = [...map.entries()]
       .sort((a, b) => (a[0] < b[0] ? 1 : -1))
       .map(([key, items]) => ({ key, items }));
+    if (foundational.length) dated.push({ key: "foundational", items: foundational });
+    return dated;
   }, [data, track]);
 
   const radarGroups = useMemo(() => {

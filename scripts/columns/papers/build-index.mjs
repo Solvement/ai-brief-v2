@@ -60,6 +60,7 @@ export async function collectDeepReads(deps = {}) {
       date: meta.date || meta.first_seen_date || "",
       first_seen_date: meta.first_seen_date || meta.date || "",
       must_read: Boolean(meta.must_read),
+      foundational: Boolean(meta.foundational),
       track: meta.track === "conference" ? "conference" : "hf",
       venue: meta.venue || "",
       authors: (meta.authors || []).slice(0, 6),
