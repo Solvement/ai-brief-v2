@@ -77,6 +77,14 @@ export function TierTemplateDeepDive({ item, tpl }: { item: DiveItem; tpl: Proje
   const maturity = tpl.maturity_signals;
   const crossLinks = (tpl.cross_links || []).filter(Boolean);
 
+  // Judgment data for the sticky verdict rail (the moat: action + ratings up front).
+  const pv = (item.meta?.project_verdict as {
+    verdict?: string; relevance_to_ai_engineer?: number; engineering_depth?: number;
+    reuse_value?: number; maturity?: number; main_risk?: string;
+  } | undefined) ?? null;
+  const nextActions: string[] = Array.isArray(item.meta?.next_actions) ? (item.meta!.next_actions as string[]) : [];
+  const hasRail = Boolean(pv && (pv.verdict || pv.relevance_to_ai_engineer != null || pv.engineering_depth != null || hasText(pv.main_risk)));
+
   return (
     <article className="dd dd-tier">
       <a className="dd-back" href="/projects">← 项目雷达</a>
@@ -121,7 +129,7 @@ export function TierTemplateDeepDive({ item, tpl }: { item: DiveItem; tpl: Proje
         )}
       </header>
 
-      <div className="dd-body dd-body--single">
+      <div className={`dd-body${hasRail ? "" : " dd-body--single"}`}>
         <div className="dd-main">
           {/* 干什么 */}
           {hasText(tpl.what_it_does) && (
@@ -221,8 +229,51 @@ export function TierTemplateDeepDive({ item, tpl }: { item: DiveItem; tpl: Proje
             </Section>
           )}
         </div>
+
+        {hasRail && pv && (
+          <aside className="dd-rail">
+            <div className="dd-rail-card">
+              <div className="dd-rail-head">
+                <span className="dd-kicker-line">VERDICT</span>
+                <h2 className="dd-rail-title">判断速览</h2>
+              </div>
+              {pv.verdict && (
+                <div className="dd-action">
+                  <span className="dd-action-label">判定</span>
+                  <span className="dd-action-pill">{VERDICT_LABEL[pv.verdict] || pv.verdict}</span>
+                </div>
+              )}
+              <div className="dd-rail-ratings">
+                {pv.relevance_to_ai_engineer != null && <RailRating label="AI工程相关" value={pv.relevance_to_ai_engineer} />}
+                {pv.engineering_depth != null && <RailRating label="工程深度" value={pv.engineering_depth} />}
+                {pv.reuse_value != null && <RailRating label="复用价值" value={pv.reuse_value} />}
+                {pv.maturity != null && <RailRating label="成熟度" value={pv.maturity} />}
+              </div>
+              {nextActions.length > 0 && (
+                <div className="dd-rail-actions">
+                  <span className="dd-action-label">下一步</span>
+                  <div className="dd-rail-actions-pills">{nextActions.map((a, i) => <span className="dd-action-pill dd-action-pill--soft" key={i}>{a}</span>)}</div>
+                </div>
+              )}
+              {hasText(pv.main_risk) && <p className="dd-rail-risk"><strong>主要风险</strong>{pv.main_risk}</p>}
+            </div>
+          </aside>
+        )}
       </div>
     </article>
+  );
+}
+
+const VERDICT_LABEL: Record<string, string> = {
+  skip: "跳过", watch: "观望", L1: "L1 学习", deep_dive: "深扒", clone_and_run: "克隆跑通",
+};
+
+function RailRating({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="dd-rail-rating">
+      <span className="dd-rail-rating-label">{label}</span>
+      <span className="dd-rail-rating-val">{value}<i>/5</i></span>
+    </div>
   );
 }
 

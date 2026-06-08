@@ -4557,6 +4557,17 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 }
 .dd-rail-head { margin-bottom: 16px; }
 .dd-rail-title { margin: 2px 0 0; font-size: 18px; font-weight: 800; color: var(--dd-ink); letter-spacing: -0.01em; }
+/* FE-3: project verdict rail (TierTemplateDeepDive) — judgment up front + sticky */
+.dd-rail-ratings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; margin: 4px 0 14px; }
+.dd-rail-rating { display: flex; flex-direction: column; gap: 2px; padding: 9px 11px; background: var(--dd-bg); border: 1px solid var(--dd-line); border-radius: 10px; }
+.dd-rail-rating-label { font-size: 11.5px; color: var(--dd-ink-3); font-weight: 600; }
+.dd-rail-rating-val { font-size: 17px; font-weight: 800; color: var(--dd-accent-strong); }
+.dd-rail-rating-val i { font-size: 11px; font-weight: 600; color: var(--dd-ink-3); font-style: normal; margin-left: 1px; }
+.dd-rail-actions { margin: 6px 0 12px; }
+.dd-rail-actions-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.dd-action-pill--soft { background: var(--dd-bg); color: var(--dd-ink-2); border: 1px solid var(--dd-line); }
+.dd-rail-risk { margin: 10px 0 0; padding-top: 12px; border-top: 1px solid var(--dd-line); font-size: 13px; line-height: 1.7; color: var(--dd-ink-2); }
+.dd-rail-risk strong { display: block; font-size: 11.5px; color: var(--dd-ink-3); font-weight: 700; margin-bottom: 3px; }
 .dd-ratings--grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
