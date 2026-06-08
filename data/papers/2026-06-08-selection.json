@@ -1,0 +1,134 @@
+{
+  "date": "2026-06-08",
+  "generatedAt": "2026-06-08T12:06:51.481Z",
+  "minUpvotes": 20,
+  "scoredCount": 30,
+  "deep": [
+    {
+      "arxiv_id": "2606.01249",
+      "title": "Trust Region On-Policy Distillation",
+      "final_score": 7.8,
+      "category": "training",
+      "autosci_relevance": "direct",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 8,
+        "transferability_to_autosci": 9,
+        "breadth_value": 8,
+        "ai_engineering_value": 8,
+        "buildability": 7,
+        "evaluation_value": 7,
+        "evidence_quality": 8
+      },
+      "one_line": "提出信任区域在策略蒸馏方法，稳定师生分布差异下的蒸馏训练，适用于Agent学习等场景。"
+    },
+    {
+      "arxiv_id": "2606.02437",
+      "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+      "final_score": 7.15,
+      "category": "training",
+      "autosci_relevance": "direct",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "transferability_to_autosci": 9,
+        "breadth_value": 6,
+        "ai_engineering_value": 7,
+        "buildability": 6,
+        "evaluation_value": 4,
+        "evidence_quality": 4
+      },
+      "one_line": "将PEFT适配器作为持久化局部状态，探索三个扩展轴，为大规模个性化模型提供可迁移模式。"
+    },
+    {
+      "arxiv_id": "2606.06492",
+      "title": "Code2LoRA: Hypernetwork-Generated Adapters for Code Language Models under Software Evolution",
+      "final_score": 7.15,
+      "category": "systems",
+      "autosci_relevance": "direct",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "transferability_to_autosci": 7,
+        "breadth_value": 6,
+        "ai_engineering_value": 8,
+        "buildability": 7,
+        "evaluation_value": 5,
+        "evidence_quality": 5
+      },
+      "one_line": "用超网络生成仓库级LoRA适配器，零推理开销注入知识"
+    }
+  ],
+  "radar": [
+    {
+      "arxiv_id": "2606.01311",
+      "title": "SkillAdaptor: Self-Adapting Skills for LLM Agents from Trajectories",
+      "final_score": 7.1,
+      "category": "agent",
+      "one_line": "提供可插拔的step-level技能适应框架，显式归因失败步骤，可迁移至agent自我进化"
+    },
+    {
+      "arxiv_id": "2605.24956",
+      "title": "NITP: Next Implicit Token Prediction for LLM Pre-training",
+      "final_score": 7.05,
+      "category": "training",
+      "one_line": "在表示空间增加连续监督信号，改进预训练范式，可直接用于agent模型训练"
+    },
+    {
+      "arxiv_id": "2605.29343",
+      "title": "Draft-OPD: On-Policy Distillation for Speculative Draft Models",
+      "final_score": 7.05,
+      "category": "inference",
+      "one_line": "提出用于推测解码草稿模型的在线蒸馏方法，解决离线训练不匹配问题"
+    },
+    {
+      "arxiv_id": "2606.05553",
+      "title": "ArcANE: Do Role-Playing Language Agents Stay in Character at the Right Time?",
+      "final_score": 6.9,
+      "category": "eval",
+      "one_line": "提出基于角色弧线的自动构建评测基准，用于评估角色扮演agent的人物一致性。"
+    },
+    {
+      "arxiv_id": "2605.29307",
+      "title": "GrepSeek: Training Search Agents for Direct Corpus Interaction",
+      "final_score": 6.85,
+      "category": "agent",
+      "one_line": "训练搜索代理直接通过shell命令与语料库交互，展示可迁移的agent-环境交互模式。"
+    },
+    {
+      "arxiv_id": "2605.31268",
+      "title": "Mellum2 Technical Report",
+      "final_score": 6.8,
+      "category": "training",
+      "one_line": "12B MoE代码生成模型，支持agentic编程"
+    },
+    {
+      "arxiv_id": "2605.31604",
+      "title": "Representation Forcing for Bottleneck-Free Unified Multimodal Models",
+      "final_score": 6.75,
+      "category": "multimodal",
+      "one_line": "使用表示强制技术使统一多模态模型无需单独VAE即可生成图像"
+    },
+    {
+      "arxiv_id": "2606.04743",
+      "title": "TIDE: Proactive Multi-Problem Discovery via Template-Guided Iteration",
+      "final_score": 6.5,
+      "category": "agent",
+      "one_line": "模板引导的迭代框架，主动发现多重隐藏问题，可迁移至自进化agent"
+    },
+    {
+      "arxiv_id": "2606.05622",
+      "title": "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model Agents under World and User Constraints",
+      "final_score": 6.35,
+      "category": "eval",
+      "one_line": "动态约束下自适应规划的评测基准，可迁移至AutoSci评估"
+    },
+    {
+      "arxiv_id": "2605.31039",
+      "title": "GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration",
+      "final_score": 6.3,
+      "category": "data",
+      "one_line": "利用生成式多模态模型从真实低质图像生成高质量目标，解决配对数据稀缺问题。"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "paper_id": "2606.01249",
+  "arxiv_id": "2606.01249",
+  "title": "Trust Region On-Policy Distillation",
+  "authors": [
+    "Xingrun Xing",
+    "Haoqing Wang",
+    "Boyan Gao",
+    "Ziheng Li",
+    "Yehui Tang"
+  ],
+  "date": "2026-05-31",
+  "huggingface_url": "https://huggingface.co/papers/2606.01249",
+  "paper_url": "https://arxiv.org/abs/2606.01249",
+  "code_url": "https://github.com/Xingrun-Xing2/TrOPD",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "track": "hf",
+  "source_rankings": [
+    "daily"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.01249.yaml",
+  "first_seen_date": "2026-06-03",
+  "topic": "training",
+  "agent_relevant": true,
+  "tags": [
+    "on-policy-distillation",
+    "reasoning-models",
+    "small-reasoning-models",
+    "trust-region",
+    "outlier-credit-assignment",
+    "kl-estimator",
+    "reverse-kl",
+    "forward-kl",
+    "post-training",
+    "knowledge-distillation",
+    "reproducibility-partial"
+  ],
+  "artifact_status": {
+    "paper": "available",
+    "code": "not_released",
+    "models": "not_released",
+    "note": "Repository clone at b4bee6fb98166a9ca173ea201e77b397e2c01899 contains README/LICENSE/imgs only; README ToDo leaves HuggingFace models and training/evaluation code unchecked."
+  },
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 7,
+    "system_design_value": 8,
+    "career_value": 8,
+    "autosci_reuse_value": 9,
+    "buildability": 5,
+    "evaluation_value": 7,
+    "breadth_value": 7,
+    "evidence_quality": 7
+  },
+  "one_sentence_judgment": "TrOPD 把 on-policy 蒸馏的核心风险从'老师监督不足'改写成'师生分布错位下少数 token 的不可靠监督过强':用 min(π_T/π_S,1) 逐 token 划 trust region,可靠区用 K1 reverse KL,离群区用 teacher top-k forward KL 温和回退,再用老师前缀 + cosine 退火解决低质学生生成;论文自报在 DeepSeek/Qwen3 两组师生、多域推理上较 OPD 提升约 +3~6 点,消融也支持 outlier FKL 的位置价值,但仓库当前未发布训练/评测代码和模型,真实复现与部署成熟度仍不足。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

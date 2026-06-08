@@ -1,0 +1,85 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**有什么用。
+
+## 为什么这对我重要
+
+你做 AI 产品时很快会遇到这类需求:**线上用强模型太贵,能不能把它的能力蒸到一个便宜模型里?** TrOPD 讲的就是这件事里最容易被低估的坑:强老师在弱学生自己的轨迹上逐步打分,并不总是可靠。师生分布一错位,少数 token 的错误梯度就能把训练带歪。
+
+这对应用型工程师很实用,因为它提供了一种可迁移的系统设计心法:**强监督要先过可靠度门,再进入训练或自进化闭环。** 不管你做小模型蒸馏、agent self-improvement、RAG 答案自评,还是 AI 自动写代码后的 critic,都不能默认"强模型给的每一步分数都一样可信"。
+
+> [!key] 和 AutoSci / agent 自进化的关系
+> AutoSci L1 自进化会用强裁判评自己的轨迹,再把信号回灌。TrOPD 的核心病灶就是这个闭环的训练版:学生自己生成,老师逐步监督,分布错位就有不可靠信号。可迁移结论是:**逐步监督必须分区**——信得过的正常学,低信任的改用温和回退或老师示范,而不是统一加权或一刀切裁剪。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 蒸馏路线判断 | off-policy(抄老师轨迹)vs on-policy(学生自己写再被点评),理解 exposure bias | 用一对小师生模型做 toy SFT 蒸馏和 toy on-policy 蒸馏,比较推理时分布漂移 |
+| KL 直觉 | reverse KL 抓主峰、forward KL 更覆盖;为什么同一个 FKL 全局用会失败,只在 outlier 区用反而有效 | 画一个双峰老师分布,用 FKL/RKL 拟合学生分布,看 mode-covering vs mode-seeking |
+| 训练稳定性观测 | 看 gradient norm、policy entropy、outlier token ratio,识别训练被少数坏信号绑架 | 写一个训练 callback,每 N step 记录 grad norm 和 entropy,故意注入低概率 token 看曲线 |
+| 省显存 KL 估计 | K1 estimator 和 top-k FKL 为什么能避开 full-vocabulary KL 的 `O(n·k)` 爆炸 | 算 8K token × 15 万词表的 full KL logits 存储,再和 K1/top-k 对比 |
+| 可靠度分区设计 | 用 `min(π_T/π_S,1)` 这类自适应信号替代固定阈值 | 实现一个 token partitioner:输入 teacher/student logprob,输出 trust/outlier mask |
+| 读仓库成熟度 | README 自称、ToDo、文件清单、可运行脚本要分开看 | clone 一个新论文仓库,列出"论文可读/模型可用/代码可跑/评测可复现"四档状态 |
+
+## 系统设计心法
+
+一句话:**用强模型监督弱模型时,最大风险不是监督太少,而是少数不可信监督太强。**
+
+- **自适应 > 固定阈值**:REOPOLD 类 clipping 需要阈值 `τ`;TrOPD 用 `min(π_T/π_S,1)` 让师生概率比直接决定信任度。
+- **温和回退 > 硬丢弃**:outlier 区不一定全是垃圾。直接 mask 会稳,但会丢知识;top-k FKL 尝试保留老师正面示范。
+- **先扶后放 > 一直代写**:off-policy guidance 一开始给老师前缀,后面 cosine 退火到 0。这是很多冷启动系统都能用的 curriculum:先给脚手架,最终回到真实分布。
+- **先统一基准,再提方法**:本文先把 OPD/EOPD/REOPOLD/FKL/JSD/Entropy 放同一设置下比,才发现 Full FKL 1.40、TrOPD 49.85 这类关键反差。工程上不要拿不同训练预算的结果互相说服。
+- **复现成熟度要诚实**:论文表格不等于可复现系统。这个仓库当前未发布训练/评测代码和模型,所以你只能学方法和设计,不能声称复现了作者结果。
+
+## 作品集角度(Portfolio angle)
+
+这篇能支撑一个很硬的作品方向:**小模型蒸馏稳定性工具链**。它比做一个 prompt demo 更有含金量,因为你展示的是模型训练与监督设计能力。
+
+最好的作品不是"我读了 TrOPD",而是一个小系统:
+
+| 作品 | 范围 | 时间 | 面试价值 |
+| --- | --- | --- | --- |
+| On-policy 蒸馏稳定性看板 | 记录 grad norm、entropy、trust/outlier 比例、teacher/student KL | 3-5 天 | 把"训崩"变成可观测曲线 |
+| TrOPD 最小分区器 | 输入 teacher/student logprob,实现 `P_trust=min(π_T/π_S,1)` 和 top-k FKL fallback | 3-7 天 | 复现论文最可迁移的核心零件 |
+| Agent critic 可靠度门 | 强裁判给 agent 步骤打分前,先按可靠度分 trust/outlier,低信任只给温和建议 | 1 周 | 直接迁移到 AI app / FDE 场景 |
+| 蒸馏复现成熟度审计器 | 自动检查论文仓库是否有代码、模型、数据、脚本、license、repro command | 1-2 天 | 展示你不会被 README 自称带偏 |
+
+## 可造(Build ideas)
+
+| 造什么 | 核心功能 | 为什么有用 |
+| --- | --- | --- |
+| Trust-region KD Playground | 上传一批 teacher/student logits,可视化 trust mask、outlier mask、FKL/RKL loss | 把抽象公式变成可交互理解工具 |
+| Mini-TrOPD on Math | 选一对小 Qwen 模型,只在小数学集上跑几十步,比较 OPD vs Mask vs top-k FKL | 即使不复现论文分数,也能验证机制 |
+| Reliability-partitioned Judge | 对 agent 每个中间 claim/step,强裁判先给置信度,低信任不进训练样本 | 将 TrOPD 思想用于自进化质量门 |
+| Distillation Cost Calculator | 输入 seq len、vocab、top-k、batch、rollouts,估算 full KL/K1/top-k 的显存与 token 成本 | FDE 面试里很实用,能讲清约束 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built a trust-region distillation prototype that partitions student-generated tokens using `min(p_teacher/p_student, 1)` and routes outlier tokens to a top-k forward-KL fallback instead of clipping all rewards."*
+- *"Built a distillation stability dashboard tracking gradient norm, policy entropy, and trust/outlier token ratios during on-policy distillation."*
+- *"Audited a new research repo for reproducibility and separated paper-reported results from released artifacts; identified that the TrOPD repo had not yet released training/evaluation code or models."*
+
+> [!key] 面试可讲
+> "怎么用强模型训练弱模型,还不被强模型的坏监督带崩?"——回答可以是:先区分 off-policy 和 on-policy;再说 on-policy 的 K1 reverse KL 省显存但遇到师生错位会有 outlier gradients;最后给出 TrOPD 式解法:trust region 正常学,outlier 区 top-k FKL 温和回退,冷启动用老师前缀并退火。
+
+## 学习清单
+
+**必学**
+- off-policy vs on-policy distillation,以及 exposure bias。
+- reverse KL / forward KL 的直觉差异。
+- K1 estimator 为什么省显存,也为什么更怕分布错位。
+- `P_trust=min(π_T/π_S,1)` 的 trust-region 分区思想。
+
+**有用**
+- gradient norm / policy entropy 的训练诊断。
+- top-k FKL 如何作为 outlier fallback。
+- curriculum / cosine annealing:老师先扶,后面撤掉。
+- 如何做论文仓库复现成熟度审计。
+
+**可选**
+- TRPO / trust region 在 RL 里的原始动机。
+- AOPD、REOPOLD、EOPD 的差别和可组合性。
+- 小模型后训练 pipeline:pre-training、mid-training、SFT、RLVR、OPD 的边界。

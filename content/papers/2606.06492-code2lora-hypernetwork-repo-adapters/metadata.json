@@ -1,0 +1,57 @@
+{
+  "paper_id": "2606.06492",
+  "arxiv_id": "2606.06492",
+  "title": "Code2LoRA: Hypernetwork-Generated Adapters for Code Language Models under Software Evolution",
+  "authors": [
+    "Liliana Hotsko",
+    "Yinxi Li",
+    "Yuntian Deng",
+    "Pengyu Nie"
+  ],
+  "date": "2026-06-05",
+  "huggingface_url": "https://huggingface.co/papers/2606.06492",
+  "paper_url": "https://arxiv.org/abs/2606.06492",
+  "code_url": "https://anonymous.4open.science/r/code2lora-6857",
+  "dataset_url": "https://huggingface.co/code2lora",
+  "model_url": "https://huggingface.co/code2lora",
+  "space_url": "",
+  "track": "hf",
+  "source_rankings": [
+    "daily"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.06492.yaml",
+  "first_seen_date": "2026-06-06",
+  "topic": "systems",
+  "agent_relevant": true,
+  "tags": [
+    "hypernetwork",
+    "lora-generation",
+    "code-language-models",
+    "repository-level",
+    "software-evolution",
+    "parametric-knowledge-injection",
+    "zero-token-overhead",
+    "gru-incremental-update",
+    "repopeftbench",
+    "assertion-completion"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 8,
+    "career_value": 8,
+    "autosci_reuse_value": 7,
+    "buildability": 7,
+    "evaluation_value": 6,
+    "breadth_value": 6,
+    "evidence_quality": 6
+  },
+  "one_sentence_judgment": "把'让模型懂一个大仓库'从'每次查询塞上下文(RAG,重复付费)'或'每仓库单训 LoRA(贵且对演化脆)'改成'训一个超网络,看一眼仓库就一次前向生成专属 LoRA、推理零额外 token';并第一个为软件演化加时间维(Evo 用 GRU 累积 commit diff 做增量更新而非全量重训)。在自建 RepoPeftBench(604 Python 仓)上 Static 跨仓 63.8% EM、零按仓训练就追平每仓单训上限(学'生成器'>学'单实例'),Evo 演化轨道 60.3%(+5.2pp)。两条可迁移的工程方法论扎实——how/when 正交拆轴 + 强化基线隔离'LoRA 生成头'为瓶颈;且单 H100 可复现、buildability 高。但只在 1.5B/Python/断言补全验证,EM 是表面指标且 OOD 有目标长度伪影(72%+ 只能表内比),超网络体量随基座增长、大模型可行性未验证。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

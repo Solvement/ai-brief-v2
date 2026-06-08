@@ -1,0 +1,54 @@
+{
+  "paper_id": "2606.02437",
+  "arxiv_id": "2606.02437",
+  "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+  "authors": [
+    "Mind Lab"
+  ],
+  "date": "2026-06-02",
+  "huggingface_url": "https://huggingface.co/papers/2606.02437",
+  "paper_url": "https://arxiv.org/abs/2606.02437",
+  "code_url": "",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "track": "hf",
+  "source_rankings": [
+    "daily"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.02437.yaml",
+  "first_seen_date": "2026-06-04",
+  "topic": "training",
+  "agent_relevant": true,
+  "tags": [
+    "peft",
+    "lora",
+    "personal-models",
+    "persistent-state",
+    "lora-as-memory",
+    "trillion-scale-moe",
+    "lora-rl",
+    "adapter-lifecycle",
+    "diversity-voting",
+    "position-paper"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 8,
+    "career_value": 7,
+    "autosci_reuse_value": 9,
+    "buildability": 4,
+    "evaluation_value": 4,
+    "breadth_value": 7,
+    "evidence_quality": 4
+  },
+  "one_sentence_judgment": "一份把 PEFT/LoRA 从'省钱微调'reframe 成'长在共享大模型之上的持久个人状态'的纲领论文:基座供通用智能、<1% 的适配器承载某人/某 agent 的偏好-技能-记忆,目标是'一个基座 → 千万个持久个人模型',拆成 Scale Up/Down/Out 三条依赖轴(万亿级 LoRA RL ~10% 算力、秩 16-32 默认而低秩是'优化不够非容量不够'、LoRA 记忆容量律 ~10⁻² tokens/param 崩溃、多样性投票 acc≈0.386+0.0172·ln(k))。框架与工程判断对 Kevin'外置大脑/陪伴 agent/共享关系记忆'方向几乎是同一张蓝图、极可迁移;但这是立场论文而非单一可复现工作,证据多为自家闭源系统(Kimi K2/GLM5/MinT)的单点/单种子摘要,作者自己反复标注'非普适定理、未隔离变量',evaluation/evidence 都低——当方向读,别把任何单个数字当定论。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

@@ -1,0 +1,59 @@
+primitive_id: peft-as-persistent-personal-state
+source_paper: "2606.02437"
+title: "PEFT/LoRA 作为长在共享基座上的持久个人状态(三轴扩展纲领)"
+relevance_level: direct                      # 直接对应 AutoSci 的'持久局部状态 + 自进化适配器 + 群体'蓝图
+audience: ai_only
+core_pattern: >
+  把 LoRA 适配器从'省钱微调'reframe 成'长在共享强基座上的持久个人/agent 状态':基座供通用智能,
+  <1% 的适配器承载'反复交互沉淀的行为后果'(偏好/技能/工具习惯/记忆式更新),原始事实/文档仍走外部记忆。
+  规模化拆成三条相互依赖的轴——Scale Up(把共享先验做更强,小更新才有杠杆;RL 受先验限制)、
+  Scale Down(把可训练状态做更小更稳;低秩常是'优化不够非容量不够',需 RL 原生初始化)、
+  Scale Out(许多持久适配器共存解锁记忆/用户模拟/群体多样性)。关键纪律:记忆分层(参数 vs 外部),
+  个人状态要有生命周期(命名/评测/回滚/退役,像策略实例而非匿名权重),群体多样性是廉价的二阶资源。
+problem_class: persistent-personalization-and-self-evolving-local-state-at-population-scale
+components:
+  - layered_memory_split        # 适配器承载行为后果 / 外部记忆存事实,二者分层不混
+  - adapter_lifecycle           # 策略记录 + 修订 + 冷/温/热服务驻留(MinT 范式)
+  - rl_native_low_rank_init     # 低秩适配器的 RL 原生初始化(SFT 的 SVD 初始化在 RL 会塌)
+  - diversity_aggregation       # 同基座多差异适配器投票/路由/蒸馏,ln(k) 收益
+autosci_modules:
+  - typed_memory              # LoRA-as-memory = 一种有容量律的参数化结构记忆;事实仍走外部库
+  - self_evolve_controller    # 自进化 = 反复把'上下文期改进'固化进局部状态(Context Learning 写策略)
+  - self_skill_distiller      # 适配器承载'反复经验沉淀的技能',对应把成功轨迹蒸进持久状态
+  - guard                     # 个人状态生命周期闸:命名/评测/回滚/退役,防匿名权重漂移
+inputs:
+  - shared_strong_prior       # 共享强基座(越强,小更新越有杠杆)
+  - per_instance_experience   # 某人/某 agent 的反复交互/轨迹
+  - external_memory           # 原始事实/文档(检索/外部记忆,不进适配器)
+outputs:
+  - persistent_personal_state # 承载行为后果的持久 LoRA 状态(可评测/可回滚)
+  - adapter_population        # 一群有差异、可投票/路由的持久适配器
+  - capacity_aware_budget     # 按'记忆 token / 可训练参数'容量律选定的秩/目标模块预算
+implementation_idea: >
+  不必训万亿模型;做领域无关的最小版:① LoRA-as-memory 玩具(把用户偏好写进小 LoRA,跨会话保持 + 更新 + 回滚),
+  量'记忆 token / 可训练参数 vs 召回准确率'找崩溃阈值(复刻容量律);② mini-MinT 生命周期层(策略记录 + 版本修订
+  + 冷/温/热驻留,'千个用户适配器只热载一小撮');③ 多样性聚合(同基座训几个差异 LoRA,多数投票对照单模型多次采样)。
+  把'记忆分层 + 个人状态生命周期'接进 AutoSci 的云端共享库与 L1 自进化(哪些改进固化进参数 vs 留外部记忆)。
+small_experiment: >
+  A=单一不断变长提示的'个性化' vs B=把偏好写进小 LoRA 的持久状态,比跨会话连续性与可回滚性;
+  再做容量消融:固定召回任务,扫 LoRA 秩/目标模块,画'记忆 token/参数 vs 准确率'找崩溃点(复刻 ~10⁻² 阈值方向)。
+  1-7 天(小模型、单卡级)。
+design_principles:
+  - id: layer-memory-dont-overload-one-adapter
+    principle: "个人/agent 记忆要分层:适配器只承载'反复经验沉淀的行为后果'(偏好/技能/习惯),原始事实/可编辑文档留外部检索;别让一块适配器背全部(既存不下也改不动)。"
+    transfers_to: "AutoSci 云端共享库:结构化行为状态进参数/typed memory,原文/事实进对象存储+向量库,分层设计。"
+  - id: personal-state-needs-a-lifecycle
+    principle: "把个人/策略状态当'可命名、可评测、可回滚、可退役'的实例管(策略记录+修订+冷温热驻留),而非一堆覆盖式匿名权重;否则反馈驱动的迭代无法审计与回退。"
+    transfers_to: "反馈/自进化系统:每次自我更新生成带 provenance 的版本修订,支持评测与回滚(对齐宪法的 provenance/version 红线)。"
+  - id: stronger-prior-makes-small-updates-high-leverage
+    principle: "先验越强,小局部更新越能撬动大行为变化(RL 受先验限制,只能强化本就采样得到的轨迹);预算优先投在'基座够强 + 适配器够稳',而非盲目堆秩(秩>64 常只涨成本不涨上限)。"
+    transfers_to: "选型/预算:优先用更强基座 + 小而稳的自进化状态,而非把可训练面做大。"
+  - id: diversity-is-a-cheap-second-order-resource
+    principle: "与其追一个越来越个性化的单体,不如养一群有差异的适配器:投票/路由/蒸馏能把'模型数量'变成可测的性能变量(准确率随 ln(模型数)递增),且多样性来自互补策略而非采样噪声。"
+    transfers_to: "AutoSci 多策略聚合 / 集体推理:用廉价的轨迹差异(数据顺序/掩码)造多样性,再聚合。"
+risks:
+  - position_paper_weak_evidence  # 纲领论文,多为单点/单种子;作者自陈'非普适定理、未隔离变量'
+  - closed_systems_unverifiable   # 关键结果依赖自家闭源系统(Kimi K2/GLM5/MinT),外部无法核验
+  - not_reproducible_at_scale     # 万亿级 LoRA RL 远超个人算力;可迁移的是框架与判断而非实验
+  - vision_vs_validated           # '千万个人模型/个性即策略'是愿景陈述,需持续区分'方向'与'已验证'
+status: extracted

@@ -1,0 +1,204 @@
+# Paper · 论文本身
+
+## 一句话总结
+
+想把一个**会长篇推理的大模型**(老师)的本事,搬进一个**更小、更便宜的小模型**(学生)里,最省事的路线是 **On-Policy Distillation(OPD,在策略蒸馏)**——让学生自己写推理轨迹,老师在学生自己写出的 token 上给监督。但作者指出:师生分布差距一大,学生会写出老师几乎不给概率的 token,这时常用的 **K1 reverse-KL 估计器**会给出极端负的 policy-gradient 信号,训练可能被少数离群 token 带崩。TrOPD 的做法是**逐 token 分区治理**:老师信得过的 token 进 trust region,继续用 reverse KL 学;老师信不过的 outlier token 改用 teacher top-k forward KL 给温和监督;再用老师前缀 + 学生续写的 off-policy guidance 帮学生从高质量区域开始探索。论文自报在数学、代码、指令遵循、STEM 上相对 OPD 分别提升 **+3.34 / +4.00 / +5.11 / +6.18** 点。[^arxiv]
+
+## 问题(Problem)
+
+- Large Reasoning Models(LRMs,大推理模型)靠更长的 test-time reasoning 提高数学、代码、agent 等任务表现,但推理成本高;Small Reasoning Models(SRMs,小推理模型)要靠蒸馏把能力压下来。[^arxiv]
+- **off-policy distillation(离策略蒸馏)** 是让学生抄老师生成好的答案;问题是训练时看到的是老师轨迹,推理时走的是学生自己的轨迹,这叫 **exposure bias(暴露偏差)**,长链推理里尤其明显。[^opd]
+- **OPD(在策略蒸馏)** 改成让学生自己生成 Student-of-Generation(SoG),老师在学生轨迹上给分,更接近推理时真实分布。
+- 但 OPD 在长推理上不能便宜地算 full-vocabulary KL。全词表 KL 的显存是 `O(n·k)`(n=序列长,k=词表大小),所以现有推理 OPD 常用 token 级 **K1 estimator(K1 估计器,只看采样 token 的省显存估计)**。这带来两个瓶颈:[^bottleneck]
+  1. **policy-gradient outliers(策略梯度离群点)**:当老师给学生某个 token 的概率接近 0,梯度形如 `(1 / π_S(x)) · log(π_T(x) / π_S(x)) -> -∞`,少数 token 就可能主导训练。
+  2. **low-quality SoG(低质量学生生成)**:难题上学生自己写不出好开头,OPD 只能在低质轨迹上学,有效监督空间被锁死。
+- 前人 REOPOLD 用 reward clipping,entropy-aware OPD 用高熵 token 筛选;本文的基准结果显示,这些方法不是不稳定,就是把有用监督一起裁掉。[^bench]
+
+> [!key] 立场
+> 这篇真正值得学的不是某个新 loss 名字,而是一个工程判断:**强老师给弱学生的逐步监督不是天然可靠的;要先判断"这一步老师是否信得过",再决定用哪种监督信号。** 这比固定阈值裁剪更像生产训练系统:可靠区照常学,不可靠区降级成温和回退,冷启动再用老师前缀扶一把。
+
+## 关键术语(Key terms)
+
+| 术语 | 大白话解释 |
+| --- | --- |
+| **distillation(蒸馏)** | 用大模型(老师)的行为/概率分布训练小模型(学生),让小模型低成本复用老师能力。 |
+| **on-policy / off-policy(在策略 / 离策略)** | on-policy=学生用自己生成的轨迹来学;off-policy=学生照老师已生成的轨迹学。本文主攻 on-policy。[^opd] |
+| **reverse KL / forward KL(反向 / 正向 KL)** | KL 是衡量两个概率分布差距的量。reverse KL 通常偏向抓老师最自信的模式(mode-seeking);forward KL 更像覆盖老师分布(mode-covering)。 |
+| **K1 estimator(K1 估计器)** | 不在整个词表上算 KL,只用学生采样到的 token 估计,把 long-CoT 蒸馏的显存从全词表开销降下来;代价是遇到师生分布错位时更容易出现离群梯度。[^bottleneck] |
+| **trust region(信任区)** | 对某个学生 token,如果老师也给出相对高概率,说明老师能提供可靠监督,这个 token 进入正常 OPD 区。 |
+| **outlier(离群区)** | 学生写出的 token 在老师分布下很不自然;这时继续用 K1 reverse KL 可能给出极端梯度,需要换监督方式。 |
+| **speculative decoding acceptance ratio(投机解码接受率)** | 投机解码里老师用 `min(π_T/π_S,1)` 判断是否接受学生草稿 token。本文借这个比值当"老师认不认这个 token"的信任度。[^trust] |
+
+## 核心方法(Core method)
+
+TrOPD 把一条学生生成轨迹拆成三类区域,每类用不同目标:
+
+1. **On-policy trust region**:学生自己生成 `x ~ π_S`;若 token 以 `P_trust(x)=min(π_T(x)/π_S(x),1)` 采样进入信任区,就用 K1 reverse KL 估计器学习。直觉是:老师给这个 token 的概率不比学生低太多,老师的监督比较可信。[^trust]
+2. **On-policy outlier**:学生仍然生成 `x ~ π_S`,但 token 落在离群区时,不用那个会爆的 reverse-KL 梯度,改用老师 top-k 词表上的 forward KL。大白话:学生刚写了老师不认可的词,这时别围着这个坏 token 惩罚;改看老师最可能写的 top-k 词,给学生一个更温和的正面方向。[^outlier]
+3. **Off-policy guidance**:老师先写一段前缀 `x[:l]`,学生从 `x[l:]` 继续写,前缀用 forward KL 模仿。训练初期最大前缀长度等于最大训练序列长,随后用 cosine schedule 退火到 0,最后回到完全 on-policy。系数 `β=0.001`。[^guide]
+
+> [!key] 补丁:为什么不是"直接丢掉离群点"
+> 论文先试了 Mask Outlier 和 Clip Outlier。Mask/Clip 确实比 vanilla OPD 稳,并且 Mask Outlier 在图中维持了更高 policy entropy、较低 gradient norm;但只屏蔽会丢掉离群区里仍然有用的老师信号。TrOPD 的 FKL Outlier 试图保住这部分信号:离群 token 本身不可靠,但老师 top-k 分布仍可当正面示范。[^outlier]
+
+> [!warn] 小心一个公式直觉坑
+> 原文在 outlier FKL 解释里说,当学生在老师 top-k 上的概率和趋近 0 时,辅助 outlier objective 会被抑制、不干扰 trust region。这个说法按常规 KL 直觉并不显然;复现时应以作者代码/实现为准。但当前 GitHub 仓库尚未发布训练代码,所以这里只能按论文表述记录,不替它补实现细节。[^repo]
+
+## 架构 / 流程(Architecture / pipeline)
+
+```mermaid
+flowchart TD
+  P([训练 prompt]) --> S[学生生成 SoG<br/>x ~ pi_S]
+  S --> A{逐 token 算信任度<br/>P_trust=min(pi_T/pi_S,1)}
+  A -->|M_x: trust region| RKL[On-policy trust region<br/>K1 reverse KL<br/>log pi_T/pi_S<br/>Memory O(n)]
+  A -->|not M_x: outlier| FKL[On-policy outlier<br/>teacher top-k forward KL<br/>Memory O(nk)]
+  P --> T[老师生成前缀 x[:l]]
+  T --> C[学生续写 x[l:]<br/>off-policy guidance]
+  C --> G[beta * forward KL<br/>beta=0.001<br/>前缀长度 cosine 退火到 0]
+  RKL --> L[TrOPD unified objective]
+  FKL --> L
+  G --> L
+  L --> U[更新学生模型]
+```
+
+## 创新点(Innovation points)
+
+| 创新 | 新在哪 | 为什么重要 |
+| --- | --- | --- |
+| 统一 OPD 基准 | 把 OPD、EOPD、REOPOLD、entropy token selection、FKL/JSD 等放到同一训练设置下比较 | 先定位真问题:不是"缺一个更强老师",而是 K1 reverse KL 在分布错位时监督不可靠 |
+| 自适应信任区 | 用 `min(π_T/π_S,1)` 而不是手设阈值 `τ` 划 reliable token | 少一个固定阈值超参,让"老师是否接受学生 token"直接由师生概率比决定 |
+| 离群区 top-k FKL | outlier token 不再用爆炸 reverse-KL 信号,改从老师 top-k 分布给正面示范 | 比纯 mask/clip 多保留可用监督,消融里最高 |
+| 老师前缀 + 退火 | 初期老师给高质量开头,学生续写;训练后期前缀长度退火到 0 | 缓解低质量 SoG,但最终仍回到学生自己的 on-policy 分布 |
+| 与 AOPD 可叠加 | TrOPD + AOPD 从 40.63 提到 41.67 | 说明 trust-region 分区和 AOPD 的 token 级利用/模仿是两条可组合轴 |
+
+## 实验 / 证据(Experiments / evidence)
+
+> **自报 vs 实测(整节适用)**:下列 benchmark、消融、提升数字都来自论文 arXiv v2 表格,属于**作者自报实验**;我没有在本机复训模型。仓库已 clone 实查,但当前没有训练/评测源码可跑。[^repo]
+
+**统一训练设定**:所有 OPD benchmark 训练 **200 steps**,固定学习率 **5×10^-6**;FKL top-k 统一 **k=64**;off-policy guidance 系数 **β=0.001**;prompt batch size **128**,每个 prompt 采样 **4 rollouts**,最大生成长度 **8096 tokens**。AIME 2024/2025 和 AMC 2023 的数学评测结果是 **32 次评测平均准确率**。[^setup]
+
+**Table 1: OPD 方法基准(数学域,老师 Skywork-OR1-Math-7B)**[^t1]
+
+| 方法 | AIME24 | AIME25 | AMC23 | Avg. |
+| --- | ---: | ---: | ---: | ---: |
+| DeepSeek-Qwen2.5-1.5B | 28.64 | 24.16 | 71.01 | 41.27 |
+| OPD(RKL) | 35.83 | 29.16 | 75.39 | 46.79 |
+| FKL(全局 top-k) | 0.00 | 0.00 | 4.21 | 1.40 |
+| JSD | 37.91 | 30.72 | 75.07 | 47.90 |
+| Entropy OPD 20% | 35.52 | 29.06 | 73.82 | 46.13 |
+| Clip Outlier | 36.97 | 30.83 | 75.78 | 47.86 |
+| Mask Outlier | 37.08 | 30.62 | 75.46 | 47.72 |
+| FKL Outlier | 39.16 | 29.89 | 77.96 | 49.00 |
+| **TrOPD** | **38.54** | **32.50** | **78.51** | **49.85** |
+
+这里最关键的反差是:**全局 top-k FKL 几乎训不动(Avg. 1.40)**,但**只在 outlier 区用 FKL** 能到 49.00,再加 off-policy guidance 到 49.85。也就是说,不是 FKL 本身神奇,而是"只把它放到不可靠区域"才有效。[^t1]
+
+**Table 3: DeepSeek-R1-Distill-Qwen-1.5B 端到端结果**[^t3]
+
+单域数学蒸馏(老师 Skywork-OR1-Math-7B):
+
+| 方法 | AIME24 | AIME25 | AMC23 | LCB v6 | GPQA diamond | Avg. |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 学生底座 | 28.64 | 24.16 | 71.01 | 15.43 | 34.22 | 34.69 |
+| OPD | 35.83 | 29.16 | 75.39 | 17.14 | 28.03 | 37.11 |
+| REOPOLD | 36.97 | 30.83 | 75.78 | 18.29 | 32.07 | 38.79 |
+| **TrOPD** | **38.54** | **32.50** | **77.03** | **18.86** | **36.24** | **40.63** |
+| 老师 | 66.14 | 51.87 | 92.34 | 34.86 | 47.22 | 58.48 |
+
+多域蒸馏(老师 Skywork-OR1-7B):
+
+| 方法 | AIME24 | AIME25 | AMC23 | LCB v6 | GPQA diamond | Avg. |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| OPD | 30.10 | 21.66 | 61.56 | 20.57 | 31.06 | 32.99 |
+| REOPOLD | 34.27 | 25.83 | 63.90 | 19.43 | 34.47 | 35.58 |
+| **TrOPD** | **36.04** | **27.60** | **70.93** | **22.29** | **31.19** | **37.61** |
+
+论文文字总结:单域里 TrOPD 相对 OPD,数学三项均值 +3.06,OOD general-domain 均值 +2.63;多域里,DeepSeek 学生相对 OPD +4.62。[^results]
+
+**Table 4: Qwen3-SFT-1.7B 多域结果(老师 Qwen3-Nemotron-4B)**[^t4]
+
+| 方法 | AIME24 | AIME25 | AMC23 | GPQA dia. | MMLU red. | IFBench | LCB v6 | Avg. |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Qwen3-SFT-1.7B | 35.41 | 26.45 | 68.90 | 25.25 | 66.60 | 26.19 | 30.29 | 39.87 |
+| Teacher | 81.66 | 75.72 | 98.98 | 58.86 | 77.03 | 62.93 | 58.86 | 73.43 |
+| OPD | 48.02 | 40.72 | 81.79 | 29.80 | 68.60 | 37.07 | 32.00 | 48.29 |
+| EOPD | 47.08 | 40.83 | 81.32 | 33.84 | 68.26 | 36.39 | 34.29 | 48.86 |
+| Entropy OPD | 43.54 | 42.70 | 79.53 | 29.92 | 68.51 | 38.78 | 33.71 | 48.10 |
+| REOPOLD | 45.62 | 42.29 | 81.64 | 30.56 | 68.30 | 36.05 | 35.43 | 48.56 |
+| **TrOPD** | **52.08** | **44.06** | **83.04** | **35.98** | **68.74** | **42.18** | **36.00** | **51.73** |
+
+论文自报 Qwen3-SFT-1.7B 多域里 TrOPD 相对 OPD **+3.44 Avg.**;相对 OPD 的分项提升是 AIME24 +4.06、AIME25 +3.34、AMC23 +1.25、GPQA +6.18、MMLU +0.14、IFBench +5.11、LCB +4.00。[^t4]
+
+**Table 5/6: 消融与并发 AOPD**[^t5]
+
+| 变体 | AIME24 | AIME25 | AMC23 | Avg. |
+| --- | ---: | ---: | ---: | ---: |
+| OPD | 35.83 | 29.16 | 75.39 | 46.79 |
+| Mask Outlier | 37.08 | 30.62 | 75.46 | 47.72 |
+| Clip Outlier | 36.97 | 30.83 | 75.78 | 47.86 |
+| Full FKL | 0.00 | 0.00 | 4.21 | 1.40 |
+| FKL Outlier | 39.16 | 29.89 | 77.96 | 49.00 |
+| TrOPD Mask | 40.10 | 30.41 | 75.85 | 48.79 |
+| TrOPD Clip | 37.39 | 31.77 | 77.03 | 48.73 |
+| **TrOPD FKL** | **38.54** | **32.50** | **78.51** | **49.85** |
+
+AOPD 对比(5 项均值):OPD 37.11,AOPD 39.79,TrOPD 40.63,**TrOPD + AOPD 41.67**。作者据此说 AOPD 与 TrOPD 正交,可以组合。[^aopd]
+
+**仓库实查(不是只看 README)**:我 clone 了 `Xingrun-Xing2/TrOPD`,HEAD 为 `b4bee6fb98166a9ca173ea201e77b397e2c01899`(2026-05-31,`Update README.md`)。当前文件只有 `README.md`、`LICENSE`、`imgs/f1-1.PNG`、`imgs/f2.png`、`imgs/test.log`。README 第一句自称 "contains the training code and models",但 ToDo 里只有 "Release technical report" 勾选,`Release Huggingface models`、`Training and evaluation code`、`Demos and applications` 都未勾选。**所以本文结果可读,但代码不可复跑;不要把 README 自称当成已释放源码。**[^repo]
+
+> [!warn] 三处别被带偏
+> 1. **不是学生超过老师**:Table 3 单域老师 Avg. 58.48,TrOPD 40.63;Table 4 老师 73.43,TrOPD 51.73。TrOPD 的目标是稳定逼近老师,不是蒸出超老师模型。
+> 2. **提升是 +3~6 点级别,不是数量级跃迁**:价值在稳定性和监督利用率,不是一夜改变 SRM 上限。
+> 3. **复现成熟度低**:arXiv/PDF/TeX 公开,但仓库未放训练代码、模型、评测脚本;当前只能审论文表格和 README/文件清单。
+
+## 限制与风险(Limitations and risks)
+
+- **作者自认缺真实部署/应用研究**:Limitations 明说没有 practical deployment 和 application studies。[^limits]
+- **只覆盖 OPD post-training**:论文聚焦 DeepSeek-Qwen2.5-1.5B 与 Qwen3-SFT-1.7B 的 OPD 后训练;作者认为真实高性能 SRM 可能还需要 pre-training / mid-training,否则性能上限受限。[^limits]
+- **依赖老师分布可信**:trust region 的尺子是 `π_T/π_S`;如果老师本身不可靠、或者师生 tokenizer/能力差异导致概率比不可比,这把尺子可能失真。原文未充分展开这类失败模式。
+- **超参敏感性披露不足**:`k=64`、`β=0.001`、cosine 退火日程都给了,但跨任务敏感性没有系统表。
+- **代码未释放**:当前仓库没有训练/评测实现,所以很多实现细节(例如 outlier FKL 的数值稳定处理)只能以原文表述为准。
+
+## 先读什么(What to read first)
+
+1. **Abstract + Introduction** —— 先看三件套:trust-region on-policy learning、outlier estimation、off-policy guidance。[^arxiv]
+2. **§3.2 OPD for Reasoning Models** —— 看 K1 estimator 为什么在分布错位时有 `-> -∞` 的 policy-gradient outlier。[^bottleneck]
+3. **Table 1** —— 看同一设置下 FKL/JSD/Entropy/Clip/Mask/FKL Outlier/TrOPD 的差别,尤其 Full FKL 1.40 vs TrOPD 49.85。[^t1]
+4. **§4.2 Adaptive Trust Region + Outlier Estimation** —— 吃透 `min(π_T/π_S,1)` 和 top-k FKL 为什么被放在不同区。[^trust]
+5. **Table 3/4/5/6** —— 主结果、消融、AOPD 叠加。
+6. **GitHub README ToDo** —— 复现前先确认代码/模型是否已发布,当前是未发布。[^repo]
+
+## 技术细节(选读)
+
+> **三区目标按原文 Table 2**
+> On-policy trust region:`x ~ π_S`,`-KL(π_S || π_T)`,估计器 `log(π_T(x)/π_S(x))`,显存 `O(n)`;on-policy outlier:`x ~ π_S`,`-KL(π_T || π_S)`,估计器为老师 top-k 上的 `Σ π_T(v) log(π_S(v)/π_T(v))`,显存 `O(nk)`;off-policy guidance:`x ~ π_T`,`-β KL(π_T || π_S)`,估计器 `β log(π_S(x)/π_T(x))`,显存 `O(n)`。[^table2]
+
+> **Qwen3-Nemotron-4B 老师怎么来的**
+> Appendix A 写明,Qwen3-Nemotron-4B 从 Qwen3-4B-Base 初始化,先用 Nemotron 3 Nano 公开 SFT 数据/recipe 做 SFT,组合多域数据后约 **14M training samples**;再用 Nemotron-3-Nano-RL-Training-Blend 做 RLVR,四域样本量为 Math **22,056**、Coding **19,169**、Science **19,670**、Instruction Following **16,575**。SFT 用 Adam,lr **5×10^-5**,weight decay **0.1**,warmup **10%**,batch size **512**,平均 response length 约 **7K tokens**;RLVR 用 GRPO,group size **16**,batch size **128**,每 **2048 rollouts** 更新,最大生成 **32K tokens**,temperature **1.0**。[^teacher]
+
+## 后续演化 · 这方法后来怎样了
+
+TrOPD 是 2026-06-03 v2 的新论文,截至本轮深读没有明确后继工作可可靠归因。下面是论文自身引用和同赛道脉络,不是"后来优化了它"。
+
+- **REOPOLD**(arXiv:2603.11137,*Scaling reasoning efficiently via relaxed on-policy distillation*)——本文最强基线之一,用 reward clipping 处理 outlier;TrOPD 认为它可能同时裁掉 informative supervision _[置信度:高]_。
+- **AOPD**(arXiv:2605.06387,*Asymmetric on-policy distillation*)——并发工作;本文 Table 6 显示 TrOPD + AOPD 可从 40.63 到 41.67 _[置信度:高]_。[^aopd]
+- **EOPD / Entropy-aware OPD**(arXiv:2603.07079)——用熵选 token;本文在统一基准里显示 entropy selection 不稳定,在某些设置下不如 OPD/REOPOLD/TrOPD _[置信度:高]_。
+- **MiniLLM / GKD / Thinking Machines OPD blog**——K1 estimator、on-policy 蒸馏和 full-vocabulary distillation 的背景来源 _[置信度:高]_。
+
+[^arxiv]: 论文 *Trust Region On-Policy Distillation*,arXiv:2606.01249v2(Submitted 2026-05-31,revised 2026-06-03),Xingrun Xing、Haoqing Wang、Boyan Gao、Ziheng Li、Yehui Tang;机构 Samsung Research Beijing / University of Oxford / Peking University;HF Papers 抓取时 upvotes 41。https://arxiv.org/abs/2606.01249
+[^opd]: 同上,§1 Introduction + §3.1 Distillation for Language Models。off-policy 使用 teacher-generated trajectories;on-policy 使用 student-generated trajectories;RKL 期望在学生分布上,呈 mode-seeking。
+[^bottleneck]: 同上,§3.2 OPD for Reasoning Models。full-vocabulary reverse KL 显存 `O(n·k)`;K1 estimator 目标式(2);policy-gradient outlier 公式 `(1/π_S(x)) log(π_T(x)/π_S(x)) -> -∞`;低质 SoG 限制优化空间。
+[^bench]: 同上,§4.1 Benchmarking OPD Baselines + Table 1。Entropy OPD 20% Avg. 46.13,Clip Outlier 47.86,Mask Outlier 47.72,FKL Outlier 49.00,TrOPD 49.85。
+[^trust]: 同上,§4.2 Adaptive Trust Region + 式(6)。`M_x ~ Bernoulli(P_trust(x))`,`P_trust(x)=min(π_T(x)/π_S(x),1)`,动机来自 speculative decoding 的接受概率。
+[^outlier]: 同上,§4.2 Outlier Masking / Outlier Estimation + Fig.3/Fig.4 + 式(7)。Mask Outlier 保持更高 policy entropy 和更低 gradient norm;outlier 区用 teacher top-k FKL。
+[^guide]: 同上,§4.3 Off-Policy Trust-Region Guidance + 式(8)(9)。老师前缀 `x[:l]`、学生续写 `x[l:]`;`β=0.001`;最大 off-policy trajectory length 从最大训练序列长 cosine 退火到 0。
+[^table2]: 同上,Table 2 "Region-specific learning objectives and estimators in TrOPD"。
+[^setup]: 同上,§5.1 Implementation Details / Benchmark Training / Benchmark Evaluation。200 steps、lr 5×10^-6、k=64、β=0.001、batch 128、4 rollouts、8096 tokens;AIME/AMC 取 32 次平均。
+[^t1]: 同上,Table 1 "Comparison of OPD methods on math-domain reasoning benchmarks"。
+[^t3]: 同上,Table 3。单域老师 Skywork-OR1-Math-7B,多域老师 Skywork-OR1-7B,学生 DeepSeek-R1-Distill-Qwen-1.5B。
+[^t4]: 同上,Table 4。学生 Qwen3-SFT-1.7B,老师 Qwen3-Nemotron-4B。
+[^results]: 同上,§5.2 Main Results。TrOPD 相对 OPD:单域数学 +3.06、general-domain +2.63;DeepSeek/Qwen3 多域均值分别 +4.62/+3.44。
+[^t5]: 同上,Table 5 "Ablation Studies of TrOPD in math-domain distillation"。
+[^aopd]: 同上,Table 6。OPD 37.11,AOPD 39.79,TrOPD 40.63,TrOPD + AOPD 41.67。
+[^limits]: 同上,Limitations。缺 practical deployment/application studies;只做 OPD post-training,未含 pre-training/mid-training,可能限制 SRM 性能上限。
+[^teacher]: 同上,Appendix A Training Details of Teacher Model Qwen3-Nemotron-4B。
+[^repo]: 代码仓库 `Xingrun-Xing2/TrOPD`,clone 实查 HEAD `b4bee6fb98166a9ca173ea201e77b397e2c01899`(2026-05-31)。当前文件清单只有 README/LICENSE/imgs;README ToDo:technical report 已发布,HF models/training and evaluation code/demos 未发布。https://github.com/Xingrun-Xing2/TrOPD
