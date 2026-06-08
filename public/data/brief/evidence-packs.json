@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T13:29:01.858Z",
+  "generatedAt": "2026-06-07T14:12:42.383Z",
   "entity": "evidence-pack",
   "directory": "evidence-packs",
-  "count": 48,
+  "count": 49,
   "items": [
     {
       "id": "evidence-pack/9router-evidence-pack",
@@ -3714,6 +3714,91 @@
         {
           "target": "content/taste-skill",
           "raw": "[[content/taste-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/tolaria-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "tolaria-evidence-pack",
+      "title": "tolaria — Evidence Pack",
+      "file": "evidence-packs/tolaria-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "tolaria",
+        "kind": "evidence-pack",
+        "title": "tolaria — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "一个以文件为本、离线优先的桌面知识库管理工具，同时为 AI 代理提供 Markdown 知识库上下文",
+            "internal_logic": "### Agent 交互方式：MCP 工具服务器\nTolaria 本身不是完整 agent 框架，但它通过内置 MCP 服务器提供工具接口，让外部 AI agent 能读取、搜索、写入知识库。README 声称支持 Claude Code、Codex CLI、Gemini CLI 的 setup paths，并给出 AGENTS.md 文件供 agent 理解 vault 结构。具体 MCP 工具定义（例如搜索、列出文件、读取内容）未在 README 中说明，需查阅 `mcp-server/` 源码。\n\n### Tool Interface（工具接口）\n根据存在 `mcp-server/` 目录的事实，该服务器应实现 MCP 协议，将文件系统操作包装为工具调用。但详细的 API 文档、可用命令列表、权限控制均未在 README 或公开文档中描述。\n\n### State/Memory（状态与记忆）\nTolaria 不维护 agent 的对话状态，而是将整个 vault 作为持久化的记忆存储。Agent 通过 MCP 读写 Markdown 文件实现长期记忆，而状态管理完全交由 agent 自身。Git 历史提供记忆回滚能力。\n\n### Planner/Sandbox（规划器/沙箱）\n本项目不包含规划器或沙箱组件，因为它是知识库管理工具而非 agent 运行时。Agent 如何利用知识库规划行动完全在外部。\n\n### 安全边界\n由于 MCP 服务器运行在本地，agent 被授予访问整个 vault 文件系统的权限。README 未说明服务器是否有细粒度的读写控制、路径限制或操作审计。风险缓解依赖 Git 版本历史（来源：README git-first），允许用户回滚意外修改，但不能防止恶意 agent 刻意破坏。",
+            "failure_mode": "桌面应用依赖本地环境，跨平台一致性可能存在挑战（Linux 依赖问题可能导致部分用户无法使用）。",
+            "source_pointer": "https://github.com/refactoringhq/tolaria"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/AGPL-3.0/v2026-06-06"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/tolaria-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/tolaria-repo]]"
+        ],
+        "metrics": [
+          "stars=12635",
+          "forks=899",
+          "open_issues=26",
+          "latest_release=v2026-06-06",
+          "pushed_at=2026-06-07T13:58:59Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "桌面应用依赖本地环境，跨平台一致性可能存在挑战（Linux 依赖问题可能导致部分用户无法使用）。",
+          "MCP 服务器访问本地文件，如果 AI 代理被恶意控制，可能破坏知识库数据；尽管有 Git 版本历史可恢复，但仍有风险。",
+          "项目较新（创建于 2026-02-14），可能功能尚不完善，存在 bug 和不稳定因素。",
+          "作者个人维护，可持续性有风险。"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/refactoringhq/tolaria"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/tolaria-main-claim]],官方 artifact 落库为 [[artifacts/tolaria-repo]]。See [[content/tolaria]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/tolaria-main-claim]],官方 artifact 落库为 [[artifacts/tolaria-repo]]。See [[content/tolaria]]。",
+      "links": [
+        {
+          "target": "claims/tolaria-main-claim",
+          "raw": "[[claims/tolaria-main-claim]]"
+        },
+        {
+          "target": "artifacts/tolaria-repo",
+          "raw": "[[artifacts/tolaria-repo]]"
+        },
+        {
+          "target": "claims/tolaria-main-claim",
+          "raw": "[[claims/tolaria-main-claim]]"
+        },
+        {
+          "target": "artifacts/tolaria-repo",
+          "raw": "[[artifacts/tolaria-repo]]"
+        },
+        {
+          "target": "content/tolaria",
+          "raw": "[[content/tolaria]]"
         }
       ],
       "headings": [

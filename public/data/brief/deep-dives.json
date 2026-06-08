@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T13:29:01.858Z",
+  "generatedAt": "2026-06-07T14:12:42.383Z",
   "entity": "deep-dive",
   "directory": "deep-dives",
-  "count": 48,
+  "count": 49,
   "items": [
     {
       "id": "deep-dive/9router-deep-dive",
@@ -9031,6 +9031,250 @@
         {
           "depth": 2,
           "text": "Memory card"
+        }
+      ]
+    },
+    {
+      "id": "deep-dive/tolaria-deep-dive",
+      "type": "deep-dive",
+      "slug": "tolaria-deep-dive",
+      "title": "tolaria — 深度拆解",
+      "file": "deep-dives/tolaria-deep-dive.md",
+      "directory": "deep-dives",
+      "meta": {
+        "content": "tolaria",
+        "kind": "deep-dive",
+        "shape": "agent-build",
+        "project_type": "agent_framework",
+        "title": "tolaria — 深度拆解",
+        "tier_template": {
+          "tier": 2,
+          "bucket": "真·新项目",
+          "tag": "[Tier 2｜真·新项目]",
+          "one_sentence_positioning": "一个以文件为本、离线优先的桌面知识库管理工具，同时为 AI 代理提供 Markdown 知识库上下文",
+          "what_it_does": "为个人和团队提供快速、可移植的 Markdown 笔记管理，内置 Git 版本控制，并可通过 MCP 服务器将知识库暴露给 AI 代理。",
+          "metadata": {
+            "language": "TypeScript",
+            "total_stars": "12635",
+            "stars_in_period": "242",
+            "author": "refactoringhq"
+          },
+          "labels": [
+            "agent",
+            "工具",
+            "数据"
+          ],
+          "pain_point": "以往管理个人知识库要么依赖专有云服务（如 Notion、Obsidian Sync），数据不归用户所有，版本控制不足；要么为 AI 代理提供上下文时需要手动复制或重新格式化，缺乏与 AI 工作流的原生集成。而 Tolaria 通过纯 Markdown 文件和 Git 解决数据所有权和版本问题，并通过 MCP 服务器让 AI 代理直接读取知识库（来源：README 原则部分）",
+          "core_capabilities": [
+            "文件优先的 Markdown 知识库管理：所有笔记为本地 Markdown 文件，配合 YAML frontmatter 元数据，支持任意编辑器编辑，无需导出（来源：README 📑 Files-first）",
+            "Git 原生集成：每个 vault 是一个 Git 仓库，提供完整版本历史，并支持任何 Git 远程服务，无供应商锁定（来源：README 🔌 Git-first）",
+            "AI 代理深度集成：内置 MCP 服务器，可将知识库暴露给 Claude Code、Codex CLI、Gemini CLI 等 AI 代理，同时提供 AGENTS.md 文件指导代理行为（来源：README 🪄 AI-first but not AI-only）"
+          ],
+          "how_to_run": {
+            "install_command": "brew install --cask tolaria (macOS) 或从 https://refactoringhq.github.io/tolaria/download/ 下载安装包",
+            "minimal_example": "启动 Tolaria 后，从启动界面克隆官方入门仓库 (https://github.com/refactoringhq/tolaria-getting-started) 即可体验完整的 walkthrough。"
+          },
+          "maturity_signals": {
+            "star_velocity": "日增 242 stars（2026-06-07 观察）",
+            "recent_commit": "pushed_at 2026-06-07，近期活跃",
+            "releases": "latest release v2026-06-06（2026-06-06 发布）",
+            "issue_activity": "open_issues 26，显示中等活跃度"
+          },
+          "comparison": "横向对比 Obsidian（基于本地 Markdown 但 AI 集成依赖社区插件，同步服务收费，无内置 MCP 暴露）和 Notion（云依赖，数据格式专有）——Tolaria 提供相同的本地 Markdown 基础，但通过内置 MCP 服务器让 AI 代理原生访问知识库，且完全离线、开源（AGPL-3.0）（来源：README 原则部分）",
+          "trajectory_note": "appears_in_tabs 轨迹：daily 趋势上榜，正值快速增长期",
+          "manual_confirmation": false,
+          "how_it_works_with_analogy": "",
+          "essential_design_difference": "",
+          "practitioner_meaning": "",
+          "cross_links": [],
+          "prose_body": ""
+        },
+        "reasoning_trace": {
+          "paper_type_decision": "agent_framework，因为项目包含 AI 代理的 MCP 工具集成，旨在为代理提供知识库，属于代理工具/框架范畴。",
+          "central_contribution": "提供了一个本地优先的开源桌面知识库，并通过 MCP 服务器将完整知识库作为 AI 代理的可操作上下文。",
+          "inspected": [
+            "README.md",
+            "top_level_dirs (mcp-server, src, demo-vault-v2)",
+            "package.json"
+          ],
+          "top_claims": [
+            "README 声称 files-first, git-first, offline-first, AI-first",
+            "README 声称支持 Claude Code, Codex CLI, Gemini CLI",
+            "README 称作者个人使用 10,000+ 笔记",
+            "有 mcp-server 目录"
+          ],
+          "evidence_needed": [
+            "README 对 MCP 工具的具体实现",
+            "AGENTS.md 内容",
+            "ARCHITECTURE.md 内容",
+            "性能表现"
+          ],
+          "main_threats": [
+            "证据不足以全面评估其 MCP 集成深度和安全边界",
+            "项目很新，可能隐藏设计缺陷"
+          ],
+          "transfer_decision": "可复用 MCP 服务器设计模式和 markdown 知识库结构，但桌面 UI 部分特定于 Tauri/React，复用性有限。"
+        },
+        "project_verdict": {
+          "verdict": "deep_dive",
+          "relevance_to_ai_engineer": 5,
+          "engineering_depth": 3,
+          "reuse_value": 4,
+          "maturity": 3,
+          "main_risk": "作为个人项目，长期维护和社区支持不足的风险"
+        },
+        "next_actions": [
+          "star",
+          "clone-and-run",
+          "read-docs"
+        ],
+        "unknowns": [
+          "具体的 MCP 工具定义（搜索、读取、写入等）和权限控制未在 README 说明，需查阅源码。",
+          "是否有内置的 Agent loop 或自主代理逻辑？（可能没有，但未明确）",
+          "是否支持多用户协作？（未提及，可能仅单用户本地使用）",
+          "如何管理大型 vault 的性能（README 提到作者有 10,000+ 笔记，但未说明索引或缓存机制）",
+          "是否支持插件系统？（未提及）",
+          "是否支持 web 界面或移动端？（未提及）",
+          "AGENTS.md 的具体内容未在 README 展示"
+        ],
+        "builder_reuse": {
+          "pattern": "本地文件系统知识库 + MCP 工具服务器模式",
+          "copy": "使用 Markdown 文件作为原始知识存储，YAML frontmatter 作为结构化元数据；通过 MCP 协议暴露文件操作工具（如列出文件、读取内容、搜索）；将整个 vault 作为 Git 仓库提供版本控制，使知识库可审计。",
+          "skip": "如果不需要桌面 GUI，可以只复用知识库结构和 MCP 服务器部分，跳过 Tauri 桌面层；Tolaria 的编辑器特定功能（命令面板、键盘快捷键）对纯服务端知识库帮助有限。",
+          "why_it_matters": "这种模式让 AI 代理能够直接、安全地访问和更新人类编辑的知识库，结合了人类友好的编辑体验和机器可读的接口，为 AI 应用提供了可持久化的、版本化的外部记忆。"
+        },
+        "dependency_platform_risk": {
+          "dependency": "third-party platform dependencies: Node.js, Rust, Tauri, MCP protocol, Linux system WebKit2GTK and GTK libraries",
+          "what_if_change": "若 MCP 协议废弃或重大升级，Tolaria 的 MCP 服务器需要重写才能继续被 AI 代理使用；若 Tauri 或 WebKit2GTK 做出破坏性更改，可能影响桌面应用构建和运行；目前 MCP 服务器依赖系统 Node 二进制，如果 Node.js 版本变化或移除，可能无法运行。",
+          "exposure": "medium",
+          "mitigation_or_unknown": "项目可以跟进 MCP 协议更新；用户可自行维护代码；或者回退到仅使用桌面应用，不使用 AI 集成。由于是开源项目，社区可协助适配新协议。"
+        },
+        "claim_ledger": [
+          {
+            "claim": "Tolaria 提供 files-first 知识库管理",
+            "plain_english": "笔记是纯 Markdown 文件，不锁定在专有格式中",
+            "source": "README Principles - 📑 Files-first",
+            "attribution": "自称",
+            "evidence_strength": "high",
+            "supports": "用户能直接访问文件系统，与任何编辑器兼容",
+            "does_not_support": "未说明对非 Markdown 文件的支持",
+            "threat": "如果 Markdown 解析器有 bug，可能影响使用"
+          },
+          {
+            "claim": "每个 vault 是一个 Git 仓库，版本历史完整",
+            "plain_english": "用户获得内置版本控制，不依赖任何外部服务",
+            "source": "README Principles - 🔌 Git-first",
+            "attribution": "自称",
+            "evidence_strength": "medium",
+            "supports": "任意 Git 远程可用，数据可被标准 Git 工具管理",
+            "does_not_support": "未说明是否自动提交或需要手动操作",
+            "threat": "如果 Git 损坏或误操作，可能丢失历史但不太可能"
+          },
+          {
+            "claim": "支持 Claude Code、Codex CLI、Gemini CLI 等 AI 代理",
+            "plain_english": "可以通过内置 MCP 服务器让这些 AI 代理读取知识库",
+            "source": "README 🪄 AI-first but not AI-only",
+            "attribution": "自称",
+            "evidence_strength": "medium",
+            "supports": "AI 代理集成是设计核心之一",
+            "does_not_support": "未说明具体集成步骤或需要什么 MCP 端点",
+            "threat": "未经验证的 MCP 服务器可能存在安全漏洞"
+          },
+          {
+            "claim": "作者个人使用 10,000+ 笔记",
+            "plain_english": "应用被大规模实际使用验证",
+            "source": "README Built from real use",
+            "attribution": "自称",
+            "evidence_strength": "low",
+            "supports": "表明应用能处理大型知识库",
+            "does_not_support": "没有性能数据或测试证明",
+            "threat": "可能只适用于作者的特定条件"
+          }
+        ],
+        "render_warnings": [
+          "faithfulness.unknown_assertion line 38 term \"AGENTS.md\": - AI 代理深度集成：内置 MCP 服务器，可将知识库暴露给 Claude Code、Codex CLI、Gemini CLI 等 AI 代理，同时提供 AGENTS.md 文件指导代理行为（来源：README 🪄 AI-first but not AI-only）"
+        ],
+        "artifact_audit": {
+          "official_repo": "https://github.com/refactoringhq/tolaria",
+          "official_data": "not_found",
+          "evaluation_code": "artifactAudit.has_tests=true",
+          "prompts_or_rubrics": "not_found",
+          "benchmark_tasks": "not_found",
+          "model_checkpoints": "not_found",
+          "appendix": "not_found",
+          "license": "AGPL-3.0",
+          "minimal_demo": "artifactAudit.has_examples/has_docs=true",
+          "closed_dependencies": [],
+          "third_party_dependencies": [],
+          "broken_links": [],
+          "hardware": "未在 README/artifact 说明",
+          "reproducibility_status": "reproducible"
+        }
+      },
+      "body": "\n## [Tier 2｜真·新项目]（来源：README/artifactAudit）\n\n## 一句话定位\n\n一个以文件为本、离线优先的桌面知识库管理工具，同时为 AI 代理提供 Markdown 知识库上下文\n\n（来源：README/artifactAudit）\n\n## 干什么\n\n为个人和团队提供快速、可移植的 Markdown 笔记管理，内置 Git 版本控制，并可通过 MCP 服务器将知识库暴露给 AI 代理。\n\n（来源：README/artifactAudit）\n\n## 元数据\n\n| 项 | 值 |\n| --- | --- |\n| language | TypeScript |\n| total_stars | 12635 |\n| stars_in_period | 242 |\n| author | refactoringhq |\n\n## 标签\n\n- agent（来源：数据不足）\n- 工具（来源：数据不足）\n- 数据（来源：数据不足）\n\n## 解决什么痛点\n\n以往管理个人知识库要么依赖专有云服务（如 Notion、Obsidian Sync），数据不归用户所有，版本控制不足；要么为 AI 代理提供上下文时需要手动复制或重新格式化，缺乏与 AI 工作流的原生集成。而 Tolaria 通过纯 Markdown 文件和 Git 解决数据所有权和版本问题，并通过 MCP 服务器让 AI 代理直接读取知识库（来源：README 原则部分）\n\n## 核心能力\n\n- 文件优先的 Markdown 知识库管理：所有笔记为本地 Markdown 文件，配合 YAML frontmatter 元数据，支持任意编辑器编辑，无需导出（来源：README 📑 Files-first）\n- Git 原生集成：每个 vault 是一个 Git 仓库，提供完整版本历史，并支持任何 Git 远程服务，无供应商锁定（来源：README 🔌 Git-first）\n- AI 代理深度集成：内置 MCP 服务器，可将知识库暴露给 Claude Code、Codex CLI、Gemini CLI 等 AI 代理，同时提供 AGENTS.md 文件指导代理行为（来源：README 🪄 AI-first but not AI-only）\n\n## 怎么跑起来\n\n- 安装命令：brew install --cask tolaria (macOS) 或从 https://refactoringhq.github.io/tolaria/download/ 下载安装包（来源：README/artifactAudit）\n- 最小可运行示例：启动 Tolaria 后，从启动界面克隆官方入门仓库 (https://github.com/refactoringhq/tolaria-getting-started) 即可体验完整的 walkthrough。（来源：README/artifactAudit）\n\n## 成熟度信号\n\n| 项 | 值 |\n| --- | --- |\n| star_velocity | 日增 242 stars（2026-06-07 观察） |\n| recent_commit | pushed_at 2026-06-07，近期活跃 |\n| releases | latest release v2026-06-06（2026-06-06 发布） |\n| issue_activity | open_issues 26，显示中等活跃度 |\n\n## 和同类的区别\n\n横向对比 Obsidian（基于本地 Markdown 但 AI 集成依赖社区插件，同步服务收费，无内置 MCP 暴露）和 Notion（云依赖，数据格式专有）——Tolaria 提供相同的本地 Markdown 基础，但通过内置 MCP 服务器让 AI 代理原生访问知识库，且完全离线、开源（AGPL-3.0）（来源：README 原则部分）\n\n## 轨迹备注\n\nappears_in_tabs 轨迹：daily 趋势上榜，正值快速增长期\n\n（来源：README/artifactAudit）\n\n可复用范式落库:[[concepts/mcp-knowledge-base]]、[[concepts/file-first-knowledge]]。另见 [[content/tolaria]]、[[claims/tolaria-main-claim]]。\n",
+      "excerpt": "一个以文件为本、离线优先的桌面知识库管理工具，同时为 AI 代理提供 Markdown 知识库上下文",
+      "links": [
+        {
+          "target": "concepts/mcp-knowledge-base",
+          "raw": "[[concepts/mcp-knowledge-base]]"
+        },
+        {
+          "target": "concepts/file-first-knowledge",
+          "raw": "[[concepts/file-first-knowledge]]"
+        },
+        {
+          "target": "content/tolaria",
+          "raw": "[[content/tolaria]]"
+        },
+        {
+          "target": "claims/tolaria-main-claim",
+          "raw": "[[claims/tolaria-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "[Tier 2｜真·新项目]（来源：README/artifactAudit）"
+        },
+        {
+          "depth": 2,
+          "text": "一句话定位"
+        },
+        {
+          "depth": 2,
+          "text": "干什么"
+        },
+        {
+          "depth": 2,
+          "text": "元数据"
+        },
+        {
+          "depth": 2,
+          "text": "标签"
+        },
+        {
+          "depth": 2,
+          "text": "解决什么痛点"
+        },
+        {
+          "depth": 2,
+          "text": "核心能力"
+        },
+        {
+          "depth": 2,
+          "text": "怎么跑起来"
+        },
+        {
+          "depth": 2,
+          "text": "成熟度信号"
+        },
+        {
+          "depth": 2,
+          "text": "和同类的区别"
+        },
+        {
+          "depth": 2,
+          "text": "轨迹备注"
         }
       ]
     },

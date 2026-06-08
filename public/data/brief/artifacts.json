@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T13:29:01.858Z",
+  "generatedAt": "2026-06-07T14:12:42.383Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 48,
+  "count": 49,
   "items": [
     {
       "id": "artifact/9router-repo",
@@ -1635,6 +1635,44 @@
         {
           "target": "content/taste-skill",
           "raw": "[[content/taste-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/tolaria-repo",
+      "type": "artifact",
+      "slug": "tolaria-repo",
+      "title": "Tolaria Repo",
+      "file": "artifacts/tolaria-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "tolaria-repo",
+        "kind": "artifact",
+        "content": "tolaria",
+        "artifact_type": "repo",
+        "url": "https://github.com/refactoringhq/tolaria",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "AGPL-3.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "未提供详细的 MCP 工具文档",
+          "AGENTS.md 具体内容未公开"
+        ],
+        "last_checked": "2026-06-07"
+      },
+      "body": "\n## Artifact audit\n\n跨平台桌面知识库应用，配 MCP 服务器实现 AI 代理集成，使用 Tauri/React/TypeScript 构建，本地 Markdown 文件搭配 Git 版本控制。\n\n出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。\n",
+      "excerpt": "跨平台桌面知识库应用，配 MCP 服务器实现 AI 代理集成，使用 Tauri/React/TypeScript 构建，本地 Markdown 文件搭配 Git 版本控制。",
+      "links": [
+        {
+          "target": "content/tolaria",
+          "raw": "[[content/tolaria]]"
         }
       ],
       "headings": [
