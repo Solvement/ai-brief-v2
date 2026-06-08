@@ -2,6 +2,7 @@
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { fetchWithRetry } from "../../lib/http.mjs";
 import { MODEL_REGISTRY, getModelConfig, listModelConfigs } from "./registry.mjs";
 
 const DEFAULT_USER_AGENT = "Mozilla/5.0 ai-brief-models/0.3";
@@ -213,13 +214,19 @@ async function fetchHuggingFaceOrgListing(model, options = {}) {
 }
 
 async function fetchJson(url, options = {}) {
-  const response = await fetch(url, { headers: requestHeaders(options, "application/json", { includeHfToken: true }) });
+  const response = await fetchWithRetry(url, { headers: requestHeaders(options, "application/json", { includeHfToken: true }) }, {
+    retries: 0,
+    timeoutMs: null,
+  });
   if (!response.ok) throw new Error(`GET ${url} -> ${response.status}`);
   return response.json();
 }
 
 async function fetchText(url, options = {}) {
-  const response = await fetch(url, { headers: requestHeaders(options, options.accept || "text/html") });
+  const response = await fetchWithRetry(url, { headers: requestHeaders(options, options.accept || "text/html") }, {
+    retries: 0,
+    timeoutMs: null,
+  });
   if (!response.ok) throw new Error(`GET ${url} -> ${response.status}`);
   return response.text();
 }

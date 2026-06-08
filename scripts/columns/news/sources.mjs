@@ -1,4 +1,4 @@
-import { fetchWithRetry } from "../projects/sources.mjs";
+import { fetchWithRetry } from "../../lib/http.mjs";
 
 const DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; ai-brief/0.1; news aggregator)";
 const DEFAULT_PER_SOURCE_LIMIT = 30;

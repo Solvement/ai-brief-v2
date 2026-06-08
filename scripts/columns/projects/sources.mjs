@@ -2,8 +2,11 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { fetchWithRetry } from "../../lib/http.mjs";
 import { BOOST_TERMS } from "../../lib/project-ranking.mjs";
 import { scrapeTrendingBoard } from "../../lib/github-trending.mjs";
+
+export { fetchWithRetry, isTransientNetworkError } from "../../lib/http.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -286,87 +289,6 @@ async function fetchArtifactAudit(owner, name, { options = {}, logger, repo = {}
   }
 
   return audit;
-}
-
-// --- Resilient fetch -------------------------------------------------------
-// Grounded, not improvised. Sources:
-//   - AWS "Exponential Backoff and Jitter" — Full Jitter formula:
-//       sleep = random_between(0, min(cap, base * 2^attempt))
-//     https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
-//   - GitHub REST API best practices — honor retry-after / x-ratelimit-reset,
-//     wait >= 1min fallback, throw after a bounded number of retries:
-//     https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api
-//   - Node/undici guidance — retry transient `fetch failed`/ECONNRESET/ETIMEDOUT,
-//     use a per-request timeout (AbortSignal.timeout). undici keeps connections
-//     alive by default, which itself reduces ECONNRESET.
-// One wrapper covers BOTH api.github.com and raw.githubusercontent.com.
-const RETRY_BASE_MS = 500;
-const RETRY_CAP_MS = 8000;
-const RETRY_MAX_ATTEMPTS = 4; // 1 initial try + 3 retries
-const REQUEST_TIMEOUT_MS = 15000;
-const RATE_LIMIT_WAIT_CAP_MS = 60000;
-
-const sleepMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export function isTransientNetworkError(error) {
-  if (!error) return false;
-  const code = error.code || error.cause?.code || "";
-  if ([
-    "ECONNRESET", "ETIMEDOUT", "ECONNREFUSED", "EAI_AGAIN", "EPIPE",
-    "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_SOCKET",
-  ].includes(code)) return true;
-  if (error.name === "TimeoutError") return true; // AbortSignal.timeout fired
-  const msg = String(error.message || "").toLowerCase();
-  return msg.includes("fetch failed") || msg.includes("terminated") || msg.includes("socket hang up");
-}
-
-function fullJitterDelay(attempt) {
-  // AWS Full Jitter: random_between(0, min(cap, base * 2^attempt))
-  const ceiling = Math.min(RETRY_CAP_MS, RETRY_BASE_MS * 2 ** attempt);
-  return Math.floor(Math.random() * ceiling);
-}
-
-function rateLimitWaitMs(response) {
-  // GitHub: honor retry-after; else if x-ratelimit-remaining === 0 wait until x-ratelimit-reset.
-  const retryAfter = Number(response.headers.get("retry-after"));
-  if (Number.isFinite(retryAfter) && retryAfter > 0) {
-    return Math.min(retryAfter * 1000, RATE_LIMIT_WAIT_CAP_MS);
-  }
-  if (response.headers.get("x-ratelimit-remaining") === "0") {
-    const reset = Number(response.headers.get("x-ratelimit-reset"));
-    if (Number.isFinite(reset)) {
-      const waitMs = reset * 1000 - Date.now();
-      if (waitMs > 0) return Math.min(waitMs, RATE_LIMIT_WAIT_CAP_MS);
-    }
-    return Math.min(60000, RATE_LIMIT_WAIT_CAP_MS); // GitHub fallback: wait >= 1 minute
-  }
-  return 0;
-}
-
-export async function fetchWithRetry(url, init = {}, { logger, label = String(url) } = {}) {
-  let lastError;
-  for (let attempt = 0; attempt < RETRY_MAX_ATTEMPTS; attempt += 1) {
-    try {
-      // Fresh per-request timeout each attempt so a hung socket can't stall a slot.
-      const response = await fetch(url, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
-      if (response.status === 403 || response.status === 429) {
-        const waitMs = rateLimitWaitMs(response);
-        if (waitMs > 0 && attempt < RETRY_MAX_ATTEMPTS - 1) {
-          logger?.warn?.(`rate limited ${label}: waiting ${Math.round(waitMs / 1000)}s (attempt ${attempt + 1})`);
-          await sleepMs(waitMs);
-          continue;
-        }
-      }
-      return response; // other non-ok statuses (404 etc.) are the caller's to interpret
-    } catch (error) {
-      lastError = error;
-      if (!isTransientNetworkError(error) || attempt === RETRY_MAX_ATTEMPTS - 1) throw error;
-      const delay = fullJitterDelay(attempt);
-      logger?.warn?.(`transient fetch ${label} (${error.code || error.name || error.message}); retry ${attempt + 1}/${RETRY_MAX_ATTEMPTS - 1} in ${delay}ms`);
-      await sleepMs(delay);
-    }
-  }
-  throw lastError;
 }
 
 async function fetchGitHubApiJson(pathname, { options = {}, logger, label = pathname, warn404 = true } = {}) {
