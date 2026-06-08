@@ -3,6 +3,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { claudeAuthorModel, createClaudeAuthorClient } from "../../lib/claude-author.mjs";
 import { createDeepSeekClient } from "../../lib/llm.mjs";
 import { getModelConfig } from "./registry.mjs";
 import { buildOfflineModelStatus, fetchModelStatus } from "./sources.mjs";
@@ -39,16 +40,27 @@ export async function generateModelEntry({
       ? { analysis: buildOfflineOpenAnalysisStub(model, fetchedPayload) }
       : { changelog: buildOfflineClosedChangelogStub(model, fetchedPayload) };
   } else {
-    const chatJson = options.chatJson || createDeepSeekClient({
-      apiTimeoutMs: options.apiTimeoutMs,
-      logger,
-    }).chatJson;
+    const env = options.env || process.env;
+    const useClaudeAuthor = shouldUseClaudeOpenAuthor(model, options, env);
+    const chatJson = options.chatJson || (useClaudeAuthor
+      ? createClaudeAuthorClient({
+        timeoutMs: options.claudeTimeoutMs,
+        model: claudeAuthorModel(env),
+        logger,
+        env,
+        cwd: ROOT,
+      }).chatJson
+      : createDeepSeekClient({
+        apiTimeoutMs: options.apiTimeoutMs,
+        logger,
+        env,
+      }).chatJson);
     if (model.kind === "open") {
       const goldStandard = await loadGoldOpenExample();
       payload = await chatJson({
         system: openModelSystemPrompt(),
         user: openModelUserPrompt({ model, fetched: fetchedPayload, goldStandard }),
-        model: selectedModel,
+        model: useClaudeAuthor ? claudeAuthorModel(env) : selectedModel,
         maxTokens: options.maxTokens || Number(process.env.MODEL_ANALYSIS_MAX_TOKENS) || 12000,
       });
     } else {
@@ -66,7 +78,7 @@ export async function generateModelEntry({
     fetched: fetchedPayload,
     payload,
     generatedAt,
-    analysisAuthor: offline ? "offline-model-generator-stub" : `DeepSeek:${selectedModel}`,
+    analysisAuthor: analysisAuthorFor({ offline, model, options, selectedModel }),
     existing: options.existingEntry || null,
     libraryRecords: options.libraryRecords || [],
   });
@@ -74,6 +86,21 @@ export async function generateModelEntry({
 
 export function modelAnalysisModel(env = process.env) {
   return env.MODEL_ANALYSIS_MODEL || env.DEEPSEEK_MODEL || "deepseek-v4-pro";
+}
+
+export function modelOpenAuthor(env = process.env) {
+  return (env.MODEL_OPEN_AUTHOR || "deepseek").toLowerCase();
+}
+
+function shouldUseClaudeOpenAuthor(model, options = {}, env = process.env) {
+  return model?.kind === "open" && !isOffline(options, env) && modelOpenAuthor(env) === "claude";
+}
+
+function analysisAuthorFor({ offline, model, options = {}, selectedModel }) {
+  if (offline) return "offline-model-generator-stub";
+  const env = options.env || process.env;
+  if (shouldUseClaudeOpenAuthor(model, options, env)) return `Claude:${claudeAuthorModel(env)}`;
+  return `DeepSeek:${selectedModel}`;
 }
 
 async function loadGoldOpenExample() {

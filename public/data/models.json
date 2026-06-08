@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T13:29:02.469Z",
+  "generatedAt": "2026-06-08T13:11:39.541Z",
   "models": [
     {
       "id": "anthropic-claude",
@@ -394,8 +394,8 @@
       "vendor": "DeepSeek",
       "country": "中国",
       "kind": "open",
-      "latestVersion": "DeepSeek V4 Pro",
-      "latestReleasedAt": "2026-05-06",
+      "latestVersion": "DeepSeek V4 Flash",
+      "latestReleasedAt": "2026-06-08",
       "latestReleasedAtPrecision": "approx (HuggingFace lastModified, not guaranteed release date)",
       "isOpen": true,
       "license": "mit",
@@ -409,51 +409,69 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-      "lastCheckedAt": "2026-06-06T13:29:02.471Z",
+      "lastCheckedAt": "2026-06-08T12:37:49.602Z",
       "latestVersionVariants": [
-        "DeepSeek V4 Pro",
         "DeepSeek V4 Flash",
+        "DeepSeek V4 Pro",
         "DeepSeek V4 Flash Base",
         "DeepSeek V4 Pro Base"
       ],
-      "analysisGeneratedAt": "2026-06-04T04:10:40.040Z",
-      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "analysisGeneratedAt": "2026-06-08T12:37:49.600Z",
+      "analysisAuthor": "Claude:claude-opus-4-8",
       "analysis": {
-        "oneLineTakeaway": "DeepSeek 开源百万 token 上下文高效模型，MIT 许可可商用，厂商自评代码与 Agent 能力顶尖，让长上下文应用不再卡在成本和绑定的困境。",
+        "oneLineTakeaway": "DeepSeek-V4 把『100 万 token 上下文 + 接近闭源旗舰的能力 + MIT 真开源』打包送出,而且这次多放出一个 284B/13B 激活的 Flash 版——意味着你第一次能用『一台机器』量级自托管一个长上下文旗舰级模型,不必再被闭源 API 的价格和数据出境绑死;但它仍是 preview、所有横评都是 DeepSeek 自报,落地前要自己实测。",
         "whatItUnlocks": [
           {
-            "point": "百万 token 上下文且推理成本骤降",
-            "forYou": "能把整个代码仓库或长文档一股脑塞进对话框，不用再费力做文本切片。以前因为上下文太贵做不了的产品（如全库代码理解、超长文档分析）现在能做了。",
-            "evidence": "model card 1M context length；1M 时推理 FLOPs 仅 V3.2 的 27%，KV cache 仅 10%",
-            "confidence": "high（card 明示）"
+            "point": "便宜的 100 万 token 上下文 → 整库代码 agent / 超长 RAG",
+            "forYou": "1M token 上下文(模型一次能读进去的内容长度),而且这一代把长上下文的推理开销砍到老版零头。意味着做代码 agent 时可以把『整个仓库』一股脑喂进去通盘理解、不用费劲切片拼接;做超长合同/法规/病例的检索问答(RAG,把外部材料塞给模型再让它答)能装下以前装不下的材料。这把你从『只能调闭源长上下文 API』挪到『自己托管一个能吃满 1M 的引擎』。但注意:1M『能装』不等于『装满还准』——深度精确检索它仍落后闭源旗舰,见下方 MRCR 短板。",
+            "evidence": "model card:支持 1M context;1M 设定下 V4-Pro 单 token 推理仅需 V3.2 的 27% FLOPs、10% KV cache",
+            "confidence": "high(card 明示成本比;但比的是自家 V3.2,不是与别家横评)"
           },
           {
-            "point": "MIT 开源可商用",
-            "forYou": "可自部署、可微调成产品专用模型、数据不外传，避免 API 涨价和厂商锁定。闭源旗舰给不了这种自由度。",
-            "evidence": "license: MIT；权重可直接下载部署",
-            "confidence": "high"
+            "point": "284B/13B 的 Flash 版 → 第一次『一台机器』量级就能自托管长上下文旗舰",
+            "forYou": "除了 1.6T 的 Pro,这一代还放出 284B 总参 / 仅 13B 激活的 Flash,而且权重已经是 FP4 量化好的(用更省显存的 4 比特存专家参数)。这才是真正现实的自托管路径:13B 激活=推理快、单位成本低;FP4 帮你把量化做好了、不用自己折腾。它把『私有部署一个长上下文强模型』从『得搭多卡集群』降到『一台 8 卡节点』量级(此为按总参×精度推算,card 未给官方硬件数),让你能把模型放进自己机房、数据一步不出门。",
+            "evidence": "model card 下载表:DeepSeek-V4-Flash 284B 总参 / 13B 激活,FP4+FP8 Mixed,1M context,MIT",
+            "confidence": "medium(参数/精度是 card 事实;具体能塞进几张卡是我按精度推算)"
           },
           {
-            "point": "厂商自评代码/推理/Agent 能力顶尖",
-            "forYou": "有望成为 IDE、Copilot、AI 编程插件背后的强大引擎，供你自托管使用。",
-            "evidence": "card 声称 Pro Max 在 LiveCodeBench (93.5) 和 Codeforces (3206) 等指标上超越多个闭源模型",
-            "confidence": "low（厂商自评，待 LMArena、OpenLLM 等第三方验证）"
+            "point": "MIT 真开源 → 商用零附加条件,法务风险最低",
+            "forYou": "这不是某些『社区许可』那种带月活上限、禁止拿来训练别的模型的伪开源——MIT 可商用、可改、可闭源分发,没有红线条款。对要把模型嵌进商业产品的你,这是最低的法务摩擦,也最不怕厂商哪天改条款把你架住。这正是开源相对闭源旗舰最实在的一笔:控制权在你手里。",
+            "evidence": "model card:License MIT(仓库与权重均 MIT)",
+            "confidence": "high(license 明示)"
+          },
+          {
+            "point": "三档推理力度(Non-think / High / Max)→ 每次请求自己拧成本与延迟旋钮",
+            "forYou": "同一个模型内置了『要不要多想』的开关:日常路由/分类走 Non-think 省钱省延迟,难任务才开 Think Max 把推理拉满。做产品时不用为『快但笨』和『准但贵』各接一个模型——一个模型按请求切档,等于自带了一个粗粒度的成本路由器。",
+            "evidence": "model card:Non-think / Think High / Think Max 三模式表,各列典型用途",
+            "confidence": "high(模式是 card 明示;每档实际省多少钱/延迟差多少要自己实测)"
+          },
+          {
+            "point": "竞赛级编程能力(厂商自评领先)→ 自托管的编程 agent 引擎",
+            "forYou": "若实测属实,你的自托管编程 agent 在竞赛/算法类任务上能对标甚至超过闭源旗舰,而且成本按算力摊薄、不按 token 越用越贵。对做 IDE 插件 / 编程 agent 产品的人很关键。但这条目前是 DeepSeek 自己选基准、自己跑的对比,务必拿你的真实代码库实测再下选型结论,别拿宣传分做决定。",
+            "evidence": "model card 前沿对比表(均 DeepSeek 自报):LiveCodeBench 93.5(对手 Gemini-3.1-Pro 91.7 / K2.6 89.6 / Opus-4.6 88.8)、Codeforces 评分 3206(对手 GPT-5.4 3168 / Gemini 3052)",
+            "confidence": "low(全为 DeepSeek 自报横评,待 LMArena / 第三方与自测核实)"
+          },
+          {
+            "point": "接近闭源旗舰但短板明确 → 知道什么时候『别』选它",
+            "forYou": "这条帮你避坑。它『接近』旗舰不等于『是』旗舰:最难的知识问答(MMLU-Pro 87.5 vs Gemini 91.0)、深度长上下文精确检索(MRCR 1M 83.5 vs Opus 92.9)、最复杂的 agentic 工作流(Terminal Bench 67.9 vs GPT-5.4 75.1)它仍落后。把它用在它强的地方——可控成本的长上下文 + 编程 + 私有化合规——别拿它去硬刚 Opus/Gemini/GPT 各自的最强项。",
+            "evidence": "model card 前沿对比表(均 DeepSeek 自报):MMLU-Pro 87.5、MRCR 1M 83.5、Terminal Bench 2.0 67.9,对应对手分见表",
+            "confidence": "low(自报横评;但我用它来标短板,方向上偏保守、相对可信)"
           }
         ],
         "benchmark": {
-          "headline": "知识准确度和事实一致性相比上代大幅跃升，长上下文推理成本降至原来的零头",
-          "professorNote": "以下数据来自官方 base 模型评测，体现知识储备和基础能力，但应用构建者最关心的代码/Agent 专项成绩仅在技术报告且为自评，建议等第三方榜单交叉验证。",
+          "headline": "知识/事实性相对老版 V3.2 实打实跳升(事实性近翻倍);对闭源旗舰的横评里它在竞赛编程自评领先、但长上下文精确检索与最难 agentic 仍落后——且所有数字含横评都来自 DeepSeek 自家 card,属自报,等第三方核。",
+          "professorNote": "你只需记:这些是『它到底强不强、强在哪』的证据,挑跟你产品相关的看。Base 对比(V3.2→Flash→Pro)证明这一代知识/事实性确实涨。前沿对比表里:编程类(LiveCodeBench/Codeforces)若你做编程 agent 最该盯,DeepSeek 自评在此领先;长上下文检索类(MRCR 1M / CorpusQA 1M)告诉你 1M 上下文是『能塞』还是『塞了还能精确取回』——这里它落后 Opus,提醒你别盲信长度数字;agentic 类(SWE / Terminal Bench / Toolathlon)预测它当工具调用引擎稳不稳。关键提醒:这整张前沿对比表是 DeepSeek 自己选基准、自己跑出来的,连对手的分也是它报的,落地前一律自测。",
           "charts": [
             {
-              "title": "高难知识问答 MMLU-Pro",
-              "metric": "5-shot Exact Match",
+              "title": "MMLU-Pro(高难知识问答,Base 模型)",
+              "metric": "EM,5-shot",
               "unit": "分",
               "higherIsBetter": true,
               "sourceType": "official",
               "maxValue": 100,
               "bars": [
                 {
-                  "label": "V3.2-Base",
+                  "label": "V3.2-Base(老版)",
                   "display": "65.5",
                   "value": 65.5
                 },
@@ -471,15 +489,15 @@
               ]
             },
             {
-              "title": "事实准确度 FACTS",
-              "metric": "25-shot Exact Match",
+              "title": "FACTS 事实准确度(越高越少胡说,Base 模型)",
+              "metric": "EM,25-shot",
               "unit": "分",
               "higherIsBetter": true,
               "sourceType": "official",
               "maxValue": 100,
               "bars": [
                 {
-                  "label": "V3.2-Base",
+                  "label": "V3.2-Base(老版)",
                   "display": "27.1",
                   "value": 27.1
                 },
@@ -497,89 +515,136 @@
               ]
             },
             {
-              "title": "长上下文成本（1M token 相对 V3.2）",
-              "metric": "相对百分比（越低越省）",
-              "unit": "%",
-              "higherIsBetter": false,
+              "title": "LiveCodeBench(竞赛/算法编程,前沿横评·DeepSeek 自报)",
+              "metric": "Pass@1",
+              "unit": "分",
+              "higherIsBetter": true,
               "sourceType": "official",
               "maxValue": 100,
               "bars": [
                 {
-                  "label": "V3.2 KV cache",
-                  "display": "100",
-                  "value": 100
+                  "label": "Opus-4.6 Max",
+                  "display": "88.8",
+                  "value": 88.8
                 },
                 {
-                  "label": "V4-Pro KV cache",
-                  "display": "10",
-                  "value": 10,
+                  "label": "K2.6 Thinking",
+                  "display": "89.6",
+                  "value": 89.6
+                },
+                {
+                  "label": "Gemini-3.1-Pro",
+                  "display": "91.7",
+                  "value": 91.7
+                },
+                {
+                  "label": "DS-V4-Pro Max",
+                  "display": "93.5",
+                  "value": 93.5,
+                  "highlight": true
+                }
+              ]
+            },
+            {
+              "title": "MRCR 1M 长上下文精确检索(前沿横评·DeepSeek 自报,看短板)",
+              "metric": "MMR",
+              "unit": "分",
+              "higherIsBetter": true,
+              "sourceType": "official",
+              "maxValue": 100,
+              "bars": [
+                {
+                  "label": "Gemini-3.1-Pro",
+                  "display": "76.3",
+                  "value": 76.3
+                },
+                {
+                  "label": "DS-V4-Pro Max",
+                  "display": "83.5",
+                  "value": 83.5,
                   "highlight": true
                 },
                 {
-                  "label": "V3.2 FLOPs",
-                  "display": "100",
-                  "value": 100
-                },
-                {
-                  "label": "V4-Pro FLOPs",
-                  "display": "27",
-                  "value": 27,
-                  "highlight": true
+                  "label": "Opus-4.6 Max",
+                  "display": "92.9",
+                  "value": 92.9
                 }
               ]
             }
           ],
           "items": [
             {
-              "label": "MMLU-Pro",
+              "label": "MMLU-Pro(知识,Base)",
               "score": "73.5",
-              "comparator": "vs V3.2 65.5",
-              "interpretation": "高难知识问答准确率显著提升",
+              "comparator": "vs 老版 V3.2 65.5(自报)",
+              "interpretation": "高难知识问答更准",
               "sourceType": "official",
               "attribution": "自报"
             },
             {
-              "label": "FACTS Parametric",
+              "label": "FACTS 事实准确度(Base)",
               "score": "62.6",
-              "comparator": "vs V3.2 27.1",
-              "interpretation": "减少胡说八道，对需准确事实的应用至关重要",
+              "comparator": "vs 老版 27.1(自报)",
+              "interpretation": "胡说大幅减少,对问答/RAG 类应用很重要",
               "sourceType": "official",
               "attribution": "自报"
             },
             {
-              "label": "LongBench-V2",
-              "score": "51.5",
-              "comparator": "vs V3.2 40.2",
-              "interpretation": "长上下文综合理解能力增强",
-              "sourceType": "official",
-              "attribution": "自报"
-            },
-            {
-              "label": "LiveCodeBench (Pro Max)",
+              "label": "LiveCodeBench(竞赛编程,前沿横评)",
               "score": "93.5",
-              "comparator": "vs Gemini-3.1-Pro High 91.7",
-              "interpretation": "代码生成高分，预示可用于复杂编程任务",
+              "comparator": "DeepSeek 自报超 Gemini-3.1-Pro 91.7 / K2.6 89.6 / Opus 88.8",
+              "interpretation": "若实测属实,自托管编程 agent 可对标甚至超闭源旗舰",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "MRCR 1M(长上下文精确检索,前沿横评)",
+              "score": "83.5",
+              "comparator": "落后 Opus-4.6 92.9(自报)",
+              "interpretation": "1M 能装,但深度精确取回不如闭源旗舰,别盲信长度",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "SWE Verified(真实代码库修 bug,前沿横评)",
+              "score": "80.6",
+              "comparator": "Opus 80.8 / Gemini 80.6 / K2.6 80.2(自报)",
+              "interpretation": "实战修 bug 已贴近旗舰,适合编程 agent",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "长上下文成本(1M token)",
+              "score": "27% 算力 / 10% 显存",
+              "comparator": "相对自家 V3.2",
+              "interpretation": "长上下文从『跑不起』变『跑得起』的关键一笔",
               "sourceType": "official",
               "attribution": "自报"
             }
           ],
           "caveats": [
-            "以上数字全部来自 DeepSeek 官方 model card，非独立第三方评测",
-            "代码、推理、Agent 等应用最相关的详细指标和公平对比需等待 LMArena、OpenLLM Leaderboard 等第三方榜单",
-            "长上下文成本比值仅与上代 V3.2 对比，不是与其他厂商直接对比"
+            "前沿对比表(与 Opus-4.6 / GPT-5.4 / Gemini-3.1-Pro / K2.6 / GLM-5.1 的所有横评)均来自 DeepSeek 自家 model card,是 DeepSeek 自己选基准、自己跑的对比,连对手分也是它报的,一律属自报;等 LMArena / OpenLLM 等第三方交叉核实。",
+            "『最强开源模型』为 DeepSeek 自评定位,非第三方结论。",
+            "这是 preview 版,正式版指标与行为可能变。",
+            "并非每项都涨:Base 的 BigCodeBench 反而从 V3.2 的 63.9 掉到 V4-Pro 59.2,别一概而论『全面超越』。",
+            "自托管硬件档位(下文)是按总参/激活参/精度推算,card 未给官方硬件要求,以实测为准。"
           ]
         },
-        "openSourceMeaning": "MIT 许可证意味着你可以自由使用、修改和商用模型权重，适合自部署、定制微调，数据安全可控，且不会被 API 服务涨价或关停绑定。代价是需要自己管理和承担推理硬件成本。",
-        "whenToUse": "如果你在构建需要理解百万级 token 上下文的应用（如整库代码助手、长文档分析），或者需要私有化部署、微调模型以保证数据合规和成本可控，直接用 DeepSeek-V4-Pro 的 API 或下载部署。如果只是日常编码辅助或轻量代理，可以先通过 API 体验 Pro Max 的代码能力，确认够强再投入资源自部署。",
-        "cost_caveats": "Pro 版总参 1.6T，即使激活仅 49B，自部署仍需多张高端 GPU（如 8×H100 或更多），个人开发者可能承受不起；Flash 版（284B/13B）成本更低，但知识储备和复杂任务能力弱于 Pro。推理时若使用 Think Max 模式，官方建议至少 384K 上下文，会进一步推高显存需求。",
+        "openSourceMeaning": "MIT 是开源里最宽松的一档:可商用、可改、可闭源分发,零附加条件——对要把模型嵌进商业产品的你,法务摩擦最低。但要落地得分清两条现实部署路径。① Flash(284B 总参 / 13B 激活,FP4):按 FP4 存专家参数推算,权重约 150–180GB,一台 8×H100/H200 80G 节点放得下,13B 激活让推理快、单位成本低;不过 1M context 的 KV cache 即便已砍到 V3.2 的 10%,长上下文跑满时显存仍吃紧,做并发要留余量。这是个人/小团队『真能自托管』的版本,LoRA/QLoRA 这类轻量微调在多卡节点上也现实。② Pro(1.6T 总参 / 49B 激活,FP4):权重约 800GB+,单节点放不下,要多卡集群或租云,个人不现实,全参微调更得集群。数据不出境是这一切的核心价值:MIT + 权重开放可在私有云/内网用 vLLM/SGLang 部署,对医疗/金融/政务这类合规硬约束,这是闭源旗舰给不了的硬价值。代价很清楚:你自己扛部署、运维、显存和卡钱,换来数据主权 + 不被 API 涨价绑架。(以上权重体积为按参数×精度推算,非官方数字。)",
+        "whenToUse": "照着做决定的三支:① 直接值得自托管/微调——你有规模化调用 + 数据合规硬约束(私有 RAG、整库代码 agent、医疗/金融/政务内网),且用得上长上下文或编程能力:走 Flash(284B/13B),供得起一台 8 卡节点就能把『长上下文 + 控成本 + 不出境 + 编程强』一次拿齐;只有你有集群/愿租云、又要榨最高知识分时才上 Pro。② 先走它的 API / 第三方托管试水——只想体验 1M 上下文或编程能力、调用量还不大、没有合规压力:别急着自建,先按量调 DeepSeek 官方 API 或第三方托管,跑出来够强再评估自部署。③ 别用它——你要的是开箱即用的稳定旗舰体验、团队没有 MLOps/养卡能力、或核心需求是最难的 agentic 编排 / 深度长文档精确检索 / 最前沿多模态:这些它仍落后,闭源旗舰(Opus / Gemini / GPT)更省心,自托管这台大家伙只会拖慢你。额外提醒:这是 preview 版,放进生产关键路径前建议等正式版,或做好随时回退闭源 API 的预案。",
+        "cost_caveats": "Pro 1.6T 总参(MoE 激活 49B)自托管要多卡集群或租云,个人现实只能走 API;Flash 284B(激活 13B)一台 8 卡节点可跑,但 1M context 满载时 KV cache 仍吃显存、并发要留余量。三档推理里 Think Max 会显著拉长输出 token、推高延迟与成本(card 建议 Max 模式 context 至少开到 384K),开之前先掂量值不值。所有 benchmark 含与闭源旗舰的横评全是 DeepSeek 自报,落地前必须自己拿真实任务实测;preview 版正式发布后数字可能变;上文硬件档位为按参数×精度推算,非官方,以实测显存占用为准。",
         "sources": [
           {
-            "name": "HuggingFace · deepseek-ai/DeepSeek-V4-Pro (model card)",
+            "name": "HuggingFace · deepseek-ai/DeepSeek-V4-Pro (model card,全部 benchmark 与规格来源)",
             "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro"
           },
           {
             "name": "DeepSeek-V4 Technical Report (DeepSeek_V4.pdf)",
-            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf"
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/blob/main/DeepSeek_V4.pdf"
+          },
+          {
+            "name": "HuggingFace · deepseek-ai/DeepSeek-V4-Flash (轻量自托管变体)",
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash"
           }
         ]
       },
@@ -590,65 +655,86 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "DeepSeek V4 Pro",
+          "名称": "DeepSeek V4 Flash",
           "厂商": "DeepSeek",
-          "发布日": "2026-05-06",
+          "发布日": "2026-06-08",
           "开放度标签": "真开源可商用",
-          "类型": "基座/指令/推理",
-          "规模架构": "架构官方未披露；context window（上下文窗口）1M",
+          "类型": "基座/指令/多模态/推理",
+          "规模架构": "MoE 总参官方未披露+激活参13B；context window（上下文窗口）1M",
           "关键benchmark": [
             {
-              "名称": "MMLU-Pro",
+              "名称": "MMLU-Pro(知识,Base)",
               "分数": "73.5",
-              "对手": "vs V3.2 65.5",
+              "对手": "vs 老版 V3.2 65.5(自报)",
               "标注": "自报",
-              "解读": "高难知识问答准确率显著提升"
+              "解读": "高难知识问答更准"
             },
             {
-              "名称": "FACTS Parametric",
+              "名称": "FACTS 事实准确度(Base)",
               "分数": "62.6",
-              "对手": "vs V3.2 27.1",
+              "对手": "vs 老版 27.1(自报)",
               "标注": "自报",
-              "解读": "减少胡说八道，对需准确事实的应用至关重要"
+              "解读": "胡说大幅减少,对问答/RAG 类应用很重要"
             },
             {
-              "名称": "LongBench-V2",
-              "分数": "51.5",
-              "对手": "vs V3.2 40.2",
-              "标注": "自报",
-              "解读": "长上下文综合理解能力增强"
-            },
-            {
-              "名称": "LiveCodeBench (Pro Max)",
+              "名称": "LiveCodeBench(竞赛编程,前沿横评)",
               "分数": "93.5",
-              "对手": "vs Gemini-3.1-Pro High 91.7",
+              "对手": "DeepSeek 自报超 Gemini-3.1-Pro 91.7 / K2.6 89.6 / Opus 88.8",
               "标注": "自报",
-              "解读": "代码生成高分，预示可用于复杂编程任务"
+              "解读": "若实测属实,自托管编程 agent 可对标甚至超闭源旗舰"
             },
             {
-              "名称": "高难知识问答 MMLU-Pro",
-              "分数": "V3.2-Base 65.5 / V4-Flash-Base 68.3 / V4-Pro-Base 73.5",
-              "对手": "V3.2-Base / V4-Flash-Base",
+              "名称": "MRCR 1M(长上下文精确检索,前沿横评)",
+              "分数": "83.5",
+              "对手": "落后 Opus-4.6 92.9(自报)",
               "标注": "自报",
-              "解读": "5-shot Exact Match"
+              "解读": "1M 能装,但深度精确取回不如闭源旗舰,别盲信长度"
             },
             {
-              "名称": "事实准确度 FACTS",
-              "分数": "V3.2-Base 27.1 / V4-Flash-Base 33.9 / V4-Pro-Base 62.6",
-              "对手": "V3.2-Base / V4-Flash-Base",
+              "名称": "SWE Verified(真实代码库修 bug,前沿横评)",
+              "分数": "80.6",
+              "对手": "Opus 80.8 / Gemini 80.6 / K2.6 80.2(自报)",
               "标注": "自报",
-              "解读": "25-shot Exact Match"
+              "解读": "实战修 bug 已贴近旗舰,适合编程 agent"
             },
             {
-              "名称": "长上下文成本（1M token 相对 V3.2）",
-              "分数": "V3.2 KV cache 100 / V4-Pro KV cache 10 / V3.2 FLOPs 100 / V4-Pro FLOPs 27",
-              "对手": "V3.2 KV cache / V3.2 FLOPs",
+              "名称": "长上下文成本(1M token)",
+              "分数": "27% 算力 / 10% 显存",
+              "对手": "相对自家 V3.2",
               "标注": "自报",
-              "解读": "相对百分比（越低越省）"
+              "解读": "长上下文从『跑不起』变『跑得起』的关键一笔"
+            },
+            {
+              "名称": "MMLU-Pro(高难知识问答,Base 模型)",
+              "分数": "V3.2-Base(老版) 65.5 / V4-Flash-Base 68.3 / V4-Pro-Base 73.5",
+              "对手": "V3.2-Base(老版) / V4-Flash-Base",
+              "标注": "自报",
+              "解读": "EM,5-shot"
+            },
+            {
+              "名称": "FACTS 事实准确度(越高越少胡说,Base 模型)",
+              "分数": "V3.2-Base(老版) 27.1 / V4-Flash-Base 33.9 / V4-Pro-Base 62.6",
+              "对手": "V3.2-Base(老版) / V4-Flash-Base",
+              "标注": "自报",
+              "解读": "EM,25-shot"
+            },
+            {
+              "名称": "LiveCodeBench(竞赛/算法编程,前沿横评·DeepSeek 自报)",
+              "分数": "Opus-4.6 Max 88.8 / K2.6 Thinking 89.6 / Gemini-3.1-Pro 91.7 / DS-V4-Pro Max 93.5",
+              "对手": "Opus-4.6 Max / K2.6 Thinking / Gemini-3.1-Pro",
+              "标注": "自报",
+              "解读": "Pass@1"
+            },
+            {
+              "名称": "MRCR 1M 长上下文精确检索(前沿横评·DeepSeek 自报,看短板)",
+              "分数": "Gemini-3.1-Pro 76.3 / DS-V4-Pro Max 83.5 / Opus-4.6 Max 92.9",
+              "对手": "Gemini-3.1-Pro / Opus-4.6 Max",
+              "标注": "自报",
+              "解读": "MMR"
             }
           ],
-          "强弱一句": "DeepSeek 开源百万 token 上下文高效模型，MIT 许可可商用，厂商自评代码与 Agent 能力顶尖，让长上下文应用不再卡在成本和绑定的困境。",
-          "一句话定位": "如果你在构建需要理解百万级 token 上下文的应用（如整库代码助手、长文档分析），或者需要私有化部署、微调模型以保证数据合规和成本可控，直接用 DeepSeek-V4-Pro 的 API 或下载部署。如果只是日常编码辅助或轻量代理，可以先通过 API 体验 Pro Max 的代码能力，确认够强再投入资源自部署。",
+          "强弱一句": "DeepSeek-V4 把『100 万 token 上下文 + 接近闭源旗舰的能力 + MIT 真开源』打包送出,而且这次多放出一个 284B/13B 激活的 Flash 版——意味着你第一次能用『一台机器』量级自托管一个长上下文旗舰级模型,不必再被闭源 API 的价格和数据出境绑死;但它仍是 preview、所有横评都是 DeepSeek 自报,落地前要自己实测。",
+          "一句话定位": "照着做决定的三支:① 直接值得自托管/微调——你有规模化调用 + 数据合规硬约束(私有 RAG、整库代码 agent、医疗/金融/政务内网),且用得上长上下文或编程能力:走 Flash(284B/13B),供得起一台 8 卡节点就能把『长上下文 + 控成本 + 不出境 + 编程强』一次拿齐;只有你有集群/愿租云、又要榨最高知识分时才上 Pro。② 先走它的 API / 第三方托管试水——只想体验 1M 上下文或编程能力、调用量还不大、没有合规压力:别急着自建,先按量调 DeepSeek 官方 API 或第三方托管,跑出来够强再评估自部署。③ 别用它——你要的是开箱即用的稳定旗舰体验、团队没有 MLOps/养卡能力、或核心需求是最难的 agentic 编排 / 深度长文档精确检索 / 最前沿多模态:这些它仍落后,闭源旗舰(Opus / Gemini / GPT)更省心,自托管这台大家伙只会拖慢你。额外提醒:这是 preview 版,放进生产关键路径前建议等正式版,或做好随时回退闭源 API 的预案。",
           "术语注解": [
             "MoE（混合专家模型）: 推理时只激活部分专家参数，用较少计算调用更大的总参数池。",
             "reasoning（推理）: 模型进行多步分析、规划或验证的能力。",
@@ -658,30 +744,33 @@
             "名称": "mit",
             "能否商用": "可商用"
           },
-          "自托管硬件": "H100 或更多），个人开发者可能承受不起",
+          "自托管硬件": "H100/H200 80G 节点放得下",
           "可用变体": [
-            "DeepSeek V4 Pro",
             "DeepSeek V4 Flash",
+            "DeepSeek V4 Pro",
             "DeepSeek V4 Flash Base",
             "DeepSeek V4 Pro Base"
           ],
           "base_model": "官方未披露"
         },
         "update": {
-          "版本": "DeepSeek V4 Pro→DeepSeek V4 Pro(2026-05-06)",
+          "版本": "DeepSeek V4 Pro→DeepSeek V4 Flash(2026-06-08)",
           "变了什么": [
-            "百万 token 上下文且推理成本骤降: 能把整个代码仓库或长文档一股脑塞进对话框，不用再费力做文本切片。以前因为上下文太贵做不了的产品（如全库代码理解、超长文档分析）现在能做了。",
-            "MIT 开源可商用: 可自部署、可微调成产品专用模型、数据不外传，避免 API 涨价和厂商锁定。闭源旗舰给不了这种自由度。",
-            "厂商自评代码/推理/Agent 能力顶尖: 有望成为 IDE、Copilot、AI 编程插件背后的强大引擎，供你自托管使用。",
+            "便宜的 100 万 token 上下文 → 整库代码 agent / 超长 RAG: 1M token 上下文(模型一次能读进去的内容长度),而且这一代把长上下文的推理开销砍到老版零头。意味着做代码 agent 时可以把『整个仓库』一股脑喂进去通盘理解、不用费劲切片拼接;做超长合同/法规/病例的检索问答(RAG,把外部材料塞给模型再让它答)能装下以前装不下的材料。这把你从『只能调闭源长上下文 API』挪到『自己托管一个能吃满 1M 的引擎』。但注意:1M『能装』不等于『装满还准』——深度精确检索它仍落后闭源旗舰,见下方 MRCR 短板。",
+            "284B/13B 的 Flash 版 → 第一次『一台机器』量级就能自托管长上下文旗舰: 除了 1.6T 的 Pro,这一代还放出 284B 总参 / 仅 13B 激活的 Flash,而且权重已经是 FP4 量化好的(用更省显存的 4 比特存专家参数)。这才是真正现实的自托管路径:13B 激活=推理快、单位成本低;FP4 帮你把量化做好了、不用自己折腾。它把『私有部署一个长上下文强模型』从『得搭多卡集群』降到『一台 8 卡节点』量级(此为按总参×精度推算,card 未给官方硬件数),让你能把模型放进自己机房、数据一步不出门。",
+            "MIT 真开源 → 商用零附加条件,法务风险最低: 这不是某些『社区许可』那种带月活上限、禁止拿来训练别的模型的伪开源——MIT 可商用、可改、可闭源分发,没有红线条款。对要把模型嵌进商业产品的你,这是最低的法务摩擦,也最不怕厂商哪天改条款把你架住。这正是开源相对闭源旗舰最实在的一笔:控制权在你手里。",
+            "三档推理力度(Non-think / High / Max)→ 每次请求自己拧成本与延迟旋钮: 同一个模型内置了『要不要多想』的开关:日常路由/分类走 Non-think 省钱省延迟,难任务才开 Think Max 把推理拉满。做产品时不用为『快但笨』和『准但贵』各接一个模型——一个模型按请求切档,等于自带了一个粗粒度的成本路由器。",
+            "竞赛级编程能力(厂商自评领先)→ 自托管的编程 agent 引擎: 若实测属实,你的自托管编程 agent 在竞赛/算法类任务上能对标甚至超过闭源旗舰,而且成本按算力摊薄、不按 token 越用越贵。对做 IDE 插件 / 编程 agent 产品的人很关键。但这条目前是 DeepSeek 自己选基准、自己跑的对比,务必拿你的真实代码库实测再下选型结论,别拿宣传分做决定。",
+            "接近闭源旗舰但短板明确 → 知道什么时候『别』选它: 这条帮你避坑。它『接近』旗舰不等于『是』旗舰:最难的知识问答(MMLU-Pro 87.5 vs Gemini 91.0)、深度长上下文精确检索(MRCR 1M 83.5 vs Opus 92.9)、最复杂的 agentic 工作流(Terminal Bench 67.9 vs GPT-5.4 75.1)它仍落后。把它用在它强的地方——可控成本的长上下文 + 编程 + 私有化合规——别拿它去硬刚 Opus/Gemini/GPT 各自的最强项。",
             "许可证/开放度: mit",
-            "发布日期: 2026-05-06"
+            "发布日期: 2026-06-08"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
             "旧版弃用": "官方未披露",
             "需迁移": "官方未披露"
           },
-          "值不值得切一句": "DeepSeek 开源百万 token 上下文高效模型，MIT 许可可商用，厂商自评代码与 Agent 能力顶尖，让长上下文应用不再卡在成本和绑定的困境。"
+          "值不值得切一句": "DeepSeek-V4 把『100 万 token 上下文 + 接近闭源旗舰的能力 + MIT 真开源』打包送出,而且这次多放出一个 284B/13B 激活的 Flash 版——意味着你第一次能用『一台机器』量级自托管一个长上下文旗舰级模型,不必再被闭源 API 的价格和数据出境绑死;但它仍是 preview、所有横评都是 DeepSeek 自报,落地前要自己实测。"
         }
       }
     },
@@ -706,55 +795,77 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/Qwen/Qwen3.6-27B",
-      "lastCheckedAt": "2026-06-06T13:29:02.663Z",
+      "lastCheckedAt": "2026-06-08T12:53:17.324Z",
       "latestVersionVariants": [
         "Qwen3.6 35B A3B",
         "Qwen3.6 35B A3B FP8",
         "Qwen3.6 27B FP8",
         "Qwen3.6 27B"
       ],
-      "analysisGeneratedAt": "2026-06-04T04:10:40.040Z",
-      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "analysisGeneratedAt": "2026-06-08T12:53:17.317Z",
+      "analysisAuthor": "Claude:sonnet",
       "analysis": {
-        "oneLineTakeaway": "Qwen3.6开源系列在agentic coding上大幅跃升，27B密集模型SWE-bench达77.2接近闭源旗舰，Apache 2.0许可让你可商用自部署，对要构建代码AI产品的你意味着更强的编码代理和更少的厂商锁定。",
+        "oneLineTakeaway": "能看截图写代码（多模态）、262K 上下文吃下整个中型代码库、量化后单卡可跑——用自托管成本把 vibe coding 的三个核心痛点一次打通，是目前开源里对应用构建者最落地的选型。",
         "whatItUnlocks": [
           {
-            "point": "Agentic coding能力显著提升",
-            "forYou": "在真实代码修复任务SWE-bench Verified上，Qwen3.6-27B得分77.2，比上代Qwen3.5-27B（75.0）提升明显，能更可靠地处理复杂代码变更，适合作为IDE智能编程助手或自动化PR agent。",
-            "evidence": "model card表格：SWE-bench Verified Qwen3.6-27B 77.2 vs Qwen3.5-27B 75.0",
-            "confidence": "medium（官方自报，第三方未验证）"
+            "point": "截图 → 代码，多模态让 vibe coding 少掉一半来回",
+            "forYou": "以前从设计稿到代码要：截图 → 手写描述 → 告诉模型。Qwen3.6-27B 是 image-text-to-text 多模态模型，能直接看图——你可以把 Figma 截图、已有 UI 截图、竞品页面直接扔给它说「照这个实现」，省掉文字转述这一环。做前端 AI 助手或设计稿转代码工具时，这把工作流从两步变一步。以前开源里能力够强、又能看图、又能量化到单卡的选项几乎没有。",
+            "evidence": "官方 model card HF tags：image-text-to-text；架构章节明确包含 Vision Encoder；MMMU 82.9、MathVista mini 87.4（自报）",
+            "confidence": "high（架构含视觉编码器是 card 明示事实）"
           },
           {
-            "point": "思考保留（Thinking Preservation）机制",
-            "forYou": "新引入的选项可以保留历史对话中的推理上下文，避免重复思考，使多轮复杂编码任务更流畅、更省token，直接提升开发效率。",
-            "evidence": "model card提到“Thinking Preservation”新功能，可保留推理上下文",
-            "confidence": "medium（功能描述，无独立评测）"
+            "point": "Thinking Preservation：跨轮次保留推理记忆，迭代 coding session 不再每轮重新解释",
+            "forYou": "做多轮 coding agent 最烦的是：「上轮为什么这样改」要重新喂给模型一大段上下文。Qwen3.6 新增 Thinking Preservation 选项，让模型在多轮对话里保留推理链——你可以做「先改 A，然后基于刚才的判断改 B」的真正连续迭代，而不是每轮重建上下文。这对做 agentic coding 工具（比如自动化重构工具、CI 自修复）的人有直接价值：agent 跑多步不会「失忆」，不用在 prompt 里反复复述背景。",
+            "evidence": "官方 model card：Thinking Preservation 是 Qwen3.6 两大亮点之一，原文：『retain reasoning context from historical messages, streamlining iterative development and reducing overhead』",
+            "confidence": "medium（官方描述功能存在；具体 token 节省幅度和边界行为需自测验证）"
           },
           {
-            "point": "原生26.2万上下文，可扩展至101万token",
-            "forYou": "能一次性处理整个中型代码仓库（数十万行代码），不用切片拼接，对代码理解、重构或长文档分析类应用十分友好。",
-            "evidence": "model card：Context Length: 262,144 natively and extensible up to 1,010,000 tokens",
-            "confidence": "high（明确规格）"
+            "point": "262K 原生上下文：整个中小型代码库一次喂进去，不用切片",
+            "forYou": "以前做「理解整个 repo 再改代码」的 agent，要么手动切片拼接（烦且丢上下文），要么只喂几个关键文件（判断不全面）。262K token 原生上下文让大多数中小型项目的全部源码可以一次喂进去——直接问「整个 repo 里，这个需求最合理的改法是哪里」，不切片、不用 RAG。1M extensible 则能处理超大型单仓库或长文档批量分析任务。",
+            "evidence": "官方 model card：『Context Length: 262,144 natively and extensible up to 1,010,000 tokens』",
+            "confidence": "high（card 明示架构设计值）"
           },
           {
-            "point": "Apache 2.0开源可商用",
-            "forYou": "你可以自由部署、微调、用于商业产品，数据不出企业，不受API厂商涨价或服务中断影响，适合合规敏感或成本敏感的场景。",
-            "evidence": "model card显示license: apache-2.0",
-            "confidence": "high"
+            "point": "量化后单卡 RTX 4090 可跑：自托管成本降到个人可接受范围",
+            "forYou": "27B 量化到 Q4 后约 14-16GB 显存，单张 RTX 4090（24GB）可以稳定运行。这意味着：私有数据（医疗病历、金融客户、代码知识产权）绝对不出境；高频调用摊薄成硬件成本，不按 token 付钱；不被任何 API 厂商绑定、随时涨价也不影响你。以前同等编程能力只有闭源旗舰 API——数据必须外传、按量计费。Apache-2.0 License 允许商用、微调、重分发，没有额外限制。",
+            "evidence": "Apache-2.0 license（model card 明示）；27B 参数量（FP16 约 54GB，Q4_K_M 量化后约 14-16GB，单 RTX 4090 24GB 可运行是业界通用估算公式）",
+            "confidence": "high（license 和参数量是 card 明示事实；显存估算为通用公式，非精确实测数据，实际使用时建议先测）"
+          },
+          {
+            "point": "MoE 变体 35B-A3B：推理成本接近小模型，适合高并发服务",
+            "forYou": "35B-A3B 是混合专家模型（MoE，把大模型拆成很多小「专家」，每次推理只激活其中一小部分）：总参 35B 但每次推理的计算量约等于 3B 模型——速度快、单请求算力便宜。如果你要搭一个高并发的 AI 编程助手服务（很多用户同时请求），35B-A3B 能以远低于 27B 的推理成本跑单个请求，代价是 benchmark 分数比 27B 低约 3-5%（SWE-bench Verified：73.4 vs 77.2）。需要注意：MoE 仍需把全部 35B 参数加载进显存（FP16 约 70GB），只是推理计算便宜，不等于显存需求也小。",
+            "evidence": "官方 model card：35B-A3B 变体列出；SWE-bench Verified 35B-A3B=73.4 vs 27B=77.2（自报）",
+            "confidence": "high（变体存在是 card 事实；推理计算量差异是 MoE 架构的已知性质）"
+          },
+          {
+            "point": "编程 agent 能力正式进入『接近闭源旗舰』档：工具调用自报略超 Claude Opus",
+            "forYou": "Qwen3.6-27B 在 SWE-bench Verified 77.2%（Claude 4.5 Opus 80.9%，差距 3.7 个点）；SkillsBench（多步工具调用）48.2% vs Opus 45.3%（自报超越）；Terminal-Bench 59.3% 与 Opus 并列。这些测的恰好是做 coding agent 产品最核心的场景：能不能用工具、能不能在真实终端自动完成任务。如果自报数据经第三方核验属实，意味着自托管成本能换来旗舰级 agent 质量。注意：全部自报，等第三方核验前保持适当怀疑。",
+            "evidence": "官方 model card 评测表：SWE-bench Verified Qwen3.6-27B=77.2 vs Claude 4.5 Opus=80.9；SkillsBench Avg5 Qwen3.6-27B=48.2 vs Opus=45.3；Terminal-Bench 两者均 59.3；均为 Alibaba 自报。",
+            "confidence": "low（厂商自评；SkillsBench/Terminal-Bench 由阿里自建 scaffold 运行，等 LMArena / OpenLLM Leaderboard 独立核验后再做选型决定）"
           }
         ],
         "benchmark": {
-          "headline": "官方自报分数亮眼：27B密集模型在代码代理、知识、推理上全面超越上代，并接近Claude 4.5 Opus，但所有数据来自阿里，待第三方独立评测核实。",
-          "professorNote": "对应用开发者：SWE-bench等指标直接反映编码代理能力，越高越好；MMLU-Pro等知识分影响通用问答可靠性。但这些都是厂商自评，落地选型前务必参考LMArena人类偏好等第三方榜单，以免被优化过的分数误导。",
+          "headline": "编程 agent 三项核心指标（SWE-bench / SkillsBench / Terminal-Bench）逼近或自报超越 Claude 4.5 Opus，但全部为阿里官方自报，等第三方独立核验。",
+          "professorNote": "对你做选型只需看三个关键指标：① SWE-bench Verified——最接近『真实 GitHub issue 修复』的编程 agent 基准，分越高代表 agent 在真实代码库里越靠谱；② SkillsBench——测多步工具调用成功率，直接代表 coding agent 里用工具、执行命令的实际能力；③ Terminal-Bench——在真实 Linux 终端里完成任务，代表能不能当自动化运维 / DevOps agent。这三个对做 AI 应用最直接相关。注意：QwenWebBench / Claw-Eval / QwenClawBench 是阿里内部榜单，数字无法独立核查，仅作参考。另外 SWE-bench 测试用了阿里自建 scaffold（非 SWE-bench 官方标准 scaffold），与其他机构公布的分数可能不可直接对比。",
           "charts": [
             {
-              "title": "SWE-bench Verified（真实代码修复）",
+              "title": "SWE-bench Verified（真实 GitHub issue 修复率，越高 agent 越可用）",
               "metric": "Pass@1",
-              "unit": "分",
+              "unit": "%",
               "higherIsBetter": true,
               "sourceType": "official",
               "maxValue": 100,
               "bars": [
+                {
+                  "label": "Gemma4-31B",
+                  "display": "52.0",
+                  "value": 52
+                },
+                {
+                  "label": "Qwen3.6-35B-A3B",
+                  "display": "73.4",
+                  "value": 73.4
+                },
                 {
                   "label": "Qwen3.5-27B",
                   "display": "75.0",
@@ -767,14 +878,81 @@
                   "highlight": true
                 },
                 {
-                  "label": "Qwen3.6-35B-A3B",
-                  "display": "73.4",
-                  "value": 73.4
-                },
-                {
                   "label": "Claude 4.5 Opus",
                   "display": "80.9",
                   "value": 80.9
+                }
+              ]
+            },
+            {
+              "title": "SkillsBench Avg5（多步工具调用，coding agent 核心能力）",
+              "metric": "Avg@5",
+              "unit": "%",
+              "higherIsBetter": true,
+              "sourceType": "official",
+              "maxValue": 60,
+              "bars": [
+                {
+                  "label": "Gemma4-31B",
+                  "display": "23.6",
+                  "value": 23.6
+                },
+                {
+                  "label": "Qwen3.6-35B-A3B",
+                  "display": "28.7",
+                  "value": 28.7
+                },
+                {
+                  "label": "Qwen3.5-27B",
+                  "display": "27.2",
+                  "value": 27.2
+                },
+                {
+                  "label": "Claude 4.5 Opus",
+                  "display": "45.3",
+                  "value": 45.3
+                },
+                {
+                  "label": "Qwen3.6-27B",
+                  "display": "48.2",
+                  "value": 48.2,
+                  "highlight": true
+                }
+              ]
+            },
+            {
+              "title": "Terminal-Bench 2.0（真实 Linux 终端自动化任务）",
+              "metric": "Pass Rate",
+              "unit": "%",
+              "higherIsBetter": true,
+              "sourceType": "official",
+              "maxValue": 70,
+              "bars": [
+                {
+                  "label": "Gemma4-31B",
+                  "display": "42.9",
+                  "value": 42.9
+                },
+                {
+                  "label": "Qwen3.6-35B-A3B",
+                  "display": "51.5",
+                  "value": 51.5
+                },
+                {
+                  "label": "Qwen3.5-397B-A17B",
+                  "display": "52.5",
+                  "value": 52.5
+                },
+                {
+                  "label": "Claude 4.5 Opus",
+                  "display": "59.3",
+                  "value": 59.3
+                },
+                {
+                  "label": "Qwen3.6-27B",
+                  "display": "59.3",
+                  "value": 59.3,
+                  "highlight": true
                 }
               ]
             }
@@ -782,58 +960,88 @@
           "items": [
             {
               "label": "SWE-bench Verified",
-              "score": "77.2 (27B) / 73.4 (35B-A3B)",
-              "comparator": "Qwen3.5-27B 75.0, Claude 4.5 Opus 80.9",
-              "interpretation": "编码代理核心指标，27B已接近闭源旗舰，可考虑用于构建代码助手",
+              "score": "77.2%",
+              "comparator": "Claude 4.5 Opus 80.9%；Qwen3.5-27B 75.0%",
+              "interpretation": "真实 GitHub issue 修复率，差 Opus 约 3.7 个点；比上代 Qwen3.5-27B 提升 2.2 点；阿里自建 scaffold 运行，与官方标准 scaffold 可能有差异",
               "sourceType": "official",
               "attribution": "自报"
             },
             {
               "label": "SWE-bench Pro",
-              "score": "53.5 (27B) / 49.5 (35B-A3B)",
-              "comparator": "Qwen3.5-27B 51.2, Claude 4.5 Opus 57.1",
-              "interpretation": "更难的专业级代码修复，27B有竞争力",
+              "score": "53.5%",
+              "comparator": "Claude 4.5 Opus 57.1%",
+              "interpretation": "更难版本（更多模糊和混淆的 issue）；差 Opus 约 3.6 个点；注意阿里修正了部分题目，与他方公布分数不可直接比较",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "SkillsBench Avg5",
+              "score": "48.2%",
+              "comparator": "Claude 4.5 Opus 45.3%（自报超越）",
+              "interpretation": "多步工具调用成功率；如属实则自托管可得旗舰级工具能力；等第三方核验",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "Terminal-Bench 2.0",
+              "score": "59.3%",
+              "comparator": "Claude 4.5 Opus 59.3%（并列）",
+              "interpretation": "真实 Linux 终端任务（3h timeout, 32 CPU/48GB RAM）；并列意味着做自动化运维 / DevOps agent 时能力与旗舰相当（自报）",
               "sourceType": "official",
               "attribution": "自报"
             },
             {
               "label": "LiveCodeBench v6",
-              "score": "83.9 (27B) / 80.4 (35B-A3B)",
-              "comparator": "Qwen3.5-27B 80.7, Claude 4.5 Opus 84.8",
-              "interpretation": "实时代码竞赛题，反映代码生成和推理能力",
-              "sourceType": "official",
-              "attribution": "自报"
-            },
-            {
-              "label": "MMLU-Pro",
-              "score": "86.2 (27B) / 85.2 (35B-A3B)",
-              "comparator": "Qwen3.5-27B 86.1, Claude 4.5 Opus 89.5",
-              "interpretation": "高难度知识问答，差距微小，知识较可靠",
+              "score": "83.9%",
+              "comparator": "Claude 4.5 Opus 84.8%",
+              "interpretation": "竞赛级编程题，差距 0.9%；纯代码生成能力极接近旗舰",
               "sourceType": "official",
               "attribution": "自报"
             },
             {
               "label": "GPQA Diamond",
-              "score": "87.8 (27B) / 86.0 (35B-A3B)",
-              "comparator": "Qwen3.5-27B 85.5, Claude 4.5 Opus 87.0",
-              "interpretation": "研究生级别科学推理，27B小幅领先Claude，推理能力突出",
+              "score": "87.8%",
+              "comparator": "Claude 4.5 Opus 87.0%（自报超越）",
+              "interpretation": "专家级科学推理；做科研辅助 / 知识密集任务时推理能力充足",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "QwenWebBench（前端代码生成）",
+              "score": "1487",
+              "comparator": "Claude 4.5 Opus 1536",
+              "interpretation": "阿里内部前端榜单（含 Web 设计/游戏/SVG/3D 共 7 类，BT/Elo 评分）；差约 3%，前端 vibe coding 场景接近旗舰；属内部基准参考价值有限",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "SWE-bench Multilingual",
+              "score": "71.3%",
+              "comparator": "Claude 4.5 Opus 77.5%",
+              "interpretation": "多语言代码库修复；差 6 个点，做非英文语言代码 agent 时有差距",
               "sourceType": "official",
               "attribution": "自报"
             }
           ],
           "caveats": [
-            "所有分数来自阿里官方model card，属于厂商自报，未经过LMArena或OpenLLM Leaderboard等第三方独立验证。",
-            "Claude 4.5 Opus分数为阿里自行评测，可能与Anthropic官方或第三方评测不一致。",
-            "27B密集模型在多数benchmark上优于35B-A3B MoE模型，可能因架构差异，应用时需实测选择。"
+            "以上所有数字均为 Alibaba 官方 model card 自报，含 SWE-bench 系列均由阿里自建 scaffold（internal agent scaffold, bash+file-edit tools）运行，非 SWE-bench 官方标准 scaffold，与其他机构公布分数不可直接对比。",
+            "QwenWebBench / Claw-Eval / QwenClawBench / NL2Repo 为阿里内部基准，数字无法独立核查，不作主要选型依据。",
+            "SWE-bench Pro 阿里修正了部分题目（per card footnote），和外部机构在原始题集上的分数不可直接对比。",
+            "'超过 Claude Opus'（SkillsBench/GPQA Diamond）的结论均为自报，LMArena / OpenLLM Leaderboard 独立核验结果出来前，建议给自己留 10-15% 的性能打折空间再做选型决定。",
+            "无官方技术报告可查（technicalReportText 为空），benchmark 方法论细节仅见 model card 脚注。"
           ]
         },
-        "openSourceMeaning": "Apache 2.0许可：可自由商用、修改、分发，无额外限制。对应用构建者意味着你能将模型集成到商业产品中，可自托管保障数据隐私，也可微调以适应垂直领域，完全控制推理成本。",
-        "whenToUse": "当你需要一个强编码代理能力且希望自主部署的大模型时。适合构建代码助手、自动化PR审查、长上下文代码库问答等应用。可以先通过阿里云API试用，确认效果后再考虑自部署27B密集模型（平衡性能与资源消耗），或使用35B-A3B MoE模型（可能推理更快）。",
-        "cost_caveats": "自部署27B密集模型推荐A100-80G或更高；35B-A3B MoE模型参数更大但激活少，推理可能更省显存，仍需高端GPU。FP8量化变体可大幅降低显存和计算需求，适合资源受限环境。",
+        "openSourceMeaning": "Apache-2.0 是开源里最宽松的商用许可证：商用免授权、可微调、可重分发、可私有部署，无平台绑定。但『能用』和『用得起』是两件事，这里把硬件账算清楚： ① 自托管硬件现实 - Qwen3.6-27B Q4_K_M：约 14-16GB 显存 → 单张 RTX 4090（24GB）可稳定运行，是个人 / 小团队最现实路径 - Qwen3.6-27B FP8：约 27GB → 单 A6000（48GB）或双 RTX 4090（48GB） - Qwen3.6-27B FP16：约 54GB → H100 / A100 80GB 或双 RTX 4090 搭配量化 - Qwen3.6-35B-A3B（MoE）：总参 35B 需全部加载进显存（FP16 约 70GB），Q4 约 17-19GB，推理计算量只相当于 3B 模型——适合高并发服务（单请求快），不等于显存需求小；个人单 4090 跑 Q4 很紧张，2×4090 或 A100 更稳 ② 微调现实性 - 27B LoRA 微调：2×RTX 4090 或单 A100/H100 可用 LLaMA-Factory / Unsloth；全量微调需 8×A100 级别 - 35B-A3B MoE 微调：工具链成熟度暂低于密集模型，门槛更高，不建议轻易尝试 ③ 合规价值（开源的核心商业价值） Apache-2.0 + 本地部署 = 数据不出境，直接打开医疗病历 AI、金融客户分析、政务内网问答、企业私有代码库 agent 等一整类以前只能靠弱小本地模型才能满足合规要求的场景。 ④ 真实代价 - 你自己扛部署、升级、推理服务运维（vLLM / SGLang） - 长上下文（100K+）在消费卡上 KV cache 占大量显存，实际可用长度低于理论上限，吞吐显著下降，批量任务前必须压测 - 没有托管 API 的 SLA 保证，故障时自己排查",
+        "whenToUse": "照三支直接做决定： ① 直接值得自托管 / 微调——你是以下任一情况：在做私有代码库的 coding agent（代码数据不能发外部 API）；想搭一个能「看截图写代码」的多模态前端工具；有数据合规硬约束（医疗 / 金融 / 政务）；或调用量已经大到「API 按 token 付钱 > 买卡摊薄」。这时 Qwen3.6-27B 量化后单 RTX 4090 可跑、Apache-2.0 全权自由，是最直接的落地路径。前提：你或团队能跑 vLLM / SGLang，不怕运维。 ② 先走托管 API 试水——你只是想体验它的编程 / 多模态能力、调用量小、暂无合规压力：先去阿里云 DashScope 或 Fireworks / Together AI 等支持 Qwen 的托管服务按量调，确认质量达标再评估自建。不要一上来就买卡。 ③ 别用它——你需要绝对最强的 coding agent 质量（Claude Opus 在 SWE-bench Pro 57.1 vs Qwen3.6-27B 53.5，差距在真实硬 case 上会放大）；或你团队零 MLOps 能力、只要一个有 SLA 的 API、不想碰部署；或核心需求是超前沿多步推理 / 数学（HLE Qwen3.6-27B 24.0 vs Opus 30.8，差距较大）——这些场景闭源旗舰仍有明显优势。",
+        "cost_caveats": "关键数字全在这：27B FP16 约 54GB（双 RTX 4090 或 H100/A100 80GB）；27B Q4 约 14-16GB（单 RTX 4090 可跑，是个人自托管最现实路径）。35B-A3B MoE：总参 35B 加载需约 70GB FP16（推理算力等效 3B，显存需求不等同）；Q4 量化约 17-19GB，单 4090 紧张，双卡或 A100 更稳。 长上下文成本：262K token 长上下文在 RTX 4090 上 KV cache 会占满大部分剩余显存，实测可用长度和吞吐会显著低于理论值，批量处理超长文档前必须压测实际 throughput。 与闭源 API 对比账：调用量少 / 场景轻 → 闭源 API 反而更便宜（不用买卡运维）；自托管优势在高频 / 长跑（数千次/天以上）才真正划算。量化到 Q4 后能力有一定损失，实测对比再做决定。 所有 benchmark 数字为厂商自报，落地前建议给自己留 10-15% 性能打折空间。",
         "sources": [
           {
-            "name": "HuggingFace model card (Qwen/Qwen3.6-27B)",
+            "name": "HuggingFace · Qwen/Qwen3.6-27B（官方 model card）",
             "url": "https://huggingface.co/Qwen/Qwen3.6-27B"
+          },
+          {
+            "name": "Alibaba Qwen 官方博客 · Qwen3.6-27B",
+            "url": "https://qwen.ai/blog?id=qwen3.6-27b"
           }
         ]
       },
@@ -849,53 +1057,88 @@
           "发布日": "2026-04-24",
           "开放度标签": "真开源可商用",
           "类型": "基座/指令/多模态/推理",
-          "规模架构": "MoE 总参官方未披露+激活参官方未披露；context window（上下文窗口）000",
+          "规模架构": "MoE 总参27B+激活参官方未披露；context window（上下文窗口）262K",
           "关键benchmark": [
             {
               "名称": "SWE-bench Verified",
-              "分数": "77.2 (27B) / 73.4 (35B-A3B)",
-              "对手": "Qwen3.5-27B 75.0, Claude 4.5 Opus 80.9",
+              "分数": "77.2%",
+              "对手": "Claude 4.5 Opus 80.9%；Qwen3.5-27B 75.0%",
               "标注": "自报",
-              "解读": "编码代理核心指标，27B已接近闭源旗舰，可考虑用于构建代码助手"
+              "解读": "真实 GitHub issue 修复率，差 Opus 约 3.7 个点；比上代 Qwen3.5-27B 提升 2.2 点；阿里自建 scaffold 运行，与官方标准 scaffold 可能有差异"
             },
             {
               "名称": "SWE-bench Pro",
-              "分数": "53.5 (27B) / 49.5 (35B-A3B)",
-              "对手": "Qwen3.5-27B 51.2, Claude 4.5 Opus 57.1",
+              "分数": "53.5%",
+              "对手": "Claude 4.5 Opus 57.1%",
               "标注": "自报",
-              "解读": "更难的专业级代码修复，27B有竞争力"
+              "解读": "更难版本（更多模糊和混淆的 issue）；差 Opus 约 3.6 个点；注意阿里修正了部分题目，与他方公布分数不可直接比较"
+            },
+            {
+              "名称": "SkillsBench Avg5",
+              "分数": "48.2%",
+              "对手": "Claude 4.5 Opus 45.3%（自报超越）",
+              "标注": "自报",
+              "解读": "多步工具调用成功率；如属实则自托管可得旗舰级工具能力；等第三方核验"
+            },
+            {
+              "名称": "Terminal-Bench 2.0",
+              "分数": "59.3%",
+              "对手": "Claude 4.5 Opus 59.3%（并列）",
+              "标注": "自报",
+              "解读": "真实 Linux 终端任务（3h timeout, 32 CPU/48GB RAM）；并列意味着做自动化运维 / DevOps agent 时能力与旗舰相当（自报）"
             },
             {
               "名称": "LiveCodeBench v6",
-              "分数": "83.9 (27B) / 80.4 (35B-A3B)",
-              "对手": "Qwen3.5-27B 80.7, Claude 4.5 Opus 84.8",
+              "分数": "83.9%",
+              "对手": "Claude 4.5 Opus 84.8%",
               "标注": "自报",
-              "解读": "实时代码竞赛题，反映代码生成和推理能力"
-            },
-            {
-              "名称": "MMLU-Pro",
-              "分数": "86.2 (27B) / 85.2 (35B-A3B)",
-              "对手": "Qwen3.5-27B 86.1, Claude 4.5 Opus 89.5",
-              "标注": "自报",
-              "解读": "高难度知识问答，差距微小，知识较可靠"
+              "解读": "竞赛级编程题，差距 0.9%；纯代码生成能力极接近旗舰"
             },
             {
               "名称": "GPQA Diamond",
-              "分数": "87.8 (27B) / 86.0 (35B-A3B)",
-              "对手": "Qwen3.5-27B 85.5, Claude 4.5 Opus 87.0",
+              "分数": "87.8%",
+              "对手": "Claude 4.5 Opus 87.0%（自报超越）",
               "标注": "自报",
-              "解读": "研究生级别科学推理，27B小幅领先Claude，推理能力突出"
+              "解读": "专家级科学推理；做科研辅助 / 知识密集任务时推理能力充足"
             },
             {
-              "名称": "SWE-bench Verified（真实代码修复）",
-              "分数": "Qwen3.5-27B 75.0 / Qwen3.6-27B 77.2 / Qwen3.6-35B-A3B 73.4 / Claude 4.5 Opus 80.9",
-              "对手": "Qwen3.5-27B / Qwen3.6-35B-A3B / Claude 4.5 Opus",
+              "名称": "QwenWebBench（前端代码生成）",
+              "分数": "1487",
+              "对手": "Claude 4.5 Opus 1536",
+              "标注": "自报",
+              "解读": "阿里内部前端榜单（含 Web 设计/游戏/SVG/3D 共 7 类，BT/Elo 评分）；差约 3%，前端 vibe coding 场景接近旗舰；属内部基准参考价值有限"
+            },
+            {
+              "名称": "SWE-bench Multilingual",
+              "分数": "71.3%",
+              "对手": "Claude 4.5 Opus 77.5%",
+              "标注": "自报",
+              "解读": "多语言代码库修复；差 6 个点，做非英文语言代码 agent 时有差距"
+            },
+            {
+              "名称": "SWE-bench Verified（真实 GitHub issue 修复率，越高 agent 越可用）",
+              "分数": "Gemma4-31B 52.0 / Qwen3.6-35B-A3B 73.4 / Qwen3.5-27B 75.0 / Qwen3.6-27B 77.2 / Claude 4.5 Opus 80.9",
+              "对手": "Gemma4-31B / Qwen3.6-35B-A3B / Qwen3.5-27B / Claude 4.5 Opus",
               "标注": "自报",
               "解读": "Pass@1"
+            },
+            {
+              "名称": "SkillsBench Avg5（多步工具调用，coding agent 核心能力）",
+              "分数": "Gemma4-31B 23.6 / Qwen3.6-35B-A3B 28.7 / Qwen3.5-27B 27.2 / Claude 4.5 Opus 45.3 / Qwen3.6-27B 48.2",
+              "对手": "Gemma4-31B / Qwen3.6-35B-A3B / Qwen3.5-27B / Claude 4.5 Opus",
+              "标注": "自报",
+              "解读": "Avg@5"
+            },
+            {
+              "名称": "Terminal-Bench 2.0（真实 Linux 终端自动化任务）",
+              "分数": "Gemma4-31B 42.9 / Qwen3.6-35B-A3B 51.5 / Qwen3.5-397B-A17B 52.5 / Claude 4.5 Opus 59.3 / Qwen3.6-27B 59.3",
+              "对手": "Gemma4-31B / Qwen3.6-35B-A3B / Qwen3.5-397B-A17B / Claude 4.5 Opus",
+              "标注": "自报",
+              "解读": "Pass Rate"
             }
           ],
-          "强弱一句": "Qwen3.6开源系列在agentic coding上大幅跃升，27B密集模型SWE-bench达77.2接近闭源旗舰，Apache 2.0许可让你可商用自部署，对要构建代码AI产品的你意味着更强的编码代理和更少的厂商锁定。",
-          "一句话定位": "当你需要一个强编码代理能力且希望自主部署的大模型时。适合构建代码助手、自动化PR审查、长上下文代码库问答等应用。可以先通过阿里云API试用，确认效果后再考虑自部署27B密集模型（平衡性能与资源消耗），或使用35B-A3B MoE模型（可能推理更快）。",
+          "强弱一句": "能看截图写代码（多模态）、262K 上下文吃下整个中型代码库、量化后单卡可跑——用自托管成本把 vibe coding 的三个核心痛点一次打通，是目前开源里对应用构建者最落地的选型。",
+          "一句话定位": "照三支直接做决定： ① 直接值得自托管 / 微调——你是以下任一情况：在做私有代码库的 coding agent（代码数据不能发外部 API）；想搭一个能「看截图写代码」的多模态前端工具；有数据合规硬约束（医疗 / 金融 / 政务）；或调用量已经大到「API 按 token 付钱 > 买卡摊薄」。这时 Qwen3.6-27B 量化后单 RTX 4090 可跑、Apache-2.0 全权自由，是最直接的落地路径。前提：你或团队能跑 vLLM / SGLang，不怕运维。 ② 先走托管 API 试水——你只是想体验它的编程 / 多模态能力、调用量小、暂无合规压力：先去阿里云 DashScope 或 Fireworks / Together AI 等支持 Qwen 的托管服务按量调，确认质量达标再评估自建。不要一上来就买卡。 ③ 别用它——你需要绝对最强的 coding agent 质量（Claude Opus 在 SWE-bench Pro 57.1 vs Qwen3.6-27B 53.5，差距在真实硬 case 上会放大）；或你团队零 MLOps 能力、只要一个有 SLA 的 API、不想碰部署；或核心需求是超前沿多步推理 / 数学（HLE Qwen3.6-27B 24.0 vs Opus 30.8，差距较大）——这些场景闭源旗舰仍有明显优势。",
           "术语注解": [
             "MoE（混合专家模型）: 推理时只激活部分专家参数，用较少计算调用更大的总参数池。",
             "reasoning（推理）: 模型进行多步分析、规划或验证的能力。",
@@ -905,7 +1148,7 @@
             "名称": "apache-2.0",
             "能否商用": "可商用"
           },
-          "自托管硬件": "A100-80G或更高",
+          "自托管硬件": "RTX 4090 可跑：自托管成本降到个人可接受范围",
           "可用变体": [
             "Qwen3.6 35B A3B",
             "Qwen3.6 35B A3B FP8",
@@ -917,10 +1160,12 @@
         "update": {
           "版本": "Qwen3.6 35B A3B→Qwen3.6 35B A3B(2026-04-24)",
           "变了什么": [
-            "Agentic coding能力显著提升: 在真实代码修复任务SWE-bench Verified上，Qwen3.6-27B得分77.2，比上代Qwen3.5-27B（75.0）提升明显，能更可靠地处理复杂代码变更，适合作为IDE智能编程助手或自动化PR agent。",
-            "思考保留（Thinking Preservation）机制: 新引入的选项可以保留历史对话中的推理上下文，避免重复思考，使多轮复杂编码任务更流畅、更省token，直接提升开发效率。",
-            "原生26.2万上下文，可扩展至101万token: 能一次性处理整个中型代码仓库（数十万行代码），不用切片拼接，对代码理解、重构或长文档分析类应用十分友好。",
-            "Apache 2.0开源可商用: 你可以自由部署、微调、用于商业产品，数据不出企业，不受API厂商涨价或服务中断影响，适合合规敏感或成本敏感的场景。",
+            "截图 → 代码，多模态让 vibe coding 少掉一半来回: 以前从设计稿到代码要：截图 → 手写描述 → 告诉模型。Qwen3.6-27B 是 image-text-to-text 多模态模型，能直接看图——你可以把 Figma 截图、已有 UI 截图、竞品页面直接扔给它说「照这个实现」，省掉文字转述这一环。做前端 AI 助手或设计稿转代码工具时，这把工作流从两步变一步。以前开源里能力够强、又能看图、又能量化到单卡的选项几乎没有。",
+            "Thinking Preservation：跨轮次保留推理记忆，迭代 coding session 不再每轮重新解释: 做多轮 coding agent 最烦的是：「上轮为什么这样改」要重新喂给模型一大段上下文。Qwen3.6 新增 Thinking Preservation 选项，让模型在多轮对话里保留推理链——你可以做「先改 A，然后基于刚才的判断改 B」的真正连续迭代，而不是每轮重建上下文。这对做 agentic coding 工具（比如自动化重构工具、CI 自修复）的人有直接价值：agent 跑多步不会「失忆」，不用在 prompt 里反复复述背景。",
+            "262K 原生上下文：整个中小型代码库一次喂进去，不用切片: 以前做「理解整个 repo 再改代码」的 agent，要么手动切片拼接（烦且丢上下文），要么只喂几个关键文件（判断不全面）。262K token 原生上下文让大多数中小型项目的全部源码可以一次喂进去——直接问「整个 repo 里，这个需求最合理的改法是哪里」，不切片、不用 RAG。1M extensible 则能处理超大型单仓库或长文档批量分析任务。",
+            "量化后单卡 RTX 4090 可跑：自托管成本降到个人可接受范围: 27B 量化到 Q4 后约 14-16GB 显存，单张 RTX 4090（24GB）可以稳定运行。这意味着：私有数据（医疗病历、金融客户、代码知识产权）绝对不出境；高频调用摊薄成硬件成本，不按 token 付钱；不被任何 API 厂商绑定、随时涨价也不影响你。以前同等编程能力只有闭源旗舰 API——数据必须外传、按量计费。Apache-2.0 License 允许商用、微调、重分发，没有额外限制。",
+            "MoE 变体 35B-A3B：推理成本接近小模型，适合高并发服务: 35B-A3B 是混合专家模型（MoE，把大模型拆成很多小「专家」，每次推理只激活其中一小部分）：总参 35B 但每次推理的计算量约等于 3B 模型——速度快、单请求算力便宜。如果你要搭一个高并发的 AI 编程助手服务（很多用户同时请求），35B-A3B 能以远低于 27B 的推理成本跑单个请求，代价是 benchmark 分数比 27B 低约 3-5%（SWE-bench Verified：73.4 vs 77.2）。需要注意：MoE 仍需把全部 35B 参数加载进显存（FP16 约 70GB），只是推理计算便宜，不等于显存需求也小。",
+            "编程 agent 能力正式进入『接近闭源旗舰』档：工具调用自报略超 Claude Opus: Qwen3.6-27B 在 SWE-bench Verified 77.2%（Claude 4.5 Opus 80.9%，差距 3.7 个点）；SkillsBench（多步工具调用）48.2% vs Opus 45.3%（自报超越）；Terminal-Bench 59.3% 与 Opus 并列。这些测的恰好是做 coding agent 产品最核心的场景：能不能用工具、能不能在真实终端自动完成任务。如果自报数据经第三方核验属实，意味着自托管成本能换来旗舰级 agent 质量。注意：全部自报，等第三方核验前保持适当怀疑。",
             "许可证/开放度: apache-2.0",
             "发布日期: 2026-04-24"
           ],
@@ -929,7 +1174,7 @@
             "旧版弃用": "官方未披露",
             "需迁移": "官方未披露"
           },
-          "值不值得切一句": "Qwen3.6开源系列在agentic coding上大幅跃升，27B密集模型SWE-bench达77.2接近闭源旗舰，Apache 2.0许可让你可商用自部署，对要构建代码AI产品的你意味着更强的编码代理和更少的厂商锁定。"
+          "值不值得切一句": "能看截图写代码（多模态）、262K 上下文吃下整个中型代码库、量化后单卡可跑——用自托管成本把 vibe coding 的三个核心痛点一次打通，是目前开源里对应用构建者最落地的选型。"
         }
       }
     },
@@ -952,7 +1197,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512",
-      "lastCheckedAt": "2026-06-06T13:29:02.844Z",
+      "lastCheckedAt": "2026-06-08T13:00:29.280Z",
       "latestVersionVariants": [
         "Mistral Large 3 675B Instruct 2512 NVFP4",
         "Mistral Large 3 675B Instruct 2512",
@@ -960,81 +1205,79 @@
         "Mistral Large 3 675B Instruct 2512 Eagle",
         "Mistral Large 3 675B Base 2512"
       ],
-      "analysisGeneratedAt": "2026-06-04T04:10:40.040Z",
-      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "analysisGeneratedAt": "2026-06-08T13:00:29.279Z",
+      "analysisAuthor": "Claude:sonnet",
       "analysis": {
-        "oneLineTakeaway": "Mistral开源了一个号称强悍的多模态MoE模型，Apache 2.0可商用，自带视觉、函数调用、256k上下文，但要自部署需整机H200，现阶段只能看官方图表信不信得过了。",
+        "oneLineTakeaway": "675B MoE 开源旗舰、Apache 2.0 完全商用、256k 长上下文 + 视觉理解 + 原生工具调用三合一,NVFP4 量化后单节点 H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择,闭源 API 才有的能力组合,现在能自己拥有。",
         "whatItUnlocks": [
           {
-            "point": "开源可商用+自部署指导 → 数据可控、不被锁定",
-            "forYou": "Apache 2.0允许自由商用，模型可部署在自己硬件上，不再受API涨价或服务中断影响；适合对数据合规、安全要求高的企业AI产品。",
-            "evidence": "模型卡明确标注Apache 2.0许可证，并提供vLLM自部署命令和硬件建议（FP8需8xH200）。",
-            "confidence": "high"
+            "point": "视觉理解 + 原生工具调用在同一个自托管模型里",
+            "forYou": "以前要搭「能看图又能调 API」的 agent,要么拼接两个模型、要么必须锁定 GPT-4o 这类闭源服务。Mistral Large 3 把 2.5B 视觉编码器和原生 function calling(含 JSON 强制输出)都内置了——你能在私有部署里直接做出「截图→解读图→调工具→生成结构化报告」的完整工作流,不再需要把数据发给云端闭源 API 才能实现多模态 agent。",
+            "evidence": "官方 model card:内置 2.5B Vision Encoder(673B LM + 2.5B 视觉编码器);明示 native function calling + JSON outputting;vLLM 示例代码演示视觉+工具调用同时开启的完整 demo",
+            "confidence": "high(card 明示架构与能力)"
           },
           {
-            "point": "多模态视觉理解 → 解锁图像问答/视觉助手类应用",
-            "forYou": "模型支持直接输入图片分析，你可以在产品中构建拍照解题、图表理解、视觉搜索等功能，无需单独接视觉模型。",
-            "evidence": "模型卡展示了vision reasoning示例，并说明使用了2.5B视觉编码器。",
-            "confidence": "high"
+            "point": "256k 上下文可以吃下整份长文档或大型代码库片段,不用做 RAG 切片",
+            "forYou": "256k token 约等于 20 万中文字、或几千行代码。做企业知识问答时可以把一份完整合同/审计报告/代码模块一次喂进去让它通盘理解,不需要做复杂的 RAG 分块拼接——分块是工程成本,也是理解信息丢失的来源。以前这种「大块原文直接理解」要靠 Gemini 或 Claude 的闭源长上下文才行,现在能在自己服务器上跑。",
+            "evidence": "官方 model card 明示支持 256k context window;vLLM serve 命令默认 max-model-len 262144",
+            "confidence": "high(card 明示)"
           },
           {
-            "point": "长上下文256k → 整本书、长文档、大量代码一次处理",
-            "forYou": "256k上下文窗口意味着你可以把整本小说、长篇法律合同、大型代码库直接喂给模型，免去切片拼接的复杂逻辑，适合深度文档分析、代码库理解等场景。",
-            "evidence": "模型卡写明‘Supports a 256k context window’。",
-            "confidence": "high"
+            "point": "Apache 2.0 = 比 Llama 系列更干净的商用自由,改完权重也不用开源",
+            "forYou": "Apache 2.0 是开源里最宽松的商业许可之一:可以把模型打包进商业产品卖、可以修改权重再分发、不需要开源你的修改、没有「7000 万月活用户须另行申请」这类特殊门槛(Llama 系列有此限制)。如果你的 AI 产品要规模化商用、或者要把模型能力嵌进 SaaS 卖给企业客户,Mistral Large 3 是目前旗舰级开源模型里许可证条款最干净的选项之一——法务审查成本低。",
+            "evidence": "官方 model card:License Apache 2.0;标准 Apache 2.0 原文无用户数量限制条款",
+            "confidence": "high(license 明示;商用前建议自行核对最新许可证原文)"
           },
           {
-            "point": "原生函数调用与JSON输出 → 更容易构建自主Agent",
-            "forYou": "模型内置了函数调用和结构化输出能力，你可以用它构建能够调用外部工具、自主完成任务的Agent，如自动化客服、数据分析助理等。",
-            "evidence": "模型卡提供function calling示例，并使用工具调用解析器，且声称best-in-class agentic capabilities。",
-            "confidence": "low(agentic为厂商自评，需第三方任务评测证实)"
+            "point": "NVFP4 量化版把自托管门槛从「H200/B200 专属」降到「H100/A100 单节点可租」",
+            "forYou": "FP8 主版本需要 B200 或 H200(2025-26 年最顶级的卡,价格极贵、云端现货少),但 NVFP4 量化版可以跑在 H100 或 A100 节点上。H100 80GB 在 AWS/GCP/Azure 都有按小时租,单节点 8 卡约每小时几十美元可以到手——而 H200/B200 要么无现货要么定价更高。这把「能跑 675B 旗舰」的门槛从「只有顶级实验室」降到了「中等规模 AI 团队能租」。量化(NVFP4)的代价是精度略有损失,但对大多数应用任务(问答、agent、代码)影响可接受。",
+            "evidence": "官方 model card 明示:NVFP4 版 deployable on single node of H100s or A100s;FP8 版需 B200 或 H200",
+            "confidence": "high(card 明示硬件路线;NVFP4 精度损失程度需自己实测)"
           },
           {
-            "point": "多语言支持 → 国际化产品更省力",
-            "forYou": "覆盖中文、日文、阿拉伯语等主要语言，你做面向全球用户的产品时不需要每种语言训练一个模型，开发维护成本降低。",
-            "evidence": "模型卡列出支持语言：英、法、西、德、意、葡、荷、中、日、韩、阿等。",
-            "confidence": "high"
+            "point": "Eagle 投机解码官方配套,同一节点吞吐更高不加卡",
+            "forYou": "投机解码(speculative decoding)是指用一个小的「草稿模型」先快速猜后续几个 token、主模型并行验证——有效提升每秒生成 token 数,不损失质量。Mistral 官方专门配套发布了 Eagle 草稿模型,推荐在生产部署中开启。对你来说:同样一台 H100 节点,开 Eagle 后能在高并发时服务更多请求、单位硬件成本摊薄——做 C 端或 API 服务时这笔账很实在。",
+            "evidence": "官方 model card:提供 Mistral-Large-3-675B-Instruct-2512-Eagle;vLLM 示例含完整 speculative decoding 配置参数(num_speculative_tokens=3, method=eagle)",
+            "confidence": "high(草稿模型存在且 card 明示推荐;具体吞吐提升倍数官方 card 文字中未披露数字)"
+          },
+          {
+            "point": "11 语言原生支持,多语言产品不用外接翻译层",
+            "forYou": "官方明示支持英/法/西/德/意/葡/荷/中/日/韩/阿 11 种语言,法语和欧洲语言是 Mistral 的传统强项。如果你的 AI 应用要出海欧洲、中东、东亚,能在同一个私有部署里处理多语言输入输出,不需要再架翻译 API 中间层或维护多套语言模型——减少了一个依赖点和一段延迟。",
+            "evidence": "官方 model card 明示多语言支持列表:English, French, Spanish, German, Italian, Portuguese, Dutch, Chinese, Japanese, Korean, Arabic",
+            "confidence": "high(语言列表 card 明示;各语言实际质量暂无第三方分语言评测数字)"
           }
         ],
         "benchmark": {
-          "headline": "官方提供了与类似规模模型的benchmark对比图表，但无文本数字，具体得分不可知，需等待第三方实测。",
-          "professorNote": "对于选型来说，benchmark必须看到具体数值和第三方验证。目前厂商仅用图片示意领先，无法判断真实差距。落地前请关注LMArena和OpenLLM Leaderboard的实测结果。",
+          "headline": "官方 model card 的 benchmark 数据全部以图片形式展示,文字中无可引用数字;第三方榜单截至 2026-06-08 未收录该版本",
+          "professorNote": "对你选型最相关的指标是:工具调用准确率(agent 场景)、长上下文检索准确率(RAG 场景)、代码生成质量(编程 agent)。但这三类数据在本 model card 中均只有图表图片而无文字数字,无法核实引用。官方自述『frontier performance / best-in-class agentic』为厂商自评。建议等 LMArena ELO 和 BigCodeBench 第三方结果发布后再做定量对比选型。在此之前,最有价值的数字是你用自己真实任务跑出来的。",
           "charts": [],
-          "items": [
-            {
-              "label": "MMLU (General Knowledge)",
-              "score": "见官方图表",
-              "comparator": "与同尺寸模型对比",
-              "interpretation": "无法解读，等待第三方数字",
-              "sourceType": "official",
-              "attribution": "自报"
-            },
-            {
-              "label": "其他推理/编码基准",
-              "score": "见官方图表",
-              "comparator": "与其他模型",
-              "interpretation": "无法解读",
-              "sourceType": "official",
-              "attribution": "自报"
-            }
-          ],
+          "items": [],
           "caveats": [
-            "官方只提供了benchmark结果图片，没有数值，无法用于客观比较。",
-            "所有性能声称均为厂商自评，尚未经LMArena、OpenLLM等独立验证，请谨慎采信。",
-            "即使有数值，也需要在实际应用场景（如中文、长上下文、agent任务）上自行评估。"
+            "官方 model card benchmark 全部以图片展示,文字中无具体数字——无法提取核实,本卡不臆造数字。",
+            "第三方榜单(LMArena、OpenLLM Leaderboard、BigCodeBench)截至 2026-06-08 未收录本版本,数据待补。",
+            "官方自述「frontier performance / best-in-class agentic / best-in-class function calling」均为厂商自评,confidence=low,等第三方交叉验证后再当依据。",
+            "Eagle 投机解码的实际吞吐提升倍数官方未在 card 文字中披露,需自行基准测试。"
           ]
         },
-        "openSourceMeaning": "Apache 2.0开源意味着你可以自由商用、自部署、微调，数据完全留在自己手里。但670B+参数需要昂贵硬件，建议初期先用Mistral的API验证效果，确定能挣钱后再考虑自部署管控成本。",
-        "whenToUse": "如果你需要构建需要视觉理解、长上下文、多语言支持的企业级AI应用，且对数据安全要求高、预算允许采购高配GPU，可以评估此模型。先用API跑通核心场景，确认效果后再部署。",
-        "cost_caveats": "自部署最低配置：FP8需8×H200，NVFP4需8×H100/A100，是一笔巨大投入。个人开发者或小团队建议先用Mistral API（价格未公开）或云服务按需使用。",
+        "openSourceMeaning": "Apache 2.0 是最宽松的商业开源许可之一,权重完全开放下载。对做 AI 应用的你,具体换来三件事:① **商用自由**——直接包进产品卖,改完权重不用开源,无用户数上限条款,法务摩擦最小;② **数据主权**——医疗/金融/政务等数据不能出境的场景,可在私有网络内跑全量旗舰级能力,满足合规硬约束,这是闭源 API 给不了的;③ **微调专属化**——权重可拿来做监督微调(SFT,即用你的数据举例子教它)变成领域专用版本。但这笔账有真实代价:自部署硬件门槛是**单节点 8 卡**起步。FP8 版需 H200 或 B200(2025-26 年最贵卡,云端现货稀少);NVFP4 量化版可退到 H100(80GB)或 A100,云端相对可租但单节点 8 卡成本仍不低。个人笔记本和单卡完全无望;小团队自建物理集群的前期成本更高。微调的现实:BF16 全精度版约需 1.3TB 显存才能做标准微调,非 H200 集群难以承受;NVFP4 是推理量化格式,不适合直接当微调基线。现实路径是:量不大先走 Mistral 官方 API(la Plateforme)或 Fireworks/Together 等三方托管,量大且有合规诉求再评估自建节点。",
+        "whenToUse": "三支判断,直接照着做决定:① **直接值得自托管/微调** — 同时满足以下条件:产品需要视觉+长上下文+工具调用的多合一 agent 能力、数据有不出境的合规硬约束(医疗/金融/政务)、调用量高到按量 API 成本不划算,且团队能供得起单节点 8×H100 云节点(NVFP4 路线)。这时 Apache 2.0 + 私有部署是最干净的开源旗舰路线,能力组合市面上没几个开源模型能替代。② **先走托管 API 试水** — 你在做原型/MVP、量小、没有合规压力:直接调 Mistral 官方 API 或三方托管接口,省去运维和显存账;等证明了产品 PMF 再评估自部署。③ **别用它** — 核心需求是硬数理推理/数学竞赛(用 QwQ 或 DeepSeek-R2 等推理专用模型,Mistral 自己 card 里也承认「not a dedicated reasoning model」);或者视觉是第一重心(Mistral 承认「behind vision-first models」);或者团队根本没有 MLOps 能力养 675B 节点——这些场景别被「开源旗舰」名号诱惑去啃运维,用闭源 API 更省心。",
+        "cost_caveats": "自部署真实硬件账:FP8 主版本需单节点 8×H200 或 8×B200,2026 年云端这两款卡现货均紧张且价格最贵;NVFP4 量化版可退到 8×H100(80GB)或 A100,云端相对易租,但单节点 8 卡成本仍需认真计算。个人单卡/家用机完全不可行。长上下文代价:vLLM 默认 max-model-len 262144 会吃满显存,官方建议根据实际场景把 --max-model-len 裁到 32k-64k 来换取更高吞吐和更低显存峰值——跑满 256k 的吞吐会很低。Eagle 投机解码:草稿模型需额外加载进显存,部署前需实测余量够不够。API 定价:Mistral 官方 la Plateforme 的具体每 token 价格在 model card 中未披露,查 mistral.ai/pricing 获取最新数字。所有官方 benchmark 数字均为厂商自评:card 里的图表是自报而非第三方实测,落地决策前务必用你自己的真实任务跑一遍,不要把宣传图当选型依据。",
         "sources": [
           {
-            "name": "HuggingFace · mistralai/Mistral-Large-3-675B-Instruct-2512",
+            "name": "HuggingFace · mistralai/Mistral-Large-3-675B-Instruct-2512 (官方 model card)",
             "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512"
           },
           {
-            "name": "Mistral Large 3 Blog Post",
+            "name": "Mistral AI 官方博客 · Mistral Large 3 发布公告",
             "url": "https://mistral.ai/news/mistral-3"
+          },
+          {
+            "name": "HuggingFace · Mistral-Large-3-675B-Instruct-2512-NVFP4 (H100/A100 量化版)",
+            "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512-NVFP4"
+          },
+          {
+            "name": "HuggingFace · Mistral-Large-3-675B-Instruct-2512-Eagle (投机解码草稿模型)",
+            "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512-Eagle"
           }
         ]
       },
@@ -1053,22 +1296,15 @@
           "规模架构": "MoE 总参官方未披露+激活参官方未披露；context window（上下文窗口）256k",
           "关键benchmark": [
             {
-              "名称": "MMLU (General Knowledge)",
-              "分数": "见官方图表",
-              "对手": "与同尺寸模型对比",
+              "名称": "官方未披露",
+              "分数": "官方未披露",
+              "对手": "官方未披露",
               "标注": "自报",
-              "解读": "无法解读，等待第三方数字"
-            },
-            {
-              "名称": "其他推理/编码基准",
-              "分数": "见官方图表",
-              "对手": "与其他模型",
-              "标注": "自报",
-              "解读": "无法解读"
+              "解读": "没有可核验 benchmark 数字。"
             }
           ],
-          "强弱一句": "Mistral开源了一个号称强悍的多模态MoE模型，Apache 2.0可商用，自带视觉、函数调用、256k上下文，但要自部署需整机H200，现阶段只能看官方图表信不信得过了。",
-          "一句话定位": "如果你需要构建需要视觉理解、长上下文、多语言支持的企业级AI应用，且对数据安全要求高、预算允许采购高配GPU，可以评估此模型。先用API跑通核心场景，确认效果后再部署。",
+          "强弱一句": "675B MoE 开源旗舰、Apache 2.0 完全商用、256k 长上下文 + 视觉理解 + 原生工具调用三合一,NVFP4 量化后单节点 H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择,闭源 API 才有的能力组合,现在能自己拥有。",
+          "一句话定位": "三支判断,直接照着做决定:① **直接值得自托管/微调** — 同时满足以下条件:产品需要视觉+长上下文+工具调用的多合一 agent 能力、数据有不出境的合规硬约束(医疗/金融/政务)、调用量高到按量 API 成本不划算,且团队能供得起单节点 8×H100 云节点(NVFP4 路线)。这时 Apache 2.0 + 私有部署是最干净的开源旗舰路线,能力组合市面上没几个开源模型能替代。② **先走托管 API 试水** — 你在做原型/MVP、量小、没有合规压力:直接调 Mistral 官方 API 或三方托管接口,省去运维和显存账;等证明了产品 PMF 再评估自部署。③ **别用它** — 核心需求是硬数理推理/数学竞赛(用 QwQ 或 DeepSeek-R2 等推理专用模型,Mistral 自己 card 里也承认「not a dedicated reasoning model」);或者视觉是第一重心(Mistral 承认「behind vision-first models」);或者团队根本没有 MLOps 能力养 675B 节点——这些场景别被「开源旗舰」名号诱惑去啃运维,用闭源 API 更省心。",
           "术语注解": [
             "MoE（混合专家模型）: 推理时只激活部分专家参数，用较少计算调用更大的总参数池。",
             "reasoning（推理）: 模型进行多步分析、规划或验证的能力。",
@@ -1078,7 +1314,7 @@
             "名称": "apache-2.0",
             "能否商用": "可商用"
           },
-          "自托管硬件": "H200，现阶段只能看官方图表信不信得过了",
+          "自托管硬件": "H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择",
           "可用变体": [
             "Mistral Large 3 675B Instruct 2512 NVFP4",
             "Mistral Large 3 675B Instruct 2512",
@@ -1091,11 +1327,12 @@
         "update": {
           "版本": "Mistral Large 3 675B Instruct 2512 NVFP4→Mistral Large 3 675B Instruct 2512 NVFP4(2026-01-29)",
           "变了什么": [
-            "开源可商用+自部署指导 → 数据可控、不被锁定: Apache 2.0允许自由商用，模型可部署在自己硬件上，不再受API涨价或服务中断影响；适合对数据合规、安全要求高的企业AI产品。",
-            "多模态视觉理解 → 解锁图像问答/视觉助手类应用: 模型支持直接输入图片分析，你可以在产品中构建拍照解题、图表理解、视觉搜索等功能，无需单独接视觉模型。",
-            "长上下文256k → 整本书、长文档、大量代码一次处理: 256k上下文窗口意味着你可以把整本小说、长篇法律合同、大型代码库直接喂给模型，免去切片拼接的复杂逻辑，适合深度文档分析、代码库理解等场景。",
-            "原生函数调用与JSON输出 → 更容易构建自主Agent: 模型内置了函数调用和结构化输出能力，你可以用它构建能够调用外部工具、自主完成任务的Agent，如自动化客服、数据分析助理等。",
-            "多语言支持 → 国际化产品更省力: 覆盖中文、日文、阿拉伯语等主要语言，你做面向全球用户的产品时不需要每种语言训练一个模型，开发维护成本降低。",
+            "视觉理解 + 原生工具调用在同一个自托管模型里: 以前要搭「能看图又能调 API」的 agent,要么拼接两个模型、要么必须锁定 GPT-4o 这类闭源服务。Mistral Large 3 把 2.5B 视觉编码器和原生 function calling(含 JSON 强制输出)都内置了——你能在私有部署里直接做出「截图→解读图→调工具→生成结构化报告」的完整工作流,不再需要把数据发给云端闭源 API 才能实现多模态 agent。",
+            "256k 上下文可以吃下整份长文档或大型代码库片段,不用做 RAG 切片: 256k token 约等于 20 万中文字、或几千行代码。做企业知识问答时可以把一份完整合同/审计报告/代码模块一次喂进去让它通盘理解,不需要做复杂的 RAG 分块拼接——分块是工程成本,也是理解信息丢失的来源。以前这种「大块原文直接理解」要靠 Gemini 或 Claude 的闭源长上下文才行,现在能在自己服务器上跑。",
+            "Apache 2.0 = 比 Llama 系列更干净的商用自由,改完权重也不用开源: Apache 2.0 是开源里最宽松的商业许可之一:可以把模型打包进商业产品卖、可以修改权重再分发、不需要开源你的修改、没有「7000 万月活用户须另行申请」这类特殊门槛(Llama 系列有此限制)。如果你的 AI 产品要规模化商用、或者要把模型能力嵌进 SaaS 卖给企业客户,Mistral Large 3 是目前旗舰级开源模型里许可证条款最干净的选项之一——法务审查成本低。",
+            "NVFP4 量化版把自托管门槛从「H200/B200 专属」降到「H100/A100 单节点可租」: FP8 主版本需要 B200 或 H200(2025-26 年最顶级的卡,价格极贵、云端现货少),但 NVFP4 量化版可以跑在 H100 或 A100 节点上。H100 80GB 在 AWS/GCP/Azure 都有按小时租,单节点 8 卡约每小时几十美元可以到手——而 H200/B200 要么无现货要么定价更高。这把「能跑 675B 旗舰」的门槛从「只有顶级实验室」降到了「中等规模 AI 团队能租」。量化(NVFP4)的代价是精度略有损失,但对大多数应用任务(问答、agent、代码)影响可接受。",
+            "Eagle 投机解码官方配套,同一节点吞吐更高不加卡: 投机解码(speculative decoding)是指用一个小的「草稿模型」先快速猜后续几个 token、主模型并行验证——有效提升每秒生成 token 数,不损失质量。Mistral 官方专门配套发布了 Eagle 草稿模型,推荐在生产部署中开启。对你来说:同样一台 H100 节点,开 Eagle 后能在高并发时服务更多请求、单位硬件成本摊薄——做 C 端或 API 服务时这笔账很实在。",
+            "11 语言原生支持,多语言产品不用外接翻译层: 官方明示支持英/法/西/德/意/葡/荷/中/日/韩/阿 11 种语言,法语和欧洲语言是 Mistral 的传统强项。如果你的 AI 应用要出海欧洲、中东、东亚,能在同一个私有部署里处理多语言输入输出,不需要再架翻译 API 中间层或维护多套语言模型——减少了一个依赖点和一段延迟。",
             "许可证/开放度: apache-2.0",
             "发布日期: 2026-01-29"
           ],
@@ -1104,7 +1341,7 @@
             "旧版弃用": "官方未披露",
             "需迁移": "官方未披露"
           },
-          "值不值得切一句": "Mistral开源了一个号称强悍的多模态MoE模型，Apache 2.0可商用，自带视觉、函数调用、256k上下文，但要自部署需整机H200，现阶段只能看官方图表信不信得过了。"
+          "值不值得切一句": "675B MoE 开源旗舰、Apache 2.0 完全商用、256k 长上下文 + 视觉理解 + 原生工具调用三合一,NVFP4 量化后单节点 H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择,闭源 API 才有的能力组合,现在能自己拥有。"
         }
       }
     },
@@ -1129,7 +1366,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-      "lastCheckedAt": "2026-06-03T12:32:13.128Z",
+      "lastCheckedAt": "2026-06-08T13:11:39.541Z",
       "latestVersionVariants": [
         "Llama 4 Maverick 17B 128E Instruct",
         "Llama 4 Maverick 17B 128E Instruct FP8",
@@ -1138,68 +1375,242 @@
         "Llama 4 Maverick 17B 128E",
         "Llama 4 Scout 17B 16E"
       ],
-      "analysisGeneratedAt": "2026-06-02T20:50:25.938Z",
-      "analysisAuthor": "DeepSeek:deepseek-v4-pro",
+      "analysisGeneratedAt": "2026-06-08T13:11:39.541Z",
+      "analysisAuthor": "Claude:sonnet",
       "analysis": {
-        "oneLineTakeaway": "Meta 开源的多模态对话模型,图片+文字都能理解,输出是文字;适合想做多模态应用但不想被绑在闭源 API 上的构建者。",
+        "oneLineTakeaway": "开源界首个旗舰级原生多模态 MoE——你第一次能在自己的机器上跑一个会看图、能吃百万 token 的强模型，把以前只能锁定 GPT-4V 或 Gemini 才能做的视觉 AI 应用，带进了「数据不出境 + 成本可控」的射程。",
         "whatItUnlocks": [
           {
-            "point": "原生多模态(图像+文本)对话",
-            "forYou": "可以直接把图片扔给模型,让它描述、问答、提取信息;对要做图库搜索、视觉客服、AI 配文等产品是开箱即用。不用再串联单独的图像理解组件。",
-            "evidence": "HuggingFace model card 标签: image-text-to-text, conversational",
-            "confidence": "medium (基于标签推断,无官方评测数字)"
+            "point": "原生多模态视觉理解，开源可自部署",
+            "forYou": "以前要做「看图理解、文档图片解析、截图转代码、产品图描述生成」这类视觉 AI 功能，开源路线几乎没有旗舰级选项——只能付钱调 GPT-4V 或 Gemini API，数据发出去就不受控了。Llama 4 Maverick 是第一个把图文多模态做到与闭源旗舰竞争水平、同时开放权重的主流选择。对做医疗影像分析、企业内部文件处理、本地私有 PDF / 合同解读的场景，这是以前完全没有的选项——图片进了你自己的服务器，从此不必上传给第三方。",
+            "evidence": "HuggingFace model card 标签：image-text-to-text；Meta 官方发布公告（2025-04-05）明确原生多模态支持",
+            "confidence": "high（card 明示多模态架构类型）"
           },
           {
-            "point": "可自部署的开源权重",
-            "forYou": "跟闭源 API 不同,你能自己租卡部署,做数据不出门的私有化多模态应用;也能微调成你业务的特化版。",
-            "evidence": "HuggingFace model card 提供 safetensors 权重下载,支持 transformers 等库加载",
-            "confidence": "high"
+            "point": "MoE 架构：用 17B 的推理算力换取远超 17B 的输出质量",
+            "forYou": "MoE（混合专家，Mixture of Experts，可理解为「模型内有 128 个专家团队，每次只叫其中几个来干活」）的核心优势是：推理时只激活 17B 参数，但知识储量对应的是 128 个专家的总规模。对做应用的你，意味着：在同等延迟和显存开销下，你得到的输出质量远高于同等激活参数量的普通稠密模型。批量处理文档、让 agent 连轴运行几小时——单 token 推理成本是接近 17B 级别的，不是总参数级别的。高并发或长时间运行场景下，这能显著压低单位成本。",
+            "evidence": "模型命名 17B-128E 明确激活参数 17B、128 个专家；HuggingFace model card 架构描述",
+            "confidence": "high（架构规格来自 card 命名与 Meta 官方）"
+          },
+          {
+            "point": "1M token 上下文（Maverick）/ 10M token 超长上下文（Scout）",
+            "forYou": "上下文窗口（指模型一次能读入多少文字）达到 100 万 token，意味着你可以把整个中型代码仓库、完整技术手册、数百份 API 文档一股脑塞进去，让模型通盘理解——不再需要费劲分块切片、靠 RAG（检索增强，即先搜索相关段落再喂给模型的工程手段）拼接上下文。以前做整库代码 agent 或长文档问答，你要搭一套复杂的检索管线；现在的 Maverick 可以直接喂进去。Scout 变体进一步到 1000 万 token，适合超长材料（法律合同库、学术文献汇编）。工程复杂度大幅下降，就是这条最直接的产品价值。",
+            "evidence": "Meta 官方发布公告（2025-04-05）：Maverick 支持 1M token 上下文，Scout 支持 10M token 上下文",
+            "confidence": "high（官方发布明示）"
+          },
+          {
+            "point": "原生支持 12 种语言，东南亚 / 印度 / 中东市场直接可用",
+            "forYou": "官方支持：英、中、西、法、德、印地语、印尼语、意、葡、泰、他加禄语（菲律宾）、越南语——覆盖东南亚核心六国和印度次大陆。以前做这些市场的 AI 产品，开源路线的多语言质量普遍差，只能走闭源 API 且数据出境。现在你可以自托管一个对 12 种语言都有原生训练支持的模型，做本地化 AI 产品时不必把用户数据发到境外，且质量更有保证。这对要出海或服务本地化市场的产品是硬价值。",
+            "evidence": "HuggingFace model card 语言标签：ar, de, en, es, fr, hi, id, it, pt, th, tl, vi（共 12 种）",
+            "confidence": "high（card 明示）"
+          },
+          {
+            "point": "开放权重可微调 → 把通用多模态能力迁移进你的垂直领域",
+            "forYou": "可以用你自己的领域数据（产品文档、客服对话、代码库、行业图片数据集）做监督微调（SFT）或偏好对齐（DPO），把这个通用多模态模型改造成「只懂你这个产品领域」的专属引擎。比如：微调成「理解你公司图纸 / 设计图稿」的工业视觉助手，或「只认你医院 CT 图像格式」的临床辅助工具。这是闭源 API 给不了的——闭源你微调不了，或者微调了数据就到厂商那边了。代价是：需要 GPU 微调基础设施（至少能跑起来模型）加上标注数据，不适合 0 到 1 阶段，更适合已验证方向后的产品深化。",
+            "evidence": "HuggingFace model card：license 标注为 Llama 4 Community License，允许微调；权重以 safetensors 格式开放下载",
+            "confidence": "high（license 事实明确）"
+          },
+          {
+            "point": "Llama 生态兼容：现有 Llama 工具链 / 推理框架直接接入",
+            "forYou": "Llama 4 兼容 HuggingFace Transformers、vLLM、SGLang、text-generation-inference 等主流推理框架。如果你团队已在用 Llama 3.x 或任何 HF 生态，迁移成本极低——换模型 ID，调显存配置，已有推理服务、prompt 模板、评估脚本基本复用。不需要重学工具链，工程风险低。",
+            "evidence": "HuggingFace model card 标签：transformers, text-generation-inference, endpoints_compatible；safetensors 格式权重",
+            "confidence": "high（来自 card 标签，为框架兼容性事实）"
           }
         ],
         "benchmark": {
-          "headline": "该模型在 HuggingFace model card 上有 eval-results 标签,但未公布具体评分,无法给出任何数字;落地前必须等第三方评测。",
-          "professorNote": "没有评测数字就意味着『现在不知道它有多强』。作为应用开发者,别光信厂商宣传,一定要等 LMArena、OpenLLM Leaderboard 这类第三方跑出成绩,再对比你要做的任务去选。",
-          "charts": [],
-          "items": [],
+          "headline": "多模态视觉基准（MMMU、DocVQA、MathVista）官方自报与 GPT-4o 持平或领先；但所有数字均为 Meta 自报，且 LMArena 测评版本与发布权重存在明确差异争议——选型务必以自己任务的实测为准",
+          "professorNote": "对你选型最重要的一件事：Llama 4 Maverick 的招牌战场是「开源多模态视觉」，下面的视觉类指标是它最有说服力的正面证据。代码生成和纯文本推理的官方对比数字我没有可靠来源，不在这里引用。更关键的一个背景：Meta 向 LMArena 提交的是一个与公开发布权重不同的「实验调优版」（Llama-4-Maverick-03-26-Experimental），被社区研究者核实后 LMArena 已重新标注——这导致 LMArena 历史排名显著高于开发者实际下载权重后的体感。请把这些官方数字当方向参考，用你自己的真实任务实测后再做选型决策。",
+          "charts": [
+            {
+              "title": "MMMU（多模态综合理解，看图答复杂问题）",
+              "metric": "准确率",
+              "unit": "%",
+              "higherIsBetter": true,
+              "sourceType": "official",
+              "maxValue": 100,
+              "bars": [
+                {
+                  "label": "Llama 4 Maverick",
+                  "display": "73.5",
+                  "value": 73.5,
+                  "highlight": true
+                },
+                {
+                  "label": "Gemini 2.0 Flash",
+                  "display": "71.9",
+                  "value": 71.9
+                },
+                {
+                  "label": "GPT-4o",
+                  "display": "69.1",
+                  "value": 69.1
+                }
+              ]
+            },
+            {
+              "title": "DocVQA（文档图片问答，发票 / 合同 / 表格截图）",
+              "metric": "ANLS",
+              "unit": "%",
+              "higherIsBetter": true,
+              "sourceType": "official",
+              "maxValue": 100,
+              "bars": [
+                {
+                  "label": "Llama 4 Maverick",
+                  "display": "94.4",
+                  "value": 94.4,
+                  "highlight": true
+                },
+                {
+                  "label": "Gemini 2.0 Flash",
+                  "display": "92.1",
+                  "value": 92.1
+                },
+                {
+                  "label": "GPT-4o",
+                  "display": "91.1",
+                  "value": 91.1
+                }
+              ]
+            },
+            {
+              "title": "MathVista（图文数学推理，图表读数 / 几何题）",
+              "metric": "准确率",
+              "unit": "%",
+              "higherIsBetter": true,
+              "sourceType": "official",
+              "maxValue": 100,
+              "bars": [
+                {
+                  "label": "Llama 4 Maverick",
+                  "display": "73.7",
+                  "value": 73.7,
+                  "highlight": true
+                },
+                {
+                  "label": "Gemini 2.0 Flash",
+                  "display": "73.1",
+                  "value": 73.1
+                },
+                {
+                  "label": "GPT-4o",
+                  "display": "63.8",
+                  "value": 63.8
+                }
+              ]
+            }
+          ],
+          "items": [
+            {
+              "label": "MMMU",
+              "score": "73.5",
+              "comparator": "GPT-4o 69.1 / Gemini 2.0 Flash 71.9",
+              "interpretation": "多模态综合理解能力（要求模型同时理解图片内容和复杂问题）——这个分数说明用它做图文问答、多模态知识库应用时，输出质量和闭源旗舰同一量级",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "DocVQA",
+              "score": "94.4",
+              "comparator": "GPT-4o 91.1",
+              "interpretation": "文档图片问答（含打印体 / 手写体发票、合同、表格截图）—— 94 分以上在商业文档处理场景基本可用，对做企业文档 AI、财务自动化应用的你是最直接的正面证据",
+              "sourceType": "official",
+              "attribution": "自报"
+            },
+            {
+              "label": "MathVista",
+              "score": "73.7",
+              "comparator": "GPT-4o 63.8",
+              "interpretation": "含图数学推理（图表读数、几何题、数据可视化理解）——对做教育类或数据分析 AI 有参考价值；比 GPT-4o 高 10 分是显著差距",
+              "sourceType": "official",
+              "attribution": "自报"
+            }
+          ],
           "caveats": [
-            "无任何可核验的 benchmark 数字,模型能力完全未知;厂商未公开自评,亦无第三方交叉验证。",
-            "所谓『多模态』仅有标签支持,实际能力(准确率、幻觉程度等)未测试。"
+            "以上全部为 Meta 官方自报，来自 2025-04-05 发布公告；尚未经 OpenLLM Leaderboard 等独立第三方交叉核实。",
+            "⚠️ LMArena 争议（选型关键）：Meta 向 LMArena 提交的是内部实验调优版（Llama-4-Maverick-03-26-Experimental），与公开发布权重不同，被社区研究者核实后 LMArena 已重新标注。这意味着 LMArena 的历史排名（约全球前 5）反映的不是你实际能下载到的模型。以自己任务实测发布权重为准。",
+            "代码生成（LiveCodeBench 等）和纯文本推理（GPQA Diamond 等）的官方对比数字在本次核实中未找到可靠一手来源，不引用。这类任务与闭源旗舰的实际差距仍待独立评测确认。",
+            "总参数量 Meta 官方未明确披露；社区估算约 400B 级别（未核实）。硬件门槛评估基于 FP8 变体实际可用性和社区部署报告，非官方数字。"
           ]
         },
-        "openSourceMeaning": "开源(权重开放,但许可证为 other,具体条款需查阅 Llama 4 Community License)让你可以自部署、微调、控制数据,不被厂商锁定;成本上省去 API 调用费,但要自行承担 GPU 硬件和运维。",
-        "whenToUse": "当你急需一个多模态对话模型,又想自己折腾部署,或数据绝对不能外传时,可以尝试用它打底。但因为没有性能数据,更适合先玩起来、验证原型,不要直接押注到生产线。怎么开始:从 HuggingFace 下载模型,用 transformers 加载,或用 vLLM 部署后接个前端试验。",
-        "cost_caveats": "模型名含 17B,可能为 MoE 架构(128E 可能指专家数),总参数可能远大于 17B,自部署需可观显存(预估单卡 A100 80G 起步,视量化情况)。若有 FP8 量化版可降低要求。",
+        "openSourceMeaning": "Llama 4 Community License（Meta 定制许可证）：允许商业使用和微调，但有一条关键限制——月活用户超过 7 亿的平台必须单独向 Meta 申请许可。对绝大多数 AI 应用开发者完全不构成障碍；但若目标是把它嵌入一个已有超大量级用户的平台（如某个现有亿级用户产品），需要先核查完整条款。 硬件现实账：Maverick 的 MoE 架构在推理时只激活 17B 参数，计算效率接近 17B 级别；但你仍需把所有专家权重加载进显存或高速内存——这是 MoE 的固有代价，总存储开销比激活参数大得多（社区估算总参约 400B 级别，Meta 未官方确认）。官方提供 FP8 精度变体，是自部署的务实起点：社区报告约需 160–320GB 显存（2–4 台 A100-80GB），BF16 全精度需 8×A100 以上。个人单卡（24G/48G）跑不了 Maverick。Scout（16 个专家）权重更小，2–3 张 A100 跑 INT8 量化可行，但视觉质量和复杂推理弱于 Maverick，要事先权衡。 微调现实：LoRA / QLoRA 微调可行，但门槛是「先能跑起来」——至少需要 A100 级别 GPU 访问权（租云卡可行，消费级显卡不行）。微调换来的是把通用多模态能力迁移到你的垂直领域，在调用量足够大的前提下长期成本优于持续调用闭源 API。 数据主权核心价值：「必须数据不出境」的场景（医疗影像、金融客户文件、政务内网文档）——Llama 4 Maverick 目前是唯一能同时做到「旗舰级多模态 + 长上下文 + 数据不离开机房」的开源选项。这条护城河是闭源 API 结构性给不了的，是它真正的差异化所在。",
+        "whenToUse": "三支决策树，照着做： ① 直接值得自托管 / 微调——你有「图片或文档理解」核心需求 + 数据合规硬约束（不能上传给 OpenAI / Google），或调用量大到 API 费用不划算；团队有能力维护 GPU 推理服务（vLLM / SGLang）且能供得起 2 台以上 A100-80GB；且目标市场在 Llama 4 支持的 12 语言内。此时部署 FP8 版 Maverick 是目前开源多模态里最强的可商用选择，值得投入。 ② 先走托管 API 试水——你刚开始探索多模态或长上下文功能，量还不大，没有合规硬约束。可先通过 Groq、Together AI、Fireworks AI 等支持 Llama 4 的推理服务按量调用，在你自己的真实任务上验证质量（不要只看 LMArena 排名），确认方向再决定是否自建。 ③ 别用它——核心任务是纯文本代码生成或复杂推理（没有视觉需求）：DeepSeek V4 / Qwen3 等在这类任务上有更扎实的第三方实测数据，开源代码 / 推理能力更有保证；需要最强多模态体验且不在乎数据出境：GPT-4o / Gemini 1.5 Pro 的实际体感目前仍更稳定；团队没有 GPU 运维能力且调用量小：自部署 Maverick 是一笔真实工程债，初期 API 更省事。",
+        "cost_caveats": "硬件门槛：Maverick FP8 变体是自部署最低可行起点，社区报告约需 160–320GB 显存（2–4 台 A100-80GB 或同等 H100），BF16 全精度需 8×A100 以上，属于企业 GPU 集群级别。个人开发者短期内走托管 API（Groq / Together AI / Fireworks AI 均已支持）比自建划算得多。Scout（16E）作为轻量选项，2–3 张 A100 跑 INT8 可行，但要接受视觉质量和复杂推理低于 Maverick 的代价。 长上下文显存陷阱：1M token 上下文名义上支持，但 KV cache（存储上下文的显存缓冲区，随上下文长度线性增长）在接近满载时会极大拉高显存占用，实际可用并发大幅下降。商业部署前务必在你的硬件上做负载实测，不要只看上下文窗口数字规划容量。 Benchmark 可信度提醒：官方数字为自报，LMArena 数字来自与发布权重不同的实验版，开发者社区有明确记录。把这些数字当能力下限参考，用你自己任务实测后再做最终选型判断。",
         "sources": [
           {
-            "name": "HuggingFace · meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+            "name": "HuggingFace · meta-llama/Llama-4-Maverick-17B-128E-Instruct（model card）",
             "url": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct"
+          },
+          {
+            "name": "Meta Llama 4 官方发布公告（2025-04-05，benchmark 数据来源）",
+            "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/"
+          },
+          {
+            "name": "Llama 4 Community License Agreement",
+            "url": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct/blob/main/LICENSE"
           }
         ]
       },
       "paradigm": {
-        "tag": "[更新｜open]",
-        "branch": "update",
+        "tag": "[新模型 Tier0｜open]",
+        "branch": "new_model",
         "access": "open",
-        "updateSize": "light",
-        "template": "version_update",
+        "tier": 0,
+        "requiresHumanConfirmation": false,
+        "template": "new_model_card",
         "card": {
           "名称": "Llama 4 Maverick 17B 128E Instruct",
           "厂商": "Meta",
           "发布日": "2025-05-22",
           "开放度标签": "有条件商用",
-          "类型": "指令/多模态",
-          "规模架构": "MoE 总参官方未披露+激活参官方未披露；context window（上下文窗口）官方未披露",
+          "类型": "基座/指令/多模态/推理",
+          "规模架构": "MoE 总参17B+激活参官方未披露；context window（上下文窗口）1M",
           "关键benchmark": [
             {
-              "名称": "官方未披露",
-              "分数": "官方未披露",
-              "对手": "官方未披露",
+              "名称": "MMMU",
+              "分数": "73.5",
+              "对手": "GPT-4o 69.1 / Gemini 2.0 Flash 71.9",
               "标注": "自报",
-              "解读": "没有可核验 benchmark 数字。"
+              "解读": "多模态综合理解能力（要求模型同时理解图片内容和复杂问题）——这个分数说明用它做图文问答、多模态知识库应用时，输出质量和闭源旗舰同一量级"
+            },
+            {
+              "名称": "DocVQA",
+              "分数": "94.4",
+              "对手": "GPT-4o 91.1",
+              "标注": "自报",
+              "解读": "文档图片问答（含打印体 / 手写体发票、合同、表格截图）—— 94 分以上在商业文档处理场景基本可用，对做企业文档 AI、财务自动化应用的你是最直接的正面证据"
+            },
+            {
+              "名称": "MathVista",
+              "分数": "73.7",
+              "对手": "GPT-4o 63.8",
+              "标注": "自报",
+              "解读": "含图数学推理（图表读数、几何题、数据可视化理解）——对做教育类或数据分析 AI 有参考价值；比 GPT-4o 高 10 分是显著差距"
+            },
+            {
+              "名称": "MMMU（多模态综合理解，看图答复杂问题）",
+              "分数": "Llama 4 Maverick 73.5 / Gemini 2.0 Flash 71.9 / GPT-4o 69.1",
+              "对手": "Gemini 2.0 Flash / GPT-4o",
+              "标注": "自报",
+              "解读": "准确率"
+            },
+            {
+              "名称": "DocVQA（文档图片问答，发票 / 合同 / 表格截图）",
+              "分数": "Llama 4 Maverick 94.4 / Gemini 2.0 Flash 92.1 / GPT-4o 91.1",
+              "对手": "Gemini 2.0 Flash / GPT-4o",
+              "标注": "自报",
+              "解读": "ANLS"
+            },
+            {
+              "名称": "MathVista（图文数学推理，图表读数 / 几何题）",
+              "分数": "Llama 4 Maverick 73.7 / Gemini 2.0 Flash 73.1 / GPT-4o 63.8",
+              "对手": "Gemini 2.0 Flash / GPT-4o",
+              "标注": "自报",
+              "解读": "准确率"
             }
           ],
-          "强弱一句": "Meta 开源的多模态对话模型,图片+文字都能理解,输出是文字;适合想做多模态应用但不想被绑在闭源 API 上的构建者。",
-          "一句话定位": "当你急需一个多模态对话模型,又想自己折腾部署,或数据绝对不能外传时,可以尝试用它打底。但因为没有性能数据,更适合先玩起来、验证原型,不要直接押注到生产线。怎么开始:从 HuggingFace 下载模型,用 transformers 加载,或用 vLLM 部署后接个前端试验。",
+          "强弱一句": "开源界首个旗舰级原生多模态 MoE——你第一次能在自己的机器上跑一个会看图、能吃百万 token 的强模型，把以前只能锁定 GPT-4V 或 Gemini 才能做的视觉 AI 应用，带进了「数据不出境 + 成本可控」的射程。",
+          "一句话定位": "三支决策树，照着做： ① 直接值得自托管 / 微调——你有「图片或文档理解」核心需求 + 数据合规硬约束（不能上传给 OpenAI / Google），或调用量大到 API 费用不划算；团队有能力维护 GPU 推理服务（vLLM / SGLang）且能供得起 2 台以上 A100-80GB；且目标市场在 Llama 4 支持的 12 语言内。此时部署 FP8 版 Maverick 是目前开源多模态里最强的可商用选择，值得投入。 ② 先走托管 API 试水——你刚开始探索多模态或长上下文功能，量还不大，没有合规硬约束。可先通过 Groq、Together AI、Fireworks AI 等支持 Llama 4 的推理服务按量调用，在你自己的真实任务上验证质量（不要只看 LMArena 排名），确认方向再决定是否自建。 ③ 别用它——核心任务是纯文本代码生成或复杂推理（没有视觉需求）：DeepSeek V4 / Qwen3 等在这类任务上有更扎实的第三方实测数据，开源代码 / 推理能力更有保证；需要最强多模态体验且不在乎数据出境：GPT-4o / Gemini 1.5 Pro 的实际体感目前仍更稳定；团队没有 GPU 运维能力且调用量小：自部署 Maverick 是一笔真实工程债，初期 API 更省事。",
           "术语注解": [
             "MoE（混合专家模型）: 推理时只激活部分专家参数，用较少计算调用更大的总参数池。",
             "reasoning（推理）: 模型进行多步分析、规划或验证的能力。",
@@ -1209,7 +1620,7 @@
             "名称": "other",
             "能否商用": "有条件商用，需核对许可证条款"
           },
-          "自托管硬件": "A100 80G 起步",
+          "自托管硬件": "A100-80GB），BF16 全精度需 8×A100 以上",
           "可用变体": [
             "Llama 4 Maverick 17B 128E Instruct",
             "Llama 4 Maverick 17B 128E Instruct FP8",
@@ -1219,21 +1630,6 @@
             "Llama 4 Scout 17B 16E"
           ],
           "base_model": "官方未披露"
-        },
-        "update": {
-          "版本": "Llama 4 Maverick 17B 128E Instruct→Llama 4 Maverick 17B 128E Instruct(2025-05-22)",
-          "变了什么": [
-            "原生多模态(图像+文本)对话: 可以直接把图片扔给模型,让它描述、问答、提取信息;对要做图库搜索、视觉客服、AI 配文等产品是开箱即用。不用再串联单独的图像理解组件。",
-            "可自部署的开源权重: 跟闭源 API 不同,你能自己租卡部署,做数据不出门的私有化多模态应用;也能微调成你业务的特化版。",
-            "许可证/开放度: other",
-            "发布日期: 2025-05-22"
-          ],
-          "破坏性提醒": {
-            "model string变更": "官方未披露",
-            "旧版弃用": "是",
-            "需迁移": "需要评估迁移"
-          },
-          "值不值得切一句": "Meta 开源的多模态对话模型,图片+文字都能理解,输出是文字;适合想做多模态应用但不想被绑在闭源 API 上的构建者。"
         }
       }
     }
