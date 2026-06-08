@@ -51,6 +51,19 @@ function checkMermaidBalanced(md, where) {
   if (opens > fences / 2) fail(`${where}: mermaid 围栏(${opens})多于可配对围栏对(${fences / 2})`);
 }
 
+// BUG-4 新鲜度断言:用「相对落后」而非「绝对年龄」判定,既能逮住「papers 栏静默失败、
+// 昨日索引被原样重发」(papers 比其它栏明显旧),又不会在「整库统一旧」(如新 clone / 久未 boot)
+// 时误杀单测。阈值可用 PAPERS_INDEX_MAX_LAG_DAYS 调。
+const PAPERS_INDEX_MAX_LAG_DAYS = Number(process.env.PAPERS_INDEX_MAX_LAG_DAYS) || 2;
+const SIBLING_DATA = ["news.json", "trending.json"];
+
+async function readGeneratedAt(file) {
+  try {
+    const j = JSON.parse(await readFile(file, "utf8"));
+    return Date.parse(j.generatedAt || j.updatedAt || j.meta?.generatedAt || "");
+  } catch { return NaN; }
+}
+
 async function checkIndex() {
   if (!(await exists(INDEX))) { fail("public/data/papers-index.json 缺失 — 运行 build-index.mjs"); return; }
   let idx;
@@ -58,6 +71,24 @@ async function checkIndex() {
   if (!Array.isArray(idx.deepReads)) fail("papers-index.json: deepReads 不是数组");
   for (const w of ["daily", "weekly", "monthly"]) {
     if (!Array.isArray(idx.board?.[w])) fail(`papers-index.json: board.${w} 不是数组`);
+  }
+  // 新鲜度:papers-index 必须带 generatedAt,且不得比最新栏目数据落后超过阈值。
+  const papersAt = Date.parse(idx.generatedAt || "");
+  if (Number.isNaN(papersAt)) {
+    fail("papers-index.json: 缺 generatedAt——无法核验新鲜度(陈旧索引可能蒙混过门)");
+    return;
+  }
+  const siblings = [];
+  for (const f of SIBLING_DATA) {
+    const at = await readGeneratedAt(path.join(ROOT, "public", "data", f));
+    if (!Number.isNaN(at)) siblings.push(at);
+  }
+  if (siblings.length) {
+    const newest = Math.max(...siblings);
+    const lagDays = (newest - papersAt) / 864e5;
+    if (lagDays > PAPERS_INDEX_MAX_LAG_DAYS) {
+      fail(`papers-index.json 相对陈旧: 比最新栏目数据落后 ${lagDays.toFixed(1)} 天(阈值 ${PAPERS_INDEX_MAX_LAG_DAYS})——papers 栏可能静默失败、昨日索引被原样重发`);
+    }
   }
 }
 
