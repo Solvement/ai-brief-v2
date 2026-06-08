@@ -287,7 +287,7 @@ export function buildStageBPrompt(artifact, source = {}, stageA = {}, ctx = {}) 
 
 # 输出:严格 JSON,只输出 JSON,不要任何解释性散文、不要 markdown 围栏。Schema:
 {
-  "stageB": { "faithful": true, "notes": "对账要点(错/漏/编造/自称)" },
+  "stageB": { "faithful": true, "notes": "对账要点≤2句(错/漏/编造/自称),禁止逐格抄表" },
   "perCriterion": [
     { "criterion": "retellable|faithful|mechanism|concrete|judgment",
       "severity": "major|minor|none",
@@ -297,6 +297,7 @@ export function buildStageBPrompt(artifact, source = {}, stageA = {}, ctx = {}) 
   "verdict": "pass|revise|hold"
 }
 说明:5 个 criterion 必须全部各给一条(retellable/faithful/mechanism/concrete/judgment 一个都不能少);有重大缺口 severity=major;裁判以 severity=major 为准(不以 verdict 字段为准)。本轮 round=${round}。
+**输出长度纪律(硬性,防 JSON 截断)**:notes ≤2 句;每条 gap/fix ≤120 字。**严禁**把整张表/逐格数字对账抄进 notes 或 gap——那会撑爆输出、把后面的 perCriterion/verdict 截掉导致 JSON 不完整无法解析。判决靠 perCriterion 的 severity 和 verdict,不靠长篇 notes。整个 JSON 必须完整闭合、可被 JSON.parse 直接解析。
 
 # ====== 已固定的 Stage A 盲读(不可改,只拿来对账) ======
 ${stageAText}
