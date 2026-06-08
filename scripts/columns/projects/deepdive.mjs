@@ -178,10 +178,13 @@ export async function generateProjectDeepDive({
     finalDepth,
     options,
   });
+  const autosciPrimitiveCount = autosciPrimitive ? 1 : 0;
+  logger?.info?.(`projects AutoSci primitives ${repo.fullName || repo.name || candidate?.id || ""}: 本次抽取 ${autosciPrimitiveCount} 条原语`);
 
   return {
     ...written,
     autosciPrimitive,
+    autosciPrimitiveCount,
     repo: repo.fullName || repo.name || "",
     final_depth: finalDepth,
     depth_decision: depthDecision,

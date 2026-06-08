@@ -1,0 +1,61 @@
+primitive_id: "proj-fathah-hermes-desktop"
+source_project: "fathah/hermes-desktop"
+source_url: "https://github.com/fathah/hermes-desktop"
+title: "fathah/hermes-desktop reusable architecture pattern"
+relevance_level: "project_pattern"
+audience: "ai_only"
+core_pattern: >
+
+  desktop agent control surface: Copy the visible tool toggles, streaming trace renderer, and
+  local session store.
+problem_class: "reliable-agent-runtime-and-tool-orchestration"
+status: "extracted"
+extracted_at: "2026-06-08T00:00:00.000Z"
+components:
+  - "agent_orchestrator"
+  - "developer_control_surface"
+  - "model_or_retrieval_layer"
+  - "validation_harness"
+  - "desktop-agent-control-surface"
+autosci_modules:
+  - "pattern_library"
+  - "experiment_runner"
+  - "agent_runtime"
+  - "tool_governance"
+  - "trace_memory"
+inputs:
+  - "task_spec"
+  - "repo_or_runtime_context"
+  - "tool_or_model_interfaces"
+  - "budget_and_validation_policy"
+outputs:
+  - "working_artifact"
+  - "execution_trace"
+  - "reusable_architecture_notes"
+  - "failure_or_risk_report"
+implementation_idea: >
+
+  Rebuild the agent-infra pattern from fathah/hermes-desktop as a small AutoSci module: extract
+  the control flow, define typed inputs/outputs, run it on one synthetic research task, and log
+  traces plus validation results. Reference flow: The reusable architecture is a desktop client
+  that mediates agent actions through visible tool controls, SSE trace rendering, and local
+  conversation state before requests reach the Hermes Agent backend.
+small_experiment: >
+
+  Compare baseline free-form execution against the extracted agent-infra pattern from
+  fathah/hermes-desktop on three AutoSci tasks. Measure completion rate, trace inspectability,
+  failure recovery, and cost over 1-3 days.
+design_principles:
+  - id: "agent-infra-boundary-as-module"
+    principle: "desktop agent control surface: Copy the visible tool toggles, streaming trace renderer, and local session store."
+    transfers_to: "Transfer the visible control surface and typed adapter boundary; do not transfer Hermes-specific integrations."
+  - id: "agent-infra-observable-flow"
+    principle: "The reusable architecture is a desktop client that mediates agent actions through visible tool controls, SSE trace rendering, and local conversation state before requests reach the Hermes Agent backend."
+    transfers_to: "Use the flow as an inspectable experiment harness with logs, checkpoints, and failure reports."
+  - id: "agent-infra-risk-first-transfer"
+    principle: "Transfer the architecture together with its main failure boundary: Hermes Agent API: If the backend API changes, chat streaming and tool toggles can break.."
+    transfers_to: "Require an explicit dependency and over-transfer risk review before promoting the pattern into AutoSci."
+risks:
+  - "Hermes Agent API: If the backend API changes, chat streaming and tool toggles can break."
+  - "upstream_api_drift"
+  - "over_transfer"

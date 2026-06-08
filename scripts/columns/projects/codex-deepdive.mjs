@@ -243,6 +243,8 @@ async function authorOneDeepDive(record, options = {}) {
     finalDepth: "deep",
     options,
   });
+  const autosciPrimitiveCount = autosciPrimitive ? 1 : 0;
+  console.log(`codex deep-dive AutoSci primitives ${repoLabel}: 本次抽取 ${autosciPrimitiveCount} 条原语`);
 
   const generatedAt = nowIso(options);
   const dbPayload = {
@@ -257,6 +259,7 @@ async function authorOneDeepDive(record, options = {}) {
     authoring: payload.authoring,
     rawPayload: relativeToRoot(rawJsonPath),
     autosciPrimitive,
+    autosciPrimitiveCount,
   };
 
   let analysisId = null;
@@ -279,6 +282,7 @@ async function authorOneDeepDive(record, options = {}) {
         slug: written.slug,
         model: options.model,
         model_reasoning_effort: options.reasoningEffort,
+        autosciPrimitiveCount,
       },
       ranAt: generatedAt,
     });
@@ -296,6 +300,7 @@ async function authorOneDeepDive(record, options = {}) {
     paths: written.paths,
     rawPayload: rawJsonPath,
     autosciPrimitive,
+    autosciPrimitiveCount,
     prompt: promptPath,
     invocation: invocation.invocationPath,
     trending,
