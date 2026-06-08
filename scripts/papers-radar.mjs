@@ -452,6 +452,17 @@ function candidateId(candidate) {
   return key.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase().slice(0, 80) || `paper-${hash(candidate.title)}`;
 }
 
+function slugify(value) {
+  return (
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9.]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .replace(/-{2,}/g, "-") || "paper"
+  );
+}
+
 function makeCandidate(input) {
   const title = cleanTitle(input.title);
   const arxivId = normalizeArxivId(input.arxivId || input.paperUrl || input.sourceUrl || "");
@@ -1519,6 +1530,7 @@ async function review() {
   const skipped = [];
   for (const candidate of candidates) {
     const reviewedKey = `${candidate.key}:${candidate.version || "unknown"}`;
+    const reviewedFileId = slugify(candidate.id);
     const existing = cache.reviewed[reviewedKey];
     if (existing && !DRY_RUN && !FORCE_REVIEW && !existing.dryRun && existsSync(path.join(ROOT, existing.file))) {
       skipped.push({ id: candidate.id, reason: "already_reviewed_same_version", file: existing.file });
@@ -1526,7 +1538,7 @@ async function review() {
     }
     if (DRY_RUN) {
       const dry = dryReview(candidate);
-      const outFile = path.join(REVIEWED_DIR, `${candidate.id}-${DATE}.json`);
+      const outFile = path.join(REVIEWED_DIR, `${reviewedFileId}-${DATE}.json`);
       await writeJson(outFile, dry);
       cache.reviewed[reviewedKey] = { id: candidate.id, version: candidate.version, file: path.relative(ROOT, outFile), reviewedAt: new Date().toISOString(), dryRun: true };
       reviewed.push(dry);
@@ -1538,7 +1550,7 @@ async function review() {
     }
     const model = process.env.PAPERS_REVIEW_MODEL || process.env.DEEPSEEK_PRO_MODEL || "deepseek-v4-pro";
     const structured = await modelReview(candidate, model);
-    const outFile = path.join(REVIEWED_DIR, `${candidate.id}-${DATE}.json`);
+    const outFile = path.join(REVIEWED_DIR, `${reviewedFileId}-${DATE}.json`);
     await writeJson(outFile, structured);
     cache.reviewed[reviewedKey] = { id: candidate.id, version: candidate.version, file: path.relative(ROOT, outFile), reviewedAt: new Date().toISOString(), model };
     reviewed.push(structured);
