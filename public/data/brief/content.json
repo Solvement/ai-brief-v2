@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T16:42:33.594Z",
+  "generatedAt": "2026-06-08T18:13:53.800Z",
   "entity": "content",
   "directory": "content",
-  "count": 48,
+  "count": 54,
   "items": [
     {
       "id": "content/9router",
@@ -745,6 +745,97 @@
       ]
     },
     {
+      "id": "content/bytedance-ui-tars-desktop",
+      "type": "content",
+      "slug": "bytedance-ui-tars-desktop",
+      "title": "UI-TARS-desktop — The Open-Source Multimodal AI Agent Stack: Connec...",
+      "file": "content/bytedance-ui-tars-desktop.md",
+      "directory": "content",
+      "meta": {
+        "title": "UI-TARS-desktop — The Open-Source Multimodal AI Agent Stack: Connec...",
+        "slug": "bytedance-ui-tars-desktop",
+        "kind": "content",
+        "type": "project",
+        "source": "github-trending:monthly",
+        "url": "https://github.com/bytedance/UI-TARS-desktop",
+        "authors_or_creators": [
+          "bytedance"
+        ],
+        "date": "2025-11-04",
+        "discovered_at": "2026-06-06",
+        "content_track": "FDE",
+        "status": "deep_dived",
+        "project_kind": "functional_software",
+        "tags": [
+          "tier-3",
+          "project",
+          "agents",
+          "mcp",
+          "skills",
+          "agent-framework",
+          "typescript"
+        ],
+        "importance": 5,
+        "why_discovered": "bytedance/UI-TARS-desktop came from github-trending:monthly; ranking=score=95; max=deep; final=deep",
+        "why_selected": "UI-TARS-desktop 是一个把桌面/浏览器截图、视觉语言模型、动作解析器和本机/MCP 工具执行串成闭环的多模态 Agent monorepo。",
+        "relation_to_existing_memory": "extends_existing"
+      },
+      "body": "\n## Summary\n\nUI-TARS-desktop 是一个把桌面/浏览器截图、视觉语言模型、动作解析器和本机/MCP 工具执行串成闭环的多模态 Agent monorepo。\n\n## Pipeline\n- [[source-packs/bytedance-ui-tars-desktop-source-pack]]\n- [[evidence-packs/bytedance-ui-tars-desktop-evidence-pack]]\n- [[deep-dives/bytedance-ui-tars-desktop-deep-dive]]\n\n## Concepts\n- [[concepts/gui-agent]]\n- [[concepts/visual-grounding]]\n\n## Claims\n- [[claims/bytedance-ui-tars-desktop-main-claim]]\n\n## Artifacts\n- [[artifacts/bytedance-ui-tars-desktop-repo]]\n",
+      "excerpt": "UI-TARS-desktop 是一个把桌面/浏览器截图、视觉语言模型、动作解析器和本机/MCP 工具执行串成闭环的多模态 Agent monorepo。",
+      "links": [
+        {
+          "target": "source-packs/bytedance-ui-tars-desktop-source-pack",
+          "raw": "[[source-packs/bytedance-ui-tars-desktop-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/bytedance-ui-tars-desktop-evidence-pack",
+          "raw": "[[evidence-packs/bytedance-ui-tars-desktop-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/bytedance-ui-tars-desktop-deep-dive",
+          "raw": "[[deep-dives/bytedance-ui-tars-desktop-deep-dive]]"
+        },
+        {
+          "target": "concepts/gui-agent",
+          "raw": "[[concepts/gui-agent]]"
+        },
+        {
+          "target": "concepts/visual-grounding",
+          "raw": "[[concepts/visual-grounding]]"
+        },
+        {
+          "target": "claims/bytedance-ui-tars-desktop-main-claim",
+          "raw": "[[claims/bytedance-ui-tars-desktop-main-claim]]"
+        },
+        {
+          "target": "artifacts/bytedance-ui-tars-desktop-repo",
+          "raw": "[[artifacts/bytedance-ui-tars-desktop-repo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    },
+    {
       "id": "content/can1357-oh-my-pi",
       "type": "content",
       "slug": "can1357-oh-my-pi",
@@ -1287,6 +1378,97 @@
       ]
     },
     {
+      "id": "content/decolua-9router",
+      "type": "content",
+      "slug": "decolua-9router",
+      "title": "9router — Unlimited FREE AI coding. Connect Claude Code, Codex, Cur...",
+      "file": "content/decolua-9router.md",
+      "directory": "content",
+      "meta": {
+        "title": "9router — Unlimited FREE AI coding. Connect Claude Code, Codex, Cur...",
+        "slug": "decolua-9router",
+        "kind": "content",
+        "type": "project",
+        "source": "github-trending:monthly",
+        "url": "https://github.com/decolua/9router",
+        "authors_or_creators": [
+          "decolua"
+        ],
+        "date": "2026-06-06",
+        "discovered_at": "2026-06-06",
+        "content_track": "FDE",
+        "status": "deep_dived",
+        "project_kind": "functional_software",
+        "tags": [
+          "tier-3",
+          "project",
+          "agents",
+          "skills",
+          "models",
+          "devtool-cli",
+          "javascript"
+        ],
+        "importance": 5,
+        "why_discovered": "decolua/9router came from github-trending:monthly; ranking=score=83; max=deep; final=deep",
+        "why_selected": "9Router 是一个本地运行的 AI 编程工具网关：把 Claude Code、Codex、Cursor、Cline 等客户端接到统一的 `/v1` 接口，再按模型名、账号、组合和错误状态转发到不同上游 provider。",
+        "relation_to_existing_memory": "extends_existing"
+      },
+      "body": "\n## Summary\n\n9Router 是一个本地运行的 AI 编程工具网关：把 Claude Code、Codex、Cursor、Cline 等客户端接到统一的 `/v1` 接口，再按模型名、账号、组合和错误状态转发到不同上游 provider。\n\n## Pipeline\n- [[source-packs/decolua-9router-source-pack]]\n- [[evidence-packs/decolua-9router-evidence-pack]]\n- [[deep-dives/decolua-9router-deep-dive]]\n\n## Concepts\n- [[concepts/openai-compatible-local-gateway]]\n- [[concepts/combo-fallback-routing]]\n\n## Claims\n- [[claims/decolua-9router-main-claim]]\n\n## Artifacts\n- [[artifacts/decolua-9router-repo]]\n",
+      "excerpt": "9Router 是一个本地运行的 AI 编程工具网关：把 Claude Code、Codex、Cursor、Cline 等客户端接到统一的 `/v1` 接口，再按模型名、账号、组合和错误状态转发到不同上游 provider。",
+      "links": [
+        {
+          "target": "source-packs/decolua-9router-source-pack",
+          "raw": "[[source-packs/decolua-9router-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/decolua-9router-evidence-pack",
+          "raw": "[[evidence-packs/decolua-9router-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/decolua-9router-deep-dive",
+          "raw": "[[deep-dives/decolua-9router-deep-dive]]"
+        },
+        {
+          "target": "concepts/openai-compatible-local-gateway",
+          "raw": "[[concepts/openai-compatible-local-gateway]]"
+        },
+        {
+          "target": "concepts/combo-fallback-routing",
+          "raw": "[[concepts/combo-fallback-routing]]"
+        },
+        {
+          "target": "claims/decolua-9router-main-claim",
+          "raw": "[[claims/decolua-9router-main-claim]]"
+        },
+        {
+          "target": "artifacts/decolua-9router-repo",
+          "raw": "[[artifacts/decolua-9router-repo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    },
+    {
       "id": "content/easy-vibe",
       "type": "content",
       "slug": "easy-vibe",
@@ -1742,6 +1924,97 @@
       ]
     },
     {
+      "id": "content/hkuds-vimax",
+      "type": "content",
+      "slug": "hkuds-vimax",
+      "title": "ViMax — \"ViMax: Agentic Video Generation (Director, Screenwriter, P...",
+      "file": "content/hkuds-vimax.md",
+      "directory": "content",
+      "meta": {
+        "title": "ViMax — \"ViMax: Agentic Video Generation (Director, Screenwriter, P...",
+        "slug": "hkuds-vimax",
+        "kind": "content",
+        "type": "project",
+        "source": "github-trending:monthly",
+        "url": "https://github.com/HKUDS/ViMax",
+        "authors_or_creators": [
+          "HKUDS"
+        ],
+        "date": "",
+        "discovered_at": "2026-06-08",
+        "content_track": "FDE",
+        "status": "deep_dived",
+        "project_kind": "functional_software",
+        "tags": [
+          "tier-3",
+          "project",
+          "agents",
+          "models",
+          "deep",
+          "agent-framework",
+          "python"
+        ],
+        "importance": 4,
+        "why_discovered": "HKUDS/ViMax came from github-trending:monthly; ranking=score=83; max=deep; final=deep",
+        "why_selected": "ViMax 是一个把想法、剧本或小说拆成故事、角色、分镜、镜头、关键帧和视频片段的多阶段视频生成代理框架，但端到端效果依赖外部 LLM、图片生成和视频生成 API。",
+        "relation_to_existing_memory": "extends_existing"
+      },
+      "body": "\n## Summary\n\nViMax 是一个把想法、剧本或小说拆成故事、角色、分镜、镜头、关键帧和视频片段的多阶段视频生成代理框架，但端到端效果依赖外部 LLM、图片生成和视频生成 API。\n\n## Pipeline\n- [[source-packs/hkuds-vimax-source-pack]]\n- [[evidence-packs/hkuds-vimax-evidence-pack]]\n- [[deep-dives/hkuds-vimax-deep-dive]]\n\n## Concepts\n- [[concepts/artifact-authority]]\n- [[concepts/camera-tree]]\n\n## Claims\n- [[claims/hkuds-vimax-main-claim]]\n\n## Artifacts\n- [[artifacts/hkuds-vimax-repo]]\n",
+      "excerpt": "ViMax 是一个把想法、剧本或小说拆成故事、角色、分镜、镜头、关键帧和视频片段的多阶段视频生成代理框架，但端到端效果依赖外部 LLM、图片生成和视频生成 API。",
+      "links": [
+        {
+          "target": "source-packs/hkuds-vimax-source-pack",
+          "raw": "[[source-packs/hkuds-vimax-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/hkuds-vimax-evidence-pack",
+          "raw": "[[evidence-packs/hkuds-vimax-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/hkuds-vimax-deep-dive",
+          "raw": "[[deep-dives/hkuds-vimax-deep-dive]]"
+        },
+        {
+          "target": "concepts/artifact-authority",
+          "raw": "[[concepts/artifact-authority]]"
+        },
+        {
+          "target": "concepts/camera-tree",
+          "raw": "[[concepts/camera-tree]]"
+        },
+        {
+          "target": "claims/hkuds-vimax-main-claim",
+          "raw": "[[claims/hkuds-vimax-main-claim]]"
+        },
+        {
+          "target": "artifacts/hkuds-vimax-repo",
+          "raw": "[[artifacts/hkuds-vimax-repo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    },
+    {
       "id": "content/iii",
       "type": "content",
       "slug": "iii",
@@ -1807,6 +2080,96 @@
         {
           "target": "artifacts/iii-repo",
           "raw": "[[artifacts/iii-repo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    },
+    {
+      "id": "content/jamwithai-production-agentic-rag-course",
+      "type": "content",
+      "slug": "jamwithai-production-agentic-rag-course",
+      "title": "production-agentic-rag-course",
+      "file": "content/jamwithai-production-agentic-rag-course.md",
+      "directory": "content",
+      "meta": {
+        "title": "production-agentic-rag-course",
+        "slug": "jamwithai-production-agentic-rag-course",
+        "kind": "content",
+        "type": "project",
+        "source": "github-trending:daily",
+        "url": "https://github.com/jamwithai/production-agentic-rag-course",
+        "authors_or_creators": [
+          "jamwithai"
+        ],
+        "date": "2025-11-26",
+        "discovered_at": "2026-06-03",
+        "content_track": "FDE",
+        "status": "deep_dived",
+        "project_kind": "functional_software",
+        "tags": [
+          "agents",
+          "skills",
+          "models",
+          "deep",
+          "ai-app",
+          "python"
+        ],
+        "importance": 4,
+        "why_discovered": "jamwithai/production-agentic-rag-course came from github-trending:daily; ranking=score=91; max=deep; final=deep",
+        "why_selected": "这是一个以 arXiv Paper Curator 为载体的生产式 RAG 课程仓库：从 Docker/FastAPI/PostgreSQL/OpenSearch/Airflow 起步，逐周加上 arXiv 抓取、Docling 解析、BM25、Jina 向量、Ollama 生成、Redis 缓存、Langfuse tracing、LangGraph agentic RAG 和 Telegram bot。",
+        "relation_to_existing_memory": "extends_existing"
+      },
+      "body": "\n## Summary\n\n这是一个以 arXiv Paper Curator 为载体的生产式 RAG 课程仓库：从 Docker/FastAPI/PostgreSQL/OpenSearch/Airflow 起步，逐周加上 arXiv 抓取、Docling 解析、BM25、Jina 向量、Ollama 生成、Redis 缓存、Langfuse tracing、LangGraph agentic RAG 和 Telegram bot。\n\n## Pipeline\n- [[source-packs/jamwithai-production-agentic-rag-course-source-pack]]\n- [[evidence-packs/jamwithai-production-agentic-rag-course-evidence-pack]]\n- [[deep-dives/jamwithai-production-agentic-rag-course-deep-dive]]\n\n## Concepts\n- [[concepts/agentic-rag]]\n- [[concepts/hybrid-search-rrf]]\n\n## Claims\n- [[claims/jamwithai-production-agentic-rag-course-main-claim]]\n\n## Artifacts\n- [[artifacts/jamwithai-production-agentic-rag-course-repo]]\n",
+      "excerpt": "这是一个以 arXiv Paper Curator 为载体的生产式 RAG 课程仓库：从 Docker/FastAPI/PostgreSQL/OpenSearch/Airflow 起步，逐周加上 arXiv 抓取、Docling 解析、BM25、Jina 向量、Ollama 生成、Redis 缓存、Langfuse tracing、LangGraph agentic RAG 和 Telegram bot。",
+      "links": [
+        {
+          "target": "source-packs/jamwithai-production-agentic-rag-course-source-pack",
+          "raw": "[[source-packs/jamwithai-production-agentic-rag-course-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/jamwithai-production-agentic-rag-course-evidence-pack",
+          "raw": "[[evidence-packs/jamwithai-production-agentic-rag-course-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/jamwithai-production-agentic-rag-course-deep-dive",
+          "raw": "[[deep-dives/jamwithai-production-agentic-rag-course-deep-dive]]"
+        },
+        {
+          "target": "concepts/agentic-rag",
+          "raw": "[[concepts/agentic-rag]]"
+        },
+        {
+          "target": "concepts/hybrid-search-rrf",
+          "raw": "[[concepts/hybrid-search-rrf]]"
+        },
+        {
+          "target": "claims/jamwithai-production-agentic-rag-course-main-claim",
+          "raw": "[[claims/jamwithai-production-agentic-rag-course-main-claim]]"
+        },
+        {
+          "target": "artifacts/jamwithai-production-agentic-rag-course-repo",
+          "raw": "[[artifacts/jamwithai-production-agentic-rag-course-repo]]"
         }
       ],
       "headings": [
@@ -2185,6 +2548,97 @@
         {
           "target": "artifacts/microsoft-markitdown-repo",
           "raw": "[[artifacts/microsoft-markitdown-repo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    },
+    {
+      "id": "content/modelscope-funasr",
+      "type": "content",
+      "slug": "modelscope-funasr",
+      "title": "FunASR — Industrial-grade speech recognition toolkit: 170x realtime...",
+      "file": "content/modelscope-funasr.md",
+      "directory": "content",
+      "meta": {
+        "title": "FunASR — Industrial-grade speech recognition toolkit: 170x realtime...",
+        "slug": "modelscope-funasr",
+        "kind": "content",
+        "type": "project",
+        "source": "github-trending:weekly",
+        "url": "https://github.com/modelscope/FunASR",
+        "authors_or_creators": [
+          "modelscope"
+        ],
+        "date": "2026-05-29",
+        "discovered_at": "2026-06-03",
+        "content_track": "FDE",
+        "status": "deep_dived",
+        "project_kind": "functional_software",
+        "tags": [
+          "agents",
+          "mcp",
+          "models",
+          "cli",
+          "docs",
+          "model-infra",
+          "python"
+        ],
+        "importance": 5,
+        "why_discovered": "modelscope/FunASR came from github-trending:weekly; ranking=score=90; max=deep; final=deep",
+        "why_selected": "FunASR 是一个把离线/流式语音识别、VAD、标点、说话人分离、OpenAI 兼容 API、MCP 工具和 vLLM 加速放在同一套 Python/部署栈里的 ASR 工具箱。",
+        "relation_to_existing_memory": "extends_existing"
+      },
+      "body": "\n## Summary\n\nFunASR 是一个把离线/流式语音识别、VAD、标点、说话人分离、OpenAI 兼容 API、MCP 工具和 vLLM 加速放在同一套 Python/部署栈里的 ASR 工具箱。\n\n## Pipeline\n- [[source-packs/modelscope-funasr-source-pack]]\n- [[evidence-packs/modelscope-funasr-evidence-pack]]\n- [[deep-dives/modelscope-funasr-deep-dive]]\n\n## Concepts\n- [[concepts/automatic-speech-recognition]]\n- [[concepts/voice-activity-detection]]\n\n## Claims\n- [[claims/modelscope-funasr-main-claim]]\n\n## Artifacts\n- [[artifacts/modelscope-funasr-repo]]\n",
+      "excerpt": "FunASR 是一个把离线/流式语音识别、VAD、标点、说话人分离、OpenAI 兼容 API、MCP 工具和 vLLM 加速放在同一套 Python/部署栈里的 ASR 工具箱。",
+      "links": [
+        {
+          "target": "source-packs/modelscope-funasr-source-pack",
+          "raw": "[[source-packs/modelscope-funasr-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/modelscope-funasr-evidence-pack",
+          "raw": "[[evidence-packs/modelscope-funasr-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/modelscope-funasr-deep-dive",
+          "raw": "[[deep-dives/modelscope-funasr-deep-dive]]"
+        },
+        {
+          "target": "concepts/automatic-speech-recognition",
+          "raw": "[[concepts/automatic-speech-recognition]]"
+        },
+        {
+          "target": "concepts/voice-activity-detection",
+          "raw": "[[concepts/voice-activity-detection]]"
+        },
+        {
+          "target": "claims/modelscope-funasr-main-claim",
+          "raw": "[[claims/modelscope-funasr-main-claim]]"
+        },
+        {
+          "target": "artifacts/modelscope-funasr-repo",
+          "raw": "[[artifacts/modelscope-funasr-repo]]"
         }
       ],
       "headings": [
@@ -2726,6 +3180,97 @@
         {
           "target": "artifacts/opendataloader-pdf-repo",
           "raw": "[[artifacts/opendataloader-pdf-repo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Summary"
+        },
+        {
+          "depth": 2,
+          "text": "Pipeline"
+        },
+        {
+          "depth": 2,
+          "text": "Concepts"
+        },
+        {
+          "depth": 2,
+          "text": "Claims"
+        },
+        {
+          "depth": 2,
+          "text": "Artifacts"
+        }
+      ]
+    },
+    {
+      "id": "content/openmoss-moss-tts",
+      "type": "content",
+      "slug": "openmoss-moss-tts",
+      "title": "MOSS-TTS — MOSS‑TTS Family is an open‑source speech and sound gener...",
+      "file": "content/openmoss-moss-tts.md",
+      "directory": "content",
+      "meta": {
+        "title": "MOSS-TTS — MOSS‑TTS Family is an open‑source speech and sound gener...",
+        "slug": "openmoss-moss-tts",
+        "kind": "content",
+        "type": "project",
+        "source": "github-trending:weekly",
+        "url": "https://github.com/OpenMOSS/MOSS-TTS",
+        "authors_or_creators": [
+          "OpenMOSS"
+        ],
+        "date": "",
+        "discovered_at": "2026-06-04",
+        "content_track": "FDE",
+        "status": "deep_dived",
+        "project_kind": "functional_software",
+        "tags": [
+          "tier-3",
+          "project",
+          "agents",
+          "skills",
+          "models",
+          "model-infra",
+          "python"
+        ],
+        "importance": 5,
+        "why_discovered": "OpenMOSS/MOSS-TTS came from github-trending:weekly; ranking=score=95; max=deep; final=deep",
+        "why_selected": "MOSS-TTS 是一个开源语音/声音生成模型家族仓库，把长文本 TTS、音色克隆、实时流式 TTS、多人对话语音、音效生成和本地/边缘推理放在同一个工程里。",
+        "relation_to_existing_memory": "extends_existing"
+      },
+      "body": "\n## Summary\n\nMOSS-TTS 是一个开源语音/声音生成模型家族仓库，把长文本 TTS、音色克隆、实时流式 TTS、多人对话语音、音效生成和本地/边缘推理放在同一个工程里。\n\n## Pipeline\n- [[source-packs/openmoss-moss-tts-source-pack]]\n- [[evidence-packs/openmoss-moss-tts-evidence-pack]]\n- [[deep-dives/openmoss-moss-tts-deep-dive]]\n\n## Concepts\n- [[concepts/residual-vector-quantization]]\n- [[concepts/delay-pattern-scheduling]]\n\n## Claims\n- [[claims/openmoss-moss-tts-main-claim]]\n\n## Artifacts\n- [[artifacts/openmoss-moss-tts-repo]]\n",
+      "excerpt": "MOSS-TTS 是一个开源语音/声音生成模型家族仓库，把长文本 TTS、音色克隆、实时流式 TTS、多人对话语音、音效生成和本地/边缘推理放在同一个工程里。",
+      "links": [
+        {
+          "target": "source-packs/openmoss-moss-tts-source-pack",
+          "raw": "[[source-packs/openmoss-moss-tts-source-pack]]"
+        },
+        {
+          "target": "evidence-packs/openmoss-moss-tts-evidence-pack",
+          "raw": "[[evidence-packs/openmoss-moss-tts-evidence-pack]]"
+        },
+        {
+          "target": "deep-dives/openmoss-moss-tts-deep-dive",
+          "raw": "[[deep-dives/openmoss-moss-tts-deep-dive]]"
+        },
+        {
+          "target": "concepts/residual-vector-quantization",
+          "raw": "[[concepts/residual-vector-quantization]]"
+        },
+        {
+          "target": "concepts/delay-pattern-scheduling",
+          "raw": "[[concepts/delay-pattern-scheduling]]"
+        },
+        {
+          "target": "claims/openmoss-moss-tts-main-claim",
+          "raw": "[[claims/openmoss-moss-tts-main-claim]]"
+        },
+        {
+          "target": "artifacts/openmoss-moss-tts-repo",
+          "raw": "[[artifacts/openmoss-moss-tts-repo]]"
         }
       ],
       "headings": [

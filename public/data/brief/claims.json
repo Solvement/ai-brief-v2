@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T16:42:33.594Z",
+  "generatedAt": "2026-06-08T18:13:53.800Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 50,
+  "count": 56,
   "items": [
     {
       "id": "claim/9router-main-claim",
@@ -364,6 +364,46 @@
       ]
     },
     {
+      "id": "claim/bytedance-ui-tars-desktop-main-claim",
+      "type": "claim",
+      "slug": "bytedance-ui-tars-desktop-main-claim",
+      "title": "Bytedance Ui Tars Desktop Main Claim",
+      "file": "claims/bytedance-ui-tars-desktop-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "“TARS is a Multimodal AI Agent stack, currently shipping two projects: Agent TARS and UI-TARS-desktop”。",
+        "slug": "bytedance-ui-tars-desktop-main-claim",
+        "kind": "claim",
+        "content": "bytedance-ui-tars-desktop",
+        "source_pointer": "README Introduction；README Agent TARS；README UI-TARS Desktop",
+        "evidence_strength": "medium",
+        "supports": [
+          "gui-agent",
+          "visual-grounding"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不直接证明两个产品在当前 commit 都能完整端到端运行。",
+          "Agent TARS 的完整用户文档大量指向外部 `agent-tars.com`，本次主要核验了仓库内代码和 README。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n仓库定位自己为多模态 Agent 栈，主线有 Agent TARS 和 UI-TARS Desktop 两块。\n\n证据:README 明确列出两块；代码树也有 `apps/ui-tars`、`packages/ui-tars/*`、`multimodal/agent-tars/core`、`multimodal/agent-tars/cli`。。边界:不直接证明两个产品在当前 commit 都能完整端到端运行。。风险:Agent TARS 的完整用户文档大量指向外部 `agent-tars.com`，本次主要核验了仓库内代码和 README。。See [[content/bytedance-ui-tars-desktop]]。\n",
+      "excerpt": "仓库定位自己为多模态 Agent 栈，主线有 Agent TARS 和 UI-TARS Desktop 两块。",
+      "links": [
+        {
+          "target": "content/bytedance-ui-tars-desktop",
+          "raw": "[[content/bytedance-ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/can1357-oh-my-pi-main-claim",
       "type": "claim",
       "slug": "can1357-oh-my-pi-main-claim",
@@ -593,6 +633,46 @@
         {
           "target": "content/compound-engineering-plugin",
           "raw": "[[content/compound-engineering-plugin]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/decolua-9router-main-claim",
+      "type": "claim",
+      "slug": "decolua-9router-main-claim",
+      "title": "Decolua 9router Main Claim",
+      "file": "claims/decolua-9router-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "提供本地 OpenAI-compatible `/v1` API 给 AI 编程工具使用。",
+        "slug": "decolua-9router-main-claim",
+        "kind": "claim",
+        "content": "decolua-9router",
+        "source_pointer": "README Quick Start；next.config.mjs rewrites；src/app/api/v1/chat/completions/route.js POST",
+        "evidence_strength": "high",
+        "supports": [
+          "openai-compatible-local-gateway",
+          "combo-fallback-routing"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不证明所有第三方 CLI 在当前版本都无 bug 可用。",
+          "不同客户端的非标准请求、SSE 细节或 tool-call 行为仍可能破坏兼容性。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n客户端可以把 base URL 指到 `http://localhost:20128/v1`；Next.js rewrite 会把 `/v1/chat/completions` 转到 `/api/v1/chat/completions`，route 再调用 `handleChat`。\n\n证据:`source: \"/v1/:path*\" destination: \"/api/v1/:path*\"`；README 示例给出 Endpoint `http://localhost:20128/v1` 与 Model `kr/claude-sonnet-4.5`。。边界:不证明所有第三方 CLI 在当前版本都无 bug 可用。。风险:不同客户端的非标准请求、SSE 细节或 tool-call 行为仍可能破坏兼容性。。See [[content/decolua-9router]]。\n",
+      "excerpt": "客户端可以把 base URL 指到 `http://localhost:20128/v1`；Next.js rewrite 会把 `/v1/chat/completions` 转到 `/api/v1/chat/completions`，route 再调用 `handleChat`。",
+      "links": [
+        {
+          "target": "content/decolua-9router",
+          "raw": "[[content/decolua-9router]]"
         }
       ],
       "headings": [
@@ -843,6 +923,46 @@
       ]
     },
     {
+      "id": "claim/hkuds-vimax-main-claim",
+      "type": "claim",
+      "slug": "hkuds-vimax-main-claim",
+      "title": "Hkuds Vimax Main Claim",
+      "file": "claims/hkuds-vimax-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "ViMax 是“multi-agent video framework”，面向 automated multi-shot video generation 和 character/scene consistency。",
+        "slug": "hkuds-vimax-main-claim",
+        "kind": "claim",
+        "content": "hkuds-vimax",
+        "source_pointer": "README Architecture",
+        "evidence_strength": "medium",
+        "supports": [
+          "artifact-authority",
+          "camera-tree"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "README 不能证明生成质量、长视频稳定性或比其他系统更好。",
+          "这是项目方叙述；没有仓库内 benchmark 或可复现实验结果支撑质量结论。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\nREADME 把它定位成多代理长视频生成框架，强调多镜头、角色和场景一致性。\n\n证据:README 明确写了 multi-agent video framework，并列出 script understanding、scene & shot planning、visual asset planning、consistency & continuity、visual synthesis & assembly。。边界:README 不能证明生成质量、长视频稳定性或比其他系统更好。。风险:这是项目方叙述；没有仓库内 benchmark 或可复现实验结果支撑质量结论。。See [[content/hkuds-vimax]]。\n",
+      "excerpt": "README 把它定位成多代理长视频生成框架，强调多镜头、角色和场景一致性。",
+      "links": [
+        {
+          "target": "content/hkuds-vimax",
+          "raw": "[[content/hkuds-vimax]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/iii-main-claim",
       "type": "claim",
       "slug": "iii-main-claim",
@@ -873,6 +993,46 @@
         {
           "target": "content/iii",
           "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/jamwithai-production-agentic-rag-course-main-claim",
+      "type": "claim",
+      "slug": "jamwithai-production-agentic-rag-course-main-claim",
+      "title": "Jamwithai Production Agentic Rag Course Main Claim",
+      "file": "claims/jamwithai-production-agentic-rag-course-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "课程自称按 Week 1 到 Week 7 构建 RAG 系统，Week 7 是 Agentic RAG with LangGraph and Telegram Bot。",
+        "slug": "jamwithai-production-agentic-rag-course-main-claim",
+        "kind": "claim",
+        "content": "jamwithai-production-agentic-rag-course",
+        "source_pointer": "README What You'll Build",
+        "evidence_strength": "medium",
+        "supports": [
+          "agentic-rag",
+          "hybrid-search-rrf"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不直接证明每周 notebook 都能在当前环境完整跑通。",
+          "Week 7 README 中部分文件名和命令能力与实际 tree 不一致。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n它把项目拆成每周一个工程层：基础设施、抓取、BM25、混合检索、LLM、监控缓存、agent 和 Telegram。\n\n证据:README 明确列出 Week 1 到 Week 7；仓库也有 `notebooks/week1` 到 `notebooks/week7`、`src/services/agents`、`src/services/telegram`。。边界:不直接证明每周 notebook 都能在当前环境完整跑通。。风险:Week 7 README 中部分文件名和命令能力与实际 tree 不一致。。See [[content/jamwithai-production-agentic-rag-course]]。\n",
+      "excerpt": "它把项目拆成每周一个工程层：基础设施、抓取、BM25、混合检索、LLM、监控缓存、agent 和 Telegram。",
+      "links": [
+        {
+          "target": "content/jamwithai-production-agentic-rag-course",
+          "raw": "[[content/jamwithai-production-agentic-rag-course]]"
         }
       ],
       "headings": [
@@ -1035,6 +1195,46 @@
         {
           "target": "content/microsoft-markitdown",
           "raw": "[[content/microsoft-markitdown]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/modelscope-funasr-main-claim",
+      "type": "claim",
+      "slug": "modelscope-funasr-main-claim",
+      "title": "Modelscope Funasr Main Claim",
+      "file": "claims/modelscope-funasr-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "“比 Whisper 快 170 倍、支持 50+ 语言”。",
+        "slug": "modelscope-funasr-main-claim",
+        "kind": "claim",
+        "content": "modelscope-funasr",
+        "source_pointer": "README 顶部标语；README Why FunASR 表格",
+        "evidence_strength": "medium",
+        "supports": [
+          "automatic-speech-recognition",
+          "voice-activity-detection"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "本次没有运行 benchmark，也没有核验 50+ 语言清单覆盖质量。",
+          "速度数字依赖硬件、模型、batch、warmup、音频分布；语言数量不等于每种语言质量一致。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n项目首页把 FunASR 定位成高吞吐、多语言的私有语音识别工具。\n\n证据:README 明确写 `170x faster than Whisper`、`50+ languages`，中文 README 写“比 Whisper 快 170 倍。支持 50+ 语言”。。边界:本次没有运行 benchmark，也没有核验 50+ 语言清单覆盖质量。。风险:速度数字依赖硬件、模型、batch、warmup、音频分布；语言数量不等于每种语言质量一致。。See [[content/modelscope-funasr]]。\n",
+      "excerpt": "项目首页把 FunASR 定位成高吞吐、多语言的私有语音识别工具。",
+      "links": [
+        {
+          "target": "content/modelscope-funasr",
+          "raw": "[[content/modelscope-funasr]]"
         }
       ],
       "headings": [
@@ -1274,6 +1474,46 @@
         {
           "target": "content/opendataloader-pdf",
           "raw": "[[content/opendataloader-pdf]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/openmoss-moss-tts-main-claim",
+      "type": "claim",
+      "slug": "openmoss-moss-tts-main-claim",
+      "title": "Openmoss Moss Tts Main Claim",
+      "file": "claims/openmoss-moss-tts-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "MOSS-TTS-v1.5 支持 31 languages，并保留 MOSS-TTS 1.0 的 20 languages。",
+        "slug": "openmoss-moss-tts-main-claim",
+        "kind": "claim",
+        "content": "openmoss-moss-tts",
+        "source_pointer": "README Supported Languages；docs/moss_tts_model_card.md 1.5 Supported Languages",
+        "evidence_strength": "medium",
+        "supports": [
+          "residual-vector-quantization",
+          "delay-pattern-scheduling"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "没有在仓库内看到逐语言测试集、复现实验脚本或每种语言的样例音频生成结果。",
+          "语言覆盖不等于每种语言质量相同；未跑权重。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n作者说 v1.5 覆盖 31 种语言，README 还列出了 zh、yue、en、ar、cs、da、nl、fi、fr、de、el、he、hi、hu、it、ja、ko、mk、ms、fa、pl、pt、ro、ru、es、sw、sv、tl、th、tr、vi。\n\n证据:README 和 model card 的语言表与“31 languages”文字一致。。边界:没有在仓库内看到逐语言测试集、复现实验脚本或每种语言的样例音频生成结果。。风险:语言覆盖不等于每种语言质量相同；未跑权重。。See [[content/openmoss-moss-tts]]。\n",
+      "excerpt": "作者说 v1.5 覆盖 31 种语言，README 还列出了 zh、yue、en、ar、cs、da、nl、fi、fr、de、el、he、hi、hu、it、ja、ko、mk、ms、fa、pl、pt、ro、ru、es、sw、sv、tl、th、tr、vi。",
+      "links": [
+        {
+          "target": "content/openmoss-moss-tts",
+          "raw": "[[content/openmoss-moss-tts]]"
         }
       ],
       "headings": [

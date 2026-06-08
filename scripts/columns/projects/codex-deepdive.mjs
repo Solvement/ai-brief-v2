@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { openAiBriefDb } from "../../lib/db.mjs";
 import { parseJson } from "../../lib/llm.mjs";
-import { publishBriefMirror, isProjectAlreadyDeepDived } from "./brief-pipeline.mjs";
+import { publishBriefMirror, isBriefWikiAnalysisCompleted, isProjectAlreadyDeepDived } from "./brief-pipeline.mjs";
 import { writeProjectBriefWikiEntities } from "./brief-writer.mjs";
 import { emitProjectAutoSciPrimitive } from "./autosci-primitives.mjs";
 
@@ -171,7 +171,7 @@ export function selectAuthoringRecords(records, options = {}) {
 
   return records
     .filter((record) => record.finalDepth === "deep")
-    .filter((record) => options.force || !record.briefWikiRow)
+    .filter((record) => options.force || !isBriefWikiAnalysisCompleted(record.briefWikiRow))
     .slice(0, options.limit || 1);
 }
 

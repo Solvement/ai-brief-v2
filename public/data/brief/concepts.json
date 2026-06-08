@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T16:42:33.594Z",
+  "generatedAt": "2026-06-08T18:13:53.800Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 94,
+  "count": 106,
   "items": [
     {
       "id": "concept/adaptive-element-relocation",
@@ -329,6 +329,64 @@
       ]
     },
     {
+      "id": "concept/agentic-rag",
+      "type": "concept",
+      "slug": "agentic-rag",
+      "title": "Agentic Rag",
+      "file": "concepts/agentic-rag.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Agentic RAG",
+        "slug": "agentic-rag",
+        "kind": "concept",
+        "tags": [
+          "rag",
+          "agent",
+          "langgraph"
+        ],
+        "maturity": "active",
+        "first_seen_in": "jamwithai-production-agentic-rag-course",
+        "related_content": [
+          "jamwithai-production-agentic-rag-course"
+        ],
+        "related_concepts": [],
+        "explanation": "人话说：不是每个问题都无脑检索，而是先判断是否该检索，检索后再判断资料是否够用，不够就改写问题再试。技术上，本仓库用 LangGraph 的 `StateGraph` 编排 `guardrail`、`retrieve`、`ToolNode`、`grade_documents`、`rewrite_query`、`generate_answer`。",
+        "examples": [
+          "`src/services/agents/agentic_rag.py` 的 `_build_graph`",
+          "`POST /api/v1/ask-agentic`"
+        ],
+        "common_misunderstandings": [
+          "把 agentic RAG 理解成一定要多工具调用；本仓库的核心工具只有 `retrieve_papers`。",
+          "把 README 的“simple question direct response”当已完整实现；当前源码实际先走 guardrail，低分进 out_of_scope。"
+        ],
+        "open_questions": [
+          "实际模型在 guardrail/grade/rewrite 上的稳定性未在仓库 benchmark 中说明。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话说：不是每个问题都无脑检索，而是先判断是否该检索，检索后再判断资料是否够用，不够就改写问题再试。技术上，本仓库用 LangGraph 的 `StateGraph` 编排 `guardrail`、`retrieve`、`ToolNode`、`grade_documents`、`rewrite_query`、`generate_answer`。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/jamwithai-production-agentic-rag-course]]。\n\n## Supported by\n- [[claims/jamwithai-production-agentic-rag-course-main-claim]]\n",
+      "excerpt": "人话说：不是每个问题都无脑检索，而是先判断是否该检索，检索后再判断资料是否够用，不够就改写问题再试。技术上，本仓库用 LangGraph 的 `StateGraph` 编排 `guardrail`、`retrieve`、`ToolNode`、`grade_documents`、`rewrite_query`、`generate_answer`。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/jamwithai-production-agentic-r",
+      "links": [
+        {
+          "target": "content/jamwithai-production-agentic-rag-course",
+          "raw": "[[content/jamwithai-production-agentic-rag-course]]"
+        },
+        {
+          "target": "claims/jamwithai-production-agentic-rag-course-main-claim",
+          "raw": "[[claims/jamwithai-production-agentic-rag-course-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/agentic-tree-search",
       "type": "concept",
       "slug": "agentic-tree-search",
@@ -442,6 +500,122 @@
       ]
     },
     {
+      "id": "concept/artifact-authority",
+      "type": "concept",
+      "slug": "artifact-authority",
+      "title": "Artifact Authority",
+      "file": "concepts/artifact-authority.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "文件化事实源",
+        "slug": "artifact-authority",
+        "kind": "concept",
+        "tags": [
+          "agent-runtime",
+          "workflow-state",
+          "reliability"
+        ],
+        "maturity": "active",
+        "first_seen_in": "hkuds-vimax",
+        "related_content": [
+          "hkuds-vimax"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：让 `.working_dir` 里的文件决定项目进度，而不是让模型凭记忆说“我做完了”。在 ViMax 中，`story.txt`、`characters.json`、`script.json`、`storyboard.json`、`shot_description.json`、`camera_tree.json` 和 `final_video.mp4` 都被 `artifact_checklist()` 检查。术语定义：artifact authority 指工作流状态由持久化产物证明。（来源：agent_runtime/session_index.py；来源：prompts/workflow.md）",
+        "examples": [
+          "`.working_dir/<session_id>/idea2video/story.txt` 存在才算故事已生成",
+          "`vimax_render_video` 缺结构化文本依赖时返回 missing，而不是假装开始渲染"
+        ],
+        "common_misunderstandings": [
+          "不是把所有输出都缓存就自动可靠；仍要校验文件内容是否符合 schema 和业务质量。",
+          "文件存在不等于视频质量合格。"
+        ],
+        "open_questions": [
+          "仓库未说明是否有自动清理、版本化或多人协作冲突处理。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：让 `.working_dir` 里的文件决定项目进度，而不是让模型凭记忆说“我做完了”。在 ViMax 中，`story.txt`、`characters.json`、`script.json`、`storyboard.json`、`shot_description.json`、`camera_tree.json` 和 `final_video.mp4` 都被 `artifact_checklist()` 检查。术语定义：artifact authority 指工作流状态由持久化产物证明。（来源：agent_runtime/session_index.py；来源：prompts/workflow.md） 出处:https://github.com/hkuds/vimax。See [[content/hkuds-vimax]]。\n\n## Supported by\n- [[claims/hkuds-vimax-main-claim]]\n",
+      "excerpt": "人话：让 `.working_dir` 里的文件决定项目进度，而不是让模型凭记忆说“我做完了”。在 ViMax 中，`story.txt`、`characters.json`、`script.json`、`storyboard.json`、`shot_description.json`、`camera_tree.json` 和 `final_video.mp4` 都被 `artifact_checklist()` 检查。术语定义：artifact authority 指工作流状态由持久化产物证明。（来源：agent_runtime/session_ind",
+      "links": [
+        {
+          "target": "content/hkuds-vimax",
+          "raw": "[[content/hkuds-vimax]]"
+        },
+        {
+          "target": "claims/hkuds-vimax-main-claim",
+          "raw": "[[claims/hkuds-vimax-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/automatic-speech-recognition",
+      "type": "concept",
+      "slug": "automatic-speech-recognition",
+      "title": "Automatic Speech Recognition",
+      "file": "concepts/automatic-speech-recognition.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "ASR / 自动语音识别",
+        "slug": "automatic-speech-recognition",
+        "kind": "concept",
+        "tags": [
+          "speech",
+          "model-inference",
+          "funasr"
+        ],
+        "maturity": "active",
+        "first_seen_in": "modelscope-funasr",
+        "related_content": [
+          "modelscope-funasr"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：把音频里的话转成文字。技术定义：FunASR 通过 `AutoModel.generate(input=...)` 接收文件路径、URL、numpy array、bytes 或列表，返回含 `text`、`timestamp`、`sentence_info` 的 dict 列表。",
+        "examples": [
+          "README Quick Start: `model.generate(input=\"meeting.wav\")`",
+          "examples/openai_api/server.py: `client.audio.transcriptions.create(model=\"sensevoice\", file=open(\"meeting.wav\", \"rb\"))`"
+        ],
+        "common_misunderstandings": [
+          "ASR 只等于转文字；在 FunASR 里常和 VAD、标点、时间戳、说话人一起组成流水线。",
+          "支持某语言数量不等于业务音频质量已达标。"
+        ],
+        "open_questions": [
+          "本次未复跑不同语言和方言质量。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：把音频里的话转成文字。技术定义：FunASR 通过 `AutoModel.generate(input=...)` 接收文件路径、URL、numpy array、bytes 或列表，返回含 `text`、`timestamp`、`sentence_info` 的 dict 列表。 出处:https://github.com/modelscope/funasr。See [[content/modelscope-funasr]]。\n\n## Supported by\n- [[claims/modelscope-funasr-main-claim]]\n",
+      "excerpt": "人话：把音频里的话转成文字。技术定义：FunASR 通过 `AutoModel.generate(input=...)` 接收文件路径、URL、numpy array、bytes 或列表，返回含 `text`、`timestamp`、`sentence_info` 的 dict 列表。 出处:https://github.com/modelscope/funasr。See [[content/modelscope-funasr]]。",
+      "links": [
+        {
+          "target": "content/modelscope-funasr",
+          "raw": "[[content/modelscope-funasr]]"
+        },
+        {
+          "target": "claims/modelscope-funasr-main-claim",
+          "raw": "[[claims/modelscope-funasr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/automodel-pipeline",
       "type": "concept",
       "slug": "automodel-pipeline",
@@ -484,6 +658,64 @@
         {
           "target": "claims/funasr-main-claim",
           "raw": "[[claims/funasr-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/camera-tree",
+      "type": "concept",
+      "slug": "camera-tree",
+      "title": "Camera Tree",
+      "file": "concepts/camera-tree.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "相机树",
+        "slug": "camera-tree",
+        "kind": "concept",
+        "tags": [
+          "video-generation",
+          "continuity",
+          "shot-planning"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "hkuds-vimax",
+        "related_content": [
+          "hkuds-vimax"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：用父子关系记录哪个宽镜头能覆盖哪个近景镜头，从而为后续关键帧生成提供参考。术语定义：camera tree 是一组 `Camera` 节点，字段包括 `idx`、`active_shot_idxs`、`parent_cam_idx`、`parent_shot_idx`、`missing_info`。（来源：interfaces/camera.py；来源：agents/camera_image_generator.py）",
+        "examples": [
+          "`CameraImageGenerator.construct_camera_tree()` 把 `<CAMERA_0>`、`<CAMERA_1>` 等镜头描述交给 LLM 输出 parent camera items",
+          "如果子镜头缺少父镜头覆盖的信息，`missing_info` 会被用于新相机图生成 prompt"
+        ],
+        "common_misunderstandings": [
+          "它不是真实 3D 相机求解；它是基于文本镜头描述的语义结构。",
+          "父相机覆盖子相机不保证像素级一致。"
+        ],
+        "open_questions": [
+          "没有仓库内评测说明 camera tree 判断准确率。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：用父子关系记录哪个宽镜头能覆盖哪个近景镜头，从而为后续关键帧生成提供参考。术语定义：camera tree 是一组 `Camera` 节点，字段包括 `idx`、`active_shot_idxs`、`parent_cam_idx`、`parent_shot_idx`、`missing_info`。（来源：interfaces/camera.py；来源：agents/camera_image_generator.py） 出处:https://github.com/hkuds/vimax。See [[content/hkuds-vimax]]。\n\n## Supported by\n- [[claims/hkuds-vimax-main-claim]]\n",
+      "excerpt": "人话：用父子关系记录哪个宽镜头能覆盖哪个近景镜头，从而为后续关键帧生成提供参考。术语定义：camera tree 是一组 `Camera` 节点，字段包括 `idx`、`active_shot_idxs`、`parent_cam_idx`、`parent_shot_idx`、`missing_info`。（来源：interfaces/camera.py；来源：agents/camera_image_generator.py） 出处:https://github.com/hkuds/vimax。See [[content/hkuds-vimax]]。",
+      "links": [
+        {
+          "target": "content/hkuds-vimax",
+          "raw": "[[content/hkuds-vimax]]"
+        },
+        {
+          "target": "claims/hkuds-vimax-main-claim",
+          "raw": "[[claims/hkuds-vimax-main-claim]]"
         }
       ],
       "headings": [
@@ -654,6 +886,64 @@
         {
           "target": "claims/academic-research-skills-main-claim",
           "raw": "[[claims/academic-research-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/combo-fallback-routing",
+      "type": "concept",
+      "slug": "combo-fallback-routing",
+      "title": "Combo Fallback Routing",
+      "file": "concepts/combo-fallback-routing.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Combo fallback routing",
+        "slug": "combo-fallback-routing",
+        "kind": "concept",
+        "tags": [
+          "routing",
+          "fallback",
+          "resilience"
+        ],
+        "maturity": "active",
+        "first_seen_in": "decolua-9router",
+        "related_content": [
+          "decolua-9router"
+        ],
+        "related_concepts": [],
+        "explanation": "通俗说，就是把多个模型排成一个候补队列，第一个失败就试第二个。技术上，`open-sse/services/combo.js` 接收 `models` 数组，支持 `fallback` 与 `round-robin`，并用 `checkFallbackError` 判断是否继续。",
+        "examples": [
+          "README combo 示例：`cc/claude-opus-4-7` → `glm/glm-5.1` → `minimax/MiniMax-M2.7`",
+          "`settingsRepo.js` 默认 `comboStrategy: \"fallback\"`、`comboStickyRoundRobinLimit: 1`"
+        ],
+        "common_misunderstandings": [
+          "Fallback 不是零停机保证；它只是在错误可分类时换路。",
+          "Round-robin 不等于负载均衡 SLA。"
+        ],
+        "open_questions": [
+          "不同 provider 的错误文本变化后，fallback 规则需要持续维护。"
+        ]
+      },
+      "body": "\n## Explanation\n\n通俗说，就是把多个模型排成一个候补队列，第一个失败就试第二个。技术上，`open-sse/services/combo.js` 接收 `models` 数组，支持 `fallback` 与 `round-robin`，并用 `checkFallbackError` 判断是否继续。 出处:https://github.com/decolua/9router。See [[content/decolua-9router]]。\n\n## Supported by\n- [[claims/decolua-9router-main-claim]]\n",
+      "excerpt": "通俗说，就是把多个模型排成一个候补队列，第一个失败就试第二个。技术上，`open-sse/services/combo.js` 接收 `models` 数组，支持 `fallback` 与 `round-robin`，并用 `checkFallbackError` 判断是否继续。 出处:https://github.com/decolua/9router。See [[content/decolua-9router]]。",
+      "links": [
+        {
+          "target": "content/decolua-9router",
+          "raw": "[[content/decolua-9router]]"
+        },
+        {
+          "target": "claims/decolua-9router-main-claim",
+          "raw": "[[claims/decolua-9router-main-claim]]"
         }
       ],
       "headings": [
@@ -1055,6 +1345,64 @@
         {
           "target": "claims/anthropic-cybersecurity-skills-main-claim",
           "raw": "[[claims/anthropic-cybersecurity-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/delay-pattern-scheduling",
+      "type": "concept",
+      "slug": "delay-pattern-scheduling",
+      "title": "Delay Pattern Scheduling",
+      "file": "concepts/delay-pattern-scheduling.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Delay-Pattern Scheduling",
+        "slug": "delay-pattern-scheduling",
+        "kind": "concept",
+        "tags": [
+          "autoregressive",
+          "rvq",
+          "inference"
+        ],
+        "maturity": "active",
+        "first_seen_in": "openmoss-moss-tts",
+        "related_content": [
+          "openmoss-moss-tts"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：不按 32 个码本一层层慢慢生成，而是把不同码本错开一个时间步，让 33 个 head 并行吐下一帧相关 token。技术定义：Head 1 预测 Frame t 的 Layer 1，Head 2 预测 Frame t-1 的 Layer 2，依此类推；代码里 `delay_step` 每次返回 `[text_token, audio_0, ..., audio_31]`。（来源：moss_tts_delay/README.md Prediction Topology；moss_tts_delay/llama_cpp/delay_state.py step）",
+        "examples": [
+          "`moss_tts_delay/llama_cpp/processor.py` 的 `apply_delay_pattern(codes, AUDIO_PAD_CODE)` 用于把参考音频 codes 放入 multi-channel prompt。",
+          "`AUDIO_ASSISTANT_DELAY_SLOT_TOKEN_ID` 用于音频结束后的 delay slot flush。（来源：moss_tts_delay/llama_cpp/delay_state.py）"
+        ],
+        "common_misunderstandings": [
+          "Delay-pattern 不是音频播放延迟，而是训练/推理序列排布方式。",
+          "并行预测 RVQ heads 不等于整个音频非自回归；时间维仍是 autoregressive loop。"
+        ],
+        "open_questions": [
+          "仓库未给出 delay-pattern 与 local architecture 在同一硬件同一输入上的独立可复现延迟日志。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：不按 32 个码本一层层慢慢生成，而是把不同码本错开一个时间步，让 33 个 head 并行吐下一帧相关 token。技术定义：Head 1 预测 Frame t 的 Layer 1，Head 2 预测 Frame t-1 的 Layer 2，依此类推；代码里 `delay_step` 每次返回 `[text_token, audio_0, ..., audio_31]`。（来源：moss_tts_delay/README.md Prediction Topology；moss_tts_delay/llama_cpp/delay_state.py step） 出处:https://github.com/openmoss/moss-tts。See [[content/openmoss-moss-tts]]。\n\n## Supported by\n- [[claims/openmoss-moss-tts-main-claim]]\n",
+      "excerpt": "人话：不按 32 个码本一层层慢慢生成，而是把不同码本错开一个时间步，让 33 个 head 并行吐下一帧相关 token。技术定义：Head 1 预测 Frame t 的 Layer 1，Head 2 预测 Frame t-1 的 Layer 2，依此类推；代码里 `delay_step` 每次返回 `[text_token, audio_0, ..., audio_31]`。（来源：moss_tts_delay/README.md Prediction Topology；moss_tts_delay/llama_cpp/delay_state.py ",
+      "links": [
+        {
+          "target": "content/openmoss-moss-tts",
+          "raw": "[[content/openmoss-moss-tts]]"
+        },
+        {
+          "target": "claims/openmoss-moss-tts-main-claim",
+          "raw": "[[claims/openmoss-moss-tts-main-claim]]"
         }
       ],
       "headings": [
@@ -1643,6 +1991,62 @@
       ]
     },
     {
+      "id": "concept/gui-agent",
+      "type": "concept",
+      "slug": "gui-agent",
+      "title": "Gui Agent",
+      "file": "concepts/gui-agent.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "GUI Agent",
+        "slug": "gui-agent",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "multimodal",
+          "automation"
+        ],
+        "maturity": "active",
+        "first_seen_in": "bytedance-ui-tars-desktop",
+        "related_content": [
+          "bytedance-ui-tars-desktop"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：让模型像人一样看屏幕、点按钮、输入文字。技术定义：一个循环系统，输入用户任务和截图，模型输出动作，operator 把动作映射到鼠标/键盘/浏览器/设备 API。",
+        "examples": [
+          "UI-TARS `GUIAgent.run()` 调截图、VLM、action parser、operator.execute。"
+        ],
+        "common_misunderstandings": [
+          "不是只靠 prompt；坐标转换、权限、动作解析和执行器同样关键。"
+        ],
+        "open_questions": [
+          "不同 VLM provider 的动作格式兼容性如何长期维护？"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：让模型像人一样看屏幕、点按钮、输入文字。技术定义：一个循环系统，输入用户任务和截图，模型输出动作，operator 把动作映射到鼠标/键盘/浏览器/设备 API。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/bytedance-ui-tars-desktop]]。\n\n## Supported by\n- [[claims/bytedance-ui-tars-desktop-main-claim]]\n",
+      "excerpt": "人话：让模型像人一样看屏幕、点按钮、输入文字。技术定义：一个循环系统，输入用户任务和截图，模型输出动作，operator 把动作映射到鼠标/键盘/浏览器/设备 API。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/bytedance-ui-tars-desktop]]。",
+      "links": [
+        {
+          "target": "content/bytedance-ui-tars-desktop",
+          "raw": "[[content/bytedance-ui-tars-desktop]]"
+        },
+        {
+          "target": "claims/bytedance-ui-tars-desktop-main-claim",
+          "raw": "[[claims/bytedance-ui-tars-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/harness-hooks",
       "type": "concept",
       "slug": "harness-hooks",
@@ -1917,6 +2321,64 @@
         {
           "target": "claims/production-agentic-rag-course-main-claim",
           "raw": "[[claims/production-agentic-rag-course-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/hybrid-search-rrf",
+      "type": "concept",
+      "slug": "hybrid-search-rrf",
+      "title": "Hybrid Search Rrf",
+      "file": "concepts/hybrid-search-rrf.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Hybrid Search with RRF",
+        "slug": "hybrid-search-rrf",
+        "kind": "concept",
+        "tags": [
+          "search",
+          "opensearch",
+          "retrieval"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "jamwithai-production-agentic-rag-course",
+        "related_content": [
+          "jamwithai-production-agentic-rag-course"
+        ],
+        "related_concepts": [],
+        "explanation": "人话说：关键词能找精确术语，向量能找语义相近内容，RRF 把两边排名合并。技术上，本仓库在 OpenSearch 里同时发 BM25 bool/multi_match 和 `knn` vector query，再通过 `hybrid-rrf-pipeline` 做 reciprocal rank fusion。",
+        "examples": [
+          "`src/services/opensearch/client.py::_search_hybrid_native`",
+          "`src/services/opensearch/index_config_hybrid.py::HYBRID_RRF_PIPELINE`"
+        ],
+        "common_misunderstandings": [
+          "以为 hybrid search 等于简单加权平均；本仓库默认不是 weighted average，而是 RRF，weighted pipeline 只是注释里的替代方案。",
+          "以为向量维度可随意改；mapping 固定 `dimension=1024`。"
+        ],
+        "open_questions": [
+          "没有仓库内实验比较 RRF、weighted average、BM25-only、vector-only 的效果。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话说：关键词能找精确术语，向量能找语义相近内容，RRF 把两边排名合并。技术上，本仓库在 OpenSearch 里同时发 BM25 bool/multi_match 和 `knn` vector query，再通过 `hybrid-rrf-pipeline` 做 reciprocal rank fusion。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/jamwithai-production-agentic-rag-course]]。\n\n## Supported by\n- [[claims/jamwithai-production-agentic-rag-course-main-claim]]\n",
+      "excerpt": "人话说：关键词能找精确术语，向量能找语义相近内容，RRF 把两边排名合并。技术上，本仓库在 OpenSearch 里同时发 BM25 bool/multi_match 和 `knn` vector query，再通过 `hybrid-rrf-pipeline` 做 reciprocal rank fusion。 出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/jamwithai-production-agentic-rag-course]]。",
+      "links": [
+        {
+          "target": "content/jamwithai-production-agentic-rag-course",
+          "raw": "[[content/jamwithai-production-agentic-rag-course]]"
+        },
+        {
+          "target": "claims/jamwithai-production-agentic-rag-course-main-claim",
+          "raw": "[[claims/jamwithai-production-agentic-rag-course-main-claim]]"
         }
       ],
       "headings": [
@@ -2993,6 +3455,65 @@
       ]
     },
     {
+      "id": "concept/openai-compatible-local-gateway",
+      "type": "concept",
+      "slug": "openai-compatible-local-gateway",
+      "title": "Openai Compatible Local Gateway",
+      "file": "concepts/openai-compatible-local-gateway.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "OpenAI-compatible local gateway",
+        "slug": "openai-compatible-local-gateway",
+        "kind": "concept",
+        "tags": [
+          "llm-gateway",
+          "local-proxy",
+          "api-compatibility"
+        ],
+        "maturity": "active",
+        "first_seen_in": "decolua-9router",
+        "related_content": [
+          "decolua-9router"
+        ],
+        "related_concepts": [],
+        "explanation": "通俗说，就是让不同 AI 工具都对着同一个本地 `/v1` 地址发请求。技术上，9Router 用 Next.js rewrite 把 `/v1/*` 转到 `/api/v1/*`，再在 handler 内做模型解析、格式翻译和上游调用。",
+        "examples": [
+          "`OPENAI_BASE_URL=http://localhost:20128`",
+          "`POST /v1/chat/completions`",
+          "`src/app/api/v1/models/route.js` 返回 OpenAI-format model list"
+        ],
+        "common_misunderstandings": [
+          "OpenAI-compatible 不等于所有 OpenAI SDK 功能都完全一致。",
+          "本地网关不等于上游 provider 免费或稳定。"
+        ],
+        "open_questions": [
+          "不同 CLI 对 SSE、tool call、Responses API 的边界兼容性需要真实回归测试。"
+        ]
+      },
+      "body": "\n## Explanation\n\n通俗说，就是让不同 AI 工具都对着同一个本地 `/v1` 地址发请求。技术上，9Router 用 Next.js rewrite 把 `/v1/*` 转到 `/api/v1/*`，再在 handler 内做模型解析、格式翻译和上游调用。 出处:https://github.com/decolua/9router。See [[content/decolua-9router]]。\n\n## Supported by\n- [[claims/decolua-9router-main-claim]]\n",
+      "excerpt": "通俗说，就是让不同 AI 工具都对着同一个本地 `/v1` 地址发请求。技术上，9Router 用 Next.js rewrite 把 `/v1/*` 转到 `/api/v1/*`，再在 handler 内做模型解析、格式翻译和上游调用。 出处:https://github.com/decolua/9router。See [[content/decolua-9router]]。",
+      "links": [
+        {
+          "target": "content/decolua-9router",
+          "raw": "[[content/decolua-9router]]"
+        },
+        {
+          "target": "claims/decolua-9router-main-claim",
+          "raw": "[[claims/decolua-9router-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/patched-browser-binary",
       "type": "concept",
       "slug": "patched-browser-binary",
@@ -3608,6 +4129,64 @@
         {
           "target": "claims/pixelle-video-main-claim",
           "raw": "[[claims/pixelle-video-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/residual-vector-quantization",
+      "type": "concept",
+      "slug": "residual-vector-quantization",
+      "title": "Residual Vector Quantization",
+      "file": "concepts/residual-vector-quantization.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "RVQ（Residual Vector Quantization）",
+        "slug": "residual-vector-quantization",
+        "kind": "concept",
+        "tags": [
+          "audio-tokenizer",
+          "tts",
+          "discrete-audio"
+        ],
+        "maturity": "active",
+        "first_seen_in": "openmoss-moss-tts",
+        "related_content": [
+          "openmoss-moss-tts"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：把连续音频压成多层离散编号，模型生成编号，再由 codec 还原成波形。技术定义：MossTTSDelay 文档写 `Codebooks` 为 32 RVQ layers，10-bit each；frame rate 12.5 Hz，所以 README 的 `tokens` 时长控制使用 `1s ≈ 12.5 tokens`。（来源：moss_tts_delay/README.md Technical Specifications；docs/moss_tts_model_card.md Input Types）",
+        "examples": [
+          "`tokens=325` 和 `tokens=600` 控制同一段英文生成不同目标 token 数。（来源：README MOSS-TTS Basic Usage）",
+          "`n_vq_for_inference=4` 或 32 在 MossTTSLocal 中控制低/高 bitrate。（来源：moss_tts_local/README.md Progressive Sequence Dropout）"
+        ],
+        "common_misunderstandings": [
+          "RVQ token 不是文本 token；它是音频 tokenizer 的离散码。",
+          "12.5 tokens/s 是该 tokenizer/模型文档中的换算，不是所有 TTS 的通用规律。"
+        ],
+        "open_questions": [
+          "MOSS-Audio-Tokenizer 子模块未初始化，tokenizer 的完整训练/评估实现需另查。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：把连续音频压成多层离散编号，模型生成编号，再由 codec 还原成波形。技术定义：MossTTSDelay 文档写 `Codebooks` 为 32 RVQ layers，10-bit each；frame rate 12.5 Hz，所以 README 的 `tokens` 时长控制使用 `1s ≈ 12.5 tokens`。（来源：moss_tts_delay/README.md Technical Specifications；docs/moss_tts_model_card.md Input Types） 出处:https://github.com/openmoss/moss-tts。See [[content/openmoss-moss-tts]]。\n\n## Supported by\n- [[claims/openmoss-moss-tts-main-claim]]\n",
+      "excerpt": "人话：把连续音频压成多层离散编号，模型生成编号，再由 codec 还原成波形。技术定义：MossTTSDelay 文档写 `Codebooks` 为 32 RVQ layers，10-bit each；frame rate 12.5 Hz，所以 README 的 `tokens` 时长控制使用 `1s ≈ 12.5 tokens`。（来源：moss_tts_delay/README.md Technical Specifications；docs/moss_tts_model_card.md Input Types） 出处:https://github.",
+      "links": [
+        {
+          "target": "content/openmoss-moss-tts",
+          "raw": "[[content/openmoss-moss-tts]]"
+        },
+        {
+          "target": "claims/openmoss-moss-tts-main-claim",
+          "raw": "[[claims/openmoss-moss-tts-main-claim]]"
         }
       ],
       "headings": [
@@ -4940,6 +5519,120 @@
         {
           "target": "claims/moneyprinterturbo-main-claim",
           "raw": "[[claims/moneyprinterturbo-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/visual-grounding",
+      "type": "concept",
+      "slug": "visual-grounding",
+      "title": "Visual Grounding",
+      "file": "concepts/visual-grounding.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Visual Grounding",
+        "slug": "visual-grounding",
+        "kind": "concept",
+        "tags": [
+          "vision",
+          "gui",
+          "coordinate"
+        ],
+        "maturity": "active",
+        "first_seen_in": "bytedance-ui-tars-desktop",
+        "related_content": [
+          "bytedance-ui-tars-desktop"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：模型不是靠 DOM id，而是靠截图中看到的位置来决定点哪里。技术定义：把 UI 截图作为视觉输入，输出归一化坐标或 box，再按屏幕尺寸还原成实际点击位置。",
+        "examples": [
+          "`parseBoxToScreenCoords()` 把 `[x1,y1,x2,y2]` 中心按 screenWidth/screenHeight 转像素。"
+        ],
+        "common_misunderstandings": [
+          "视觉定位不等于一定精确；缩放、多屏、截图裁剪都会影响坐标。"
+        ],
+        "open_questions": [
+          "UI-TARS-1.5 smart resize factor 对不同分辨率的误差边界未在仓库说明。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：模型不是靠 DOM id，而是靠截图中看到的位置来决定点哪里。技术定义：把 UI 截图作为视觉输入，输出归一化坐标或 box，再按屏幕尺寸还原成实际点击位置。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/bytedance-ui-tars-desktop]]。\n\n## Supported by\n- [[claims/bytedance-ui-tars-desktop-main-claim]]\n",
+      "excerpt": "人话：模型不是靠 DOM id，而是靠截图中看到的位置来决定点哪里。技术定义：把 UI 截图作为视觉输入，输出归一化坐标或 box，再按屏幕尺寸还原成实际点击位置。 出处:https://github.com/bytedance/ui-tars-desktop。See [[content/bytedance-ui-tars-desktop]]。",
+      "links": [
+        {
+          "target": "content/bytedance-ui-tars-desktop",
+          "raw": "[[content/bytedance-ui-tars-desktop]]"
+        },
+        {
+          "target": "claims/bytedance-ui-tars-desktop-main-claim",
+          "raw": "[[claims/bytedance-ui-tars-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/voice-activity-detection",
+      "type": "concept",
+      "slug": "voice-activity-detection",
+      "title": "Voice Activity Detection",
+      "file": "concepts/voice-activity-detection.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "VAD / 语音端点检测",
+        "slug": "voice-activity-detection",
+        "kind": "concept",
+        "tags": [
+          "speech",
+          "segmentation",
+          "long-audio"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "modelscope-funasr",
+        "related_content": [
+          "modelscope-funasr"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：先找音频里哪些时间段有人说话，避免把整段长音频一次塞给识别模型。技术定义：FunASR 用 `vad_model=\"fsmn-vad\"`，`inference_with_vad` 先得到 `vadsegments`，再切片识别。",
+        "examples": [
+          "README 使用示例: `AutoModel(model=\"paraformer-zh\", vad_model=\"fsmn-vad\", punc_model=\"ct-punc\", spk_model=\"cam++\")`",
+          "funasr/bin/_server_app.py: `vad_res = app.state.vad_model.generate(input=audio_data, fs=sr)`"
+        ],
+        "common_misunderstandings": [
+          "VAD 不是识别文字，它只决定哪些片段送去 ASR。",
+          "VAD 参数会影响长句切分、静音处理和后续说话人分离。"
+        ],
+        "open_questions": [
+          "README/docs 没有给所有场景的 VAD 参数推荐表。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：先找音频里哪些时间段有人说话，避免把整段长音频一次塞给识别模型。技术定义：FunASR 用 `vad_model=\"fsmn-vad\"`，`inference_with_vad` 先得到 `vadsegments`，再切片识别。 出处:https://github.com/modelscope/funasr。See [[content/modelscope-funasr]]。\n\n## Supported by\n- [[claims/modelscope-funasr-main-claim]]\n",
+      "excerpt": "人话：先找音频里哪些时间段有人说话，避免把整段长音频一次塞给识别模型。技术定义：FunASR 用 `vad_model=\"fsmn-vad\"`，`inference_with_vad` 先得到 `vadsegments`，再切片识别。 出处:https://github.com/modelscope/funasr。See [[content/modelscope-funasr]]。",
+      "links": [
+        {
+          "target": "content/modelscope-funasr",
+          "raw": "[[content/modelscope-funasr]]"
+        },
+        {
+          "target": "claims/modelscope-funasr-main-claim",
+          "raw": "[[claims/modelscope-funasr-main-claim]]"
         }
       ],
       "headings": [

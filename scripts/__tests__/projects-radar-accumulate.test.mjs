@@ -49,6 +49,27 @@ function lightItem(fullName, score) {
 
 const repoSet = (radar) => new Set(radar.repos.map((r) => String(r.fullName).toLowerCase()));
 
+const requiredDeepRepos = [
+  "rohitg00/agentmemory",
+  "microsoft/markitdown",
+  "RyanCodrai/turbovec",
+  "NousResearch/hermes-agent",
+  "can1357/oh-my-pi",
+  "chopratejas/headroom",
+  "yikart/AiToEarn",
+  "nesquena/hermes-webui",
+  "pbakaus/impeccable",
+  "colbymchenry/codegraph",
+  "CloakHQ/CloakBrowser",
+  "fathah/hermes-desktop",
+  "HKUDS/ViMax",
+  "decolua/9router",
+  "bytedance/UI-TARS-desktop",
+  "OpenMOSS/MOSS-TTS",
+  "jamwithai/production-agentic-rag-course",
+  "modelscope/FunASR",
+];
+
 test("makeRadar pins completed deep-dives so fresh trending cannot evict them", () => {
   // 3 accumulated deep-dives, each with a LOW trending score (1-3).
   const deep = [deepItem("acc/alpha", 1), deepItem("acc/beta", 2), deepItem("acc/gamma", 3)];
@@ -67,6 +88,20 @@ test("makeRadar pins completed deep-dives so fresh trending cannot evict them", 
   // pinned (3) <= limit (30).
   assert.equal(radar.repos.length, 30);
   assert.equal(radar.depthCounts.deep, 3);
+});
+
+test("makeRadar durability: the 18 completed project deep-dives survive fake trending churn", () => {
+  const completed = requiredDeepRepos.map((repo, index) => deepItem(repo, index + 1));
+  const fresh = Array.from({ length: 40 }, (_, i) => lightItem(`fake-trending/repo-${i}`, 1000 - i));
+
+  const radar = makeRadar([...completed, ...fresh], { radarLimit: 30, now: () => "2026-06-08T00:00:00.000Z" });
+  const repos = repoSet(radar);
+
+  for (const repo of requiredDeepRepos) {
+    assert.ok(repos.has(repo.toLowerCase()), `${repo} must stay pinned in radar`);
+  }
+  assert.equal(radar.depthCounts.deep, 18);
+  assert.equal(radar.repos.length, 30);
 });
 
 test("makeRadar is idempotent across rebuilds (deep set never drops out)", () => {

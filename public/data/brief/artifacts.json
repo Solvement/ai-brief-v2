@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T16:42:33.594Z",
+  "generatedAt": "2026-06-08T18:13:53.800Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 50,
+  "count": 56,
   "items": [
     {
       "id": "artifact/9router-repo",
@@ -353,6 +353,46 @@
       ]
     },
     {
+      "id": "artifact/bytedance-ui-tars-desktop-repo",
+      "type": "artifact",
+      "slug": "bytedance-ui-tars-desktop-repo",
+      "title": "Bytedance Ui Tars Desktop Repo",
+      "file": "artifacts/bytedance-ui-tars-desktop-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "bytedance-ui-tars-desktop-repo",
+        "kind": "artifact",
+        "content": "bytedance-ui-tars-desktop",
+        "artifact_type": "repo",
+        "url": "https://github.com/bytedance/UI-TARS-desktop",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0 at repo root; `packages/agent-infra/mcp-http-server/package.json` declares MIT for that subpackage",
+        "runnable": "unknown",
+        "missing_parts": [
+          "未运行安装/测试/构建",
+          "需要 VLM Base URL/API Key/Model Name",
+          "本机 GUI 控制需要 OS 权限",
+          "Remote Operator 文档显示 2025-08-20 停止服务，当前可用性未在仓库说明"
+        ],
+        "last_checked": "2026-06-08"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并检查真实 upstream checkout：`e9f3387288da4af2ad99972da2ac916cdabce093`。仓库是 TypeScript/pnpm monorepo，覆盖 UI-TARS Desktop、UI-TARS SDK/operator/action-parser、Agent TARS、Tarko Agent、agent-infra MCP/browser/filesystem/commands 相关包。\n\n出处:https://github.com/bytedance/ui-tars-desktop。See [[content/bytedance-ui-tars-desktop]]。\n",
+      "excerpt": "已克隆并检查真实 upstream checkout：`e9f3387288da4af2ad99972da2ac916cdabce093`。仓库是 TypeScript/pnpm monorepo，覆盖 UI-TARS Desktop、UI-TARS SDK/operator/action-parser、Agent TARS、Tarko Agent、agent-infra MCP/browser/filesystem/commands 相关包。",
+      "links": [
+        {
+          "target": "content/bytedance-ui-tars-desktop",
+          "raw": "[[content/bytedance-ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/can1357-oh-my-pi-repo",
       "type": "artifact",
       "slug": "can1357-oh-my-pi-repo",
@@ -576,6 +616,45 @@
         {
           "target": "content/compound-engineering-plugin",
           "raw": "[[content/compound-engineering-plugin]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/decolua-9router-repo",
+      "type": "artifact",
+      "slug": "decolua-9router-repo",
+      "title": "Decolua 9router Repo",
+      "file": "artifacts/decolua-9router-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "decolua-9router-repo",
+        "kind": "artifact",
+        "content": "decolua-9router",
+        "artifact_type": "repo",
+        "url": "https://github.com/decolua/9router",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT License",
+        "runnable": "yes",
+        "missing_parts": [
+          "本次未实际启动服务或运行测试。",
+          "真实 provider 账号、额度、免费层和上游稳定性未验证。",
+          "Cloud sync 后端实现不在仓库内，README/docs/tree 未说明完整服务端边界。"
+        ],
+        "last_checked": "2026-06-08"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并检查 upstream checkout：`C:\\Users\\Ykw18\\OneDrive\\Desktop\\Study\\Project\\AI-Brief v2\\logs\\codex-deepdive-2026-06-08T1732\\decolua-9router\\checkout`，commit `827e5c382b11f90b876f856ffa99cbd50f6abd6b`，tag `v0.4.71`。仓库提供 Next.js dashboard/local gateway、npm CLI、Dockerfile、OpenAI-compatible `/v1` routes、provider executors、combo/account fallback、RTK 压缩、SQLite 本地状态和技能文档。\n\n出处:https://github.com/decolua/9router。See [[content/decolua-9router]]。\n",
+      "excerpt": "已克隆并检查 upstream checkout：`C:\\Users\\Ykw18\\OneDrive\\Desktop\\Study\\Project\\AI-Brief v2\\logs\\codex-deepdive-2026-06-08T1732\\decolua-9router\\checkout`，commit `827e5c382b11f90b876f856ffa99cbd50f6abd6b`，tag `v0.4.71`。仓库提供 Next.js dashboard/local gateway、npm CLI、Dockerfile、OpenAI-compati",
+      "links": [
+        {
+          "target": "content/decolua-9router",
+          "raw": "[[content/decolua-9router]]"
         }
       ],
       "headings": [
@@ -810,6 +889,47 @@
       ]
     },
     {
+      "id": "artifact/hkuds-vimax-repo",
+      "type": "artifact",
+      "slug": "hkuds-vimax-repo",
+      "title": "Hkuds Vimax Repo",
+      "file": "artifacts/hkuds-vimax-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "hkuds-vimax-repo",
+        "kind": "artifact",
+        "content": "hkuds-vimax",
+        "artifact_type": "repo",
+        "url": "https://github.com/HKUDS/ViMax",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "unknown",
+        "missing_parts": [
+          "端到端运行需要 LLM、image、video API key；本次未运行真实生成。",
+          "未发现 docs/ 目录或独立 examples/ 目录。",
+          "README 中 AutoCameo 缺少已核实源码入口。",
+          "Novel2MoviePipeline 文件顶部仍标注 TODO。",
+          "TUI 入口是 bash 脚本，Windows 原生执行方式未在 README/docs/tree 详细说明。"
+        ],
+        "last_checked": "2026-06-08"
+      },
+      "body": "\n## Artifact audit\n\n已按要求克隆并检查真实上游仓库到 `logs/codex-deepdive-2026-06-08T1732/hkuds-vimax/checkout`。HEAD 为 `89cdc2f69fedb98e3531d95cd054b645bdef85b0`，提交时间 `2026-06-08 22:08:49 +0800`，提交信息 `remove minimax readme section`。仓库包含 Python pipelines、agent_runtime、configs、tests、prompts 和 Ink TUI；许可证文件为 MIT。\n\n出处:https://github.com/hkuds/vimax。See [[content/hkuds-vimax]]。\n",
+      "excerpt": "已按要求克隆并检查真实上游仓库到 `logs/codex-deepdive-2026-06-08T1732/hkuds-vimax/checkout`。HEAD 为 `89cdc2f69fedb98e3531d95cd054b645bdef85b0`，提交时间 `2026-06-08 22:08:49 +0800`，提交信息 `remove minimax readme section`。仓库包含 Python pipelines、agent_runtime、configs、tests、prompts 和 Ink TUI；许可证文件为 MIT。",
+      "links": [
+        {
+          "target": "content/hkuds-vimax",
+          "raw": "[[content/hkuds-vimax]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/iii-repo",
       "type": "artifact",
       "slug": "iii-repo",
@@ -839,6 +959,47 @@
         {
           "target": "content/iii",
           "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/jamwithai-production-agentic-rag-course-repo",
+      "type": "artifact",
+      "slug": "jamwithai-production-agentic-rag-course-repo",
+      "title": "Jamwithai Production Agentic Rag Course Repo",
+      "file": "artifacts/jamwithai-production-agentic-rag-course-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "jamwithai-production-agentic-rag-course-repo",
+        "kind": "artifact",
+        "content": "jamwithai-production-agentic-rag-course",
+        "artifact_type": "repo",
+        "url": "https://github.com/jamwithai/production-agentic-rag-course",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "需要 `.env`，其中 Week 4+ hybrid search 需要 `JINA_API_KEY`。",
+          "Week 6 tracing 需要 Langfuse public/secret keys；Compose 也需要 Langfuse server secrets。",
+          "Week 7 Telegram 需要 `TELEGRAM__BOT_TOKEN`；README 中部分 Telegram 高级功能未在当前源码 tree 中实现。",
+          "需要 Docker Desktop、Python 3.12+、UV；Ollama 默认模型为 `llama3.2:1b`。",
+          "未在本次任务中运行完整端到端服务或测试。"
+        ],
+        "last_checked": "2026-06-08"
+      },
+      "body": "\n## Artifact audit\n\n已在指定临时目录克隆并检查真实 upstream repo，checkout 为 `424a0eb99edf841994f2a9a053912b489d2a94ff`、branch `main`。仓库是 MIT 许可的 Python/FastAPI RAG 课程应用，工程上覆盖 Airflow arXiv ingestion、Docling PDF parsing、OpenSearch hybrid RRF、Jina embeddings、Ollama generation、Redis cache、Langfuse tracing、LangGraph agentic workflow 和一个简化 Telegram bot。核心可复用价值高；采用前需处理文档/代码/测试漂移。\n\n出处:https://github.com/jamwithai/production-agentic-rag-course。See [[content/jamwithai-production-agentic-rag-course]]。\n",
+      "excerpt": "已在指定临时目录克隆并检查真实 upstream repo，checkout 为 `424a0eb99edf841994f2a9a053912b489d2a94ff`、branch `main`。仓库是 MIT 许可的 Python/FastAPI RAG 课程应用，工程上覆盖 Airflow arXiv ingestion、Docling PDF parsing、OpenSearch hybrid RRF、Jina embeddings、Ollama generation、Redis cache、Langfuse tracing、LangGraph a",
+      "links": [
+        {
+          "target": "content/jamwithai-production-agentic-rag-course",
+          "raw": "[[content/jamwithai-production-agentic-rag-course]]"
         }
       ],
       "headings": [
@@ -991,6 +1152,46 @@
         {
           "target": "content/microsoft-markitdown",
           "raw": "[[content/microsoft-markitdown]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/modelscope-funasr-repo",
+      "type": "artifact",
+      "slug": "modelscope-funasr-repo",
+      "title": "Modelscope Funasr Repo",
+      "file": "artifacts/modelscope-funasr-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "modelscope-funasr-repo",
+        "kind": "artifact",
+        "content": "modelscope-funasr",
+        "artifact_type": "repo",
+        "url": "https://github.com/modelscope/FunASR",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Code: MIT License（LICENSE）; model weights: FunASR Model Open Source License Agreement v1.1（MODEL_LICENSE）",
+        "runnable": "unknown",
+        "missing_parts": [
+          "本次未安装依赖或运行 smoke test",
+          "未复跑 README/vLLM benchmark",
+          "生产鉴权、TLS、上传限制、限流需由网关补齐",
+          "GPU Docker 镜像和 CUDA/vLLM 版本锁定需使用方补齐"
+        ],
+        "last_checked": "2026-06-08"
+      },
+      "body": "\n## Artifact audit\n\n已按要求克隆并检查真实 upstream repo，checkout commit 为 e7ba9b3c3e8a42bfaf3c7601949df8ca49158e7d，最新提交时间为 2026-06-08T11:17:33Z；本地 `funasr/version.txt` 为 1.3.9。\n\n出处:https://github.com/modelscope/funasr。See [[content/modelscope-funasr]]。\n",
+      "excerpt": "已按要求克隆并检查真实 upstream repo，checkout commit 为 e7ba9b3c3e8a42bfaf3c7601949df8ca49158e7d，最新提交时间为 2026-06-08T11:17:33Z；本地 `funasr/version.txt` 为 1.3.9。",
+      "links": [
+        {
+          "target": "content/modelscope-funasr",
+          "raw": "[[content/modelscope-funasr]]"
         }
       ],
       "headings": [
@@ -1222,6 +1423,47 @@
         {
           "target": "content/opendataloader-pdf",
           "raw": "[[content/opendataloader-pdf]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/openmoss-moss-tts-repo",
+      "type": "artifact",
+      "slug": "openmoss-moss-tts-repo",
+      "title": "Openmoss Moss Tts Repo",
+      "file": "artifacts/openmoss-moss-tts-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "openmoss-moss-tts-repo",
+        "kind": "artifact",
+        "content": "openmoss-moss-tts",
+        "artifact_type": "repo",
+        "url": "https://github.com/OpenMOSS/MOSS-TTS",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "unknown",
+        "missing_parts": [
+          "未下载 Hugging Face/ModelScope 模型权重、GGUF 权重或 ONNX tokenizer 权重。",
+          "未初始化 `moss_audio_tokenizer` git submodule；`.gitmodules` 指向 https://github.com/OpenMOSS/MOSS-Audio-Tokenizer。",
+          "未编译 llama.cpp C bridge，未构建 TensorRT engines。",
+          "未运行推理、微调或 benchmark；README/model card 性能数字按自称处理。",
+          "仓库树未见项目级 `tests/`、`.github/`、Dockerfile。"
+        ],
+        "last_checked": "2026-06-08"
+      },
+      "body": "\n## Artifact audit\n\n已按要求 clone 到 `logs/codex-deepdive-2026-06-08T1732/openmoss-moss-tts/checkout` 并读取 README、docs、pyproject、configs、llama.cpp backend、Realtime 示例、SoundEffect-v2 pipeline 与 fine-tuning 文档。仓库有具体推理和训练入口，但实际可运行性取决于外部权重、CUDA/FFmpeg/Transformers/PyTorch 版本、子模块和硬件。\n\n出处:https://github.com/openmoss/moss-tts。See [[content/openmoss-moss-tts]]。\n",
+      "excerpt": "已按要求 clone 到 `logs/codex-deepdive-2026-06-08T1732/openmoss-moss-tts/checkout` 并读取 README、docs、pyproject、configs、llama.cpp backend、Realtime 示例、SoundEffect-v2 pipeline 与 fine-tuning 文档。仓库有具体推理和训练入口，但实际可运行性取决于外部权重、CUDA/FFmpeg/Transformers/PyTorch 版本、子模块和硬件。",
+      "links": [
+        {
+          "target": "content/openmoss-moss-tts",
+          "raw": "[[content/openmoss-moss-tts]]"
         }
       ],
       "headings": [

@@ -1,5 +1,4 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -26,9 +25,13 @@ import { applyDailyDepthTargets, isBriefDepth, isContentDepth } from "./project-
 import { projectReviewModel } from "./review.mjs";
 import {
   isBriefWikiProjectPipeline,
+  isProjectCompletedDeepDive,
   isProjectAlreadyDeepDived,
   publishBriefMirror,
   runProjectBriefWikiGuard,
+  isAuthoredText,
+  tierTemplateFromBriefWikiPayload,
+  tierTemplateHasAuthoredBody,
 } from "./brief-pipeline.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -266,9 +269,14 @@ export async function publish(_qaItems = [], ctx = {}) {
   }
 
   const currentIds = new Set((ctx.result?.evals || []).map((item) => item.candidate?.id).filter(Boolean));
-  const candidateRows = currentIds.size
+  const baseCandidateRows = currentIds.size
     ? [...currentIds].map((id) => db.getCandidate(id)).filter(Boolean)
     : db.listCandidates({ column: "projects", limit: numberOption(options.publishCandidateLimit, 500) });
+  const completedDeepRows = briefWikiPipeline
+    ? db.listCandidates({ column: "projects", limit: numberOption(options.publishCandidateLimit, 5000) })
+        .filter((candidate) => isProjectCompletedDeepDive(candidate, { ...options, db }))
+    : [];
+  const candidateRows = uniqueCandidates([...baseCandidateRows, ...completedDeepRows]);
   const enriched = candidateRows.map((candidate) => enrichFromDb(db, candidate)).filter((item) => item.light);
   const boards = Object.fromEntries(WINDOWS.map((window) => [window, makeBoard(window, enriched, options)]));
   const radar = makeRadar(enriched, options);
@@ -402,7 +410,7 @@ export async function archive(result, ctx = {}) {
   return { stages: result.stages?.length || 0 };
 }
 
-function enrichFromDb(db, candidate) {
+export function enrichFromDb(db, candidate) {
   const analyses = db.listAnalyses(candidate.id);
   const lightRow = latestTier(analyses, "light");
   const light = lightRow?.payload;
@@ -411,7 +419,7 @@ function enrichFromDb(db, candidate) {
   const briefWiki = briefWikiRow?.payload || null;
   const authoredTierTemplate = tierTemplateFromBriefWikiPayload(briefWiki);
   const reviewDecision = briefWikiRow && isAtLeastAsNew(briefWikiRow, lightRow) ? briefWiki?.depth_decision || null : null;
-  const mergedLight = reviewDecision
+  let mergedLight = reviewDecision
     ? {
         ...(light || {}),
         depth_decision: {
@@ -419,13 +427,39 @@ function enrichFromDb(db, candidate) {
           ...reviewDecision,
         },
         final_depth: reviewDecision.final_depth || briefWiki.final_depth || light?.final_depth,
+        project_tier: Number(reviewDecision.project_tier ?? projectTierForDepth(reviewDecision.final_depth || briefWiki.final_depth || light?.final_depth)),
+        project_tier_label: reviewDecision.project_tier_label || `Tier ${Number(reviewDecision.project_tier ?? projectTierForDepth(reviewDecision.final_depth || briefWiki.final_depth || light?.final_depth))}`,
+        project_bucket: reviewDecision.project_bucket || reviewDecision.bucket || light?.project_bucket || light?.bucket,
+        bucket: reviewDecision.project_bucket || reviewDecision.bucket || light?.project_bucket || light?.bucket,
+        model_tier: reviewDecision.model_tier || light?.model_tier || modelForProjectTier(reviewDecision.project_tier ?? projectTierForDepth(reviewDecision.final_depth || briefWiki.final_depth || light?.final_depth)),
+        requires_manual_confirmation: Boolean(reviewDecision.requires_manual_confirmation || light?.requires_manual_confirmation || projectTierForDepth(reviewDecision.final_depth || briefWiki.final_depth || light?.final_depth) === 3),
         review_verdict: reviewDecision.review_verdict || briefWiki.review?.verdict || light?.review_verdict,
         review_issues: reviewDecision.review_issues || briefWiki.review?.issues || light?.review_issues || [],
         tier_template: mergeAuthoredTierTemplate(light?.tier_template, authoredTierTemplate),
       }
     : light;
-  if (!reviewDecision && authoredTierTemplate && mergedLight) {
-    mergedLight.tier_template = mergeAuthoredTierTemplate(mergedLight.tier_template, authoredTierTemplate);
+
+  if (authoredTierTemplate && mergedLight) {
+    const briefDepth = briefWiki?.depth_decision?.final_depth || briefWiki?.final_depth || mergedLight.final_depth;
+    const briefTier = Number(briefWiki?.depth_decision?.project_tier ?? projectTierForDepth(briefDepth));
+    mergedLight = {
+      ...mergedLight,
+      tier_template: mergeAuthoredTierTemplate(mergedLight.tier_template, authoredTierTemplate),
+      final_depth: briefDepth,
+      project_tier: briefTier,
+      project_tier_label: briefWiki?.depth_decision?.project_tier_label || `Tier ${briefTier}`,
+      project_bucket: briefWiki?.depth_decision?.project_bucket || briefWiki?.depth_decision?.bucket || mergedLight.project_bucket || mergedLight.bucket,
+      bucket: briefWiki?.depth_decision?.project_bucket || briefWiki?.depth_decision?.bucket || mergedLight.project_bucket || mergedLight.bucket,
+      model_tier: briefWiki?.depth_decision?.model_tier || mergedLight.model_tier || modelForProjectTier(briefTier),
+      requires_manual_confirmation: Boolean(briefWiki?.depth_decision?.requires_manual_confirmation || mergedLight.requires_manual_confirmation || briefTier === 3),
+    };
+    mergedLight.depth_decision = {
+      ...(mergedLight.depth_decision || {}),
+      ...(briefWiki?.depth_decision || {}),
+      final_depth: briefDepth,
+      project_tier: briefTier,
+      project_tier_label: briefWiki?.depth_decision?.project_tier_label || `Tier ${briefTier}`,
+    };
   }
   const qa = deepRow ? db.getQaVerdict(deepRow.id) : null;
   const deep = deepRow && (!qa || qa.verdict !== "fail") ? publicDeep(deepRow.payload) : null;
@@ -437,54 +471,6 @@ function enrichFromDb(db, candidate) {
     deep,
     briefSlug: briefWiki?.slug || candidate.raw?.briefSlug || null,
     briefWiki,
-  };
-}
-
-function tierTemplateFromBriefWikiPayload(briefWiki = {}) {
-  if (!briefWiki || typeof briefWiki !== "object") return null;
-  const direct = briefWiki.tier_template;
-  if (direct && typeof direct === "object") return direct;
-
-  const rawPayloadPath = briefWiki.rawPayload && path.resolve(ROOT, briefWiki.rawPayload);
-  if (!rawPayloadPath) return null;
-  try {
-    const raw = JSON.parse(readFileSync(rawPayloadPath, "utf8"));
-    return normalizeAuthoredTierTemplate(raw.tier_template || raw.tierTemplate || raw.light_spine || raw.lightSpine);
-  } catch {
-    return null;
-  }
-}
-
-function normalizeAuthoredTierTemplate(template = {}) {
-  if (!template || typeof template !== "object") return null;
-  const comparison = sectionText(template.comparison);
-  const howItWorks = cleanTemplateText(
-    template.how_it_works_with_analogy
-    || template.howItWorksWithAnalogy
-    || sectionText(template.how_it_works)
-  );
-  const reusable = reusableTemplateText(template.reusable_abstractions);
-  const practitioner = cleanTemplateText(
-    template.practitioner_meaning
-    || template.practitionerMeaning
-    || sectionText(template.judgment)
-  );
-  const painPoint = cleanTemplateText(
-    template.pain_point
-    || template.painPoint
-    || sectionText(template.why_worth_attention)
-  );
-  return {
-    ...template,
-    comparison: cleanTemplateText(comparison),
-    how_it_works_with_analogy: howItWorks,
-    essential_design_difference: cleanTemplateText(
-      template.essential_design_difference
-      || template.essentialDesignDifference
-      || reusable
-    ),
-    practitioner_meaning: practitioner,
-    pain_point: painPoint,
   };
 }
 
@@ -501,29 +487,6 @@ function mergeAuthoredTierTemplate(base = {}, authored = null) {
     if (isAuthoredText(authored[field])) merged[field] = authored[field];
   }
   return Object.keys(merged).length ? merged : null;
-}
-
-function sectionText(value) {
-  if (typeof value === "string") return value;
-  if (!value || typeof value !== "object") return "";
-  return cleanTemplateText(value.body_md || value.summary || "");
-}
-
-function reusableTemplateText(section = {}) {
-  const body = sectionText(section);
-  const items = asArray(section?.items).map((item) => {
-    if (typeof item === "string") return cleanTemplateText(item);
-    const name = cleanTemplateText(item?.name || "");
-    const copy = cleanTemplateText(item?.copy || "");
-    const skip = cleanTemplateText(item?.skip || "");
-    const why = cleanTemplateText(item?.why_it_matters || item?.whyItMatters || "");
-    return [name, copy, skip, why].filter(Boolean).join("；");
-  }).filter(Boolean);
-  return [body, ...items.map((item) => `- ${item}`)].filter(Boolean).join("\n");
-}
-
-function cleanTemplateText(value) {
-  return String(value || "").trim();
 }
 
 function latestTier(analyses, tier) {
@@ -761,33 +724,6 @@ function computeDeepStatus(out = {}) {
   return tierTemplateHasAuthoredBody(out.tier_template) ? "available" : "queued";
 }
 
-/** No-fabrication sentinels the deterministic stub emits when it has nothing real. */
-const DEEP_BODY_SENTINELS = ["数据不足", "官方未披露"];
-
-/** True iff `s` is real authored prose (not empty / not just a sentinel). */
-function isAuthoredText(s) {
-  if (typeof s !== "string") return false;
-  const t = s.trim();
-  if (!t) return false;
-  return !DEEP_BODY_SENTINELS.some((sentinel) => t === sentinel || t.startsWith(sentinel));
-}
-
-/**
- * The Tier 2/3 narrative fields the deep-dive renderer reads. If ANY of them
- * holds authored prose, the tier_template is a real deep-dive, not the stub.
- */
-function tierTemplateHasAuthoredBody(tpl) {
-  if (!tpl || typeof tpl !== "object") return false;
-  const narrativeFields = [
-    tpl.pain_point,
-    tpl.comparison,
-    tpl.how_it_works_with_analogy,
-    tpl.essential_design_difference,
-    tpl.practitioner_meaning,
-  ];
-  return narrativeFields.some(isAuthoredText);
-}
-
 async function publishBriefWikiMirror({ options = {}, logger = console } = {}) {
   const guard = await runProjectBriefWikiGuard({ options, logger });
   const build = await publishBriefMirror({ options, logger });
@@ -924,6 +860,18 @@ function modelForProjectTier(tier) {
 function numberOption(value, fallback) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
+}
+
+function uniqueCandidates(candidates = []) {
+  const seen = new Set();
+  const out = [];
+  for (const candidate of candidates) {
+    const key = candidate?.id || normalizeRepoFullName(candidate?.raw?.fullName || candidate?.raw?.url);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(candidate);
+  }
+  return out;
 }
 
 function normalizeRepoFullName(value) {

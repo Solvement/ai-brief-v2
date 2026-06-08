@@ -1,0 +1,26 @@
+<!-- AI-ONLY AutoSci primitive. Generated from a deep-analyzed GitHub project; not for the public project card. -->
+# AutoSci reuse - decolua/9router
+
+## Core Pattern
+Model string as routing contract: 用 `alias/model` 作为路由键，例如 `kr/claude-sonnet-4.5`、`cx/gpt-5.5`，并把 alias 映射集中在 `open-sse/services/model.js` 与 `PROVIDER_ID_TO_ALIAS`。 Combo fallback service: `handleComboChat({ body, models, handleSingleModel, comboStrategy, comboStickyLimit })` 这种把 fallback 编排与单模型执行分离的接口。 Per-model account lock: 失败后写 `modelLock_${model}`，成功后只清当前模型 lock；避免一个模型限流导致整个账号不可用。 RTK pre-dispatch compression: 在格式翻译之后、executor 之前处理 tool output，并支持 OpenAI、Claude、Responses、Kiro 多种 body 形状。 Driver chain for local persistence: Node 下优先 `better-sqlite3`，再尝试 `node:sqlite`，最后 `sql.js`；Bun 下先 `bun:sqlite`。
+
+## Mapping
+- problem_class: reliable-agent-runtime-and-tool-orchestration
+- components: agent_orchestrator, developer_control_surface, model_or_retrieval_layer, validation_harness, model-string-as-routing-contract, combo-fallback-service, per-model-account-lock, rtk-pre-dispatch-compression
+- autosci_modules: pattern_library, experiment_runner, agent_runtime, tool_governance, trace_memory
+
+## Small Experiment
+Compare baseline free-form execution against the extracted agent-infra pattern from decolua/9router on three AutoSci tasks. Measure completion rate, trace inspectability, failure recovery, and cost over 1-3 days.
+
+## Design Principles
+- agent-infra-boundary-as-module: Model string as routing contract: 用 `alias/model` 作为路由键，例如 `kr/claude-sonnet-4.5`、`cx/gpt-5.5`，并把 alias 映射集中在 `open-sse/services/model.js` 与 `PROVIDER_ID_TO_ALIAS`。 Combo fallback service: `handleComboChat({ body, models, handleSingleModel, comboStrategy, comboStickyLimit })` 这种把 fallback 编排与单模型执行分离的接口。 Per-model account lock: 失败后写 `modelLock_${model}`，成功后只清当前模型 lock；避免一个模型限流导致整个账号不可用。 RTK pre-dispatch compression: 在格式翻译之后、executor 之前处理 tool output，并支持 OpenAI、Claude、Responses、Kiro 多种 body 形状。 Driver chain for local persistence: Node 下优先 `better-sqlite3`，再尝试 `node:sqlite`，最后 `sql.js`；Bun 下先 `bun:sqlite`。
+- agent-infra-observable-flow: 通俗说，真实请求流是：用户在 Claude Code/Codex/Cline 这类工具里配置 `Endpoint: http://localhost:20128/v1`、`API Key: [dashboard key]`、`Model: kr/claude-sonnet-4.5`。请求到 `/v1/chat/completions` 后，`next.config.mjs` rewrite 到 `/api/v1/chat/completions`；`src/app/api/v1/chat/completions/route.js` 初始化 translator 后调用 `handleChat(request)`。`handleChat` 读取 JSON、缓存 Claude header、检查 `settings.requireApiKey`，没有 model 就返回 400；如果 model 是 combo 名，会取 `getComboModels(modelStr)` 并调用 `handleComboChat`；如果是 `kr/claude-sonnet-4.5` 这种 `alias/model`，`open-sse/services/model.js` 把 `kr` 解析为 provider `kiro`。然后 `src/sse/services/auth.js` 选择账号：无认证 provider 会返回虚拟 `noauth` connection；普通 provider 会查 active `providerConnections`，过滤 `modelLock_*`，按 `fill-first` 或 `round-robin` 选连接。之后 `handleChatCore` 检测来源格式，决定目标格式；非 native passthrough 时调用 `translateRequest(sourceFormat, targetFormat, upstreamModel, ...)`；发送前执行 `compressMessages` 和可选 `injectCaveman`；再用 `getExecutor(provider)` 调上游。如果上游 401/403，会尝试 `refreshWithRetry(..., 3, log)`；如果上游失败，会 `parseUpstreamError`，调用 `markAccountUnavailable` 写入 `modelLock_${model}`，再走账号或 combo fallback。（来源：README Quick Start；next.config.mjs rewrites；src/app/api/v1/chat/completions/route.js；src/sse/handlers/chat.js；open-sse/services/model.js；src/sse/services/auth.js；open-sse/handlers/chatCore.js；open-sse/services/combo.js） 术语定义：alias 是短前缀，例如 `kr` 映射 `kiro`、`cx` 映射 `codex`；source format 是客户端请求格式，例如 OpenAI/Claude/Gemini；target format 是上游 provider 需要的格式；executor 是 provider-specific 网络调用模块；model lock 是某账号某模型在限流/认证错误后被临时锁住的字段。
+- agent-infra-risk-first-transfer: Transfer the architecture together with its main failure boundary: 上游 provider 私有/半私有接口与客户端指纹: Claude/Codex/GitHub/Cursor/Kiro/Antigravity 等接口、OAuth client、header 或模型名变化时，executor 或 translator 可能失效。.
+
+## Risks
+- 上游 provider 私有/半私有接口与客户端指纹: Claude/Codex/GitHub/Cursor/Kiro/Antigravity 等接口、OAuth client、header 或模型名变化时，executor 或 translator 可能失效。
+- 免费/无限 provider 可用性: README 推荐的 free tier 变化会直接影响用户成本和可用性。
+- 本地密钥与请求日志: provider access token、API key、请求体或 header 若落盘，机器被共享或日志误传会泄露。
+- SQLite driver/native dependency: Windows 或精简环境缺少 native build tools 时，`better-sqlite3` 可能安装失败。
+- Next.js standalone 和大请求体转发: 长上下文或 base64 图片请求超过默认 body limit 时，代理可能失败。
+- over_transfer

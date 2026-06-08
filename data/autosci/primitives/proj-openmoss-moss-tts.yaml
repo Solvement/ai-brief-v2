@@ -1,0 +1,86 @@
+primitive_id: "proj-openmoss-moss-tts"
+source_project: "OpenMOSS/MOSS-TTS"
+source_url: "https://github.com/OpenMOSS/MOSS-TTS"
+title: "OpenMOSS/MOSS-TTS reusable architecture pattern"
+relevance_level: "project_pattern"
+audience: "ai_only"
+core_pattern: >
+
+  消息式 TTS 输入: 复用 `processor.build_user_message(text=..., language=..., reference=..., tokens=...)`
+  这类输入结构，把语言、参考音频、时长、任务字段都放进一个消息对象，而不是散落成多个函数重载。（来源：README MOSS-TTS Basic
+  Usage；moss_tts_delay/llama_cpp/processor.py build_generation_prompt） Delay-pattern
+  multi-codebook 生成: 复用“文本通道 + 32 个 RVQ 音频通道”的 `(S, 33)` 表示，以及 1-step offset 的 delay state；代码中
+  `delay_step` 返回 `(33,)`，并用 `AUDIO_ASSISTANT_GEN_SLOT_TOKEN_ID` /
+  `AUDIO_ASSISTANT_DELAY_SLOT_TOKEN_ID` 控制生成和 flush。（来源：moss_tts_delay/llama_cpp/delay_state.py）
+  安装画像拆分: 顶层 `pyproject.toml` 用 extras 拆出
+  `torch-runtime`、`finetune`、`finetune-deepspeed`、`llama-cpp-onnx`、`llama-cpp-trt`、`llama-cpp-torch`；soundeffect
+  v2 又独立成 Python >=3.12 的 `moss-soundeffect-v2` 包。（来源：pyproject.toml
+  optional-dependencies；moss_soundeffect_v2/pyproject.toml） 低显存 staged loading: `LlamaCppPipeline`
+  的 `low_memory` 模式在 encode、generate、decode 阶段分别加载/释放 GPU-heavy
+  components；`configs/llama_cpp/trt-8gb.yaml` 写明 `low_memory: true`、`heads_backend:
+  numpy`、`audio_backend: trt`、`n_ctx: 4096`。（来源：moss_tts_delay/llama_cpp/pipeline.py
+  LlamaCppPipeline；configs/llama_cpp/trt-8gb.yaml） 流式文本到流式音频 session: Realtime 示例把 LLM 增量文本抽象成
+  `text_deltas` iterator，循环中调用 `session.push_text(delta)`，结束时调用 `session.end_text()` 和
+  `session.drain(max_steps=1)`，再通过 `AudioStreamDecoder` 输出 WAV
+  chunks。（来源：moss_tts_realtime/example_llm_stream_to_tts.py run_streaming_tts）
+problem_class: "reliable-agent-runtime-and-tool-orchestration"
+status: "extracted"
+extracted_at: "2026-06-08T17:53:33.941Z"
+components:
+  - "agent_orchestrator"
+  - "model_or_retrieval_layer"
+  - "tts"
+  - "delay-pattern-multi-codebook"
+  - "project"
+  - "staged-loading"
+  - "session"
+autosci_modules:
+  - "pattern_library"
+  - "experiment_runner"
+  - "agent_runtime"
+  - "tool_governance"
+  - "trace_memory"
+inputs:
+  - "task_spec"
+  - "repo_or_runtime_context"
+  - "tool_or_model_interfaces"
+  - "budget_and_validation_policy"
+outputs:
+  - "working_artifact"
+  - "execution_trace"
+  - "reusable_architecture_notes"
+  - "failure_or_risk_report"
+implementation_idea: >
+
+  Rebuild the agent-infra pattern from OpenMOSS/MOSS-TTS as a small AutoSci module: extract the
+  control flow, define typed inputs/outputs, run it on one synthetic research task, and log traces
+  plus validation results. Reference flow: 人话：以 README 的 MOSS-TTS-v1.5 例子为真实流程：先建 Python 3.12
+  环境并安装 `pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e
+  ".[torch-runtime]"`；代码选择 `device = "cuda" if torch.cuda.is_available() else "cpu"`，CUDA 上用
+  `torch.bfloat16`，并通过 `resolve_attn_implementation()` 在 FlashAttention 2、SDPA、eager 之间选后端。接着
+  `AutoProcessor.from_pretrained("OpenMOSS-Team/MOSS-TTS-v1.5", trust_remote_code=True)` 加载
+  processor，把 `processor.audio_tokenizer` 移到 device；输入不是裸字符串，而是消息：例如法语
+  `processor.build_user_messag
+small_experiment: >
+
+  Compare baseline free-form execution against the extracted agent-infra pattern from
+  OpenMOSS/MOSS-TTS on three AutoSci tasks. Measure completion rate, trace inspectability, failure
+  recovery, and cost over 1-3 days.
+design_principles:
+  - id: "agent-infra-boundary-as-module"
+    principle: "消息式 TTS 输入: 复用 `processor.build_user_message(text=..., language=..., reference=..., tokens=...)` 这类输入结构，把语言、参考音频、时长、任务字段都放进一个消息对象，而不是散落成多个函数重载。（来源：README MOSS-TTS Basic Usage；moss_tts_delay/llama_cpp/processor.py build_generation_prompt） Delay-pattern multi-codebook 生成: 复用“文本通道 + 32 个 RVQ 音频通道”的 `(S, 33)` 表示，以及 1-step offset 的 delay state；代码中 `delay_step` 返回 `(33,)`，并用 `AUDIO_ASSISTANT_GEN_SLOT_TOKEN_ID` / `AUDIO_ASSISTANT_DELAY_SLOT_TOKEN_ID` 控制生成和 flush。（来源：moss_tts_delay/llama_cpp/delay_state.py） 安装画像拆分: 顶层 `pyproject.toml` 用 extras 拆出 `torch-runtime`、`finetune`、`finetune-deepspeed`、`llama-cpp-onnx`、`llama-cpp-trt`、`llama-cpp-torch`；soundeffect v2 又独立成 Python >=3.12 的 `moss-soundeffect-v2` 包。（来源：pyproject.toml optional-dependencies；moss_soundeffect_v2/pyproject.toml） 低显存 staged loading: `LlamaCppPipeline` 的 `low_memory` 模式在 encode、generate、decode 阶段分别加载/释放 GPU-heavy components；`configs/llama_cpp/trt-8gb.yaml` 写明 `low_memory: true`、`heads_backend: numpy`、`audio_backend: trt`、`n_ctx: 4096`。（来源：moss_tts_delay/llama_cpp/pipeline.py LlamaCppPipeline；configs/llama_cpp/trt-8gb.yaml） 流式文本到流式音频 session: Realtime 示例把 LLM 增量文本抽象成 `text_deltas` iterator，循环中调用 `session.push_text(delta)`，结束时调用 `session.end_text()` 和 `session.drain(max_steps=1)`，再通过 `AudioStreamDecoder` 输出 WAV chunks。（来源：moss_tts_realtime/example_llm_stream_to_tts.py run_streaming_tts）"
+    transfers_to: "Extract the reusable agent-infra boundary from OpenMOSS/MOSS-TTS into a typed AutoSci module."
+  - id: "agent-infra-observable-flow"
+    principle: "人话：以 README 的 MOSS-TTS-v1.5 例子为真实流程：先建 Python 3.12 环境并安装 `pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e \".[torch-runtime]\"`；代码选择 `device = \"cuda\" if torch.cuda.is_available() else \"cpu\"`，CUDA 上用 `torch.bfloat16`，并通过 `resolve_attn_implementation()` 在 FlashAttention 2、SDPA、eager 之间选后端。接着 `AutoProcessor.from_pretrained(\"OpenMOSS-Team/MOSS-TTS-v1.5\", trust_remote_code=True)` 加载 processor，把 `processor.audio_tokenizer` 移到 device；输入不是裸字符串，而是消息：例如法语 `processor.build_user_message(text=text_7, language=\"French\")`，克隆声音 `processor.build_user_message(text=text_1, reference=[ref_audio_1])`，控时长 `processor.build_user_message(text=text_2, tokens=325)`，显式停顿 `我今天学习了一首中国的古诗，它的名字是[pause 3.2s]静夜思！`。这些 conversation 送进 `processor(batch_conversations, mode=\"generation\")` 变成 `input_ids` 和 `attention_mask`，再由 `model.generate(..., max_new_tokens=4096)` 生成；`processor.decode(outputs)` 得到 `message.audio_codes_list[0]`，最后 `torchaudio.save(out_path, audio.unsqueeze(0), processor.model_config.sampling_rate)` 写 WAV。（来源：README Environment Setup；来源：README MOSS-TTS Basic Usage） 术语层：MossTTSDelay 的底层不是直接预测波形，而是预测 MOSS-Audio-Tokenizer 的离散音频 tokens。`moss_tts_delay/README.md` 写明采样率 24,000 Hz、frame rate 12.5 Hz、32 个 RVQ layers、33 个 LM heads；`moss_tts_delay/llama_cpp/processor.py` 还展示了 prompt 被打包成 `(S, 33)` 的 multi-channel `input_ids`，第 0 列是文本 token，后 32 列是音频 codebook。llama.cpp 路径中，`build_generation_prompt(...)` 把 `Reference(s)`、`Instruction`、`Tokens`、`Quality`、`Sound Event`、`Ambient Sound`、`Language`、`Text` 写入 `<user_inst>...</user_inst>`；`LlamaCppPipeline.generate(...)` 先 `_prepare_reference()` 把参考音频编码为 codes，再 prefill backbone，然后在 `_autoregressive_loop()` 中每步取 `text_logits`、`hs = backbone.get_hidden_state(-1)`、`audio_logits = lm_heads.audio_all(hs)`，交给 `delay_step(...)` 采样下一个 `[text_token, audio_0..audio_31]`，循环结束后 `parse_generation_output(...)` 取音频 codes，再用 ONNX/TRT/Torch audio tokenizer decode 成 waveform。（来源：moss_tts_delay/README.md Technical Specifications；来源：moss_tts_delay/llama_cpp/processor.py build_generation_prompt；来源：moss_tts_delay/llama_cpp/pipeline.py generate and _autoregressive_loop）"
+    transfers_to: "Use the flow as an inspectable experiment harness with logs, checkpoints, and failure reports."
+  - id: "agent-infra-risk-first-transfer"
+    principle: "Transfer the architecture together with its main failure boundary: Hugging Face / ModelScope 权重与 `trust_remote_code=True`: 如果模型仓库、remote code 或 tokenizer 文件变动，README 示例的 `AutoProcessor.from_pretrained(...)`、`AutoModel.from_pretrained(...)` 行为会跟着变；如果离线环境没有缓存，示例不能启动。."
+    transfers_to: "Require an explicit dependency and over-transfer risk review before promoting the pattern into AutoSci."
+risks:
+  - "Hugging Face / ModelScope 权重与 `trust_remote_code=True`: 如果模型仓库、remote code 或 tokenizer 文件变动，README 示例的 `AutoProcessor.from_pretrained(...)`、`AutoModel.from_pretrained(...)` 行为会跟着变；如果离线环境没有缓存，示例不能启动。"
+  - "PyTorch CUDA 12.8 / Transformers 5.0.0: 顶层 `torch-runtime` pin `torch==2.9.1+cu128`、`torchaudio==2.9.1+cu128`、`torchcodec===0.8.1`、`transformers==5.0.0`；版本冲突会直接影响安装。"
+  - "moss_audio_tokenizer git submodule / 外部 tokenizer 包: `.gitmodules` 指向 `https://github.com/OpenMOSS/MOSS-Audio-Tokenizer`；当前浅 clone 未初始化 submodule，README 中 `moss_audio_tokenizer/trt/build_engine.sh` 在本地 checkout 里不可直接验证。"
+  - "llama.cpp C bridge / GGUF / ONNX Runtime / TensorRT: llama.cpp 路线要求下载 `OpenMOSS-Team/MOSS-TTS-GGUF` 和 `OpenMOSS-Team/MOSS-Audio-Tokenizer-ONNX`，并 `bash build_bridge.sh /path/to/llama.cpp`；TensorRT engines 不提供预编译版本，需要用户自己构建。"
+  - "SGLang OpenMOSS fork: README 的 SGLang 后端要求 clone `https://github.com/OpenMOSS/sglang.git`，安装 `pip install -e ./sglang/python[all]`，再 fuse MOSS-TTS 与 Audio-Tokenizer 权重；这不是上游通用 SGLang 的即插即用路径。"
+  - "FlashAttention 2 / SDPA / torch.compile: README 示例在硬件满足时偏向 FlashAttention 2，否则 SDPA/eager；Realtime 性能数字注明 SDPA + torch.compile、单张 L20 GPU。"
+  - "over_transfer"

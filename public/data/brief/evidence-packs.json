@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T16:42:33.594Z",
+  "generatedAt": "2026-06-08T18:13:53.800Z",
   "entity": "evidence-pack",
   "directory": "evidence-packs",
-  "count": 50,
+  "count": 56,
   "items": [
     {
       "id": "evidence-pack/9router-evidence-pack",
@@ -790,6 +790,94 @@
       ]
     },
     {
+      "id": "evidence-pack/bytedance-ui-tars-desktop-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "bytedance-ui-tars-desktop-evidence-pack",
+      "title": "UI-TARS-desktop — Evidence Pack",
+      "file": "evidence-packs/bytedance-ui-tars-desktop-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "bytedance-ui-tars-desktop",
+        "kind": "evidence-pack",
+        "title": "UI-TARS-desktop — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "UI-TARS-desktop 是一个把桌面/浏览器截图、视觉语言模型、动作解析器和本机/MCP 工具执行串成闭环的多模态 Agent monorepo。",
+            "internal_logic": "人话：最小链路可以从 CLI 跑起来：`npx @ui-tars/cli start`（文档写法），CLI 先拿模型配置，再让你选 `nut-js` 或 `adb`，最后把自然语言任务交给 GUIAgent。技术上：`packages/ui-tars/cli/src/cli/start.ts` 会读 `~/.ui-tars-cli.json`；如果传 `--presets`，它 fetch YAML 并读取 `vlmApiKey`、`vlmBaseUrl`、`vlmModelName`、`useResponsesApi`；没有配置就用 `@clack/prompts` 询问 `baseURL/apiKey/model`，并写回 `~/.ui-tars-cli.json`。随后它选择 operator：`adb` 会 `getAndroidDeviceId()` 后 new `AdbOperator(deviceId)`，默认 `nut-js` 会 new `NutJSOperator()`；再 new `GUIAgent({ model: { baseURL, apiKey, model, useResponsesApi }, operator, signal })`，执行 `await guiAgent.run(answers.instruction)`（来源：packages/ui-tars/cli/src/cli/start.ts）。\n\n真实的一轮执行是：`GUIAgent.run()` 初始化 conversations，把用户 instruction 放入 human message；每轮调用 `operator.screenshot()`，用 Jimp 读出 width/height/mime，把截图作为 human `<image>` 放回 conversations；构造 `vlmParams`，包含 `screenContext: { width, height }`、`scaleFactor`、`uiTarsVersion`、`previousResponseId`；然后 `model.invoke(vlmParams)`（来源：packages/ui-tars/sdk/src/GUIAgent.ts run）。`UITarsModel.invoke()` 会按版本选择 `MAX_PIXELS_V1_5`/`MAX_PIXELS_DOUBAO`/`MAX_PIXELS_V1_0`，对图片做 `preprocessResizeImage()`，`convertToOpenAIMessages()` 把图片变成 `content: [{ type: 'image_url', image_url: { url: 'data:image/png;base64,...' }}]`；如果 `useResponsesApi` 为真走 `openai.responses.create()`，否则走 `openai.chat.completions.create()`；模型响应再交给 `actionParser({ prediction, factor, screenContext, scaleFactor, modelVer })`（来源：packages/ui-tars/sdk/src/Model.ts；packages/ui-tars/sdk/src/utils.ts）。\n\n动作解析的例子：默认 prompt 要求模型输出 `Thought: ...` 和 `Action: click(start_box='[x1, y1, x2, y2]')`、`type(content='')`、`scroll(...)`、`finished()` 等；parser 会把 `<point>510 150</point>` 改写成 `start_box`，把 `<bbox>637 964 637 964</bbox>` 改写成坐标串，再把 box 按 `[1000,1000]` 或 UI-TARS-1.5 的 smart resize factor 缩放成 0-1 坐标（来源：packages/ui-tars/sdk/src/constants.ts；packages/ui-tars/action-parser/src/actionParser.ts）。执行时 `parseBoxToScreenCoords()` 取 box 中心点，按屏幕宽高换算成像素；`NutJSOperator.execute()` 对 `click` 移动鼠标并 `mouse.click(Button.LEFT)`，对 `type` 在 Windows 用剪贴板粘贴并在末尾 `\\n` 时敲 Enter，对 `scroll down` 执行 `mouse.scrollDown(5 * 100)`（来源：packages/ui-tars/sdk/src/utils.ts；packages/ui-tars/operators/nut-js/src/index.ts）。\n\nAgent TARS 的另一个真实流是：`new AgentTARS({ aioSandbox: 'http://localhost:8080', model: { provider: 'volcengine', id: 'ep-20250510145437-5sxhs', apiKey: process.env.ARK_API_KEY } })`，`initialize()` 后打印 tools，再 `run('Open https://seed-tars.com')`（来源：multimodal/agent-tars/core/examples/aio-sandbox-example.ts）。如果不用 AIO Sandbox，本地环境会按 browser control 初始化 GUI Agent、SearchToolProvider、in-memory MCP server；browser 工具调用前 `onBeforeToolCall()` 会 lazy launch browser，filesystem/command 路径参数会经过 WorkspacePathResolver（来源：multimodal/agent-tars/core/src/agent-tars.ts；multimodal/agent-tars/core/src/environments/local/index.ts）。",
+            "failure_mode": "docs/setting.md VLM Settings；packages/ui-tars/sdk/src/Model.ts",
+            "source_pointer": "https://github.com/bytedance/ui-tars-desktop"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/true/Apache-2.0/v0.3.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/bytedance-ui-tars-desktop-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/bytedance-ui-tars-desktop-repo]]"
+        ],
+        "metrics": [
+          "stars=36148",
+          "forks=3638",
+          "open_issues=403",
+          "latest_release=v0.3.0",
+          "pushed_at=2026-05-18T02:55:49Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "docs/setting.md VLM Settings；packages/ui-tars/sdk/src/Model.ts",
+          "docs/quick-start.md Prerequisites/Install",
+          "docs/quick-start.md Run remote operator",
+          "apps/ui-tars/package.json dependencies；apps/ui-tars/forge.config.ts",
+          "multimodal/agent-tars/core/src/environments/local/index.ts；workspace-path-resolver.ts；filesystem-tools-manager.ts",
+          "docs/setting.md Report Settings/UTIO Base URL",
+          "multimodal/agent-tars/core/src/environments/aio/index.ts；multimodal/agent-tars/core/examples/aio-sandbox-example.ts"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/bytedance/ui-tars-desktop"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/bytedance-ui-tars-desktop-main-claim]],官方 artifact 落库为 [[artifacts/bytedance-ui-tars-desktop-repo]]。See [[content/bytedance-ui-tars-desktop]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/bytedance-ui-tars-desktop-main-claim]],官方 artifact 落库为 [[artifacts/bytedance-ui-tars-desktop-repo]]。See [[content/bytedance-ui-tars-desktop]]。",
+      "links": [
+        {
+          "target": "claims/bytedance-ui-tars-desktop-main-claim",
+          "raw": "[[claims/bytedance-ui-tars-desktop-main-claim]]"
+        },
+        {
+          "target": "artifacts/bytedance-ui-tars-desktop-repo",
+          "raw": "[[artifacts/bytedance-ui-tars-desktop-repo]]"
+        },
+        {
+          "target": "claims/bytedance-ui-tars-desktop-main-claim",
+          "raw": "[[claims/bytedance-ui-tars-desktop-main-claim]]"
+        },
+        {
+          "target": "artifacts/bytedance-ui-tars-desktop-repo",
+          "raw": "[[artifacts/bytedance-ui-tars-desktop-repo]]"
+        },
+        {
+          "target": "content/bytedance-ui-tars-desktop",
+          "raw": "[[content/bytedance-ui-tars-desktop]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/can1357-oh-my-pi-evidence-pack",
       "type": "evidence-pack",
       "slug": "can1357-oh-my-pi-evidence-pack",
@@ -1298,6 +1386,92 @@
         {
           "target": "content/compound-engineering-plugin",
           "raw": "[[content/compound-engineering-plugin]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/decolua-9router-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "decolua-9router-evidence-pack",
+      "title": "9router — Evidence Pack",
+      "file": "evidence-packs/decolua-9router-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "decolua-9router",
+        "kind": "evidence-pack",
+        "title": "9router — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "9Router 是一个本地运行的 AI 编程工具网关：把 Claude Code、Codex、Cursor、Cline 等客户端接到统一的 `/v1` 接口，再按模型名、账号、组合和错误状态转发到不同上游 provider。",
+            "internal_logic": "通俗说，真实请求流是：用户在 Claude Code/Codex/Cline 这类工具里配置 `Endpoint: http://localhost:20128/v1`、`API Key: [dashboard key]`、`Model: kr/claude-sonnet-4.5`。请求到 `/v1/chat/completions` 后，`next.config.mjs` rewrite 到 `/api/v1/chat/completions`；`src/app/api/v1/chat/completions/route.js` 初始化 translator 后调用 `handleChat(request)`。`handleChat` 读取 JSON、缓存 Claude header、检查 `settings.requireApiKey`，没有 model 就返回 400；如果 model 是 combo 名，会取 `getComboModels(modelStr)` 并调用 `handleComboChat`；如果是 `kr/claude-sonnet-4.5` 这种 `alias/model`，`open-sse/services/model.js` 把 `kr` 解析为 provider `kiro`。然后 `src/sse/services/auth.js` 选择账号：无认证 provider 会返回虚拟 `noauth` connection；普通 provider 会查 active `providerConnections`，过滤 `modelLock_*`，按 `fill-first` 或 `round-robin` 选连接。之后 `handleChatCore` 检测来源格式，决定目标格式；非 native passthrough 时调用 `translateRequest(sourceFormat, targetFormat, upstreamModel, ...)`；发送前执行 `compressMessages` 和可选 `injectCaveman`；再用 `getExecutor(provider)` 调上游。如果上游 401/403，会尝试 `refreshWithRetry(..., 3, log)`；如果上游失败，会 `parseUpstreamError`，调用 `markAccountUnavailable` 写入 `modelLock_${model}`，再走账号或 combo fallback。（来源：README Quick Start；next.config.mjs rewrites；src/app/api/v1/chat/completions/route.js；src/sse/handlers/chat.js；open-sse/services/model.js；src/sse/services/auth.js；open-sse/handlers/chatCore.js；open-sse/services/combo.js）\n\n术语定义：alias 是短前缀，例如 `kr` 映射 `kiro`、`cx` 映射 `codex`；source format 是客户端请求格式，例如 OpenAI/Claude/Gemini；target format 是上游 provider 需要的格式；executor 是 provider-specific 网络调用模块；model lock 是某账号某模型在限流/认证错误后被临时锁住的字段。",
+            "failure_mode": "open-sse/config/providers.js headers/clientId/tokenUrl；open-sse/executors/*；CHANGELOG.md v0.4.71/v0.4.66/v0.4.62",
+            "source_pointer": "https://github.com/decolua/9router"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/MIT/v0.4.71"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/decolua-9router-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/decolua-9router-repo]]"
+        ],
+        "metrics": [
+          "stars=16559",
+          "forks=2496",
+          "open_issues=638",
+          "latest_release=v0.4.71",
+          "pushed_at=2026-06-06T09:18:08Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "open-sse/config/providers.js headers/clientId/tokenUrl；open-sse/executors/*；CHANGELOG.md v0.4.71/v0.4.66/v0.4.62",
+          "README FREE Providers；README FAQ Are FREE providers really unlimited?",
+          ".env.example；src/lib/db/schema.js providerConnections/apiKeys；docs/ARCHITECTURE.md Security-Sensitive Boundaries",
+          "src/lib/db/driver.js；cli/hooks/sqliteRuntime.js；package.json optionalDependencies",
+          "next.config.mjs experimental.proxyClientMaxBodySize；CHANGELOG.md v0.4.71 Fixes"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/decolua/9router"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/decolua-9router-main-claim]],官方 artifact 落库为 [[artifacts/decolua-9router-repo]]。See [[content/decolua-9router]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/decolua-9router-main-claim]],官方 artifact 落库为 [[artifacts/decolua-9router-repo]]。See [[content/decolua-9router]]。",
+      "links": [
+        {
+          "target": "claims/decolua-9router-main-claim",
+          "raw": "[[claims/decolua-9router-main-claim]]"
+        },
+        {
+          "target": "artifacts/decolua-9router-repo",
+          "raw": "[[artifacts/decolua-9router-repo]]"
+        },
+        {
+          "target": "claims/decolua-9router-main-claim",
+          "raw": "[[claims/decolua-9router-main-claim]]"
+        },
+        {
+          "target": "artifacts/decolua-9router-repo",
+          "raw": "[[artifacts/decolua-9router-repo]]"
+        },
+        {
+          "target": "content/decolua-9router",
+          "raw": "[[content/decolua-9router]]"
         }
       ],
       "headings": [
@@ -1826,6 +2000,97 @@
       ]
     },
     {
+      "id": "evidence-pack/hkuds-vimax-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "hkuds-vimax-evidence-pack",
+      "title": "ViMax — Evidence Pack",
+      "file": "evidence-packs/hkuds-vimax-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "hkuds-vimax",
+        "kind": "evidence-pack",
+        "title": "ViMax — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "ViMax 是一个把想法、剧本或小说拆成故事、角色、分镜、镜头、关键帧和视频片段的多阶段视频生成代理框架，但端到端效果依赖外部 LLM、图片生成和视频生成 API。",
+            "internal_logic": "人话：以仓库自带的 `main_script2video.py` 为例，用户先在文件里写剧本。实际示例是 `EXT. SCHOOL GYM - DAY`，包含 John 和 Jane 的篮球训练对白；约束是 `Fast-paced with no more than 15 shots.`，风格是 `Anime Style`。入口调用 `Script2VideoPipeline.init_from_config(config_path=\"configs/script2video.yaml\")`，再 `await pipeline(script=script, user_requirement=user_requirement, style=style)`。（来源：main_script2video.py）\n\n第一步，配置加载。`configs/script2video.yaml` 把 chat model 设为 `google/gemini-2.5-flash-lite-preview-09-2025`，`model_provider: openai`，`base_url: https://openrouter.ai/api/v1`；图片生成类是 `tools.ImageGeneratorNanobananaGoogleAPI`，视频生成类是 `tools.VideoGeneratorVeoGoogleAPI`；工作目录是 `.working_dir/script2video`。`RenderBackend.from_config()` 会按 `class_path` 动态 import 这些类，并按 `max_requests_per_minute` / `max_requests_per_day` 创建 `RateLimiter`。（来源：configs/script2video.yaml；来源：tools/render_backend.py）\n\n第二步，结构化文本规划。`Script2VideoPipeline.plan_text_artifacts()` 的真实顺序是：如果没有传入 characters，就 `extract_characters` 写 `characters.json`；然后 `design_storyboard` 写 `storyboard.json`；再 `decompose_visual_descriptions`，每个镜头写 `shots/<idx>/shot_description.json`；最后 `construct_camera_tree` 写 `camera_tree.json`。测试 `test_plan_text_artifacts_emits_progress_in_order` 验证的 progress 顺序正是 `extract_characters`、`design_storyboard`、`decompose_shots`、`construct_camera_tree`。（来源：pipelines/script2video_pipeline.py plan_text_artifacts；来源：tests/test_vimax_adapters.py）\n\n第三步，渲染。`__call__()` 会先生成或读取角色肖像注册表 `character_portraits_registry.json`，再为每个 camera 生成 frame 任务，为每个 shot 生成 video 任务。对于 `variation_type` 为 `medium` 或 `large` 的镜头，视频生成前会等待 first frame 和 last frame；视频 prompt 是 `shot_description.motion_desc + \"\\n\" + shot_description.audio_desc`，参考图是 `first_frame.png`，以及需要时的 `last_frame.png`。每个镜头输出到 `shots/<idx>/video.mp4`，最后用 MoviePy `concatenate_videoclips` 合成 `final_video.mp4`。（来源：pipelines/script2video_pipeline.py __call__；来源：pipelines/script2video_pipeline.py generate_video_for_single_shot）\n\n第四步，agent 模式把这条管线包装成可交互工具。`vimax_narrative_planning` 只做文本规划，不生成图片视频；`vimax_render_video` 会先检查 `idea2video/story.txt`、`characters.json`、`script.json`、`storyboard.json`、`shot_description.json`、`camera_tree.json` 等依赖是否齐全。TUI 通过 `ui/src/cli.tsx` 启动 `uv run python main_agent.py --jsonl --stdin-repl`，把 JSONL 事件映射成终端界面。（来源：agent_runtime/vimax_adapters.py；来源：prompts/workflow.md；来源：ui/src/cli.tsx）\n\n术语定义：storyboard 是镜头级分镜；shot_description 是把一个镜头拆成首帧、尾帧、运动描述和音频描述；camera_tree 是不同相机位之间的父子/覆盖关系；first/last-frame-to-video 是用首帧和可选尾帧约束视频生成。",
+            "failure_mode": "agent_runtime/config.py；agent_runtime/vimax_adapters.py",
+            "source_pointer": "https://github.com/hkuds/vimax"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/false/false/MIT/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/hkuds-vimax-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/hkuds-vimax-repo]]"
+        ],
+        "metrics": [
+          "stars=9079",
+          "forks=1374",
+          "open_issues=37",
+          "latest_release=not_found",
+          "pushed_at=2026-06-01T16:39:16Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "agent_runtime/config.py；agent_runtime/vimax_adapters.py",
+          "tools/image_generator_nanobanana_google_api.py；tools/image_generator_nanobanana_yunwu_api.py",
+          "tools/video_generator_openrouter_api.py；tools/video_generator_veo_yunwu_api.py",
+          "agents/camera_image_generator.py；pipelines/script2video_pipeline.py",
+          "vimax；ui/package.json；README Quick Start",
+          "pyproject.toml；README Quick Start"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found",
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/hkuds/vimax"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hkuds-vimax-main-claim]],官方 artifact 落库为 [[artifacts/hkuds-vimax-repo]]。See [[content/hkuds-vimax]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/hkuds-vimax-main-claim]],官方 artifact 落库为 [[artifacts/hkuds-vimax-repo]]。See [[content/hkuds-vimax]]。",
+      "links": [
+        {
+          "target": "claims/hkuds-vimax-main-claim",
+          "raw": "[[claims/hkuds-vimax-main-claim]]"
+        },
+        {
+          "target": "artifacts/hkuds-vimax-repo",
+          "raw": "[[artifacts/hkuds-vimax-repo]]"
+        },
+        {
+          "target": "claims/hkuds-vimax-main-claim",
+          "raw": "[[claims/hkuds-vimax-main-claim]]"
+        },
+        {
+          "target": "artifacts/hkuds-vimax-repo",
+          "raw": "[[artifacts/hkuds-vimax-repo]]"
+        },
+        {
+          "target": "content/hkuds-vimax",
+          "raw": "[[content/hkuds-vimax]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/iii-evidence-pack",
       "type": "evidence-pack",
       "slug": "iii-evidence-pack",
@@ -1903,6 +2168,96 @@
         {
           "target": "content/iii",
           "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/jamwithai-production-agentic-rag-course-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "jamwithai-production-agentic-rag-course-evidence-pack",
+      "title": "production-agentic-rag-course — Evidence Pack",
+      "file": "evidence-packs/jamwithai-production-agentic-rag-course-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "jamwithai-production-agentic-rag-course",
+        "kind": "evidence-pack",
+        "title": "production-agentic-rag-course — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "这是一个以 arXiv Paper Curator 为载体的生产式 RAG 课程仓库：从 Docker/FastAPI/PostgreSQL/OpenSearch/Airflow 起步，逐周加上 arXiv 抓取、Docling 解析、BM25、Jina 向量、Ollama 生成、Redis 缓存、Langfuse tracing、LangGraph agentic RAG 和 Telegram bot。",
+            "internal_logic": "真实流程可以从“每天入库”和“用户提问”两条线看。\n\n第一条线是数据进入系统。Airflow DAG `airflow/dags/arxiv_paper_ingestion.py` 的 `schedule=\"0 6 * * 1-5\"`，默认参数含 `retries=2`、`retry_delay=timedelta(minutes=30)`、`max_active_runs=1`。`fetch_daily_papers` 会取 execution date 的前一天作为 `YYYYMMDD`，调用 `metadata_fetcher.fetch_and_process_papers(max_results=arxiv_client.max_results, from_date=target_date, to_date=target_date, process_pdfs=True, store_to_db=True)`。（来源：airflow/dags/arxiv_ingestion/fetching.py）\n\n第二步是索引。`index_papers_hybrid` 从 PostgreSQL 取新论文，交给 `HybridIndexingService.index_papers_batch(..., replace_existing=True)`。单篇论文会先走 `TextChunker.chunk_paper`：有 sections 时优先 section-based chunking；100-800 words 的 section 直接成 chunk；小于 100 words 的 section 合并；大于 800 words 的 section 再切；无 sections 时 fallback 到 word-based chunking，默认 `chunk_size=600`、`overlap_size=100`、`min_chunk_size=100`。（来源：src/services/indexing/text_chunker.py；src/config.py ChunkingSettings）\n\n第三步是 embedding 和索引。`HybridIndexingService.index_paper` 用 `JinaEmbeddingsClient.embed_passages(texts=chunk_texts, batch_size=50)` 生成 `jina-embeddings-v3` passage embeddings，再把 chunk 写入 OpenSearch，chunk data 里含 `arxiv_id`、`paper_id`、`chunk_index`、`chunk_text`、`chunk_word_count`、`section_title`、`embedding_model=\"jina-embeddings-v3\"`、title/authors/abstract/categories/published_date。（来源：src/services/indexing/hybrid_indexer.py；src/services/embeddings/jina_client.py）\n\n用户问问题时有普通 RAG 和 agentic RAG 两条 API。普通 `POST /api/v1/ask` 会先用 `CacheClient.find_cached_response(request)` 查 exact cache；cache key 明确包含 `query`、`model`、`top_k`、`use_hybrid`、`categories`。未命中时，如果 `request.use_hybrid` 为 true，就调用 `embeddings_service.embed_query(request.query)`，然后 `opensearch_client.search_unified(..., use_hybrid=request.use_hybrid and query_embedding is not None)`；拿到 chunks 后调用 `ollama_client.generate_rag_answer`。（来源：src/routers/ask.py；src/services/cache/client.py）\n\nAgentic RAG 的入口是 `POST /api/v1/ask-agentic`。`AgenticRAGService.ask` 初始化 state：`messages=[HumanMessage(content=query)]`、`retrieval_attempts=0`、`relevant_sources=[]`、`grading_results=[]` 等；runtime context 注入 `ollama_client`、`opensearch_client`、`embeddings_client`、`model_name`、`temperature`、`top_k`、`max_retrieval_attempts`、`guardrail_threshold`。（来源：src/services/agents/agentic_rag.py ask/_run_workflow；src/services/agents/context.py）\n\n图里的具体机制是：`guardrail_node` 把用户问题塞进 `GUARDRAIL_PROMPT`，要求 LLM 输出 `GuardrailScoring(score: 0-100, reason)`；`continue_after_guardrail` 用 `score >= runtime.context.guardrail_threshold` 决定进入 `retrieve` 还是 `out_of_scope`，默认阈值是 `60`。`retrieve_node` 在未达到 `max_retrieval_attempts=2` 前创建 tool call：`id=\"retrieve_1\"`、`name=\"retrieve_papers\"`、`args={\"query\": question}`。`retrieve_papers` 先 `embed_query(query)`，再调用 `opensearch_client.search_unified(query=query, query_embedding=query_embedding, size=top_k, use_hybrid=use_hybrid)`，把每个 hit 转成 LangChain `Document`，metadata 里放 `arxiv_id`、`title`、`authors`、`score`、`source=https://arxiv.org/pdf/{arxiv_id}.pdf`、`section`、`search_mode`、`top_k`。（来源：src/services/agents/nodes/guardrail_node.py；src/services/agents/nodes/retrieve_node.py；src/services/agents/tools.py）\n\n检索后 `grade_documents_node` 用 `GRADE_DOCUMENTS_PROMPT` 要 LLM 返回 `binary_score` 为 `yes` 或 `no`；yes 路由到 `generate_answer`，no 路由到 `rewrite_query`。`rewrite_query_node` 用 `REWRITE_PROMPT` 生成 `rewritten_query`，失败 fallback 为 `f\"{original_question} research paper arxiv machine learning\"`，然后追加新的 `HumanMessage` 再回到 retrieve。最终 `generate_answer_node` 用 `GENERATE_ANSWER_PROMPT`，明确要求“using ONLY the information from the retrieved research papers”。（来源：src/services/agents/nodes/grade_documents_node.py；src/services/agents/nodes/rewrite_query_node.py；src/services/agents/nodes/generate_answer_node.py；src/services/agents/prompts.py）",
+            "failure_mode": ".env.example Jina AI Embeddings；src/services/embeddings/jina_client.py；src/services/opensearch/index_config_hybrid.py",
+            "source_pointer": "https://github.com/jamwithai/production-agentic-rag-course"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:ai_app",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/false/false/MIT/week7.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/jamwithai-production-agentic-rag-course-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/jamwithai-production-agentic-rag-course-repo]]"
+        ],
+        "metrics": [
+          "stars=6609",
+          "forks=1504",
+          "open_issues=21",
+          "latest_release=week7.0",
+          "pushed_at=2026-04-05T06:13:54Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          ".env.example Jina AI Embeddings；src/services/embeddings/jina_client.py；src/services/opensearch/index_config_hybrid.py",
+          "compose.yml opensearch；src/services/opensearch/client.py；src/services/opensearch/index_config_hybrid.py",
+          "src/config.py Settings；src/routers/agentic_ask.py；tests/api/routers/test_agentic_ask.py",
+          "compose.yml langfuse-* services；src/services/agents/agentic_rag.py tracing；src/routers/agentic_ask.py feedback",
+          "src/services/telegram/factory.py；src/services/telegram/bot.py；notebooks/week7/README.md",
+          ".env.example arXiv API Configuration；src/services/arxiv/client.py",
+          "notebooks/week7/README.md Code Structure；repo tree；src/services/telegram"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/jamwithai/production-agentic-rag-course"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/jamwithai-production-agentic-rag-course-main-claim]],官方 artifact 落库为 [[artifacts/jamwithai-production-agentic-rag-course-repo]]。See [[content/jamwithai-production-agentic-rag-course]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/jamwithai-production-agentic-rag-course-main-claim]],官方 artifact 落库为 [[artifacts/jamwithai-production-agentic-rag-course-repo]]。See [[content/jamwithai-production-agentic-rag-course]]。",
+      "links": [
+        {
+          "target": "claims/jamwithai-production-agentic-rag-course-main-claim",
+          "raw": "[[claims/jamwithai-production-agentic-rag-course-main-claim]]"
+        },
+        {
+          "target": "artifacts/jamwithai-production-agentic-rag-course-repo",
+          "raw": "[[artifacts/jamwithai-production-agentic-rag-course-repo]]"
+        },
+        {
+          "target": "claims/jamwithai-production-agentic-rag-course-main-claim",
+          "raw": "[[claims/jamwithai-production-agentic-rag-course-main-claim]]"
+        },
+        {
+          "target": "artifacts/jamwithai-production-agentic-rag-course-repo",
+          "raw": "[[artifacts/jamwithai-production-agentic-rag-course-repo]]"
+        },
+        {
+          "target": "content/jamwithai-production-agentic-rag-course",
+          "raw": "[[content/jamwithai-production-agentic-rag-course]]"
         }
       ],
       "headings": [
@@ -2261,6 +2616,93 @@
         {
           "target": "content/microsoft-markitdown",
           "raw": "[[content/microsoft-markitdown]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/modelscope-funasr-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "modelscope-funasr-evidence-pack",
+      "title": "FunASR — Evidence Pack",
+      "file": "evidence-packs/modelscope-funasr-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "modelscope-funasr",
+        "kind": "evidence-pack",
+        "title": "FunASR — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "component",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "FunASR 是一个把离线/流式语音识别、VAD、标点、说话人分离、OpenAI 兼容 API、MCP 工具和 vLLM 加速放在同一套 Python/部署栈里的 ASR 工具箱。",
+            "internal_logic": "人话流程：上传一段 `meeting.wav`，FunASR 先把音频里真正有人说话的段落找出来，再把每段送进识别模型，最后把文字、时间、说话人信息拼回一个结果。技术流程可以从两个真实入口看。\n\n入口一，Python API：README 的例子是 `AutoModel(model=\"iic/SenseVoiceSmall\", vad_model=\"fsmn-vad\", spk_model=\"cam++\", device=\"cuda\")` 后调用 `model.generate(input=\"meeting.wav\")`。（来源：README Quick Start）源码里 `AutoModel.generate` 会先判断有没有 `vad_model`：没有就走 `inference()`，有就走 `inference_with_vad()`；`inference_with_vad` 先调用 `self.vad_model` 得到 `vadsegments`，再按片段长度排序批处理，用 `slice_padding_audio_samples` 取音频片段，调用主 ASR 模型，必要时调用 `punc_model`，有 `spk_model` 时提取 `spk_embedding`、聚类并把结果写到 `sentence_info`。（来源：funasr/auto/auto_model.py generate/inference_with_vad）\n\n入口二，OpenAI 兼容服务：`funasr-server --model sensevoice --device cuda` 最终调用 `funasr.bin._server_app.create_app`。如果 `preload_model == \"auto\"`，GPU 默认选 `fun-asr-nano`，CPU 默认选 `sensevoice`；`/v1/audio/transcriptions` 接收 `file`、`model`、`language`、`response_format`、`spk`。当 `model == \"fun-asr-nano\"` 且 vLLM 可用时，代码用 `soundfile.read` 读 bytes，必要时 `librosa.resample` 到 16000Hz，调用 VAD 得到毫秒级 segments，再对每段 `engine.generate(inputs=seg_audios, max_new_tokens=500, repetition_penalty=1.3)`，最后返回 `text` 和 `segments`；如果不是 vLLM 路径，则写临时文件，调用 `_process_fallback`，也就是 `AutoModel.generate`。（来源：funasr/bin/server.py；funasr/bin/_server_app.py create_app/_process_vllm/_process_fallback）\n\n术语定义：RTFx 是“音频时长 / 推理耗时”的倍数；`response_format=verbose_json` 是返回分段细节；`spk` 是 speaker 参数；`hotwords` 是热词，用来把“张三、北京”这类词传给模型或 vLLM 解码。（来源：docs/vllm_guide_zh_v2.md 离线 SDK 推理/API 参考；examples/openai_api/README_zh.md 使用 OpenAI SDK）",
+            "failure_mode": "docs/vllm_guide_zh_v2.md 安装与环境；funasr/bin/_server_app.py _load_vllm_engine",
+            "source_pointer": "https://github.com/modelscope/funasr"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:model_infra",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/MIT/v1.3.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/modelscope-funasr-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/modelscope-funasr-repo]]"
+        ],
+        "metrics": [
+          "stars=17029",
+          "forks=1735",
+          "open_issues=19",
+          "latest_release=v1.3.9",
+          "pushed_at=2026-05-30T16:19:19Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "docs/vllm_guide_zh_v2.md 安装与环境；funasr/bin/_server_app.py _load_vllm_engine",
+          "funasr/auto/auto_model.py build_model；docs/deployment_matrix_zh.md 上线检查清单",
+          "examples/openai_api/SECURITY_zh.md 对团队开放前的最低控制项",
+          "examples/openai_api/Dockerfile；funasr/bin/_server_app.py _process_vllm",
+          "LICENSE；MODEL_LICENSE；model_zoo/modelscope_models_zh.md 模型许可协议",
+          "examples/openai_api/kubernetes/funasr-api.yaml；examples/openai_api/SECURITY_zh.md Kubernetes 注意事项"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/modelscope/funasr"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/modelscope-funasr-main-claim]],官方 artifact 落库为 [[artifacts/modelscope-funasr-repo]]。See [[content/modelscope-funasr]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/modelscope-funasr-main-claim]],官方 artifact 落库为 [[artifacts/modelscope-funasr-repo]]。See [[content/modelscope-funasr]]。",
+      "links": [
+        {
+          "target": "claims/modelscope-funasr-main-claim",
+          "raw": "[[claims/modelscope-funasr-main-claim]]"
+        },
+        {
+          "target": "artifacts/modelscope-funasr-repo",
+          "raw": "[[artifacts/modelscope-funasr-repo]]"
+        },
+        {
+          "target": "claims/modelscope-funasr-main-claim",
+          "raw": "[[claims/modelscope-funasr-main-claim]]"
+        },
+        {
+          "target": "artifacts/modelscope-funasr-repo",
+          "raw": "[[artifacts/modelscope-funasr-repo]]"
+        },
+        {
+          "target": "content/modelscope-funasr",
+          "raw": "[[content/modelscope-funasr]]"
         }
       ],
       "headings": [
@@ -2779,6 +3221,97 @@
         {
           "target": "content/opendataloader-pdf",
           "raw": "[[content/opendataloader-pdf]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/openmoss-moss-tts-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "openmoss-moss-tts-evidence-pack",
+      "title": "MOSS-TTS — Evidence Pack",
+      "file": "evidence-packs/openmoss-moss-tts-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "openmoss-moss-tts",
+        "kind": "evidence-pack",
+        "title": "MOSS-TTS — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "component",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "MOSS-TTS 是一个开源语音/声音生成模型家族仓库，把长文本 TTS、音色克隆、实时流式 TTS、多人对话语音、音效生成和本地/边缘推理放在同一个工程里。",
+            "internal_logic": "人话：以 README 的 MOSS-TTS-v1.5 例子为真实流程：先建 Python 3.12 环境并安装 `pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e \".[torch-runtime]\"`；代码选择 `device = \"cuda\" if torch.cuda.is_available() else \"cpu\"`，CUDA 上用 `torch.bfloat16`，并通过 `resolve_attn_implementation()` 在 FlashAttention 2、SDPA、eager 之间选后端。接着 `AutoProcessor.from_pretrained(\"OpenMOSS-Team/MOSS-TTS-v1.5\", trust_remote_code=True)` 加载 processor，把 `processor.audio_tokenizer` 移到 device；输入不是裸字符串，而是消息：例如法语 `processor.build_user_message(text=text_7, language=\"French\")`，克隆声音 `processor.build_user_message(text=text_1, reference=[ref_audio_1])`，控时长 `processor.build_user_message(text=text_2, tokens=325)`，显式停顿 `我今天学习了一首中国的古诗，它的名字是[pause 3.2s]静夜思！`。这些 conversation 送进 `processor(batch_conversations, mode=\"generation\")` 变成 `input_ids` 和 `attention_mask`，再由 `model.generate(..., max_new_tokens=4096)` 生成；`processor.decode(outputs)` 得到 `message.audio_codes_list[0]`，最后 `torchaudio.save(out_path, audio.unsqueeze(0), processor.model_config.sampling_rate)` 写 WAV。（来源：README Environment Setup；来源：README MOSS-TTS Basic Usage）\n\n术语层：MossTTSDelay 的底层不是直接预测波形，而是预测 MOSS-Audio-Tokenizer 的离散音频 tokens。`moss_tts_delay/README.md` 写明采样率 24,000 Hz、frame rate 12.5 Hz、32 个 RVQ layers、33 个 LM heads；`moss_tts_delay/llama_cpp/processor.py` 还展示了 prompt 被打包成 `(S, 33)` 的 multi-channel `input_ids`，第 0 列是文本 token，后 32 列是音频 codebook。llama.cpp 路径中，`build_generation_prompt(...)` 把 `Reference(s)`、`Instruction`、`Tokens`、`Quality`、`Sound Event`、`Ambient Sound`、`Language`、`Text` 写入 `<user_inst>...</user_inst>`；`LlamaCppPipeline.generate(...)` 先 `_prepare_reference()` 把参考音频编码为 codes，再 prefill backbone，然后在 `_autoregressive_loop()` 中每步取 `text_logits`、`hs = backbone.get_hidden_state(-1)`、`audio_logits = lm_heads.audio_all(hs)`，交给 `delay_step(...)` 采样下一个 `[text_token, audio_0..audio_31]`，循环结束后 `parse_generation_output(...)` 取音频 codes，再用 ONNX/TRT/Torch audio tokenizer decode 成 waveform。（来源：moss_tts_delay/README.md Technical Specifications；来源：moss_tts_delay/llama_cpp/processor.py build_generation_prompt；来源：moss_tts_delay/llama_cpp/pipeline.py generate and _autoregressive_loop）",
+            "failure_mode": "README MOSS-TTS Basic Usage；docs/moss_tts_realtime_model_card.md Basic Usage",
+            "source_pointer": "https://github.com/openmoss/moss-tts"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:model_infra",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/Apache-2.0/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/openmoss-moss-tts-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/openmoss-moss-tts-repo]]"
+        ],
+        "metrics": [
+          "stars=3071",
+          "forks=273",
+          "open_issues=6",
+          "latest_release=not_found",
+          "pushed_at=2026-06-04T09:08:01Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "README MOSS-TTS Basic Usage；docs/moss_tts_realtime_model_card.md Basic Usage",
+          "pyproject.toml torch-runtime；README Environment Setup",
+          ".gitmodules；README llama.cpp Backend Model Weights",
+          "moss_tts_delay/llama_cpp/README.md Weight Preparation；README llama.cpp Backend Configuration",
+          "README SGLang Backend Quick Start",
+          "README Optional Install FlashAttention 2；docs/moss_tts_realtime_model_card.md TTFB and RTF",
+          "moss_soundeffect_v2/README.md Environment Setup；moss_soundeffect_v2/pyproject.toml"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/openmoss/moss-tts"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/openmoss-moss-tts-main-claim]],官方 artifact 落库为 [[artifacts/openmoss-moss-tts-repo]]。See [[content/openmoss-moss-tts]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/openmoss-moss-tts-main-claim]],官方 artifact 落库为 [[artifacts/openmoss-moss-tts-repo]]。See [[content/openmoss-moss-tts]]。",
+      "links": [
+        {
+          "target": "claims/openmoss-moss-tts-main-claim",
+          "raw": "[[claims/openmoss-moss-tts-main-claim]]"
+        },
+        {
+          "target": "artifacts/openmoss-moss-tts-repo",
+          "raw": "[[artifacts/openmoss-moss-tts-repo]]"
+        },
+        {
+          "target": "claims/openmoss-moss-tts-main-claim",
+          "raw": "[[claims/openmoss-moss-tts-main-claim]]"
+        },
+        {
+          "target": "artifacts/openmoss-moss-tts-repo",
+          "raw": "[[artifacts/openmoss-moss-tts-repo]]"
+        },
+        {
+          "target": "content/openmoss-moss-tts",
+          "raw": "[[content/openmoss-moss-tts]]"
         }
       ],
       "headings": [
