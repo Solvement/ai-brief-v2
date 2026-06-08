@@ -22,6 +22,11 @@ Log "=== AI-Brief daily boot (deterministic) $today ==="
 try {
   Log "git pull..."; git pull --rebase --autostash 2>&1 | Tee-Object -FilePath $log -Append
 
+  # last30days community-signal discovery sub-layer for the news column (Reddit/HN/Polymarket/GitHub,
+  # deterministic/headless, zero keys). Supplements official-blog RSS — which can underperform on a
+  # given day (e.g. 2026-06-08 boot got only HN/Reddit). The column still does Chinese + 20/day cap.
+  $env:NEWS_LAST30DAYS = "1"
+
   Log "deterministic daily (npm run daily: news / papers-curation / projects / models + build-index)..."
   npm run daily 2>&1 | Tee-Object -FilePath $log -Append
 
@@ -35,6 +40,22 @@ try {
     npm run papers:cold-audit 2>&1 | Tee-Object -FilePath $log -Append
     Log "rebuild index (apply gate statuses: ready_to_publish in, hold/needs_human out)..."
     node scripts/columns/papers/build-index.mjs 2>&1 | Tee-Object -FilePath $log -Append
+
+    # DURABLE deep-read gap guard (Kevin 2026-06-08): the deep-read stage above is best-effort and
+    # used to fail SILENTLY (no alert, no retry) — it sat broken for 2 days (6-07/08) unnoticed. Now:
+    # compute a VISIBLE health file (public/data/papers-deepread-health.json, deploys with the site)
+    # comparing what was SELECTED for deep-read vs what was AUTHORED+published, and on a gap retry the
+    # authoring ONCE in-boot (self-heals transient claude -p failures / rate limits).
+    Log "deep-read coverage check (selected-vs-authored; writes visible health file)..."
+    node scripts/columns/papers/check-deepread-coverage.mjs 2>&1 | Tee-Object -FilePath $log -Append
+    if ($LASTEXITCODE -ne 0) {
+      Log "WARN deep-read coverage GAP -> retry authoring once (self-heal)..."
+      npm run papers:deepread 2>&1 | Tee-Object -FilePath $log -Append
+      npm run papers:cold-audit 2>&1 | Tee-Object -FilePath $log -Append
+      node scripts/columns/papers/build-index.mjs 2>&1 | Tee-Object -FilePath $log -Append
+      node scripts/columns/papers/check-deepread-coverage.mjs 2>&1 | Tee-Object -FilePath $log -Append
+      if ($LASTEXITCODE -ne 0) { Log "!!! deep-read coverage STILL gapped after one retry -> see public/data/papers-deepread-health.json (deployed/visible); manual rerun needed" }
+    }
   } catch { Log "WARN deep-read/cold-audit stage failed (non-fatal; deterministic refresh still publishes): $($_.Exception.Message)" }
 
   # Machine gate before deploy = `npm run verify` (ESLint + content lint, node:test unit
