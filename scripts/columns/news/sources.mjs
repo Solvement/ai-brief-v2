@@ -1,4 +1,5 @@
 import { fetchWithRetry } from "../../lib/http.mjs";
+import { isLast30DaysEnabled, fetchLast30DaysSource } from "./last30days-source.mjs";
 
 const DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; ai-brief/0.1; news aggregator)";
 const DEFAULT_PER_SOURCE_LIMIT = 30;
@@ -158,6 +159,20 @@ export async function discoverNews(options = {}) {
     sourceStats.push(result.stat);
     if (result.items?.length) items.push(...result.items);
     if (!result.stat.ok) logger?.warn?.(`news source ${result.stat.id} failed: ${result.stat.error}`);
+  }
+
+  // Optional community-signal discovery sub-layer (last30days engine).
+  // Gated OFF by default; only runs when env NEWS_LAST30DAYS=1. Supplies extra
+  // CANDIDATES only — the normalize/dedupe/cap/Chinese stages stay unchanged.
+  if (isLast30DaysEnabled()) {
+    try {
+      const l30 = await fetchLast30DaysSource({ ...options, logger, discoveredAt });
+      for (const stat of l30.sourceStats || []) sourceStats.push(stat);
+      if (l30.items?.length) items.push(...l30.items);
+    } catch (error) {
+      logger?.warn?.(`news source last30days failed: ${error.message || String(error)}`);
+      sourceStats.push({ id: "last30days", source: "last30days", sourceType: "community", ok: false, count: 0, error: error.message || String(error) });
+    }
   }
 
   return { items, sourceStats, discoveredAt };
