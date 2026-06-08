@@ -461,7 +461,7 @@ export function makeCodexAuthorFn(config = {}) {
     model = "gpt-5.5",
     reasoningEffort = "high",
     codexBin = "codex",
-    timeoutMs = 30 * 60 * 1000,
+    timeoutMs = Number(process.env.COLD_AUDIT_CODEX_TIMEOUT_MS) || 12 * 60 * 1000, // per codex call cap (was 30min; a single call must not hang the batch)
     buildPrompt, // (paper, { round, fixes, prevArtifact }) => string. REQUIRED for live use.
     cwd = ROOT,
     logger = console,
@@ -528,7 +528,7 @@ export function makeCodexAuthorFn(config = {}) {
 export function makeClaudeAuditFn(config = {}) {
   const {
     claudeBin = "claude",
-    timeoutMs = 20 * 60 * 1000,
+    timeoutMs = Number(process.env.COLD_AUDIT_CLAUDE_TIMEOUT_MS) || 8 * 60 * 1000, // per claude-audit call cap (was 20min)
     // Two-call seam: Stage A (blind, source-free) then Stage B (open-book). Both REQUIRED for live use.
     buildStageAPrompt, // (artifact, ctx) => string
     buildStageBPrompt, // (artifact, source, stageA, ctx) => string

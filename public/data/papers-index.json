@@ -1,12 +1,58 @@
 {
-  "generatedAt": "2026-06-08T23:18:12.600Z",
+  "generatedAt": "2026-06-08T23:39:25.826Z",
   "date": "2026-06-08",
   "counts": {
-    "deepReads": 19,
+    "deepReads": 20,
     "radar": 10,
     "deepCandidates": 3
   },
   "deepReads": [
+    {
+      "slug": "2606.06492-code2lora-hypernetwork-repo-adapters",
+      "arxiv_id": "2606.06492",
+      "title": "Code2LoRA: Hypernetwork-Generated Adapters for Code Language Models under Software Evolution",
+      "date": "2026-06-04",
+      "first_seen_date": "2026-06-08",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Liliana Hotsko",
+        "Yinxi Li",
+        "Yuntian Deng",
+        "Pengyu Nie"
+      ],
+      "tags": [
+        "code-llm",
+        "repository-level-context",
+        "lora",
+        "hypernetwork",
+        "parameter-efficient-fine-tuning",
+        "software-evolution",
+        "commit-diff",
+        "repopeftbench",
+        "coding-agent",
+        "adapter-generation",
+        "repo-memory",
+        "versioned-adapters"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 8,
+        "buildability": 6,
+        "evaluation_value": 8,
+        "breadth_value": 6,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily"
+      ],
+      "one_sentence_judgment": "Code2LoRA 把 repository context 从 per-query token 注入改成 repo-conditioned LoRA generation,并用 GRU diff state 处理软件演化;RepoPeftBench 上 Static 63.8% CR EM、Evo 60.3% commit-CR EM 的证据很有工程启发,但只覆盖 Python assertion completion + Qwen2.5-Coder-1.5B,且匿名源码/HF artifacts 本轮不可访问,所以复现成熟度必须保守。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.06492.png"
+    },
     {
       "slug": "2606.02437-scaling-peft-million-personal-models",
       "arxiv_id": "2606.02437",
@@ -910,7 +956,7 @@
         "evidence_quality": 5
       },
       "one_line": "用超网络生成仓库级LoRA适配器，零推理开销注入知识",
-      "deep_slug": null
+      "deep_slug": "2606.06492-code2lora-hypernetwork-repo-adapters"
     }
   ],
   "radar": [
