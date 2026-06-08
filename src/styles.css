@@ -5161,6 +5161,8 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
    light + blue accent, reuses --radar-* palette
    ============================================================ */
 .pd-page { max-width: 860px; margin: 0 auto; }
+/* No-TOC full-width reading page: use the landscape, no empty left column. */
+.pd-page--full { max-width: 1080px; }
 .pd-back { display: inline-block; margin: 0 0 16px; font-size: 13px; font-weight: 600; color: var(--radar-ink-3); text-decoration: none; }
 .pd-back:hover { color: var(--radar-blue-strong); }
 
@@ -5209,8 +5211,9 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 .pd-prose tr:nth-child(even) td { background: #fcfdff; }
 
 /* mermaid */
-.pd-mermaid { display: flex; justify-content: center; margin: 8px 0 20px; padding: 16px; background: var(--radar-bg); border: 1px solid var(--radar-line); border-radius: 12px; overflow-x: auto; }
-.pd-mermaid svg { max-width: 100%; height: auto; }
+.pd-mermaid { display: flex; justify-content: center; margin: 12px 0 26px; padding: 24px; background: var(--radar-bg); border: 1px solid var(--radar-line); border-radius: 12px; overflow-x: auto; }
+/* Enlarge the architecture diagrams: fill the (now wider) column instead of staying tiny. */
+.pd-mermaid svg { width: 100%; max-width: 900px; min-width: min(100%, 560px); height: auto; }
 .pd-mermaid-fallback { background: #0f1729; color: #e6edf3; border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 12.5px; }
 
 /* heading anchor offset so TOC jumps don't tuck under the top */

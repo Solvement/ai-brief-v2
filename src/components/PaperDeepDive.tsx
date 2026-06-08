@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { MarkdownRich, buildToc } from "./MarkdownRich";
+import { useState } from "react";
+import { MarkdownRich } from "./MarkdownRich";
 import { FeedbackWidget } from "./FeedbackWidget";
 
 interface PaperMeta {
@@ -32,53 +32,30 @@ const SCORE_LABEL: Record<string, string> = {
 
 type Tab = "paper" | "career";
 
+/** Remove footnote markers `[^x]` and their `[^x]: …` definition block from the
+ *  rendered text. The source .mdx keeps footnotes for provenance/AutoSci — this
+ *  only declutters the reading page (Kevin: the 来源 section is noise). */
+function stripFootnotes(md: string): string {
+  return md
+    .replace(/^\[\^[^\]]+\]:.*(?:\n(?!\[\^|#|\S).*)*$/gm, "") // definition lines (+ wrapped continuations)
+    .replace(/\[\^[^\]]+\]/g, "")                              // inline refs
+    .replace(/[ \t]+\n/g, "\n")                                // trailing spaces left behind
+    .replace(/\n{3,}/g, "\n\n")                                // collapse blank runs
+    .trimEnd();
+}
+
 export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper: string; career: string }) {
   const [tab, setTab] = useState<Tab>("paper");
   const scores = meta.scores || {};
-  const source = tab === "paper" ? paper : career;
+  // Strip footnote refs + definitions from the rendered page (Kevin: the 来源 section is noise);
+  // the source .mdx keeps them for provenance/AutoSci.
+  const source = stripFootnotes(tab === "paper" ? paper : career);
   // Fold the deep "技术细节(选读)" read-on layer by default (progressive disclosure).
   const foldHeading = tab === "paper" ? "技术细节" : undefined;
-  const toc = useMemo(() => {
-    const all = buildToc(source);
-    if (!foldHeading) return all;
-    // Drop the folded layer's sub-headings from the main-spine TOC so it stays short.
-    let inFold = false;
-    return all.filter((t) => {
-      if (t.level === 2) { inFold = t.text.startsWith(foldHeading); return true; }
-      return !inFold;
-    });
-  }, [source, foldHeading]);
-  const hasToc = toc.length > 2;
-
-  // 目录 scroll-spy：高亮当前视口最靠上的小节。直接 toggle DOM class（比 React
-  // state 稳、且每次滚动不触发 re-render）。
-  const tocRef = useRef<HTMLElement | null>(null);
-  useEffect(() => {
-    if (typeof IntersectionObserver === "undefined") return;
-    const heads = toc.map((t) => document.getElementById(t.slug)).filter(Boolean) as HTMLElement[];
-    if (!heads.length) return;
-    const visible = new Set<HTMLElement>();
-    const apply = (id: string) => {
-      tocRef.current?.querySelectorAll<HTMLAnchorElement>("a[data-slug]").forEach((a) => {
-        a.classList.toggle("pd-toc-active", a.dataset.slug === id);
-      });
-    };
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) visible.add(e.target as HTMLElement);
-        else visible.delete(e.target as HTMLElement);
-      }
-      if (!visible.size) return;
-      const topMost = [...visible].sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
-      apply(topMost.id);
-    }, { rootMargin: "-80px 0px 0px 0px", threshold: 0 });
-    heads.forEach((h) => io.observe(h));
-    return () => io.disconnect();
-  }, [toc]);
 
   return (
     <>
-      <main className={`page pd-page${hasToc ? " pd-page--toc" : ""}`}>
+      <main className="page pd-page pd-page--full">
         <a className="pd-back" href="/articles">← 文章</a>
 
         <header className="pd-header">
@@ -115,18 +92,6 @@ export function PaperDeepDive({ meta, paper, career }: { meta: PaperMeta; paper:
         </div>
 
         <div className="pd-body" id="pd-panel" role="tabpanel" aria-labelledby={`pd-tab-${tab}`} tabIndex={0}>
-          {hasToc && (
-            <nav className="pd-toc" aria-label="目录" ref={tocRef}>
-              <div className="pd-toc-title">目录</div>
-              <ul>
-                {toc.map((t, i) => (
-                  <li key={`${t.slug}-${i}`} className={t.level === 3 ? "pd-toc-sub" : undefined}>
-                    <a href={`#${t.slug}`} data-slug={t.slug}>{t.text}</a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
           <article className="pd-article">
             <MarkdownRich source={source} collapsibleHeading={foldHeading} />
           </article>

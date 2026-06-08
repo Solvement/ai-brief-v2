@@ -4,11 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { loadPapersIndex, type PapersIndex } from "../lib/data";
 
-type Win = "daily" | "weekly" | "monthly";
-type Mode = "hf" | "conference" | "board";
+type Mode = "hf" | "conference";
 type DeepRead = PapersIndex["deepReads"][number];
-const WIN_LABEL: Record<Win, string> = { daily: "日榜", weekly: "周榜", monthly: "月榜" };
-const MODE_LABEL: Record<Mode, string> = { hf: "HF 精读", conference: "顶会最佳", board: "HF 全榜" };
+const MODE_LABEL: Record<Mode, string> = { hf: "HF 精读", conference: "顶会最佳" };
 const REL_LABEL: Record<string, string> = { direct: "AutoSci 直接", indirect: "AutoSci 间接", inspiration: "AutoSci 启发", none: "" };
 
 function thumbUrl(arxivId: string) {
@@ -106,12 +104,9 @@ export function PapersPage() {
   const [data, setData] = useState<PapersIndex | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("hf");
-  const [win, setWin] = useState<Win>("daily");
-  const [limit, setLimit] = useState(18);
   const [activeDate, setActiveDate] = useState<string>("");
 
   useEffect(() => { loadPapersIndex().then(setData).catch((e) => setErr(e?.message || String(e))); }, []);
-  useEffect(() => { setLimit(18); }, [win]);
   useEffect(() => { setActiveDate(""); }, [mode]); // each mode starts at its own latest day
 
   const track = mode === "conference" ? "conference" : "hf";
@@ -153,8 +148,6 @@ export function PapersPage() {
   if (!data) return (<main className="page radar-page"><div className="loading">正在加载论文…</div></main>);
 
   const deepSlugByArxiv = new Map(data.deepReads.map((d) => [d.arxiv_id, d.slug]));
-  const board = data.board[win] || [];
-  const boardShown = board.slice(0, limit);
   const current = groups.find((g) => g.key === activeDate) || groups[0] || null;
   const isLatestDay = Boolean(current && groups[0] && current.key === groups[0].key);
   const totalDeep = groups.reduce((n, g) => n + g.items.length, 0);
@@ -171,8 +164,7 @@ export function PapersPage() {
     return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   })();
 
-  const showDeep = mode === "hf" || mode === "conference";
-  const countLabel = mode === "board" ? `${board.length} 篇` : mode === "conference" ? `${totalDeep} 篇顶会` : `${totalDeep} 篇精读`;
+  const countLabel = mode === "conference" ? `${totalDeep} 篇顶会` : `${totalDeep} 篇精读`;
 
   return (
     <main className="page radar-page">
@@ -183,26 +175,16 @@ export function PapersPage() {
 
       <div className="radar-filters">
         <div className="radar-chip-group">
-          {(["hf", "conference", "board"] as Mode[]).map((m) => (
+          {(["hf", "conference"] as Mode[]).map((m) => (
             <button key={m} className={`radar-chip${mode === m ? " active" : ""}`} onClick={() => setMode(m)}>{MODE_LABEL[m]}</button>
           ))}
         </div>
-        {mode === "board" && (
-          <div className="radar-chip-group">
-            {(["daily", "weekly", "monthly"] as Win[]).map((w) => (
-              <button key={w} className={`radar-chip${win === w ? " active" : ""}`} onClick={() => setWin(w)}>
-                {WIN_LABEL[w]}<span className="radar-chip-count">{data.board[w].length}</span>
-              </button>
-            ))}
-          </div>
-        )}
         <div className="radar-chip-group radar-chip-group-right">
           <span className="radar-chip radar-chip-static">{countLabel}</span>
         </div>
       </div>
 
-      {showDeep ? (
-        groups.length === 0 ? (
+      {groups.length === 0 ? (
           <div className="notice">{mode === "conference" ? "暂无顶会精读。" : "暂无精读。"}</div>
         ) : (
           <>
@@ -297,35 +279,7 @@ export function PapersPage() {
               </>
             )}
           </>
-        )
-      ) : (
-        <>
-          <SecHead label={`${WIN_LABEL[win]} · HF 全榜`} n={board.length} hint="原始榜单，未分类" />
-          <div className="radar-grid">
-            {boardShown.map((b, i) => (
-              <a key={b.arxiv_id} className="radar-card paper-card paper-card-board" href={b.hf_paper_url} target="_blank" rel="noreferrer">
-                <Thumb src={b.thumbnail_url || thumbUrl(b.arxiv_id)} alt={b.title} />
-                <div className="radar-card-top">
-                  <div className="paper-card-badges">
-                    <span className="paper-rank">#{i + 1}</span>
-                    <span className="radar-score">▲{b.upvotes}</span>
-                  </div>
-                  {b.already_done && <span className="paper-rel">已深读</span>}
-                </div>
-                <h3 className="radar-name paper-name">{b.title}</h3>
-                {b.authors.length > 0 && <p className="radar-summary paper-authors">{b.authors.join(", ")}</p>}
-                <div className="radar-foot">
-                  <div className="radar-meta" />
-                  <span className="radar-foot-right"><span className="radar-cta deep">看论文 →</span></span>
-                </div>
-              </a>
-            ))}
-          </div>
-          {limit < board.length && (
-            <div className="paper-more"><button className="radar-more-btn" onClick={() => setLimit((l) => l + 18)}>加载更多（{board.length - limit}）</button></div>
-          )}
-        </>
-      )}
+        )}
     </main>
   );
 }
