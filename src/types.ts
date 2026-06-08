@@ -606,39 +606,3 @@ export interface PaperRadarReflection {
   selfCorrections: string[];
   nextRunAdjustments: string[];
 }
-
-export interface PaperRadarPublicData {
-  schemaVersion: number;
-  date: string;
-  generatedAt: string;
-  sourceFiles: {
-    daily: string;
-    triage: string;
-  };
-  pipelineRun?: AgentPipelineRunRef | null;
-  qualityGate?: AgentQualityGate | null;
-  runTrace?: PaperRadarRunTrace | null;
-  reflection?: PaperRadarReflection | null;
-  memoryVersion?: number;
-  triageSummary: {
-    candidateCount: number;
-    scoredCount: number;
-    selectedCount: number;
-    rejectedCount: number;
-    belowTopCutoffCount: number;
-    cutoffScore: number;
-  } | null;
-  agentFlow: PaperRadarAgentFlowStep[];
-  mustRead: PaperRadarSummaryPaper | null;
-  skim: PaperRadarSummaryPaper[];
-  professorLesson: string;
-  goodIdeaToSteal: string;
-  badIdeaOrRisk: string;
-  transferablePattern: string;
-  futureWorkApplication: string;
-  architectureTakeaway: string;
-  interviewTalkingPoint: string;
-  projectIdea: string;
-  topPapers: PaperRadarSummaryPaper[];
-  selectionTrace: PaperRadarSelectionTraceItem[];
-}

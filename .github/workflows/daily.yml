@@ -56,6 +56,14 @@ jobs:
           COLUMN: ${{ github.event.inputs.column || 'all' }}
         run: npm run daily -- --only "$COLUMN"
 
+      # Quality gate parity with the local boot path (scripts/boot-daily.ps1):
+      # `npm run verify` = lint (ESLint + content lint) + test (node:test + validate)
+      # + next build. A non-zero exit here aborts the job BEFORE the commit/push step,
+      # so broken or stale generated content never auto-deploys to production.
+      # No `continue-on-error`: a failed gate must stop the job (RED LINE: no gate = no publish).
+      - name: Quality gate (no gate = no publish)
+        run: npm run verify
+
       - name: Commit data changes
         shell: bash
         env:
