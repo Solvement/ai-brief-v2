@@ -24,7 +24,7 @@ open_questions:
 
 ## Explanation
 
-不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。
+不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。
 
 ## Supported by
 - [[claims/herdr-main-claim]]

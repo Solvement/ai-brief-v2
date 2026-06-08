@@ -11,6 +11,8 @@ const PROJECT_ROOT = path.resolve(
   fileURLToPath(new URL('../..', import.meta.url)),
 );
 const OUTPUT_ROOT = path.join(PROJECT_ROOT, 'public', 'data', 'brief');
+const DATA_INSUFFICIENT = '数据不足';
+const TEXT_SENTINELS = [DATA_INSUFFICIENT, '官方未披露', ''];
 
 function normalizeEntries(value) {
   if (value instanceof Map) return Array.from(value.entries());
@@ -306,6 +308,140 @@ function excerptFor(text) {
   return paragraph.replace(/\s+/g, ' ').slice(0, 280);
 }
 
+function hasAuthoredText(value) {
+  if (typeof value !== 'string') return false;
+  const text = value.trim();
+  if (!text) return false;
+  return !TEXT_SENTINELS.some((sentinel) => sentinel && (text === sentinel || text.startsWith(`${sentinel}（`) || text.startsWith(`${sentinel}(`)));
+}
+
+function firstAuthoredText(...values) {
+  return values.find(hasAuthoredText) || '';
+}
+
+function stripMarkdown(value = '') {
+  return String(value)
+    .replace(/\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]+))?\]\]/g, '$2')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\r\n/g, '\n')
+    .trim();
+}
+
+function bodySection(body, headingPattern) {
+  const normalized = String(body || '').replace(/\r\n/g, '\n');
+  const regex = /^##\s+(.+)$/gm;
+  let match;
+  const headings = [];
+
+  while ((match = regex.exec(normalized))) {
+    headings.push({ title: match[1].trim(), start: match.index, contentStart: regex.lastIndex });
+  }
+
+  const index = headings.findIndex((heading) => headingPattern.test(heading.title));
+  if (index === -1) return '';
+  const end = headings[index + 1]?.start ?? normalized.length;
+  return normalized.slice(headings[index].contentStart, end).trim();
+}
+
+function bulletTexts(section, limit = 3) {
+  return String(section || '')
+    .split(/\r?\n/)
+    .map((line) => line.match(/^\s*[-*]\s+(.+)$/)?.[1])
+    .filter(Boolean)
+    .map((line) => stripMarkdown(line).replace(/（来源：[^）]+）/g, '').trim())
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function memoryCardValue(body, key) {
+  const section = bodySection(body, /Memory card/i);
+  const match = section.match(new RegExp(`^${key}:\\s*(.+)$`, 'mi'));
+  return match ? stripMarkdown(match[1]) : '';
+}
+
+function spineBody(section = {}) {
+  if (typeof section === 'string') return section.trim();
+  if (!section || typeof section !== 'object') return '';
+  return String(section.body_md || section.body || section.markdown || section.text || section.summary || '').trim();
+}
+
+function maturitySignalsFromAudit(meta = {}) {
+  const audit = meta.artifact_audit || {};
+  return {
+    star_velocity: firstAuthoredText(audit.star_velocity, audit.stars_in_period) || DATA_INSUFFICIENT,
+    recent_commit: firstAuthoredText(audit.recent_commit, audit.updated_at, audit.pushed_at) || DATA_INSUFFICIENT,
+    releases: firstAuthoredText(audit.releases, audit.latest_release) || DATA_INSUFFICIENT,
+    issue_activity: firstAuthoredText(audit.issue_activity, audit.open_issues) || DATA_INSUFFICIENT,
+  };
+}
+
+function tierTemplateHasRenderGaps(template = {}) {
+  return [
+    template.pain_point,
+    template.comparison,
+    template.how_it_works_with_analogy,
+    template.essential_design_difference,
+    template.practitioner_meaning,
+  ].some((value) => !hasAuthoredText(value));
+}
+
+function synthesizeDeepDiveTierTemplate(meta, body) {
+  const existing = meta.tier_template && typeof meta.tier_template === 'object' ? meta.tier_template : {};
+  if (Object.keys(existing).length && !tierTemplateHasRenderGaps(existing)) return existing;
+
+  const positioning = bodySection(body, /大白话定位|一句话定位/);
+  const whyHot = firstAuthoredText(bodySection(body, /为什么火|为什么值得看|解决什么痛点/), spineBody(meta.light_spine?.why_worth_attention));
+  const tech = firstAuthoredText(bodySection(body, /技术拆解|它怎么工作|它怎么work|how it works/i), spineBody(meta.light_spine?.how_it_works));
+  const value = firstAuthoredText(bodySection(body, /对我的价值|对从业者|意味着什么|判断/), spineBody(meta.light_spine?.judgment));
+  const risk = bodySection(body, /风险/);
+  const comparison = firstAuthoredText(
+    existing.comparison,
+    bodySection(body, /和同类|横向对比|comparison/i),
+  );
+  const reusable = firstAuthoredText(
+    existing.essential_design_difference,
+    memoryCardValue(body, 'architecture_pattern'),
+    memoryCardValue(body, 'reusable_patterns'),
+    spineBody(meta.light_spine?.reusable_abstractions),
+    meta.reasoning_trace?.transfer_decision,
+  );
+
+  return {
+    ...existing,
+    tier: Number(existing.tier || 3),
+    bucket: existing.bucket || '真·新项目',
+    tag: existing.tag || `[Tier ${Number(existing.tier || 3)}｜${existing.bucket || '真·新项目'}]`,
+    one_sentence_positioning: firstAuthoredText(existing.one_sentence_positioning, stripMarkdown(positioning).split(/\n\n/)[0], meta.reasoning_trace?.central_contribution) || DATA_INSUFFICIENT,
+    what_it_does: firstAuthoredText(existing.what_it_does, meta.reasoning_trace?.central_contribution, stripMarkdown(positioning).split(/\n\n/)[0]) || DATA_INSUFFICIENT,
+    metadata: existing.metadata || {},
+    labels: existing.labels || [],
+    pain_point: firstAuthoredText(existing.pain_point, whyHot) || DATA_INSUFFICIENT,
+    core_capabilities: Array.isArray(existing.core_capabilities) && existing.core_capabilities.length
+      ? existing.core_capabilities
+      : [...bulletTexts(tech, 3), ...bulletTexts(whyHot, 3)].slice(0, 3),
+    how_to_run: existing.how_to_run || {},
+    maturity_signals: existing.maturity_signals || maturitySignalsFromAudit(meta),
+    comparison: comparison || DATA_INSUFFICIENT,
+    trajectory_note: firstAuthoredText(existing.trajectory_note, meta.reasoning_trace?.transfer_decision) || DATA_INSUFFICIENT,
+    manual_confirmation: existing.manual_confirmation ?? true,
+    how_it_works_with_analogy: firstAuthoredText(existing.how_it_works_with_analogy, tech) || DATA_INSUFFICIENT,
+    essential_design_difference: reusable || DATA_INSUFFICIENT,
+    practitioner_meaning: firstAuthoredText(existing.practitioner_meaning, value, risk, meta.project_verdict?.main_risk) || DATA_INSUFFICIENT,
+    cross_links: existing.cross_links || [],
+  };
+}
+
+function normalizeDeepDiveMeta(meta, body) {
+  if (!meta || typeof meta !== 'object') return meta;
+  const shouldSynthesize = meta.kind === 'deep-dive' && meta.project_type;
+  if (!shouldSynthesize) return meta;
+  return {
+    ...meta,
+    tier_template: synthesizeDeepDiveTierTemplate(meta, body),
+  };
+}
+
 async function listMarkdownFiles(root) {
   let entries;
 
@@ -340,8 +476,13 @@ async function readTextIfExists(filePath) {
 
 async function readEntityFile(filePath, wikiRoot, entity) {
   const raw = await readFile(filePath, 'utf8');
-  const { meta, body } = parseMarkdown(raw);
-  const slug = String(meta.slug ?? slugFromFile(filePath));
+  const parsed = parseMarkdown(raw);
+  const body = parsed.body;
+  const baseSlug = String(parsed.meta.slug ?? slugFromFile(filePath));
+  const meta = entity.type === 'deep-dive'
+    ? normalizeDeepDiveMeta(parsed.meta, body)
+    : parsed.meta;
+  const slug = String(meta.slug ?? baseSlug);
   const file = normalizeRelativePath(path.relative(wikiRoot, filePath));
 
   return {

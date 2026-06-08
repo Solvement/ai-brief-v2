@@ -1,0 +1,84 @@
+primitive_id: "proj-colbymchenry-codegraph"
+source_project: "colbymchenry/codegraph"
+source_url: "https://github.com/colbymchenry/codegraph"
+title: "colbymchenry/codegraph reusable architecture pattern"
+relevance_level: "project_pattern"
+audience: "ai_only"
+core_pattern: >
+
+  MCP initialize instructions as single source of truth: 把工具使用策略放到 MCP `initialize` 响应里，而不是到处写
+  `CLAUDE.md`、`AGENTS.md`。CodeGraph 的 `SERVER_INSTRUCTIONS` 明确写了何时用 `codegraph_explore`、何时用
+  `codegraph_search`、何时回退 Read。（来源：src/mcp/server-instructions.ts；src/installer/targets/claude.ts
+  issue #529 comments） Local graph schema with unresolved reference staging: 先把未解析引用写进
+  `unresolved_refs`，再批量解析并创建 `edges`；schema 里节点、边、文件和 unresolved refs
+  分表。（来源：src/db/schema.sql；src/extraction/index.ts storeExtractionResult；src/resolution/index.ts
+  resolveAndPersistBatched） Staleness banner instead of silent stale context: 当 watcher debounce
+  期间某个响应引用了 pending file，就在响应顶部提示该文件可能 stale，并让代理 Read 指定文件；未引用的 pending file 放
+  footer。（来源：src/mcp/tools.ts
+  formatStaleBanner/formatStaleFooter；__tests__/mcp-staleness-banner.test.ts） Installer target
+  registry: 每个代理作为 `AgentTarget`，集中注册在 `ALL_TARGETS`，支持 `auto`、`all`、`none` 和 CSV
+  解析。（来源：src/installer/targets/registry.ts） Adaptive explore output budget:
+  `getExploreOutputBudget(fileCount)` 按文件数给 `codegraph_explore` 设置
+  `maxOutputChars`、`defaultMaxFiles`、`maxCharsPerFile` 等预算，小仓库和大仓库不同。（来源：src/mcp/tools.ts
+  getExploreOutputBudget）
+problem_class: "reliable-agent-runtime-and-tool-orchestration"
+status: "extracted"
+extracted_at: "2026-06-08T14:55:46.541Z"
+components:
+  - "agent_orchestrator"
+  - "tool_protocol_adapter"
+  - "developer_control_surface"
+  - "model_or_retrieval_layer"
+  - "validation_harness"
+  - "mcp-initialize-instructions-as-single-source-of-truth"
+  - "local-graph-schema-with-unresolved-reference-staging"
+  - "staleness-banner-instead-of-silent-stale-context"
+autosci_modules:
+  - "pattern_library"
+  - "experiment_runner"
+  - "agent_runtime"
+  - "tool_governance"
+  - "trace_memory"
+inputs:
+  - "task_spec"
+  - "repo_or_runtime_context"
+  - "tool_or_model_interfaces"
+  - "budget_and_validation_policy"
+outputs:
+  - "working_artifact"
+  - "execution_trace"
+  - "reusable_architecture_notes"
+  - "failure_or_risk_report"
+implementation_idea: >
+
+  Rebuild the agent-infra pattern from colbymchenry/codegraph as a small AutoSci module: extract
+  the control flow, define typed inputs/outputs, run it on one synthetic research task, and log
+  traces plus validation results. Reference flow: 白话：真实路径可以按一个项目初始化来走。用户先装 CLI：README 给出 `curl
+  -fsSL .../install.sh | sh`、Windows `irm .../install.ps1 | iex`，或 `npm i -g
+  @colbymchenry/codegraph`。然后 `codegraph install` 写入代理 MCP 配置；例如 Codex 目标写 `~/.codex/config.toml`
+  的 `[mcp_servers.codegraph]`，Claude 全局写 `~/.claude.json`、本地写 `./.mcp.json`，共同的 server 配置是
+  `command: codegraph`、`args: ['serve','--mcp']`。（来源：README Get
+  Started；src/installer/targets/codex.ts；src/installer/targets/claude.ts；src/installer/targets/shared.ts）
+  项目内运行 `codegraph init -i` 时，C
+small_experiment: >
+
+  Compare baseline free-form execution against the extracted agent-infra pattern from
+  colbymchenry/codegraph on three AutoSci tasks. Measure completion rate, trace inspectability,
+  failure recovery, and cost over 1-3 days.
+design_principles:
+  - id: "agent-infra-boundary-as-module"
+    principle: "MCP initialize instructions as single source of truth: 把工具使用策略放到 MCP `initialize` 响应里，而不是到处写 `CLAUDE.md`、`AGENTS.md`。CodeGraph 的 `SERVER_INSTRUCTIONS` 明确写了何时用 `codegraph_explore`、何时用 `codegraph_search`、何时回退 Read。（来源：src/mcp/server-instructions.ts；src/installer/targets/claude.ts issue #529 comments） Local graph schema with unresolved reference staging: 先把未解析引用写进 `unresolved_refs`，再批量解析并创建 `edges`；schema 里节点、边、文件和 unresolved refs 分表。（来源：src/db/schema.sql；src/extraction/index.ts storeExtractionResult；src/resolution/index.ts resolveAndPersistBatched） Staleness banner instead of silent stale context: 当 watcher debounce 期间某个响应引用了 pending file，就在响应顶部提示该文件可能 stale，并让代理 Read 指定文件；未引用的 pending file 放 footer。（来源：src/mcp/tools.ts formatStaleBanner/formatStaleFooter；__tests__/mcp-staleness-banner.test.ts） Installer target registry: 每个代理作为 `AgentTarget`，集中注册在 `ALL_TARGETS`，支持 `auto`、`all`、`none` 和 CSV 解析。（来源：src/installer/targets/registry.ts） Adaptive explore output budget: `getExploreOutputBudget(fileCount)` 按文件数给 `codegraph_explore` 设置 `maxOutputChars`、`defaultMaxFiles`、`maxCharsPerFile` 等预算，小仓库和大仓库不同。（来源：src/mcp/tools.ts getExploreOutputBudget）"
+    transfers_to: "Extract the reusable agent-infra boundary from colbymchenry/codegraph into a typed AutoSci module."
+  - id: "agent-infra-observable-flow"
+    principle: "白话：真实路径可以按一个项目初始化来走。用户先装 CLI：README 给出 `curl -fsSL .../install.sh | sh`、Windows `irm .../install.ps1 | iex`，或 `npm i -g @colbymchenry/codegraph`。然后 `codegraph install` 写入代理 MCP 配置；例如 Codex 目标写 `~/.codex/config.toml` 的 `[mcp_servers.codegraph]`，Claude 全局写 `~/.claude.json`、本地写 `./.mcp.json`，共同的 server 配置是 `command: codegraph`、`args: ['serve','--mcp']`。（来源：README Get Started；src/installer/targets/codex.ts；src/installer/targets/claude.ts；src/installer/targets/shared.ts） 项目内运行 `codegraph init -i` 时，CLI 的 `init [path]` 命令会调用 `CodeGraph.init(projectPath, { index: false })`，随后实际执行 `cg.indexAll()`；源码注释说明 `-i/--index` 现在保留兼容但初始化默认会建索引。`CodeGraph.init()` 创建 `.codegraph/`，初始化 `.codegraph/codegraph.db`，然后 `indexAll()` 扫描源码文件、抽取 nodes/edges/unresolved refs，运行 resolver，把引用落成 `calls`、`references`、`imports`、`extends` 等边，并写入 `indexed_with_version`、`indexed_with_extraction_version`。（来源：src/bin/codegraph.ts init command；src/index.ts CodeGraph.init/indexAll；src/extraction/index.ts storeExtractionResult；src/db/schema.sql） 具体例子：README 的 `codegraph affected` CI 片段是 `AFFECTED=$(git diff --name-only HEAD | codegraph affected --stdin --quiet)`，CLI 里 `affected [files...]` 读取 stdin 或参数，默认 test pattern 包括 `.spec.`、`.test.`、`/__tests__/`、`/tests?/`、`/e2e/`、`/spec/`，然后从 changed file 做 BFS，调用 `cg.getFileDependents(current.file)` 追踪依赖，默认 `--depth` 是 `5`，最后输出受影响测试文件。（来源：README codegraph affected；src/bin/codegraph.ts affected command；site/src/content/docs/guides/affected-tests.md） 术语：Tree-sitter 是把源码转 AST 的解析器；node 是函数、类、方法、路由等符号；edge 是 `calls`、`contains`、`extends` 等关系；FTS5 是 SQLite 的全文索引；MCP 是代理通过 stdio 调工具的协议。"
+    transfers_to: "Use the flow as an inspectable experiment harness with logs, checkpoints, and failure reports."
+  - id: "agent-infra-risk-first-transfer"
+    principle: "Transfer the architecture together with its main failure boundary: Node runtime and `node:sqlite`: 库模式要求调用方 runtime 支持 Node 22.5+ 的 `node:sqlite`；CLI/MCP 作者说使用自带 runtime。若 Node 版本或 `node:sqlite` 行为变化，数据库打开会失败。."
+    transfers_to: "Require an explicit dependency and over-transfer risk review before promoting the pattern into AutoSci."
+risks:
+  - "Node runtime and `node:sqlite`: 库模式要求调用方 runtime 支持 Node 22.5+ 的 `node:sqlite`；CLI/MCP 作者说使用自带 runtime。若 Node 版本或 `node:sqlite` 行为变化，数据库打开会失败。"
+  - "web-tree-sitter and WASM grammars: 语言解析依赖 `web-tree-sitter`、`tree-sitter-wasms` 和 vendored wasm；grammar ABI 或 AST 形状变化会影响 node/edge 抽取。"
+  - "SQLite WAL and local filesystem: WAL、mmap、busy timeout、文件锁在网络盘、WSL、虚拟化挂载上可能不一致；并发写可能影响 MCP 查询。"
+  - "Native file watcher: FSEvents、inotify、ReadDirectoryChangesW 或沙箱限制导致自动同步延迟或失败。"
+  - "Agent configuration formats: Claude、Codex、Cursor、Gemini 等配置路径或 schema 改动会让自动安装失效。"
+  - "over_transfer"

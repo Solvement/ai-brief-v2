@@ -41,4 +41,4 @@ source_pointers:
 
 ## Notes
 
-证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agent-governance-toolkit-main-claim]],官方 artifact 落库为 [[artifacts/agent-governance-toolkit-repo]]。See [[content/agent-governance-toolkit]]。
+证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/agent-governance-toolkit-main-claim]],官方 artifact 落库为 [[artifacts/agent-governance-toolkit-repo]]。See [[content/microsoft-agent-governance-toolkit]]。

@@ -24,7 +24,7 @@ open_questions:
 
 ## Explanation
 
-为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。
+为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。
 
 ## Supported by
 - [[claims/agent-governance-toolkit-main-claim]]

@@ -1,0 +1,27 @@
+<!-- AI-ONLY AutoSci primitive. Generated from a deep-analyzed GitHub project; not for the public project card. -->
+# AutoSci reuse - NousResearch/hermes-agent
+
+## Core Pattern
+Programmatic Tool Calling RPC: 把长工具链封装成子进程脚本，通过 stub 调父进程工具；限制工具白名单、调用次数、stdout/stderr 大小。 SKILL.md procedural memory: 用 `SKILL.md` + references/templates/scripts/assets 表示可复用流程；`skill_view` 渐进加载，`skill_manage` 支持 create/edit/patch/write_file。 Observer hooks + middleware split: 把只读 telemetry hook 和会改写行为的 middleware 分离；hook 负责记录，middleware 负责改写请求或包裹执行。 Terminal backend abstraction: 把命令执行后端抽象成 `env_type`，支持本机、SSH、Docker、Singularity、Modal、Daytona，并把 cwd、镜像、资源、持久化、env forward 放进配置。 Cron prompt scanner: 为无人值守任务单独做严格 prompt 扫描；对附加 skill 内容使用更窄扫描，避免安全文档中的攻击样例误报。
+
+## Mapping
+- problem_class: reliable-agent-runtime-and-tool-orchestration
+- components: agent_orchestrator, tool_protocol_adapter, developer_control_surface, model_or_retrieval_layer, validation_harness, programmatic-tool-calling-rpc, skill-md-procedural-memory, observer-hooks-middleware-split
+- autosci_modules: pattern_library, experiment_runner, agent_runtime, tool_governance, trace_memory
+
+## Small Experiment
+Compare baseline free-form execution against the extracted agent-infra pattern from NousResearch/hermes-agent on three AutoSci tasks. Measure completion rate, trace inspectability, failure recovery, and cost over 1-3 days.
+
+## Design Principles
+- agent-infra-boundary-as-module: Programmatic Tool Calling RPC: 把长工具链封装成子进程脚本，通过 stub 调父进程工具；限制工具白名单、调用次数、stdout/stderr 大小。 SKILL.md procedural memory: 用 `SKILL.md` + references/templates/scripts/assets 表示可复用流程；`skill_view` 渐进加载，`skill_manage` 支持 create/edit/patch/write_file。 Observer hooks + middleware split: 把只读 telemetry hook 和会改写行为的 middleware 分离；hook 负责记录，middleware 负责改写请求或包裹执行。 Terminal backend abstraction: 把命令执行后端抽象成 `env_type`，支持本机、SSH、Docker、Singularity、Modal、Daytona，并把 cwd、镜像、资源、持久化、env forward 放进配置。 Cron prompt scanner: 为无人值守任务单独做严格 prompt 扫描；对附加 skill 内容使用更窄扫描，避免安全文档中的攻击样例误报。
+- agent-infra-observable-flow: 一个真实流程可以这样走：先运行 `hermes` 进入 CLI，或者用 `hermes chat --query 'Reply exactly ok'` 做非交互测试；`pyproject.toml` 把 `hermes` 绑定到 `hermes_cli.main:main`（来源：README Getting Started；docs/middleware Enablement；pyproject.toml project.scripts）。模型侧，`cli-config.yaml.example` 默认模型写成 `anthropic/claude-opus-4.6`，provider 默认 `auto`，也可以配置 OpenRouter base_url `https://openrouter.ai/api/v1` 或本地/custom provider（来源：cli-config.yaml.example Model Configuration）。 当模型要调用工具时，`agent/agent_runtime_helpers.py` 会按函数名分派：`delegate_task` 走 `agent._dispatch_delegate_task(next_args)`，普通工具走 `run_agent.handle_function_call(...)`，并在最后包一层 `run_tool_execution_middleware(...)`，这样插件中间件可以包裹工具执行（来源：agent/agent_runtime_helpers.py tool dispatch；docs/middleware Tool Calls）。 如果模型选择 `execute_code`，它不是直接把一串 shell 命令塞回上下文。`tools/code_execution_tool.py` 会先用 `check_execute_code_guard(code, env_type)` 审批整段 Python，再按 terminal backend 选择 local RPC 或 remote file-based RPC。它生成 `hermes_tools.py`，脚本里可以 `from hermes_tools import terminal` 等，工具调用回到父进程统一分派；默认限制是 300 秒、最多 50 次工具调用、stdout 50KB、stderr 10KB（来源：tools/code_execution_tool.py execute_code / build_execute_code_schema）。 如果用户让它“每天早上生成日报”，agent 可以通过 cron 工具创建 job。`cron/jobs.py` 把任务放在 `~/.hermes/cron/jobs.json`，输出写入 `~/.hermes/cron/output/{job_id}/{timestamp}.md`；`parse_schedule` 能解析 `every 30m`、`0 9 * * *`、ISO timestamp 等；`tools/cronjob_tools.py` 在创建/更新和运行时扫描 prompt，阻断 `ignore previous instructions`、读 `.env`、`rm -rf /`、curl/wget 携带 secret 等注入/外传模式（来源：cron/jobs.py Schedule Parsing；tools/cronjob_tools.py Cron prompt scanning）。 如果它在 Telegram/Discord/Slack 等聊天平台工作，README 要求先 `hermes gateway setup` + `hermes gateway start`；MCP 侧则可运行 `hermes mcp serve`，让 Claude Code/Cursor/Codex 等 MCP client 用 stdio 调 Hermes 的会话工具，例如 `messages_read` 读历史、`messages_send` 发消息、`permissions_respond` 回复审批（来源：README CLI vs Messaging Quick Reference；mcp_serve.py Usage/create_mcp_server）。
+- agent-infra-risk-first-transfer: Transfer the architecture together with its main failure boundary: Python runtime and pinned PyPI dependencies: Python 3.14 或某些 Rust-backed wheel 生态变化会让安装失败；项目已经把 `requires-python` cap 到 `<3.14`。.
+
+## Risks
+- Python runtime and pinned PyPI dependencies: Python 3.14 或某些 Rust-backed wheel 生态变化会让安装失败；项目已经把 `requires-python` cap 到 `<3.14`。
+- Model providers and credentials: OpenRouter、Nous Portal、Anthropic、OpenAI Codex、Gemini、z.ai、Kimi、MiniMax、Hugging Face、NVIDIA、Xiaomi、Azure Foundry、本地服务等任何一个协议/鉴权变化都会影响对应 provider。
+- Terminal backend isolation: local backend 直接在宿主机执行；Docker/Modal/Daytona/Singularity/SSH 需要对应平台、镜像、凭据和资源配置。
+- Docker networking: 默认 `docker-compose.yml` 使用 `network_mode: host`，agent/gateway 可有较大出站网络面。
+- SQLite FTS5: 如果 Python/SQLite 缺少 FTS5，全文 session search 会被禁用或降级。
+- Node/browser assets: TUI/web/dashboard/browser tool 依赖 Node/npm/Playwright；Dockerfile 固定 uv、Node 22 source stage、Playwright chromium shell。
+- over_transfer

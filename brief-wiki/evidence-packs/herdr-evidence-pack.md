@@ -40,4 +40,4 @@ source_pointers:
 
 ## Notes
 
-证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/herdr-main-claim]],官方 artifact 落库为 [[artifacts/herdr-repo]]。See [[content/herdr]]。
+证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/herdr-main-claim]],官方 artifact 落库为 [[artifacts/herdr-repo]]。See [[content/ogulcancelik-herdr]]。

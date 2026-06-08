@@ -1632,10 +1632,9 @@ export function deriveSlug(repo = {}, existingContentSlugs = new Set()) {
   const [ownerFromFull, nameFromFull] = fullName.split("/");
   const ownerSlug = slugify(repo.owner || ownerFromFull || "");
   const nameSlug = slugify(repo.name || nameFromFull || fullName || "project");
-  if (!existingContentSlugs.has(nameSlug)) return nameSlug;
-
   const ownerPrefixed = ownerSlug && !nameSlug.startsWith(`${ownerSlug}-`) ? `${ownerSlug}-${nameSlug}` : nameSlug;
-  if (!existingContentSlugs.has(ownerPrefixed)) return ownerPrefixed;
+  if (ownerSlug) return ownerPrefixed;
+  if (!existingContentSlugs.has(nameSlug)) return nameSlug;
 
   let index = 2;
   while (existingContentSlugs.has(`${nameSlug}-${index}`)) index += 1;

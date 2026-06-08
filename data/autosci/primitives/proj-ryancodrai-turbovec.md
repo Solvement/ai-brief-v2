@@ -1,0 +1,26 @@
+<!-- AI-ONLY AutoSci primitive. Generated from a deep-analyzed GitHub project; not for the public project card. -->
+# AutoSci reuse - RyanCodrai/turbovec
+
+## Core Pattern
+稳定 ID 包装层: 把高速 positional index 留在内层，外层维护 `slot_to_id` 和 `id_to_slot`，删除时同步 swap-remove 后的 moved id。 候选集先解析、内核只接 bitset: 把 SQL/BM25/ACL/time-window 等复杂条件在外部解析成 ID allowlist，核心向量内核只处理 packed bitset。 首次 add 锁定维度: 允许 `dim=None` 的 lazy constructor，首次 `add`/`add_with_ids` 从输入 shape 锁定 dim。 二进制索引 + JSON side-car: 向量索引用 `.tvim`，文档文本、metadata、string-id map 用 `docstore.json` 或 `{stem}.nodes.json`。 文档化的“不支持”: 对 MMR、full-precision embedding recovery、非默认 LlamaIndex query mode 等不可实现能力直接 raise `NotImplementedError`。
+
+## Mapping
+- problem_class: research-artifact-to-repeatable-evaluation-harness
+- components: model_or_retrieval_layer, id, bitset, add, json-side-car, project
+- autosci_modules: pattern_library, experiment_runner, benchmark_harness, cold_critic
+
+## Small Experiment
+Compare baseline free-form execution against the extracted research pattern from RyanCodrai/turbovec on three AutoSci tasks. Measure completion rate, trace inspectability, failure recovery, and cost over 1-3 days.
+
+## Design Principles
+- research-boundary-as-module: 稳定 ID 包装层: 把高速 positional index 留在内层，外层维护 `slot_to_id` 和 `id_to_slot`，删除时同步 swap-remove 后的 moved id。 候选集先解析、内核只接 bitset: 把 SQL/BM25/ACL/time-window 等复杂条件在外部解析成 ID allowlist，核心向量内核只处理 packed bitset。 首次 add 锁定维度: 允许 `dim=None` 的 lazy constructor，首次 `add`/`add_with_ids` 从输入 shape 锁定 dim。 二进制索引 + JSON side-car: 向量索引用 `.tvim`，文档文本、metadata、string-id map 用 `docstore.json` 或 `{stem}.nodes.json`。 文档化的“不支持”: 对 MMR、full-precision embedding recovery、非默认 LlamaIndex query mode 等不可实现能力直接 raise `NotImplementedError`。
+- research-observable-flow: 人话流程：假设你有 1536 维 embedding 和业务文档 ID。Python 侧用 `idx = IdMapIndex(dim=1536, bit_width=4)`，再 `idx.add_with_ids(vectors, np.array([1001, 1002, 1003], dtype=np.uint64))`。搜索时可以直接 `idx.search(query, k=10)`，也可以先从 SQL 拿候选：`allowed = ... SELECT id FROM docs WHERE tenant=? ...`，再 `idx.search(query, k=10, allowlist=allowed)`（来源：README Python；README Hybrid retrieval）。 源码路径：`turbovec-python/src/lib.rs` 接收 `PyReadonlyArray2<f32>` 和 `PyReadonlyArray1<u64>`，要求数组 C-contiguous；`add_with_ids` 调 `turbovec_core::IdMapIndex::add_with_ids_2d`。`turbovec/src/id_map.rs` 先检查 `ids.len() == vectors.len()/dim` 和重复 ID，再调用内部 `TurboQuantIndex.add_2d`，成功后才写 `id_to_slot` 和 `slot_to_id`，避免 inner add 失败后留下 ghost ID（来源：turbovec-python/src/lib.rs add_with_ids；turbovec/src/id_map.rs add_with_ids_2d）。 编码路径：`turbovec/src/encode.rs` 对每行向量计算 norm、归一化、乘同一个 rotation matrix；如果首批样本数 `n >= 1000`，TQ+ 用每个坐标的经验 5%/95% 分位去拟合 `shift` 和 `scale`，否则返回 identity calibration；随后按 Lloyd-Max boundaries 把每维变成小整数 code，并按 `bytes_per_row = bit_width * (dim / 8)` bit-pack（来源：turbovec/src/encode.rs encode；compute_tqplus_calibration）。 搜索路径：allowlist 搜索先在 Python 侧拒绝空 allowlist 和未知 id；Rust `IdMapIndex.search_with_allowlist` 把外部 `u64` id 映射到 slot bool mask；`TurboQuantIndex.search_with_mask` 再把 bool mask 打成每 64 slot 一个 `u64` 的 bitset。`search.rs` 对 query 做 batched rotation，用 query LUT 和 packed codes 直接计分；x86 运行时选择 AVX-512BW、AVX2 或 scalar fallback；有 mask 时，`block_has_allowed` 在 32-vector block 级别提前跳过没有允许 slot 的 block，最后返回外部 id（来源：turbovec/src/id_map.rs search_with_allowlist；turbovec/src/lib.rs search_with_mask；turbovec/src/search.rs search/block_has_allowed）。 术语解释：slot 是内部数组位置；external id 是调用方给的稳定 `u64` 文档 ID；LUT 是把 query 与 quantized codebook 的分数预先做成查表；SIMD 是 CPU 一条指令同时处理多组 code。
+- research-risk-first-transfer: Transfer the architecture together with its main failure boundary: x86 SIMD baseline / AVX2 / AVX-512BW: 老 x86_64、隐藏 AVX2 的 VM 或不符合 x86-64-v3 的机器会影响运行或性能；AVX-512 只在运行时检测后启用。.
+
+## Risks
+- x86 SIMD baseline / AVX2 / AVX-512BW: 老 x86_64、隐藏 AVX2 的 VM 或不符合 x86-64-v3 的机器会影响运行或性能；AVX-512 只在运行时检测后启用。
+- BLAS provider: Linux OpenBLAS / macOS Accelerate: Linux 缺少 OpenBLAS 或 wheel 打包错误会导致 import/link 失败；macOS 走 Accelerate；Windows 按 build.rs 注释落到 ndarray pure-Rust fallback。
+- Python native extension: maturin + pyo3 + numpy: Python 包不是纯 Python；构建和 ABI 依赖 Rust extension、NumPy 和平台 wheel。
+- framework extras: LangChain / LlamaIndex / Haystack / Agno: 这些框架的接口变动会让 drop-in wrapper 失配，尤其是过滤语义、persist 格式和 async 方法。
+- `.tv` / `.tvim` file format: 当前源码写 v3；v2 可读为 identity calibration；v1 被拒绝。docs/api.md 仍描述旧的 `.tv` 9-byte header 和 `.tvim version = 1`，会误导自写 reader。
+- over_transfer

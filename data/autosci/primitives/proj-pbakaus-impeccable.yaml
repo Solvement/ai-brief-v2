@@ -1,0 +1,75 @@
+primitive_id: "proj-pbakaus-impeccable"
+source_project: "pbakaus/impeccable"
+source_url: "https://github.com/pbakaus/impeccable"
+title: "pbakaus/impeccable reusable architecture pattern"
+relevance_level: "project_pattern"
+audience: "ai_only"
+core_pattern: >
+
+  单 skill 多子命令路由: 用一个 `SKILL.src.md` 承载入口、setup、routing rules，再把具体动作放到
+  `reference/<command>.md`；命令列表由 `command-metadata.json` 维护。 provider transformer: 保留一个 canonical
+  skill source，构建时按 provider 写不同目录、frontmatter、placeholder 和 subagent 格式。 规则 registry + skill rule
+  markers: detector registry 用 `id/category/name/description/skillGuideline` 定义规则；skill 文本里有 `<!--
+  rule:... -->` 标记，把教学条款和机器扫描条款连起来。 live session journal: live mode 用
+  `live-status.mjs`、`live-resume.mjs`、`live-complete.mjs` 和 `.impeccable/live/sessions/` 处理中断恢复。
+problem_class: "reliable-agent-runtime-and-tool-orchestration"
+status: "extracted"
+extracted_at: "2026-06-08T14:51:26.619Z"
+components:
+  - "agent_orchestrator"
+  - "developer_control_surface"
+  - "model_or_retrieval_layer"
+  - "validation_harness"
+  - "skill"
+  - "provider-transformer"
+  - "registry-skill-rule-markers"
+  - "live-session-journal"
+autosci_modules:
+  - "pattern_library"
+  - "experiment_runner"
+  - "agent_runtime"
+  - "tool_governance"
+  - "trace_memory"
+inputs:
+  - "task_spec"
+  - "repo_or_runtime_context"
+  - "tool_or_model_interfaces"
+  - "budget_and_validation_policy"
+outputs:
+  - "working_artifact"
+  - "execution_trace"
+  - "reusable_architecture_notes"
+  - "failure_or_risk_report"
+implementation_idea: >
+
+  Rebuild the agent-infra pattern from pbakaus/impeccable as a small AutoSci module: extract the
+  control flow, define typed inputs/outputs, run it on one synthetic research task, and log traces
+  plus validation results. Reference flow: 人话：一个典型流程是：先安装 skill，再让 AI harness 加载
+  `/impeccable`，skill 首先跑上下文脚本，然后按子命令读取对应参考，必要时调用本地 detector。 具体例子一，安装路径：`npx impeccable skills
+  install` 进入 `cli/bin/cli.js` 的 `skills` 分支，再到 `cli/bin/commands/skills.mjs`。安装逻辑会找项目里已有 provider
+  目录，或者从全局 `~/.claude`、`~/.codex` 等推断；找不到时默认写 `.claude` 和 `.agents`。它从
+  `https://impeccable.style/api/download/bundle/universal` 下载 bundle，再把每个 provider 的 compiled
+  skill copy 到对应 `skills/` 目录。（来源：README
+  Installation；来源：cli/bin/cli.js；来源：cli/bin/commands/skills.mjs resolveIn
+small_experiment: >
+
+  Compare baseline free-form execution against the extracted agent-infra pattern from
+  pbakaus/impeccable on three AutoSci tasks. Measure completion rate, trace inspectability,
+  failure recovery, and cost over 1-3 days.
+design_principles:
+  - id: "agent-infra-boundary-as-module"
+    principle: "单 skill 多子命令路由: 用一个 `SKILL.src.md` 承载入口、setup、routing rules，再把具体动作放到 `reference/<command>.md`；命令列表由 `command-metadata.json` 维护。 provider transformer: 保留一个 canonical skill source，构建时按 provider 写不同目录、frontmatter、placeholder 和 subagent 格式。 规则 registry + skill rule markers: detector registry 用 `id/category/name/description/skillGuideline` 定义规则；skill 文本里有 `<!-- rule:... -->` 标记，把教学条款和机器扫描条款连起来。 live session journal: live mode 用 `live-status.mjs`、`live-resume.mjs`、`live-complete.mjs` 和 `.impeccable/live/sessions/` 处理中断恢复。"
+    transfers_to: "Extract the reusable agent-infra boundary from pbakaus/impeccable into a typed AutoSci module."
+  - id: "agent-infra-observable-flow"
+    principle: "人话：一个典型流程是：先安装 skill，再让 AI harness 加载 `/impeccable`，skill 首先跑上下文脚本，然后按子命令读取对应参考，必要时调用本地 detector。 具体例子一，安装路径：`npx impeccable skills install` 进入 `cli/bin/cli.js` 的 `skills` 分支，再到 `cli/bin/commands/skills.mjs`。安装逻辑会找项目里已有 provider 目录，或者从全局 `~/.claude`、`~/.codex` 等推断；找不到时默认写 `.claude` 和 `.agents`。它从 `https://impeccable.style/api/download/bundle/universal` 下载 bundle，再把每个 provider 的 compiled skill copy 到对应 `skills/` 目录。（来源：README Installation；来源：cli/bin/cli.js；来源：cli/bin/commands/skills.mjs resolveInstallTargets/downloadAndExtractBundle/copyProviderSkills） 具体例子二，agent 执行 `/impeccable audit checkout`：`skill/SKILL.src.md` 要求先运行 `node {{scripts_path}}/context.mjs`；如果有子命令，就必须读 `reference/audit.md`；还必须读 brand/product register。`reference/audit.md` 把 audit 定义成 5 维检查：Accessibility、Performance、Theming、Responsive Design、Anti-Patterns，总分 20 分，并要求 P0-P3 分级。（来源：skill/SKILL.src.md Setup；来源：skill/reference/audit.md Diagnostic Scan） 具体例子三，detector 的真实输出：本次在 checkout 中运行 `node cli/bin/cli.js detect --json tests/fixtures/antipatterns/typography-should-flag.html`，返回 4 个 findings：`overused-font` line 10 snippet `font-family: 'Inter`，`overused-font` line 7 snippet `Google Fonts: Inter`，`single-font` line 7 snippet `only font used is inter`，`flat-type-hierarchy` line 14 snippet `Sizes: 13px, 14px, 15px, 16px, 18px (ratio 1.4:1)`。CLI 对有 findings 的扫描按设计返回非零退出码。（来源：cli/engine/cli/main.mjs formatFindings/detectCli；来源：tests/fixtures/antipatterns/typography-should-flag.html；来源：本次本地运行输出） 术语：static HTML analysis 是解析 HTML/CSS 后做规则检查；regex fallback 是对 CSS/JSX/TSX 等源码文本做模式匹配；provider-gated rule 是默认不报，只有加 `--gpt` 或 `--gemini` 才启用的规则。"
+    transfers_to: "Use the flow as an inspectable experiment harness with logs, checkpoints, and failure reports."
+  - id: "agent-infra-risk-first-transfer"
+    principle: "Transfer the architecture together with its main failure boundary: Node.js >=24: 用户环境低于 Node 24 时 CLI 不满足 `engines` 要求。."
+    transfers_to: "Require an explicit dependency and over-transfer risk review before promoting the pattern into AutoSci."
+risks:
+  - "Node.js >=24: 用户环境低于 Node 24 时 CLI 不满足 `engines` 要求。"
+  - "impeccable.style bundle/version API: `skills install/update/check` 下载或查询失败，复制安装路径受影响。"
+  - "AI harness skill directory/spec: Claude/Cursor/Codex/Gemini 等改变 skill frontmatter、目录或 agent discovery，生成产物可能失效。"
+  - "Puppeteer optional dependency: 扫描 URL 时需要浏览器渲染路径，缺少 Puppeteer 会限制 URL scan。"
+  - "README/docs 与源码同步: 用户按 README 中 7 reference links、24/27 detection counts 或 `--fast` 语义操作，会遇到过期信息。"
+  - "over_transfer"

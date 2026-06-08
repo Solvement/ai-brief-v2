@@ -19,4 +19,4 @@ last_checked: "2026-06-03"
 
 一个用 Rust 编写的终端代理多路复用器，提供工作区、窗格、持久会话和代理状态感知。项目结构完整，有源代码、测试、文档和变更日志。许可证在 README 中说明为 AGPL-3.0 或商业许可，但 GitHub 未检测到标准许可证文件。建议查阅官方文档以获取完整集成说明。
 
-出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。
+出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。

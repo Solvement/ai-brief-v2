@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -408,6 +409,7 @@ function enrichFromDb(db, candidate) {
   const deepRow = latestTier(analyses, "deep");
   const briefWikiRow = latestTier(analyses, "brief-wiki");
   const briefWiki = briefWikiRow?.payload || null;
+  const authoredTierTemplate = tierTemplateFromBriefWikiPayload(briefWiki);
   const reviewDecision = briefWikiRow && isAtLeastAsNew(briefWikiRow, lightRow) ? briefWiki?.depth_decision || null : null;
   const mergedLight = reviewDecision
     ? {
@@ -419,8 +421,12 @@ function enrichFromDb(db, candidate) {
         final_depth: reviewDecision.final_depth || briefWiki.final_depth || light?.final_depth,
         review_verdict: reviewDecision.review_verdict || briefWiki.review?.verdict || light?.review_verdict,
         review_issues: reviewDecision.review_issues || briefWiki.review?.issues || light?.review_issues || [],
+        tier_template: mergeAuthoredTierTemplate(light?.tier_template, authoredTierTemplate),
       }
     : light;
+  if (!reviewDecision && authoredTierTemplate && mergedLight) {
+    mergedLight.tier_template = mergeAuthoredTierTemplate(mergedLight.tier_template, authoredTierTemplate);
+  }
   const qa = deepRow ? db.getQaVerdict(deepRow.id) : null;
   const deep = deepRow && (!qa || qa.verdict !== "fail") ? publicDeep(deepRow.payload) : null;
   return {
@@ -432,6 +438,92 @@ function enrichFromDb(db, candidate) {
     briefSlug: briefWiki?.slug || candidate.raw?.briefSlug || null,
     briefWiki,
   };
+}
+
+function tierTemplateFromBriefWikiPayload(briefWiki = {}) {
+  if (!briefWiki || typeof briefWiki !== "object") return null;
+  const direct = briefWiki.tier_template;
+  if (direct && typeof direct === "object") return direct;
+
+  const rawPayloadPath = briefWiki.rawPayload && path.resolve(ROOT, briefWiki.rawPayload);
+  if (!rawPayloadPath) return null;
+  try {
+    const raw = JSON.parse(readFileSync(rawPayloadPath, "utf8"));
+    return normalizeAuthoredTierTemplate(raw.tier_template || raw.tierTemplate || raw.light_spine || raw.lightSpine);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeAuthoredTierTemplate(template = {}) {
+  if (!template || typeof template !== "object") return null;
+  const comparison = sectionText(template.comparison);
+  const howItWorks = cleanTemplateText(
+    template.how_it_works_with_analogy
+    || template.howItWorksWithAnalogy
+    || sectionText(template.how_it_works)
+  );
+  const reusable = reusableTemplateText(template.reusable_abstractions);
+  const practitioner = cleanTemplateText(
+    template.practitioner_meaning
+    || template.practitionerMeaning
+    || sectionText(template.judgment)
+  );
+  const painPoint = cleanTemplateText(
+    template.pain_point
+    || template.painPoint
+    || sectionText(template.why_worth_attention)
+  );
+  return {
+    ...template,
+    comparison: cleanTemplateText(comparison),
+    how_it_works_with_analogy: howItWorks,
+    essential_design_difference: cleanTemplateText(
+      template.essential_design_difference
+      || template.essentialDesignDifference
+      || reusable
+    ),
+    practitioner_meaning: practitioner,
+    pain_point: painPoint,
+  };
+}
+
+function mergeAuthoredTierTemplate(base = {}, authored = null) {
+  if (!authored) return base || null;
+  const merged = { ...(base || {}) };
+  for (const field of [
+    "comparison",
+    "how_it_works_with_analogy",
+    "essential_design_difference",
+    "practitioner_meaning",
+    "pain_point",
+  ]) {
+    if (isAuthoredText(authored[field])) merged[field] = authored[field];
+  }
+  return Object.keys(merged).length ? merged : null;
+}
+
+function sectionText(value) {
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object") return "";
+  return cleanTemplateText(value.body_md || value.summary || "");
+}
+
+function reusableTemplateText(section = {}) {
+  const body = sectionText(section);
+  const items = asArray(section?.items).map((item) => {
+    if (typeof item === "string") return cleanTemplateText(item);
+    const name = cleanTemplateText(item?.name || "");
+    const copy = cleanTemplateText(item?.copy || "");
+    const skip = cleanTemplateText(item?.skip || "");
+    const why = cleanTemplateText(item?.why_it_matters || item?.whyItMatters || "");
+    return [name, copy, skip, why].filter(Boolean).join("；");
+  }).filter(Boolean);
+  return [body, ...items.map((item) => `- ${item}`)].filter(Boolean).join("\n");
+}
+
+function cleanTemplateText(value) {
+  return String(value || "").trim();
 }
 
 function latestTier(analyses, tier) {
@@ -470,13 +562,57 @@ export function makeBoard(window, items, options = {}) {
   };
 }
 
-function makeRadar(items, options = {}) {
+// ───────────────────────────────────────────────────────────────────────────
+// "deep 累积 / light 滚动" — paradigm contract, made durable here (2026-06-08).
+//
+// ROOT CAUSE this fixes: makeRadar used to take `sortedItems.slice(0, limit)`,
+// i.e. it re-selected radar members from CURRENT trending on every rebuild and
+// capped at `limit` (30). A repo that was deep-dived weeks ago but is no longer
+// trending fell out of the top-30 and got EVICTED — so its real deep-dive page
+// (brief-wiki content + authored tier_template) was orphaned and the card went
+// 数据不足. The paradigm says deep ACCUMULATES; the code rolled it.
+//
+// THE FIX: a completed deep-dive is force-PINNED into the radar and never
+// evicted by fresh trending. We derive the pinned set PROGRAMMATICALLY from the
+// data already on each enriched item — any item whose merged
+// `light.tier_template` carries authored (non-"数据不足") narrative body is a
+// completed deep-dive (same signal `computeDeepStatus` uses for deep_status).
+// No manual list to maintain; the manual `options.radarRequiredRepos` still
+// augments it (union) for explicit overrides. Pinned-deep is UNCAPPED — it
+// accumulates beyond `limit`; current trending light fills the REMAINING slots
+// up to `limit`. So the radar = (all accumulated deep) + (top trending light).
+//
+// Deterministic + idempotent: derived purely from each item's fields, so a
+// rebuild on unchanged input yields the same radar, and a rebuild with fresh
+// trending keeps every accumulated deep project in place.
+// ───────────────────────────────────────────────────────────────────────────
+export function makeRadar(items, options = {}) {
   const generatedAt = nowIso(options);
   const limit = numberOption(options.radarLimit, 30);
-  const repos = [...items]
-    .sort((left, right) => Number(right.light?.ranking_score ?? right.light?.worthDeepDive ?? right.eval?.score ?? 0) - Number(left.light?.ranking_score ?? left.light?.worthDeepDive ?? left.eval?.score ?? 0))
-    .slice(0, limit)
-    .map((item, index) => repoForBoard(item, "radar", index + 1, options));
+  const rankScore = (item) => Number(item.light?.ranking_score ?? item.light?.worthDeepDive ?? item.eval?.score ?? 0);
+  const sortedItems = [...items].sort((left, right) => rankScore(right) - rankScore(left));
+
+  // Manual force-include list (explicit override), unioned with the auto set.
+  const manualRequired = new Set(asArray(options.radarRequiredRepos).map(normalizeRepoFullName).filter(Boolean));
+  const repoKey = (item) => normalizeRepoFullName(item.repo?.fullName || item.repo?.url);
+
+  // A pinned item is either an explicitly-required repo OR a completed deep-dive
+  // (authored tier_template body). These are kept regardless of trending rank.
+  const isPinned = (item) => manualRequired.has(repoKey(item)) || isCompletedDeepDive(item);
+
+  const pinned = sortedItems.filter(isPinned);
+  const pinnedKeys = new Set(pinned.map(repoKey));
+
+  // Remaining radar slots (up to `limit`) go to the top current-trending light
+  // items that are not already pinned. If pinned alone exceeds `limit`, deep
+  // accumulation wins and the radar grows past `limit` — deep is never dropped.
+  const fillSlots = Math.max(0, limit - pinned.length);
+  const fill = sortedItems
+    .filter((item) => !pinnedKeys.has(repoKey(item)))
+    .slice(0, fillSlots);
+
+  const selectedItems = [...pinned, ...fill].sort((left, right) => rankScore(right) - rankScore(left));
+  const repos = selectedItems.map((item, index) => repoForBoard(item, "radar", index + 1, options));
 
   return {
     window: "radar",
@@ -485,6 +621,24 @@ function makeRadar(items, options = {}) {
     repos,
     depthCounts: depthCounts(repos),
   };
+}
+
+/**
+ * True iff this enriched item already carries a COMPLETED deep-dive — i.e. its
+ * merged light.tier_template has authored (non-sentinel) narrative body. This is
+ * the same authored-body test `computeDeepStatus` uses to mark `deep_status:
+ * "available"`, so the "pin it" set is exactly the set the frontend would render
+ * as a real deep page. Repos with only the deterministic stub (every field
+ * "数据不足") are NOT pinned — they roll with trending like any light card.
+ */
+function isCompletedDeepDive(item) {
+  const tpl = item?.light?.tier_template;
+  if (tierTemplateHasAuthoredBody(tpl)) return true;
+  // Some authored deep-dives expose their tier_template via the brief-wiki
+  // payload's rawPayload rather than the merged light row (older rows where
+  // enrichFromDb could not merge). Honor those too so accumulation is complete.
+  const authored = tierTemplateFromBriefWikiPayload(item?.briefWiki);
+  return tierTemplateHasAuthoredBody(authored);
 }
 
 function sortForWindow(left, right, window) {
@@ -770,6 +924,16 @@ function modelForProjectTier(tier) {
 function numberOption(value, fallback) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
+}
+
+function normalizeRepoFullName(value) {
+  const raw = String(value || "")
+    .trim()
+    .replace(/^github\.com\//i, "")
+    .replace(/^https?:\/\/github\.com\//i, "")
+    .replace(/^git@github\.com:/i, "");
+  const match = raw.match(/^([^/\s?#]+)\/([^/\s?#]+?)(?:\.git)?(?:[/?#].*)?$/);
+  return match ? `${match[1]}/${match[2]}`.toLowerCase() : "";
 }
 
 function nowIso(options = {}) {

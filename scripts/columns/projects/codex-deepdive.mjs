@@ -313,6 +313,7 @@ function normalizeCodexPayload(input = {}, { repo, invocation, responsePath, pro
   }
   return {
     ...input,
+    tier_template: normalizeAuthorTierTemplate(input.tier_template || input.tierTemplate),
     schema_version: input.schema_version || TIER_TEMPLATE_SCHEMA_VERSION,
     project_type: input.project_type || input.projectType,
     authoring: {
@@ -327,6 +328,64 @@ function normalizeCodexPayload(input = {}, { repo, invocation, responsePath, pro
       repo: repo.fullName || repo.url || "",
     },
   };
+}
+
+function normalizeAuthorTierTemplate(template = {}) {
+  if (!template || typeof template !== "object") return template;
+  const comparison = sectionText(template.comparison);
+  const reusable = reusableTemplateText(template.reusable_abstractions);
+  return {
+    ...template,
+    comparison: comparison || cleanTemplateText(template.comparison),
+    how_it_works_with_analogy: cleanTemplateText(
+      template.how_it_works_with_analogy
+      || template.howItWorksWithAnalogy
+      || sectionText(template.how_it_works)
+    ),
+    essential_design_difference: cleanTemplateText(
+      template.essential_design_difference
+      || template.essentialDesignDifference
+      || reusable
+    ),
+    practitioner_meaning: cleanTemplateText(
+      template.practitioner_meaning
+      || template.practitionerMeaning
+      || sectionText(template.judgment)
+    ),
+    pain_point: cleanTemplateText(
+      template.pain_point
+      || template.painPoint
+      || sectionText(template.why_worth_attention)
+    ),
+  };
+}
+
+function sectionText(value) {
+  if (typeof value === "string") return value.trim();
+  if (!value || typeof value !== "object") return "";
+  return cleanTemplateText(value.body_md || value.summary || "");
+}
+
+function reusableTemplateText(section = {}) {
+  const body = sectionText(section);
+  const items = asArray(section?.items).map((item) => {
+    if (typeof item === "string") return cleanTemplateText(item);
+    const name = cleanTemplateText(item?.name || "");
+    const copy = cleanTemplateText(item?.copy || "");
+    const skip = cleanTemplateText(item?.skip || "");
+    const why = cleanTemplateText(item?.why_it_matters || item?.whyItMatters || "");
+    return [name, copy, skip, why].filter(Boolean).join("；");
+  }).filter(Boolean);
+  return [body, ...items.map((item) => `- ${item}`)].filter(Boolean).join("\n");
+}
+
+function cleanTemplateText(value) {
+  return String(value || "").trim();
+}
+
+function asArray(value) {
+  if (value == null) return [];
+  return Array.isArray(value) ? value : [value];
 }
 
 async function runCodexExec({ prompt, outputPath, schemaPath, itemLogDir, options = {} }) {

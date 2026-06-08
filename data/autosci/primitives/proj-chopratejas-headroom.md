@@ -1,0 +1,27 @@
+<!-- AI-ONLY AutoSci primitive. Generated from a deep-analyzed GitHub project; not for the public project card. -->
+# AutoSci reuse - chopratejas/headroom
+
+## Core Pattern
+Compress-Cache-Retrieve marker: 把压缩输出写成可读 marker，例如文档中的 `[1000 items compressed to 20. Retrieve more: hash=abc123]`，同时把原文存到本地 store，用 MCP/工具调用按 hash 取回。 ContentRouter safety gates: 先判 role、长度、content type、近期窗口、analysis intent，再决定是否压缩；默认跳过 user/system/developer、近期代码、已有 retrieval marker 和小内容。 Proxy-first SDK: 让 TS SDK 只做格式转换和 HTTP 调用，把压缩算法集中在本地 Python/Rust proxy；默认 `HEADROOM_BASE_URL` / `http://localhost:8787`。 Agent failure learning marker block: `headroom learn` 把失败路径和成功修正写入 `CLAUDE.md` / `MEMORY.md`，并用 `<!-- headroom:learn:start -->` 到 `<!-- headroom:learn:end -->` 管理自动生成区。
+
+## Mapping
+- problem_class: reliable-agent-runtime-and-tool-orchestration
+- components: agent_orchestrator, tool_protocol_adapter, developer_control_surface, model_or_retrieval_layer, validation_harness, compress-cache-retrieve-marker, contentrouter-safety-gates, proxy-first-sdk
+- autosci_modules: pattern_library, experiment_runner, agent_runtime, tool_governance, trace_memory
+
+## Small Experiment
+Compare baseline free-form execution against the extracted agent-infra pattern from chopratejas/headroom on three AutoSci tasks. Measure completion rate, trace inspectability, failure recovery, and cost over 1-3 days.
+
+## Design Principles
+- agent-infra-boundary-as-module: Compress-Cache-Retrieve marker: 把压缩输出写成可读 marker，例如文档中的 `[1000 items compressed to 20. Retrieve more: hash=abc123]`，同时把原文存到本地 store，用 MCP/工具调用按 hash 取回。 ContentRouter safety gates: 先判 role、长度、content type、近期窗口、analysis intent，再决定是否压缩；默认跳过 user/system/developer、近期代码、已有 retrieval marker 和小内容。 Proxy-first SDK: 让 TS SDK 只做格式转换和 HTTP 调用，把压缩算法集中在本地 Python/Rust proxy；默认 `HEADROOM_BASE_URL` / `http://localhost:8787`。 Agent failure learning marker block: `headroom learn` 把失败路径和成功修正写入 `CLAUDE.md` / `MEMORY.md`，并用 `<!-- headroom:learn:start -->` 到 `<!-- headroom:learn:end -->` 管理自动生成区。
+- agent-infra-observable-flow: 人话：一个真实使用流可以从 quickstart 的 500 条搜索结果开始。Python 里构造 `messages`：system 是“You analyze search results.”，assistant 里有 `tool_calls`，tool 消息把 500 个 `{title, snippet, score}` 结果 JSON 化，最后用户问“What are the top 3 results?”，然后调用 `result = compress(messages, model="gpt-4o")`（来源：docs/content/docs/quickstart.mdx 2. Compress messages）。 术语流程：`compress()` 先处理 hooks，再从消息里抽取 user query 给变换器做 relevance scoring，然后调用 pipeline；返回 `tokens_before`、`tokens_after`、`tokens_saved`、`compression_ratio`、`transforms_applied`（来源：headroom/compress.py compress）。默认 pipeline 在源码注释中是 `CacheAligner -> ContentRouter`，其中 ContentRouter 会跳过 user/system/developer 消息、小内容、近期代码、analysis intent 下的代码和已有 `Retrieve more: hash=` marker 的内容（来源：headroom/compress.py _get_pipeline；headroom/transforms/content_router.py message loop）。 对那条 500 结果 tool 消息，ContentRouter 会把 cache miss 放入 `pending_tasks`，最多用 `HEADROOM_COMPRESS_WORKERS`，默认字符串 `"4"`，并行调用 `self.compress(...)`；如果返回的 `result.compression_ratio < min_ratio`，就把压缩文本写回该消息，并记录类似 `router:<strategy>:<ratio>` 的 transform marker（来源：headroom/transforms/content_router.py pending_tasks / merge results）。JSON 数组会走 SmartCrusher；Python 类实际是 Rust-backed，通过 `from headroom._core import SmartCrusher` 和 `SmartCrusherConfig`，配置包括 `min_items_to_analyze=5`、`min_tokens_to_crush=200`、`max_items_after_crush=15`、`first_fraction=0.3`、`last_fraction=0.15`（来源：headroom/transforms/smart_crusher.py SmartCrusherConfig / SmartCrusher）。 可逆部分：SmartCrusher 或其他 compressor 产生 marker 后，Python store 会保存原文；普通 store 的默认 TTL 是 300 秒，hash 默认 `sha256(original)[:24]`；MCP 的 `headroom_compress` 会把输入包装成 `[{"role":"tool","content":content}]` 调 `compress()`，再把原文存入本地 `CompressionStore(max_entries=500, default_ttl=MCP_SESSION_TTL)`，返回 `compressed`、`hash`、`original_tokens`、`compressed_tokens`、`tokens_saved`、`savings_percent`、`transforms`（来源：headroom/cache/compression_store.py CompressionStore.store；headroom/ccr/mcp_server.py _compress_content）。需要原文时，`headroom_retrieve` 先查本地 store；如果带 `query`，调用 `store.search(hash_key, query)`；否则 `store.retrieve(hash_key)`；失败后再 POST 到 proxy 的 `/v1/retrieve`（来源：headroom/ccr/mcp_server.py _retrieve_content / _retrieve_via_proxy）。
+- agent-infra-risk-first-transfer: Transfer the architecture together with its main failure boundary: Rust + maturin + PyO3 extension `headroom._core`: 没有预构建 wheel 或本机没有工具链时，安装会尝试从 sdist 编译 Rust 扩展；SmartCrusher 源码是 hard import `headroom._core`，没有 Python fallback。.
+
+## Risks
+- Rust + maturin + PyO3 extension `headroom._core`: 没有预构建 wheel 或本机没有工具链时，安装会尝试从 sdist 编译 Rust 扩展；SmartCrusher 源码是 hard import `headroom._core`，没有 Python fallback。
+- Windows / Intel macOS wheel availability: docs 明确说当前 release wheels 覆盖 Python 3.10-3.13 的 Linux manylinux_2_28 x86_64/aarch64 和 macOS Apple Silicon；Windows 和 Intel macOS 会 fallback build。
+- Local proxy runtime: FastAPI, uvicorn, httpx, provider SDKs: 如果 proxy 未启动，TS SDK 和 base-url routing 会失败或无法压缩；proxy 模式还要管理端口、upstream URL、telemetry、stateful 文件。
+- MCP stdio registration and agent config files: MCP 工具不可见、proxy URL 配错或 hash 过期时，模型无法取回被压缩内容；docs 明确 `/mcp` HTTP endpoint 不是默认假设。
+- Optional ML/vector/image dependencies: `[ml]` 引入 torch/transformers/huggingface-hub；`[memory]` 引入 hnswlib/sqlite-vec/sentence-transformers；`[image]` 引入 OCR/ONNX/Pillow，安装体积和平台兼容性会上升。
+- 外部 CLI 二进制 RTK、lean-ctx、difft、scc: 下载失败、TLS 问题、平台不支持或离线环境会影响 wrap/context-tool 或辅助工具；`headroom/binaries.py` 支持 `HEADROOM_BINARIES_OFFLINE` 直接禁止网络获取。
+- over_transfer

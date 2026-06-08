@@ -24,7 +24,7 @@ open_questions:
 
 ## Explanation
 
-将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。
+将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。
 
 ## Supported by
 - [[claims/herdr-main-claim]]

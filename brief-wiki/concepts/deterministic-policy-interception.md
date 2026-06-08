@@ -24,7 +24,7 @@ open_questions:
 
 ## Explanation
 
-在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。
+在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。
 
 ## Supported by
 - [[claims/agent-governance-toolkit-main-claim]]

@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-06-07T21:47:40.940Z",
+  "generatedAt": "2026-06-08T12:06:51.552Z",
   "note": "L0 knowledge-graph DAG. forward_lineage = verified 'edge effect' only.",
   "stats": {
-    "nodes": 62,
-    "edges": 55,
+    "nodes": 74,
+    "edges": 65,
     "nodeByType": {
-      "paper": 31,
-      "principle": 31
+      "paper": 33,
+      "principle": 41
     },
     "edgeByType": {
-      "exhibits_principle": 31,
+      "exhibits_principle": 41,
       "shares_tag": 3,
       "forward_lineage": 21
     },
@@ -481,6 +481,49 @@
       "primitive_relevance": "direct"
     },
     {
+      "id": "paper:2605.31584",
+      "type": "paper",
+      "arxiv_id": "2605.31584",
+      "slug": "2605.31584-longtracerl-rubric-rewards",
+      "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+      "date": "2026-05-29",
+      "authors": [
+        "Nianyi Lin",
+        "Jiajie Zhang",
+        "Lei Hou",
+        "Juanzi Li"
+      ],
+      "tags": [
+        "long-context-reasoning",
+        "rlvr",
+        "rubric-reward",
+        "process-supervision",
+        "search-agent-trajectory",
+        "tiered-distractors",
+        "reward-hacking",
+        "knowledge-graph-data",
+        "self-improving-agent"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 7,
+        "breadth_value": 7,
+        "evidence_quality": 5
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "trajectory-distractors-entity-rubric-positive-only",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
+    },
+    {
       "id": "paper:2606.00408",
       "type": "paper",
       "arxiv_id": "2606.00408",
@@ -671,6 +714,51 @@
       "primitive": "unified-omnimodal-backbone-mode-by-arrangement",
       "external": false,
       "primitive_relevance": "indirect"
+    },
+    {
+      "id": "paper:2606.03458",
+      "type": "paper",
+      "arxiv_id": "2606.03458",
+      "slug": "2606.03458-kvarn-kv-cache-quantization",
+      "title": "KVarN: Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
+      "date": "2026-06-02",
+      "authors": [
+        "Lorenz K. Muller",
+        "Philippe Bich",
+        "Chiara Boretti",
+        "Hyun-Min Chang",
+        "Jiawei Zhuang",
+        "Lukas Cavigelli"
+      ],
+      "tags": [
+        "kv-cache-quantization",
+        "test-time-scaling",
+        "autoregressive-decoding",
+        "error-accumulation",
+        "hadamard-rotation",
+        "variance-normalization",
+        "inference-efficiency",
+        "calibration-free",
+        "long-context"
+      ],
+      "topic": "inference",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 7,
+        "buildability": 8,
+        "evaluation_value": 8,
+        "breadth_value": 7,
+        "evidence_quality": 7
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "load-aligned-eval-outlier-first-quant",
+      "external": false,
+      "primitive_relevance": "direct_pattern_medium"
     },
     {
       "id": "paper:2606.05259",
@@ -910,6 +998,51 @@
       ]
     },
     {
+      "id": "principle:harvest-training-signal-from-agent-behavior",
+      "type": "principle",
+      "key": "harvest-training-signal-from-agent-behavior",
+      "principle": "高质量负样本/训练信号不必另造,可从 agent 自身真实行为里榨——『读了却没引用』就是最像、最难的干扰。",
+      "papers": [
+        "2605.31584"
+      ]
+    },
+    {
+      "id": "principle:process-reward-must-have-anti-hack-gate",
+      "type": "principle",
+      "key": "process-reward-must-have-anti-hack-gate",
+      "principle": "细粒度过程奖励(实体召回)单用会被钻空子(堆实体名刷分);必须配 positive-only——只奖『答对且过程扎实』,答错归零。",
+      "papers": [
+        "2605.31584"
+      ]
+    },
+    {
+      "id": "principle:data-difficulty-is-a-measurable-design-variable",
+      "type": "principle",
+      "key": "data-difficulty-is-a-measurable-design-variable",
+      "principle": "数据『难不难』可量化(干扰含黄金实体比例),且该难度与下游效果严格同序——难度是可设计、可迭代的变量,不是玄学。",
+      "papers": [
+        "2605.31584"
+      ]
+    },
+    {
+      "id": "principle:finer-signal-has-an-optimal-weight",
+      "type": "principle",
+      "key": "finer-signal-has-an-optimal-weight",
+      "principle": "更细的辅助信号不是越重越好——过程分权重 α 太大反伤(把模型推向捷径);任何辅助奖励都要扫配比、做消融。",
+      "papers": [
+        "2605.31584"
+      ]
+    },
+    {
+      "id": "principle:report-gains-by-regime-not-cherry-picked",
+      "type": "principle",
+      "key": "report-gains-by-regime-not-cherry-picked",
+      "principle": "同方法在 4B 上 +5.7、8B 上仅 +1.1——收益对规模/骨干敏感;诚实地分 regime 报,别只挑最好那个数。",
+      "papers": [
+        "2605.31584"
+      ]
+    },
+    {
       "id": "principle:cm-is-regime-dependent",
       "type": "principle",
       "key": "cm-is-regime-dependent",
@@ -997,6 +1130,51 @@
       "principle": "把'判错'拆成 记录→查证→追责 三段,而非黑箱打分,才能解释'为什么判它错'。",
       "papers": [
         "2606.02060"
+      ]
+    },
+    {
+      "id": "principle:eval-setting-must-match-real-workload",
+      "type": "principle",
+      "key": "eval-setting-must-match-real-workload",
+      "principle": "一个方法的 SOTA 只在它被评测的设定里成立;KV-Cache 量化在 prefill(静态)好看 ≠ 在 decode(累积)好用。评测前先问『这负载和线上一样吗』。",
+      "papers": [
+        "2606.03458"
+      ]
+    },
+    {
+      "id": "principle:optimize-outliers-not-average",
+      "type": "principle",
+      "key": "optimize-outliers-not-average",
+      "principle": "top 5% 离群误差只占少数 MSE 却主导端到端质量(KL);MSE 最优 ≠ 端到端最优。先治少数坏得离谱的点,比均匀降平均更划算。",
+      "papers": [
+        "2606.03458"
+      ]
+    },
+    {
+      "id": "principle:errors-accumulate-in-compressed-memory",
+      "type": "principle",
+      "key": "errors-accumulate-in-compressed-memory",
+      "principle": "有损压缩的记忆(量化缓存)误差会跨步累积、越滚越歪;序列越长越严重。便宜的省成本手段藏着随长度放大的隐性代价。",
+      "papers": [
+        "2606.03458"
+      ]
+    },
+    {
+      "id": "principle:calibration-free-online-beats-offline-tuned",
+      "type": "principle",
+      "key": "calibration-free-online-beats-offline-tuned",
+      "principle": "能在线从数据自身算参数(免校准)的方法,换模型/换领域不用重跑校准,部署成本与脆性都更低。",
+      "papers": [
+        "2606.03458"
+      ]
+    },
+    {
+      "id": "principle:diagnose-then-compose-over-invent",
+      "type": "principle",
+      "key": "diagnose-then-compose-over-invent",
+      "principle": "正确诊断病因(误差几何拆分→幅度是罪魁)+ 巧妙组合已有零件(Hadamard+方差归一化),常比发明新算子更快见效、更可靠。",
+      "papers": [
+        "2606.03458"
       ]
     },
     {
@@ -1235,6 +1413,31 @@
       "type": "exhibits_principle"
     },
     {
+      "source": "paper:2605.31584",
+      "target": "principle:harvest-training-signal-from-agent-behavior",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2605.31584",
+      "target": "principle:process-reward-must-have-anti-hack-gate",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2605.31584",
+      "target": "principle:data-difficulty-is-a-measurable-design-variable",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2605.31584",
+      "target": "principle:finer-signal-has-an-optimal-weight",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2605.31584",
+      "target": "principle:report-gains-by-regime-not-cherry-picked",
+      "type": "exhibits_principle"
+    },
+    {
       "source": "paper:2606.00408",
       "target": "principle:cm-is-regime-dependent",
       "type": "exhibits_principle"
@@ -1282,6 +1485,31 @@
     {
       "source": "paper:2606.02060",
       "target": "principle:explainable-three-stage-audit",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.03458",
+      "target": "principle:eval-setting-must-match-real-workload",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.03458",
+      "target": "principle:optimize-outliers-not-average",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.03458",
+      "target": "principle:errors-accumulate-in-compressed-memory",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.03458",
+      "target": "principle:calibration-free-online-beats-offline-tuned",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.03458",
+      "target": "principle:diagnose-then-compose-over-invent",
       "type": "exhibits_principle"
     },
     {

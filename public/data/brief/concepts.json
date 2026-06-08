@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-07T14:12:42.383Z",
+  "generatedAt": "2026-06-08T16:42:33.594Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 92,
+  "count": 94,
   "items": [
     {
       "id": "concept/adaptive-element-relocation",
@@ -96,12 +96,12 @@
           "自定义代理如何注册自己的输出模式？"
         ]
       },
-      "body": "\n## Explanation\n\n不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。\n\n## Supported by\n- [[claims/herdr-main-claim]]\n",
-      "excerpt": "不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。",
+      "body": "\n## Explanation\n\n不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。\n\n## Supported by\n- [[claims/herdr-main-claim]]\n",
+      "excerpt": "不依赖 API，通过监控进程名和终端输出来推断 AI 代理的状态（阻塞、工作中、完成），实现轻量级且零配置的集成。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。",
       "links": [
         {
-          "target": "content/herdr",
-          "raw": "[[content/herdr]]"
+          "target": "content/ogulcancelik-herdr",
+          "raw": "[[content/ogulcancelik-herdr]]"
         },
         {
           "target": "claims/herdr-main-claim",
@@ -176,63 +176,6 @@
       ]
     },
     {
-      "id": "concept/agent-skills",
-      "type": "concept",
-      "slug": "agent-skills",
-      "title": "Agent Skills",
-      "file": "concepts/agent-skills.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "代理技能",
-        "slug": "agent-skills",
-        "kind": "concept",
-        "tags": [
-          "agent",
-          "skills",
-          "learning"
-        ],
-        "maturity": "active",
-        "first_seen_in": "hermes-agent",
-        "related_content": [
-          "hermes-agent"
-        ],
-        "related_concepts": [],
-        "explanation": "代理可从对话中自动创建可复用的技能，技能在使用中自我改进，并以文件形式持久化。",
-        "examples": [
-          "用户通过复杂命令序列，agent 自动生成一个 skill 文件，此后可用 `/<skill-name>` 调用。"
-        ],
-        "common_misunderstandings": [
-          "并非所有任务都会生成技能，触发条件未公开。"
-        ],
-        "open_questions": [
-          "技能如何避免冲突和保证安全性？",
-          "技能自我改进的准确率如何？"
-        ]
-      },
-      "body": "\n## Explanation\n\n代理可从对话中自动创建可复用的技能，技能在使用中自我改进，并以文件形式持久化。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。\n\n## Supported by\n- [[claims/hermes-agent-main-claim]]\n",
-      "excerpt": "代理可从对话中自动创建可复用的技能，技能在使用中自我改进，并以文件形式持久化。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。",
-      "links": [
-        {
-          "target": "content/hermes-agent",
-          "raw": "[[content/hermes-agent]]"
-        },
-        {
-          "target": "claims/hermes-agent-main-claim",
-          "raw": "[[claims/hermes-agent-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
       "id": "concept/agent-skills-catalog",
       "type": "concept",
       "slug": "agent-skills-catalog",
@@ -276,6 +219,64 @@
         {
           "target": "claims/ecc-main-claim",
           "raw": "[[claims/ecc-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/agent-source-boundary",
+      "type": "concept",
+      "slug": "agent-source-boundary",
+      "title": "Agent Source Boundary",
+      "file": "concepts/agent-source-boundary.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Agent 源码边界",
+        "slug": "agent-source-boundary",
+        "kind": "concept",
+        "tags": [
+          "architecture",
+          "compatibility",
+          "risk"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "nesquena-hermes-webui",
+        "related_content": [
+          "nesquena-hermes-webui"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：WebUI 现在还要读/导入 Hermes Agent 的内部 Python 源码，不只是调用稳定 API。技术定义：`api/streaming.py` 依赖 `run_agent.AIAgent`，profile/model/goal/command/session bridge 依赖 `hermes_cli.*` 或 Agent state schema。",
+        "examples": [
+          "`docs/rfcs/agent-source-boundary.md` 把 Browser chat execution 列为 `run_agent.AIAgent` dependency",
+          "two-container compose 把 `hermes-agent-src` 只读挂到 WebUI"
+        ],
+        "common_misunderstandings": [
+          "多容器不等于 API 解耦；文档明确说 source mount 是 compatibility bridge。",
+          "只读挂载降低写风险，但不消除版本耦合。"
+        ],
+        "open_questions": [
+          "Hermes Agent 何时提供稳定的 run/profile/provider/session API？"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：WebUI 现在还要读/导入 Hermes Agent 的内部 Python 源码，不只是调用稳定 API。技术定义：`api/streaming.py` 依赖 `run_agent.AIAgent`，profile/model/goal/command/session bridge 依赖 `hermes_cli.*` 或 Agent state schema。 出处:https://github.com/nesquena/hermes-webui。See [[content/nesquena-hermes-webui]]。\n\n## Supported by\n- [[claims/nesquena-hermes-webui-main-claim]]\n",
+      "excerpt": "人话：WebUI 现在还要读/导入 Hermes Agent 的内部 Python 源码，不只是调用稳定 API。技术定义：`api/streaming.py` 依赖 `run_agent.AIAgent`，profile/model/goal/command/session bridge 依赖 `hermes_cli.*` 或 Agent state schema。 出处:https://github.com/nesquena/hermes-webui。See [[content/nesquena-hermes-webui]]。",
+      "links": [
+        {
+          "target": "content/nesquena-hermes-webui",
+          "raw": "[[content/nesquena-hermes-webui]]"
+        },
+        {
+          "target": "claims/nesquena-hermes-webui-main-claim",
+          "raw": "[[claims/nesquena-hermes-webui-main-claim]]"
         }
       ],
       "headings": [
@@ -441,65 +442,6 @@
       ]
     },
     {
-      "id": "concept/ai-agent-content-monetization",
-      "type": "concept",
-      "slug": "ai-agent-content-monetization",
-      "title": "Ai Agent Content Monetization",
-      "file": "concepts/ai-agent-content-monetization.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "AI Agent 内容变现",
-        "slug": "ai-agent-content-monetization",
-        "kind": "concept",
-        "tags": [
-          "agent",
-          "monetization",
-          "social-media"
-        ],
-        "maturity": "active",
-        "first_seen_in": "aitoearn",
-        "related_content": [
-          "aitoearn"
-        ],
-        "related_concepts": [],
-        "explanation": "通过多个 AI Agent 协同工作，覆盖内容创作、跨平台分发、自动化互动和效果结算的全链路，使个体创作者像运营公司一样高效。",
-        "examples": [
-          "AiToEarn 的 Publish Agent 自动将视频推送到抖音、YouTube 等平台",
-          "Engage Agent 自动回复评论并抓取高转化信号"
-        ],
-        "common_misunderstandings": [
-          "不等于简单的内容自动发布工具，它包含交易市场和效果结算",
-          "Agent 不是完全自主，仍需用户设定任务和提供初始素材"
-        ],
-        "open_questions": [
-          "如何确保 AI 生成内容的质量不损害创作者品牌？",
-          "交易市场的供需匹配算法如何避免刷量作弊？"
-        ]
-      },
-      "body": "\n## Explanation\n\n通过多个 AI Agent 协同工作，覆盖内容创作、跨平台分发、自动化互动和效果结算的全链路，使个体创作者像运营公司一样高效。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。\n\n## Supported by\n- [[claims/aitoearn-main-claim]]\n",
-      "excerpt": "通过多个 AI Agent 协同工作，覆盖内容创作、跨平台分发、自动化互动和效果结算的全链路，使个体创作者像运营公司一样高效。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。",
-      "links": [
-        {
-          "target": "content/aitoearn",
-          "raw": "[[content/aitoearn]]"
-        },
-        {
-          "target": "claims/aitoearn-main-claim",
-          "raw": "[[claims/aitoearn-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
       "id": "concept/automodel-pipeline",
       "type": "concept",
       "slug": "automodel-pipeline",
@@ -556,50 +498,49 @@
       ]
     },
     {
-      "id": "concept/cachealigner",
+      "id": "concept/capabilities-gated-streaming-transport",
       "type": "concept",
-      "slug": "cachealigner",
-      "title": "Cachealigner",
-      "file": "concepts/cachealigner.md",
+      "slug": "capabilities-gated-streaming-transport",
+      "title": "Capabilities Gated Streaming Transport",
+      "file": "concepts/capabilities-gated-streaming-transport.md",
       "directory": "concepts",
       "meta": {
-        "name": "CacheAligner",
-        "slug": "cachealigner",
+        "name": "能力探测式流式传输",
+        "slug": "capabilities-gated-streaming-transport",
         "kind": "concept",
         "tags": [
-          "caching",
-          "optimization",
-          "prompt-engineering"
+          "sse",
+          "api-compatibility",
+          "streaming"
         ],
         "maturity": "active",
-        "first_seen_in": "headroom",
+        "first_seen_in": "fathah-hermes-desktop",
         "related_content": [
-          "headroom"
+          "fathah-hermes-desktop"
         ],
         "related_concepts": [],
-        "explanation": "一种前缀稳定化技术，确保经过压缩的提示在传递给 LLM 时，其前缀与提供商的 KV 缓存布局对齐，从而提高缓存命中率，降低首 token 延迟。",
+        "explanation": "人话：先问后端支持什么，再决定走新接口还是旧接口。术语：`supportsHermesRunsTransport` 要求 features 和 endpoint path 同时匹配，才走 `/v1/runs` 与 events SSE。",
         "examples": [
-          "在对一系列相似请求进行压缩时，CacheAligner 保证相同前缀在 token 序列中位置固定，使 Anthropic 或 OpenAI 的缓存生效。"
+          "`/v1/runs/{run_id}/events` 收到 `message.delta` 后调用 `onChunk(delta)`。",
+          "不满足 capabilities 时回退 `/v1/chat/completions`。"
         ],
         "common_misunderstandings": [
-          "它并不压缩内容本身，而是调整已压缩内容的序列化方式。",
-          "只有使用支持 KV 缓存的提供商的 API 时才有意义。"
+          "有 `/v1/capabilities` 不等于一定支持 runs；代码要求多个 feature 和 path 全部匹配。"
         ],
         "open_questions": [
-          "在多个代理并发时，缓存对齐的一致性如何保证？",
-          "对齐策略是否依赖特定模型版本？"
+          "Hermes capabilities schema 是否有版本号，仓库内未说明。"
         ]
       },
-      "body": "\n## Explanation\n\n一种前缀稳定化技术，确保经过压缩的提示在传递给 LLM 时，其前缀与提供商的 KV 缓存布局对齐，从而提高缓存命中率，降低首 token 延迟。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。\n\n## Supported by\n- [[claims/headroom-main-claim]]\n",
-      "excerpt": "一种前缀稳定化技术，确保经过压缩的提示在传递给 LLM 时，其前缀与提供商的 KV 缓存布局对齐，从而提高缓存命中率，降低首 token 延迟。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。",
+      "body": "\n## Explanation\n\n人话：先问后端支持什么，再决定走新接口还是旧接口。术语：`supportsHermesRunsTransport` 要求 features 和 endpoint path 同时匹配，才走 `/v1/runs` 与 events SSE。 出处:https://github.com/fathah/hermes-desktop。See [[content/fathah-hermes-desktop]]。\n\n## Supported by\n- [[claims/fathah-hermes-desktop-main-claim]]\n",
+      "excerpt": "人话：先问后端支持什么，再决定走新接口还是旧接口。术语：`supportsHermesRunsTransport` 要求 features 和 endpoint path 同时匹配，才走 `/v1/runs` 与 events SSE。 出处:https://github.com/fathah/hermes-desktop。See [[content/fathah-hermes-desktop]]。",
       "links": [
         {
-          "target": "content/headroom",
-          "raw": "[[content/headroom]]"
+          "target": "content/fathah-hermes-desktop",
+          "raw": "[[content/fathah-hermes-desktop]]"
         },
         {
-          "target": "claims/headroom-main-claim",
-          "raw": "[[claims/headroom-main-claim]]"
+          "target": "claims/fathah-hermes-desktop-main-claim",
+          "raw": "[[claims/fathah-hermes-desktop-main-claim]]"
         }
       ],
       "headings": [
@@ -713,63 +654,6 @@
         {
           "target": "claims/academic-research-skills-main-claim",
           "raw": "[[claims/academic-research-skills-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
-      "id": "concept/closed-learning-loop",
-      "type": "concept",
-      "slug": "closed-learning-loop",
-      "title": "Closed Learning Loop",
-      "file": "concepts/closed-learning-loop.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "闭环学习循环",
-        "slug": "closed-learning-loop",
-        "kind": "concept",
-        "tags": [
-          "agent",
-          "learning",
-          "memory"
-        ],
-        "maturity": "active",
-        "first_seen_in": "hermes-agent",
-        "related_content": [
-          "hermes-agent"
-        ],
-        "related_concepts": [],
-        "explanation": "agent 通过执行任务、创建技能、记忆存储、自我提醒形成持续改进的循环。",
-        "examples": [
-          "完成一个代码审查任务后，agent 可能创建一个 skill，并在未来相似任务中自动使用。"
-        ],
-        "common_misunderstandings": [
-          "不是强化学习，而是基于 LLM 的规则和文件管理。"
-        ],
-        "open_questions": [
-          "学习循环的有效性如何评估？",
-          "如何防止错误的技能固化？"
-        ]
-      },
-      "body": "\n## Explanation\n\nagent 通过执行任务、创建技能、记忆存储、自我提醒形成持续改进的循环。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。\n\n## Supported by\n- [[claims/hermes-agent-main-claim]]\n",
-      "excerpt": "agent 通过执行任务、创建技能、记忆存储、自我提醒形成持续改进的循环。 出处:https://github.com/nousresearch/hermes-agent。See [[content/hermes-agent]]。",
-      "links": [
-        {
-          "target": "content/hermes-agent",
-          "raw": "[[content/hermes-agent]]"
-        },
-        {
-          "target": "claims/hermes-agent-main-claim",
-          "raw": "[[claims/hermes-agent-main-claim]]"
         }
       ],
       "headings": [
@@ -898,6 +782,65 @@
       ]
     },
     {
+      "id": "concept/compress-cache-retrieve",
+      "type": "concept",
+      "slug": "compress-cache-retrieve",
+      "title": "Compress Cache Retrieve",
+      "file": "concepts/compress-cache-retrieve.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "CCR：压缩-缓存-取回",
+        "slug": "compress-cache-retrieve",
+        "kind": "concept",
+        "tags": [
+          "retrieval",
+          "mcp",
+          "cache",
+          "context"
+        ],
+        "maturity": "active",
+        "first_seen_in": "chopratejas-headroom",
+        "related_content": [
+          "chopratejas-headroom"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：先把长内容压短，同时把原文存起来；模型需要细节时用 hash 取回。术语：`CompressionStore` 默认 SHA-256[:24] hash、TTL 300 秒、BM25 search；MCP `headroom_retrieve` 接受 `hash` 和可选 `query`。",
+        "examples": [
+          "`headroom_compress(content=\"[5000 lines of grep results...]\")` 返回 `hash`",
+          "`headroom_retrieve(hash=\"...\", query=\"authentication errors\")` 搜索缓存原文"
+        ],
+        "common_misunderstandings": [
+          "可取回不等于模型一开始就看过全部原文。",
+          "hash 过期或 proxy/store 不同进程会影响取回。"
+        ],
+        "open_questions": [
+          "长任务中 store TTL 和跨进程持久化策略是否足够稳定？"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：先把长内容压短，同时把原文存起来；模型需要细节时用 hash 取回。术语：`CompressionStore` 默认 SHA-256[:24] hash、TTL 300 秒、BM25 search；MCP `headroom_retrieve` 接受 `hash` 和可选 `query`。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。\n\n## Supported by\n- [[claims/chopratejas-headroom-main-claim]]\n",
+      "excerpt": "人话：先把长内容压短，同时把原文存起来；模型需要细节时用 hash 取回。术语：`CompressionStore` 默认 SHA-256[:24] hash、TTL 300 秒、BM25 search；MCP `headroom_retrieve` 接受 `hash` 和可选 `query`。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。",
+      "links": [
+        {
+          "target": "content/chopratejas-headroom",
+          "raw": "[[content/chopratejas-headroom]]"
+        },
+        {
+          "target": "claims/chopratejas-headroom-main-claim",
+          "raw": "[[claims/chopratejas-headroom-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/connector-first-broker-abstraction",
       "type": "concept",
       "slug": "connector-first-broker-abstraction",
@@ -1011,50 +954,51 @@
       ]
     },
     {
-      "id": "concept/content-router",
+      "id": "concept/context-compression-layer",
       "type": "concept",
-      "slug": "content-router",
-      "title": "Content Router",
-      "file": "concepts/content-router.md",
+      "slug": "context-compression-layer",
+      "title": "Context Compression Layer",
+      "file": "concepts/context-compression-layer.md",
       "directory": "concepts",
       "meta": {
-        "name": "ContentRouter",
-        "slug": "content-router",
+        "name": "上下文压缩层",
+        "slug": "context-compression-layer",
         "kind": "concept",
         "tags": [
-          "routing",
+          "llm",
+          "agent",
           "compression",
-          "pipeline"
+          "proxy"
         ],
         "maturity": "active",
-        "first_seen_in": "headroom",
+        "first_seen_in": "chopratejas-headroom",
         "related_content": [
-          "headroom"
+          "chopratejas-headroom"
         ],
         "related_concepts": [],
-        "explanation": "内容路由器，负责检测输入内容的类型（JSON、代码、自然语言等），并将它们分发给最合适的压缩器，比如 SmartCrusher 处理 JSON，CodeCompressor 处理代码。",
+        "explanation": "人话：在消息送进 LLM 之前，先把工具输出、日志、RAG 结果等大块内容缩小。术语：Headroom 把这个层做成 `compress()`、HTTP proxy、MCP server 和 framework adapter，默认入口最后进入 `CacheAligner -> ContentRouter` 管线。",
         "examples": [
-          "当输入是一段 Python 代码时，ContentRouter 将其导向 CodeCompressor；而当输入是一个大型 JSON 数组时，则导向 SmartCrusher。"
+          "`from headroom import compress` 后调用 `compress(messages, model=\"gpt-4o\")`",
+          "`headroom proxy --port 8787` 后设置 `OPENAI_BASE_URL=http://localhost:8787/v1`"
         ],
         "common_misunderstandings": [
-          "它只做路由，不做压缩。",
-          "路由规则需要预先定义，可能无法处理未知混合内容。"
+          "不是所有内容都会被压缩；user/system/developer、近期代码、小内容默认会跳过。",
+          "TypeScript SDK 不是纯本地算法实现，它默认调用本地 proxy。"
         ],
         "open_questions": [
-          "检测依据的具体规则是怎样的？",
-          "如果内容混合（如代码和评论），如何处理？"
+          "在不同团队真实 agent 流量上，压缩节省和 retrieve 开销的净收益是多少？"
         ]
       },
-      "body": "\n## Explanation\n\n内容路由器，负责检测输入内容的类型（JSON、代码、自然语言等），并将它们分发给最合适的压缩器，比如 SmartCrusher 处理 JSON，CodeCompressor 处理代码。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。\n\n## Supported by\n- [[claims/headroom-main-claim]]\n",
-      "excerpt": "内容路由器，负责检测输入内容的类型（JSON、代码、自然语言等），并将它们分发给最合适的压缩器，比如 SmartCrusher 处理 JSON，CodeCompressor 处理代码。 出处:https://github.com/chopratejas/headroom。See [[content/headroom]]。",
+      "body": "\n## Explanation\n\n人话：在消息送进 LLM 之前，先把工具输出、日志、RAG 结果等大块内容缩小。术语：Headroom 把这个层做成 `compress()`、HTTP proxy、MCP server 和 framework adapter，默认入口最后进入 `CacheAligner -> ContentRouter` 管线。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。\n\n## Supported by\n- [[claims/chopratejas-headroom-main-claim]]\n",
+      "excerpt": "人话：在消息送进 LLM 之前，先把工具输出、日志、RAG 结果等大块内容缩小。术语：Headroom 把这个层做成 `compress()`、HTTP proxy、MCP server 和 framework adapter，默认入口最后进入 `CacheAligner -> ContentRouter` 管线。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。",
       "links": [
         {
-          "target": "content/headroom",
-          "raw": "[[content/headroom]]"
+          "target": "content/chopratejas-headroom",
+          "raw": "[[content/chopratejas-headroom]]"
         },
         {
-          "target": "claims/headroom-main-claim",
-          "raw": "[[claims/headroom-main-claim]]"
+          "target": "claims/chopratejas-headroom-main-claim",
+          "raw": "[[claims/chopratejas-headroom-main-claim]]"
         }
       ],
       "headings": [
@@ -1125,49 +1069,49 @@
       ]
     },
     {
-      "id": "concept/desktop-agent-shell",
+      "id": "concept/desktop-companion-for-cli-agent",
       "type": "concept",
-      "slug": "desktop-agent-shell",
-      "title": "Desktop Agent Shell",
-      "file": "concepts/desktop-agent-shell.md",
+      "slug": "desktop-companion-for-cli-agent",
+      "title": "Desktop Companion For Cli Agent",
+      "file": "concepts/desktop-companion-for-cli-agent.md",
       "directory": "concepts",
       "meta": {
-        "name": "桌面代理壳层",
-        "slug": "desktop-agent-shell",
+        "name": "CLI Agent 桌面伴侣",
+        "slug": "desktop-companion-for-cli-agent",
         "kind": "concept",
         "tags": [
-          "electron",
-          "agent-shell",
-          "desktop-app"
+          "desktop",
+          "agent-ui",
+          "cli-wrapper"
         ],
-        "maturity": "emerging",
-        "first_seen_in": "hermes-desktop",
+        "maturity": "active",
+        "first_seen_in": "fathah-hermes-desktop",
         "related_content": [
-          "hermes-desktop"
+          "fathah-hermes-desktop"
         ],
         "related_concepts": [],
-        "explanation": "为 CLI 代理提供 Electron 桌面界面，处理安装、配置、会话和 UI 交互，但不实现代理核心逻辑。通过 HTTP SSE 与后端代理通信。",
+        "explanation": "人话：把本来要手动装、手动改配置、手动跑命令的 agent 做成桌面入口。术语：Hermes Desktop 通过 Electron UI 管理 `~/.hermes`、Hermes Agent repo、gateway、profiles 和配置文件。",
         "examples": [
-          "Hermes Desktop 为 Hermes Agent 提供图形化安装和管理界面。"
+          "安装页调用官方 Hermes install script 并传 `--skip-setup`/`-SkipSetup`。",
+          "聊天失败时 fallback 到 `hermes chat -q ... --source desktop`。"
         ],
         "common_misunderstandings": [
-          "不是代理的实现，不包含推理或执行工具的能力。"
+          "不要把 Hermes Desktop 当成新的 agent runtime；agent 行为依赖上游 Hermes Agent。"
         ],
         "open_questions": [
-          "如何确保壳层与后端版本兼容？",
-          "多代理后端支持的可能性？"
+          "与 Hermes Agent 具体版本的兼容矩阵未在 README/docs/tree 说明。"
         ]
       },
-      "body": "\n## Explanation\n\n为 CLI 代理提供 Electron 桌面界面，处理安装、配置、会话和 UI 交互，但不实现代理核心逻辑。通过 HTTP SSE 与后端代理通信。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。\n\n## Supported by\n- [[claims/hermes-desktop-main-claim]]\n",
-      "excerpt": "为 CLI 代理提供 Electron 桌面界面，处理安装、配置、会话和 UI 交互，但不实现代理核心逻辑。通过 HTTP SSE 与后端代理通信。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。",
+      "body": "\n## Explanation\n\n人话：把本来要手动装、手动改配置、手动跑命令的 agent 做成桌面入口。术语：Hermes Desktop 通过 Electron UI 管理 `~/.hermes`、Hermes Agent repo、gateway、profiles 和配置文件。 出处:https://github.com/fathah/hermes-desktop。See [[content/fathah-hermes-desktop]]。\n\n## Supported by\n- [[claims/fathah-hermes-desktop-main-claim]]\n",
+      "excerpt": "人话：把本来要手动装、手动改配置、手动跑命令的 agent 做成桌面入口。术语：Hermes Desktop 通过 Electron UI 管理 `~/.hermes`、Hermes Agent repo、gateway、profiles 和配置文件。 出处:https://github.com/fathah/hermes-desktop。See [[content/fathah-hermes-desktop]]。",
       "links": [
         {
-          "target": "content/hermes-desktop",
-          "raw": "[[content/hermes-desktop]]"
+          "target": "content/fathah-hermes-desktop",
+          "raw": "[[content/fathah-hermes-desktop]]"
         },
         {
-          "target": "claims/hermes-desktop-main-claim",
-          "raw": "[[claims/hermes-desktop-main-claim]]"
+          "target": "claims/fathah-hermes-desktop-main-claim",
+          "raw": "[[claims/fathah-hermes-desktop-main-claim]]"
         }
       ],
       "headings": [
@@ -1216,16 +1160,131 @@
           "当策略复杂到需要维护人员理解整个系统时，是否会陷入配置泥潭？"
         ]
       },
-      "body": "\n## Explanation\n\n在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/agent-governance-toolkit-main-claim]]\n",
-      "excerpt": "在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。",
+      "body": "\n## Explanation\n\n在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/agent-governance-toolkit-main-claim]]\n",
+      "excerpt": "在代理的工具调用或动作执行之前，通过代码检查预先定义的显式规则来决定允许或拒绝，而不是依赖 LLM 的主观判断。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。",
       "links": [
         {
-          "target": "content/agent-governance-toolkit",
-          "raw": "[[content/agent-governance-toolkit]]"
+          "target": "content/microsoft-agent-governance-toolkit",
+          "raw": "[[content/microsoft-agent-governance-toolkit]]"
         },
         {
           "target": "claims/agent-governance-toolkit-main-claim",
           "raw": "[[claims/agent-governance-toolkit-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/document-converter-chain",
+      "type": "concept",
+      "slug": "document-converter-chain",
+      "title": "Document Converter Chain",
+      "file": "concepts/document-converter-chain.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "文档转换器链",
+        "slug": "document-converter-chain",
+        "kind": "concept",
+        "tags": [
+          "architecture",
+          "converter",
+          "python"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "microsoft-markitdown",
+        "related_content": [
+          "microsoft-markitdown"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：每种文件格式一个小转换器，调度器按顺序试。术语：`DocumentConverter.accepts()` 做格式接受判断，`convert()` 返回 `DocumentConverterResult(markdown=...)`。",
+        "examples": [
+          "`PdfConverter` 接受 `.pdf` 和 `application/pdf`。",
+          "`ZipConverter` 解压后对内部文件递归调用 `self._markitdown.convert_stream()`。"
+        ],
+        "common_misunderstandings": [
+          "不是所有 converter 都一定会运行；只有 `accepts()` 返回 True 的 converter 才会尝试转换。"
+        ],
+        "open_questions": [
+          "未在 README 说明第三方 converter 冲突时的用户级诊断体验。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：每种文件格式一个小转换器，调度器按顺序试。术语：`DocumentConverter.accepts()` 做格式接受判断，`convert()` 返回 `DocumentConverterResult(markdown=...)`。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。\n\n## Supported by\n- [[claims/microsoft-markitdown-main-claim]]\n",
+      "excerpt": "人话：每种文件格式一个小转换器，调度器按顺序试。术语：`DocumentConverter.accepts()` 做格式接受判断，`convert()` 返回 `DocumentConverterResult(markdown=...)`。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。",
+      "links": [
+        {
+          "target": "content/microsoft-markitdown",
+          "raw": "[[content/microsoft-markitdown]]"
+        },
+        {
+          "target": "claims/microsoft-markitdown-main-claim",
+          "raw": "[[claims/microsoft-markitdown-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/draft-first-agent-workflow",
+      "type": "concept",
+      "slug": "draft-first-agent-workflow",
+      "title": "Draft First Agent Workflow",
+      "file": "concepts/draft-first-agent-workflow.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "草稿优先 Agent 流程",
+        "slug": "draft-first-agent-workflow",
+        "kind": "concept",
+        "tags": [
+          "agent-workflow",
+          "content-operations",
+          "product-ux"
+        ],
+        "maturity": "active",
+        "first_seen_in": "yikart-aitoearn",
+        "related_content": [
+          "yikart-aitoearn"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：AI 生成完不只是把链接甩给用户，而是先存成产品里的草稿。术语：系统提示词要求内容生成后自动调用 `getDraftGroupInfoByName` 和 `createDraft`，再返回 `navigateToDraft` action。",
+        "examples": [
+          "生成视频后创建 `type: VIDEO` 的 draft",
+          "缺账号时返回 `createChannel` 而不是直接失败"
+        ],
+        "common_misunderstandings": [
+          "草稿不是模型记忆，它是业务数据库里的内容对象。",
+          "自动保存草稿不等于自动发布。"
+        ],
+        "open_questions": [
+          "草稿自动保存的失败重试、去重和清理策略未在 README/docs/tree 说明。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：AI 生成完不只是把链接甩给用户，而是先存成产品里的草稿。术语：系统提示词要求内容生成后自动调用 `getDraftGroupInfoByName` 和 `createDraft`，再返回 `navigateToDraft` action。 出处:https://github.com/yikart/aitoearn。See [[content/yikart-aitoearn]]。\n\n## Supported by\n- [[claims/yikart-aitoearn-main-claim]]\n",
+      "excerpt": "人话：AI 生成完不只是把链接甩给用户，而是先存成产品里的草稿。术语：系统提示词要求内容生成后自动调用 `getDraftGroupInfoByName` 和 `createDraft`，再返回 `navigateToDraft` action。 出处:https://github.com/yikart/aitoearn。See [[content/yikart-aitoearn]]。",
+      "links": [
+        {
+          "target": "content/yikart-aitoearn",
+          "raw": "[[content/yikart-aitoearn]]"
+        },
+        {
+          "target": "claims/yikart-aitoearn-main-claim",
+          "raw": "[[claims/yikart-aitoearn-main-claim]]"
         }
       ],
       "headings": [
@@ -1412,161 +1471,50 @@
       ]
     },
     {
-      "id": "concept/external-memory-server",
+      "id": "concept/fingerprint-seed",
       "type": "concept",
-      "slug": "external-memory-server",
-      "title": "External Memory Server",
-      "file": "concepts/external-memory-server.md",
+      "slug": "fingerprint-seed",
+      "title": "Fingerprint Seed",
+      "file": "concepts/fingerprint-seed.md",
       "directory": "concepts",
       "meta": {
-        "name": "外部记忆服务器",
-        "slug": "external-memory-server",
+        "name": "fingerprint seed",
+        "slug": "fingerprint-seed",
         "kind": "concept",
         "tags": [
-          "memory",
-          "server",
-          "agent"
+          "fingerprint",
+          "session-isolation",
+          "cdp"
         ],
         "maturity": "active",
-        "first_seen_in": "agentmemory",
+        "first_seen_in": "cloakhq-cloakbrowser",
         "related_content": [
-          "agentmemory"
+          "cloakhq-cloakbrowser"
         ],
         "related_concepts": [],
-        "explanation": "作为独立进程运行，为 AI 代理提供持久记忆的读写服务。代理通过 RPC（如 MCP）或 REST API 与之交互，实现记忆与代理逻辑解耦。",
+        "explanation": "人话：用一个 seed 生成一套浏览器身份；同一个 seed 可复用同一类信号。技术词：默认 `get_default_stealth_args()` 生成 `--fingerprint=<10000..99999>`，`cloakserve` 也允许 `?fingerprint=11111` 路由到单独 Chrome 进程。",
         "examples": [
-          "agentmemory 启动后，Claude Code 通过 MCP 工具 store_memory、recall_memory 存取记忆。"
+          "`--fingerprint=12345`",
+          "`pw.chromium.connect_over_cdp(\"http://localhost:9222?fingerprint=11111\")`"
         ],
         "common_misunderstandings": [
-          "记忆服务器不是向量数据库，它内部封装了存储和搜索逻辑，对外暴露高层语义工具。"
+          "seed 不是账号身份，也不能替代 cookie/profile 管理。",
+          "同 seed 首次参数会赢；README 写 same seed reuses same process，first connection's params win。"
         ],
         "open_questions": [
-          "如何设计记忆的过期与清理策略？"
+          "seed 到具体 GPU/screen/device-memory 生成规则在二进制内，repo wrapper 未公开。"
         ]
       },
-      "body": "\n## Explanation\n\n作为独立进程运行，为 AI 代理提供持久记忆的读写服务。代理通过 RPC（如 MCP）或 REST API 与之交互，实现记忆与代理逻辑解耦。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。\n\n## Supported by\n- [[claims/agentmemory-main-claim]]\n",
-      "excerpt": "作为独立进程运行，为 AI 代理提供持久记忆的读写服务。代理通过 RPC（如 MCP）或 REST API 与之交互，实现记忆与代理逻辑解耦。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。",
+      "body": "\n## Explanation\n\n人话：用一个 seed 生成一套浏览器身份；同一个 seed 可复用同一类信号。技术词：默认 `get_default_stealth_args()` 生成 `--fingerprint=<10000..99999>`，`cloakserve` 也允许 `?fingerprint=11111` 路由到单独 Chrome 进程。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakhq-cloakbrowser]]。\n\n## Supported by\n- [[claims/cloakhq-cloakbrowser-main-claim]]\n",
+      "excerpt": "人话：用一个 seed 生成一套浏览器身份；同一个 seed 可复用同一类信号。技术词：默认 `get_default_stealth_args()` 生成 `--fingerprint=<10000..99999>`，`cloakserve` 也允许 `?fingerprint=11111` 路由到单独 Chrome 进程。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakhq-cloakbrowser]]。",
       "links": [
         {
-          "target": "content/agentmemory",
-          "raw": "[[content/agentmemory]]"
+          "target": "content/cloakhq-cloakbrowser",
+          "raw": "[[content/cloakhq-cloakbrowser]]"
         },
         {
-          "target": "claims/agentmemory-main-claim",
-          "raw": "[[claims/agentmemory-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
-      "id": "concept/file-first-knowledge",
-      "type": "concept",
-      "slug": "file-first-knowledge",
-      "title": "File First Knowledge",
-      "file": "concepts/file-first-knowledge.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "File-First Knowledge Management",
-        "slug": "file-first-knowledge",
-        "kind": "concept",
-        "tags": [
-          "knowledge-management",
-          "offline-first",
-          "markdown"
-        ],
-        "maturity": "stable",
-        "first_seen_in": "tolaria",
-        "related_content": [
-          "tolaria"
-        ],
-        "related_concepts": [],
-        "explanation": "以文件系统为基础的知识管理方法，强调数据可移植性、离线可用性和标准格式（Markdown）。",
-        "examples": [
-          "Obsidian (local-first, but not AI-native)",
-          "Tolaria"
-        ],
-        "common_misunderstandings": [
-          "并不是必须用特定编辑器；文件可以被任何工具读取和写入"
-        ],
-        "open_questions": [
-          "如何在大规模文件时保持高效搜索和索引？"
-        ]
-      },
-      "body": "\n## Explanation\n\n以文件系统为基础的知识管理方法，强调数据可移植性、离线可用性和标准格式（Markdown）。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。\n\n## Supported by\n- [[claims/tolaria-main-claim]]\n",
-      "excerpt": "以文件系统为基础的知识管理方法，强调数据可移植性、离线可用性和标准格式（Markdown）。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。",
-      "links": [
-        {
-          "target": "content/tolaria",
-          "raw": "[[content/tolaria]]"
-        },
-        {
-          "target": "claims/tolaria-main-claim",
-          "raw": "[[claims/tolaria-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
-      "id": "concept/file-to-markdown-converter",
-      "type": "concept",
-      "slug": "file-to-markdown-converter",
-      "title": "File To Markdown Converter",
-      "file": "concepts/file-to-markdown-converter.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "文件转Markdown转换器",
-        "slug": "file-to-markdown-converter",
-        "kind": "concept",
-        "tags": [
-          "document-processing",
-          "markdown",
-          "llm-ingestion"
-        ],
-        "maturity": "stable",
-        "first_seen_in": "markitdown",
-        "related_content": [
-          "markitdown"
-        ],
-        "related_concepts": [],
-        "explanation": "一种将异构文档格式统一为结构化 Markdown 的模式，通过分发器根据文件类型调用特定解析器，输出保留标题、表格、链接等结构。",
-        "examples": [
-          "MarkItDown 转换 PDF 保留标题层级，转换 Excel 保留表格 Markdown"
-        ],
-        "common_misunderstandings": [
-          "不是所见即得的 PDF 渲染器，输出可能丢失复杂布局"
-        ],
-        "open_questions": [
-          "如何平衡结构保真与存储/计算开销？"
-        ]
-      },
-      "body": "\n## Explanation\n\n一种将异构文档格式统一为结构化 Markdown 的模式，通过分发器根据文件类型调用特定解析器，输出保留标题、表格、链接等结构。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。\n\n## Supported by\n- [[claims/markitdown-main-claim]]\n",
-      "excerpt": "一种将异构文档格式统一为结构化 Markdown 的模式，通过分发器根据文件类型调用特定解析器，输出保留标题、表格、链接等结构。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。",
-      "links": [
-        {
-          "target": "content/markitdown",
-          "raw": "[[content/markitdown]]"
-        },
-        {
-          "target": "claims/markitdown-main-claim",
-          "raw": "[[claims/markitdown-main-claim]]"
+          "target": "claims/cloakhq-cloakbrowser-main-claim",
+          "raw": "[[claims/cloakhq-cloakbrowser-main-claim]]"
         }
       ],
       "headings": [
@@ -1752,51 +1700,50 @@
       ]
     },
     {
-      "id": "concept/hashline-editing",
+      "id": "concept/hashline",
       "type": "concept",
-      "slug": "hashline-editing",
-      "title": "Hashline Editing",
-      "file": "concepts/hashline-editing.md",
+      "slug": "hashline",
+      "title": "Hashline",
+      "file": "concepts/hashline.md",
       "directory": "concepts",
       "meta": {
-        "name": "Hashline 编辑",
-        "slug": "hashline-editing",
+        "name": "Hashline",
+        "slug": "hashline",
         "kind": "concept",
         "tags": [
           "editing",
-          "agent",
-          "token-optimization"
+          "agent-harness",
+          "patch-format"
         ],
         "maturity": "active",
-        "first_seen_in": "oh-my-pi",
+        "first_seen_in": "can1357-oh-my-pi",
         "related_content": [
-          "oh-my-pi"
+          "can1357-oh-my-pi"
         ],
         "related_concepts": [],
-        "explanation": "一种编辑格式，模型通过提供待修改行的内容哈希（锚点）而不是完整行内容来定位修改位置。代理在应用前验证哈希，避免因文件并发修改导致的错误。",
+        "explanation": "人话：给 LLM 改文件用的“带版本锚点的行编辑语言”。术语：每个 section 带 path 和 4-hex snapshot tag，操作包括 `replace A..B`、`replace block A`、`delete`、`insert before/after/head/tail`；Patcher 通过 SnapshotStore 校验 stale anchor。",
         "examples": [
-          "README 提到 Grok 4 Fast 使用后输出 token 减少 61%",
-          "传统 diff 格式匹配失败时 hashline 可以快速拒绝过期锚点"
+          "`¶a.ts#0A3B replace 1..1: +const X = \"b\";`",
+          "`packages/hashline/README.md` 的 InMemoryFilesystem + Patcher quick start"
         ],
         "common_misunderstandings": [
-          "不是用哈希唯一标识行，而是在生成的编辑命令中引用现有多行内容哈希来定位；仍需要模型输出替换内容。",
-          "依赖文件内容稳定，频繁变更的文件可能导致锚点频繁失效。"
+          "不是普通 unified diff。",
+          "4-hex tag 不是全局永久文件 ID，只在对应 SnapshotStore 有意义。"
         ],
         "open_questions": [
-          "如何处理同一哈希对应多行的情况？",
-          "在大规模重构中锚点失效比例如何？"
+          "不同模型对 hashline 格式的学习成本和失败率需要运行评测确认。"
         ]
       },
-      "body": "\n## Explanation\n\n一种编辑格式，模型通过提供待修改行的内容哈希（锚点）而不是完整行内容来定位修改位置。代理在应用前验证哈希，避免因文件并发修改导致的错误。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。\n\n## Supported by\n- [[claims/oh-my-pi-main-claim]]\n",
-      "excerpt": "一种编辑格式，模型通过提供待修改行的内容哈希（锚点）而不是完整行内容来定位修改位置。代理在应用前验证哈希，避免因文件并发修改导致的错误。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。",
+      "body": "\n## Explanation\n\n人话：给 LLM 改文件用的“带版本锚点的行编辑语言”。术语：每个 section 带 path 和 4-hex snapshot tag，操作包括 `replace A..B`、`replace block A`、`delete`、`insert before/after/head/tail`；Patcher 通过 SnapshotStore 校验 stale anchor。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。\n\n## Supported by\n- [[claims/can1357-oh-my-pi-main-claim]]\n",
+      "excerpt": "人话：给 LLM 改文件用的“带版本锚点的行编辑语言”。术语：每个 section 带 path 和 4-hex snapshot tag，操作包括 `replace A..B`、`replace block A`、`delete`、`insert before/after/head/tail`；Patcher 通过 SnapshotStore 校验 stale anchor。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。",
       "links": [
         {
-          "target": "content/oh-my-pi",
-          "raw": "[[content/oh-my-pi]]"
+          "target": "content/can1357-oh-my-pi",
+          "raw": "[[content/can1357-oh-my-pi]]"
         },
         {
-          "target": "claims/oh-my-pi-main-claim",
-          "raw": "[[claims/oh-my-pi-main-claim]]"
+          "target": "claims/can1357-oh-my-pi-main-claim",
+          "raw": "[[claims/can1357-oh-my-pi-main-claim]]"
         }
       ],
       "headings": [
@@ -1811,47 +1758,49 @@
       ]
     },
     {
-      "id": "concept/humanize",
+      "id": "concept/hook-based-observation-capture",
       "type": "concept",
-      "slug": "humanize",
-      "title": "Humanize",
-      "file": "concepts/humanize.md",
+      "slug": "hook-based-observation-capture",
+      "title": "Hook Based Observation Capture",
+      "file": "concepts/hook-based-observation-capture.md",
       "directory": "concepts",
       "meta": {
-        "name": "人性化行为模拟",
-        "slug": "humanize",
+        "name": "基于 hook 的观察采集",
+        "slug": "hook-based-observation-capture",
         "kind": "concept",
         "tags": [
-          "humanization",
-          "anti-bot"
+          "hooks",
+          "observability",
+          "agent-workflow"
         ],
         "maturity": "active",
-        "first_seen_in": "cloakbrowser",
+        "first_seen_in": "rohitg00-agentmemory",
         "related_content": [
-          "cloakbrowser"
+          "rohitg00-agentmemory"
         ],
         "related_concepts": [],
-        "explanation": "在自动化操作中加入人类用户的典型行为模式，如贝塞尔曲线鼠标移动、随机键盘延迟、真实滚动模式，以规避行为分析。",
+        "explanation": "人话：代理每次开始会话、提交提示、读写文件、工具完成时，顺手把事件发给记忆服务。术语：Claude 插件的 `plugin/hooks/hooks.json` 把生命周期事件映射到 `plugin/scripts/*.mjs`，REST `/agentmemory/observe` 再进入 `mem::observe`。",
         "examples": [
-          "CloakBrowser 的 humanize=True 自动实现所有交互人性化。"
+          "`PostToolUse` 调 `post-tool-use.mjs`。",
+          "`PreToolUse` matcher 是 `Edit|Write|Read|Glob|Grep`。"
         ],
         "common_misunderstandings": [
-          "简单随机延迟不足以对抗机器学习行为模型。"
+          "hook 采集不等于自动注入上下文；`AGENTMEMORY_INJECT_CONTEXT` 默认关闭。"
         ],
         "open_questions": [
-          "行为模拟是否能持续对抗不断进化的检测算法？"
+          "不同 MCP/agent 客户端 hook 语义是否长期稳定未知。"
         ]
       },
-      "body": "\n## Explanation\n\n在自动化操作中加入人类用户的典型行为模式，如贝塞尔曲线鼠标移动、随机键盘延迟、真实滚动模式，以规避行为分析。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。\n\n## Supported by\n- [[claims/cloakbrowser-main-claim]]\n",
-      "excerpt": "在自动化操作中加入人类用户的典型行为模式，如贝塞尔曲线鼠标移动、随机键盘延迟、真实滚动模式，以规避行为分析。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。",
+      "body": "\n## Explanation\n\n人话：代理每次开始会话、提交提示、读写文件、工具完成时，顺手把事件发给记忆服务。术语：Claude 插件的 `plugin/hooks/hooks.json` 把生命周期事件映射到 `plugin/scripts/*.mjs`，REST `/agentmemory/observe` 再进入 `mem::observe`。 出处:https://github.com/rohitg00/agentmemory。See [[content/rohitg00-agentmemory]]。\n\n## Supported by\n- [[claims/rohitg00-agentmemory-main-claim]]\n",
+      "excerpt": "人话：代理每次开始会话、提交提示、读写文件、工具完成时，顺手把事件发给记忆服务。术语：Claude 插件的 `plugin/hooks/hooks.json` 把生命周期事件映射到 `plugin/scripts/*.mjs`，REST `/agentmemory/observe` 再进入 `mem::observe`。 出处:https://github.com/rohitg00/agentmemory。See [[content/rohitg00-agentmemory]]。",
       "links": [
         {
-          "target": "content/cloakbrowser",
-          "raw": "[[content/cloakbrowser]]"
+          "target": "content/rohitg00-agentmemory",
+          "raw": "[[content/rohitg00-agentmemory]]"
         },
         {
-          "target": "claims/cloakbrowser-main-claim",
-          "raw": "[[claims/cloakbrowser-main-claim]]"
+          "target": "claims/rohitg00-agentmemory-main-claim",
+          "raw": "[[claims/rohitg00-agentmemory-main-claim]]"
         }
       ],
       "headings": [
@@ -2486,50 +2435,107 @@
       ]
     },
     {
-      "id": "concept/mcp-as-tool-gateway",
+      "id": "concept/markdown-for-llm",
       "type": "concept",
-      "slug": "mcp-as-tool-gateway",
-      "title": "Mcp As Tool Gateway",
-      "file": "concepts/mcp-as-tool-gateway.md",
+      "slug": "markdown-for-llm",
+      "title": "Markdown For Llm",
+      "file": "concepts/markdown-for-llm.md",
       "directory": "concepts",
       "meta": {
-        "name": "MCP 作为工具网关",
-        "slug": "mcp-as-tool-gateway",
+        "name": "面向 LLM 的 Markdown 中间层",
+        "slug": "markdown-for-llm",
+        "kind": "concept",
+        "tags": [
+          "markdown",
+          "llm",
+          "rag"
+        ],
+        "maturity": "active",
+        "first_seen_in": "microsoft-markitdown",
+        "related_content": [
+          "microsoft-markitdown"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：先把复杂文件变成 Markdown，再给检索、摘要、Agent 或评测用。术语：Markdown 保留标题、列表、表格、链接等轻量结构，比纯文本多结构，比 HTML/Office 少噪声。",
+        "examples": [
+          "README 说目标是 LLMs and related text analysis pipelines。",
+          "XLSX converter 为每个 sheet 输出 `## sheet-name` 和 Markdown 表格。"
+        ],
+        "common_misunderstandings": [
+          "它不是高保真排版转换器；README 明确说 may not be the best option for high-fidelity document conversions for human consumption。"
+        ],
+        "open_questions": [
+          "没有仓库内 benchmark 说明 Markdown 输出对不同 LLM/RAG 任务的质量提升幅度。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：先把复杂文件变成 Markdown，再给检索、摘要、Agent 或评测用。术语：Markdown 保留标题、列表、表格、链接等轻量结构，比纯文本多结构，比 HTML/Office 少噪声。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。\n\n## Supported by\n- [[claims/microsoft-markitdown-main-claim]]\n",
+      "excerpt": "人话：先把复杂文件变成 Markdown，再给检索、摘要、Agent 或评测用。术语：Markdown 保留标题、列表、表格、链接等轻量结构，比纯文本多结构，比 HTML/Office 少噪声。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。",
+      "links": [
+        {
+          "target": "content/microsoft-markitdown",
+          "raw": "[[content/microsoft-markitdown]]"
+        },
+        {
+          "target": "claims/microsoft-markitdown-main-claim",
+          "raw": "[[claims/microsoft-markitdown-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-code-index",
+      "type": "concept",
+      "slug": "mcp-code-index",
+      "title": "Mcp Code Index",
+      "file": "concepts/mcp-code-index.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 代码索引工具",
+        "slug": "mcp-code-index",
         "kind": "concept",
         "tags": [
           "mcp",
-          "integration",
-          "tool-calling"
+          "agent-tools",
+          "code-intelligence"
         ],
-        "maturity": "emerging",
-        "first_seen_in": "aitoearn",
+        "maturity": "active",
+        "first_seen_in": "colbymchenry-codegraph",
         "related_content": [
-          "aitoearn"
+          "colbymchenry-codegraph"
         ],
         "related_concepts": [],
-        "explanation": "将平台的核心能力通过 Model Context Protocol 封装为工具，让外部 AI 助手（如 Claude）可以直接操控，实现“AI 使用 AI 产品”。",
+        "explanation": "白话：把代码库先建索引，再作为 MCP 工具给代理调用。术语：CodeGraph 用 stdio MCP server 暴露 `codegraph_explore/search/node/impact` 等工具，agent config 里启动命令是 `codegraph serve --mcp`。",
         "examples": [
-          "在 Claude Desktop 中配置 MCP 地址后，可以直接让 Claude 执行发布任务"
+          "`src/installer/targets/shared.ts` 的 `getMcpServerConfig()`",
+          "`src/mcp/tools.ts` 的 `tools` 定义"
         ],
         "common_misunderstandings": [
-          "MCP 不是简单的 API 代理，它让 AI 助手理解工具的语义并自主决定调用时机",
-          "需要 AI 助手本身支持 MCP，并不是所有对话模型都原生支持"
+          "MCP 只是通信接口，不自动带来代码理解；理解来自背后的索引和解析器。",
+          "安装 CLI 不等于代理已接入，README 明确需要 `codegraph install`。"
         ],
         "open_questions": [
-          "MCP 工具调用的失败反馈如何设计才能让 AI 助手自愈？",
-          "如何在不影响用户体验的前提下保障多租户间的隔离？"
+          "不同代理是否完整遵守 MCP initialize instructions，需要逐个验证。"
         ]
       },
-      "body": "\n## Explanation\n\n将平台的核心能力通过 Model Context Protocol 封装为工具，让外部 AI 助手（如 Claude）可以直接操控，实现“AI 使用 AI 产品”。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。\n\n## Supported by\n- [[claims/aitoearn-main-claim]]\n",
-      "excerpt": "将平台的核心能力通过 Model Context Protocol 封装为工具，让外部 AI 助手（如 Claude）可以直接操控，实现“AI 使用 AI 产品”。 出处:https://github.com/yikart/aitoearn。See [[content/aitoearn]]。",
+      "body": "\n## Explanation\n\n白话：把代码库先建索引，再作为 MCP 工具给代理调用。术语：CodeGraph 用 stdio MCP server 暴露 `codegraph_explore/search/node/impact` 等工具，agent config 里启动命令是 `codegraph serve --mcp`。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。\n\n## Supported by\n- [[claims/colbymchenry-codegraph-main-claim]]\n",
+      "excerpt": "白话：把代码库先建索引，再作为 MCP 工具给代理调用。术语：CodeGraph 用 stdio MCP server 暴露 `codegraph_explore/search/node/impact` 等工具，agent config 里启动命令是 `codegraph serve --mcp`。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。",
       "links": [
         {
-          "target": "content/aitoearn",
-          "raw": "[[content/aitoearn]]"
+          "target": "content/colbymchenry-codegraph",
+          "raw": "[[content/colbymchenry-codegraph]]"
         },
         {
-          "target": "claims/aitoearn-main-claim",
-          "raw": "[[claims/aitoearn-main-claim]]"
+          "target": "claims/colbymchenry-codegraph-main-claim",
+          "raw": "[[claims/colbymchenry-codegraph-main-claim]]"
         }
       ],
       "headings": [
@@ -2602,63 +2608,6 @@
       ]
     },
     {
-      "id": "concept/mcp-knowledge-base",
-      "type": "concept",
-      "slug": "mcp-knowledge-base",
-      "title": "Mcp Knowledge Base",
-      "file": "concepts/mcp-knowledge-base.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "MCP-Connected Knowledge Base",
-        "slug": "mcp-knowledge-base",
-        "kind": "concept",
-        "tags": [
-          "mcp",
-          "knowledge-base",
-          "agent-tool"
-        ],
-        "maturity": "active",
-        "first_seen_in": "tolaria",
-        "related_content": [
-          "tolaria"
-        ],
-        "related_concepts": [],
-        "explanation": "通过 MCP 协议将本地知识库暴露给 AI 代理的工具模式，使代理能搜索和修改作为文件的笔记。",
-        "examples": [
-          "Tolaria's mcp-server directory"
-        ],
-        "common_misunderstandings": [
-          "这不是一个 AI 写作助手，而是让外部 AI 代理可以操作的知识源"
-        ],
-        "open_questions": [
-          "如何控制代理的写入权限？",
-          "如何处理多代理并发写入？"
-        ]
-      },
-      "body": "\n## Explanation\n\n通过 MCP 协议将本地知识库暴露给 AI 代理的工具模式，使代理能搜索和修改作为文件的笔记。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。\n\n## Supported by\n- [[claims/tolaria-main-claim]]\n",
-      "excerpt": "通过 MCP 协议将本地知识库暴露给 AI 代理的工具模式，使代理能搜索和修改作为文件的笔记。 出处:https://github.com/refactoringhq/tolaria。See [[content/tolaria]]。",
-      "links": [
-        {
-          "target": "content/tolaria",
-          "raw": "[[content/tolaria]]"
-        },
-        {
-          "target": "claims/tolaria-main-claim",
-          "raw": "[[claims/tolaria-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
       "id": "concept/mcp-server",
       "type": "concept",
       "slug": "mcp-server",
@@ -2715,106 +2664,51 @@
       ]
     },
     {
-      "id": "concept/mcp-tool-integration",
+      "id": "concept/mcp-tool-controller",
       "type": "concept",
-      "slug": "mcp-tool-integration",
-      "title": "Mcp Tool Integration",
-      "file": "concepts/mcp-tool-integration.md",
+      "slug": "mcp-tool-controller",
+      "title": "Mcp Tool Controller",
+      "file": "concepts/mcp-tool-controller.md",
       "directory": "concepts",
       "meta": {
-        "name": "MCP 工具集成",
-        "slug": "mcp-tool-integration",
+        "name": "MCP 工具控制器",
+        "slug": "mcp-tool-controller",
         "kind": "concept",
         "tags": [
           "mcp",
-          "tool-calling",
-          "integration"
+          "nestjs",
+          "agent-tools"
         ],
         "maturity": "active",
-        "first_seen_in": "codegraph",
+        "first_seen_in": "yikart-aitoearn",
         "related_content": [
-          "codegraph"
+          "yikart-aitoearn"
         ],
         "related_concepts": [],
-        "explanation": "通过 Model Context Protocol 将自定义工具注册到 AI 助手的工具列表中，使 LLM 能直接调用本地功能。CodeGraph 借此让 agent 用自然语言查询代码结构，而非笨拙的文件操作。",
+        "explanation": "人话：把后端能力包装成 Agent 能调用的按钮。术语：AiToEarn 用 `@Tool` 标注 NestJS controller 方法，配 Zod schema 和 description，MCP registry 在启动时扫描并注册这些工具。",
         "examples": [
-          "`codegraph serve --mcp` 启动 MCP 服务器，`codegraph install` 自动将其配置到 Claude Code、Cursor 等，agent 随后可调用 `codegraph_explore`。"
+          "`getAccountGroupList` 返回账号组",
+          "`createDraft` 创建草稿",
+          "`publishPostToYoutube` 创建发布任务并返回 FlowId"
         ],
         "common_misunderstandings": [
-          "MCP 不是取代 API 调用，而是标准化工具描述和传输。",
-          "CodeGraph 的 MCP 服务器只提供代码探索，不提供其他工具；它不是通用 MCP 网关。"
+          "MCP 工具不是普通 prompt，它会执行真实后端副作用。",
+          "有平台限制表不等于该平台有自动发布工具。"
         ],
         "open_questions": [
-          "MCP 协议未来变化会不会导致 CodeGraph 的集成方式过时？",
-          "非 MCP 原生 agent 如何接入？"
+          "单独 `/account/mcp`、`/content/mcp`、`/publish/mcp` 模块是否在运行时被导入？"
         ]
       },
-      "body": "\n## Explanation\n\n通过 Model Context Protocol 将自定义工具注册到 AI 助手的工具列表中，使 LLM 能直接调用本地功能。CodeGraph 借此让 agent 用自然语言查询代码结构，而非笨拙的文件操作。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。\n\n## Supported by\n- [[claims/codegraph-main-claim]]\n",
-      "excerpt": "通过 Model Context Protocol 将自定义工具注册到 AI 助手的工具列表中，使 LLM 能直接调用本地功能。CodeGraph 借此让 agent 用自然语言查询代码结构，而非笨拙的文件操作。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。",
+      "body": "\n## Explanation\n\n人话：把后端能力包装成 Agent 能调用的按钮。术语：AiToEarn 用 `@Tool` 标注 NestJS controller 方法，配 Zod schema 和 description，MCP registry 在启动时扫描并注册这些工具。 出处:https://github.com/yikart/aitoearn。See [[content/yikart-aitoearn]]。\n\n## Supported by\n- [[claims/yikart-aitoearn-main-claim]]\n",
+      "excerpt": "人话：把后端能力包装成 Agent 能调用的按钮。术语：AiToEarn 用 `@Tool` 标注 NestJS controller 方法，配 Zod schema 和 description，MCP registry 在启动时扫描并注册这些工具。 出处:https://github.com/yikart/aitoearn。See [[content/yikart-aitoearn]]。",
       "links": [
         {
-          "target": "content/codegraph",
-          "raw": "[[content/codegraph]]"
+          "target": "content/yikart-aitoearn",
+          "raw": "[[content/yikart-aitoearn]]"
         },
         {
-          "target": "claims/codegraph-main-claim",
-          "raw": "[[claims/codegraph-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
-      "id": "concept/mcp-tool-server",
-      "type": "concept",
-      "slug": "mcp-tool-server",
-      "title": "Mcp Tool Server",
-      "file": "concepts/mcp-tool-server.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "MCP 工具服务器",
-        "slug": "mcp-tool-server",
-        "kind": "concept",
-        "tags": [
-          "mcp",
-          "tool",
-          "integration"
-        ],
-        "maturity": "active",
-        "first_seen_in": "agentmemory",
-        "related_content": [
-          "agentmemory"
-        ],
-        "related_concepts": [],
-        "explanation": "遵循 Model Context Protocol 的工具提供服务，允许语言模型在对话中动态调用自定义工具。每个工具定义名称、描述和 JSON Schema 参数。",
-        "examples": [
-          "agentmemory 提供 store_reasoning_trace（存储推理链）、find_relevant_memories（查找相关记忆）等 53 个 MCP 工具。"
-        ],
-        "common_misunderstandings": [
-          "MCP 工具服务器不处理自然语言，它只接收结构化的工具调用请求并返回结果。"
-        ],
-        "open_questions": [
-          "如何管理工具的数量和粒度，以避免上下文膨胀？"
-        ]
-      },
-      "body": "\n## Explanation\n\n遵循 Model Context Protocol 的工具提供服务，允许语言模型在对话中动态调用自定义工具。每个工具定义名称、描述和 JSON Schema 参数。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。\n\n## Supported by\n- [[claims/agentmemory-main-claim]]\n",
-      "excerpt": "遵循 Model Context Protocol 的工具提供服务，允许语言模型在对话中动态调用自定义工具。每个工具定义名称、描述和 JSON Schema 参数。 出处:https://github.com/rohitg00/agentmemory。See [[content/agentmemory]]。",
-      "links": [
-        {
-          "target": "content/agentmemory",
-          "raw": "[[content/agentmemory]]"
-        },
-        {
-          "target": "claims/agentmemory-main-claim",
-          "raw": "[[claims/agentmemory-main-claim]]"
+          "target": "claims/yikart-aitoearn-main-claim",
+          "raw": "[[claims/yikart-aitoearn-main-claim]]"
         }
       ],
       "headings": [
@@ -3099,49 +2993,50 @@
       ]
     },
     {
-      "id": "concept/persistent-memory-agent",
+      "id": "concept/patched-browser-binary",
       "type": "concept",
-      "slug": "persistent-memory-agent",
-      "title": "Persistent Memory Agent",
-      "file": "concepts/persistent-memory-agent.md",
+      "slug": "patched-browser-binary",
+      "title": "Patched Browser Binary",
+      "file": "concepts/patched-browser-binary.md",
       "directory": "concepts",
       "meta": {
-        "name": "持久记忆代理",
-        "slug": "persistent-memory-agent",
+        "name": "patched browser binary",
+        "slug": "patched-browser-binary",
         "kind": "concept",
         "tags": [
-          "memory",
-          "agent",
-          "persistence"
+          "browser-automation",
+          "fingerprint",
+          "binary-distribution"
         ],
         "maturity": "active",
-        "first_seen_in": "hermes-webui",
+        "first_seen_in": "cloakhq-cloakbrowser",
         "related_content": [
-          "hermes-webui"
+          "cloakhq-cloakbrowser"
         ],
         "related_concepts": [],
-        "explanation": "AI Agent 能够跨会话记住用户信息、项目环境和学习到的技能，不再每次对话都从零开始，从而提供更个性化的长期辅助。",
+        "explanation": "人话：不是给普通 Chrome 打启动参数，而是运行一个已经改过源码并重新编译的浏览器。技术词：CloakBrowser wrapper 用 `executable_path`/`executablePath` 指向 CloakHQ 发布的 Chromium binary；README 自称 fingerprint patch 在 C++ source level。",
         "examples": [
-          "Hermes Agent 的用户画像、项目上下文和技能存储"
+          "`cloakbrowser/browser.py launch()` 调用 `pw.chromium.launch(executable_path=binary_path, ...)`",
+          "`config.py` 当前 `CHROMIUM_VERSION = 146.0.7680.177.5`"
         ],
         "common_misunderstandings": [
-          "不等于简单的聊天历史记录，而是结构化的知识提取和自适应行为调整。"
+          "wrapper MIT 不等于 binary 也可自由再分发。",
+          "有 C++ patch 自称不等于 patch 源码已公开。"
         ],
         "open_questions": [
-          "记忆的存储和检索机制如何平衡效率与准确性？",
-          "长期记忆如何避免过时和冲突？"
+          "58 个 patch 的源码和测试映射未在 repo tree 公开。"
         ]
       },
-      "body": "\n## Explanation\n\nAI Agent 能够跨会话记住用户信息、项目环境和学习到的技能，不再每次对话都从零开始，从而提供更个性化的长期辅助。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。\n\n## Supported by\n- [[claims/hermes-webui-main-claim]]\n",
-      "excerpt": "AI Agent 能够跨会话记住用户信息、项目环境和学习到的技能，不再每次对话都从零开始，从而提供更个性化的长期辅助。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。",
+      "body": "\n## Explanation\n\n人话：不是给普通 Chrome 打启动参数，而是运行一个已经改过源码并重新编译的浏览器。技术词：CloakBrowser wrapper 用 `executable_path`/`executablePath` 指向 CloakHQ 发布的 Chromium binary；README 自称 fingerprint patch 在 C++ source level。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakhq-cloakbrowser]]。\n\n## Supported by\n- [[claims/cloakhq-cloakbrowser-main-claim]]\n",
+      "excerpt": "人话：不是给普通 Chrome 打启动参数，而是运行一个已经改过源码并重新编译的浏览器。技术词：CloakBrowser wrapper 用 `executable_path`/`executablePath` 指向 CloakHQ 发布的 Chromium binary；README 自称 fingerprint patch 在 C++ source level。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakhq-cloakbrowser]]。",
       "links": [
         {
-          "target": "content/hermes-webui",
-          "raw": "[[content/hermes-webui]]"
+          "target": "content/cloakhq-cloakbrowser",
+          "raw": "[[content/cloakhq-cloakbrowser]]"
         },
         {
-          "target": "claims/hermes-webui-main-claim",
-          "raw": "[[claims/hermes-webui-main-claim]]"
+          "target": "claims/cloakhq-cloakbrowser-main-claim",
+          "raw": "[[claims/cloakhq-cloakbrowser-main-claim]]"
         }
       ],
       "headings": [
@@ -3156,47 +3051,166 @@
       ]
     },
     {
-      "id": "concept/plugin-based-converter-architecture",
+      "id": "concept/pbakaus-impeccable-agent-skill-command-router",
       "type": "concept",
-      "slug": "plugin-based-converter-architecture",
-      "title": "Plugin Based Converter Architecture",
-      "file": "concepts/plugin-based-converter-architecture.md",
+      "slug": "pbakaus-impeccable-agent-skill-command-router",
+      "title": "Pbakaus Impeccable Agent Skill Command Router",
+      "file": "concepts/pbakaus-impeccable-agent-skill-command-router.md",
       "directory": "concepts",
       "meta": {
-        "name": "基于插件的转换器架构",
-        "slug": "plugin-based-converter-architecture",
+        "name": "Agent skill command router",
+        "slug": "pbakaus-impeccable-agent-skill-command-router",
         "kind": "concept",
         "tags": [
-          "plugin-system",
-          "extensibility"
+          "agent-workflow",
+          "skills",
+          "prompt-architecture"
         ],
         "maturity": "active",
-        "first_seen_in": "markitdown",
+        "first_seen_in": "pbakaus-impeccable",
         "related_content": [
-          "markitdown"
+          "pbakaus-impeccable"
         ],
         "related_concepts": [],
-        "explanation": "核心引擎提供注册机制，外部通过入口点贡献格式处理器或后处理步骤，不修改核心代码即可扩展能力。",
+        "explanation": "人话：一个 skill 入口承接多个用户动作，先统一做上下文加载，再按第一个词路由到具体参考文件。术语：`skill/SKILL.src.md` 的 Routing rules 把 `craft/audit/polish/live` 等子命令映射到 `reference/<command>.md`。",
         "examples": [
-          "MarkItDown 的 markitdown-ocr 插件通过 entry point 注册 OCR 转换器，复用 llm_client"
+          "`/impeccable audit the header` 读取 `reference/audit.md`",
+          "`/impeccable pin audit` 调用 `node {{scripts_path}}/pin.mjs <pin|unpin> <command>`"
         ],
         "common_misunderstandings": [
-          "插件不一定运行在沙箱，可能继承宿主权限"
+          "不是每个命令都是独立二进制程序；很多命令是 agent workflow reference。",
+          "不是 UI 组件库。"
         ],
         "open_questions": [
-          "如何保证插件的质量和安全审查？"
+          "不同 harness 对同一个 routing prompt 的执行一致性如何量化，repo 未给 benchmark。"
         ]
       },
-      "body": "\n## Explanation\n\n核心引擎提供注册机制，外部通过入口点贡献格式处理器或后处理步骤，不修改核心代码即可扩展能力。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。\n\n## Supported by\n- [[claims/markitdown-main-claim]]\n",
-      "excerpt": "核心引擎提供注册机制，外部通过入口点贡献格式处理器或后处理步骤，不修改核心代码即可扩展能力。 出处:https://github.com/microsoft/markitdown。See [[content/markitdown]]。",
+      "body": "\n## Explanation\n\n人话：一个 skill 入口承接多个用户动作，先统一做上下文加载，再按第一个词路由到具体参考文件。术语：`skill/SKILL.src.md` 的 Routing rules 把 `craft/audit/polish/live` 等子命令映射到 `reference/<command>.md`。 出处:https://github.com/pbakaus/impeccable。See [[content/pbakaus-impeccable]]。\n\n## Supported by\n- [[claims/pbakaus-impeccable-main-claim]]\n",
+      "excerpt": "人话：一个 skill 入口承接多个用户动作，先统一做上下文加载，再按第一个词路由到具体参考文件。术语：`skill/SKILL.src.md` 的 Routing rules 把 `craft/audit/polish/live` 等子命令映射到 `reference/<command>.md`。 出处:https://github.com/pbakaus/impeccable。See [[content/pbakaus-impeccable]]。",
       "links": [
         {
-          "target": "content/markitdown",
-          "raw": "[[content/markitdown]]"
+          "target": "content/pbakaus-impeccable",
+          "raw": "[[content/pbakaus-impeccable]]"
         },
         {
-          "target": "claims/markitdown-main-claim",
-          "raw": "[[claims/markitdown-main-claim]]"
+          "target": "claims/pbakaus-impeccable-main-claim",
+          "raw": "[[claims/pbakaus-impeccable-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/pbakaus-impeccable-deterministic-antipattern-detector",
+      "type": "concept",
+      "slug": "pbakaus-impeccable-deterministic-antipattern-detector",
+      "title": "Pbakaus Impeccable Deterministic Antipattern Detector",
+      "file": "concepts/pbakaus-impeccable-deterministic-antipattern-detector.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Deterministic anti-pattern detector",
+        "slug": "pbakaus-impeccable-deterministic-antipattern-detector",
+        "kind": "concept",
+        "tags": [
+          "lint",
+          "frontend",
+          "design-quality"
+        ],
+        "maturity": "active",
+        "first_seen_in": "pbakaus-impeccable",
+        "related_content": [
+          "pbakaus-impeccable"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：不用 LLM，直接扫描源码或渲染页面，找作者定义的设计坏味道。术语：registry 中的 `ANTIPATTERNS` 定义 rule id/category/name/description，CLI 用 static HTML、regex、browser engines 产生 findings。",
+        "examples": [
+          "`overused-font` 检测 Inter/Roboto/Fraunces/Geist/Plus Jakarta Sans/Space Grotesk",
+          "`flat-type-hierarchy` 输出 `Sizes: 13px, 14px, 15px, 16px, 18px (ratio 1.4:1)`"
+        ],
+        "common_misunderstandings": [
+          "detector findings 不是审美真理，只是项目作者定义的规则命中。",
+          "README 的 24/27 规则数不是当前 registry 的真实数量。"
+        ],
+        "open_questions": [
+          "真实项目误报/漏报率未在 README/docs/tree 说明。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：不用 LLM，直接扫描源码或渲染页面，找作者定义的设计坏味道。术语：registry 中的 `ANTIPATTERNS` 定义 rule id/category/name/description，CLI 用 static HTML、regex、browser engines 产生 findings。 出处:https://github.com/pbakaus/impeccable。See [[content/pbakaus-impeccable]]。\n\n## Supported by\n- [[claims/pbakaus-impeccable-main-claim]]\n",
+      "excerpt": "人话：不用 LLM，直接扫描源码或渲染页面，找作者定义的设计坏味道。术语：registry 中的 `ANTIPATTERNS` 定义 rule id/category/name/description，CLI 用 static HTML、regex、browser engines 产生 findings。 出处:https://github.com/pbakaus/impeccable。See [[content/pbakaus-impeccable]]。",
+      "links": [
+        {
+          "target": "content/pbakaus-impeccable",
+          "raw": "[[content/pbakaus-impeccable]]"
+        },
+        {
+          "target": "claims/pbakaus-impeccable-main-claim",
+          "raw": "[[claims/pbakaus-impeccable-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/persistent-agent-memory",
+      "type": "concept",
+      "slug": "persistent-agent-memory",
+      "title": "Persistent Agent Memory",
+      "file": "concepts/persistent-agent-memory.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "持久代理记忆",
+        "slug": "persistent-agent-memory",
+        "kind": "concept",
+        "tags": [
+          "agents",
+          "memory",
+          "mcp"
+        ],
+        "maturity": "active",
+        "first_seen_in": "rohitg00-agentmemory",
+        "related_content": [
+          "rohitg00-agentmemory"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：把代理做过的决定、错误、偏好和会话结果保存下来，下次能查。术语：agentmemory 用 KV scopes 保存 sessions、observations、memories、lessons 等，并通过 MCP/REST 暴露 recall/save/search。",
+        "examples": [
+          "`mem::remember` 写 `KV.memories`。",
+          "`memory_smart_search` 返回 compact observation IDs。"
+        ],
+        "common_misunderstandings": [
+          "不是把全部历史塞回 prompt；它先检索再返回相关片段。",
+          "不是完整 agent runtime；它是记忆层。"
+        ],
+        "open_questions": [
+          "默认 embedding 是否真的开箱即用需运行确认。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：把代理做过的决定、错误、偏好和会话结果保存下来，下次能查。术语：agentmemory 用 KV scopes 保存 sessions、observations、memories、lessons 等，并通过 MCP/REST 暴露 recall/save/search。 出处:https://github.com/rohitg00/agentmemory。See [[content/rohitg00-agentmemory]]。\n\n## Supported by\n- [[claims/rohitg00-agentmemory-main-claim]]\n",
+      "excerpt": "人话：把代理做过的决定、错误、偏好和会话结果保存下来，下次能查。术语：agentmemory 用 KV scopes 保存 sessions、observations、memories、lessons 等，并通过 MCP/REST 暴露 recall/save/search。 出处:https://github.com/rohitg00/agentmemory。See [[content/rohitg00-agentmemory]]。",
+      "links": [
+        {
+          "target": "content/rohitg00-agentmemory",
+          "raw": "[[content/rohitg00-agentmemory]]"
+        },
+        {
+          "target": "claims/rohitg00-agentmemory-main-claim",
+          "raw": "[[claims/rohitg00-agentmemory-main-claim]]"
         }
       ],
       "headings": [
@@ -3323,64 +3337,6 @@
       ]
     },
     {
-      "id": "concept/pre-indexed-knowledge-graph",
-      "type": "concept",
-      "slug": "pre-indexed-knowledge-graph",
-      "title": "Pre Indexed Knowledge Graph",
-      "file": "concepts/pre-indexed-knowledge-graph.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "预索引知识图谱",
-        "slug": "pre-indexed-knowledge-graph",
-        "kind": "concept",
-        "tags": [
-          "code-intelligence",
-          "performance-optimization",
-          "agent-tool"
-        ],
-        "maturity": "active",
-        "first_seen_in": "codegraph",
-        "related_content": [
-          "codegraph"
-        ],
-        "related_concepts": [],
-        "explanation": "在 AI 助手开始工作前，先对整个代码库做静态分析，生成包含符号、调用关系、路由等的结构化图谱并存入数据库。后续查询时无需扫描文件，直接检索图谱，大幅降低 token 和工具调用。",
-        "examples": [
-          "CodeGraph 在 VS Code 仓库上，agent 用 `codegraph_explore` 一次性获得扩展宿主通信的完整调用链，0 次文件读取。"
-        ],
-        "common_misunderstandings": [
-          "不是代码生成，不修改源码；不替代 agent 的推理，只提供上下文。",
-          "索引是本地独立进程，不依赖外部服务。图谱可能不是实时，依赖于同步机制。"
-        ],
-        "open_questions": [
-          "对于动态类型语言或大量运行时反射的代码，静态解析的图谱能覆盖多少真实调用关系？",
-          "如何评估图谱的召回率与准确率对 agent 最终回答质量的影响？"
-        ]
-      },
-      "body": "\n## Explanation\n\n在 AI 助手开始工作前，先对整个代码库做静态分析，生成包含符号、调用关系、路由等的结构化图谱并存入数据库。后续查询时无需扫描文件，直接检索图谱，大幅降低 token 和工具调用。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。\n\n## Supported by\n- [[claims/codegraph-main-claim]]\n",
-      "excerpt": "在 AI 助手开始工作前，先对整个代码库做静态分析，生成包含符号、调用关系、路由等的结构化图谱并存入数据库。后续查询时无需扫描文件，直接检索图谱，大幅降低 token 和工具调用。 出处:https://github.com/colbymchenry/codegraph。See [[content/codegraph]]。",
-      "links": [
-        {
-          "target": "content/codegraph",
-          "raw": "[[content/codegraph]]"
-        },
-        {
-          "target": "claims/codegraph-main-claim",
-          "raw": "[[claims/codegraph-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
       "id": "concept/prefix-caching-exploitation",
       "type": "concept",
       "slug": "prefix-caching-exploitation",
@@ -3423,6 +3379,64 @@
         {
           "target": "claims/codewhale-main-claim",
           "raw": "[[claims/codewhale-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/procedural-memory-skills",
+      "type": "concept",
+      "slug": "procedural-memory-skills",
+      "title": "Procedural Memory Skills",
+      "file": "concepts/procedural-memory-skills.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Procedural Memory / Skills",
+        "slug": "procedural-memory-skills",
+        "kind": "concept",
+        "tags": [
+          "skills",
+          "memory",
+          "agents"
+        ],
+        "maturity": "active",
+        "first_seen_in": "nousresearch-hermes-agent",
+        "related_content": [
+          "nousresearch-hermes-agent"
+        ],
+        "related_concepts": [],
+        "explanation": "普通话说：skill 是把“这类事以后怎么做”写成可复用说明，而不是只记住一个事实。技术定义：Hermes 用 `SKILL.md` 加 references/templates/scripts/assets 表示技能，`skill_view` 负责按需加载，`skill_manage` 负责创建、编辑、patch 和写支持文件。",
+        "examples": [
+          "skills/software-development/test-driven-development/SKILL.md",
+          "tools/skill_manager_tool.py MAX_SKILL_CONTENT_CHARS = 100_000"
+        ],
+        "common_misunderstandings": [
+          "把 skill 当成普通偏好记忆；skill 更适合过程和操作步骤。",
+          "以为 agent-created skill 默认强安全扫描；源码显示 `skills.guard_agent_created` 默认 false。"
+        ],
+        "open_questions": [
+          "自动创建和自我改进 skill 的真实触发策略需要运行后确认。"
+        ]
+      },
+      "body": "\n## Explanation\n\n普通话说：skill 是把“这类事以后怎么做”写成可复用说明，而不是只记住一个事实。技术定义：Hermes 用 `SKILL.md` 加 references/templates/scripts/assets 表示技能，`skill_view` 负责按需加载，`skill_manage` 负责创建、编辑、patch 和写支持文件。 出处:https://github.com/nousresearch/hermes-agent。See [[content/nousresearch-hermes-agent]]。\n\n## Supported by\n- [[claims/nousresearch-hermes-agent-main-claim]]\n",
+      "excerpt": "普通话说：skill 是把“这类事以后怎么做”写成可复用说明，而不是只记住一个事实。技术定义：Hermes 用 `SKILL.md` 加 references/templates/scripts/assets 表示技能，`skill_view` 负责按需加载，`skill_manage` 负责创建、编辑、patch 和写支持文件。 出处:https://github.com/nousresearch/hermes-agent。See [[content/nousresearch-hermes-agent]]。",
+      "links": [
+        {
+          "target": "content/nousresearch-hermes-agent",
+          "raw": "[[content/nousresearch-hermes-agent]]"
+        },
+        {
+          "target": "claims/nousresearch-hermes-agent-main-claim",
+          "raw": "[[claims/nousresearch-hermes-agent-main-claim]]"
         }
       ],
       "headings": [
@@ -3551,62 +3565,6 @@
       ]
     },
     {
-      "id": "concept/provider-abstraction",
-      "type": "concept",
-      "slug": "provider-abstraction",
-      "title": "Provider Abstraction",
-      "file": "concepts/provider-abstraction.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "供应商抽象层",
-        "slug": "provider-abstraction",
-        "kind": "concept",
-        "tags": [
-          "llm-provider",
-          "abstraction",
-          "ui-ux"
-        ],
-        "maturity": "active",
-        "first_seen_in": "hermes-desktop",
-        "related_content": [
-          "hermes-desktop"
-        ],
-        "related_concepts": [],
-        "explanation": "统一管理多个 LLM 供应商的 API 密钥、端点配置和模型列表，通过 UI 切换，无需修改代码。",
-        "examples": [
-          "Hermes Desktop 支持 OpenRouter、Anthropic、OpenAI、Ollama 等 11 种供应商。"
-        ],
-        "common_misunderstandings": [
-          "不是只做转发，而是针对每个供应商进行了专门的 UI 配置适配。"
-        ],
-        "open_questions": [
-          "如何在添加新供应商时保持抽象层的简洁性？"
-        ]
-      },
-      "body": "\n## Explanation\n\n统一管理多个 LLM 供应商的 API 密钥、端点配置和模型列表，通过 UI 切换，无需修改代码。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。\n\n## Supported by\n- [[claims/hermes-desktop-main-claim]]\n",
-      "excerpt": "统一管理多个 LLM 供应商的 API 密钥、端点配置和模型列表，通过 UI 切换，无需修改代码。 出处:https://github.com/fathah/hermes-desktop。See [[content/hermes-desktop]]。",
-      "links": [
-        {
-          "target": "content/hermes-desktop",
-          "raw": "[[content/hermes-desktop]]"
-        },
-        {
-          "target": "claims/hermes-desktop-main-claim",
-          "raw": "[[claims/hermes-desktop-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
       "id": "concept/replaceable-media-pipeline",
       "type": "concept",
       "slug": "replaceable-media-pipeline",
@@ -3664,6 +3622,122 @@
       ]
     },
     {
+      "id": "concept/ryancodrai-turbovec-id-mapped-vector-index",
+      "type": "concept",
+      "slug": "ryancodrai-turbovec-id-mapped-vector-index",
+      "title": "Ryancodrai Turbovec Id Mapped Vector Index",
+      "file": "concepts/ryancodrai-turbovec-id-mapped-vector-index.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "稳定 ID 向量索引",
+        "slug": "ryancodrai-turbovec-id-mapped-vector-index",
+        "kind": "concept",
+        "tags": [
+          "indexing",
+          "ids",
+          "rag"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "ryancodrai-turbovec",
+        "related_content": [
+          "ryancodrai-turbovec"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：内部数组位置会因为删除而变，但业务文档 ID 不能变，所以外面包一层 ID 到 slot 的映射。术语：`IdMapIndex` 维护 `slot_to_id: Vec<u64>` 和 `id_to_slot: HashMap<u64, usize>`，删除时调用内部 `swap_remove` 并更新 moved id（来源：turbovec/src/id_map.rs）。",
+        "examples": [
+          "`idx.add_with_ids(vectors, np.array([1001, 1002, 1003], dtype=np.uint64))`",
+          "`idx.remove(1002)`"
+        ],
+        "common_misunderstandings": [
+          "稳定 ID 不等于保存文档内容；文档内容在 wrapper side-car 或外部数据库。",
+          "字符串 ID 不是核心索引的原生类型，wrapper 会映射成 u64。"
+        ],
+        "open_questions": [
+          "跨进程并发更新 ID map 的策略未在 README/docs/tree 说明。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：内部数组位置会因为删除而变，但业务文档 ID 不能变，所以外面包一层 ID 到 slot 的映射。术语：`IdMapIndex` 维护 `slot_to_id: Vec<u64>` 和 `id_to_slot: HashMap<u64, usize>`，删除时调用内部 `swap_remove` 并更新 moved id（来源：turbovec/src/id_map.rs）。 出处:https://github.com/ryancodrai/turbovec。See [[content/ryancodrai-turbovec]]。\n\n## Supported by\n- [[claims/ryancodrai-turbovec-main-claim]]\n",
+      "excerpt": "人话：内部数组位置会因为删除而变，但业务文档 ID 不能变，所以外面包一层 ID 到 slot 的映射。术语：`IdMapIndex` 维护 `slot_to_id: Vec<u64>` 和 `id_to_slot: HashMap<u64, usize>`，删除时调用内部 `swap_remove` 并更新 moved id（来源：turbovec/src/id_map.rs）。 出处:https://github.com/ryancodrai/turbovec。See [[content/ryancodrai-turbovec]]。",
+      "links": [
+        {
+          "target": "content/ryancodrai-turbovec",
+          "raw": "[[content/ryancodrai-turbovec]]"
+        },
+        {
+          "target": "claims/ryancodrai-turbovec-main-claim",
+          "raw": "[[claims/ryancodrai-turbovec-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/ryancodrai-turbovec-turboquant-vector-quantization",
+      "type": "concept",
+      "slug": "ryancodrai-turbovec-turboquant-vector-quantization",
+      "title": "Ryancodrai Turbovec Turboquant Vector Quantization",
+      "file": "concepts/ryancodrai-turbovec-turboquant-vector-quantization.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "TurboQuant 向量量化",
+        "slug": "ryancodrai-turbovec-turboquant-vector-quantization",
+        "kind": "concept",
+        "tags": [
+          "vector-search",
+          "quantization",
+          "rag"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "ryancodrai-turbovec",
+        "related_content": [
+          "ryancodrai-turbovec"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：把高维 embedding 的方向压成每维少量 bit，而不是保存整条 float32 向量。术语：仓库实现路径是 normalize、random rotation、Lloyd-Max scalar quantization、bit-pack，并在搜索时用 query LUT 直接对 packed codes 计分（来源：README How it works；turbovec/src/encode.rs；turbovec/src/search.rs）。",
+        "examples": [
+          "`TurboQuantIndex(dim=1536, bit_width=4)`",
+          "`bytes_per_row = bit_width * (dim / 8)`"
+        ],
+        "common_misunderstandings": [
+          "它不是 embedding 模型；它只索引已经生成的向量。",
+          "压缩后不能精确拿回原始 full-precision embedding。"
+        ],
+        "open_questions": [
+          "README 性能数字在目标硬件和目标数据集上是否复现。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：把高维 embedding 的方向压成每维少量 bit，而不是保存整条 float32 向量。术语：仓库实现路径是 normalize、random rotation、Lloyd-Max scalar quantization、bit-pack，并在搜索时用 query LUT 直接对 packed codes 计分（来源：README How it works；turbovec/src/encode.rs；turbovec/src/search.rs）。 出处:https://github.com/ryancodrai/turbovec。See [[content/ryancodrai-turbovec]]。\n\n## Supported by\n- [[claims/ryancodrai-turbovec-main-claim]]\n",
+      "excerpt": "人话：把高维 embedding 的方向压成每维少量 bit，而不是保存整条 float32 向量。术语：仓库实现路径是 normalize、random rotation、Lloyd-Max scalar quantization、bit-pack，并在搜索时用 query LUT 直接对 packed codes 计分（来源：README How it works；turbovec/src/encode.rs；turbovec/src/search.rs）。 出处:https://github.com/ryancodrai/turbovec。See ",
+      "links": [
+        {
+          "target": "content/ryancodrai-turbovec",
+          "raw": "[[content/ryancodrai-turbovec]]"
+        },
+        {
+          "target": "claims/ryancodrai-turbovec-main-claim",
+          "raw": "[[claims/ryancodrai-turbovec-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/scrapling-mcp-tool-integration",
       "type": "concept",
       "slug": "scrapling-mcp-tool-integration",
@@ -3707,64 +3781,6 @@
         {
           "target": "claims/scrapling-main-claim",
           "raw": "[[claims/scrapling-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
-      "id": "concept/self-hosted-agent-ui",
-      "type": "concept",
-      "slug": "self-hosted-agent-ui",
-      "title": "Self Hosted Agent Ui",
-      "file": "concepts/self-hosted-agent-ui.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "自托管 Agent 界面",
-        "slug": "self-hosted-agent-ui",
-        "kind": "concept",
-        "tags": [
-          "self-hosted",
-          "agent",
-          "web-ui"
-        ],
-        "maturity": "active",
-        "first_seen_in": "hermes-webui",
-        "related_content": [
-          "hermes-webui"
-        ],
-        "related_concepts": [],
-        "explanation": "通过自建 Web 服务为本地运行的 AI Agent 提供图形化交互界面，无需依赖云厂商的服务，数据存储在用户自己的机器上。",
-        "examples": [
-          "Hermes WebUI",
-          "OpenCode 的 WebUI（部分）"
-        ],
-        "common_misunderstandings": [
-          "不等于代理的‘控制面板’，而是完整的交互前端，可执行与 CLI 相同的操作。"
-        ],
-        "open_questions": [
-          "如何保证 UI 与 Agent 进程之间的低延迟和高可靠通信？",
-          "如何设计离线状态下的任务队列和结果推送？"
-        ]
-      },
-      "body": "\n## Explanation\n\n通过自建 Web 服务为本地运行的 AI Agent 提供图形化交互界面，无需依赖云厂商的服务，数据存储在用户自己的机器上。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。\n\n## Supported by\n- [[claims/hermes-webui-main-claim]]\n",
-      "excerpt": "通过自建 Web 服务为本地运行的 AI Agent 提供图形化交互界面，无需依赖云厂商的服务，数据存储在用户自己的机器上。 出处:https://github.com/nesquena/hermes-webui。See [[content/hermes-webui]]。",
-      "links": [
-        {
-          "target": "content/hermes-webui",
-          "raw": "[[content/hermes-webui]]"
-        },
-        {
-          "target": "claims/hermes-webui-main-claim",
-          "raw": "[[claims/hermes-webui-main-claim]]"
         }
       ],
       "headings": [
@@ -3895,47 +3911,109 @@
       ]
     },
     {
-      "id": "concept/source-level-stealth",
+      "id": "concept/sqlite-knowledge-graph",
       "type": "concept",
-      "slug": "source-level-stealth",
-      "title": "Source Level Stealth",
-      "file": "concepts/source-level-stealth.md",
+      "slug": "sqlite-knowledge-graph",
+      "title": "Sqlite Knowledge Graph",
+      "file": "concepts/sqlite-knowledge-graph.md",
       "directory": "concepts",
       "meta": {
-        "name": "源码级隐身",
-        "slug": "source-level-stealth",
+        "name": "SQLite 知识图谱",
+        "slug": "sqlite-knowledge-graph",
         "kind": "concept",
         "tags": [
-          "anti-detection",
-          "stealth"
+          "sqlite",
+          "knowledge-graph",
+          "static-analysis"
         ],
-        "maturity": "active",
-        "first_seen_in": "cloakbrowser",
+        "maturity": "stable",
+        "first_seen_in": "colbymchenry-codegraph",
         "related_content": [
-          "cloakbrowser"
+          "colbymchenry-codegraph"
         ],
         "related_concepts": [],
-        "explanation": "在浏览器引擎源代码层面（C++）修改指纹数据，使得浏览器在底层看起来与真实用户无异，规避 JavaScript 指纹检测。",
+        "explanation": "白话：用数据库存代码里的“谁是谁、谁调用谁”。术语：`nodes` 表存符号，`edges` 表存 `calls/imports/extends` 等关系，`nodes_fts` 用 FTS5 做符号全文检索。",
         "examples": [
-          "CloakBrowser 对 canvas、WebGL、audio 等指纹进行 C++ 级替换。"
+          "`src/db/schema.sql`",
+          "`src/types.ts` 的 `NODE_KINDS` 和 `EdgeKind`"
         ],
         "common_misunderstandings": [
-          "认为只需修改 navigator.webdriver 等 JS 属性即可绕过后端检测，实际上现代反爬会检查渲染一致性、底层 API 行为等。"
+          "SQLite 不只适合小配置；这里被用作本地索引数据库。",
+          "图数据库不一定要 Neo4j；关系表也能表达图边。"
         ],
         "open_questions": [
-          "反爬厂商是否会针对特定二进制构建指纹库进行防御？"
+          "超大型 monorepo 下单个 SQLite DB 的写入/查询上限需要实测。"
         ]
       },
-      "body": "\n## Explanation\n\n在浏览器引擎源代码层面（C++）修改指纹数据，使得浏览器在底层看起来与真实用户无异，规避 JavaScript 指纹检测。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。\n\n## Supported by\n- [[claims/cloakbrowser-main-claim]]\n",
-      "excerpt": "在浏览器引擎源代码层面（C++）修改指纹数据，使得浏览器在底层看起来与真实用户无异，规避 JavaScript 指纹检测。 出处:https://github.com/cloakhq/cloakbrowser。See [[content/cloakbrowser]]。",
+      "body": "\n## Explanation\n\n白话：用数据库存代码里的“谁是谁、谁调用谁”。术语：`nodes` 表存符号，`edges` 表存 `calls/imports/extends` 等关系，`nodes_fts` 用 FTS5 做符号全文检索。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。\n\n## Supported by\n- [[claims/colbymchenry-codegraph-main-claim]]\n",
+      "excerpt": "白话：用数据库存代码里的“谁是谁、谁调用谁”。术语：`nodes` 表存符号，`edges` 表存 `calls/imports/extends` 等关系，`nodes_fts` 用 FTS5 做符号全文检索。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。",
       "links": [
         {
-          "target": "content/cloakbrowser",
-          "raw": "[[content/cloakbrowser]]"
+          "target": "content/colbymchenry-codegraph",
+          "raw": "[[content/colbymchenry-codegraph]]"
         },
         {
-          "target": "claims/cloakbrowser-main-claim",
-          "raw": "[[claims/cloakbrowser-main-claim]]"
+          "target": "claims/colbymchenry-codegraph-main-claim",
+          "raw": "[[claims/colbymchenry-codegraph-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/sse-chat-stream",
+      "type": "concept",
+      "slug": "sse-chat-stream",
+      "title": "Sse Chat Stream",
+      "file": "concepts/sse-chat-stream.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "SSE 聊天流",
+        "slug": "sse-chat-stream",
+        "kind": "concept",
+        "tags": [
+          "web-runtime",
+          "agent-ui",
+          "streaming"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "nesquena-hermes-webui",
+        "related_content": [
+          "nesquena-hermes-webui"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：浏览器先拿到一个 stream_id，然后像订阅直播一样接收 token、tool、approval、done 等事件。技术定义：SSE 是 Server-Sent Events，前端用 EventSource 连接 `/api/chat/stream?stream_id=...`，后端用进程内 stream/channel/queue 推送事件。",
+        "examples": [
+          "`POST /api/chat/start` -> `{stream_id}`",
+          "`new EventSource('api/chat/stream?stream_id=...')`",
+          "事件类型包括 token、approval、done、error"
+        ],
+        "common_misunderstandings": [
+          "SSE 不是 WebSocket；它是服务端单向推送。",
+          "stream_id 不是会话 id；它代表一次运行/观察通道。"
+        ],
+        "open_questions": [
+          "RuntimeAdapter/runner-local 完成后，SSE producer 会不会从 WebUI 进程移到独立 runner？"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：浏览器先拿到一个 stream_id，然后像订阅直播一样接收 token、tool、approval、done 等事件。技术定义：SSE 是 Server-Sent Events，前端用 EventSource 连接 `/api/chat/stream?stream_id=...`，后端用进程内 stream/channel/queue 推送事件。 出处:https://github.com/nesquena/hermes-webui。See [[content/nesquena-hermes-webui]]。\n\n## Supported by\n- [[claims/nesquena-hermes-webui-main-claim]]\n",
+      "excerpt": "人话：浏览器先拿到一个 stream_id，然后像订阅直播一样接收 token、tool、approval、done 等事件。技术定义：SSE 是 Server-Sent Events，前端用 EventSource 连接 `/api/chat/stream?stream_id=...`，后端用进程内 stream/channel/queue 推送事件。 出处:https://github.com/nesquena/hermes-webui。See [[content/nesquena-hermes-webui]]。",
+      "links": [
+        {
+          "target": "content/nesquena-hermes-webui",
+          "raw": "[[content/nesquena-hermes-webui]]"
+        },
+        {
+          "target": "claims/nesquena-hermes-webui-main-claim",
+          "raw": "[[claims/nesquena-hermes-webui-main-claim]]"
         }
       ],
       "headings": [
@@ -4161,6 +4239,64 @@
       ]
     },
     {
+      "id": "concept/terminal-backend",
+      "type": "concept",
+      "slug": "terminal-backend",
+      "title": "Terminal Backend",
+      "file": "concepts/terminal-backend.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Terminal Backend",
+        "slug": "terminal-backend",
+        "kind": "concept",
+        "tags": [
+          "sandbox",
+          "terminal",
+          "execution"
+        ],
+        "maturity": "active",
+        "first_seen_in": "nousresearch-hermes-agent",
+        "related_content": [
+          "nousresearch-hermes-agent"
+        ],
+        "related_concepts": [],
+        "explanation": "普通话说：同一条终端命令可以在本机、容器、远程机器或云沙箱里跑。技术定义：Hermes 的 terminal tool 根据 `env_type` 分派到 local/docker/singularity/modal/daytona/ssh 等 Environment 实现，并用配置控制 cwd、镜像、资源、持久化和 env forward。",
+        "examples": [
+          "cli-config.yaml.example terminal.backend: docker",
+          "tools/terminal_tool.py _create_environment"
+        ],
+        "common_misunderstandings": [
+          "配置了 agent 不等于命令自动安全；local backend 仍直接触达宿主机。",
+          "Docker 隔离不等于网络隔离；默认 compose 使用 host network。"
+        ],
+        "open_questions": [
+          "不同 backend 的实际隔离强度和清理行为需要逐项实测。"
+        ]
+      },
+      "body": "\n## Explanation\n\n普通话说：同一条终端命令可以在本机、容器、远程机器或云沙箱里跑。技术定义：Hermes 的 terminal tool 根据 `env_type` 分派到 local/docker/singularity/modal/daytona/ssh 等 Environment 实现，并用配置控制 cwd、镜像、资源、持久化和 env forward。 出处:https://github.com/nousresearch/hermes-agent。See [[content/nousresearch-hermes-agent]]。\n\n## Supported by\n- [[claims/nousresearch-hermes-agent-main-claim]]\n",
+      "excerpt": "普通话说：同一条终端命令可以在本机、容器、远程机器或云沙箱里跑。技术定义：Hermes 的 terminal tool 根据 `env_type` 分派到 local/docker/singularity/modal/daytona/ssh 等 Environment 实现，并用配置控制 cwd、镜像、资源、持久化和 env forward。 出处:https://github.com/nousresearch/hermes-agent。See [[content/nousresearch-hermes-agent]]。",
+      "links": [
+        {
+          "target": "content/nousresearch-hermes-agent",
+          "raw": "[[content/nousresearch-hermes-agent]]"
+        },
+        {
+          "target": "claims/nousresearch-hermes-agent-main-claim",
+          "raw": "[[claims/nousresearch-hermes-agent-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/terminal-multiplexing-for-agents",
       "type": "concept",
       "slug": "terminal-multiplexing-for-agents",
@@ -4195,75 +4331,16 @@
           "是否支持跨机器的代理迁移？"
         ]
       },
-      "body": "\n## Explanation\n\n将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。\n\n## Supported by\n- [[claims/herdr-main-claim]]\n",
-      "excerpt": "将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/herdr]]。",
+      "body": "\n## Explanation\n\n将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。\n\n## Supported by\n- [[claims/herdr-main-claim]]\n",
+      "excerpt": "将传统终端多路复用器（如 tmux）的工作区、窗格、持久会话概念扩展，加入代理状态栏和自我编排能力，专门为 AI 代理开发场景设计。 出处:https://github.com/ogulcancelik/herdr。See [[content/ogulcancelik-herdr]]。",
       "links": [
         {
-          "target": "content/herdr",
-          "raw": "[[content/herdr]]"
+          "target": "content/ogulcancelik-herdr",
+          "raw": "[[content/ogulcancelik-herdr]]"
         },
         {
           "target": "claims/herdr-main-claim",
           "raw": "[[claims/herdr-main-claim]]"
-        }
-      ],
-      "headings": [
-        {
-          "depth": 2,
-          "text": "Explanation"
-        },
-        {
-          "depth": 2,
-          "text": "Supported by"
-        }
-      ]
-    },
-    {
-      "id": "concept/time-traveling-stream-rules",
-      "type": "concept",
-      "slug": "time-traveling-stream-rules",
-      "title": "Time Traveling Stream Rules",
-      "file": "concepts/time-traveling-stream-rules.md",
-      "directory": "concepts",
-      "meta": {
-        "name": "流式规则注入",
-        "slug": "time-traveling-stream-rules",
-        "kind": "concept",
-        "tags": [
-          "safety",
-          "prompt-engineering",
-          "streaming"
-        ],
-        "maturity": "active",
-        "first_seen_in": "oh-my-pi",
-        "related_content": [
-          "oh-my-pi"
-        ],
-        "related_concepts": [],
-        "explanation": "在模型生成输出过程中实时监测 token 流，一旦匹配到用户定义的正则规则，立即中断生成，注入系统提醒，然后从断点重试。规则在上下文压缩后仍保留。",
-        "examples": [
-          "README 示例：代理想写 Box::leak 时被规则拦截并引导改用 Arc<str>",
-          "避免每次对话都携带冗长的规则描述，只按需触发"
-        ],
-        "common_misunderstandings": [
-          "并不是在事后审查，而是在生成过程中实时打断，所以能影响当前输出。",
-          "规则只作用于模型输出，不能阻止用户输入的不安全操作。"
-        ],
-        "open_questions": [
-          "正则匹配对多语言代码的覆盖度如何？",
-          "中断重试在响应延迟上的额外开销多大？"
-        ]
-      },
-      "body": "\n## Explanation\n\n在模型生成输出过程中实时监测 token 流，一旦匹配到用户定义的正则规则，立即中断生成，注入系统提醒，然后从断点重试。规则在上下文压缩后仍保留。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。\n\n## Supported by\n- [[claims/oh-my-pi-main-claim]]\n",
-      "excerpt": "在模型生成输出过程中实时监测 token 流，一旦匹配到用户定义的正则规则，立即中断生成，注入系统提醒，然后从断点重试。规则在上下文压缩后仍保留。 出处:https://github.com/can1357/oh-my-pi。See [[content/oh-my-pi]]。",
-      "links": [
-        {
-          "target": "content/oh-my-pi",
-          "raw": "[[content/oh-my-pi]]"
-        },
-        {
-          "target": "claims/oh-my-pi-main-claim",
-          "raw": "[[claims/oh-my-pi-main-claim]]"
         }
       ],
       "headings": [
@@ -4433,6 +4510,64 @@
         {
           "target": "claims/agent-reach-main-claim",
           "raw": "[[claims/agent-reach-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/ttsr",
+      "type": "concept",
+      "slug": "ttsr",
+      "title": "Ttsr",
+      "file": "concepts/ttsr.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Time Traveling Stream Rules",
+        "slug": "ttsr",
+        "kind": "concept",
+        "tags": [
+          "runtime-guardrail",
+          "streaming",
+          "rules"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "can1357-oh-my-pi",
+        "related_content": [
+          "can1357-oh-my-pi"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：模型刚开始写错方向时就拦截并提醒，而不是等错误生成完。术语：规则有 `condition`、`scope`、`interruptMode`；stream delta 命中后可 abort、插入 `<system-interrupt>` 或 `<system-reminder>`，再继续生成。",
+        "examples": [
+          "`.omp/rules/ts-hook-fetch.md` 禁止在测试里 `globalThis.fetch =` 或 `vi.spyOn(globalThis, \"fetch\")`",
+          "`docs/ttsr-injection-lifecycle.md` 的 50ms retry injection flow"
+        ],
+        "common_misunderstandings": [
+          "不是静态 lint；它运行在 assistant/token/tool stream 上。",
+          "不是所有规则都会进 `rule://`，TTSR-only 规则不在 rulebook URL 中。"
+        ],
+        "open_questions": [
+          "`TtsrSettings.enabled` 未 gating 的 caveat 是否会改变。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：模型刚开始写错方向时就拦截并提醒，而不是等错误生成完。术语：规则有 `condition`、`scope`、`interruptMode`；stream delta 命中后可 abort、插入 `<system-interrupt>` 或 `<system-reminder>`，再继续生成。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。\n\n## Supported by\n- [[claims/can1357-oh-my-pi-main-claim]]\n",
+      "excerpt": "人话：模型刚开始写错方向时就拦截并提醒，而不是等错误生成完。术语：规则有 `condition`、`scope`、`interruptMode`；stream delta 命中后可 abort、插入 `<system-interrupt>` 或 `<system-reminder>`，再继续生成。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。",
+      "links": [
+        {
+          "target": "content/can1357-oh-my-pi",
+          "raw": "[[content/can1357-oh-my-pi]]"
+        },
+        {
+          "target": "claims/can1357-oh-my-pi-main-claim",
+          "raw": "[[claims/can1357-oh-my-pi-main-claim]]"
         }
       ],
       "headings": [
@@ -5137,12 +5272,12 @@
           "DID 和 SPIFFE 的采用成本对团队有多高？"
         ]
       },
-      "body": "\n## Explanation\n\n为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/agent-governance-toolkit-main-claim]]\n",
-      "excerpt": "为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/agent-governance-toolkit]]。",
+      "body": "\n## Explanation\n\n为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。\n\n## Supported by\n- [[claims/agent-governance-toolkit-main-claim]]\n",
+      "excerpt": "为每个 AI 代理分配唯一的、可验证的身份（如基于 SPIFFE/DID），并基于该身份授权，而非依赖共享的 API 密钥。 出处:https://github.com/microsoft/agent-governance-toolkit。See [[content/microsoft-agent-governance-toolkit]]。",
       "links": [
         {
-          "target": "content/agent-governance-toolkit",
-          "raw": "[[content/agent-governance-toolkit]]"
+          "target": "content/microsoft-agent-governance-toolkit",
+          "raw": "[[content/microsoft-agent-governance-toolkit]]"
         },
         {
           "target": "claims/agent-governance-toolkit-main-claim",
