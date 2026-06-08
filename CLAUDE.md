@@ -22,6 +22,12 @@ Each column's analysis paradigm is a **canonical Kevin-authored prompt** in `doc
 ## Division of labor
 Claude = **frontend + architecture + review + router/PM**. Codex = **backend engineering** (and Codex spawns its OWN sub-agents). For sizeable work, **decompose to sub-agents, don't single-agent it**; isolate workspace (worktrees) when concurrent. **Large batch / audit / multi-angle / quality-gate → use a dynamic workflow** (below). Small one-off bugs Claude may fix directly. Frontend visual = **light theme + blue accent** (per Kevin's approved GPT mockups); Kevin judges by the rendered frontend, so verify visually (`/browse`) before claiming done. Frontend designs Claude is unsure about → write a GPT image-gen prompt (content across states, no colors) for Kevin to generate mockups.
 
+## Code intelligence (codegraph)
+A local pre-indexed **code knowledge graph** (`@colbymchenry/codegraph`, MIT, 100% local SQLite at `.codegraph/codegraph.db`, no API keys) is installed globally and registered as an MCP server into Claude Code / Codex / etc. **Use it to navigate THIS codebase instead of blind grep** — symbol search, call graph, change-impact.
+- **MCP (for agents):** the agent auto-starts it on boot (`codegraph serve --mcp`) — there is no daemon to run, just **restart the agent** to load the tools. Reach for it first for "who calls X / what breaks if I change X / where is symbol Y".
+- **CLI (terminal, anytime):** `codegraph query <name>` · `callers <sym>` / `callees <sym>` · `impact <sym>` · `status` · `sync`.
+- **Keep fresh:** run `codegraph sync` after sizeable edits (incremental reindex). The `.codegraph/` DB is git-ignored (local per machine) — **never commit it**.
+
 ## Dynamic workflows (Claude Code) — when & how to use
 
 A **dynamic workflow** is a JavaScript script Claude writes that orchestrates many [subagents] at scale; a runtime runs it in the background while the session stays responsive. The plan/loop/branching and intermediate results live in the **script**, not Claude's context window — so Claude's context only holds the final answer. (Research preview; requires Claude Code v2.1.154+; enable in `/config` → "Dynamic workflows".) Source: https://code.claude.com/docs/en/workflows
@@ -66,6 +72,12 @@ Dynamic workflows use **Claude's subagents (this Claude Code subscription)**. He
 - Claude Code = lead：架构、总路由、前端、审核、任务拆解与编排。
 - Codex CLI = 执行者：只按 /specs 下的任务规格实现，产出 diff，不扩大范围。
 - 我（人）= 验收者：schema 变更、首次上线、删除性操作必须经我确认。
+
+## 自主执行 & 审核边界（Kevin 2026-06-07）
+- **不等 Kevin 逐个回复**：连续推进任务，不在每个小修/小任务后停下等审核；非 🔴 的连续做完。
+- 只在两种情况停下找 Kevin：① **产品方向决策**（红线 🔴：schema / 删除 / 密钥 / 上线策略；或范式·方向的选择）；② 工作推进到一个 **Kevin 能从产品（渲染前端 / live 站）亲自看到的结果**——到此交给他自审。
+- 小 bug **连续修完**再汇报；汇报只讲**从产品角度解决了什么**（例「现在其它日期的论文数不再是 1 了」），**不讲**代码/技术 diff、**不附截图**——Kevin 自己去产品里查。
+- 已上线的可继续迭代上线；多任务**不冲突就并行**跑（子 agent + codex），并发写用 git worktree 隔离。**文字生成相关由 Claude 做**，后端工程交 codex。
 
 ## 不可违反的红线
 - 每日流水线里禁止放开放式 agent；它必须是确定性脚本。
