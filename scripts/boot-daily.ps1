@@ -33,6 +33,13 @@ try {
   # --- full-auto deep-read + cold-audit gate (best-effort; never blocks the deterministic push) ---
   # New reads are authored as needs_human, then the cross-model gate flips PASS->ready_to_publish
   # (published) or HOLD (excluded + alert). Review held items: logs\papers-cold-audit\digest-<date>.md
+  #
+  # ROOT-CAUSE FIX (Kevin 2026-06-08): deep-read + cold-audit author via the Claude CLI on the
+  # SUBSCRIPTION. A lingering ANTHROPIC_API_KEY (it was in .env.local + the user env) forced claude -p
+  # onto the pay-per-token API instead — whose balance was depleted, so deep-read failed with
+  # "Credit balance is too low" SILENTLY for 2 days. Verified: unset the key => claude -p uses the
+  # subscription and works. Nothing in scripts/ uses the raw key. Unset it for the boot's claude calls.
+  Remove-Item Env:ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
   try {
     Log "deep-read authoring (strong model, full-text; new reads = needs_human)..."
     npm run papers:deepread 2>&1 | Tee-Object -FilePath $log -Append
