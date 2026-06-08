@@ -33,22 +33,36 @@
     "trillion-scale-moe",
     "lora-rl",
     "adapter-lifecycle",
+    "multi-lora-serving",
     "diversity-voting",
     "position-paper"
   ],
   "status": "deep_read",
   "scores": {
     "idea_novelty": 8,
-    "system_design_value": 8,
-    "career_value": 7,
+    "system_design_value": 9,
+    "career_value": 8,
     "autosci_reuse_value": 9,
-    "buildability": 4,
-    "evaluation_value": 4,
-    "breadth_value": 7,
-    "evidence_quality": 4
+    "buildability": 5,
+    "evaluation_value": 6,
+    "breadth_value": 8,
+    "evidence_quality": 5
   },
-  "one_sentence_judgment": "一份把 PEFT/LoRA 从'省钱微调'reframe 成'长在共享大模型之上的持久个人状态'的纲领论文:基座供通用智能、<1% 的适配器承载某人/某 agent 的偏好-技能-记忆,目标是'一个基座 → 千万个持久个人模型',拆成 Scale Up/Down/Out 三条依赖轴(万亿级 LoRA RL ~10% 算力、秩 16-32 默认而低秩是'优化不够非容量不够'、LoRA 记忆容量律 ~10⁻² tokens/param 崩溃、多样性投票 acc≈0.386+0.0172·ln(k))。框架与工程判断对 Kevin'外置大脑/陪伴 agent/共享关系记忆'方向几乎是同一张蓝图、极可迁移;但这是立场论文而非单一可复现工作,证据多为自家闭源系统(Kimi K2/GLM5/MinT)的单点/单种子摘要,作者自己反复标注'非普适定理、未隔离变量',evaluation/evidence 都低——当方向读,别把任何单个数字当定论。",
+  "one_sentence_judgment": "一篇把 PEFT/LoRA 从“省钱微调”重解释为“共享强基座上的持久个人状态”的纲领论文：Scale Up 讲强先验让小 adapter 有杠杆，Scale Down 讲低秩 adapter 的稳定操作区间、OLoRA-tail 与 rank/alpha/lr 配置律，Scale Out 讲 LoRA-as-memory、用户模拟、adapter population 投票和 MinT 生命周期；它对个人 AI/长期 agent/adapter platform 的系统设计价值很高，但证据多来自作者自有闭源系统和曲线摘要，代码仓库未披露，必须按方向性蓝图而非可独立复现定论来读。",
   "cold_audit": {
-    "status": "needs_human"
+    "status": "ready_to_publish",
+    "rounds": 1,
+    "audited_at": "2026-06-08T22:47:56.169Z",
+    "auditor": "claude-cold-audit",
+    "author": "codex-gpt-5.5-high",
+    "final_verdict": "pass",
+    "major_gaps": [],
+    "arxiv_citation_audit": {
+      "checkedCount": 0,
+      "checked": [],
+      "unresolved": [],
+      "downgradeLabel": "推断/待核"
+    },
+    "unresolved_arxiv_references": []
   }
 }

@@ -1,12 +1,54 @@
 {
-  "generatedAt": "2026-06-08T21:00:29.394Z",
+  "generatedAt": "2026-06-08T23:18:12.600Z",
   "date": "2026-06-08",
   "counts": {
-    "deepReads": 17,
+    "deepReads": 19,
     "radar": 10,
     "deepCandidates": 3
   },
   "deepReads": [
+    {
+      "slug": "2606.02437-scaling-peft-million-personal-models",
+      "arxiv_id": "2606.02437",
+      "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+      "date": "2026-06-02",
+      "first_seen_date": "2026-06-04",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Mind Lab"
+      ],
+      "tags": [
+        "peft",
+        "lora",
+        "personal-models",
+        "persistent-state",
+        "lora-as-memory",
+        "trillion-scale-moe",
+        "lora-rl",
+        "adapter-lifecycle",
+        "multi-lora-serving",
+        "diversity-voting",
+        "position-paper"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 5,
+        "evaluation_value": 6,
+        "breadth_value": 8,
+        "evidence_quality": 5
+      },
+      "source_rankings": [
+        "daily"
+      ],
+      "one_sentence_judgment": "一篇把 PEFT/LoRA 从“省钱微调”重解释为“共享强基座上的持久个人状态”的纲领论文：Scale Up 讲强先验让小 adapter 有杠杆，Scale Down 讲低秩 adapter 的稳定操作区间、OLoRA-tail 与 rank/alpha/lr 配置律，Scale Out 讲 LoRA-as-memory、用户模拟、adapter population 投票和 MinT 生命周期；它对个人 AI/长期 agent/adapter platform 的系统设计价值很高，但证据多来自作者自有闭源系统和曲线摘要，代码仓库未披露，必须按方向性蓝图而非可独立复现定论来读。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.02437.png"
+    },
     {
       "slug": "2606.03458-kvarn-kv-cache-quantization",
       "arxiv_id": "2606.03458",
@@ -240,6 +282,52 @@
       ],
       "one_sentence_judgment": "一篇克制扎实的 data-centric 工作:不改架构不卷 RL 奖励,而是用「知识库→知识点场景化采集→VidR/KnowVid/KnowVidR 技能分层合成→自洽/去捷径/独立CoT验证→七模型池+专家人验门槛(每步抽100条错误率≤3%才准入)」的人在环流水线,从零新采 14.5 万条全 CC 授权专业视频、合成 31.5 万条带 CoT 样本(SFT-201K + RL-114K),并造了去单帧捷径的评测集 VideoKR-Eval(把旧基准 MMVU 单帧可解率从 49.7% 压到 10.7%);在最标准 SFT→GRPO 下让 Qwen2.5-VL-7B 知识密集均分 41.9→46.6(+4.7)、Qwen3-VL-8B 48.5→51.5 超同量级 SOTA(50.0),证明数据设计才是主瓶颈。代价与短板要标清:换专精牺牲通用能力(通用普遍微跌)、抽检仍约 4% 推理链有错(2% 改答案)、构建花 7 万美元推理+34 名专家、且正文承诺开源但全文未给数据集/代码链接(发布状态=数据不足);是 CV/数据工作非 agent 主线,对应用开发者的价值在「可整条迁移的领域数据工厂 + 去捷径评测设计模式」。",
       "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05259.png"
+    },
+    {
+      "slug": "2606.01249-tropd-trust-region-distillation",
+      "arxiv_id": "2606.01249",
+      "title": "Trust Region On-Policy Distillation",
+      "date": "2026-05-31",
+      "first_seen_date": "2026-06-03",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Xingrun Xing",
+        "Haoqing Wang",
+        "Boyan Gao",
+        "Ziheng Li",
+        "Yehui Tang"
+      ],
+      "tags": [
+        "on-policy-distillation",
+        "reasoning-models",
+        "small-reasoning-models",
+        "trust-region",
+        "outlier-credit-assignment",
+        "kl-estimator",
+        "reverse-kl",
+        "forward-kl",
+        "post-training",
+        "knowledge-distillation",
+        "reproducibility-partial"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 5,
+        "evaluation_value": 7,
+        "breadth_value": 7,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily"
+      ],
+      "one_sentence_judgment": "TrOPD 把 on-policy 蒸馏的核心风险从'老师监督不足'改写成'师生分布错位下少数 token 的不可靠监督过强':用 min(π_T/π_S,1) 逐 token 划 trust region,可靠区用 K1 reverse KL,离群区用 teacher top-k forward KL 温和回退,再用老师前缀 + cosine 退火解决低质学生生成;论文自报在 DeepSeek/Qwen3 两组师生、多域推理上较 OPD 平均提升 +3.06/+4.62/+3.44 等,Figure 1 headline 分项提升 +3.34/+4.00/+5.11/+6.18,消融也支持 outlier FKL 的位置价值,但仓库当前未发布训练/评测代码和模型,真实复现与部署成熟度仍不足。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.01249.png"
     },
     {
       "slug": "2605.31584-longtracerl-rubric-rewards",
@@ -784,7 +872,7 @@
         "evidence_quality": 8
       },
       "one_line": "提出信任区域在策略蒸馏方法，稳定师生分布差异下的蒸馏训练，适用于Agent学习等场景。",
-      "deep_slug": null
+      "deep_slug": "2606.01249-tropd-trust-region-distillation"
     },
     {
       "arxiv_id": "2606.02437",
@@ -803,7 +891,7 @@
         "evidence_quality": 4
       },
       "one_line": "将PEFT适配器作为持久化局部状态，探索三个扩展轴，为大规模个性化模型提供可迁移模式。",
-      "deep_slug": null
+      "deep_slug": "2606.02437-scaling-peft-million-personal-models"
     },
     {
       "arxiv_id": "2606.06492",

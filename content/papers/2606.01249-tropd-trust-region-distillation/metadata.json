@@ -58,8 +58,21 @@
     "breadth_value": 7,
     "evidence_quality": 7
   },
-  "one_sentence_judgment": "TrOPD 把 on-policy 蒸馏的核心风险从'老师监督不足'改写成'师生分布错位下少数 token 的不可靠监督过强':用 min(π_T/π_S,1) 逐 token 划 trust region,可靠区用 K1 reverse KL,离群区用 teacher top-k forward KL 温和回退,再用老师前缀 + cosine 退火解决低质学生生成;论文自报在 DeepSeek/Qwen3 两组师生、多域推理上较 OPD 提升约 +3~6 点,消融也支持 outlier FKL 的位置价值,但仓库当前未发布训练/评测代码和模型,真实复现与部署成熟度仍不足。",
+  "one_sentence_judgment": "TrOPD 把 on-policy 蒸馏的核心风险从'老师监督不足'改写成'师生分布错位下少数 token 的不可靠监督过强':用 min(π_T/π_S,1) 逐 token 划 trust region,可靠区用 K1 reverse KL,离群区用 teacher top-k forward KL 温和回退,再用老师前缀 + cosine 退火解决低质学生生成;论文自报在 DeepSeek/Qwen3 两组师生、多域推理上较 OPD 平均提升 +3.06/+4.62/+3.44 等,Figure 1 headline 分项提升 +3.34/+4.00/+5.11/+6.18,消融也支持 outlier FKL 的位置价值,但仓库当前未发布训练/评测代码和模型,真实复现与部署成熟度仍不足。",
   "cold_audit": {
-    "status": "needs_human"
+    "status": "ready_to_publish",
+    "rounds": 1,
+    "audited_at": "2026-06-08T22:40:17.809Z",
+    "auditor": "claude-cold-audit",
+    "author": "codex-gpt-5.5-high",
+    "final_verdict": "pass",
+    "major_gaps": [],
+    "arxiv_citation_audit": {
+      "checkedCount": 0,
+      "checked": [],
+      "unresolved": [],
+      "downgradeLabel": "推断/待核"
+    },
+    "unresolved_arxiv_references": []
   }
 }
