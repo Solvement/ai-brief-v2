@@ -1,0 +1,62 @@
+primitive_id: trajectory-distractors-entity-rubric-positive-only
+source_paper: "2605.31584"
+title: "LongTraceRL: agent 轨迹造干扰 + 实体级过程奖励 + 只奖正例防作弊"
+relevance_level: direct_pattern_strong    # 「从 agent 自身轨迹榨训练信号」+「防作弊过程奖励」几乎可原样接进 L1 自进化
+audience: ai_only                         # 给 L1/L3 与本站质量门吃的设计件,不进 Kevin 阅读 tab
+core_pattern: >
+  长上下文 RL 的两个硬伤一起治:① 数据工厂——让搜索 agent 真去答 KG 随机游走出的多跳题,把它
+  「读了却没引用」的文档当高混淆负样本(Tier-1)、「出现在结果里但没点开」的当低混淆(Tier-2),
+  按 traj-tiered 装配;干扰难度可量化(干扰含黄金实体比例),且该难度排名与下游分排名严格同序。
+  ② 奖励设计——用推理链每跳的黄金实体做实体级 rubric 过程分(实体召回率,GRPO 组内归一),
+  关键开关是 positive-only:过程分只发给最终答对的回答,答错一律 0——既防 reward hacking
+  (堆实体名刷分),又把过程分变成「在答对者之间分高下」的信号。α 控制过程 vs 结果权重(0.3 最优)。
+problem_class: sparse-outcome-reward-and-too-easy-distractors-cripple-long-context-rl
+components:
+  - trajectory_distractor_factory  # agent read-but-not-cited → 高混淆负样本;分级装配
+  - difficulty_quantifier          # 用「干扰含黄金实体比例」量数据难度,与下游分对齐
+  - entity_level_rubric_reward     # 推理链每跳黄金实体的召回率作过程分(组内归一)
+  - positive_only_gate             # 过程分仅发给答对者,防作弊 + 自我调节长度
+autosci_modules:
+  - self_evolve_controller # 「从自身轨迹榨训练信号 + 防作弊进化奖励」= L1 自进化的核心料
+  - cold_critic            # rubric 过程分 = 可验证的逐步诊断信号;positive-only = 冷审防被产物钻空子
+  - guard                  # 过程奖励 gate:进化/打分前先卡「答对且过程扎实」
+  - typed_memory          # agent 轨迹(read/cite 行为)= 结构化记忆,可反向榨成训练/评测信号
+inputs:
+  - agent_trajectory       # 搜索 agent 的 search/open/cite 行为序列
+  - gold_chain             # 推理链每跳的黄金实体(过程监督的标尺)
+  - outcome_judge          # 判最终答案对错(LLM judge)
+outputs:
+  - tiered_distractors     # 分级负样本(高/低混淆)+ 可量化难度
+  - process_reward         # 实体级过程分(仅正例)
+  - anti_hack_signal       # positive-only 下不被堆实体刷分的进化信号
+implementation_idea: >
+  100~200 行做领域无关版:一个轨迹解析器(从 agent 日志抽 read-but-not-cited 当 hard negative)+
+  一个难度打分器(算干扰含黄金实体比例)+ 一个过程奖励函数(黄金实体召回,组内归一,只在答对时计)。
+  先在一个多跳 QA / 本站深读轨迹上跑通「轨迹→分级干扰 + 实体级过程分 + positive-only」,
+  再把 positive-only 这条接进本站自进化/冷审门当防作弊闸。
+small_experiment: >
+  对照 A=随机抽干扰 + 仅结果奖励 vs B=轨迹分级干扰 + 实体级 rubric(positive-only),在一小批多跳 QA 上
+  比下游分;消融:去 positive-only(对错都给分)看作弊行为涨多少、扫 α∈{0.1,0.3,0.5} 看最优配比
+  (复刻主结论:数据难度与下游分同序、positive-only 防 hack、α 太大反伤)。1-7 天。
+design_principles:                          # 跨篇沉淀的「怎么造自进化 agent」零件(喂 L1/L3,也反哺本站质量门)
+  - id: harvest-training-signal-from-agent-behavior
+    principle: "高质量负样本/训练信号不必另造,可从 agent 自身真实行为里榨——『读了却没引用』就是最像、最难的干扰。"
+    transfers_to: "L1 自进化:从 agent 自己的轨迹里抽 hard negative 与过程信号,自给自足地变强。"
+  - id: process-reward-must-have-anti-hack-gate
+    principle: "细粒度过程奖励(实体召回)单用会被钻空子(堆实体名刷分);必须配 positive-only——只奖『答对且过程扎实』,答错归零。"
+    transfers_to: "任何过程/中间步奖励 + 本站冷审门:加防作弊闸,别让弱产物靠局部信号拿分。"
+  - id: data-difficulty-is-a-measurable-design-variable
+    principle: "数据『难不难』可量化(干扰含黄金实体比例),且该难度与下游效果严格同序——难度是可设计、可迭代的变量,不是玄学。"
+    transfers_to: "数据/课程设计:用一个可测难度指标驱动数据迭代,而非凭感觉堆量。"
+  - id: finer-signal-has-an-optimal-weight
+    principle: "更细的辅助信号不是越重越好——过程分权重 α 太大反伤(把模型推向捷径);任何辅助奖励都要扫配比、做消融。"
+    transfers_to: "多奖励组合 / 多目标:辅助信号配比要消融,别默认『越多越好』。"
+  - id: report-gains-by-regime-not-cherry-picked
+    principle: "同方法在 4B 上 +5.7、8B 上仅 +1.1——收益对规模/骨干敏感;诚实地分 regime 报,别只挑最好那个数。"
+    transfers_to: "评估纪律 / 本站忠实度门:增益要按规模/设定分说,标自报 vs 实测。"
+risks:
+  - rubric_is_recall_not_correctness  # 过程分本质是实体召回,非推理正确,强依赖 positive-only
+  - gains_uneven_across_scale         # 绝对增益随规模/骨干不均(8B 仅 +1.1)
+  - single_knowledge_source           # 数据全源自 KILT Wikipedia,推理模式多样性受限
+  - depends_on_collector_agent        # 干扰质量依赖采集轨迹的 agent 能力,换 agent 结果会变
+status: extracted

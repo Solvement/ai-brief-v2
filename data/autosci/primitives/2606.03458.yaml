@@ -1,0 +1,61 @@
+primitive_id: load-aligned-eval-outlier-first-quant
+source_paper: "2606.03458"
+title: "KVarN: pseudo-decode 评测 + 离群幅度优先的 KV-Cache 量化"
+relevance_level: direct_pattern_medium    # 不是 agent 逻辑件,而是「评测设定对齐 + 抓离群」的可迁移工程范式,直接喂本站推理成本/质量门
+audience: ai_only                         # 给 L1/L3 与本站质量门吃的设计件,不进 Kevin 阅读 tab
+core_pattern: >
+  两条可复用范式拼成:① 评测设定要对齐真实负载——前人 KV-Cache 量化都在 prefill(一次性静态压缩)
+  下评测,但 test-time scaling 的真实负载是「边生成边压、误差跨时间步累积」;作者提出便宜的
+  pseudo-decode 协议(切块 + 每块后量化 + 后续读已量化缓存)把累积误差量出来。② 优化抓离群而非平均——
+  用几何拆分把量化误差解耦成「幅度误差 E_M / 方向误差 E_D」,实证最大的 top 5% 误差几乎全来自 token 幅度,
+  且这 5% 主导端到端 KL 散度(MSE 最优 ≠ 端到端最优)。方法 = Hadamard 旋转(治通道离群)+ 双轴方差归一化
+  (治 token 幅度极端值)的互补组合,免校准、在线、开销 0.18%。
+problem_class: cheap-compression-degrades-silently-under-accumulating-real-workload
+components:
+  - pseudo_decode_evaluator   # 切块累积压缩,模拟真实解码下的误差累积(便宜的对齐真实负载的尺子)
+  - error_geometric_decomp    # 把误差拆成 magnitude vs directional,定位罪魁
+  - outlier_first_objective   # 盯 top 5% 离群误差而非降平均 MSE
+  - hadamard_plus_varn        # 通道离群(Hadamard) + token 幅度(双轴方差归一化)互补组合
+autosci_modules:
+  - cold_critic            # 「评测设定要对齐真实负载」直接迁到本站冷审:别用 prefill 式静态样例评长程产物
+  - self_evolve_controller # 「抓离群而非平均」= 精修信号应盯少数高破坏点,而非均匀降总误差
+  - guard                  # 长程产物的质量闸:用累积式(非静态)评测量真实退化
+  - typed_memory          # 量化后的缓存 = 一种有损压缩记忆,误差累积是压缩记忆的通病
+inputs:
+  - long_horizon_artifact  # 待评的长解码/长轨迹产物(或本站长深读)
+  - real_workload_profile  # 真实负载形态(累积 vs 静态)
+  - error_or_quality_signal # 可拆分/可分位化的误差或质量信号
+outputs:
+  - accumulation_curve     # 误差随长度累积的曲线(暴露静态评测看不到的退化)
+  - outlier_contribution   # top k% 离群点对端到端质量的贡献占比
+  - load_aligned_verdict   # 在对齐真实负载的设定下的结论(而非错位 benchmark 的乐观结论)
+implementation_idea: >
+  100~200 行做领域无关版:一个 pseudo-decode 包装器(把序列/轨迹切块,每块后施加有损操作,后续读「已损」状态);
+  一个误差分位分析器(画「误差分位 vs 端到端指标」验证离群点不成比例重要)。先在一个有损压缩/量化任务跑通
+  「累积评测 + 离群归因」,再把「评测要对齐真实负载」这条接进本站冷审门(长产物别用静态短样例评)。
+small_experiment: >
+  对照 A=prefill 静态评测 vs B=pseudo-decode 累积评测,在同一量化方法上看二者结论差多少(复刻本文主张:
+  静态高估质量);再做消融:只 Hadamard / 只方差归一化 / 两者,看 token 幅度误差与长上下文掉点(复刻互补结论)。
+  1-5 天。
+design_principles:                          # 跨篇沉淀的「怎么造系统」零件(喂 L1/L3,也反哺本站质量门)
+  - id: eval-setting-must-match-real-workload
+    principle: "一个方法的 SOTA 只在它被评测的设定里成立;KV-Cache 量化在 prefill(静态)好看 ≠ 在 decode(累积)好用。评测前先问『这负载和线上一样吗』。"
+    transfers_to: "本站冷审门:长程产物(长深读/长轨迹)别用静态短样例评;agent eval 要用累积式协议。"
+  - id: optimize-outliers-not-average
+    principle: "top 5% 离群误差只占少数 MSE 却主导端到端质量(KL);MSE 最优 ≠ 端到端最优。先治少数坏得离谱的点,比均匀降平均更划算。"
+    transfers_to: "精修信号 / reward 设计:盯高破坏点;质量门优先抓极端失败而非平均分。"
+  - id: errors-accumulate-in-compressed-memory
+    principle: "有损压缩的记忆(量化缓存)误差会跨步累积、越滚越歪;序列越长越严重。便宜的省成本手段藏着随长度放大的隐性代价。"
+    transfers_to: "任何有损压缩记忆(摘要式 memory、压缩上下文):要量累积误差,不能只看单步保真。"
+  - id: calibration-free-online-beats-offline-tuned
+    principle: "能在线从数据自身算参数(免校准)的方法,换模型/换领域不用重跑校准,部署成本与脆性都更低。"
+    transfers_to: "选型/造件:优先无需离线校准的在线自适应方案,降低运维与迁移成本。"
+  - id: diagnose-then-compose-over-invent
+    principle: "正确诊断病因(误差几何拆分→幅度是罪魁)+ 巧妙组合已有零件(Hadamard+方差归一化),常比发明新算子更快见效、更可靠。"
+    transfers_to: "造件方法论:先做可解释诊断再组装,而非一上来追求全新机制。"
+risks:
+  - combination_not_novel        # 方法是 QuaRot(Hadamard)+ SINQ(方差归一化)的组合,贡献在诊断/组合/评测协议
+  - no_prod_e2e_latency          # 2-bit KV-Cache 暂无公开服务框架支持,端到端加速/省显存是推算非实测
+  - arch_scope_limited           # 不适用 SSM(无 KV-Cache);对 MLA 影响未知
+  - ceiling_is_fp16              # 免训练量化天花板是 FP16,不会让模型更强;个别高于 FP16 的格子是采样方差
+status: extracted

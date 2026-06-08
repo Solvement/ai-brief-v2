@@ -1,0 +1,68 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你要做的是 **agent / 自进化 agent**,而这篇恰好把**两个 agent 时代最值钱的工程能力**做成了可复用配方:**①「用 agent 的真实行为造高质量训练/评测数据」**(数据工厂),**②「设计能管到中间步、又防作弊的过程奖励」**(reward 工程)。这两件事——造数据、调奖励——正是「把一个 agent 从能跑 demo 推到真能学、真变强」的核心手艺,也是面试 RL/agent 岗最能展示判断力的话题。
+
+> [!key] 和我们正在做的自进化 agent 直接同源
+> 我们的 north star 是 L1 自进化——agent 要从自己的轨迹里学。LongTraceRL 给了两块直接能用的料:**(a) 用 agent「读了没引」的行为当高混淆负样本**,这正是「让 agent 从自己的搜索过程里榨出训练信号」的范式;**(b) positive-only 过程奖励**——只奖励「答对且过程扎实」的,是我们做自进化奖励/质量门时**防 reward hacking** 的现成开关。你学它,等于在学怎么给我们自己的 agent 设计「不被钻空子」的进化信号。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 用 agent 轨迹造数据 | 把搜索 agent 的 read/cite 行为转成分级干扰物(高/低混淆) | 拿一个 RAG agent 的日志,标出「读了没引」的文档当 hard negative |
+| 难度可量化的数据设计 | 用「干扰含黄金实体比例」量难度,且让它和下游分对齐 | 给你的数据集算这个比例,验证「越难训练效果越好」 |
+| 过程奖励(rubric reward) | 把「最终对错」细化成「中间步该出现什么」的可验证打分 | 给一个多跳 QA 设计实体级 rubric,算实体召回率当奖励 |
+| 防 reward hacking | positive-only、组内归一化、长度预算自调节 | 跑一个小 RL,对比「对错都给过程分」vs「只给正例」,看作弊行为 |
+| GRPO / RLVR 基础 | 组相对优化、可验证奖励、过程 vs 结果奖励的权衡(α) | 用开源框架(如 Slime/verl)跑通一个 GRPO 小实验,扫 α |
+
+## 系统设计心法
+
+一句话:**数据的难度和奖励的粒度,都是可设计、可量化的变量,不是玄学。**
+- **真实行为 > 随机采样**:高质量负样本不是随机抽来的,是「智能体真差点选错的」。用 agent 行为造数据,比 embedding 相似度更贴近真实分布。
+- **过程 > 结果(但要防作弊)**:只看最终对错,会奖励「蒙对」;给中间步打分能管到推理质量——**但过程分必须配防作弊开关(positive-only),否则模型会钻空子**。
+- **难度要能测**:把「数据难不难」变成一个数(含黄金实体比例),你才能系统地把它和效果挂钩、迭代它。
+- **更细 ≠ 永远更好**:过程分权重 α 太大反而伤(把模型推向「堆实体」捷径)。任何辅助信号都有最优配比,要扫、要消融。
+- **诚实看增益**:同一方法在 4B 上 +5.7、8B 上只 +1.1——**报收益要分规模/骨干说,别只挑最好那个数**。
+
+## 作品集角度(Portfolio angle)
+
+这能撑起一个 **「agent 数据工厂 / RL 奖励工程」** 方向的硬作品,正是当下 agent 团队最缺的能力。两条路:① 自己造一个「**轨迹→分级干扰物→难度打分**」的小数据工厂,并画出难度与下游分的相关曲线;② 给 `THU-KEG/LongTraceRL`(已开源 4B/8B/30B 模型 + 数据集)提一个真实 PR(新知识源 / 新过程奖励变体 / 别的骨干上的复现)。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Trajectory→distractor 数据工厂 | 把一个 RAG/搜索 agent 的轨迹转成 Tier-1/Tier-2 干扰物,装配长上下文训练集 | 1-2 周 | 复刻本文最有迁移价值的数据范式,自己以后做长上下文都能用 |
+| 难度打分器 | 实现「干扰含黄金实体比例」打分,画难度 vs 下游分 | 3-5 天 | 把数据难度变成可测变量,面试讲「我能量化数据质量」 |
+| Positive-only 过程奖励小实验 | 在一个多跳 QA 上对比「只给正例」vs「对错都给」,展示防作弊 | 1 周 | 直击 reward hacking,RL 岗面试的硬核 demo |
+| 实体级 rubric 评测器 | 给任意长上下文回答算「黄金实体召回」过程分 | 3-5 天 | 不止训练,也能当离线评测/质量门用 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built a trajectory-derived data factory that turns a search agent's read-but-not-cited documents into high-confusability distractors, with a quantifiable difficulty metric that correlates with downstream RL performance."*
+- *"Designed an entity-level rubric reward with a positive-only strategy for long-context RL, providing process supervision on intermediate reasoning while preventing reward hacking."*
+- *"(若做了 PR)Contributed to THU-KEG/LongTraceRL, reproducing the rubric-reward recipe on a new backbone / knowledge source."*
+
+> [!key] 面试可讲
+> "结果奖励太稀,你怎么监督一个长程多跳 agent 的中间推理?"——用本文论证:**把最终对错细化成「推理链每跳该出现的黄金实体」的过程分,但只发给答对的回答(positive-only)防作弊;再用 agent 真实「读了没引」的行为造高混淆训练数据。** 同时主动点出「过程分本质是实体召回、强依赖防作弊开关」「增益随规模不均」这两个诚实的边界。体现 reward 设计 + 数据工程 + 实事求是的判断。
+
+## 学习清单
+
+**必学**
+- 用 agent 行为造分级干扰物(Tier-1 读了没引 / Tier-2 没点开)
+- 实体级 rubric 过程奖励 + positive-only 防作弊
+- 数据难度可量化(含黄金实体比例)且与效果对齐
+
+**有用**
+- GRPO / RLVR 基础;过程 vs 结果奖励、权重 α 的扫法
+- reward hacking 的常见形态与防法(归一化、只给正例、长度预算)
+
+**可选**
+- 知识图谱随机游走造多跳题(承自 DeepDive)
+- 长上下文 RL 这条赛道的相关工作(LongRLVR / LongR / EAPO)与各自奖励粒度差异

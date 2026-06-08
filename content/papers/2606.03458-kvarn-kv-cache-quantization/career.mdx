@@ -1,0 +1,68 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你要做的是 **agent 产品**,而 agent 几乎天然就是「长解码 + test-time scaling」的重度用户——多步推理、长思维链、长工具轨迹,每一项都把 **KV-Cache 顶到显存上限**。这篇直接关系到一个你迟早会撞上的现实问题:**怎么在不换更贵的卡、不牺牲推理质量的前提下,把长上下文推理跑得起、跑得便宜。** 它教你的不是某个模型,而是**推理服务侧的成本工程(inference cost engineering)**——这是把 demo 变成「能上线、能扛量」的产品时,最值钱也最稀缺的一类能力。
+
+> [!key] 和我们正在做的 agent 直接相关
+> 我们的 agent 要长程跑(读全文、写深读、跨篇抽原语),token 量大、解码长。**这篇的「误差会跨步累积」正是长程 agent 的隐性杀手**:用了便宜的量化压缩省显存,结果越到后面输出越歪——而你可能以为是 prompt 或模型的问题。学会它,你就知道**省显存的代价藏在哪、怎么用对齐真实负载的尺子(pseudo-decode)去量**,而不是被 prefill 场景的漂亮 benchmark 骗了。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| KV-Cache 是什么、为什么是瓶颈 | Transformer 解码缓存的内存增长、长上下文的显存账 | 估一笔账:某模型在 32K 上下文下 KV-Cache 占多少显存,压到 2-bit 省多少 |
+| 量化基础(per-token / per-channel / RTN) | K 按通道压、V 按 token 压、四舍五入量化、scale/zeropoint | 拿一个小矩阵手动做一次 2-bit RTN,看误差出在哪 |
+| 评测设定 = 真实负载 的思维 | prefill(静态)vs decode(累积)的差异;别被错位 benchmark 骗 | 复刻 pseudo-decode:把长序列切块、每块后量化、后续读量化缓存,量累积误差 |
+| 抓离群点而非平均的优化直觉 | top 5% 误差主导端到端质量,MSE 最优 ≠ 端到端最优 | 在一个量化任务里画「误差分位 vs 端到端 KL」,验证离群点不成比例地重要 |
+| 推理服务栈常识 | vLLM、PagedAttention、量化在服务框架里的支持现状 | 跑通 vLLM,看它支持哪些量化、为什么 2-bit KV-Cache 还没普及 |
+
+## 系统设计心法
+
+一句话:**先量对了再优化;省成本的代价往往藏在「累积」和「离群」里。**
+- **评测设定 > 评测分数**:一个方法的「SOTA」只在它被评测的设定里成立。问「这个 benchmark 的负载,和我线上的真实负载一样吗?」——prefill 好看不代表 decode 好用。
+- **离群 > 平均**:很多质量问题不是「整体差一点」,而是「极少数点坏得离谱」。优化时先去抓那 top 5%,常比把平均压低更划算。
+- **免校准 > 需校准**:能在线从数据自身算参数的方法,换模型/换领域不用重跑校准,部署成本低得多——选型时这是隐形加分项。
+- **组合已有零件 > 造新算子**:KVarN 的赢法是「把 Hadamard 和方差归一化拼对地方」。工程上,**正确诊断 + 巧妙组合**常比发明新东西更快见效、更可靠。
+
+## 作品集角度(Portfolio angle)
+
+这能撑起一个 **「LLM 推理效率 / 长上下文成本工程」** 方向的硬作品——不是又一个套壳 chatbot,而是「**让长推理跑得起**」的基建,正是招 FDE / 推理工程岗最看重的。两条路:① 自己造一个「量化误差累积可视化 + pseudo-decode 评测」小工具,把 prefill vs decode 的差异画出来;② 给 `huawei-csl/KVarN`(342★,活跃)提一个真实 PR(新模型适配 / MLA 场景探索 / 端到端延迟实测)。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Pseudo-decode 评测器 | 把任意 KV-Cache 量化方法丢进来,切块累积压缩,出累积误差曲线 | 3-5 天 | 复刻本文最有迁移价值的「对齐真实负载的尺子」,自己以后选型都能用 |
+| 量化误差「幅度 vs 方向」拆解可视化 | 实现 Eq.3 的拆分,画出 top k% 误差里幅度占比 | 2-3 天 | 把抽象论点变成能讲的图,面试 demo 极有说服力 |
+| KV-Cache 显存计算器 | 给定模型/上下文长度/量化 bit,算显存与可省比例 | 1-2 天 | 小而实用,放进 README 就是工程素养的证据 |
+| 长 agent 的「省显存 vs 质量」消融 | 在你自己的 agent 上对比 FP16 / 2-bit 不同方法的长程输出质量 | 1 周 | 直接把论文洞察接到自己产品,讲「我量过这个权衡」 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built a pseudo-decode evaluation harness for KV-cache quantization that measures error accumulation under autoregressive decoding, exposing degradations that prefill-style benchmarks miss."*
+- *"Profiled the memory/quality trade-off of 2-bit KV-cache quantization for long-horizon LLM decoding, quantifying that a small fraction of outlier (token-magnitude) errors dominates end-to-end quality."*
+- *"(若做了 PR)Contributed a model adaptation / benchmark to huawei-csl/KVarN, a calibration-free KV-cache quantizer."*
+
+> [!key] 面试可讲
+> "你怎么让一个长程推理的模型跑得既便宜又准?"——用本文论证:**别信 prefill 场景的量化 benchmark,要用 pseudo-decode 量真实解码下的误差累积;省成本的关键是先治住少数离群 token 的幅度误差(抓 top 5%),而不是均匀降 MSE。** 体现的是成本工程 + 评测设计的判断力。
+
+## 学习清单
+
+**必学**
+- KV-Cache 为什么是长推理的显存瓶颈,量化怎么省
+- prefill(静态)vs decode(累积)评测设定的差异——这是本文最大的认知升级
+- 「离群误差不成比例地重要」:抓 top 5% 比降平均 MSE 划算
+
+**有用**
+- Hadamard 旋转 / 非相干化(incoherence processing)的直觉
+- 双轴方差归一化(SINQ 系)在权重 vs KV-Cache 里有用的**不同原因**(别张冠李戴)
+- vLLM / 服务框架对低 bit KV-Cache 的支持现状
+
+**可选**
+- 量化误差的几何拆分(幅度 E_M vs 方向 E_D)
+- 与「驱逐 / 合并 token」类压缩(KVZip / SnapKV / PyramidKV)的正交关系,如何叠加

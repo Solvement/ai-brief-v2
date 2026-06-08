@@ -1,0 +1,63 @@
+{
+  "paper_id": "2606.03458",
+  "arxiv_id": "2606.03458",
+  "title": "KVarN: Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
+  "authors": [
+    "Lorenz K. Muller",
+    "Philippe Bich",
+    "Chiara Boretti",
+    "Hyun-Min Chang",
+    "Jiawei Zhuang",
+    "Lukas Cavigelli"
+  ],
+  "date": "2026-06-02",
+  "huggingface_url": "https://huggingface.co/papers/2606.03458",
+  "paper_url": "https://arxiv.org/abs/2606.03458",
+  "code_url": "https://github.com/huawei-csl/KVarN",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "track": "hf",
+  "source_rankings": [
+    "weekly",
+    "monthly"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.03458.yaml",
+  "first_seen_date": "2026-06-04",
+  "topic": "inference",
+  "agent_relevant": false,
+  "tags": [
+    "kv-cache-quantization",
+    "test-time-scaling",
+    "autoregressive-decoding",
+    "error-accumulation",
+    "hadamard-rotation",
+    "variance-normalization",
+    "inference-efficiency",
+    "calibration-free",
+    "long-context"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 8,
+    "career_value": 8,
+    "autosci_reuse_value": 7,
+    "buildability": 8,
+    "evaluation_value": 8,
+    "breadth_value": 7,
+    "evidence_quality": 7
+  },
+  "one_sentence_judgment": "把 KV-Cache 量化的评测设定从 prefill(静态)纠正到 test-time scaling 真实的逐步累积场景,指出量化误差跨时间步累积、罪魁是 token 幅度被压坏,并用 Hadamard 旋转+双轴方差归一化组合在 2.3 bit/元素下做到生成式 benchmark 新 SOTA(MATH500 在 Phi-4-14B 上 84.9→84.8 近无损,KIVI 仅 74.4),在线开销仅 0.18%;洞察扎实(误差几何拆分+离群点不成比例重要+便宜的 pseudo-decode 协议),但方法是 Hadamard(QuaRot)+方差归一化(SINQ)的组合而非全新算子,且缺生产框架端到端延迟实证(2-bit KV-Cache 暂无公开服务框架支持),不适用 SSM、对 MLA 影响未知。",
+  "cold_audit": {
+    "status": "ready_to_publish",
+    "audited_at": "2026-06-07T22:40:00.000Z",
+    "auditors": ["claude-opus (orchestrator, independent of the opus author)", "codex-gpt-5.5 (independent)"],
+    "rounds": 2,
+    "verdict": "Cross-model PASS by both. Authored by an opus sub-agent; audited independently by Claude (Kevin-distinct model from author family) AND codex GPT-5.5. Round 1: codex HELD for missing 自报/实测 tagging. Revised: added an 自报-vs-实测 disclaimer marking all benchmark numbers/ablations/0.18% overhead as 论文自报 and star/upvote as snapshots. Round 2: codex PASS + Claude PASS. Authorized by Kevin (deploy contingent on you+codex independent cross-model pass)."
+  }
+}

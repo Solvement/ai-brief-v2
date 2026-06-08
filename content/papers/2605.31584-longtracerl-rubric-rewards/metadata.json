@@ -1,0 +1,61 @@
+{
+  "paper_id": "2605.31584",
+  "arxiv_id": "2605.31584",
+  "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+  "authors": [
+    "Nianyi Lin",
+    "Jiajie Zhang",
+    "Lei Hou",
+    "Juanzi Li"
+  ],
+  "date": "2026-05-29",
+  "huggingface_url": "https://huggingface.co/papers/2605.31584",
+  "paper_url": "https://arxiv.org/abs/2605.31584",
+  "code_url": "https://github.com/THU-KEG/LongTraceRL",
+  "dataset_url": "https://huggingface.co/datasets/THU-KEG/LongTraceRL",
+  "model_url": "https://huggingface.co/THU-KEG/LongTraceRL-4B",
+  "space_url": "",
+  "track": "hf",
+  "source_rankings": [
+    "weekly",
+    "monthly"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2605.31584.yaml",
+  "first_seen_date": "2026-06-04",
+  "topic": "agent",
+  "agent_relevant": true,
+  "tags": [
+    "long-context-reasoning",
+    "rlvr",
+    "rubric-reward",
+    "process-supervision",
+    "search-agent-trajectory",
+    "tiered-distractors",
+    "reward-hacking",
+    "knowledge-graph-data",
+    "self-improving-agent"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 8,
+    "career_value": 8,
+    "autosci_reuse_value": 9,
+    "buildability": 7,
+    "evaluation_value": 7,
+    "breadth_value": 7,
+    "evidence_quality": 5
+  },
+  "one_sentence_judgment": "把长上下文 RL 的两个硬伤一起治:数据上用搜索 agent「读了却没引用」的真实行为造高混淆分级干扰物(可量化难度,含黄金实体比例与下游分严格同序),奖励上用推理链每跳的黄金实体做实体级 rubric 过程分、且只给答对的回答(positive-only)防 reward hacking;三模型五 benchmark 稳超基线(Qwen3-4B +5.7、AA-LCR +8.6,去 rubric 增益几乎全失),是 L1 自进化「从自身轨迹榨训练信号 + 防作弊进化奖励」的直接蓝本;但绝对增益随规模不均(8B 仅 +1.1)、rubric 本质是实体召回非推理正确、数据单一 Wikipedia 源且依赖所用 agent 能力,evidence_quality 偏弱。",
+  "cold_audit": {
+    "status": "ready_to_publish",
+    "audited_at": "2026-06-07T22:40:00.000Z",
+    "auditors": ["claude-opus (orchestrator, independent of the opus author)", "codex-gpt-5.5 (independent)"],
+    "rounds": 2,
+    "verdict": "Cross-model PASS by both. Authored by an opus sub-agent; audited independently by Claude AND codex GPT-5.5. Round 1: codex HELD for missing 自报/实测 tagging + the '稳定超过强基线' overclaim. Revised: added an 自报-vs-实测 disclaimer marking all scores/ablations/configs (GPT-5.2, k=8, K=5, 32xH800) as 论文自报, and softened the claim to '平均分均居首,但绝对增益不均 (4B +5.7, 8B 仅 +1.1)'. Round 2: codex PASS + Claude PASS. Authorized by Kevin (deploy contingent on you+codex independent cross-model pass)."
+  }
+}
