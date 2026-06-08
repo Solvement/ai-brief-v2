@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-07T13:57:34.188Z",
+  "generatedAt": "2026-06-08T12:03:42.355Z",
   "column": "news",
   "mode": "aggregate+optional-llm",
   "llmEnabled": true,
@@ -14,9 +14,9 @@
       "id": "openai",
       "source": "OpenAI",
       "sourceType": "official",
-      "ok": true,
-      "count": 30,
-      "error": ""
+      "ok": false,
+      "count": 0,
+      "error": "fetch failed"
     },
     {
       "id": "techcrunch-ai",
@@ -103,7 +103,7 @@
       "source": "Hacker News",
       "sourceType": "community",
       "ok": true,
-      "count": 29,
+      "count": 25,
       "error": ""
     },
     {
@@ -111,7 +111,7 @@
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
       "ok": true,
-      "count": 12,
+      "count": 11,
       "error": ""
     },
     {
@@ -119,7 +119,7 @@
       "source": "r/MachineLearning",
       "sourceType": "reddit",
       "ok": true,
-      "count": 5,
+      "count": 3,
       "error": ""
     }
   ],
@@ -128,20 +128,57 @@
     "model": "deepseek-v4-flash",
     "imageCandidateLimit": 10
   },
-  "totalDiscovered": 196,
-  "totalAfterDedupe": 154,
-  "totalPublished": 132,
-  "totalPublishedForGeneratedDay": 13,
+  "totalDiscovered": 159,
+  "totalAfterDedupe": 164,
+  "totalPublished": 142,
+  "totalPublishedForGeneratedDay": 5,
   "items": [
     {
-      "title": "I design with Claude more than Figma now",
+      "title": "DeepSeek V4 Pro beats GPT-5.5 Pro on precision",
       "source": "Hacker News",
       "sourceType": "community",
-      "url": "https://blog.janestreet.com/i-design-with-claude-code-more-than-figma-now-index/",
-      "publishedAt": "2026-06-07T05:04:24.000Z",
-      "points": 201,
-      "imageUrl": "https://blog.janestreet.com/i-design-with-claude-code-more-than-figma-now-index/figma-to-claude-hero.png",
-      "titleZh": "我现在用Claude设计比Figma更多"
+      "url": "https://runtimewire.com/article/deepseek-v4-pro-beats-gpt-5-5-pro-on-precision",
+      "publishedAt": "2026-06-08T01:39:30.000Z",
+      "points": 302,
+      "imageUrl": "https://runtimewire.com/og/deepseek-v4-pro-beats-gpt-5-5-pro-on-precision.jpg",
+      "titleZh": "DeepSeek V4 Pro在精确度上超越GPT-5.5 Pro",
+      "summaryZh": "DeepSeek V4 Pro在精确度上超越GPT-5.5 Pro"
+    },
+    {
+      "title": "Do agents.md files help coding agents?",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://twitter.com/rasbt/status/2063649136323252397",
+      "publishedAt": "2026-06-08T05:21:56.000Z",
+      "points": 46,
+      "titleZh": "agents.md文件对编程代理有帮助吗？"
+    },
+    {
+      "title": "[Benchmark] DFlash Speculative Decoding + KV Cache Compression on RTX 5090 — 3.26x Speedup",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u05t6u/benchmark_dflash_speculative_decoding_kv_cache/",
+      "publishedAt": "2026-06-08T11:59:50.000Z",
+      "titleZh": "[基准] RTX 5090上的DFlash推测解码与KV缓存压缩——3.26倍加速",
+      "summaryZh": "[基准] RTX 5090上的DFlash推测解码与KV缓存压缩——3.26倍加速"
+    },
+    {
+      "title": "Meddies PII: An Open Multilingual De-identification Model for Clinical Text",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u04rnh/meddies_pii_an_open_multilingual_deidentification/",
+      "publishedAt": "2026-06-08T11:08:50.000Z",
+      "titleZh": "Meddies PII：用于临床文本的开源多语言去标识化模型",
+      "summaryZh": "Meddies PII：用于临床文本的开源多语言去标识化模型"
+    },
+    {
+      "title": "vllm-doctor — a CLI tool to diagnose and monitor vLLM inference servers",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u02mow/vllmdoctor_a_cli_tool_to_diagnose_and_monitor/",
+      "publishedAt": "2026-06-08T09:10:58.000Z",
+      "titleZh": "vllm-doctor——诊断和监控vLLM推理服务器的CLI工具",
+      "summaryZh": "vllm-doctor——诊断和监控vLLM推理服务器的CLI工具"
     },
     {
       "title": "Anthropic, please ship an official Claude Desktop for Linux",
@@ -149,9 +186,26 @@
       "sourceType": "community",
       "url": "https://github.com/anthropics/claude-code/issues/65697",
       "publishedAt": "2026-06-07T13:06:52.000Z",
-      "points": 50,
-      "imageUrl": "https://opengraph.githubassets.com/6b5e876ce500112840e629d8b2e6e18efc5846fb9a71257c939a8b782abcd100/anthropics/claude-code/issues/65697",
-      "titleZh": "Anthropic，请为Linux发布官方的Claude桌面版"
+      "points": 503,
+      "titleZh": "Anthropic，请为Linux发布官方Claude桌面版"
+    },
+    {
+      "title": "I design with Claude more than Figma now",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://blog.janestreet.com/i-design-with-claude-code-more-than-figma-now-index/",
+      "publishedAt": "2026-06-07T05:04:24.000Z",
+      "points": 290,
+      "titleZh": "我现在用Claude设计比用Figma多"
+    },
+    {
+      "title": "The OnlyFans Economy of American AI",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://leoveanu.com/2026-06-06-qwen3.7max/",
+      "publishedAt": "2026-06-07T14:47:17.000Z",
+      "points": 143,
+      "titleZh": "美国AI的OnlyFans经济"
     },
     {
       "title": "Anthropic/OpenAI may be spending more than $1000 for every $100 you pay them",
@@ -159,9 +213,26 @@
       "sourceType": "community",
       "url": "https://ea.rna.nl/2026/06/07/anthropic-openai-may-be-spending-more-than-1000-for-every-100-you-pay-them/",
       "publishedAt": "2026-06-07T12:54:54.000Z",
-      "points": 35,
-      "imageUrl": "https://i0.wp.com/ea.rna.nl/wp-content/uploads/2026/06/chart_full_range_no_claude.jpeg?fit=1200%2C660&#038;ssl=1",
-      "titleZh": "Anthropic/OpenAI可能每从你那里收入100美元就花费超过1000美元"
+      "points": 65,
+      "titleZh": "Anthropic/OpenAI 为每100美元收入可能支出超过1000美元"
+    },
+    {
+      "title": "Ask HN: Are we as society going to let LLM companies take all the values?",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://news.ycombinator.com/item?id=48439240",
+      "publishedAt": "2026-06-07T22:30:08.000Z",
+      "points": 29,
+      "titleZh": "Ask HN: 我们作为社会是否会让LLM公司夺走所有价值？"
+    },
+    {
+      "title": "Show HN: Nightwatch, The open-source, read-only AI SRE",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/ninoxAI/nightwatch",
+      "publishedAt": "2026-06-07T20:24:36.000Z",
+      "points": 23,
+      "titleZh": "Show HN: Nightwatch，开源、只读的AI SRE"
     },
     {
       "title": "Show HN: TakoVM – Isolated model and tool execution used by enterprises",
@@ -169,10 +240,17 @@
       "sourceType": "community",
       "url": "https://github.com/las7/TakoVM",
       "publishedAt": "2026-06-07T02:42:24.000Z",
-      "points": 20,
-      "imageUrl": "https://opengraph.githubassets.com/f4094fcda621ff89f4c605b94c923c30fc652995c4c32d17ec94ecdf6e41687e/las7/TakoVM",
-      "titleZh": "Show HN: TakoVM – 企业使用的隔离模型和工具执行",
-      "summaryZh": "Show HN: TakoVM – 企业使用的隔离模型和工具执行"
+      "points": 21,
+      "titleZh": "Show HN: TakoVM – 企业使用的隔离模型和工具执行"
+    },
+    {
+      "title": "No Model Will Save Us: Pope Leo, the Miserostat, and AI's Woke Coders",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.wmbriggs.com/post/61049/",
+      "publishedAt": "2026-06-07T19:48:14.000Z",
+      "points": 8,
+      "titleZh": "没有模型能拯救我们：教皇利奥、Miserostat和AI觉醒的程序员"
     },
     {
       "title": "Automated QA and Testing with AI",
@@ -182,6 +260,70 @@
       "publishedAt": "2026-06-07T09:57:18.000Z",
       "points": 8,
       "titleZh": "使用AI进行自动化质量保证和测试"
+    },
+    {
+      "title": "Is this the dawn of the Tokenpocalypse?",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/07/is-this-the-dawn-of-the-tokenpocalypse/",
+      "publishedAt": "2026-06-07T20:26:13.000Z",
+      "summary": "We're likely to see more price increases as the big AI companies plan to go public.",
+      "titleZh": "这是Tokenpocalypse的黎明吗？",
+      "summaryZh": "随着大型AI公司计划上市，我们可能会看到更多价格上涨。"
+    },
+    {
+      "title": "Qwen 3.6 27B on DeepSWE",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tzmq5y/qwen_36_27b_on_deepswe/",
+      "publishedAt": "2026-06-07T20:13:48.000Z",
+      "titleZh": "Qwen 3.6 27B 在 DeepSWE 上"
+    },
+    {
+      "title": "2-bit QAT model releases",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tzlt37/2bit_qat_model_releases/",
+      "publishedAt": "2026-06-07T19:38:31.000Z",
+      "titleZh": "发布2位QAT模型",
+      "summaryZh": "发布2位QAT模型"
+    },
+    {
+      "title": "NVFP4 on llama.cpp?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tzjahj/nvfp4_on_llamacpp/",
+      "publishedAt": "2026-06-07T18:05:27.000Z",
+      "titleZh": "NVFP4在llama.cpp上？"
+    },
+    {
+      "title": "Notion restores access to Anthropic after service disruption",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/07/notion-restores-access-to-anthropic-after-service-disruption/",
+      "publishedAt": "2026-06-07T17:56:22.000Z",
+      "summary": "Notion's head of product said he was \"astonished\" at “the amount of people RT-ing this.\"",
+      "titleZh": "Notion在服务中断后恢复对Anthropic的访问",
+      "summaryZh": "Notion的产品负责人表示，他对“转发这条内容的人数”感到“惊讶”。"
+    },
+    {
+      "title": "OpenAI is still working on that ‘super app’",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/07/openai-is-still-working-on-that-super-app/",
+      "publishedAt": "2026-06-07T16:23:22.000Z",
+      "summary": "\"Chat is dead\" — at least, according to a senior OpenAI employee.",
+      "titleZh": "OpenAI仍在开发那个‘超级应用’",
+      "summaryZh": "至少根据一位OpenAI高级员工的说法，‘聊天已死’。"
+    },
+    {
+      "title": "GMKtec Crams OCuLink, Wi-Fi 7 and Dual PCIe 4.0 Into the EVO-X3, With a 192GB Ryzen AI MAX+ 495 Monster Following Later This Year",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tzgafl/gmktec_crams_oculink_wifi_7_and_dual_pcie_40_into/",
+      "publishedAt": "2026-06-07T16:12:12.000Z",
+      "titleZh": "GMKtec将OCuLink、Wi-Fi 7和双PCIe 4.0塞入EVO-X3，后续还将推出搭载192GB Ryzen AI MAX+ 495的怪兽级产品。",
+      "summaryZh": "GMKtec将OCuLink、Wi-Fi 7和双PCIe 4.0塞入EVO-X3，后续还将推出搭载192GB Ryzen AI MAX+ 495的怪兽级产品。"
     },
     {
       "title": "What’s your most unusual non-LLM AI you actually use daily?",
@@ -207,8 +349,8 @@
       "url": "https://www.theverge.com/ai-artificial-intelligence/943187/ai-content-creators",
       "publishedAt": "2026-06-07T12:00:00.000Z",
       "summary": "This is The Stepback, a weekly newsletter breaking down one essential story from the tech world. For more on AI confusion, follow Robert Hart. The Stepback arrives in our subscribers' inboxes at 8AM ET. Opt in for The St",
-      "imageUrl": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/06/GAUYdq3a4AAAlsX.jpg?quality=90&strip=all&crop=0%2C0.6699364330709%2C100%2C78.534031413613&w=1200",
-      "titleZh": "AI‘内容创作者’越来越难以分辨"
+      "titleZh": "AI‘内容创作者’越来越难以识别",
+      "summaryZh": "AI‘内容创作者’越来越难以识别"
     },
     {
       "title": "Qwen 3.6 27B KV cache quant benchmarks: 75 pairs, q8/q6/q5/q4, KVarN, Turbo/TCQ",
@@ -220,48 +362,14 @@
       "summaryZh": "Qwen 3.6 27B KV缓存量化基准测试：75对，q8/q6/q5/q4，KVarN，Turbo/TCQ"
     },
     {
-      "title": "You don't need a GPU to run gemma-4-26B-A4B",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tz5ffp/you_dont_need_a_gpu_to_run_gemma426ba4b/",
-      "publishedAt": "2026-06-07T07:24:27.000Z",
-      "titleZh": "运行gemma-4-26B-A4B不需要GPU",
-      "summaryZh": "运行gemma-4-26B-A4B不需要GPU"
-    },
-    {
-      "title": "Cool stuff to do with NVIDIA RTX 6000 PRO 96GB VRAM",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tz2p8h/cool_stuff_to_do_with_nvidia_rtx_6000_pro_96gb/",
-      "publishedAt": "2026-06-07T04:51:54.000Z",
-      "titleZh": "NVIDIA RTX 6000 PRO 96GB显存的一些有趣用途"
-    },
-    {
-      "title": "I can't wait for all the x250 sample distills of Mythos and GPT-5.6",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tyzh4f/i_cant_wait_for_all_the_x250_sample_distills_of/",
-      "publishedAt": "2026-06-07T02:09:25.000Z",
-      "titleZh": "期待Mythos和GPT-5.6的x250样本蒸馏"
-    },
-    {
-      "title": "Gemma 4 31B QAT Q4 vs standard Q4 — Top1 KLD benchmark results have me confused. Someone please explain or poke holes in this.",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tyxu55/gemma_4_31b_qat_q4_vs_standard_q4_top1_kld/",
-      "publishedAt": "2026-06-07T00:49:07.000Z",
-      "titleZh": "Gemma 4 31B QAT Q4与标准Q4对比——Top1 KLD基准测试结果令人困惑，请求解释",
-      "summaryZh": "Gemma 4 31B QAT Q4与标准Q4对比——Top1 KLD基准测试结果令人困惑，请求解释"
-    },
-    {
       "title": "S&P 500 rejects SpaceX, also blocking entry for OpenAI and Anthropic",
       "source": "Hacker News",
       "sourceType": "community",
       "url": "https://arstechnica.com/tech-policy/2026/06/sp-500-blocks-fast-spacex-entry-wont-waive-rule-for-unprofitable-ai-firms/",
       "publishedAt": "2026-06-06T04:38:36.000Z",
-      "points": 1421,
-      "titleZh": "标普500拒绝SpaceX，并阻止OpenAI和Anthropic进入",
-      "summaryZh": "标普500拒绝SpaceX，并阻止OpenAI和Anthropic进入"
+      "points": 1458,
+      "titleZh": "标普500拒绝SpaceX，同时也阻止OpenAI和Anthropic进入",
+      "summaryZh": "标普500拒绝SpaceX，同时也阻止OpenAI和Anthropic进入"
     },
     {
       "title": "Ask HN: Why is the HN crowd so anti-AI?",
@@ -270,7 +378,7 @@
       "url": "https://news.ycombinator.com/item?id=48420827",
       "publishedAt": "2026-06-06T02:31:51.000Z",
       "points": 421,
-      "titleZh": "Ask HN：为什么HN群体如此反AI？"
+      "titleZh": "Ask HN: 为什么HN社区对AI如此反对？"
     },
     {
       "title": "Lockdown Mode",
@@ -278,7 +386,7 @@
       "sourceType": "community",
       "url": "https://help.openai.com/en/articles/20001061-lockdown-mode",
       "publishedAt": "2026-06-06T03:36:15.000Z",
-      "points": 87,
+      "points": 89,
       "titleZh": "锁定模式"
     },
     {
@@ -296,7 +404,7 @@
       "sourceType": "community",
       "url": "https://hugotunius.se/2025/10/26/claude-teach-me-something.html",
       "publishedAt": "2026-06-06T19:25:25.000Z",
-      "points": 23,
+      "points": 35,
       "titleZh": "Claude，教点东西"
     },
     {
@@ -306,8 +414,9 @@
       "url": "https://github.com/patriceckhart/zot-sidekick",
       "publishedAt": "2026-06-06T07:23:49.000Z",
       "points": 11,
-      "titleZh": "Show HN: Sidekick – Zot编码助手，macOS一键使用",
-      "imageUrl": "https://opengraph.githubassets.com/dbc973f39a6a429b919f5fd6ce69d27eb8947fa57d8c6d89c17ca3286738a601/patriceckhart/zot-sidekick"
+      "titleZh": "Show HN: Sidekick – zot编码代理，macOS上一键使用",
+      "imageUrl": "https://opengraph.githubassets.com/dbc973f39a6a429b919f5fd6ce69d27eb8947fa57d8c6d89c17ca3286738a601/patriceckhart/zot-sidekick",
+      "summaryZh": "Show HN: Sidekick – zot编码代理，macOS上一键使用"
     },
     {
       "title": "dvlt.cu: inference engine written from scratch in CUDA/C++ for NVIDIA's DVLT 3D transformer model",
@@ -315,7 +424,8 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tyu79c/dvltcu_inference_engine_written_from_scratch_in/",
       "publishedAt": "2026-06-06T22:04:08.000Z",
-      "titleZh": "dvlt.cu: 从头用CUDA/C++为NVIDIA的DVLT 3D变换模型编写的推理引擎"
+      "titleZh": "dvlt.cu：为NVIDIA的DVLT 3D变换器模型从零开始用CUDA/C++编写的推理引擎",
+      "summaryZh": "dvlt.cu：为NVIDIA的DVLT 3D变换器模型从零开始用CUDA/C++编写的推理引擎"
     },
     {
       "title": "Another 1-click admin account takeover in pewdiepie's AI tool (language in video nsfw)",
@@ -323,7 +433,7 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tys1wj/another_1click_admin_account_takeover_in/",
       "publishedAt": "2026-06-06T20:32:52.000Z",
-      "titleZh": "PewDiePie的AI工具再次出现一键管理员账户接管（视频语言不宜）"
+      "titleZh": "PewDiePie的AI工具再次出现一键管理员账户接管漏洞（视频语言NSFW）"
     },
     {
       "title": "OpenAI unveils Lockdown Mode to protect sensitive data from prompt injection attacks",
@@ -332,8 +442,8 @@
       "url": "https://techcrunch.com/2026/06/06/openai-unveils-lockdown-mode-to-protect-sensitive-data-from-prompt-injection-attacks/",
       "publishedAt": "2026-06-06T20:32:24.000Z",
       "summary": "Even with Lockdown Mode, ChatGPT could be still vulnerable to prompt injections, but the goal is to reduce the likelihood that sensitive data gets shared in the process.",
-      "titleZh": "OpenAI推出锁定模式以保护敏感数据免受提示注入攻击",
-      "summaryZh": "即使启用锁定模式，ChatGPT仍可能受到提示注入攻击，但其目标是降低敏感数据在过程中被共享的可能性。"
+      "titleZh": "OpenAI推出锁定模式保护敏感数据免受提示注入攻击",
+      "summaryZh": "即使启用锁定模式，ChatGPT仍可能受到提示注入攻击，但目标是降低过程中敏感数据泄露的可能性。"
     },
     {
       "title": "Z.ai, we need Air! GLM GGUF wen?",
@@ -349,7 +459,7 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tyo4fv/fuck_sucessfully_ran_minecraft_server_on_glm_ais/",
       "publishedAt": "2026-06-06T17:58:20.000Z",
-      "titleZh": "靠，成功在GLM AI的Agent上运行了Minecraft服务器哈哈。"
+      "titleZh": "靠，成功在GLM AI的Agent上运行了Minecraft服务器 lol"
     },
     {
       "title": "Sriram Krishnan is leaving his role as White House AI advisor",
@@ -358,8 +468,8 @@
       "url": "https://techcrunch.com/2026/06/06/sriram-krishnan-is-leaving-his-role-as-white-house-ai-advisor/",
       "publishedAt": "2026-06-06T17:42:15.000Z",
       "summary": "Krishnan is reportedly starting a new institution to continue shaping Trump's AI policy.",
-      "titleZh": "Sriram Krishnan 将辞去白宫 AI 顾问一职",
-      "summaryZh": "Krishnan 据报将成立新机构继续影响特朗普的 AI 政策。"
+      "titleZh": "斯里拉姆·克里尚将卸任白宫人工智能顾问一职",
+      "summaryZh": "据报道，克里尚将创办一个新机构，继续影响特朗普的人工智能政策。"
     },
     {
       "title": "Cohere's unreleased coding model (early access for localllama)",
@@ -367,7 +477,7 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tylzy2/coheres_unreleased_coding_model_early_access_for/",
       "publishedAt": "2026-06-06T16:36:41.000Z",
-      "titleZh": "Cohere 未发布的编程模型（localllama 提前体验）"
+      "titleZh": "Cohere未发布的编程模型（localllama早期访问）"
     },
     {
       "title": "The Trump administration might take an equity stake in OpenAI",
@@ -376,8 +486,8 @@
       "url": "https://techcrunch.com/2026/06/06/the-trump-administration-might-take-an-equity-stake-in-openai/",
       "publishedAt": "2026-06-06T16:17:21.000Z",
       "summary": "President Donald Trump said he's discussing deals \"where the American people can benefit from the success of AI.\"",
-      "titleZh": "特朗普政府可能收购 OpenAI 股权",
-      "summaryZh": "特朗普总统称其正讨论让美国人民从 AI 成功中获益的交易。"
+      "titleZh": "特朗普政府可能持有OpenAI股权",
+      "summaryZh": "美国总统唐纳德·特朗普表示，他正在讨论“让美国人民从人工智能的成功中受益”的交易。"
     },
     {
       "title": "The mayor of Shelbyville, Indiana, says only people who live in ‘shitty houses’ oppose data center",
@@ -386,8 +496,8 @@
       "url": "https://www.theverge.com/ai-artificial-intelligence/944984/shelbyville-indiana-mayor-shitty-houses-data-center",
       "publishedAt": "2026-06-06T15:05:00.000Z",
       "summary": "A proposed $2 billion data center has become a political flashpoint in the small city of Shelbyville, Indiana. And the controversy has only grown more intense after the mayor, Scott Furgeson, was caught on camera saying",
-      "titleZh": "印第安纳州谢尔比维尔市长称只有住‘破房子’的人才会反对数据中心",
-      "summaryZh": "谢尔比维尔市长 Scott Furgeson 被拍到称只有住‘破房子’的人才会反对数据中心。"
+      "titleZh": "印第安纳州谢尔比维尔市长表示只有住在‘破房子’里的人才反对数据中心",
+      "summaryZh": "拟议中的20亿美元数据中心已成为印第安纳州谢尔比维尔市的政治焦点，市长斯科特·弗格森被摄像头拍到说"
     },
     {
       "title": "Meta made its own AI-generated clickbait news feed",
@@ -396,8 +506,8 @@
       "url": "https://www.theverge.com/ai-artificial-intelligence/944235/meta-app-ai-clickbait-articles",
       "publishedAt": "2026-06-06T14:00:00.000Z",
       "summary": "Facebook has long been filled with feeds of clickbait articles. Now, Meta is making its own clickbait articles with AI. The standalone Meta AI app now has a \"For You\" section that populates a list of clickbait-style stor",
-      "titleZh": "Meta 打造了自家 AI 生成的点击诱饵信息流",
-      "summaryZh": "Facebook 长期以来充满点击诱饵文章，现在 Meta 正用 AI 制作自己的点击诱饵内容，其独立 Meta AI 应用新增 '为你推荐' 栏目展示点击诱饵风格故事。"
+      "titleZh": "Meta用AI生成自己的点击诱饵新闻推送",
+      "summaryZh": "Meta在其AI应用中推出了一个“为你推荐”栏目，包含AI生成的点击诱饵风格文章。"
     },
     {
       "title": "Here comes new Siri again",
@@ -406,8 +516,8 @@
       "url": "https://www.theverge.com/tech/944245/apple-wwdc-2026-ai-siri-gemini",
       "publishedAt": "2026-06-06T12:00:00.000Z",
       "summary": "Apple has been on its back foot, AI-wise, for the past few years. But in a strange way, playing from behind might not be such a bad move. At WWDC on Monday, Apple appears to be getting ready to reintroduce us to the new",
-      "titleZh": "新 Siri 再次到来",
-      "summaryZh": "苹果将在 WWDC 重新介绍新 Siri。"
+      "titleZh": "新版Siri即将到来",
+      "summaryZh": "苹果似乎在WWDC上准备推出新版Siri。"
     },
     {
       "title": "Qwen 3.6 27B MTP - Adding spec-type and spec-draft-n-max is dropping tps and reducing GPU utilization",
@@ -415,7 +525,8 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tyd9ct/qwen_36_27b_mtp_adding_spectype_and_specdraftnmax/",
       "publishedAt": "2026-06-06T10:05:10.000Z",
-      "titleZh": "Qwen 3.6 27B MTP - 添加 spec-type 和 spec-draft-n-max 会降低 tps 并减少 GPU 利用率"
+      "titleZh": "Qwen 3.6 27B MTP：添加spec-type和spec-draft-n-max导致tps下降并降低GPU利用率",
+      "summaryZh": "Qwen 3.6 27B MTP：添加spec-type和spec-draft-n-max导致tps下降并降低GPU利用率"
     },
     {
       "title": "Qwen3.6-35B-A3B-Uncensored-Claude-4.6-Genesis-APEX-GGUF",
@@ -441,7 +552,7 @@
       "url": "https://alexispurslane.github.io/rsync-analysis/",
       "publishedAt": "2026-06-05T12:43:33.000Z",
       "points": 450,
-      "titleZh": "Claude 是否增加了 rsync 中的 bug？"
+      "titleZh": "Claude是否增加了rsync中的错误？"
     },
     {
       "title": "Harness engineering: Leveraging Codex in an agent-first world",
@@ -501,7 +612,7 @@
       "url": "https://news.ycombinator.com/item?id=48413629",
       "publishedAt": "2026-06-05T15:13:54.000Z",
       "points": 108,
-      "titleZh": "问 HN：你的（AI）开发技术栈/工作流是什么？"
+      "titleZh": "问HN：你的（AI）开发技术栈/工作流是什么？"
     },
     {
       "title": "Microsoft wants users to be addicted to Scout, their AI personal assistant",
@@ -531,7 +642,7 @@
       "url": "https://news.ycombinator.com/item?id=48410589",
       "publishedAt": "2026-06-05T10:43:28.000Z",
       "points": 36,
-      "titleZh": "问 HN：面向机器（/llm.txt）的网络是否是我们作为人类所希望拥有的？"
+      "titleZh": "问HN：为机器（/llm.txt）准备的网络是否是我们人类所期望的？"
     },
     {
       "title": "Show HN: I nerfed our coding agents on purpose",
@@ -540,8 +651,8 @@
       "url": "https://news.ycombinator.com/item?id=48419614",
       "publishedAt": "2026-06-05T23:19:14.000Z",
       "points": 26,
-      "titleZh": "展示 HN：我故意削弱了我们的编码代理",
-      "summaryZh": "展示 HN：我故意削弱了我们的编码代理"
+      "titleZh": "Show HN：我故意削弱了我们的编码代理",
+      "summaryZh": "Show HN：我故意削弱了我们的编码代理"
     },
     {
       "title": "ZEC drops 30% after Anthropic AI finds Zcash counterfeit vulnerability",
@@ -564,14 +675,24 @@
       "summaryZh": "唐纳德·特朗普称美国可能持有AI公司股权"
     },
     {
+      "title": "Anthropic Urges Global Pause in AI Development, Flags 'Self-Improvement' Risk",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.wsj.com/tech/ai/anthropic-urges-global-pause-in-ai-development-flags-self-improvement-risk-99cefb73",
+      "publishedAt": "2026-06-05T08:41:01.000Z",
+      "points": 17,
+      "titleZh": "Anthropic呼吁全球暂停AI开发，指出'自我改进'风险",
+      "summaryZh": "Anthropic呼吁全球暂停AI开发，指出'自我改进'风险"
+    },
+    {
       "title": "Anthropic calls for global freeze in AI development",
       "source": "Hacker News",
       "sourceType": "community",
       "url": "https://www.telegraph.co.uk/business/2026/06/04/worlds-most-valuable-ai-start-up-calls-for-global-freeze-in/",
       "publishedAt": "2026-06-05T10:21:47.000Z",
       "points": 10,
-      "titleZh": "Anthropic呼吁全球暂停AI开发",
-      "summaryZh": "Anthropic呼吁全球暂停AI开发"
+      "titleZh": "Anthropic呼吁全球冻结AI开发",
+      "summaryZh": "Anthropic呼吁全球冻结AI开发"
     },
     {
       "title": "Agentic Search Models with OpenSearch and Elasticsearch",
@@ -580,7 +701,7 @@
       "url": "https://bonsai.io/blog/agent-search-with-sid/",
       "publishedAt": "2026-06-05T18:17:21.000Z",
       "points": 9,
-      "titleZh": "使用OpenSearch和Elasticsearch的智能搜索模型"
+      "titleZh": "基于OpenSearch和Elasticsearch的智能搜索模型"
     },
     {
       "title": "Y Combinator's CEO says he ships 37,000 lines of AI code per day",
@@ -622,15 +743,6 @@
       "points": 8,
       "titleZh": "AI正在加剧Reddit的垃圾信息问题",
       "summaryZh": "AI正在加剧Reddit的垃圾信息问题"
-    },
-    {
-      "title": "OpenLumara - A different kind of AI agent, written from scratch, not vibecoded. Extremely token-efficient, super small system prompt, made for local models. Everything is modular.",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1txxgpq/openlumara_a_different_kind_of_ai_agent_written/",
-      "publishedAt": "2026-06-05T21:05:08.000Z",
-      "titleZh": "OpenLumara - 一种不同的AI代理，从头编写，非vibecoded，极高效令牌，极小系统提示，专为本地模型，所有组件模块化",
-      "summaryZh": "OpenLumara - 一种不同的AI代理，从头编写，非vibecoded，极高效令牌，极小系统提示，专为本地模型，所有组件模块化"
     },
     {
       "title": "Responsible Scaling Policy",
@@ -709,7 +821,7 @@
       "url": "https://www.anthropic.com/institute/recursive-self-improvement",
       "publishedAt": "2026-06-04T16:20:17.000Z",
       "points": 523,
-      "titleZh": "当AI自我构建时：我们向递归自我改进的进展"
+      "titleZh": "当AI自我构建：递归自我改进的进展"
     },
     {
       "title": "The ways we contain Claude across products",
@@ -759,8 +871,8 @@
       "url": "https://cost.dev/",
       "publishedAt": "2026-06-04T11:30:13.000Z",
       "points": 36,
-      "titleZh": "Show HN: Cost.dev (YC W21) – 使代理成本感知并更便宜调用",
-      "summaryZh": "Show HN: Cost.dev (YC W21) – 使代理成本感知并更便宜调用"
+      "titleZh": "Show HN: Cost.dev (YC W21) – 让AI代理成本感知并更便宜调用",
+      "summaryZh": "Show HN: Cost.dev (YC W21) – 让AI代理成本感知并更便宜调用"
     },
     {
       "title": "Nemotron 3 Ultra: Open Moe Hybrid Mamba-Transformer for Agentic Reasoning [pdf]",
@@ -917,8 +1029,7 @@
       "url": "https://www.theverge.com/ai-artificial-intelligence/941388/gemini-spark-ai-agent-trip-planning",
       "publishedAt": "2026-06-03T21:20:43.000Z",
       "points": 12,
-      "titleZh": "Gemini Spark是我迄今为止最令人印象深刻且令人恐惧的AI体验",
-      "summaryZh": "Gemini Spark是我迄今为止最令人印象深刻且令人恐惧的AI体验"
+      "titleZh": "Gemini Spark是我迄今最令人印象深刻且令人恐惧的AI体验"
     },
     {
       "title": "Reddit user creates DB and MCP to mine Polygon, finds patterns on Polymarket",
@@ -1222,8 +1333,8 @@
       "url": "https://news.ycombinator.com/item?id=48356312",
       "publishedAt": "2026-06-01T13:05:02.000Z",
       "points": 101,
-      "titleZh": "推出Expanse (YC P26) – 解锁闲置GPU容量",
-      "summaryZh": "推出Expanse (YC P26) – 解锁闲置GPU容量"
+      "titleZh": "发布HN：Expanse (YC P26) – 解锁浪费的GPU容量",
+      "summaryZh": "发布HN：Expanse (YC P26) – 解锁浪费的GPU容量"
     },
     {
       "title": "Qwen3.7-Plus: Multimodal Agent Intelligence",
@@ -1251,7 +1362,8 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/MachineLearning/comments/1ttxcm5/finetuning_a_reasoning_llm_with_supervised_or/",
       "publishedAt": "2026-06-01T16:23:24.000Z",
-      "titleZh": "使用监督学习或强化学习微调推理型大语言模型？[D]"
+      "titleZh": "微调推理LLM：监督学习还是强化学习？[D]",
+      "summaryZh": "微调推理LLM：监督学习还是强化学习？[D]"
     },
     {
       "title": "5060 Ti 16GB or Cloud: Which makes more sense for DL, RL, and LLM studies/research? [D]",
@@ -1279,8 +1391,8 @@
       "url": "https://businessanalytics.substack.com/p/deepseek-slashes-ai-costs-to-cents",
       "publishedAt": "2026-05-29T10:43:03.000Z",
       "points": 13,
-      "titleZh": "DeepSeek将AI成本降至几美分",
-      "summaryZh": "DeepSeek将AI成本降至几美分"
+      "titleZh": "DeepSeek将AI成本降至分币级别",
+      "summaryZh": "DeepSeek将AI成本降至分币级别"
     },
     {
       "title": "China Limits Overseas Travel for AI Talent at DeepSeek, Alibaba, Private Firms",
@@ -1289,8 +1401,8 @@
       "url": "https://www.bloomberg.com/news/articles/2026-05-26/china-expands-travel-curbs-to-top-ai-talent-at-private-firms",
       "publishedAt": "2026-05-29T23:54:21.000Z",
       "points": 10,
-      "titleZh": "中国限制DeepSeek、阿里巴巴及私营企业AI人才出境",
-      "summaryZh": "中国限制DeepSeek、阿里巴巴及私营企业AI人才出境"
+      "titleZh": "中国限制DeepSeek、阿里巴巴及私企AI人才海外旅行",
+      "summaryZh": "中国限制DeepSeek、阿里巴巴及私企AI人才海外旅行"
     },
     {
       "title": "Claude Opus 4.8 may have distilled Qwen",
@@ -1337,8 +1449,8 @@
       "url": "https://twitter.com/kevinsays/status/2059724146221662339",
       "publishedAt": "2026-05-28T11:27:36.000Z",
       "points": 27,
-      "titleZh": "我从Claude切换至DeepSeek，AI API成本降低99%",
-      "summaryZh": "我从Claude切换至DeepSeek，AI API成本降低99%"
+      "titleZh": "我从Claude切换到DeepSeek，将AI API成本降低了99%",
+      "summaryZh": "我从Claude切换到DeepSeek，将AI API成本降低了99%"
     },
     {
       "title": "May 27, 2026 Announcements Anthropic opens Milan office to support Italian enterprise, research, and developers",
@@ -1355,7 +1467,8 @@
       "sourceType": "official",
       "url": "https://mistral.ai/news/physics-ai-research",
       "publishedAt": "2026-05-27T00:00:00.000Z",
-      "titleZh": "影响行业的物理AI研究：2026年5月27日Mistral发布突破性进展"
+      "titleZh": "塑造行业的物理学AI研究：发布推动技术前沿的突破 – 2026年5月27日 Mistral",
+      "summaryZh": "塑造行业的物理学AI研究：发布推动技术前沿的突破 – 2026年5月27日 Mistral"
     },
     {
       "title": "Gemini, Gophers, and Fingers. Oh My Alternative Internets Beyond HTTPS",
@@ -1364,7 +1477,8 @@
       "url": "https://brennan.day/gemini-gophers-and-fingers-oh-my-alternative-internets-beyond-https/",
       "publishedAt": "2026-05-27T17:24:25.000Z",
       "points": 147,
-      "titleZh": "Gemini、Gophers与Fingers：超越HTTPS的替代互联网"
+      "titleZh": "Gemini、Gophers和Fingers：哦，超越HTTPS的替代互联网",
+      "summaryZh": "Gemini、Gophers和Fingers：哦，超越HTTPS的替代互联网"
     },
     {
       "title": "May 26, 2026 Announcements Anthropic appoints KiYoung Choi as Representative Director of Korea ahead of Seoul office opening",
@@ -1384,24 +1498,6 @@
       "points": 67,
       "titleZh": "DeepSWE：面向长周期编码代理的无污染基准测试",
       "summaryZh": "DeepSWE：面向长周期编码代理的无污染基准测试"
-    },
-    {
-      "title": "May 22, 2026 Announcements Project Glasswing: An initial update",
-      "source": "Anthropic",
-      "sourceType": "official",
-      "url": "https://www.anthropic.com/research/glasswing-initial-update",
-      "publishedAt": "2026-05-25T04:00:00.000Z",
-      "titleZh": "Project Glasswing初步更新",
-      "summaryZh": "Project Glasswing初步更新"
-    },
-    {
-      "title": "May 25, 2026 Announcements Anthropic co-founder Chris Olah&#x27;s remarks on Pope Leo XIV&#x27;s encyclical \"Magnifica humanitas\"",
-      "source": "Anthropic",
-      "sourceType": "official",
-      "url": "https://www.anthropic.com/news/chris-olah-pope-leo-encyclical",
-      "publishedAt": "2026-05-25T00:00:00.000Z",
-      "titleZh": "2026年5月25日公告：Anthropic联合创始人Chris Olah就教皇利奥十四世通谕《Magnifica humanitas》发表评论",
-      "summaryZh": "2026年5月25日公告：Anthropic联合创始人Chris Olah就教皇利奥十四世通谕《Magnifica humanitas》发表评论"
     }
   ]
 }
