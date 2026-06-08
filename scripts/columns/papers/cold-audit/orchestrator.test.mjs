@@ -10,10 +10,13 @@ import test from "node:test";
 import {
   CRITERIA,
   MAX_ROUNDS,
+  auditArxivReferences,
   collectFixes,
   decideOutcome,
+  extractArxivIdsFromArtifact,
   hasMajorGap,
   isUntrustworthyDiagnosis,
+  localArxivIdSuspicion,
   majorDiagnosis,
   makeClaudeAuditFn,
   makeMockAuditFn,
@@ -112,6 +115,57 @@ test("collectFixes: pulls major-gap fixes and dedupes", () => {
   assert.ok(fixes.some((f) => f.includes("TELBench")));
   // minor fix must NOT be pulled
   assert.ok(!fixes.some((f) => f.includes("skip me")));
+});
+
+// ---- arXiv citation verification ------------------------------------------
+
+test("extractArxivIdsFromArtifact: scans deep-read text fields only", () => {
+  const ids = extractArxivIdsFromArtifact({
+    paperMdx: "引用 2606.02060 和 arXiv:2601.19290v2。",
+    careerMdx: "另一个 2603.02701。",
+    paper: "9999.00001", // thin author handles are not deep-read citation text.
+  });
+  assert.deepEqual(ids, ["2601.19290v2", "2603.02701", "2606.02060"]);
+});
+
+test("localArxivIdSuspicion: future arXiv month is suspicious", () => {
+  assert.deepEqual(localArxivIdSuspicion("2612.12345", new Date("2026-06-08T00:00:00Z")), {
+    suspicious: true,
+    reason: "future_arxiv_month",
+  });
+  assert.equal(localArxivIdSuspicion("2606.02060", new Date("2026-06-08T00:00:00Z")).suspicious, false);
+});
+
+test("auditArxivReferences: suspicious/future arXiv ID is downgraded to 推断/待核", async () => {
+  const audit = await auditArxivReferences(
+    { paperMdx: "这段深读前向引用了 2612.12345，并且还引用了 2606.02060。" },
+    {
+      now: () => new Date("2026-06-08T00:00:00Z"),
+      resolveArxivId: async (id) => ({ resolvable: id === "2606.02060", reason: id === "2606.02060" ? "" : "no_entry" }),
+      logger: silent(),
+    },
+  );
+  assert.equal(audit.checkedCount, 2);
+  assert.equal(audit.unresolved.length, 1);
+  assert.equal(audit.unresolved[0].id, "2612.12345");
+  assert.equal(audit.unresolved[0].downgradeLabel, "推断/待核");
+  assert.match(audit.unresolved[0].downgradedCitation, /推断\/待核/);
+});
+
+test("runColdAuditGate: arXiv citation audit is attached to the cold-audit report", async () => {
+  const authorFn = makeMockAuthorFn({ artifacts: [{ paperMdx: "可疑引用 2612.12345", careerMdx: "" }] });
+  const auditFn = makeMockAuditFn({ diagnoses: [passDiagnosis()] });
+
+  const out = await runColdAuditGate(PAPER, {
+    authorFn,
+    auditFn,
+    logger: silent(),
+    now: () => new Date("2026-06-08T00:00:00Z"),
+  });
+
+  assert.equal(out.status, "ready_to_publish");
+  assert.equal(out.finalDiagnosis.arxivCitationAudit.unresolved[0].id, "2612.12345");
+  assert.equal(out.finalDiagnosis.arxivCitationAudit.unresolved[0].downgradeLabel, "推断/待核");
 });
 
 // ---- single-paper loop -----------------------------------------------------
@@ -314,6 +368,27 @@ test("batch writes status, alert, and digest files", async () => {
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
+});
+
+test("batch report lists unresolved arXiv references with downgrade label", async () => {
+  const papers = [{ arxivId: "2606.0040", title: "future ref" }];
+  const authorFn = makeMockAuthorFn({ artifacts: [{ paperMdx: "引用不存在/未来 arXiv 2612.12345", careerMdx: "" }] });
+  const auditFn = makeMockAuditFn({ diagnoses: [passDiagnosis()] });
+
+  const out = await runBatch(papers, {
+    authorFn,
+    auditFn,
+    dailyCap: 1,
+    writeFiles: false,
+    logger: silent(),
+    now: () => new Date("2026-06-08T00:00:00Z"),
+  });
+
+  assert.equal(out.results[0].unresolvedArxivReferences.length, 1);
+  assert.equal(out.results[0].unresolvedArxivReferences[0].downgradeLabel, "推断/待核");
+  assert.match(out.digest, /arXiv 引用待核/);
+  assert.match(out.digest, /2612\.12345/);
+  assert.match(out.digest, /推断\/待核/);
 });
 
 // ---- normalizeDiagnosis ----------------------------------------------------

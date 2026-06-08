@@ -33,6 +33,7 @@ const ROOT = path.resolve(__dirname, "..", "..", "..", "..");
 export const MAX_ROUNDS = 3;
 export const DEFAULT_DAILY_CAP = 3;
 const DEFAULT_AUDIT_ROOT = path.join(ROOT, "logs", "papers-cold-audit");
+const ARXIV_DOWNGRADE_LABEL = "推断/待核";
 
 // The 5 「透彻」criteria (cold-audit-prompt.md §「透彻」). The auditor scores each;
 // any `major` gap on any criterion blocks publication.
@@ -98,6 +99,132 @@ export function collectFixes(diagnosis) {
   return [...new Set(fixes)].filter(Boolean);
 }
 
+// ---- arXiv forward-reference verification ---------------------------------
+
+export function extractArxivIdsFromArtifact(artifact) {
+  const textParts = [];
+  if (typeof artifact === "string") textParts.push(artifact);
+  else if (artifact && typeof artifact === "object") {
+    if (artifact.paperMdx) textParts.push(String(artifact.paperMdx));
+    if (artifact.careerMdx) textParts.push(String(artifact.careerMdx));
+    if (artifact.prose_markdown) textParts.push(String(artifact.prose_markdown));
+    if (artifact.metadata && typeof artifact.metadata === "object") {
+      textParts.push(
+        [
+          artifact.metadata.one_sentence_judgment,
+          ...(Array.isArray(artifact.metadata.tags) ? artifact.metadata.tags : []),
+          ...(Array.isArray(artifact.metadata.source_rankings) ? artifact.metadata.source_rankings : []),
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      );
+    }
+  }
+  const text = textParts.join("\n");
+  const ids = new Set();
+  for (const match of text.matchAll(/\b(\d{4}\.\d{4,5})(v\d+)?\b/gi)) {
+    ids.add(`${match[1]}${match[2] || ""}`);
+  }
+  return [...ids].sort();
+}
+
+export function localArxivIdSuspicion(arxivId, now = new Date()) {
+  const match = /^(\d{2})(\d{2})\.(\d{4,5})(v\d+)?$/i.exec(String(arxivId || "").trim());
+  if (!match) return { suspicious: true, reason: "format_invalid" };
+  const year = 2000 + Number(match[1]);
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return { suspicious: true, reason: "month_invalid" };
+  if (year < 2007 || (year === 2007 && month < 4)) return { suspicious: true, reason: "before_modern_arxiv_id_format" };
+  const currentYear = now.getUTCFullYear();
+  const currentMonth = now.getUTCMonth() + 1;
+  if (year > currentYear || (year === currentYear && month > currentMonth)) {
+    return { suspicious: true, reason: "future_arxiv_month" };
+  }
+  return { suspicious: false, reason: "" };
+}
+
+export async function defaultResolveArxivId(arxivId, { timeoutMs = 4000 } = {}) {
+  if (typeof fetch !== "function" || typeof AbortController !== "function") {
+    return { resolvable: null, reason: "network_unavailable" };
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const id = String(arxivId || "").replace(/v\d+$/i, "");
+    const url = `https://export.arxiv.org/api/query?id_list=${encodeURIComponent(id)}`;
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: { "user-agent": "AI-Brief cold-audit arXiv reference verifier" },
+    });
+    if (!response.ok) return { resolvable: false, reason: `arxiv_api_http_${response.status}` };
+    const body = await response.text();
+    const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const hasEntry = new RegExp(`<entry>[\\s\\S]*<id>https?://arxiv\\.org/abs/${escaped}(v\\d+)?</id>`, "i").test(body);
+    return hasEntry ? { resolvable: true, reason: "" } : { resolvable: false, reason: "arxiv_api_no_entry" };
+  } catch (error) {
+    return { resolvable: null, reason: error?.name === "AbortError" ? "network_timeout" : "network_error" };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function auditArxivReferences(artifact, deps = {}) {
+  const {
+    now = () => new Date(),
+    resolveArxivId = defaultResolveArxivId,
+    logger = console,
+  } = deps;
+  const ids = extractArxivIdsFromArtifact(artifact);
+  const checked = [];
+  const unresolved = [];
+  for (const id of ids) {
+    const local = localArxivIdSuspicion(id, now());
+    if (local.suspicious) {
+      const item = {
+        id,
+        resolvable: false,
+        reason: local.reason,
+        downgradeLabel: ARXIV_DOWNGRADE_LABEL,
+        downgradedCitation: `${id}（${ARXIV_DOWNGRADE_LABEL}: ${local.reason}）`,
+      };
+      checked.push(item);
+      unresolved.push(item);
+      continue;
+    }
+    let resolved = { resolvable: null, reason: "resolver_not_run" };
+    try {
+      resolved = await resolveArxivId(id, { now: now() });
+    } catch (error) {
+      resolved = { resolvable: null, reason: error?.message || "resolver_error" };
+      logger.warn?.(`[cold-audit] arXiv resolver failed for ${id}: ${resolved.reason}`);
+    }
+    const item = {
+      id,
+      resolvable: resolved?.resolvable ?? null,
+      reason: resolved?.reason || "",
+      downgradeLabel: resolved?.resolvable === false ? ARXIV_DOWNGRADE_LABEL : "",
+      downgradedCitation:
+        resolved?.resolvable === false ? `${id}（${ARXIV_DOWNGRADE_LABEL}: ${resolved.reason || "unresolved"}）` : "",
+    };
+    checked.push(item);
+    if (item.resolvable === false) unresolved.push(item);
+  }
+  return {
+    checkedCount: checked.length,
+    checked,
+    unresolved,
+    downgradeLabel: ARXIV_DOWNGRADE_LABEL,
+  };
+}
+
+export function attachArxivCitationAudit(diagnosis, citationAudit) {
+  if (!diagnosis || typeof diagnosis !== "object") return diagnosis;
+  return {
+    ...diagnosis,
+    arxivCitationAudit: citationAudit || { checkedCount: 0, checked: [], unresolved: [], downgradeLabel: ARXIV_DOWNGRADE_LABEL },
+  };
+}
+
 // ---- the loop: author → cold-audit → revise, ≤ 3 rounds --------------------
 
 /**
@@ -140,11 +267,12 @@ export async function runColdAuditGate(paper, deps = {}) {
 
     // 2. cold-audit step (Claude, fresh context, cross-model). Two-stage per the spec.
     const diagnosis = await auditFn(artifact, source, { round, paper });
-    finalDiagnosis = diagnosis;
+    const arxivCitationAudit = await auditArxivReferences(artifact, deps);
+    finalDiagnosis = attachArxivCitationAudit(diagnosis, arxivCitationAudit);
 
     // 3. gate.
-    const outcome = decideOutcome(diagnosis, round, maxRounds);
-    history.push({ round, outcome, verdict: diagnosis?.verdict ?? null, diagnosis });
+    const outcome = decideOutcome(finalDiagnosis, round, maxRounds);
+    history.push({ round, outcome, verdict: finalDiagnosis?.verdict ?? null, diagnosis: finalDiagnosis });
     logger.log?.(`[cold-audit] ${paper.arxivId || paper.id || "?"} round ${round}: ${outcome}`);
 
     if (outcome === "pass") {
@@ -154,7 +282,7 @@ export async function runColdAuditGate(paper, deps = {}) {
       return { status: "hold", rounds: round, finalDiagnosis, artifact, history };
     }
     // revise: feed the major-gap fixes back to the author and loop.
-    fixes = collectFixes(diagnosis);
+    fixes = collectFixes(finalDiagnosis);
   }
 
   // Loop fell through (maxRounds reached without pass). Treat as hold (best-so-far retained).
@@ -204,6 +332,13 @@ export async function runBatch(papers = [], deps = {}) {
       generatedAt: now().toISOString(),
       finalVerdict: gate.finalDiagnosis?.verdict ?? null,
       majorGaps: majorGapSummary(gate.finalDiagnosis),
+      arxivCitationAudit: gate.finalDiagnosis?.arxivCitationAudit || {
+        checkedCount: 0,
+        checked: [],
+        unresolved: [],
+        downgradeLabel: ARXIV_DOWNGRADE_LABEL,
+      },
+      unresolvedArxivReferences: gate.finalDiagnosis?.arxivCitationAudit?.unresolved || [],
       history: gate.history.map((h) => ({ round: h.round, outcome: h.outcome, verdict: h.verdict })),
     };
 
@@ -220,6 +355,7 @@ export async function runBatch(papers = [], deps = {}) {
         title: paper.title || "",
         rounds: gate.rounds,
         majorGaps: status.majorGaps,
+        unresolvedArxivReferences: status.unresolvedArxivReferences,
         message: `深读冷审 HOLD（${gate.rounds} 轮仍有重大缺口，未发布，保留 best-so-far）: ${id}`,
         generatedAt: status.generatedAt,
       };
@@ -281,6 +417,16 @@ export function buildDigest({ results = [], skipped = [], dailyCap, totalCandida
   for (const r of held) {
     lines.push(`- ${r.paperId} · ${r.title} · ${r.rounds} 轮仍有重大缺口`);
     for (const g of r.majorGaps || []) lines.push(`  - [${g.criterion}] ${g.gap}`);
+  }
+  const withUnresolvedArxiv = results.filter((r) => (r.unresolvedArxivReferences || []).length > 0);
+  lines.push("");
+  lines.push(`## arXiv 引用待核 / 降级标注 — ${withUnresolvedArxiv.length}`);
+  if (withUnresolvedArxiv.length === 0) lines.push("- (无)");
+  for (const r of withUnresolvedArxiv) {
+    lines.push(`- ${r.paperId} · ${r.title}`);
+    for (const ref of r.unresolvedArxivReferences || []) {
+      lines.push(`  - ${ref.downgradedCitation || `${ref.id}（${ARXIV_DOWNGRADE_LABEL}: ${ref.reason || "unresolved"}）`}`);
+    }
   }
   lines.push("");
   if (skipped.length) {

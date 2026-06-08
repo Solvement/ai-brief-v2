@@ -193,6 +193,13 @@ export async function markOutcome(rec, gateResult, deps = {}) {
     author: "codex-gpt-5.5-high",
     final_verdict: gateResult.finalDiagnosis?.verdict ?? null,
     major_gaps: majorGaps(gateResult.finalDiagnosis),
+    arxiv_citation_audit: gateResult.finalDiagnosis?.arxivCitationAudit || {
+      checkedCount: 0,
+      checked: [],
+      unresolved: [],
+      downgradeLabel: "推断/待核",
+    },
+    unresolved_arxiv_references: gateResult.finalDiagnosis?.arxivCitationAudit?.unresolved || [],
   };
 
   await writeFileFn(metaPath, `${JSON.stringify(meta, null, 2)}\n`);
@@ -372,6 +379,12 @@ export async function runDaily(deps = {}) {
       status: result.status === "ready_to_publish" ? "ready_to_publish" : "hold",
       rounds: result.rounds,
       finalDiagnosis: { perCriterion: (result.majorGaps || []).map((g) => ({ ...g, severity: "major" })), verdict: result.finalVerdict },
+    };
+    gateResult.finalDiagnosis.arxivCitationAudit = result.arxivCitationAudit || {
+      checkedCount: 0,
+      checked: [],
+      unresolved: result.unresolvedArxivReferences || [],
+      downgradeLabel: "推断/待核",
     };
     if (writeFiles) await markFn(rec, gateResult);
     audited.push({ slug: rec.slug, paperId: result.paperId, status: gateResult.status, rounds: result.rounds });
