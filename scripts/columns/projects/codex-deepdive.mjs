@@ -551,6 +551,7 @@ Return only a JSON object matching this schema shape:
     },
     "how_it_works": {"body_md": "..."},
     "reusable_abstractions": {"body_md": "...", "items": [{"name": "...", "copy": "...", "skip": "...", "why_it_matters": "..."}]},
+    "comparison": {"body_md": "..."},
     "dependency_platform_risk": {"body_md": "...", "items": [{"dependency": "...", "what_if_change": "...", "exposure": "high|medium|low|unknown", "mitigation_or_unknown": "...", "source": "..."}]},
     "unknowns_to_confirm": {"body_md": "...", "items": ["..."]},
     "judgment": {"action": "skip|watch|read-docs|clone-and-run|extract-pattern", "ratings": {"相关度": 1, "工程深度": 1, "复用价值": 1, "成熟度": 1}, "body_md": "..."}
@@ -564,6 +565,7 @@ Return only a JSON object matching this schema shape:
 Concreteness contract:
 - Every tier_template section must contain specific, concrete detail extracted from the actual upstream repo. Do not write only category labels, architecture sketches, or generic capability summaries.
 - "how_it_works" must walk a real flow with a real example from the repo. Include actual config/code/commands/file paths where present, such as a policy rule text, a function call, a CLI command, a deny/allow path, or a package/module path. A sentence like "it uses a policy engine to intercept tools" fails unless it shows the concrete mechanism and example.
+- "comparison" is required for Tier 3 horizontal judgment. Name at least 2 concrete alternatives, predecessors, or common practices, not vague labels like "similar systems". For each, state a real difference dimension (retrieval mechanism, integration path, self-hosting, license, maturity, workflow fit, or equivalent) and the tradeoff for building AI applications: when to pick this project, and when to pick the alternative. If a competitor capability is only vendor/project claimed or not independently verified, mark it as self-claimed/unverified. If you cannot find a directly comparable alternative, write "未找到直接可比同类" and describe the searched scope; do not invent competitors or numbers.
 - "key_claims_evidence.items" must make each claim concrete: state the literal mechanism, number, config, path, command, or example that supports it. Do not write abstract claims like "provides governance capabilities" unless you also quote what it literally does and where.
 - Actively pull real snippets, config keys, commands, numbers, module names, and file paths from README plus source/docs/examples/config/tests. The result should read like someone inspected the code, not someone skimmed the README.
 - Standard: "more useful than a full translation." Preserve the concrete details a raw translation would carry, then organize and judge them. Any section that contains only a framework/category with no concrete example, number, snippet, command, or path is a failure.
@@ -616,6 +618,7 @@ function codexOutputSchema() {
           "how_it_works_with_analogy",
           "essential_design_difference",
           "practitioner_meaning",
+          "comparison",
         ],
       },
     },

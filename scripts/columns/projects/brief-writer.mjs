@@ -726,8 +726,9 @@ ${artifact.summary}
 }
 
 function normalizeProjectDeepDive(input = {}, { repo, audit, evidence, triage, checkedDate }) {
-  const lightSpine = normalizeLightSpine(input.light_spine || input.lightSpine, input);
-  const tierTemplate = normalizeTierTemplate(input.tier_template || input.tierTemplate, { repo, triage });
+  const rawTierTemplate = input.tier_template || input.tierTemplate;
+  const lightSpine = normalizeLightSpine(input.light_spine || input.lightSpine || rawTierTemplate, input);
+  const tierTemplate = normalizeTierTemplate(rawTierTemplate, { repo, triage, lightSpine, input });
   const projectType = normalizeProjectType(input.project_type || input.project_verdict?.project_type || triage?.project_type);
   const projectVerdict = normalizeProjectVerdict(input.project_verdict || lightSpine?.judgment, triage);
   const risks = normalizeStringArray(input.risks).length
@@ -782,10 +783,13 @@ function normalizeProjectDeepDive(input = {}, { repo, audit, evidence, triage, c
   };
 }
 
-function normalizeTierTemplate(input, { repo = {}, triage = {} } = {}) {
+function normalizeTierTemplate(input, { repo = {}, triage = {}, lightSpine = null, input: fullInput = {} } = {}) {
   if (!input || typeof input !== "object") return null;
   const tier = clampInt(Number(input.tier ?? triage.project_tier ?? triage.depth_decision?.project_tier ?? tierFromDepth(triage.final_depth || triage.depth_decision?.final_depth)), 0, 3);
   const bucket = cleanString(input.bucket || triage.project_bucket || triage.bucket || triage.depth_decision?.project_bucket || "数据不足");
+  const reusableBody = reusableAbstractionsMarkdown(lightSpine?.reusable_abstractions);
+  const judgmentBody = sectionBody(lightSpine?.judgment) || cleanString(fullInput.value_to_us || "");
+  const whyWorthAttention = sectionBody(lightSpine?.why_worth_attention);
   return compactObject({
     tier,
     bucket,
@@ -799,8 +803,10 @@ function normalizeTierTemplate(input, { repo = {}, triage = {} } = {}) {
       author: cleanString(input.metadata?.author || repo.owner || "数据不足"),
     },
     labels: normalizeStringArray(input.labels || input.tags || triage.tags).slice(0, 6),
-    pain_point: cleanString(input.pain_point || input.painPoint || ""),
-    core_capabilities: normalizeStringArray(input.core_capabilities || input.coreCapabilities).slice(0, 3),
+    pain_point: cleanString(input.pain_point || input.painPoint || whyWorthAttention || ""),
+    core_capabilities: normalizeStringArray(input.core_capabilities || input.coreCapabilities).length
+      ? normalizeStringArray(input.core_capabilities || input.coreCapabilities).slice(0, 3)
+      : asArray(lightSpine?.reusable_abstractions?.items).slice(0, 3).map((item) => cleanString(item?.name || item)).filter(Boolean),
     how_to_run: {
       install_command: cleanString(input.how_to_run?.install_command || input.howToRun?.installCommand || input.install_command || ""),
       minimal_example: cleanString(input.how_to_run?.minimal_example || input.howToRun?.minimalExample || input.minimal_example || ""),
@@ -809,9 +815,9 @@ function normalizeTierTemplate(input, { repo = {}, triage = {} } = {}) {
     comparison: cleanString(input.comparison || input.horizontal_comparison || ""),
     trajectory_note: cleanString(input.trajectory_note || input.trajectoryNote || ""),
     manual_confirmation: Boolean(input.manual_confirmation || tier === 3),
-    how_it_works_with_analogy: cleanString(input.how_it_works_with_analogy || input.howItWorksWithAnalogy || ""),
-    essential_design_difference: cleanString(input.essential_design_difference || input.essentialDesignDifference || ""),
-    practitioner_meaning: cleanString(input.practitioner_meaning || input.practitionerMeaning || ""),
+    how_it_works_with_analogy: cleanString(input.how_it_works_with_analogy || input.howItWorksWithAnalogy || sectionBody(lightSpine?.how_it_works) || ""),
+    essential_design_difference: cleanString(input.essential_design_difference || input.essentialDesignDifference || reusableBody || ""),
+    practitioner_meaning: cleanString(input.practitioner_meaning || input.practitionerMeaning || judgmentBody || ""),
     cross_links: normalizeStringArray(input.cross_links || input.crossLinks),
     prose_body: cleanString(input.prose_body || input.proseBody || ""),
   });
@@ -835,6 +841,26 @@ function tierTemplateFromLightSpine(lightSpine, input = {}) {
     essential_design_difference: sectionBody(lightSpine.reusable_abstractions),
     practitioner_meaning: sectionBody(lightSpine.judgment),
   };
+}
+
+function reusableAbstractionsMarkdown(section = {}) {
+  const body = sectionBody(section);
+  const items = asArray(section?.items)
+    .map((item) => {
+      if (typeof item === "string") return cleanString(item);
+      const name = cleanString(item?.name || "");
+      const copy = cleanString(item?.copy || "");
+      const skip = cleanString(item?.skip || "");
+      const why = cleanString(item?.why_it_matters || item?.whyItMatters || "");
+      const details = [
+        copy ? `copy: ${copy}` : "",
+        skip ? `skip: ${skip}` : "",
+        why ? `why: ${why}` : "",
+      ].filter(Boolean).join("；");
+      return [name, details].filter(Boolean).join(" — ");
+    })
+    .filter(Boolean);
+  return [body, ...items.map((item) => `- ${item}`)].filter(Boolean).join("\n");
 }
 
 function tierFromDepth(depth) {
