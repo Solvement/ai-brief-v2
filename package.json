@@ -17,6 +17,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "typecheck:scripts": "tsc -p scripts/jsconfig.json",
     "lint:eslint": "eslint app src scripts",
     "lint:content": "node scripts/lint.mjs",
     "lint": "npm run lint:eslint && npm run lint:content",
