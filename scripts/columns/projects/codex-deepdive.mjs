@@ -20,8 +20,77 @@ const CODEX_DEEP_MODEL = "gpt-5.5";
 // what produces concrete (not framework-sketch) analysis. See memory: analysis-concreteness
 // + deepdive-model-cost-strategy. Override per-run with --reasoning-effort=medium to save quota.
 const CODEX_REASONING_EFFORT = "high";
+// Default parallelism for the authoring pool. Each project deep-dive is fully
+// independent (own checkoutDir, own brief-wiki/<slug> writes, own log dir), so we
+// fan them out at a FIXED concurrency instead of one-at-a-time. This is the fix for
+// "one stuck/hung project (e.g. roboflow/supervision) blocks the rebuild of the
+// other 11 already-finished deep-reads": a hang now only occupies one pool slot and
+// is bounded by PROJECT_CODEX_DEEP_DIVE_TIMEOUT_MS, and the others keep flowing.
+// Kept DETERMINISTIC (fixed N, not an open-ended agent) because this runs inside the
+// daily boot pipeline. Override with env PROJECT_DEEPDIVE_CONCURRENCY.
+const DEFAULT_DEEPDIVE_CONCURRENCY = 3;
 
-export async function main(argv = process.argv.slice(2)) {
+export function resolveDeepDiveConcurrency(env = process.env) {
+  const raw = Number(env.PROJECT_DEEPDIVE_CONCURRENCY);
+  if (Number.isFinite(raw) && raw >= 1) return Math.floor(raw);
+  return DEFAULT_DEEPDIVE_CONCURRENCY;
+}
+
+/**
+ * Minimal fixed-concurrency promise pool. Runs at most `concurrency` invocations
+ * of `fn(item, index)` at once; resolves to an array of results in INPUT order.
+ * `fn` is expected to settle (never throw) — the caller wraps each unit so a single
+ * failure/timeout is isolated and the whole batch always completes. No deps.
+ */
+export async function pMap(items, fn, concurrency = 1) {
+  const list = Array.from(items);
+  const results = new Array(list.length);
+  const limit = Math.max(1, Math.floor(concurrency) || 1);
+  let next = 0;
+
+  async function worker() {
+    while (true) {
+      const index = next;
+      next += 1;
+      if (index >= list.length) return;
+      results[index] = await fn(list[index], index);
+    }
+  }
+
+  const workers = [];
+  for (let i = 0; i < Math.min(limit, list.length); i += 1) workers.push(worker());
+  await Promise.all(workers);
+  return results;
+}
+
+/**
+ * Process ONE selected record: honor --force/skip-already-deep-dived, author the
+ * deep-dive, and convert any failure/timeout into a markNeedsEnrichment fallback.
+ * This NEVER throws — that is what guarantees a single stuck project (one pool slot)
+ * cannot stall or abort the batch, and the final rebuild always runs. The author fn
+ * is injectable (`deps.authorOneDeepDive`) so tests can drive concurrency/isolation
+ * without invoking codex.
+ */
+export async function processOneRecord(record, options = {}, deps = {}) {
+  const author = deps.authorOneDeepDive || authorOneDeepDive;
+  const onEnrich = deps.markNeedsEnrichment || markNeedsEnrichment;
+  const repo = record.repo.fullName || record.candidate.id;
+  try {
+    if (!options.force && isProjectAlreadyDeepDived(record.candidate, options)) {
+      console.log(`codex deep-dive skipped ${repo}: already deep-dived`);
+      return { repo, status: "skipped", reason: "already_deep_dived" };
+    }
+    const result = await author(record, options);
+    console.log(`codex deep-dive generated ${repo}: ${result.slug}`);
+    return result;
+  } catch (error) {
+    const fallback = onEnrich(record, error, options);
+    console.warn(`codex deep-dive failed ${repo}: ${error.message}`);
+    return fallback;
+  }
+}
+
+export async function main(argv = process.argv.slice(2), deps = {}) {
   const options = parseArgs(argv);
   if (options.help) {
     printUsage();
@@ -34,30 +103,34 @@ export async function main(argv = process.argv.slice(2)) {
   try {
     await mkdir(options.logRoot, { recursive: true });
     const records = selectAuthoringRecords(loadProjectRecords(db, options), options);
-    const results = [];
+    const concurrency = resolveDeepDiveConcurrency();
 
-    for (const record of records) {
+    // Parallel authoring with single-failure isolation. processOneRecord already
+    // catches per-record, so each unit settles; we still go through allSettled as a
+    // belt-and-suspenders guard so that even an unexpected throw in the pool plumbing
+    // for one project cannot prevent the others' results or the final rebuild.
+    const settled = await pMap(
+      records,
+      (record) => processOneRecord(record, options, deps).then(
+        (value) => ({ status: "fulfilled", value }),
+        (reason) => ({ status: "rejected", reason }),
+      ),
+      concurrency,
+    );
+    const results = settled.map((entry, index) => {
+      if (entry.status === "fulfilled") return entry.value;
+      const record = records[index];
       const repo = record.repo.fullName || record.candidate.id;
-      try {
-        if (!options.force && isProjectAlreadyDeepDived(record.candidate, options)) {
-          results.push({ repo, status: "skipped", reason: "already_deep_dived" });
-          console.log(`codex deep-dive skipped ${repo}: already deep-dived`);
-          continue;
-        }
+      console.warn(`codex deep-dive pool error ${repo}: ${entry.reason?.message || entry.reason}`);
+      return (deps.markNeedsEnrichment || markNeedsEnrichment)(record, entry.reason, options);
+    });
 
-        const result = await authorOneDeepDive(record, options);
-        results.push(result);
-        console.log(`codex deep-dive generated ${repo}: ${result.slug}`);
-      } catch (error) {
-        const fallback = markNeedsEnrichment(record, error, options);
-        results.push(fallback);
-        console.warn(`codex deep-dive failed ${repo}: ${error.message}`);
-      }
-    }
-
+    // ALWAYS rebuild with whatever succeeded — never gated on a stuck/failed project.
+    // (deps.publishBriefMirror is an injection seam for hermetic tests only.)
+    const rebuild = deps.publishBriefMirror || publishBriefMirror;
     let briefMirror = null;
     if (options.build) {
-      briefMirror = await publishBriefMirror({ options, logger: console });
+      briefMirror = await rebuild({ options, logger: console });
     }
 
     const summary = {
@@ -66,6 +139,7 @@ export async function main(argv = process.argv.slice(2)) {
       model: options.model,
       model_reasoning_effort: options.reasoningEffort,
       command_template: codexCommandTemplate(options),
+      concurrency,
       logRoot: relativeToRoot(options.logRoot),
       results,
       briefMirror,
@@ -175,7 +249,7 @@ export function selectAuthoringRecords(records, options = {}) {
     .slice(0, options.limit || 1);
 }
 
-async function authorOneDeepDive(record, options = {}) {
+export async function authorOneDeepDive(record, options = {}) {
   const repo = record.repo;
   const repoLabel = repo.fullName || record.candidate.id;
   const safeRepo = slugify(repoLabel.replace("/", "__"));

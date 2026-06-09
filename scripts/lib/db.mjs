@@ -89,9 +89,26 @@ export async function openAiBriefDb(dbPath = DEFAULT_DB_PATH, options = {}) {
   const driver = await loadSqliteDriver(options);
   if (dbPath !== ":memory:") await mkdir(path.dirname(dbPath), { recursive: true });
   const connection = new driver.Database(dbPath);
+  applyConcurrencyPragmas(connection, dbPath);
   const db = new AiBriefDb(connection, { dbPath, driverName: driver.name });
   if (options.init !== false) db.initSchema();
   return db;
+}
+
+// Concurrency hardening: the daily pipeline now authors project deep-dives in
+// PARALLEL (scripts/columns/projects/codex-deepdive.mjs), so several writers can
+// hit this one file at once. WAL lets readers and a writer coexist and avoids the
+// "database is locked" SQLITE_BUSY that a default rollback journal throws under
+// concurrent writes; busy_timeout makes any remaining contention block-and-retry
+// (up to 10s) instead of failing immediately. WAL is a no-op for :memory:.
+function applyConcurrencyPragmas(connection, dbPath) {
+  try {
+    if (dbPath !== ":memory:") connection.exec("PRAGMA journal_mode=WAL;");
+    connection.exec("PRAGMA busy_timeout=10000;");
+  } catch {
+    // Pragmas are best-effort tuning; a driver that rejects them must not block
+    // opening the DB. Writes still work, just without the concurrency cushion.
+  }
 }
 
 async function loadSqliteDriver({ preferBuiltin = true } = {}) {
