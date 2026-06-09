@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-09T02:53:18.412Z",
+  "generatedAt": "2026-06-09T03:05:13.262Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -6257,8 +6257,9 @@
     },
     {
       "id": "ghost:hkuds-openspace",
-      "type": "ghost",
-      "ghost": true,
+      "type": "project",
+      "family": "ghost",
+      "slug": "ghost:hkuds-openspace",
       "title": "HKUDS/OpenSpace — 自进化 skill 引擎",
       "tags": [
         "self-evolving",
@@ -6266,15 +6267,34 @@
         "agent-runtime",
         "HKUDS"
       ],
-      "url": "https://github.com/HKUDS/OpenSpace",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "把『技能(skill)』做成可自我进化的一等实体:套在任意 agent 骨架(Claude Code/OpenClaw 等)之上,执行后自动用 FIX(原地修坏指令)/DERIVED(从父技能派生专用版)/CAPTURED(从成功执行抽新模式)三种模式改写技能,带 version DAG 血缘 + 安全闸门(确认/防循环/危险模式检测)+ 云端技能社区共享。",
       "self_evo_use": "可用性高,且与本站方向高度对位。可复用模式:① 『技能即可进化工件 + version DAG 血缘』正是 L1 自进化层最直接的落点——把深读沉淀的设计原语当 skill,执行失败触发 FIX/CAPTURED;② diff-based 最小补丁 + 自动 revert-on-regression 是安全自改的工程范式,可直接接进记忆库的『改了就回归测,坏了回滚』闭环;③ CAPTURED(从成功轨迹抽模式)= 记忆库『把一次深读/一次成功任务升格为可复用边』的写入路径。短板:它进化的是 prompt/skill 文本(行为层),不动模型权重也不动检索策略,属『软进化』;GDPVal 上 4.2× income / 70.8% 质量是厂商自报、未独立复现。怎么组合:用 OpenSpace 当 L1 的 skill 进化器,记忆库(本图)当它的语义索引/邻居发现,EvolveMem 那种『改检索配置』补它不碰的检索层。",
-      "kg_integrated": true
+      "external_url": "https://github.com/HKUDS/OpenSpace"
+    },
+    {
+      "id": "ghost:rohitg00-agentmemory",
+      "type": "project",
+      "family": "ghost",
+      "slug": "ghost:rohitg00-agentmemory",
+      "title": "rohitg00/agentmemory — AI 编程 agent 的持久记忆",
+      "tags": [
+        "agent-memory",
+        "memory-tiers",
+        "hybrid-retrieval",
+        "coding-agent"
+      ],
+      "file": "discovery-candidates.json",
+      "ghost": true,
+      "design_idea": "给编程 agent 装一套四层记忆(Working 原始观察 → Episodic 会话摘要 → Semantic 抽取事实 → Procedural 工作流),靠生命周期 hook(PostToolUse/Stop/SessionStart)自动写入,记忆按 Ebbinghaus 遗忘曲线衰减、高频强化、陈旧自动驱逐;检索用 BM25+向量+知识图谱三路 RRF(k=60)融合;全部落 SQLite,无外部库,53 个 MCP 工具暴露给 25+ agent。",
+      "self_evo_use": "可用性很高——它几乎就是『agent 记忆库』的参考实现。可复用模式:① 四层记忆(working/episodic/semantic/procedural)是把零散轨迹升格为可复用知识的成熟分层,本站记忆库可直接对标(深读=semantic/procedural,任务轨迹=episodic);② 三路 RRF 融合(关键词+向量+图谱)正是『搜一个点真正相关的一起浮现』那条关联检索的工程答案;③ 遗忘曲线 + 高频强化 = 记忆库该有的『冷热分层/自动剪枝』。短板:它是被动记账(hook 捕获)而非主动自进化,记忆只增删不重组,不会跨条目综合出新洞察(这正是本站『跨篇综合』要补的差);LongMemEval-S 95.2% R@5 是单基准、厂商自报。怎么组合:拿 agentmemory 当 L0 记忆存储/检索底座,本图的 typed 边(builds_on/shares_method)做它缺的『跨条目语义关联』,AgeMem 那种 RL 学的记忆策略补它写死的 hook 规则。"
     },
     {
       "id": "ghost:agentdisco-2605.11732",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:agentdisco-2605.11732",
       "title": "AgentDisCo: Disentanglement and Collaboration in Open-ended Deep Research Agents",
       "tags": [
         "deep-research-agent",
@@ -6283,15 +6303,17 @@
         "meta-optimization",
         "xiaohongshu"
       ],
-      "url": "https://arxiv.org/abs/2605.11732",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "把开放式深度研究形式化成『探索(找信息)vs 利用(用信息)』之间的对抗优化:Critic agent 评提纲、改写检索 query(逼探索),Generator agent 取新结果、改提纲、兼打分(管利用),Report Writer 综合成报告;另设一个代码生成 agent 做元优化,维护一个 policy bank(可复用设计策略的结构化仓库)自动发现 agent 配置。",
       "self_evo_use": "对研究 agent 高度可用,是『研究 agent 该长什么样』的优质蓝图。可复用模式:① explore/exploit 显式拆成两个对抗 agent——这条边界(该多挖还是该收敛)正是深度研究最难调的旋钮,把它做成一等设计变量值得直接借;② policy bank(可复用设计策略库)= 自进化层的核心数据结构,和本站记忆库目标同构(沉淀『怎么做研究』的元策略,不只沉淀结论);③ 代码生成 agent 做元优化 = 让系统改自己的研究流程(轻量自进化)。短板:进化停在『改 agent 配置/提纲策略』,不学权重也无长期跨任务记忆,policy bank 是会话级仓库;adversarial critic-generator 烧 token。怎么组合:AgentDisCo 当 L3 研究 agent 的骨架,本图当它 policy bank 的持久化外脑(跨任务复用设计策略),OpenSpace 把跑出来的好策略固化成可进化 skill。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2605.11732"
     },
     {
       "id": "ghost:evolvemem-2605.13941",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:evolvemem-2605.13941",
       "title": "EvolveMem: Self-Evolving Memory Architecture via AutoResearch for LLM Agents",
       "tags": [
         "self-evolving",
@@ -6299,15 +6321,17 @@
         "autoresearch",
         "closed-loop"
       ],
-      "url": "https://arxiv.org/abs/2605.13941",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "把记忆系统的『整套检索配置』暴露成一个结构化动作空间,交给 LLM 诊断模块优化:每轮读逐题失败日志→定位根因→提出定向配置调整,一个带护栏的 meta-analyzer 应用它(自动 revert-on-regression、停滞时 explore-on-stagnation),形成对自身架构做迭代研究的 AutoResearch 闭环。",
       "self_evo_use": "对自进化层极对位——它直接示范『系统对自己的记忆架构做研究』。可复用模式:① 『把配置变成动作空间 + 失败日志驱动诊断』是把模糊的『自我改进』落成可执行闭环的关键招;② revert-on-regression / explore-on-stagnation 这对护栏是自改安全性的最小可用集,任何自进化记忆库都该抄;③ 它进化的对象正好是 agentmemory 写死的那层检索 hook,二者天然互补。短板:只优化记忆的检索配置(一个窄动作空间),不碰 agent 的推理/规划;LoCoMo +25.7%、MemBench +18.9% 为单一论文自报相对增益。怎么组合:EvolveMem 当本站记忆库的『检索配置自调优器』,接在 agentmemory/MemoryAgentBench 之上,用 MemoryAgentBench 当它的回归测床。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2605.13941"
     },
     {
       "id": "ghost:dgm-2505.22954",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:dgm-2505.22954",
       "title": "Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents",
       "tags": [
         "self-improving",
@@ -6316,15 +6340,17 @@
         "agent-archive",
         "sakana"
       ],
-      "url": "https://arxiv.org/abs/2505.22954",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "让 agent 自己改写自己的源码并用实证(跑 benchmark)验证改动:维护一个生成出的 coding agent 档案库(archive),每轮从中采样一个 agent,用基础模型造一个『有意思的』新版本,长成一棵多样高质量 agent 的树,并行探索搜索空间——开放式进化而非单线优化。",
       "self_evo_use": "概念上是『自进化』的最强形态(真改自己的代码),但工程可用性要打折。可复用模式:① 『archive + 从历史采样变异 + 实证 fitness』这套开放式进化骨架,是比 prompt 级自改更彻底的范式,可启发记忆库不只存终态、还存『被淘汰的变体』(多样性档案);② 它实证发现的自我改进(更好的编辑工具、长上下文管理、peer-review 机制)本身就是可复用设计原语,值得作为节点收。短板:成本极高(每个变体要跑 SWE-bench 验证)、需要可执行 fitness 信号(研究/写作类任务难给),不适合直接搬进 boot 时确定性管线;SWE-bench 20%→50% 为论文自报。怎么组合:把 DGM 当北极星(L1→L3 的远端),近期只借它的『多样性档案 + 实证回归』思想给本站的 skill/策略进化做安全网,别真让 boot 管线改自己代码(违反红线)。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2505.22954"
     },
     {
       "id": "ghost:alita-2505.20286",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:alita-2505.20286",
       "title": "Alita: Generalist Agent with Minimal Predefinition and Maximal Self-Evolution",
       "tags": [
         "self-evolving",
@@ -6333,15 +6359,17 @@
         "generalist-agent",
         "gaia"
       ],
-      "url": "https://arxiv.org/abs/2505.20286",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "极简主义自进化:agent 只预定义一个直接解题组件,其余能力靠按需『动态生成/适配/复用 MCP(模型上下文协议)工具』长出来——不靠手搓的庞杂工具链,而是任务驱动地造工具并沉淀复用,在 GAIA 上胜过工具堆叠型大厂系统。",
       "self_evo_use": "对自进化 agent 高度可用且方向清晰。可复用模式:① 『最小预定义 + 动态造工具并复用』把自进化落在工具层(比改权重轻、比改 prompt 实),造出来的 MCP 工具可直接进记忆库当 procedural 节点;② 『复用已造工具』需要一个工具记忆库——正是本图能提供的关联检索(找到相似任务用过的工具)。短板:自进化只在工具维度,无长期记忆/无跨会话经验积累(每任务偏冷启动复用);GAIA 夺冠为论文自报、复现仓库为第三方。怎么组合:Alita 的工具生成器 + agentmemory 的 procedural 层 + 本图的关联检索 = 一个会造工具且记得住、找得到、能组合工具的研究 agent。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2505.20286"
     },
     {
       "id": "ghost:generative-agents-2304.03442",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:generative-agents-2304.03442",
       "title": "Generative Agents: Interactive Simulacra of Human Behavior (memory stream)",
       "tags": [
         "agent-memory",
@@ -6350,15 +6378,17 @@
         "retrieval",
         "foundational"
       ],
-      "url": "https://arxiv.org/abs/2304.03442",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "经典 memory stream 架构:agent 把所有感知按时间存成一条记忆流;检索按『近时性 × 重要性 × 相关性』三因子打分取相关记忆;周期性把零散记忆综合成更高层的 reflection(再写回流),reflection 又支撑长期规划。",
       "self_evo_use": "奠基级、对记忆库设计直接可用。可复用模式:① 『近时性×重要性×相关性』三因子检索打分是关联记忆的经典配方,可作为本图边权/浮现排序的基线;② reflection(把底层记忆周期性综合成高层洞察并写回)正是本站要的『跨篇综合出洞察』——这是 agentmemory 那种纯检索缺的一层,值得直接借;③ 记忆流→反思→规划的层级是 L0→L1 的最小闭环。短板:为社会模拟设计,reflection 的触发(累计重要性阈值)较朴素,无安全/回归概念;规模化检索成本高。怎么组合:用它的 reflection 机制给本站记忆库加『综合层』,三因子打分当浮现排序,EvolveMem 的护栏补它缺的安全。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2304.03442"
     },
     {
       "id": "ghost:reflexion-2303.11366",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:reflexion-2303.11366",
       "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
       "tags": [
         "self-improving",
@@ -6366,15 +6396,17 @@
         "reflection-memory",
         "foundational"
       ],
-      "url": "https://arxiv.org/abs/2303.11366",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "不更新权重的『口头强化学习』:agent 失败后,自反思模块把稀疏奖励(成败)+ 当前轨迹转成具体的口头反馈,存进记忆,下一次试验把这段反思当上下文,从而越试越好(HumanEval pass@1 91%)。",
       "self_evo_use": "对自进化层可用、且是最便宜的一档。可复用模式:① 『失败→口头反思→存记忆→下次复用』是无需训练的自改最小回路,可直接接进本站冷审门(把审稿失败转成可复用经验条目);② 反思即记忆条目——天然契合记忆库写入;③ 与本站已有的 Agent-as-a-Judge / 冷审门思想同源(过程反馈当改进信号)。短板:反思是会话/任务内短期记忆,默认不跨任务沉淀也不综合;靠模型自评,质量上限受限。怎么组合:Reflexion 当『单任务自改』的便宜层,产出的反思经 reflection(Generative Agents)综合后进本图当 episodic→semantic 边,形成跨任务积累。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2303.11366"
     },
     {
       "id": "ghost:voyager-skill-library",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:voyager-skill-library",
       "title": "Voyager: Open-Ended Embodied Agent with Skill Library (LLM)",
       "tags": [
         "self-evolving",
@@ -6382,15 +6414,17 @@
         "auto-curriculum",
         "foundational"
       ],
-      "url": "https://arxiv.org/abs/2305.16291",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "冻结 GPT-4,为每个新任务生成可执行代码,成功的程序按自然语言描述索引存进不断增长的技能库;遇到相关任务时检索并组合已验证技能而非从头推理;配自动课程(提渐进更难的探索任务)+ 执行反馈/自验证迭代精炼代码。",
       "self_evo_use": "对自进化 agent 高度可用,是 skill-as-memory 的范本。可复用模式:① 『成功代码→自然语言索引→技能库→检索组合』= 把成功经验固化成可复用、可组合工件的标准范式,直接对应本站把深读原语/成功任务存成可检索 skill;② 自动课程(系统自己提下一个该学什么)可反哺本站的缺口发现(该深读谁);③ 执行反馈自验证 = 写入前的质量门。短板:技能是可执行代码、靠环境跑通验证,研究/写作类任务没有这种硬验证信号,迁移要换成软评审;只增不重构。怎么组合:Voyager 的技能库 + OpenSpace 的技能进化(FIX/DERIVED)+ 本图的关联检索 = 会攒技能、会改技能、找得到技能的研究 agent;自动课程接本站缺口发现做『下一个深读目标』。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2305.16291"
     },
     {
       "id": "ghost:externalization-survey-2604.08224",
-      "type": "ghost",
-      "ghost": true,
+      "type": "paper",
+      "family": "ghost",
+      "slug": "ghost:externalization-survey-2604.08224",
       "title": "Externalization in LLM Agents: Unified Review of Memory, Skills, Protocols and Harness Engineering",
       "tags": [
         "survey",
@@ -6399,15 +6433,17 @@
         "skills",
         "externalization"
       ],
-      "url": "https://arxiv.org/abs/2604.08224",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "一篇 2026 综述,把 LLM agent 的『外置化』统一起来:记忆、技能、协议(如 MCP)、harness 工程四块都看成『把本该在模型脑子里的东西搬到模型之外』的同一件事,给出统一框架。",
       "self_evo_use": "作为坐标系/目录极有用。可复用模式:① 『externalization』这个统一视角正好把本站记忆库(外置记忆)+ skill 进化(外置技能)+ harness(Harness-1/Crafter 的外置状态)串成一条线,可当本图的顶层 tag 分类骨架;② 它聚合的方法清单 = 现成的 ghost 节点候选源(缺口发现的输入)。短板:综述不提供可跑实现,只给地图;需自己挑落地点。怎么组合:拿它当本站记忆库的分类学(memory/skill/protocol/harness 四象限),指导该往哪个象限补深读。",
-      "kg_integrated": true
+      "external_url": "https://arxiv.org/abs/2604.08224"
     },
     {
       "id": "ghost:awesome-self-evolving-agents",
-      "type": "ghost",
-      "ghost": true,
+      "type": "project",
+      "family": "ghost",
+      "slug": "ghost:awesome-self-evolving-agents",
       "title": "XMUDeepLIT/Awesome-Self-Evolving-Agents (curated list)",
       "tags": [
         "awesome-list",
@@ -6415,15 +6451,17 @@
         "discovery-source",
         "survey-index"
       ],
-      "url": "https://github.com/XMUDeepLIT/Awesome-Self-Evolving-Agents",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "一个自进化 agent 的策展清单(综述/论文/基准/开源项目),配套 2508.07407 那篇综述——本质是该领域的人工索引。",
       "self_evo_use": "本身不是架构,但对『缺口发现』极有价值:它是一个高质量的外部候选池,可周期性 diff 它与本站已深读节点,自动产出『该领域有但我们没收/没深读』的 ghost 候选,反哺选品。短板:是静态人工清单,需自己判优先级、去重;不含评估。怎么组合:当本站缺口发现管线的外部种子源之一(配 VoltAgent/awesome-ai-agent-papers),用本图的簇密度决定先深读清单里的哪几个。",
-      "kg_integrated": true
+      "external_url": "https://github.com/XMUDeepLIT/Awesome-Self-Evolving-Agents"
     },
     {
       "id": "ghost:auto-deep-researcher-24x7",
-      "type": "ghost",
-      "ghost": true,
+      "type": "project",
+      "family": "ghost",
+      "slug": "ghost:auto-deep-researcher-24x7",
       "title": "Deep Researcher Agent — 24/7 autonomous deep-learning experimentation (2604.05854)",
       "tags": [
         "deep-research-agent",
@@ -6431,10 +6469,11 @@
         "constant-memory",
         "leader-worker"
       ],
-      "url": "https://github.com/Xiangyue-Zhang/auto-deep-researcher-24x7",
+      "file": "discovery-candidates.json",
+      "ghost": true,
       "design_idea": "一个 7×24 自主跑深度学习实验的框架:零成本监控、两层定长记忆(two-tier constant-size memory)、最小工具集的 leader-worker 架构,把持续 LLM 驱动的科研压到约 \\$0.08/24h 周期。",
       "self_evo_use": "对 L3 研究 agent 可用,亮点在工程节流。可复用模式:① 『两层定长记忆』(把记忆压成常数大小)是长跑研究 agent 不爆上下文的实用招,可借给本站记忆库做工作记忆上限;② leader-worker 最小工具集 = 便宜的研究分工骨架,贴合本站『便宜层跑确定性活、强模型只做语义判断』;③ 7×24 自主循环对应 boot 时管线的常驻化。短板:聚焦 ML 实验自动化(有可量化 fitness),换成开放式文献研究要重设评估;成本数字为作者自报。怎么组合:借它的定长记忆 + leader-worker 给本站研究 agent 控成本,语义判断仍走强模型,知识沉淀进本图。",
-      "kg_integrated": true
+      "external_url": "https://github.com/Xiangyue-Zhang/auto-deep-researcher-24x7"
     }
   ],
   "edges": [
@@ -14629,12 +14668,21 @@
       "weight": 2
     },
     {
+      "from": "ghost:hkuds-openspace",
+      "to": "ghost:voyager-skill-library",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签 self-evolving、skill-library",
+      "weight": 2
+    },
+    {
       "from": "content/agemem",
       "to": "content/rohitg00-agentmemory",
       "type": "improves_on",
       "confidence": "high",
       "evidence": "AgeMem 用 RL 学习记忆策略,取长补短 agentmemory 的写死 hook(REPLACE/优化:学习式 > 固定式)",
-      "kg_integrated": true
+      "kg_integrated": true,
+      "cross_doc": true
     },
     {
       "from": "ghost:hkuds-openspace",
@@ -14642,7 +14690,8 @@
       "type": "improves_on",
       "confidence": "high",
       "evidence": "OpenSpace 的 skill 自进化(FIX/DERIVED/CAPTURED+回退)取代 MetaGPT 写死的 SOP 工作流(REPLACE:自进化 > 固定流程)",
-      "kg_integrated": true
+      "kg_integrated": true,
+      "cross_doc": true
     },
     {
       "from": "ghost:evolvemem-2605.13941",
@@ -14650,7 +14699,8 @@
       "type": "composes_with",
       "confidence": "high",
       "evidence": "EvolveMem 让系统自研究记忆配置,与 AgeMem 可学习记忆策略前后组合成自进化记忆层(MERGE)",
-      "kg_integrated": true
+      "kg_integrated": true,
+      "cross_doc": true
     },
     {
       "from": "ghost:agentdisco-2605.11732",
@@ -14658,7 +14708,26 @@
       "type": "composes_with",
       "confidence": "medium",
       "evidence": "AgentDisCo 的探索/利用解耦+policy bank 与深研 agent 的错误定位/上下文管理前后关联(MERGE)",
-      "kg_integrated": true
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "ghost:hkuds-openspace",
+      "to": "paper:2507.21046",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "都在解 agent 自进化;OpenSpace 是自进化综述所述能力的可落地 skill 自进化引擎",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "ghost:dgm-2505.22954",
+      "to": "paper:2507.21046",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "DGM 递归自改代码=自进化最强形态(北极星,受成本/适应度信号约束)",
+      "kg_integrated": true,
+      "cross_doc": true
     },
     {
       "from": "ghost:generative-agents-2304.03442",
@@ -14666,7 +14735,8 @@
       "type": "composes_with",
       "confidence": "medium",
       "evidence": "Generative Agents 的 reflection 综合层补上纯检索记忆(agentmemory/AgeMem)缺的跨条目综合(MERGE)",
-      "kg_integrated": true
+      "kg_integrated": true,
+      "cross_doc": true
     },
     {
       "from": "ghost:alita-2505.20286",
@@ -14674,7 +14744,1961 @@
       "type": "shares_method",
       "confidence": "medium",
       "evidence": "都走最小预定义/动态自生成能力(Alita 动态 MCP vs OpenSpace skill 派生)",
-      "kg_integrated": true
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/9router",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/9router",
+      "to": "content/easy-vibe",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/9router",
+      "to": "content/ecc",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/9router",
+      "to": "content/iii",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/9router",
+      "to": "content/open-llm-vtuber",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/academic-research-skills",
+      "to": "content/open-llm-vtuber",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/academic-research-skills",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/academic-research-skills",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/academic-research-skills",
+      "to": "content/funasr",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/agemem",
+      "to": "content/memoryagentbench",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-memory、llm-agents",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/agent-reach",
+      "to": "content/mempalace",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/agent-reach",
+      "to": "content/vibe-trading",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/agent-reach",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/agent-reach",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/agent-reach",
+      "to": "content/nousresearch-hermes-agent",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-engineering-from-scratch",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-engineering-from-scratch",
+      "to": "content/microsoft-agent-governance-toolkit",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-engineering-from-scratch",
+      "to": "content/scrapling",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-engineering-from-scratch",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-scientist-v2",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-framework、project",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-scientist-v2",
+      "to": "content/airllm",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-framework、project",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-scientist-v2",
+      "to": "content/bytedance-ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-framework、project",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-scientist-v2",
+      "to": "content/can1357-oh-my-pi",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-framework、project",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ai-scientist-v2",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-framework、project",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/airllm",
+      "to": "content/vimax",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/airllm",
+      "to": "content/compound-engineering-plugin",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/airllm",
+      "to": "content/opendataloader-pdf",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/airllm",
+      "to": "content/phuryn-pm-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/airllm",
+      "to": "content/understand-anything",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/anthropic-cybersecurity-skills",
+      "to": "content/microsoft-agent-governance-toolkit",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/anthropic-cybersecurity-skills",
+      "to": "content/scrapling",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/anthropic-cybersecurity-skills",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/bytedance-ui-tars-desktop",
+      "to": "content/can1357-oh-my-pi",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/bytedance-ui-tars-desktop",
+      "to": "content/rohitg00-agentmemory",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/bytedance-ui-tars-desktop",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/bytedance-ui-tars-desktop",
+      "to": "content/colbymchenry-codegraph",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/bytedance-ui-tars-desktop",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/can1357-oh-my-pi",
+      "to": "content/rohitg00-agentmemory",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/can1357-oh-my-pi",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/can1357-oh-my-pi",
+      "to": "content/colbymchenry-codegraph",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/can1357-oh-my-pi",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/chopratejas-headroom",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/chopratejas-headroom",
+      "to": "content/nousresearch-hermes-agent",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/cloakhq-cloakbrowser",
+      "to": "content/ryancodrai-turbovec",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、deep",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/cloakhq-cloakbrowser",
+      "to": "content/harry0703-moneyprinterturbo",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/cloakhq-cloakbrowser",
+      "to": "content/hkuds-vimax",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、deep",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/cloakhq-cloakbrowser",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/cloakhq-cloakbrowser",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、python",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/codewhale",
+      "to": "content/easy-vibe",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/codewhale",
+      "to": "content/ecc",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/codewhale",
+      "to": "content/iii",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/colbymchenry-codegraph",
+      "to": "content/rohitg00-agentmemory",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/colbymchenry-codegraph",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/colbymchenry-codegraph",
+      "to": "content/decolua-9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/compound-engineering-plugin",
+      "to": "content/understand-anything",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/compound-engineering-plugin",
+      "to": "content/opendataloader-pdf",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/compound-engineering-plugin",
+      "to": "content/phuryn-pm-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/compound-engineering-plugin",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/decolua-9router",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/decolua-9router",
+      "to": "content/pbakaus-impeccable",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/decolua-9router",
+      "to": "content/fathah-hermes-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/decolua-9router",
+      "to": "content/imbad0202-academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/easy-vibe",
+      "to": "content/ecc",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/easy-vibe",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/easy-vibe",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ecc",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ecc",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/fathah-hermes-desktop",
+      "to": "content/nesquena-hermes-webui",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/fathah-hermes-desktop",
+      "to": "content/yikart-aitoearn",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/fathah-hermes-desktop",
+      "to": "content/bytedance-ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/fathah-hermes-desktop",
+      "to": "content/can1357-oh-my-pi",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/fathah-hermes-desktop",
+      "to": "content/colbymchenry-codegraph",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/flowsint",
+      "to": "content/ruview",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/flowsint",
+      "to": "content/9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/flowsint",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/flowsint",
+      "to": "content/compound-engineering-plugin",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/flowsint",
+      "to": "content/iii",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/funasr",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/funasr",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/funasr",
+      "to": "content/microsoft-agent-governance-toolkit",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/funasr",
+      "to": "content/modelscope-funasr",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/harry0703-moneyprinterturbo",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/harry0703-moneyprinterturbo",
+      "to": "content/nesquena-hermes-webui",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/harry0703-moneyprinterturbo",
+      "to": "content/ryancodrai-turbovec",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/harry0703-moneyprinterturbo",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/hkuds-vimax",
+      "to": "content/imbad0202-academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/hkuds-vimax",
+      "to": "content/ryancodrai-turbovec",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/hkuds-vimax",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/hkuds-vimax",
+      "to": "content/harry0703-moneyprinterturbo",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/iii",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/iii",
+      "to": "content/ogulcancelik-herdr",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/iii",
+      "to": "content/open-llm-vtuber",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/imbad0202-academic-research-skills",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/imbad0202-academic-research-skills",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/imbad0202-academic-research-skills",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/imbad0202-academic-research-skills",
+      "to": "content/nesquena-hermes-webui",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/jamwithai-production-agentic-rag-course",
+      "to": "content/nesquena-hermes-webui",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、ai-app",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/jamwithai-production-agentic-rag-course",
+      "to": "content/production-agentic-rag-course",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、deep",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/jamwithai-production-agentic-rag-course",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、python",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/jamwithai-production-agentic-rag-course",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、python",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/jamwithai-production-agentic-rag-course",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、python",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/mempalace",
+      "to": "content/vibe-trading",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/mempalace",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/mempalace",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/mempalace",
+      "to": "content/nousresearch-hermes-agent",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/microsoft-agent-governance-toolkit",
+      "to": "content/scrapling",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/microsoft-agent-governance-toolkit",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/microsoft-agent-governance-toolkit",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/microsoft-markitdown",
+      "to": "content/nesquena-hermes-webui",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/microsoft-markitdown",
+      "to": "content/openmoss-moss-tts",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/modelscope-funasr",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/modelscope-funasr",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/modelscope-funasr",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/modelscope-funasr",
+      "to": "content/harry0703-moneyprinterturbo",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/moneyprinterturbo",
+      "to": "content/voxcpm",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、analysis",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/moneyprinterturbo",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/moneyprinterturbo",
+      "to": "content/funasr",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/moneyprinterturbo",
+      "to": "content/harry0703-moneyprinterturbo",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/moneyprinterturbo",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、devtool-cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/mvanhorn-last30days-skill",
+      "to": "content/nousresearch-hermes-agent",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/nesquena-hermes-webui",
+      "to": "content/openmoss-moss-tts",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/nousresearch-hermes-agent",
+      "to": "content/bytedance-ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/nousresearch-hermes-agent",
+      "to": "content/can1357-oh-my-pi",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ogulcancelik-herdr",
+      "to": "content/9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ogulcancelik-herdr",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ogulcancelik-herdr",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ogulcancelik-herdr",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/open-llm-vtuber",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/open-llm-vtuber",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/open-llm-vtuber",
+      "to": "content/funasr",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/opendataloader-pdf",
+      "to": "content/phuryn-pm-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/opendataloader-pdf",
+      "to": "content/understand-anything",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/opendataloader-pdf",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/openmoss-moss-tts",
+      "to": "content/imbad0202-academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/openmoss-moss-tts",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/openmoss-moss-tts",
+      "to": "content/decolua-9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/panniantong-agent-reach",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/panniantong-agent-reach",
+      "to": "content/mempalace",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/panniantong-agent-reach",
+      "to": "content/vibe-trading",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/panniantong-agent-reach",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/panniantong-agent-reach",
+      "to": "content/colbymchenry-codegraph",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pbakaus-impeccable",
+      "to": "content/imbad0202-academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pbakaus-impeccable",
+      "to": "content/9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pbakaus-impeccable",
+      "to": "content/bytedance-ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pbakaus-impeccable",
+      "to": "content/can1357-oh-my-pi",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/phuryn-pm-skills",
+      "to": "content/understand-anything",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/phuryn-pm-skills",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pixelle-video",
+      "to": "content/funasr",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pixelle-video",
+      "to": "content/ruview",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pixelle-video",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、docs、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pixelle-video",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/pixelle-video",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/production-agentic-rag-course",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/production-agentic-rag-course",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/production-agentic-rag-course",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/production-agentic-rag-course",
+      "to": "content/flowsint",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、deep",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/production-agentic-rag-course",
+      "to": "content/hkuds-vimax",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、deep、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/refactoringhq-tolaria",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/refactoringhq-tolaria",
+      "to": "content/bytedance-ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/refactoringhq-tolaria",
+      "to": "content/can1357-oh-my-pi",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/refactoringhq-tolaria",
+      "to": "content/colbymchenry-codegraph",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/refactoringhq-tolaria",
+      "to": "content/compound-engineering-plugin",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/rohitg00-agentmemory",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/rohitg00-agentmemory",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/rohitg00-ai-engineering-from-scratch",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/rohitg00-ai-engineering-from-scratch",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/rohitg00-ai-engineering-from-scratch",
+      "to": "content/nousresearch-hermes-agent",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/rohitg00-ai-engineering-from-scratch",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/rohitg00-ai-engineering-from-scratch",
+      "to": "content/bytedance-ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ruview",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ruview",
+      "to": "content/iii",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ruview",
+      "to": "content/9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、docs",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ryancodrai-turbovec",
+      "to": "content/imbad0202-academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ryancodrai-turbovec",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/scrapling",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/scrapling",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/skills",
+      "to": "content/9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/skills",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/skills",
+      "to": "content/iii",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/skills",
+      "to": "content/open-llm-vtuber",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/skills",
+      "to": "content/taste-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/supermemory",
+      "to": "content/ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/supermemory",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/supermemory",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/supermemory",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/supermemory",
+      "to": "content/easy-vibe",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/taste-skill",
+      "to": "content/9router",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/taste-skill",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/taste-skill",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/taste-skill",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:skills、models、cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ui-tars-desktop",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ui-tars-desktop",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ui-tars-desktop",
+      "to": "content/codewhale",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/ui-tars-desktop",
+      "to": "content/easy-vibe",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:mcp、skills、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/understand-anything",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/vibe-trading",
+      "to": "content/chopratejas-headroom",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/vibe-trading",
+      "to": "content/mvanhorn-last30days-skill",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/vibe-trading",
+      "to": "content/nousresearch-hermes-agent",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、mcp、skills",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/vimax",
+      "to": "content/agent-reach",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/vimax",
+      "to": "content/compound-engineering-plugin",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-2、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/vimax",
+      "to": "content/hkuds-vimax",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/vimax",
+      "to": "content/imbad0202-academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:project、models、agent-framework",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/voxcpm",
+      "to": "content/microsoft-markitdown",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、devtool-cli",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/voxcpm",
+      "to": "content/academic-research-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、python",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/voxcpm",
+      "to": "content/ai-engineering-from-scratch",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、python",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/voxcpm",
+      "to": "content/anthropic-cybersecurity-skills",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:models、cli、python",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/yikart-aitoearn",
+      "to": "content/bytedance-ui-tars-desktop",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/yikart-aitoearn",
+      "to": "content/can1357-oh-my-pi",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/yikart-aitoearn",
+      "to": "content/colbymchenry-codegraph",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、mcp",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/yikart-aitoearn",
+      "to": "content/harry0703-moneyprinterturbo",
+      "type": "same_track",
+      "confidence": "high",
+      "evidence": "共享标签:tier-3、project、models",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "paper:2308.00352",
+      "to": "paper:2402.16823",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:multi-agent、self-improving-agent-lineage",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "paper:2507.21046",
+      "to": "paper:2508.07407",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent、self-improving-agent-lineage",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "paper:2606.00408",
+      "to": "paper:2606.02060",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:deep-research-agent、trajectory-analysis",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/can1357-oh-my-pi",
+      "to": "deep-dive/project-can1357-oh-my-pi-deep-dive",
+      "type": "shares_concept",
+      "confidence": "medium",
+      "evidence": "共享概念:hashline-editing",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/chopratejas-headroom",
+      "to": "deep-dive/project-chopratejas-headroom-deep-dive",
+      "type": "shares_concept",
+      "confidence": "medium",
+      "evidence": "共享概念:ccr-compress-cache-retrieve",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/colbymchenry-codegraph",
+      "to": "deep-dive/project-colbymchenry-codegraph-deep-dive",
+      "type": "shares_concept",
+      "confidence": "medium",
+      "evidence": "共享概念:code-knowledge-graph",
+      "kg_integrated": true,
+      "cross_doc": true
+    },
+    {
+      "from": "content/microsoft-markitdown",
+      "to": "deep-dive/project-microsoft-markitdown-deep-dive",
+      "type": "shares_concept",
+      "confidence": "medium",
+      "evidence": "共享概念:markdown-for-llm-ingestion",
+      "kg_integrated": true,
+      "cross_doc": true
     }
   ],
   "adjacency": [
@@ -29662,11 +31686,24 @@
         "evidence": "共享标签 deep-research-agent、trajectory-analysis",
         "weight": 2
       }
+    },
+    {
+      "type": "same_track",
+      "source": "ghost:hkuds-openspace",
+      "target": "ghost:voyager-skill-library",
+      "edge": {
+        "from": "ghost:hkuds-openspace",
+        "to": "ghost:voyager-skill-library",
+        "type": "same_track",
+        "confidence": "medium",
+        "evidence": "共享标签 self-evolving、skill-library",
+        "weight": 2
+      }
     }
   ],
   "summary": {
-    "nodes": 567,
-    "edges": 1365,
+    "nodes": 568,
+    "edges": 1585,
     "nodeByType": {
       "content": 61,
       "source-pack": 67,
@@ -29678,15 +31715,15 @@
       "evidence": 3,
       "artifact": 67,
       "taste": 1,
-      "paper": 20,
-      "project": 7
+      "paper": 28,
+      "project": 11
     },
     "edgeByType": {
       "builds_on": 2,
       "shares_method": 5,
       "same_use_case": 3,
       "references": 1336,
-      "same_track": 13
+      "same_track": 14
     },
     "wikilinks": {
       "resolved": 1467,
@@ -29702,8 +31739,11 @@
       "agent-memory",
       "agentic-search"
     ],
-    "ghostCandidates": 0,
-    "ghosts": 18,
-    "assessed": 32
+    "ghostCandidates": 12,
+    "references": 1336,
+    "associativeEdges": 249,
+    "crossDocEdges": 225,
+    "ghosts": 19,
+    "assessed": 33
   }
 }

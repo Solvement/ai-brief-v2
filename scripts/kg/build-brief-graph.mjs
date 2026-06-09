@@ -207,7 +207,8 @@ function readGhostNodes() {
   } catch {
     return { nodes, edges, present: false };
   }
-  const list = Array.isArray(g) ? g : Array.isArray(g.nodes) ? g.nodes : [];
+  // discovery-candidates.json stores ghosts under `candidates`; also tolerate array / `nodes` shapes.
+  const list = Array.isArray(g) ? g : Array.isArray(g.candidates) ? g.candidates : Array.isArray(g.nodes) ? g.nodes : [];
   for (const n of list) {
     if (!n || !n.id) continue;
     nodes.set(String(n.id), {
