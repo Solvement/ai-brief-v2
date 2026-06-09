@@ -4,9 +4,17 @@
 > 阶段定义见 [docs/workflow/workflow.md](./docs/workflow/workflow.md)；角色见 [docs/agents/README.md](./docs/agents/README.md)。
 > 谁推进谁更新本表。
 
+## 已完成 (2026-06-09)
+
+### ✅ MP-1+MP-2 · Mind Palace 重构成"真记忆" + 项目深读改写 — 高质量上线
+- commit **1813e60 → main**（live, git clean, HEAD=origin/main）。回应外部冷审（"造了记忆的样子没造功能"）：质=9 facet 内化 / 功能=本地嵌入召回 **recall@3=1.000**（无 API）/ 推理=8 已核验 typed 边 + 32 tag 噪声边降级 / 图=形。`/graph`→`/mind-palace`。
+- **上线后 AI 双审 PASS**：① 文字（独立 agent）9 facet 全 SHARP&LEARNABLE、零杜撰、自报全标记、真修了"又丑又学不到"；② 视觉（/browse 实测 live）mind palace facet 面板 + 项目页 ProjectFacetSpine + Mermaid 架构 全渲染、浅色蓝主调干净。
+- 编排：我(前端+schema+gate) + 2 opus 子 agent(蒸馏 facet) + codex(后端 eval+集成) + 独立冷审 agent，全并行。
+- 非阻塞遗留：understand-anything facet 略泛（源头不透明，诚实披露非编造）；检索 free-text 查询 UI 未做（per-node facet+边+召回 eval 已证功能）；hermes 等不在 trending 时项目页不显 spine（trending 耦合，非 bug）。
+
 ## 进行中
 
-### MP-0 · Harness 治理层（结构化调度落地）
+### ✅ MP-0 · Harness 治理层（结构化调度落地）— 已落地（含编排决策修正）
 - **大方向**：本项目=长期每日更新知识库+自进化+研究 agent，必须有可约束/可交接/可审计的工程骨架，否则越迭代越乱（Kevin 2026-06-09）。
 - **小方向**：① 7 角色契约 ② 接力 workflow（人+AI+进度） ③ plan 模板 ④ RULES 工作流红线 ⑤ AGENTS.md 镜像给 codex ⑥ task-board 活起来。
 - **阶段**：开发 → 自审中。

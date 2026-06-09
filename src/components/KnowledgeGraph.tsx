@@ -280,8 +280,9 @@ export function KnowledgeGraph() {
   const [query, setQuery] = useState("");
   const [, setTick] = useState(0);
   const [enabledKinds, setEnabledKinds] = useState<Record<NodeKind, boolean>>({
-    paper: true, project: true, concept: true, claim: false, ghost: true, other: false,
+    paper: true, project: true, concept: false, claim: false, ghost: true, other: false,
   });
+  const [memoryOnly, setMemoryOnly] = useState(true); // 默认只看真·内化记忆(有 facet 的节点)，避免管线毛球
   const [view, setView] = useState({ scale: 1, tx: 0, ty: 0 });
 
   const simRef = useRef<SimNode[]>([]);
@@ -314,11 +315,21 @@ export function KnowledgeGraph() {
 
   // visible subset by enabled kinds (perf: drop dense low-signal types by default)
   const { nodes, edges } = useMemo(() => {
-    const vis = allNodes.filter((n) => enabledKinds[n.kind]);
-    const visIds = new Set(vis.map((n) => n.id));
+    // memoryOnly: 只留有 facet/judgment 的真记忆节点 + 与它们相连的对端 → 干净星座，不是管线毛球
+    let pool = allNodes.filter((n) => enabledKinds[n.kind]);
+    if (memoryOnly) {
+      const mem = new Set(allNodes.filter((n) => n.facets || n.selfEvoUse || n.designIdea).map((n) => n.id));
+      const keep = new Set(mem);
+      for (const e of allEdges) {
+        if (mem.has(e.source)) keep.add(e.target);
+        if (mem.has(e.target)) keep.add(e.source);
+      }
+      pool = pool.filter((n) => keep.has(n.id));
+    }
+    const visIds = new Set(pool.map((n) => n.id));
     const ve = allEdges.filter((e) => visIds.has(e.source) && visIds.has(e.target));
-    return { nodes: vis, edges: ve };
-  }, [allNodes, allEdges, enabledKinds]);
+    return { nodes: pool, edges: ve };
+  }, [allNodes, allEdges, enabledKinds, memoryOnly]);
 
   const clusters = useMemo(() => computeClusters(allNodes, allEdges), [allNodes, allEdges]);
 
@@ -609,6 +620,14 @@ export function KnowledgeGraph() {
                 );
               })}
             </div>
+            <button
+              onClick={() => setMemoryOnly((v) => !v)}
+              title="只显示有内化 facet 的真记忆节点，过滤掉管线子节点"
+              style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap",
+                border: `1px solid ${memoryOnly ? "#2563eb" : "#cbd5e1"}`, background: memoryOnly ? "#2563eb" : "#fff", color: memoryOnly ? "#fff" : "#475569" }}
+            >
+              {memoryOnly ? "● 只看记忆" : "○ 看全部节点"}
+            </button>
             <div className="kg-zoom">
               <button className="kg-toggle" onClick={() => zoomBy(1 / 1.25)} aria-label="缩小">−</button>
               <button className="kg-toggle" onClick={() => zoomBy(1.25)} aria-label="放大">+</button>
