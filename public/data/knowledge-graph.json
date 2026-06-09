@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-06-08T12:06:51.552Z",
+  "generatedAt": "2026-06-09T13:07:12.959Z",
   "note": "L0 knowledge-graph DAG. forward_lineage = verified 'edge effect' only.",
   "stats": {
-    "nodes": 74,
-    "edges": 65,
+    "nodes": 103,
+    "edges": 79,
     "nodeByType": {
-      "paper": 33,
-      "principle": 41
+      "paper": 36,
+      "principle": 67
     },
     "edgeByType": {
-      "exhibits_principle": 41,
+      "exhibits_principle": 55,
       "shares_tag": 3,
       "forward_lineage": 21
     },
@@ -571,6 +571,52 @@
       "primitive_relevance": "direct_pattern_strong"
     },
     {
+      "id": "paper:2606.01249",
+      "type": "paper",
+      "arxiv_id": "2606.01249",
+      "slug": "2606.01249-tropd-trust-region-distillation",
+      "title": "Trust Region On-Policy Distillation",
+      "date": "2026-05-31",
+      "authors": [
+        "Xingrun Xing",
+        "Haoqing Wang",
+        "Boyan Gao",
+        "Ziheng Li",
+        "Yehui Tang"
+      ],
+      "tags": [
+        "on-policy-distillation",
+        "reasoning-models",
+        "small-reasoning-models",
+        "trust-region",
+        "outlier-credit-assignment",
+        "kl-estimator",
+        "reverse-kl",
+        "forward-kl",
+        "post-training",
+        "knowledge-distillation",
+        "reproducibility-partial"
+      ],
+      "topic": "training",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 5,
+        "evaluation_value": 7,
+        "breadth_value": 7,
+        "evidence_quality": 7
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "reliability-partitioned-supervision",
+      "external": false,
+      "primitive_relevance": "direct"
+    },
+    {
       "id": "paper:2606.02060",
       "type": "paper",
       "arxiv_id": "2606.02060",
@@ -668,6 +714,48 @@
       "primitive": "state-externalizing-harness-rl",
       "external": false,
       "primitive_relevance": "direct"
+    },
+    {
+      "id": "paper:2606.02437",
+      "type": "paper",
+      "arxiv_id": "2606.02437",
+      "slug": "2606.02437-scaling-peft-million-personal-models",
+      "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+      "date": "2026-06-02",
+      "authors": [
+        "Mind Lab"
+      ],
+      "tags": [
+        "peft",
+        "lora",
+        "personal-models",
+        "persistent-state",
+        "lora-as-memory",
+        "trillion-scale-moe",
+        "lora-rl",
+        "adapter-lifecycle",
+        "multi-lora-serving",
+        "diversity-voting",
+        "position-paper"
+      ],
+      "topic": "training",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 5,
+        "evaluation_value": 6,
+        "breadth_value": 8,
+        "evidence_quality": 5
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "peft-as-persistent-personal-state",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
     },
     {
       "id": "paper:2606.02800",
@@ -807,6 +895,52 @@
       "primitive": "knowledge-driven-skill-tiered-data-factory",
       "external": false,
       "primitive_relevance": "direct"
+    },
+    {
+      "id": "paper:2606.06492",
+      "type": "paper",
+      "arxiv_id": "2606.06492",
+      "slug": "2606.06492-code2lora-hypernetwork-repo-adapters",
+      "title": "Code2LoRA: Hypernetwork-Generated Adapters for Code Language Models under Software Evolution",
+      "date": "2026-06-04",
+      "authors": [
+        "Liliana Hotsko",
+        "Yinxi Li",
+        "Yuntian Deng",
+        "Pengyu Nie"
+      ],
+      "tags": [
+        "code-llm",
+        "repository-level-context",
+        "lora",
+        "hypernetwork",
+        "parameter-efficient-fine-tuning",
+        "software-evolution",
+        "commit-diff",
+        "repopeftbench",
+        "coding-agent",
+        "adapter-generation",
+        "repo-memory",
+        "versioned-adapters"
+      ],
+      "topic": "code",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 8,
+        "buildability": 6,
+        "evaluation_value": 8,
+        "breadth_value": 6,
+        "evidence_quality": 7
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "repo-conditioned-versioned-lora-memory",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
     },
     {
       "id": "principle:sop-over-freeform",
@@ -1097,6 +1231,42 @@
       ]
     },
     {
+      "id": "principle:partition-by-reliability-before-learning",
+      "type": "principle",
+      "key": "partition-by-reliability-before-learning",
+      "principle": "强监督进入训练前先按可靠度分区;不要假设老师对学生自生成的每一步都同样可信。",
+      "papers": [
+        "2606.01249"
+      ]
+    },
+    {
+      "id": "principle:adaptive-ratio-beats-global-threshold",
+      "type": "principle",
+      "key": "adaptive-ratio-beats-global-threshold",
+      "principle": "优先用样本自身信号(如 min(p_teacher/p_student,1))确定信任度,少依赖固定全局阈值。",
+      "papers": [
+        "2606.01249"
+      ]
+    },
+    {
+      "id": "principle:gentle-fallback-beats-hard-drop",
+      "type": "principle",
+      "key": "gentle-fallback-beats-hard-drop",
+      "principle": "低信任样本不一定全丢;用更温和、不会放大坏梯度的 fallback 保留可用信息。",
+      "papers": [
+        "2606.01249"
+      ]
+    },
+    {
+      "id": "principle:support-then-release-curriculum",
+      "type": "principle",
+      "key": "support-then-release-curriculum",
+      "principle": "冷启动阶段给老师前缀/脚手架,再逐步退火撤掉,最终回到目标 on-policy 分布。",
+      "papers": [
+        "2606.01249"
+      ]
+    },
+    {
       "id": "principle:process-credit-over-outcome",
       "type": "principle",
       "key": "process-credit-over-outcome",
@@ -1130,6 +1300,51 @@
       "principle": "把'判错'拆成 记录→查证→追责 三段,而非黑箱打分,才能解释'为什么判它错'。",
       "papers": [
         "2606.02060"
+      ]
+    },
+    {
+      "id": "principle:separate-facts-from-behavioral-state",
+      "type": "principle",
+      "key": "separate-facts-from-behavioral-state",
+      "principle": "Do not overload adapter parameters as a universal memory store. Put editable facts and inspectable external reality in retrieval/tools; put repeated behavioral consequences, skills, preferences, and policy tendencies in PEFT state.",
+      "papers": [
+        "2606.02437"
+      ]
+    },
+    {
+      "id": "principle:adapter-is-a-policy-revision-not-a-file",
+      "type": "principle",
+      "key": "adapter-is-a-policy-revision-not-a-file",
+      "principle": "Treat every adapter as a versioned policy object with base compatibility, provenance, evaluation, activation, residency, rollback, and retirement state.",
+      "papers": [
+        "2606.02437"
+      ]
+    },
+    {
+      "id": "principle:optimize-reliability-not-best-seed",
+      "type": "principle",
+      "key": "optimize-reliability-not-best-seed",
+      "principle": "Low-rank adapters can show strong best-seed performance while being unreliable in the mean; population systems need seed reliability, KL control, and transferable rank/alpha/lr rules.",
+      "papers": [
+        "2606.02437"
+      ]
+    },
+    {
+      "id": "principle:addressability-is-not-residency",
+      "type": "principle",
+      "key": "addressability-is-not-residency",
+      "principle": "A million-adapter catalog is an addressability claim, not a simultaneous GPU-residency claim. Serving design must separate durable storage, CPU cache, GPU active slots, cold loading, and readiness.",
+      "papers": [
+        "2606.02437"
+      ]
+    },
+    {
+      "id": "principle:diversity-is-computable-state",
+      "type": "principle",
+      "key": "diversity-is-computable-state",
+      "principle": "Distinct adapters trained from the same base can provide complementary policies; model count can become a measurable scale-out variable through voting, routing, debate, or distillation.",
+      "papers": [
+        "2606.02437"
       ]
     },
     {
@@ -1175,6 +1390,207 @@
       "principle": "正确诊断病因(误差几何拆分→幅度是罪魁)+ 巧妙组合已有零件(Hadamard+方差归一化),常比发明新算子更快见效、更可靠。",
       "papers": [
         "2606.03458"
+      ]
+    },
+    {
+      "id": "principle:parameter-memory-over-repeated-context",
+      "type": "principle",
+      "key": "parameter-memory-over-repeated-context",
+      "principle": "长期 repo conventions 适合进入 adapter 参数;局部证据仍可由 RAG 查,但不要每次把整个仓库当 token 塞进 prompt。",
+      "papers": [
+        "2606.06492"
+      ]
+    },
+    {
+      "id": "principle:versioned-adapter-state",
+      "type": "principle",
+      "key": "versioned-adapter-state",
+      "principle": "repo adapter 必须绑定 repo_id + commit_sha + embedding_hash;否则只是把 stale context 换成 stale parameters。",
+      "papers": [
+        "2606.06492"
+      ]
+    },
+    {
+      "id": "principle:split-stable-and-evolving-context",
+      "type": "principle",
+      "key": "split-stable-and-evolving-context",
+      "principle": "稳定 snapshot knowledge 与 commit diff knowledge 分开建模;活跃软件系统需要 incremental refresh policy。",
+      "papers": [
+        "2606.06492"
+      ]
+    },
+    {
+      "id": "principle:adapter-is-prior-not-proof",
+      "type": "principle",
+      "key": "adapter-is-prior-not-proof",
+      "principle": "生成的 LoRA 提供 repo-specific prior,不证明输出正确;必须接 execution/static-analysis/license verifier。",
+      "papers": [
+        "2606.06492"
+      ]
+    },
+    {
+      "id": "principle:evaluate-quality-cost-together",
+      "type": "principle",
+      "key": "evaluate-quality-cost-together",
+      "principle": "报告 EM/EditSim/CodeBLEU 之外,必须同时报告 extra tokens、latency、adapter storage、训练/刷新成本。",
+      "papers": [
+        "2606.06492"
+      ]
+    },
+    {
+      "id": "principle:agent-infra-boundary-as-module",
+      "type": "principle",
+      "key": "agent-infra-boundary-as-module",
+      "principle": "Operator 接口: 复制 `Operator.screenshot()` + `Operator.execute(params)` 这层边界：上层 Agent 不知道鼠标、ADB、浏览器、远程 sandbox 的细节，只处理 screenshot/output/action。 Action grammar + parser: 保留少量固定动作：`click/drag/hotkey/type/scroll/wait/finished/call_user`，再用 parser 兼容 `<point>`、`<bbox>`、`start_box`、`end_box`。 MCP transport adapter: 把 MCP Server 包成 SSE + Streamable HTTP：默认 `/sse`、`/message`、`/mcp`，并允许自定义 `routes`、`middlewares`、`createMcpServer(req)`。 Browser control strategy: 把 browser 自动化拆成 `dom`、`visual-grounding`、`hybrid` 三个策略，而不是在 prompt 里让模型自己猜工具。 安全目录树替换: 替换 MCP 原生 `directory_tree`，默认 `maxDepth=3`、`maxFiles=1000`，排除 `node_modules/.git/dist/build/.next/coverage/logs` 等。 Preset 配置格式: 把 `language`、`vlmProvider`、`vlmBaseUrl`、`vlmApiKey`、`vlmModelName`、`reportStorageBaseUrl`、`utioBaseUrl` 放进 YAML，可从 file 或 URL 导入。",
+      "papers": [
+        "proj-bytedance-ui-tars-desktop",
+        "proj-chopratejas-headroom",
+        "proj-colbymchenry-codegraph",
+        "proj-decolua-9router",
+        "proj-fathah-hermes-desktop",
+        "proj-hkuds-vimax",
+        "proj-modelscope-funasr",
+        "proj-nesquena-hermes-webui",
+        "proj-nousresearch-hermes-agent",
+        "proj-openmoss-moss-tts",
+        "proj-panniantong-agent-reach",
+        "proj-pbakaus-impeccable",
+        "proj-refactoringhq-tolaria",
+        "proj-rohitg00-agentmemory",
+        "proj-yikart-aitoearn"
+      ]
+    },
+    {
+      "id": "principle:agent-infra-observable-flow",
+      "type": "principle",
+      "key": "agent-infra-observable-flow",
+      "principle": "人话：最小链路可以从 CLI 跑起来：`npx @ui-tars/cli start`（文档写法），CLI 先拿模型配置，再让你选 `nut-js` 或 `adb`，最后把自然语言任务交给 GUIAgent。技术上：`packages/ui-tars/cli/src/cli/start.ts` 会读 `~/.ui-tars-cli.json`；如果传 `--presets`，它 fetch YAML 并读取 `vlmApiKey`、`vlmBaseUrl`、`vlmModelName`、`useResponsesApi`；没有配置就用 `@clack/prompts` 询问 `baseURL/apiKey/model`，并写回 `~/.ui-tars-cli.json`。随后它选择 operator：`adb` 会 `getAndroidDeviceId()` 后 new `AdbOperator(deviceId)`，默认 `nut-js` 会 new `NutJSOperator()`；再 new `GUIAgent({ model: { baseURL, apiKey, model, useResponsesApi }, operator, signal })`，执行 `await guiAgent.run(answers.instruction)`（来源：packages/ui-tars/cli/src/cli/start.ts）。 真实的一轮执行是：`GUIAgent.run()` 初始化 conversations，把用户 instruction 放入 human message；每轮调用 `operator.screenshot()`，用 Jimp 读出 width/height/mime，把截图作为 human `<image>` 放回 conversations；构造 `vlmParams`，包含 `screenContext: { width, height }`、`scaleFactor`、`uiTarsVersion`、`previousResponseId`；然后 `model.invoke(vlmParams)`（来源：packages/ui-tars/sdk/src/GUIAgent.ts run）。`UITarsModel.invoke()` 会按版本选择 `MAX_PIXELS_V1_5`/`MAX_PIXELS_DOUBAO`/`MAX_PIXELS_V1_0`，对图片做 `preprocessResizeImage()`，`convertToOpenAIMessages()` 把图片变成 `content: [{ type: 'image_url', image_url: { url: 'data:image/png;base64,...' }}]`；如果 `useResponsesApi` 为真走 `openai.responses.create()`，否则走 `openai.chat.completions.create()`；模型响应再交给 `actionParser({ prediction, factor, screenContext, scaleFactor, modelVer })`（来源：packages/ui-tars/sdk/src/Model.ts；packages/ui-tars/sdk/src/utils.ts）。 动作解析的例子：默认 prompt 要求模型输出 `Thought: ...` 和 `Action: click(start_box='[x1, y1, x2, y2]')`、`type(content='')`、`scroll(...)`、`finished()` 等；parser 会把 `<point>510 150</point>` 改写成 `start_box`，把 `<bbox>637 964 637 964</bbox>` 改写成坐标串，再把 box 按 `[1000,1000]` 或 UI-TARS-1.5 的 smart resize factor 缩放成 0-1 坐标（来源：packages/ui-tars/sdk/src/constants.ts；packages/ui-tars/action-parser/src/actionParser.ts）。执行时 `parseBoxToScreenCoords()` 取 box 中心点，按屏幕宽高换算成像素；`NutJSOperator.execute()` 对 `click` 移动鼠标并 `mouse.click(Button.LEFT)`，对 `type` 在 Windows 用剪贴板粘贴并在末尾 `\\n` 时敲 Enter，对 `scroll down` 执行 `mouse.scrollDown(5 * 100)`（来源：packages/ui-tars/sdk/src/utils.ts；packages/ui-tars/operators/nut-js/src/index.ts）。 Agent TARS 的另一个真实流是：`new AgentTARS({ aioSandbox: 'http://localhost:8080', model: { provider: 'volcengine', id: 'ep-20250510145437-5sxhs', apiKey: process.env.ARK_API_KEY } })`，`initialize()` 后打印 tools，再 `run('Open https://seed-tars.com')`（来源：multimodal/agent-tars/core/examples/aio-sandbox-example.ts）。如果不用 AIO Sandbox，本地环境会按 browser control 初始化 GUI Agent、SearchToolProvider、in-memory MCP server；browser 工具调用前 `onBeforeToolCall()` 会 lazy launch browser，filesystem/command 路径参数会经过 WorkspacePathResolver（来源：multimodal/agent-tars/core/src/agent-tars.ts；multimodal/agent-tars/core/src/environments/local/index.ts）。",
+      "papers": [
+        "proj-bytedance-ui-tars-desktop",
+        "proj-chopratejas-headroom",
+        "proj-colbymchenry-codegraph",
+        "proj-decolua-9router",
+        "proj-fathah-hermes-desktop",
+        "proj-hkuds-vimax",
+        "proj-modelscope-funasr",
+        "proj-nesquena-hermes-webui",
+        "proj-nousresearch-hermes-agent",
+        "proj-openmoss-moss-tts",
+        "proj-panniantong-agent-reach",
+        "proj-pbakaus-impeccable",
+        "proj-refactoringhq-tolaria",
+        "proj-rohitg00-agentmemory",
+        "proj-yikart-aitoearn"
+      ]
+    },
+    {
+      "id": "principle:agent-infra-risk-first-transfer",
+      "type": "principle",
+      "key": "agent-infra-risk-first-transfer",
+      "principle": "Transfer the architecture together with its main failure boundary: OpenAI-compatible VLM endpoint / UI-TARS-1.5 / Doubao-1.5-UI-TARS: Base URL、模型名、Responses API 行为或 action 输出格式变化，会让 `UITarsModel.invoke()` 或 `actionParser()` 失败。.",
+      "papers": [
+        "proj-bytedance-ui-tars-desktop",
+        "proj-chopratejas-headroom",
+        "proj-colbymchenry-codegraph",
+        "proj-decolua-9router",
+        "proj-fathah-hermes-desktop",
+        "proj-hkuds-vimax",
+        "proj-modelscope-funasr",
+        "proj-nesquena-hermes-webui",
+        "proj-nousresearch-hermes-agent",
+        "proj-openmoss-moss-tts",
+        "proj-panniantong-agent-reach",
+        "proj-pbakaus-impeccable",
+        "proj-refactoringhq-tolaria",
+        "proj-rohitg00-agentmemory",
+        "proj-yikart-aitoearn"
+      ]
+    },
+    {
+      "id": "principle:finance-agent-boundary-as-module",
+      "type": "principle",
+      "key": "finance-agent-boundary-as-module",
+      "principle": "Hashline 内容锚编辑: 让读取工具返回短 hash tag，写入工具必须带 tag；编辑语言只表达“替换哪几行/插入哪里”，不复制旧内容。 统一 path 读取协议: 把文件、URL、SQLite、归档、内部 artifact 都压到 `read({path})`，再用 selector 做分页和范围读取。 隐藏工具加 BM25 发现: 默认只暴露 essential 工具；其它工具隐藏但可检索，需要时由 `search_tool_bm25` 激活。 子代理 artifact 协议: 每个子任务输出 `<id>.md` 或 JSON artifact，父代理用 `agent://<id>` 读取，而不是解析长段聊天文本。 扩展事件拦截: 扩展用 `tool_call` 和 `tool_result` 事件包住所有工具；可注册工具、命令、快捷键和 renderer。",
+      "papers": [
+        "proj-can1357-oh-my-pi",
+        "proj-cloakhq-cloakbrowser"
+      ]
+    },
+    {
+      "id": "principle:finance-agent-observable-flow",
+      "type": "principle",
+      "key": "finance-agent-observable-flow",
+      "principle": "核心流不是“模型直接乱写文件”，而是模型在一个工具注册表里选工具，工具再进入各自运行时。 ```mermaid flowchart TD A[用户任务] --> B[omp CLI] B --> C[会话运行时] C --> D[模型路由] C --> E[工具注册表] E --> F[read 统一读取] F --> G[哈希锚快照] G --> H[edit 写入] H --> I[LSP 诊断] E --> J[task 子代理] J --> K[隔离工作区] E --> L[MCP 和扩展] E --> M[eval 和 bash] ``` 一个真实编辑例子：`read` 在 hashline 模式会给可变文件加类似 `¶a.ts#0A3B` 的头，`edit` 再消费这个头和行号。（来源：docs/tools/read.md Local text files；docs/tools/edit.md Worked examples） ```text ¶a.ts#0A3B replace 1..1: ``` 这两行的意思是：只替换 `a.ts` 当前快照的第 1 行；如果文件内容已经漂移，`packages/hashline` 会按 snapshot 校验并拒绝或恢复。（来源：packages/hashline/README.md Format；docs/tools/edit.md Limits & Caps） 更完整的 agent loop：CLI 入口 `src/cli.ts` 把非子命令默认路由到 `launch`；`main.ts` 初始化 settings、model registry、session；`createTools` 从 `BUILTIN_TOOLS` 和 MCP/custom/extension 工具生成可调用工具；工具执行结果回到会话，再由模型决定下一步。（来源：packages/coding-agent/DEVELOPMENT.md Boot Sequence；packages/coding-agent/src/tools/index.ts createTools）",
+      "papers": [
+        "proj-can1357-oh-my-pi",
+        "proj-cloakhq-cloakbrowser"
+      ]
+    },
+    {
+      "id": "principle:finance-agent-risk-first-transfer",
+      "type": "principle",
+      "key": "finance-agent-risk-first-transfer",
+      "principle": "Transfer the architecture together with its main failure boundary: Bun >= 1.3.14: Bun 版本不足时 `src/cli.ts` 会直接报错退出；worker/native 加载也依赖 Bun 行为。.",
+      "papers": [
+        "proj-can1357-oh-my-pi",
+        "proj-cloakhq-cloakbrowser"
+      ]
+    },
+    {
+      "id": "principle:devtool-boundary-as-module",
+      "type": "principle",
+      "key": "devtool-boundary-as-module",
+      "principle": "分阶段 stop_at 流水线: 把长链路拆成 `script/terms/audio/subtitle/materials/video`，允许只跑到某一步并返回中间产物。 外部素材白名单目录: 上传和读取素材时只允许任务目录、songs 目录、local_videos 目录内的文件。 LLM provider 适配层: 用 `llm_provider` 统一选择 OpenAI 兼容、DashScope、Gemini、LiteLLM、Ollama 等路径。 硬件编码失败回退: 高级编码器先白名单检查，运行失败后用 `libx264` 重试。",
+      "papers": [
+        "proj-harry0703-moneyprinterturbo",
+        "proj-microsoft-markitdown"
+      ]
+    },
+    {
+      "id": "principle:devtool-observable-flow",
+      "type": "principle",
+      "key": "devtool-observable-flow",
+      "principle": "真实流程可以从 API 的 `/videos` 看：控制器创建任务 ID，把 `TaskVideoRequest` 丢给任务管理器，后台线程执行 `app/services/task.py:start`。（来源：app/controllers/v1/video.py create_task；app/controllers/manager/base_manager.py） ```mermaid flowchart TD A[用户主题或脚本] --> B[API 或 WebUI] B --> C[任务队列] C --> D[LLM 写脚本] D --> E[LLM 生成英文搜索词] E --> F[Pexels 或 Pixabay 或本地素材] D --> G[TTS 生成 audio mp3] G --> H[字幕 edge 或 whisper] F --> I[MoviePy FFmpeg 拼接 combined] H --> J[叠字幕和音频 final mp4] J --> K[任务状态和下载链接] ``` 一个具体例子：`VideoParams(video_subject=\"金钱的作用\", voice_name=\"zh-CN-XiaoyiNeural-Female\")` 是 `task.py` 里自带的本地调用示例；完整任务会把脚本写入 `script.json`，音频写入 `audio.mp3`，字幕写入 `subtitle.srt`，最后生成 `final-1.mp4`。（来源：app/services/task.py __main__/save_script_data/generate_final_videos） 最小运行路径是先复制配置，再启动 API：`config.example.toml -> config.toml`，`uv run python main.py`；Docker 路径是 `docker-compose up`，WebUI/API 分别映射到 `8501/8080`。（来源：README 安装部署；docker-compose.yml）",
+      "papers": [
+        "proj-harry0703-moneyprinterturbo",
+        "proj-microsoft-markitdown"
+      ]
+    },
+    {
+      "id": "principle:devtool-risk-first-transfer",
+      "type": "principle",
+      "key": "devtool-risk-first-transfer",
+      "principle": "Transfer the architecture together with its main failure boundary: Pexels/Pixabay 素材 API: API key 失效、限流、条款变化或搜索结果不足时，素材下载阶段会失败。.",
+      "papers": [
+        "proj-harry0703-moneyprinterturbo",
+        "proj-microsoft-markitdown"
+      ]
+    },
+    {
+      "id": "principle:research-boundary-as-module",
+      "type": "principle",
+      "key": "research-boundary-as-module",
+      "principle": "稳定 ID 包装层: 把高速 positional index 留在内层，外层维护 `slot_to_id` 和 `id_to_slot`，删除时同步 swap-remove 后的 moved id。 候选集先解析、内核只接 bitset: 把 SQL/BM25/ACL/time-window 等复杂条件在外部解析成 ID allowlist，核心向量内核只处理 packed bitset。 首次 add 锁定维度: 允许 `dim=None` 的 lazy constructor，首次 `add`/`add_with_ids` 从输入 shape 锁定 dim。 二进制索引 + JSON side-car: 向量索引用 `.tvim`，文档文本、metadata、string-id map 用 `docstore.json` 或 `{stem}.nodes.json`。 文档化的“不支持”: 对 MMR、full-precision embedding recovery、非默认 LlamaIndex query mode 等不可实现能力直接 raise `NotImplementedError`。",
+      "papers": [
+        "proj-ryancodrai-turbovec"
+      ]
+    },
+    {
+      "id": "principle:research-observable-flow",
+      "type": "principle",
+      "key": "research-observable-flow",
+      "principle": "人话流程：假设你有 1536 维 embedding 和业务文档 ID。Python 侧用 `idx = IdMapIndex(dim=1536, bit_width=4)`，再 `idx.add_with_ids(vectors, np.array([1001, 1002, 1003], dtype=np.uint64))`。搜索时可以直接 `idx.search(query, k=10)`，也可以先从 SQL 拿候选：`allowed = ... SELECT id FROM docs WHERE tenant=? ...`，再 `idx.search(query, k=10, allowlist=allowed)`（来源：README Python；README Hybrid retrieval）。 源码路径：`turbovec-python/src/lib.rs` 接收 `PyReadonlyArray2<f32>` 和 `PyReadonlyArray1<u64>`，要求数组 C-contiguous；`add_with_ids` 调 `turbovec_core::IdMapIndex::add_with_ids_2d`。`turbovec/src/id_map.rs` 先检查 `ids.len() == vectors.len()/dim` 和重复 ID，再调用内部 `TurboQuantIndex.add_2d`，成功后才写 `id_to_slot` 和 `slot_to_id`，避免 inner add 失败后留下 ghost ID（来源：turbovec-python/src/lib.rs add_with_ids；turbovec/src/id_map.rs add_with_ids_2d）。 编码路径：`turbovec/src/encode.rs` 对每行向量计算 norm、归一化、乘同一个 rotation matrix；如果首批样本数 `n >= 1000`，TQ+ 用每个坐标的经验 5%/95% 分位去拟合 `shift` 和 `scale`，否则返回 identity calibration；随后按 Lloyd-Max boundaries 把每维变成小整数 code，并按 `bytes_per_row = bit_width * (dim / 8)` bit-pack（来源：turbovec/src/encode.rs encode；compute_tqplus_calibration）。 搜索路径：allowlist 搜索先在 Python 侧拒绝空 allowlist 和未知 id；Rust `IdMapIndex.search_with_allowlist` 把外部 `u64` id 映射到 slot bool mask；`TurboQuantIndex.search_with_mask` 再把 bool mask 打成每 64 slot 一个 `u64` 的 bitset。`search.rs` 对 query 做 batched rotation，用 query LUT 和 packed codes 直接计分；x86 运行时选择 AVX-512BW、AVX2 或 scalar fallback；有 mask 时，`block_has_allowed` 在 32-vector block 级别提前跳过没有允许 slot 的 block，最后返回外部 id（来源：turbovec/src/id_map.rs search_with_allowlist；turbovec/src/lib.rs search_with_mask；turbovec/src/search.rs search/block_has_allowed）。 术语解释：slot 是内部数组位置；external id 是调用方给的稳定 `u64` 文档 ID；LUT 是把 query 与 quantized codebook 的分数预先做成查表；SIMD 是 CPU 一条指令同时处理多组 code。",
+      "papers": [
+        "proj-ryancodrai-turbovec"
+      ]
+    },
+    {
+      "id": "principle:research-risk-first-transfer",
+      "type": "principle",
+      "key": "research-risk-first-transfer",
+      "principle": "Transfer the architecture together with its main failure boundary: x86 SIMD baseline / AVX2 / AVX-512BW: 老 x86_64、隐藏 AVX2 的 VM 或不符合 x86-64-v3 的机器会影响运行或性能；AVX-512 只在运行时检测后启用。.",
+      "papers": [
+        "proj-ryancodrai-turbovec"
       ]
     },
     {
@@ -1468,6 +1884,26 @@
       "type": "exhibits_principle"
     },
     {
+      "source": "paper:2606.01249",
+      "target": "principle:partition-by-reliability-before-learning",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.01249",
+      "target": "principle:adaptive-ratio-beats-global-threshold",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.01249",
+      "target": "principle:gentle-fallback-beats-hard-drop",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.01249",
+      "target": "principle:support-then-release-curriculum",
+      "type": "exhibits_principle"
+    },
+    {
       "source": "paper:2606.02060",
       "target": "principle:process-credit-over-outcome",
       "type": "exhibits_principle"
@@ -1485,6 +1921,31 @@
     {
       "source": "paper:2606.02060",
       "target": "principle:explainable-three-stage-audit",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02437",
+      "target": "principle:separate-facts-from-behavioral-state",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02437",
+      "target": "principle:adapter-is-a-policy-revision-not-a-file",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02437",
+      "target": "principle:optimize-reliability-not-best-seed",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02437",
+      "target": "principle:addressability-is-not-residency",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.02437",
+      "target": "principle:diversity-is-computable-state",
       "type": "exhibits_principle"
     },
     {
@@ -1510,6 +1971,31 @@
     {
       "source": "paper:2606.03458",
       "target": "principle:diagnose-then-compose-over-invent",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06492",
+      "target": "principle:parameter-memory-over-repeated-context",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06492",
+      "target": "principle:versioned-adapter-state",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06492",
+      "target": "principle:split-stable-and-evolving-context",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06492",
+      "target": "principle:adapter-is-prior-not-proof",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06492",
+      "target": "principle:evaluate-quality-cost-together",
       "type": "exhibits_principle"
     },
     {

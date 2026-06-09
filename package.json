@@ -22,7 +22,7 @@
     "lint:content": "node scripts/lint.mjs",
     "lint": "npm run lint:eslint && npm run lint:content",
     "verify": "npm run lint && npm run test && npm run build",
-    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs && node scripts/validate-papers-deepread.mjs && node scripts/validate-daily-digest.mjs",
+    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs && node scripts/validate-papers-deepread.mjs && node scripts/validate-daily-digest.mjs && node scripts/validate-mind-palace.mjs",
     "digest:daily": "node --env-file-if-exists=.env.local --no-warnings scripts/columns/digest/daily.mjs",
     "test": "node --test scripts/**/*.test.mjs && npm run validate",
     "preview": "next start",
@@ -41,7 +41,7 @@
     "papers:deepread": "claude -p --dangerously-skip-permissions \"Read and follow docs/superpowers/specs/daily-deepread-prompt.md to author today's paper deep-reads (full-text grounded, Chinese, honest), then run build-index + validate. Do not git push.\"",
     "papers:cold-audit": "node --no-warnings scripts/columns/papers/cold-audit/run-daily.mjs",
     "papers:cold-audit:grandfather": "node --no-warnings scripts/columns/papers/cold-audit/run-daily.mjs --grandfather",
-    "kg:build": "node --no-warnings scripts/kg/build-brief-graph.mjs && node --no-warnings scripts/kg/integrate-kg.mjs",
+    "kg:build": "node --no-warnings scripts/kg/build-brief-graph.mjs && node --no-warnings scripts/kg/integrate-kg.mjs && node --no-warnings scripts/kg/embed.mjs",
     "kg:build-legacy": "node --no-warnings scripts/kg/build-knowledge-graph.mjs",
     "daily": "node --env-file-if-exists=.env.local --no-warnings scripts/daily.mjs",
     "news:daily": "node --no-warnings scripts/columns/news/daily.mjs",
@@ -53,6 +53,7 @@
     "pipeline:sync": "node --no-warnings scripts/sync-pipeline-status.mjs"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
     "@supabase/supabase-js": "^2.107.0",
     "jsonrepair": "^3.14.0",
     "mermaid": "^11.15.0",

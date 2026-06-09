@@ -1,0 +1,56 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z + 创新/缺点。
+node_id: content/nousresearch-hermes-agent
+slug: nousresearch-hermes-agent
+kind: project
+title: "Hermes Agent — 长期个人 agent 的「运行时」参考实现"
+source: "github.com/NousResearch/hermes-agent + deep-dive nousresearch-hermes-agent"
+facets:
+  problem_solved: >
+    大多数 agent 是「帮你写一次代码的聊天壳」，跑完就忘；缺一个能长期运行、跨 CLI 和聊天平台接任务、
+    把经验存下来、再用经验改进自己的「代理运行时」——而长期运行最难的不是聪明，是工程边界：工具怎么安全跑、经验怎么存、无人值守任务怎么不被注入。
+  method: >
+    把长期 agent 会踩的工程面全部具体化成可拆的模块。最关键几块：
+    ① execute_code 的「程序化工具调用」——模型不是把一堆 shell 命令塞回上下文，而是写一段 Python 脚本，脚本通过 RPC stub（from hermes_tools import terminal）调父进程工具，
+    中间结果留在 RPC 层不进 LLM 上下文，只把 stdout 返回（降上下文污染）；跑前先 check_execute_code_guard 审批整段代码。
+    ② SKILL.md 程序性记忆——把「怎么做某类任务」写成 SKILL.md + references/templates/scripts/assets，skill_view 渐进加载、skill_manage 增改；这是「流程记忆」不同于「事实记忆」。
+    ③ observer hooks（只读遥测、fail-open）和 middleware（能改写请求/包裹执行）分离。
+    ④ terminal backend 抽象——同一 env_type 接口下支持 local/ssh/docker/singularity/modal/daytona，隔离策略变成配置而非散在 prompt 里。
+    ⑤ cron prompt scanner——无人值守任务单独做严格注入扫描（挡 ignore previous instructions / 读 .env / rm -rf / 带 secret 外传），且区分用户 prompt 和拼接了 skill 内容的 prompt 避免误报。
+  result: >
+    [已核实·源码] execute_code 默认 timeout 300s、最多 50 次工具调用、stdout 50KB/stderr 10KB cap、sandbox 只许 7 个工具；
+    subagent 委派默认屏蔽 delegate/clarify/memory/send_message/execute_code、父上下文只看总结；cron 存 ~/.hermes/cron/jobs.json、parse_schedule 支持 every 30m / cron 表达式 / ISO；MCP server 暴露 conversations/messages/permissions 等会话工具；20+ provider 可配。
+    [自称·README] 「only agent with a built-in learning loop」「no lock-in」「costs nearly nothing when idle」——无 benchmark/对照，evidence_strength=low，按营销语处理。成熟度 3/5（代码量大、依赖面大、未端到端实跑）。
+  innovation: >
+    创新不在「某个 agent prompt」，在把长期 agent 的工程边界做成了一套可抄的参考实现：程序化工具调用 RPC（多步工具链压成一个推理轮次、中间结果不污染上下文）、
+    SKILL.md 程序性记忆（自己生成/改进技能 = 弱自进化）、observer/middleware 的只读 vs 改写分离、terminal backend 把命令执行风险变成配置面、cron 注入扫描区分用户与拼装 prompt。
+  weakness: >
+    「self-improving / only / no lock-in」全是 README 自称、无证据；默认 local terminal backend 直接在宿主机执行命令（风险甩配置）；
+    默认 docker-compose 用 network_mode: host 出站面大；依赖面极大（20+ provider、消息平台、Docker/Modal、SQLite FTS5、Node/Playwright），成熟度看 README 不可靠；
+    深读未端到端实跑（uv sync / hermes setup / chat 都没真跑）；session search 的 LLM summarization 与源码「no LLM calls」自相矛盾待确认。
+  transfer: >
+    对自进化 agent 极高价值，按模块抄：① SKILL.md 程序性记忆——「从经验生成技能、用时改进」正是 L1 自进化的可落地形态，本站可直接借这套 skill 文件结构当 agent 的可复用流程记忆；
+    ② execute_code RPC——多步工具链不污染上下文，适合长链任务；③ observer/middleware 契约——做 agent 可观测性/质量门的钩子层；④ cron scanner——无人值守管线的注入防护模板。建议抽模式、不整库当生产底座。
+  architecture: |
+    ```mermaid
+    flowchart TD
+      ENTRY[hermes CLI / gateway 消息平台 / mcp serve] --> LLM[模型层<br/>20+ provider 可配]
+      LLM -->|tool call| DISP{agent_runtime_helpers 分派}
+      DISP -->|delegate_task| SUB[子 agent: 独立上下文/受限工具<br/>父只见总结]
+      DISP -->|普通工具| MW[run_tool_execution_middleware<br/>插件可包裹]
+      DISP -->|execute_code| GUARD[check_execute_code_guard 审批]
+      GUARD --> RPC[生成 hermes_tools.py RPC stub<br/>脚本调父进程工具, 中间结果不进上下文]
+      RPC --> TERM[terminal backend<br/>local/ssh/docker/modal/daytona...]
+      SKILL[(SKILL.md 程序性记忆<br/>skill_view 渐进加载)] -.注入流程.-> LLM
+      MEM[(跨会话 SQLite + FTS5 检索)] -.过去会话.-> LLM
+      CRON[cron jobs.json + prompt scanner] -.无人值守.-> LLM
+      HOOKS[observer hooks 只读 / middleware 改写] -.遥测+改写.-> DISP
+    ```
+self_evo_use: >
+  能用，且是 4 个节点里最接近「自进化运行时」的一个。SKILL.md 程序性记忆（从经验造技能、用时改进）就是 L1 自进化的工程落地；
+  cross-session SQLite 检索 + 用户建模 = 记忆层。局限：它的「learning loop」是 README 自称、无对照证明，且没有 agemem 那种「用 RL/反馈真正训练记忆策略」的回路——它的自进化是「生成并编辑技能文件」这种规则式改写，而非策略学习。当工程参考样本极好，当「已证明的自进化」要打折。
+edges:
+  - to: agemem
+    type: contradicts
+    evidence: "两者都想做自进化记忆：agemem 把记忆操作做成可被 RL 训练的策略动作（学习式），hermes 的 SKILL.md 是规则式生成/编辑技能文件（无策略学习）——对『记忆策略怎么进化』给出相反答案：学出来 vs 写出来。"
+    confidence: medium
+status: extracted

@@ -29,6 +29,7 @@ interface RawNode {
   arxivId?: string;
   design_idea?: string;
   self_evo_use?: string;
+  facets?: Record<string, string>;
   [k: string]: unknown;
 }
 interface RawEdge {
@@ -67,6 +68,7 @@ interface GNode {
   ghost: boolean;
   designIdea?: string;
   selfEvoUse?: string;
+  facets?: Record<string, string>;
   arxivId?: string;
   href?: string;
   deg: number; // edge degree (computed)
@@ -173,6 +175,7 @@ function normalizeGraph(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
       ghost: !!n.ghost,
       designIdea: typeof n.design_idea === "string" ? n.design_idea : undefined,
       selfEvoUse: typeof n.self_evo_use === "string" ? n.self_evo_use : undefined,
+      facets: n.facets && typeof n.facets === "object" ? (n.facets as Record<string, string>) : undefined,
       arxivId,
       href,
       deg: 0,
@@ -555,12 +558,12 @@ export function KnowledgeGraph() {
     <main className="page kg-page">
       <div className="kg-head">
         <div>
-          <div className="eyebrow">Knowledge Graph</div>
-          <h1>关联记忆 · 知识图谱</h1>
+          <div className="eyebrow">Mind Palace</div>
+          <h1>记忆宫殿 · Mind Palace</h1>
           <p>
-            深读过的<b style={{ color: KIND_META.paper.color }}>论文</b>与<b style={{ color: KIND_META.project.color }}>项目</b>是记忆节点，
-            <b>带语义类型的边</b>把它们连成关联网络——搜一个点，真正相关的一起浮现。
-            <b>幽灵节点</b>=已知但还没深读的紧邻。点节点看「能否用于研究 / 自进化」的判断。
+            深读过的<b style={{ color: KIND_META.paper.color }}>论文</b>与<b style={{ color: KIND_META.project.color }}>项目</b>被<b>内化</b>成结构化记忆节点（用 X 方法解决 Y 问题、展现 Z 结果 + 创新/缺点），
+            <b>已核验的语义边</b>（取长补短/可合并/相反）连成推理网络。点节点看内化拆解 + 「能否用于研究/自进化」。
+            <b>幽灵节点</b>=已知但还没深读的紧邻。
           </p>
         </div>
         <div className="kg-legend">
@@ -753,6 +756,33 @@ function applyCharge(a: SimNode, b: SimNode, alpha: number) {
   b.vy -= (dy / d) * f;
 }
 
+// ── facet spine (internalization made visible: 用 X 解决 Y，展现 Z + 创新/缺点) ──
+const FACET_ORDER: [string, string][] = [
+  ["problem_solved", "解决什么 · Y"],
+  ["method", "用什么方法 · X"],
+  ["result", "展现结果 · Z"],
+  ["innovation", "创新"],
+  ["weakness", "缺点 / 适用边界"],
+  ["transfer", "迁移 · 研究/自进化"],
+];
+function FacetSpine({ facets }: { facets: Record<string, string> }) {
+  const rows = FACET_ORDER.filter(([k]) => facets[k] && String(facets[k]).trim());
+  if (!rows.length) return null;
+  return (
+    <div className="kg-judge" style={{ display: "grid", gap: 9 }}>
+      <div className="kg-judge-h">内化拆解（用 X 解决 Y · 展现 Z）</div>
+      {rows.map(([k, label]) => (
+        <div key={k} style={{ borderLeft: "2px solid #c7d2fe", paddingLeft: 9 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#4338ca", letterSpacing: ".02em" }}>{label}</div>
+          <p style={{ margin: "2px 0 0", fontSize: 13, lineHeight: 1.55, color: "#334155", whiteSpace: "pre-wrap" }}>
+            {facets[k]}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── node detail panel ───────────────────────────────────────────────
 function NodeDetail({
   node,
@@ -785,6 +815,8 @@ function NodeDetail({
           ))}
         </div>
       )}
+
+      {node.facets && <FacetSpine facets={node.facets} />}
 
       {node.designIdea && (
         <div className="kg-judge kg-judge-design">

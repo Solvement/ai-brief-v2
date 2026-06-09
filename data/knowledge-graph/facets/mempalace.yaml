@@ -1,0 +1,74 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
+# 不编造，未知标「数据不足」，自报数字标「自报/受称」。源：brief-wiki/deep-dives/mempalace-deep-dive.md
+node_id: content/mempalace
+slug: mempalace
+kind: project
+title: "MemPalace — 本地优先、逐字存储、零 API 的高召回记忆系统"
+source: "repo github.com/MemPalace/mempalace (Python, MIT, v3.3.5)"
+
+facets:
+  problem_solved: >    # Y
+    AI 记忆系统普遍靠 LLM 把对话压成事实条目（会丢信息、会幻觉、还得调 API 花钱）；
+    想要一个完全本地、不摘要不提取、原文一字不改还能高召回检索的记忆层。
+
+  method: >            # X：大白话 + 例子
+    像一座"记忆宫殿"：不改写你说过的话，把对话历史逐字（verbatim）存下来，靠嵌入模型（embeddinggemma-300m 或 all-MiniLM-L6-v2）做纯语义搜索。
+    再加三层逻辑命名空间索引——wings（人/项目）、rooms（主题）、drawers（原始内容），让检索可以按结构范围缩小，而不是在一个扁平大语料库里捞。
+    后端可插拔（默认 ChromaDB，抽象接口在 mempalace/backends/base.py），全部数据留在本地、零 API 调用。
+    检索分级：纯语义搜索 → 混合提升 → 可选 LLM 重排序。装一行 uv tool install mempalace，mine 一下 ~/.claude/projects 就能 search/wake-up。
+
+  result: >            # Z：自报（README，未独立复现）
+    [自报] "最佳基准的开源 AI 记忆系统"——纯语义搜索 LongMemEval（500 题）R@5 96.6%、零 API；
+    [自报] Hybrid v4 held-out（450 题）R@5 98.4%；Hybrid v4 + LLM rerank 全 500 题 ≥99%。
+    均为 README 自称、未提供与其它系统直接对比或第三方独立评测，嵌入模型/参数/数据集分割细节未充分说明，可复现性 partial。
+
+  innovation: >        # 创新
+    赛道里多数记忆系统（mem0/supermemory）走"LLM 抽取压缩事实"路线；MemPalace 反其道——逐字不压缩 + 纯语义检索 + 零 API，
+    把"激进总结会丢密集内容"这个痛点直接绕开；并用 wings/rooms/drawers 三级命名空间把"按结构范围搜"做成一等能力，而非扁平向量库。
+
+  weakness: >          # 缺点/边界/坑
+    benchmark 全是自称、无外部验证，结果可能对数据集有适配倾向、特定配置才成立；
+    wings/rooms/drawers 的具体数据结构/存储格式、自动发现 vs 手动创建逻辑 README 未公开，可能复杂难用；
+    29 个 MCP 工具只给了总数、未列清单（evidence_strength low，无法验证）；默认强绑 ChromaDB（虽留抽象层但无官方备选后端实现）；
+    逐字存储在百万级 drawers 下的性能、多用户支持均未提及；自动保存钩子专属 Claude Code。本次未实跑复现。
+
+  transfer: >          # 能迁移到什么 / 研究·自进化
+    最该抄的是架构思路：① wings/rooms/drawers 三层逻辑索引——把实体（人/项目）、主题、内容分开管理，可直接迁到 BriefMem 组织多项目记忆；
+    ② "纯语义 → 混合提升 → LLM 重排"的多级检索流水线；③ 可插拔后端接口设计（base.py）。
+    "逐字不摘要"这条对 AI-Brief 的 L0 语料尤其对口：自进化要回溯原始事实时，压缩过的事实条目不可逆，逐字保留更适合当可信源底座。
+    要替换的：ChromaDB 依赖可换；Claude-Code 专属钩子可改造成通用 session hook。
+
+  architecture: |
+    ```mermaid
+    flowchart TD
+      IN[对话历史 ~/.claude/projects] -->|mempalace mine 逐字| STORE[(本地存储，不摘要不释义)]
+      STORE --> EMB[本地嵌入<br/>embeddinggemma-300m / all-MiniLM-L6-v2]
+      EMB --> BE[(可插拔后端<br/>默认 ChromaDB · base.py 抽象)]
+      subgraph 三级逻辑索引
+        W[wings 人/项目] --> R[rooms 主题] --> D[drawers 原始内容]
+      end
+      BE --- W
+      Q[search 查询] --> L1[纯语义搜索]
+      L1 --> L2[混合提升]
+      L2 --> L3[可选 LLM 重排序]
+      BE --> L1
+      L3 --> OUT[高召回结果，零 API]
+      MCP[29 MCP 工具<br/>读写/知识图谱/跨翼导航/抽屉/日记] -.-> BE
+    ```
+
+self_evo_use: >
+  可用、且对研究底座友好。逐字保留原始对话 + 本地零 API + 可插拔后端，使它适合当自进化 agent 的"原始事实档案层"——
+  当上层策略需要回溯"当初到底说了什么"时，未压缩的逐字记忆不可逆地优于抽取式。
+  但它本身只是存储+检索基础设施、不含可学习的记忆策略（不会自己进化什么时候记/忘），属"地基"非"自进化引擎"，要做真自进化需在其上加可训练的记忆控制器。
+
+edges:
+  - to: supermemory
+    type: contradicts
+    evidence: "同做 AI 记忆但路线相反：MemPalace=本地逐字零 API 不摘要；supermemory=云托管 LLM 抽取事实图谱并自动遗忘/压缩。存储哲学正相反"
+    confidence: high
+  - to: memoryagentbench
+    type: composes_with
+    evidence: "MemPalace 自报 LongMemEval R@5 96.6%（仅 AR 单维）；MemoryAgentBench 四维协议正可补 TTL/LRU/CR 三维的独立体检，校验其『最佳』自称"
+    confidence: medium
+
+status: extracted

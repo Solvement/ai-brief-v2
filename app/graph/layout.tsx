@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
-import { AppShell } from "@/components/AppShell";
 
-// 图谱栏（/graph）共用左侧栏外壳。
+// /graph 仅做重定向到 /mind-palace，外壳交给目标路由。
 export default function GraphLayout({ children }: { children: ReactNode }) {
-  return <AppShell active="graph">{children}</AppShell>;
+  return children;
 }

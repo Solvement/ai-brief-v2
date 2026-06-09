@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { AnalyzedRepo, ScoreBreakdown, TrendingData, TrendingWindow, LimitationItem, TryStep } from "../types";
 import { loadTrending } from "../lib/data";
 import { Markdown } from "../components/Markdown";
+import { ProjectFacetSpine, type FacetRecord } from "../components/ProjectFacetSpine";
 
 interface Props { owner: string; name: string }
 
@@ -74,8 +75,23 @@ export function Detail({ owner, name }: Props) {
   const [err, setErr] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("overview");
 
+  const [facetsMap, setFacetsMap] = useState<Record<string, FacetRecord> | null>(null);
+
   useEffect(() => { loadTrending().then(setData).catch((e) => setErr(e?.message || String(e))); }, []);
+  useEffect(() => {
+    fetch("/data/brief/facets.json", { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => setFacetsMap(j?.facets ?? {}))
+      .catch(() => setFacetsMap({}));
+  }, []);
   const found = useMemo(() => (data ? findRepo(data, owner, name) : null), [data, owner, name]);
+  const facet = useMemo(() => {
+    if (!facetsMap) return null;
+    for (const c of [`${owner}-${name}`, name, owner].map((s) => s.toLowerCase())) {
+      if (facetsMap[c]) return facetsMap[c];
+    }
+    return null;
+  }, [facetsMap, owner, name]);
 
   if (err) return (<><Header /><div className="detail"><div className="notice error">加载数据失败：{err}</div></div></>);
   if (!data) return (<><Header /><div className="detail"><div className="loading">正在加载…</div></div></>);
@@ -103,6 +119,8 @@ export function Detail({ owner, name }: Props) {
           <a href="/projects">{BOARD_LABEL[win]}</a><span className="sep">/</span>
           <span>{repo.fullName}</span>
         </div>
+
+        {facet && <ProjectFacetSpine facet={facet} />}
 
         {!deep ? (
           <>

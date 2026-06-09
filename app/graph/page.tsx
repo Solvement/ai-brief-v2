@@ -1,7 +1,6 @@
-import { KnowledgeGraph } from "@/components/KnowledgeGraph";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "知识图谱 · AI Brief" };
-
+// /graph 已更名为 /mind-palace（记忆宫殿）。保留此路由做重定向，避免旧链接死掉。
 export default function Page() {
-  return <KnowledgeGraph />;
+  redirect("/mind-palace");
 }

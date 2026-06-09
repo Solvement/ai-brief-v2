@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-08T13:11:39.541Z",
+  "generatedAt": "2026-06-09T13:13:31.725Z",
   "models": [
     {
       "id": "anthropic-claude",
@@ -16,7 +16,7 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://docs.claude.com/en/release-notes/overview",
-      "lastCheckedAt": "2026-06-07T22:13:35.032Z",
+      "lastCheckedAt": "2026-06-09T13:13:32.230Z",
       "analysisGeneratedAt": "2026-06-06T00:15:44.764Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
@@ -87,7 +87,7 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "Claude Opus 4.1",
+          "名称": "Claude Opus 4.8",
           "厂商": "Anthropic",
           "发布日": "2026-06-05",
           "开放度标签": "仅API闭源",
@@ -114,12 +114,12 @@
             "输出每百万token": "官方未披露"
           },
           "知识截止": "官方未披露",
-          "model string": "Claude Opus 4.1",
+          "model string": "Claude Opus 4.8",
           "速率": "官方未披露",
           "多模态I/O": "官方未披露"
         },
         "update": {
-          "版本": "Claude Opus 4.1→Claude Opus 4.1(2026-06-05)",
+          "版本": "Claude Opus 4.8→Claude Opus 4.8(2026-06-05)",
           "变了什么": [
             "1M token context window by default: 模型默认支持 100 万 token 的上下文窗口，无需任何 beta 头或额外配置。: 可以直接处理超长文档、完整代码库或长时间对话历史，大幅扩展了一轮对话或一次分析能容纳的信息量。",
             "Adaptive thinking with effort default high: 模型只在当前轮次需要时进行深度推理（扩展思考），其余情况跳过，同时 effort 参数全平台默认设为 high。: 减少不必要的思考 token，既保持高质量输出，又节省 token 成本和延迟。",
@@ -281,7 +281,7 @@
       "vendor": "Google DeepMind",
       "country": "美国",
       "kind": "closed",
-      "latestVersion": "Gemini 3.5",
+      "latestVersion": "Gemini 29",
       "latestReleasedAt": "",
       "latestReleasedAtPrecision": "not_found",
       "isOpen": false,
@@ -290,45 +290,59 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://ai.google.dev/gemini-api/docs/changelog",
-      "lastCheckedAt": "2026-06-07T22:13:36.315Z",
-      "analysisGeneratedAt": "2026-06-06T13:29:02.469Z",
+      "lastCheckedAt": "2026-06-09T13:13:33.994Z",
+      "analysisGeneratedAt": "2026-06-09T13:13:31.725Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
-        "oneLineTakeaway": "Gemini 3.5 Flash 正式发布，带来稳定高效的代理与编码性能，并推出托管代理（Managed Agents）和 Antigravity 自主代理预览，让你构建能自动执行复杂任务的应用变得前所未有的简单。",
+        "oneLineTakeaway": "Google发布多款Gemini新模型，重点提升代理能力、多模态生成与实时交互，适合构建自主Agent应用和实时音视频体验。",
         "newFeatures": [
           {
-            "feature": "Gemini 3.5 Flash General Availability",
-            "whatItIs": "Gemini 3.5 Flash 是 Google 最新一代的智能模型，专为代理任务和编码场景提供一致、高性能的输出，同时保持快速和低成本。",
-            "forYou": "现在你可以用这个模型构建更可靠的自动化工作流、代码生成器、或需要强推理的对话助手。它比之前的 Flash 模型更聪明，能更好地处理复杂指令和工具调用。",
-            "howToUse": "在 Gemini API 中将 model 参数设为 'gemini-3.5-flash'，即可直接调用。结合工具调用（如函数调用、代码执行）或托管代理框架，可以快速搭建 agent 应用。",
-            "whenToUse": "当你需要稳定的代理行为、复杂的编码任务或超过之前 Flash-Lite 模型性能但又不想用 Pro 模型的高成本时，这就是首选。"
+            "feature": "Gemini 3.5 Flash 正式版 (2026-05-19)",
+            "whatItIs": "专为一致性能优化的最智能模型，在边缘代理任务和编码上表现突出。",
+            "forYou": "你可以构建更可靠的自主代理应用（如代码生成、自动浏览），处理复杂多步推理。",
+            "howToUse": "调用 gemini-3.5-flash 模型，搭配函数调用与代码执行工具，搭建端到端 Agent 工作流。",
+            "whenToUse": "当需要稳定处理代理推理、多轮工具调用的生产级应用时使用。"
           },
           {
-            "feature": "Managed Agents in Gemini API (public preview)",
-            "whatItIs": "托管代理是一项新服务，让你在 Google 的安全沙箱 Linux 环境中构建和部署有状态的自主代理，这些代理能运行代码、管理文件、浏览网页。",
-            "forYou": "你不必自己搭建沙箱或管理代理状态，可以直接创建能自主完成多步骤任务的代理，比如自动研究报告、数据采集、自动编码等。这大大降低了构建生产级自主代理的门槛。",
-            "howToUse": "通过 Gemini API 的托管代理端点创建代理，配置其能力和工具（如搜索、代码执行），然后发送任务，代理会在托管环境中自动执行并返回结果。参见文档中的“Managed Agents 概览”和快速入门。",
-            "whenToUse": "当你的用户需要代理自主执行长任务，而你不想处理基础设施的复杂度时。特别适合需要沙箱安全执行代码或浏览网页的应用。"
+            "feature": "托管代理 (Managed Agents) 公测 (2026-05-19)",
+            "whatItIs": "Gemini API 提供全状态自主代理，运行在 Google 托管的隔离 Linux 沙箱中。",
+            "forYou": "无需自己搭建环境即可快速部署安全、稳定的 AI Agent，处理文件操作、网页浏览等任务。",
+            "howToUse": "通过 Gemini API 的 Managed Agents 接口配置代理任务和环境，参考官方快速入门。",
+            "whenToUse": "当你需要实现复杂自动化流程（研究助手、数据分析），且希望简化运维时使用。"
           },
           {
-            "feature": "Antigravity Agent (preview)",
-            "whatItIs": "Antigravity 是一个通用的自主代理预览，可以自动规划、推理、编写和运行代码，还能管理文件和浏览网页，所有操作都在隔离的沙箱容器内完成。",
-            "forYou": "你可以立即集成一个几乎全能的自动代理，它能处理从“分析这份数据并生成报告”到“写一个爬虫抓取新闻并总结”的模糊任务，大幅减少人工干预。",
-            "howToUse": "使用模型字符串 'antigravity-preview-05-2026' 调用。发送自然语言任务，代理会自行分解步骤并执行。参考 Antigravity Agent 指南获取代码示例。",
-            "whenToUse": "当你面临需要跨工具、多步骤自主完成的任务，且没有预定义工作流，交给 Antigravity 可以显著缩短开发时间，适用于原型验证或灵活的任务执行。"
+            "feature": "深度研究代理 Deep Research 预览增强 (2026-04-21)",
+            "whatItIs": "深度研究代理增加协作规划、可视化、MCP 服务器集成和文件搜索，可自动收集并综合上下文。",
+            "forYou": "适合构建知识工作助手，能自动规划研究、浏览多源信息并生成综合报告。",
+            "howToUse": "使用 deep-research-preview-04-2026 或 deep-research-max-preview-04-2026 模型，通过 API 传入研究主题。",
+            "whenToUse": "当需要处理多源信息调研、深度综合分析时使用，比普通模型更自动化。"
           },
           {
-            "feature": "Multimodal File Search",
-            "whatItIs": "文件搜索现在支持多模态，可以原生嵌入并搜索图像。你也能在搜索结果中获得视觉引用和页码。",
-            "forYou": "构建 RAG 应用时，现在不仅能搜索文本，还能直接搜索图片，比如在医疗影像库或设计素材库中查找相似图片。视觉引用和页码让结果更可解释。",
-            "howToUse": "使用 gemini-embedding-2 模型对图像和文本进行嵌入，然后在 File Search API 中查询。通过 groundingMetadata 获取 media_id 和 page_numbers。",
-            "whenToUse": "当你的知识库包含大量图片、PDF 或文档，需要跨模态检索时，这个功能可以省去单独预处理图片的步骤，并提升查找精度。"
+            "feature": "Gemini 3.1 Flash-Lite 正式版 (2026-05-07)",
+            "whatItIs": "针对速度、规模和成本效率优化的轻量模型。",
+            "forYou": "在保持一定质量的前提下大幅降低 API 成本，适合大规模生产或成本敏感场景。",
+            "howToUse": "调用 gemini-3.1-flash-lite 模型，用法与 Flash 系列一致，价格更低。",
+            "whenToUse": "应用需处理海量简单请求（分类、摘要、基础对话）且对延迟敏感时使用。"
+          },
+          {
+            "feature": "多模态文件搜索 (2026-05-05)",
+            "whatItIs": "文件搜索升级，支持原生图像嵌入与搜索， grounding 结果包含可视化引用和页码。",
+            "forYou": "可构建能搜索图片内容的知识库应用，如扫描文档内图表、照片，实现精准检索。",
+            "howToUse": "使用 gemini-embedding-2 生成多模态嵌入，通过 File Search API 进行图文搜索。",
+            "whenToUse": "应用中需要同时检索文本和图像信息（如 PDF 中的图表、照片）时使用。"
+          },
+          {
+            "feature": "批处理 Webhooks (2026-05-04)",
+            "whatItIs": "批处理 API 支持事件驱动 Webhooks，替代轮询机制。",
+            "forYou": "构建更高效的异步处理流水线，减少轮询开销，实时接收结果通知。",
+            "howToUse": "创建批处理任务时配置 webhook URL，任务完成时自动回调。",
+            "whenToUse": "处理大批量请求并需要实时通知的生产环境自动化工作流。"
           }
         ],
-        "limitations": "Managed Agents 和 Antigravity Agent 目前为公开预览，可能有不稳定或配额限制。具体定价、速率限制、可用区域官方 changelog 未披露。Antigravity Agent 模型为预览版，可能未来有破坏性更改。Gemini 3.5 Flash 已正式可用，但可能与其他旧版本共享配额。",
+        "limitations": "官方 changelog 中未明确速率限制或配额变更；部分旧模型已弃用（如 Gemini 2.0 系列），需迁移；图片生成、视频生成等高级功能需在特定区域可用。",
         "sources": [
           {
-            "name": "Google Gemini API 发布说明",
+            "name": "Google DeepMind official changelog",
             "url": "https://ai.google.dev/gemini-api/docs/changelog"
           }
         ]
@@ -340,7 +354,7 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "Gemini 2.0",
+          "名称": "Gemini 29",
           "厂商": "Google DeepMind",
           "发布日": "官方未披露",
           "开放度标签": "仅API闭源",
@@ -367,24 +381,26 @@
             "输出每百万token": "官方未披露"
           },
           "知识截止": "官方未披露",
-          "model string": "Gemini 2.0",
+          "model string": "Gemini 29",
           "速率": "官方未披露",
           "多模态I/O": "官方未披露"
         },
         "update": {
-          "版本": "Gemini 3.5→Gemini 2.0(官方未披露)",
+          "版本": "Gemini 3.5→Gemini 29(官方未披露)",
           "变了什么": [
-            "Gemini 3.5 Flash General Availability: Gemini 3.5 Flash 是 Google 最新一代的智能模型，专为代理任务和编码场景提供一致、高性能的输出，同时保持快速和低成本。: 现在你可以用这个模型构建更可靠的自动化工作流、代码生成器、或需要强推理的对话助手。它比之前的 Flash 模型更聪明，能更好地处理复杂指令和工具调用。",
-            "Managed Agents in Gemini API (public preview): 托管代理是一项新服务，让你在 Google 的安全沙箱 Linux 环境中构建和部署有状态的自主代理，这些代理能运行代码、管理文件、浏览网页。: 你不必自己搭建沙箱或管理代理状态，可以直接创建能自主完成多步骤任务的代理，比如自动研究报告、数据采集、自动编码等。这大大降低了构建生产级自主代理的门槛。",
-            "Antigravity Agent (preview): Antigravity 是一个通用的自主代理预览，可以自动规划、推理、编写和运行代码，还能管理文件和浏览网页，所有操作都在隔离的沙箱容器内完成。: 你可以立即集成一个几乎全能的自动代理，它能处理从“分析这份数据并生成报告”到“写一个爬虫抓取新闻并总结”的模糊任务，大幅减少人工干预。",
-            "Multimodal File Search: 文件搜索现在支持多模态，可以原生嵌入并搜索图像。你也能在搜索结果中获得视觉引用和页码。: 构建 RAG 应用时，现在不仅能搜索文本，还能直接搜索图片，比如在医疗影像库或设计素材库中查找相似图片。视觉引用和页码让结果更可解释。"
+            "Gemini 3.5 Flash 正式版 (2026-05-19): 专为一致性能优化的最智能模型，在边缘代理任务和编码上表现突出。: 你可以构建更可靠的自主代理应用（如代码生成、自动浏览），处理复杂多步推理。",
+            "托管代理 (Managed Agents) 公测 (2026-05-19): Gemini API 提供全状态自主代理，运行在 Google 托管的隔离 Linux 沙箱中。: 无需自己搭建环境即可快速部署安全、稳定的 AI Agent，处理文件操作、网页浏览等任务。",
+            "深度研究代理 Deep Research 预览增强 (2026-04-21): 深度研究代理增加协作规划、可视化、MCP 服务器集成和文件搜索，可自动收集并综合上下文。: 适合构建知识工作助手，能自动规划研究、浏览多源信息并生成综合报告。",
+            "Gemini 3.1 Flash-Lite 正式版 (2026-05-07): 针对速度、规模和成本效率优化的轻量模型。: 在保持一定质量的前提下大幅降低 API 成本，适合大规模生产或成本敏感场景。",
+            "多模态文件搜索 (2026-05-05): 文件搜索升级，支持原生图像嵌入与搜索， grounding 结果包含可视化引用和页码。: 可构建能搜索图片内容的知识库应用，如扫描文档内图表、照片，实现精准检索。",
+            "批处理 Webhooks (2026-05-04): 批处理 API 支持事件驱动 Webhooks，替代轮询机制。: 构建更高效的异步处理流水线，减少轮询开销，实时接收结果通知。"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
             "旧版弃用": "官方未披露",
             "需迁移": "官方未披露"
           },
-          "值不值得切一句": "Gemini 3.5 Flash 正式发布，带来稳定高效的代理与编码性能，并推出托管代理（Managed Agents）和 Antigravity 自主代理预览，让你构建能自动执行复杂任务的应用变得前所未有的简单。"
+          "值不值得切一句": "Google发布多款Gemini新模型，重点提升代理能力、多模态生成与实时交互，适合构建自主Agent应用和实时音视频体验。"
         }
       }
     },
@@ -409,7 +425,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-      "lastCheckedAt": "2026-06-08T12:37:49.602Z",
+      "lastCheckedAt": "2026-06-09T13:13:31.727Z",
       "latestVersionVariants": [
         "DeepSeek V4 Flash",
         "DeepSeek V4 Pro",
@@ -754,7 +770,7 @@
           "base_model": "官方未披露"
         },
         "update": {
-          "版本": "DeepSeek V4 Pro→DeepSeek V4 Flash(2026-06-08)",
+          "版本": "DeepSeek V4 Flash→DeepSeek V4 Flash(2026-06-08)",
           "变了什么": [
             "便宜的 100 万 token 上下文 → 整库代码 agent / 超长 RAG: 1M token 上下文(模型一次能读进去的内容长度),而且这一代把长上下文的推理开销砍到老版零头。意味着做代码 agent 时可以把『整个仓库』一股脑喂进去通盘理解、不用费劲切片拼接;做超长合同/法规/病例的检索问答(RAG,把外部材料塞给模型再让它答)能装下以前装不下的材料。这把你从『只能调闭源长上下文 API』挪到『自己托管一个能吃满 1M 的引擎』。但注意:1M『能装』不等于『装满还准』——深度精确检索它仍落后闭源旗舰,见下方 MRCR 短板。",
             "284B/13B 的 Flash 版 → 第一次『一台机器』量级就能自托管长上下文旗舰: 除了 1.6T 的 Pro,这一代还放出 284B 总参 / 仅 13B 激活的 Flash,而且权重已经是 FP4 量化好的(用更省显存的 4 比特存专家参数)。这才是真正现实的自托管路径:13B 激活=推理快、单位成本低;FP4 帮你把量化做好了、不用自己折腾。它把『私有部署一个长上下文强模型』从『得搭多卡集群』降到『一台 8 卡节点』量级(此为按总参×精度推算,card 未给官方硬件数),让你能把模型放进自己机房、数据一步不出门。",
@@ -795,7 +811,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/Qwen/Qwen3.6-27B",
-      "lastCheckedAt": "2026-06-08T12:53:17.324Z",
+      "lastCheckedAt": "2026-06-09T13:13:31.860Z",
       "latestVersionVariants": [
         "Qwen3.6 35B A3B",
         "Qwen3.6 35B A3B FP8",
@@ -1197,7 +1213,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512",
-      "lastCheckedAt": "2026-06-08T13:00:29.280Z",
+      "lastCheckedAt": "2026-06-09T13:13:32.040Z",
       "latestVersionVariants": [
         "Mistral Large 3 675B Instruct 2512 NVFP4",
         "Mistral Large 3 675B Instruct 2512",

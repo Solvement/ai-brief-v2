@@ -12,3 +12,15 @@
 8. **不过早加重资产。** 后端重写、数据库、鉴权、K8s/队列、重框架迁移、通用 agent 平台——见 SPEC 非目标，别提前上。
 9. **中文无乱码。** 注意 PowerShell here-string 写中文会把字符写坏；公共 JSON / 数据不许出现替换字符或可疑连续问号（`validate-text-encoding` 会查）。
 10. **改了就更新地图。** 改目录结构/数据契约/路由 → 同步更新 dev-map.md。
+
+## 工作流红线（Kevin 2026-06-09 · Claude + Codex 同等）
+
+接力规则 [docs/workflow/](./docs/workflow/)，角色契约 [docs/agents/README.md](./docs/agents/README.md)，态势 [task-board.md](./task-board.md)。
+
+11. **>100 行改动先写 plan。** 用 `docs/plans/_TEMPLATE.md`；plan 必含 大方向/小方向 + eval 方式 + tool 调用 + 编排方式（是否子 agent + 角色/模型/effort）。无 plan 不动 >100 行 / schema·数据契约·路由变更 / 新栏目·新范式 / 批量生成。
+12. **不自审。** 任何大改完成后必须**独立 agent**审（generator≠critic），按 plan 的大/小方向为标的验收。生成与审核不可同一 agent。
+13. **只在三种情况停下找 Kevin：** ① 产品大方向决策（范式/栏目/"好"的定义）② 需人权限的安全问题（schema/删除/密钥/上线）③ 完成到需人视觉验收。其余连续推进，不在每个小修后停；中途决策回读目标方向再定。
+14. **每次交付 = 可运行、Kevin 能看到实际效果**的版本，否则不停。
+15. **活文档随时更新。** 任务态势写 `task-board.md`（人+AI 可读：大/小方向 + 阶段 + 阻塞 + 交付结论）；接力规则在 `docs/workflow/`（人版 + AI 版同步）。
+16. **子 agent 派发必带四件：** 角色分工 / eval 方式 / 模型选择 / effort（见 docs/agents 派发模板）。
+17. **编排分两层**（研究 CMU+腾讯 / LangGraph / CrewAI / AutoGen 后定，2026-06-09，详见 docs/agents/README.md §编排决策）：① **开发期**多 agent（建造/审计/研究）= Claude sub-agent + dynamic workflow + codex，**采纳模式不引运行时库**（我们的 agent 是订阅 CLI 非 API model-client）；② **每日管线 = LangGraph (Python)**——管线=带条件门+有界循环的状态图，要 checkpoint/断点续跑/可观测/HITL。**不引 AutoGen/CrewAI 运行时。**

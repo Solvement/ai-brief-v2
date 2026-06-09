@@ -1,0 +1,52 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z + 创新/缺点。
+# 不编造，未知标「数据不足」，自报数字标「自报/受控」。
+node_id: content/ai-scientist-v2
+slug: ai-scientist-v2
+kind: project
+title: "AI-Scientist-v2 — 把科研做成树搜索的全自主科学家"
+source: "github.com/SakanaAI/AI-Scientist-v2 + deep-dive ai-scientist-v2"
+facets:
+  problem_solved: >
+    自动科研要么靠人先写死实验模板（v1 的做法，换个领域就失效），要么一锤子让 LLM 跑一次实验、不会回头改方向——
+    缺一个能自己「试一条路、不行就退回去换条路」的探索机制。
+  method: >
+    把「从想法到论文」整个过程做成一棵会长大的实验树：每个节点 = 一次独立实验（一段 LLM 写的代码 + 跑出来的结果 + 打分）。
+    一个 experiment manager（既当规划者又当评委）每轮看所有叶子，挑最有希望的那个往下扩展（best-first，类似下棋只深算最有戏的几步），
+    跑出新结果再打分，直到步数耗尽。前面有 ideation agent 反复生成+反思憋出研究想法，后面接 writeup + 自评审。
+    短期记忆 = 把当前节点这一路的历史塞进 prompt；外部知识 = Semantic Scholar 查文献做新颖性检查。
+  result: >
+    [自报] 声称产出了首篇「完全由 AI 撰写、并通过同行评审被 workshop 接收」的论文（README 链到 ICLR2025 Workshop 实验 repo，但无直接接收通知，evidence_strength=medium）；
+    [自报] 一次完整运行用 Claude 3.5 Sonnet 实验阶段约 $15-20、写作约 $5（README FAQ，无账单截图）。无跨领域成功率统计。
+  innovation: >
+    创新点是「用 best-first 树搜索替代固定实验模板」——把科研当成一个可回溯的搜索问题，而不是一条直线 pipeline；
+    experiment manager 同时担任 planner + critic，让系统能自己决定深挖哪条路、何时停手进入写作。相比 v1 去掉了人写模板的依赖。
+  weakness: >
+    系统本身没内建沙箱——README 明说会执行 LLM 写的代码，安全完全甩给用户（推荐 Docker，但不强制）；
+    论文接收可能是 cherry-pick，普遍成功率未知；跨领域泛化只在少数类似任务验证、无对比数据；artifact 偏薄（无 tests/CI、自定义非标准 license）；成功率强依赖底层模型，弱模型可能频繁失败。
+  transfer: >
+    最值得抄的是「agentic best-first tree search loop + experiment manager」这套可回溯探索骨架——任何需要逐步试错、动态调方向的任务
+    （超参搜索、自进化 agent 的策略探索）都能套。对自进化 agent：树节点的「实验代码+结果+评分」三元组天然是一条可学习的轨迹。
+    但它的代码执行接口不可直接搬到生产，必须先补严格沙箱。
+  architecture: |
+    ```mermaid
+    flowchart TD
+      TOPIC[主题描述 .md] --> IDEA[Ideation Agent<br/>生成+反思 → 结构化想法]
+      IDEA --> ROOT[根节点: JSON 研究想法]
+      ROOT --> EM{Experiment Manager<br/>planner + critic}
+      EM -->|best-first 选最有希望叶子| EXP[扩展: LLM 生成代码变体 → 跑实验]
+      EXP --> NODE[新节点: 代码 + 结果 + 评分]
+      NODE --> EM
+      EM -->|达到 steps 上限/预算耗尽| WRITE[Writeup → 论文草稿]
+      WRITE --> REVIEW[自我评审]
+      LIT[(Semantic Scholar 文献)] -.新颖性检查/引用.-> EM
+      NODE -. 持久化到实验日志树 .-> STATE[(搜索树状态)]
+    ```
+self_evo_use: >
+  能用，作为「探索引擎」原语。它示范了自进化 agent 怎么把试错过程结构化成一棵可回溯的树、用一个 manager 节点做选择与停止判断——
+  这正是自进化所需的「提出假设→实验→评分→改方向」闭环骨架。局限：它的「学习」是搜索内的方向调整，不会把经验沉淀成可复用技能/记忆（那部分要靠 hermes-agent 的 skills 或 agemem 的可训练记忆补）。
+edges:
+  - to: nousresearch-hermes-agent
+    type: composes_with
+    evidence: "ai-scientist-v2 给的是任务级探索引擎（树搜索+实验manager），hermes-agent 给的是长期运行时（skills记忆+终端后端+审批）——前者当 hermes 的一个 execute_code 任务跑，后者补它缺的经验沉淀与安全沙箱。"
+    confidence: medium
+status: extracted

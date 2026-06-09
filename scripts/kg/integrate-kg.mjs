@@ -6,14 +6,17 @@
 //      improves_on = 取长补短/REPLACE, composes_with = 前后关联/MERGE, no edge = 新思路/ADD).
 // Idempotent: re-running replaces the integrated layer (tagged kg_integrated).
 
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import YAML from "yaml";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const GRAPH = path.join(ROOT, "public", "data", "brief", "graph.json");
 const ASSESS = path.join(ROOT, "data", "knowledge-graph", "design-assessments.json");
 const CAND = path.join(ROOT, "data", "knowledge-graph", "discovery-candidates.json");
+const FACETS = path.join(ROOT, "data", "knowledge-graph", "facets");
+const VERIFIED_FACET_EDGE_TYPES = new Set(["improves_on", "composes_with", "contradicts", "special_case_of", "derives_from"]);
 
 const readJson = async (p) => JSON.parse(await readFile(p, "utf8"));
 const arxivOf = (s) => (/(\d{4}\.\d{4,5})/.exec(String(s || "")) || [])[1] || "";
@@ -22,6 +25,12 @@ const slugOf = (s) => String(s || "").replace(/^(paper|project|ghost):/, "").rep
 const graph = await readJson(GRAPH);
 const nodes = graph.nodes || [];
 const byId = new Map(nodes.map((n) => [n.id, n]));
+const bySlug = new Map();
+for (const node of nodes) {
+  if (node.slug && !bySlug.has(node.slug)) bySlug.set(node.slug, node);
+  const stripped = slugOf(node.id);
+  if (stripped && !bySlug.has(stripped)) bySlug.set(stripped, node);
+}
 
 // Primary-node resolver: find the best node for a keyword (prefer content/paper/project/ghost,
 // avoid sub-nodes like claim/evidence/artifact/source-pack).
@@ -33,6 +42,35 @@ function findNode(keyword) {
   return cands[0] || null;
 }
 
+function resolveFacetNode(facet) {
+  if (facet?.node_id && byId.has(facet.node_id)) return byId.get(facet.node_id);
+  if (facet?.slug && bySlug.has(facet.slug)) return bySlug.get(facet.slug);
+  return facet?.slug ? findNode(facet.slug) : null;
+}
+
+function resolveSlug(slug) {
+  return bySlug.get(slug) || findNode(slug);
+}
+
+async function loadFacets() {
+  let files = [];
+  try {
+    files = (await readdir(FACETS)).filter((name) => /\.ya?ml$/i.test(name)).sort();
+  } catch {
+    return [];
+  }
+  const facets = [];
+  for (const file of files) {
+    try {
+      const facet = YAML.parse(await readFile(path.join(FACETS, file), "utf8"));
+      if (facet && facet.status !== "reject") facets.push({ ...facet, _file: file });
+    } catch (error) {
+      console.warn(`[integrate-kg] WARN facet parse failed: ${file} — ${error.message}`);
+    }
+  }
+  return facets;
+}
+
 // (1) merge assessments
 const assess = await readJson(ASSESS);
 let merged = 0;
@@ -42,6 +80,23 @@ for (const a of assess.assessments || []) {
   if (a.id.startsWith("paper:") && ax) node = byId.get(`paper:${ax}`) || findNode(ax);
   else node = findNode(slugOf(a.id));
   if (node && a.self_evo_use) { node.self_evo_use = a.self_evo_use; merged += 1; }
+}
+
+// (1b) merge Mind Palace facets onto primary nodes.
+const facets = await loadFacets();
+let facetedNodes = 0;
+let facetEdgesAdded = 0;
+for (const facet of facets) {
+  const node = resolveFacetNode(facet);
+  if (!node) {
+    console.warn(`[integrate-kg] WARN facet node unresolved: ${facet._file || facet.slug || facet.node_id}`);
+    continue;
+  }
+  if (facet.facets) node.facets = facet.facets;
+  if (facet.self_evo_use) node.self_evo_use = facet.self_evo_use;
+  if (facet.slug) node.facet_slug = facet.slug;
+  if (facet.status) node.facet_status = facet.status;
+  facetedNodes += 1;
 }
 
 // (2) add ghost nodes (dedupe vs existing content/paper nodes by slug/arxiv)
@@ -76,7 +131,6 @@ const CURATED = [
   ["generative-agents", "agemem", "composes_with", "medium", "Generative Agents 的 reflection 综合层补上纯检索记忆(agentmemory/AgeMem)缺的跨条目综合(MERGE)"],
   ["alita", "openspace", "shares_method", "medium", "都走最小预定义/动态自生成能力(Alita 动态 MCP vs OpenSpace skill 派生)"],
 ];
-const before = (graph.edges || []).length;
 graph.edges = (graph.edges || []).filter((e) => !e.kg_integrated); // idempotent
 let edgesAdded = 0;
 for (const [ka, kb, type, confidence, evidence] of CURATED) {
@@ -85,6 +139,33 @@ for (const [ka, kb, type, confidence, evidence] of CURATED) {
   if (A.id === B.id) continue;
   graph.edges.push({ from: A.id, to: B.id, type, confidence, evidence, kg_integrated: true, cross_doc: true });
   edgesAdded += 1;
+}
+
+// (3b) facet-authored verified typed edges. These are the reasoning layer;
+// unlike tag-derived same_track edges, they passed the facet gate.
+for (const facet of facets) {
+  const fromNode = resolveFacetNode(facet);
+  if (!fromNode || !Array.isArray(facet.edges)) continue;
+  for (const edge of facet.edges) {
+    if (!edge || !VERIFIED_FACET_EDGE_TYPES.has(edge.type)) continue;
+    const toNode = resolveSlug(edge.to);
+    if (!toNode) {
+      console.warn(`[integrate-kg] WARN facet edge endpoint unresolved: ${facet.slug || fromNode.id} -> ${edge.to}`);
+      continue;
+    }
+    if (fromNode.id === toNode.id) continue;
+    graph.edges.push({
+      from: fromNode.id,
+      to: toNode.id,
+      type: edge.type,
+      confidence: edge.confidence || "medium",
+      evidence: edge.evidence || `verified facet edge from ${facet.slug || fromNode.id}`,
+      kg_integrated: true,
+      cross_doc: true,
+      verified_from_facet: true,
+    });
+    facetEdgesAdded += 1;
+  }
 }
 
 // (4) D1 FIX (cold-review): REAL cross-document associative edges. The base graph is ~98% intra-doc
@@ -132,7 +213,7 @@ for (const a of tagged) {
     const key = [a.id, b.id].sort().join("|");
     if (seen.has(key)) continue; seen.add(key);
     graph.edges.push({ from: a.id, to: b.id, type: "same_track", confidence: shared.length >= 3 ? "high" : "medium",
-      evidence: `共享标签:${shared.slice(0, 3).join("、")}`, kg_integrated: true, cross_doc: true });
+      evidence: `共享标签:${shared.slice(0, 3).join("、")}`, kg_integrated: true, cross_doc: true, weak: true });
     crossDoc += 1;
   }
 }
@@ -161,6 +242,9 @@ for (const [concept, roots] of conceptDocs) {
 }
 
 graph.generatedAt = new Date().toISOString();
+for (const edge of graph.edges) {
+  if (edge.type === "same_track") edge.weak = true;
+}
 // Final dedup: keep ALL references, but at most ONE associative edge per doc-pair — the most
 // meaningful type (judgment > typed > concept > same_track). Removes reverse-direction duplicates
 // the base builder emits.
@@ -176,12 +260,13 @@ for (const e of graph.edges) {
 graph.edges = [...keptRefs, ...bestByPair.values()];
 
 const references = graph.edges.filter((e) => e.type === "references").length;
-const associativeEdges = graph.edges.length - references; // honest: cross-item association, not intra-doc plumbing
+const associativeEdges = graph.edges.filter((e) => e.type !== "references" && !(e.type === "same_track" && e.weak)).length;
 const edgeByType = {}; // recompute from scratch — base builder's count is stale after we add edges
 for (const e of graph.edges) edgeByType[e.type] = (edgeByType[e.type] || 0) + 1;
 graph.summary = { ...(graph.summary || {}), nodes: nodes.length, edges: graph.edges.length,
   references, associativeEdges, crossDocEdges: graph.edges.filter((e) => e.cross_doc).length,
-  edgeByType, ghosts: nodes.filter((n) => n.ghost).length, assessed: nodes.filter((n) => n.self_evo_use).length };
+  edgeByType, ghosts: nodes.filter((n) => n.ghost).length, assessed: nodes.filter((n) => n.self_evo_use).length,
+  facetedNodes: nodes.filter((n) => n.facets).length };
 await writeFile(GRAPH, `${JSON.stringify(graph, null, 2)}\n`, "utf8");
-console.log(`[integrate-kg] assessments:${merged} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | cross-doc:${crossDoc}`);
-console.log(`[integrate-kg] nodes ${nodes.length} | edges ${graph.edges.length} (references ${references} plumbing + ASSOCIATIVE ${associativeEdges}) | ghosts ${graph.summary.ghosts} | assessed ${graph.summary.assessed}`);
+console.log(`[integrate-kg] assessments:${merged} | facets:${facetedNodes} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | facet-edges:${facetEdgesAdded} | cross-doc:${crossDoc}`);
+console.log(`[integrate-kg] nodes ${nodes.length} | edges ${graph.edges.length} (references ${references} plumbing + ASSOCIATIVE ${associativeEdges}, weak same_track excluded) | ghosts ${graph.summary.ghosts} | assessed ${graph.summary.assessed} | faceted ${graph.summary.facetedNodes}`);

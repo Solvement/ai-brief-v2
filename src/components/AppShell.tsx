@@ -6,7 +6,7 @@ import Link from "next/link";
 // All colors are hardcoded hex (no --radar-* vars — they resolve to nothing outside
 // their scoped page containers, which previously caused white-on-white).
 
-export type ShellNavKey = "home" | "news" | "articles" | "models" | "projects" | "graph" | "podcast";
+export type ShellNavKey = "home" | "news" | "articles" | "models" | "projects" | "mind-palace" | "podcast";
 
 const NAV: { key: ShellNavKey; label: string; href: string; icon: string }[] = [
   { key: "home", label: "Home", href: "/", icon: "home" },
@@ -14,7 +14,7 @@ const NAV: { key: ShellNavKey; label: string; href: string; icon: string }[] = [
   { key: "articles", label: "Articles", href: "/articles", icon: "articles" },
   { key: "models", label: "Models", href: "/models", icon: "models" },
   { key: "projects", label: "Projects", href: "/projects", icon: "projects" },
-  { key: "graph", label: "Graph", href: "/graph", icon: "graph" },
+  { key: "mind-palace", label: "Mind Palace", href: "/mind-palace", icon: "graph" },
   { key: "podcast", label: "Podcast", href: "/podcast", icon: "podcast" },
 ];
 

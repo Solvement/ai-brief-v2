@@ -1,0 +1,72 @@
+# AI-Brief · 接力规则（AI 可读版）
+# 配套人读版 workflow.md；态势/进度在 /task-board.md；角色契约在 /docs/agents/README.md。
+# 阶段结构固定，需求内容会变。每阶段：owner / 进入前必须有 / 产出 / 前进条件 / 打回目标。
+
+version: 1
+updated: 2026-06-09
+
+# 何时跑全链 vs 快速通道
+routing:
+  full_chain: ">100 行 或 schema/数据契约/路由变更 或 新栏目/新范式 或 批量生成"
+  fast_track: "<100 行单点低风险 bug：Claude 主控直接 build→verify→deliver，自带审查视角，不放行高风险资产"
+  stop_to_human:        # RULES #13：只在这三种停
+    - product_direction # 产品大方向/范式选择
+    - security_permission # schema / 删除 / 密钥 / 上线策略
+    - visual_acceptance # 完成到需人视觉验收
+
+stages:
+  - id: requirements
+    role: 需求分析
+    owner: claude-main-or-subagent
+    enter_when: "Kevin 给了想法但目标/边界不清"
+    produce: "结构化需求：目标 / 非目标 / 影响范围 / 验收标准（写进对应 plan）"
+    advance_when: "目标+非目标+影响面+可观察验收齐备，无模糊词"
+    rollback_to: null
+
+  - id: design
+    role: 方案设计
+    owner: claude-main-or-subagent
+    enter_when: "需求清楚，要落技术方案"
+    produce: "plan（用 docs/plans/_TEMPLATE.md）：含 大/小方向 + eval + tool 调用 + 编排方式（是否子agent/角色/模型/effort）"
+    advance_when: "plan 写全 8 节，>100 行改动必须到此"
+    rollback_to: requirements
+
+  - id: gate
+    role: 闸门总控
+    owner: claude-main
+    enter_when: "需求+方案齐"
+    produce: "放行 / 打回判断：需求够清楚？方案漏边界？现工程能安全落地？风险会带进编码吗？"
+    advance_when: "无明显漏项 + 安全落地"
+    rollback_to: design
+
+  - id: build
+    role: 开发实现
+    owner: "codex(后端/脚本/数据) | claude(前端/视觉/内容)"
+    enter_when: "闸门放行"
+    produce: "可运行实现 + 自测过 npm run verify"
+    advance_when: "verify 绿 + 是可运行版本"
+    rollback_to: gate
+
+  - id: code_review
+    role: 代码审查
+    owner: independent-subagent   # 必须 ≠ build 的承担者
+    enter_when: "开发说完成"
+    produce: "审查结论：是否符合需求/方案、结构是否合理、有无遗漏/风险；按 plan 大/小方向为标的"
+    advance_when: "无 blocker；major 必须修后重审"
+    rollback_to: build
+
+  - id: verify
+    role: 测试验证
+    owner: "scripts(npm run verify) + independent-subagent(内容门)"
+    enter_when: "代码审查通过"
+    produce: "门禁报告：lint+test+build 绿；内容/视觉/数据契约门绿"
+    advance_when: "全门绿（不绿→保留上一版+告警，不部署）"
+    rollback_to: build
+
+  - id: deliver
+    role: PM
+    owner: claude-main
+    enter_when: "门禁全绿"
+    produce: "可运行交付（Kevin 能看到实际效果）+ task-board 写交付结论 + 大/小方向达成情况"
+    advance_when: "停在 visual_acceptance 交 Kevin；非视觉则继续下一任务"
+    rollback_to: null
