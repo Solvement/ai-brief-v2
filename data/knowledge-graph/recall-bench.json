@@ -1,0 +1,27 @@
+{
+  "note": "锁定的检索裁判 (research-loop: eval 先于方法, 防 metric gaming). precision=正确记忆必须 rank1; recall=accept 里任一进 top3. 含对抗查询: 簇内消歧/否定/改写/建造目标.",
+  "model": "Xenova/multilingual-e5-small",
+  "locked_at": "2026-06-09",
+  "queries": [
+    {"q": "把代码库索引成本地 SQLite 关系图、给编程 agent 查符号和调用关系的工具", "expect": "colbymchenry-codegraph", "mode": "precision", "type": "簇内消歧"},
+    {"q": "用 Tree-sitter 确定性解析做结构事实、LLM 只补语义防幻觉的代码库理解", "expect": "understand-anything", "mode": "precision", "type": "簇内消歧"},
+    {"q": "把记忆的存取改删变成强化学习可训练的策略动作", "expect": "agemem", "mode": "precision", "type": "簇内消歧"},
+    {"q": "挂在 agent 生命周期 hook 上自动采集、三路混合检索的编程代理记忆服务器", "expect": "rohitg00-agentmemory", "mode": "precision", "type": "簇内消歧"},
+    {"q": "逐字存储不摘要、纯语义检索、零外部 API 的本地高召回记忆", "expect": "mempalace", "mode": "precision", "type": "簇内消歧"},
+    {"q": "云端一个 API 全包、LLM 抽取事实知识图谱、自动遗忘消解矛盾的记忆引擎", "expect": "supermemory", "mode": "precision", "type": "簇内消歧"},
+    {"q": "评测 agent 记忆系统、四维正交、增量多轮把原文收走的 benchmark", "expect": "memoryagentbench", "mode": "precision", "type": "簇内消歧"},
+    {"q": "用 best-first 实验树搜索自动跑科研实验、能回溯的研究 agent", "expect": "ai-scientist-v2", "mode": "precision", "type": "簇内消歧"},
+    {"q": "长期运行的 agent 运行时，SKILL.md 程序性记忆 + execute_code RPC + cron 注入扫描", "expect": "nousresearch-hermes-agent", "mode": "precision", "type": "簇内消歧"},
+    {"q": "我要给 agent 加可学习的长期记忆，让它自己决定记什么、什么时候删", "expect": "agemem", "mode": "recall", "accept": ["agemem", "rohitg00-agentmemory", "mempalace"], "type": "建造目标"},
+    {"q": "我要搭一个战略决策 agent，要做 human-in-the-loop，记忆方案怎么选", "expect": "agemem", "mode": "recall", "accept": ["agemem", "rohitg00-agentmemory", "supermemory", "mempalace", "memoryagentbench"], "type": "建造目标"},
+    {"q": "怎么客观评估我做的 agent 记忆到底好不好", "expect": "memoryagentbench", "mode": "precision", "type": "建造目标"},
+    {"q": "想让 agent 自己跑实验、迭代假设、做自动研究", "expect": "ai-scientist-v2", "mode": "recall", "accept": ["ai-scientist-v2"], "type": "建造目标"},
+    {"q": "不用强化学习、纯工程化 hook 自动采集实现的 agent 记忆", "expect": "rohitg00-agentmemory", "mode": "precision", "type": "否定对比"},
+    {"q": "不做 LLM 抽取、保留对话原文逐字的记忆", "expect": "mempalace", "mode": "recall", "accept": ["mempalace"], "type": "否定对比"},
+    {"q": "不是本地自托管、而是云端黑箱托管的记忆服务", "expect": "supermemory", "mode": "precision", "type": "否定对比"},
+    {"q": "agent 每开新会话就失忆，怎么给它装跨会话的持久记忆", "expect": "rohitg00-agentmemory", "mode": "recall", "accept": ["rohitg00-agentmemory", "supermemory", "mempalace", "agemem"], "type": "改写"},
+    {"q": "新人面对一个巨大陌生代码库、没有地图，怎么快速理解它的结构", "expect": "understand-anything", "mode": "recall", "accept": ["understand-anything", "colbymchenry-codegraph"], "type": "改写"},
+    {"q": "记忆系统在多跳冲突消解上普遍很差，谁系统性指出了这个盲区", "expect": "memoryagentbench", "mode": "precision", "type": "改写"},
+    {"q": "把记忆当成大脑的一部分边想边记，而不是旁边一个写死规则的管家", "expect": "agemem", "mode": "precision", "type": "改写"}
+  ]
+}
