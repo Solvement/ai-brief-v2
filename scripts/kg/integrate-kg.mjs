@@ -106,6 +106,10 @@ const GENERIC = new Set([
   "mcp", "cli", "sdk", "api", "framework", "agent-framework", "library", "lib", "tool", "tools",
   "app", "desktop", "web", "open-source", "opensource", "github", "docs", "documentation",
   "skill", "skills", "workflow", "demo", "starter", "template", "boilerplate", "guide", "tutorial",
+  // process/category markers (cold-review r3: these — not tier-3/python — were driving 80% of noise:
+  // "deep" just means it got a deep-read; ai-app/devtool-cli are broad product buckets).
+  "deep", "analysis", "devtool-cli", "ai-app", "ai-application", "application", "library-sdk",
+  "model-infra", "infra", "infrastructure", "dev-tool", "devtool", "product", "platform", "utility",
 ]);
 const isTopical = (t) => !GENERIC.has(String(t).toLowerCase());
 const tagged = nodes.filter((n) => DOC_TYPES.has(n.type) && Array.isArray(n.tags) && n.tags.some(isTopical) && !n.ghost);
@@ -118,7 +122,10 @@ for (const a of tagged) {
   for (const b of tagged) {
     if (a.id === b.id) continue;
     const shared = (a.tags || []).filter((t) => (b.tags || []).includes(t) && isTopical(t));
-    if (shared.length >= 1) scored.push({ b, shared }); // ≥1 shared TOPICAL tag = real same-track signal
+    // ≥1 shared RESEARCH tag = same-track (noise is removed by the GENERIC blacklist above, not by a
+    // high count: with deep/ai-app/project/python/etc. excluded, a single shared tag like
+    // "agent-memory" is a real signal; capped top-5/node so a popular topic can't over-connect).
+    if (shared.length >= 1) scored.push({ b, shared });
   }
   scored.sort((x, y) => y.shared.length - x.shared.length);
   for (const { b, shared } of scored.slice(0, 5)) {
