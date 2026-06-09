@@ -96,15 +96,29 @@ let crossDoc = 0;
 // (a) same_track via shared tags, but CAPPED to each node's top-5 strongest neighbors (≥2 shared
 // tags) — a handful of genuinely-related items, not a near-complete graph (generic tags like
 // "agent" would otherwise over-connect everything into noise).
-const GENERIC = new Set(["agent", "agents", "ai", "llm", "llms", "survey"]); // too broad to imply same track
-const tagged = nodes.filter((n) => DOC_TYPES.has(n.type) && Array.isArray(n.tags) && n.tags.length >= 2 && !n.ghost);
+// Structural / taxonomy / language / generic-tech tags do NOT imply a shared research track —
+// excluded so "同赛道" requires ≥2 genuinely TOPICAL shared tags (cold-review round 2: 85% of edges
+// were boilerplate like tier-3/project/python). Keep this list broad on purpose.
+const GENERIC = new Set([
+  "agent", "agents", "ai", "llm", "llms", "survey", "ml", "nlp",
+  "tier-1", "tier-2", "tier-3", "tier1", "tier2", "tier3", "project", "projects", "model", "models",
+  "python", "typescript", "javascript", "rust", "go", "golang", "java", "c", "cpp", "ruby",
+  "mcp", "cli", "sdk", "api", "framework", "agent-framework", "library", "lib", "tool", "tools",
+  "app", "desktop", "web", "open-source", "opensource", "github", "docs", "documentation",
+  "skill", "skills", "workflow", "demo", "starter", "template", "boilerplate", "guide", "tutorial",
+]);
+const isTopical = (t) => !GENERIC.has(String(t).toLowerCase());
+const tagged = nodes.filter((n) => DOC_TYPES.has(n.type) && Array.isArray(n.tags) && n.tags.some(isTopical) && !n.ghost);
 const seen = new Set();
+// Seed dedup with EVERY existing pair (base + curated) so we never emit a reverse-direction
+// duplicate or a redundant same_track over a more-meaningful curated edge.
+for (const e of graph.edges) seen.add([e.from, e.to].sort().join("|"));
 for (const a of tagged) {
   const scored = [];
   for (const b of tagged) {
     if (a.id === b.id) continue;
-    const shared = (a.tags || []).filter((t) => (b.tags || []).includes(t) && !GENERIC.has(String(t).toLowerCase()));
-    if (shared.length >= 2) scored.push({ b, shared });
+    const shared = (a.tags || []).filter((t) => (b.tags || []).includes(t) && isTopical(t));
+    if (shared.length >= 1) scored.push({ b, shared }); // ≥1 shared TOPICAL tag = real same-track signal
   }
   scored.sort((x, y) => y.shared.length - x.shared.length);
   for (const { b, shared } of scored.slice(0, 5)) {
@@ -131,7 +145,7 @@ for (const [concept, roots] of conceptDocs) {
   const docs = [...roots].map((r) => docByRoot.get(r)).filter(Boolean);
   for (let i = 0; i < docs.length; i += 1) for (let j = i + 1; j < docs.length; j += 1) {
     if (docs[i].id === docs[j].id) continue;
-    const key = `c:${[docs[i].id, docs[j].id].sort().join("|")}`;
+    const key = [docs[i].id, docs[j].id].sort().join("|"); // unified key: one associative edge per doc-pair
     if (seen.has(key)) continue; seen.add(key);
     graph.edges.push({ from: docs[i].id, to: docs[j].id, type: "shares_concept", confidence: "medium",
       evidence: `共享概念:${concept.replace(/^[a-z-]+\//, "")}`, kg_integrated: true, cross_doc: true });
@@ -140,11 +154,27 @@ for (const [concept, roots] of conceptDocs) {
 }
 
 graph.generatedAt = new Date().toISOString();
+// Final dedup: keep ALL references, but at most ONE associative edge per doc-pair — the most
+// meaningful type (judgment > typed > concept > same_track). Removes reverse-direction duplicates
+// the base builder emits.
+const PRIORITY = { improves_on: 6, composes_with: 6, builds_on: 5, shares_method: 5, same_use_case: 5, implements: 5, shares_concept: 3, same_track: 2 };
+const bestByPair = new Map();
+const keptRefs = [];
+for (const e of graph.edges) {
+  if (e.type === "references") { keptRefs.push(e); continue; }
+  const k = [e.from, e.to].sort().join("|");
+  const prev = bestByPair.get(k);
+  if (!prev || (PRIORITY[e.type] || 1) > (PRIORITY[prev.type] || 1)) bestByPair.set(k, e);
+}
+graph.edges = [...keptRefs, ...bestByPair.values()];
+
 const references = graph.edges.filter((e) => e.type === "references").length;
 const associativeEdges = graph.edges.length - references; // honest: cross-item association, not intra-doc plumbing
+const edgeByType = {}; // recompute from scratch — base builder's count is stale after we add edges
+for (const e of graph.edges) edgeByType[e.type] = (edgeByType[e.type] || 0) + 1;
 graph.summary = { ...(graph.summary || {}), nodes: nodes.length, edges: graph.edges.length,
   references, associativeEdges, crossDocEdges: graph.edges.filter((e) => e.cross_doc).length,
-  ghosts: nodes.filter((n) => n.ghost).length, assessed: nodes.filter((n) => n.self_evo_use).length };
+  edgeByType, ghosts: nodes.filter((n) => n.ghost).length, assessed: nodes.filter((n) => n.self_evo_use).length };
 await writeFile(GRAPH, `${JSON.stringify(graph, null, 2)}\n`, "utf8");
 console.log(`[integrate-kg] assessments:${merged} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | cross-doc:${crossDoc}`);
 console.log(`[integrate-kg] nodes ${nodes.length} | edges ${graph.edges.length} (references ${references} plumbing + ASSOCIATIVE ${associativeEdges}) | ghosts ${graph.summary.ghosts} | assessed ${graph.summary.assessed}`);

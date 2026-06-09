@@ -135,6 +135,10 @@ const EDGE_STYLE: Record<string, { color: string; width: number; dash?: string; 
   same_track: { color: "#93c5fd", width: 1.2, dash: "4 4", label: "同赛道" },
   shares_method: { color: "#a7f3d0", width: 1.2, dash: "2 4", label: "共享方法" },
   same_use_case: { color: "#fbcfe8", width: 1.3, dash: "5 3", label: "同用例" },
+  shares_concept: { color: "#c4b5fd", width: 1.2, dash: "3 3", label: "共享概念" },
+  // the add/replace/merge judgment edges — visually distinct (this is the point of the typed layer)
+  improves_on: { color: "#dc2626", width: 2.2, directed: true, label: "取长补短/优化" },
+  composes_with: { color: "#0891b2", width: 2, dash: "6 3", directed: true, label: "可合并/前后关联" },
   related: { color: "#cbd5e1", width: 1, label: "关联" },
 };
 const edgeStyle = (t: string) => EDGE_STYLE[t] || EDGE_STYLE.related;
