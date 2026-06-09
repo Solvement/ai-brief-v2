@@ -1,5 +1,5 @@
 "use client";
-import { Markdown } from "./Markdown";
+import { MarkdownRich } from "./MarkdownRich";
 import type { ProjectTierTemplate } from "../types";
 
 /* ============================================================
@@ -138,6 +138,13 @@ export function TierTemplateDeepDive({ item, tpl }: { item: DiveItem; tpl: Proje
             </Section>
           )}
 
+          {/* 架构图 — new concise paradigm: a ```mermaid block rendered as a big diagram. */}
+          {hasText(tpl.architecture_diagram) && (
+            <Section title="架构" kicker="ARCHITECTURE">
+              <MarkdownRich source={tpl.architecture_diagram!} />
+            </Section>
+          )}
+
           {/* ── Tier 2+ ── */}
           {hasText(tpl.pain_point) && (
             <Section title="解决什么痛点" kicker="PAIN POINT">
@@ -183,7 +190,9 @@ export function TierTemplateDeepDive({ item, tpl }: { item: DiveItem; tpl: Proje
 
           {hasText(tpl.comparison) && (
             <Section title="和同类的区别" kicker="VS ALTERNATIVES">
-              <p className="dd-section-lead">{tpl.comparison}</p>
+              {/* May be a plain sentence OR a markdown comparison table — MarkdownRich
+                  handles both, and renders any ```mermaid as a diagram. */}
+              <MarkdownRich source={tpl.comparison!} />
             </Section>
           )}
 
@@ -193,22 +202,25 @@ export function TierTemplateDeepDive({ item, tpl }: { item: DiveItem; tpl: Proje
             </Section>
           )}
 
-          {/* ── Tier 3+ ── */}
+          {/* ── Tier 3+ ──
+             These body fields carry the new concise paradigm: architecture / data-flow
+             as ```mermaid fences. Route them through MarkdownRich so the fences render
+             as DIAGRAMS (lazy-loaded SVG) instead of raw code, and Chinese prose breathes. */}
           {hasText(tpl.how_it_works_with_analogy) && (
             <Section title="它怎么工作" kicker="HOW IT WORKS">
-              <div className="dd-prose"><Markdown text={tpl.how_it_works_with_analogy!} /></div>
+              <MarkdownRich source={tpl.how_it_works_with_analogy!} />
             </Section>
           )}
 
           {hasText(tpl.essential_design_difference) && (
             <Section title="为什么和同类本质不同" kicker="DESIGN TRADE-OFFS">
-              <div className="dd-prose"><Markdown text={tpl.essential_design_difference!} /></div>
+              <MarkdownRich source={tpl.essential_design_difference!} />
             </Section>
           )}
 
           {hasText(tpl.practitioner_meaning) && (
             <Section title="对从业者意味着什么" kicker="WHAT IT MEANS FOR YOU">
-              <div className="dd-prose"><Markdown text={tpl.practitioner_meaning!} /></div>
+              <MarkdownRich source={tpl.practitioner_meaning!} />
             </Section>
           )}
 

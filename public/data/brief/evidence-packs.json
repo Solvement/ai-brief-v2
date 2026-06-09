@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T18:13:53.800Z",
+  "generatedAt": "2026-06-09T01:44:55.025Z",
   "entity": "evidence-pack",
   "directory": "evidence-packs",
-  "count": 56,
+  "count": 67,
   "items": [
     {
       "id": "evidence-pack/9router-evidence-pack",
@@ -1914,6 +1914,94 @@
       ]
     },
     {
+      "id": "evidence-pack/harry0703-moneyprinterturbo-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "harry0703-moneyprinterturbo-evidence-pack",
+      "title": "MoneyPrinterTurbo — Evidence Pack",
+      "file": "evidence-packs/harry0703-moneyprinterturbo-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "harry0703-moneyprinterturbo",
+        "kind": "evidence-pack",
+        "title": "MoneyPrinterTurbo — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "MoneyPrinterTurbo 是一个把主题或脚本自动变成短视频的开源 AI 应用：LLM 写文案和搜索词，TTS 配音，素材来自 Pexels/Pixabay 或本地文件，最后用 MoviePy/FFmpeg 合成成片。",
+            "internal_logic": "真实流程可以从 API 的 `/videos` 看：控制器创建任务 ID，把 `TaskVideoRequest` 丢给任务管理器，后台线程执行 `app/services/task.py:start`。（来源：app/controllers/v1/video.py create_task；app/controllers/manager/base_manager.py）\n\n```mermaid\nflowchart TD\n  A[用户主题或脚本] --> B[API 或 WebUI]\n  B --> C[任务队列]\n  C --> D[LLM 写脚本]\n  D --> E[LLM 生成英文搜索词]\n  E --> F[Pexels 或 Pixabay 或本地素材]\n  D --> G[TTS 生成 audio mp3]\n  G --> H[字幕 edge 或 whisper]\n  F --> I[MoviePy FFmpeg 拼接 combined]\n  H --> J[叠字幕和音频 final mp4]\n  J --> K[任务状态和下载链接]\n```\n\n一个具体例子：`VideoParams(video_subject=\"金钱的作用\", voice_name=\"zh-CN-XiaoyiNeural-Female\")` 是 `task.py` 里自带的本地调用示例；完整任务会把脚本写入 `script.json`，音频写入 `audio.mp3`，字幕写入 `subtitle.srt`，最后生成 `final-1.mp4`。（来源：app/services/task.py __main__/save_script_data/generate_final_videos）\n\n最小运行路径是先复制配置，再启动 API：`config.example.toml -> config.toml`，`uv run python main.py`；Docker 路径是 `docker-compose up`，WebUI/API 分别映射到 `8501/8080`。（来源：README 安装部署；docker-compose.yml）",
+            "failure_mode": "config.example.toml pexels_api_keys/pixabay_api_keys；app/services/material.py",
+            "source_pointer": "https://github.com/harry0703/moneyprinterturbo"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:ai_app",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v1.2.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/harry0703-moneyprinterturbo-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/harry0703-moneyprinterturbo-repo]]"
+        ],
+        "metrics": [
+          "stars=82088",
+          "forks=11698",
+          "open_issues=27",
+          "latest_release=v1.2.9",
+          "pushed_at=2026-06-08T07:46:26Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "config.example.toml pexels_api_keys/pixabay_api_keys；app/services/material.py",
+          "config.example.toml edge_tts_timeout；app/services/voice.py",
+          "app/services/llm.py _generate_response/generate_script/generate_terms",
+          "README 常见问题；config.example.toml ffmpeg_path/video_codec；app/services/video.py",
+          "config.example.toml max_concurrent_tasks/max_queued_tasks；app/controllers/v1/video.py；app/controllers/manager/base_manager.py"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/harry0703/moneyprinterturbo"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/harry0703-moneyprinterturbo-main-claim]],官方 artifact 落库为 [[artifacts/harry0703-moneyprinterturbo-repo]]。See [[content/harry0703-moneyprinterturbo]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/harry0703-moneyprinterturbo-main-claim]],官方 artifact 落库为 [[artifacts/harry0703-moneyprinterturbo-repo]]。See [[content/harry0703-moneyprinterturbo]]。",
+      "links": [
+        {
+          "target": "claims/harry0703-moneyprinterturbo-main-claim",
+          "raw": "[[claims/harry0703-moneyprinterturbo-main-claim]]"
+        },
+        {
+          "target": "artifacts/harry0703-moneyprinterturbo-repo",
+          "raw": "[[artifacts/harry0703-moneyprinterturbo-repo]]"
+        },
+        {
+          "target": "claims/harry0703-moneyprinterturbo-main-claim",
+          "raw": "[[claims/harry0703-moneyprinterturbo-main-claim]]"
+        },
+        {
+          "target": "artifacts/harry0703-moneyprinterturbo-repo",
+          "raw": "[[artifacts/harry0703-moneyprinterturbo-repo]]"
+        },
+        {
+          "target": "content/harry0703-moneyprinterturbo",
+          "raw": "[[content/harry0703-moneyprinterturbo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/herdr-evidence-pack",
       "type": "evidence-pack",
       "slug": "herdr-evidence-pack",
@@ -2168,6 +2256,93 @@
         {
           "target": "content/iii",
           "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/imbad0202-academic-research-skills-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "imbad0202-academic-research-skills-evidence-pack",
+      "title": "academic-research-skills — Evidence Pack",
+      "file": "evidence-packs/imbad0202-academic-research-skills-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "imbad0202-academic-research-skills",
+        "kind": "evidence-pack",
+        "title": "academic-research-skills — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "给 Claude Code 用的学术研究工作流套件：把找文献、写论文、审稿、修订、终稿检查拆成可路由的 skills、slash commands、hooks 和校验脚本。",
+            "internal_logic": "真实例子：`academic-pipeline/examples/full_pipeline_example.md` 里，用户从“台湾私校少子化招生策略”开始，orchestrator 识别从 Stage 1 进入，推荐 `deep-research socratic`、`academic-paper plan`、`academic-paper-reviewer full`、revision、finalize。这个流不是一个 agent 独跑，而是 skill/agent/sidecar/schema 交接。\n\n```mermaid\nflowchart TD\n  A[用户目标] --> B[academic-pipeline 编排]\n  B --> C[Stage 1 研究]\n  C --> D[deep-research socratic]\n  D --> E[RQ Brief 和文献矩阵]\n  E --> F[Stage 2 写作]\n  F --> G[academic-paper plan 或 full]\n  G --> H[Material Passport]\n  H --> I[Stage 2.5 integrity gate]\n  I --> J{通过}\n  J -->|否| K[修复后重验 最多 3 轮]\n  J -->|是| L[Stage 3 peer review]\n  L --> M[Stage 4 revise]\n  M --> N[Stage 4.5 final integrity]\n  N --> O[可选 claim audit]\n  O --> P[formatter final output]\n```\n\n两个关键实现点：第一，插件加载时 `SessionStart` 调 `scripts/announce-ars-loaded.sh`，把命令和 3 个 plugin agents 注入上下文；第二，写文件或 Bash 前 `PreToolUse` 调 `scripts/ars_write_scope_guard.py`，用 `scripts/ars_phase_scope_manifest.json` 判断 agent 能否写入目标路径。（来源：hooks/hooks.json；scripts/announce-ars-loaded.sh；scripts/ars_write_scope_guard.py）\n\n最小入口只有两行：\n```text\n/plugin marketplace add Imbad0202/academic-research-skills\n/plugin install academic-research-skills\n```\n这会让 Claude Code 发现四个 skills；传统方式则要求四个 skill 分别位于 `.claude/skills/<skill-name>/SKILL.md`。（来源：README Quick install；QUICKSTART Step 1；docs/SETUP Method 0/1）",
+            "failure_mode": "docs/SETUP Installation methods；hooks/hooks.json",
+            "source_pointer": "https://github.com/imbad0202/academic-research-skills"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/NOASSERTION/v3.12.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/imbad0202-academic-research-skills-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/imbad0202-academic-research-skills-repo]]"
+        ],
+        "metrics": [
+          "stars=28981",
+          "forks=2402",
+          "open_issues=10",
+          "latest_release=v3.12.0",
+          "pushed_at=2026-06-08T15:23:15Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "docs/SETUP Installation methods；hooks/hooks.json",
+          "docs/SETUP Cross-model verification；shared/cross_model_verification.md",
+          "commands/ars-cache-invalidate.md；scripts/verification_gate/__init__.py；docs/PERFORMANCE v3.11 citation verification",
+          "docs/SETUP DOCX output；docs/SETUP LaTeX / PDF output；README Quick install prerequisites",
+          "LICENSE；.claude-plugin/plugin.json license",
+          "本次 checkout 观察；tests/fixtures/v3_6_7_pattern_eval 深层路径"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/imbad0202/academic-research-skills"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/imbad0202-academic-research-skills-main-claim]],官方 artifact 落库为 [[artifacts/imbad0202-academic-research-skills-repo]]。See [[content/imbad0202-academic-research-skills]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/imbad0202-academic-research-skills-main-claim]],官方 artifact 落库为 [[artifacts/imbad0202-academic-research-skills-repo]]。See [[content/imbad0202-academic-research-skills]]。",
+      "links": [
+        {
+          "target": "claims/imbad0202-academic-research-skills-main-claim",
+          "raw": "[[claims/imbad0202-academic-research-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/imbad0202-academic-research-skills-repo",
+          "raw": "[[artifacts/imbad0202-academic-research-skills-repo]]"
+        },
+        {
+          "target": "claims/imbad0202-academic-research-skills-main-claim",
+          "raw": "[[claims/imbad0202-academic-research-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/imbad0202-academic-research-skills-repo",
+          "raw": "[[artifacts/imbad0202-academic-research-skills-repo]]"
+        },
+        {
+          "target": "content/imbad0202-academic-research-skills",
+          "raw": "[[content/imbad0202-academic-research-skills]]"
         }
       ],
       "headings": [
@@ -2801,6 +2976,96 @@
       ]
     },
     {
+      "id": "evidence-pack/mvanhorn-last30days-skill-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "mvanhorn-last30days-skill-evidence-pack",
+      "title": "last30days-skill — Evidence Pack",
+      "file": "evidence-packs/mvanhorn-last30days-skill-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "mvanhorn-last30days-skill",
+        "kind": "evidence-pack",
+        "title": "last30days-skill — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "last30days-skill 是一个把“最近 30 天社区信号”塞进 Agent Skills 工作流的研究技能：先并发抓 Reddit、X、YouTube、HN、Polymarket、GitHub 和网页，再让宿主模型合成一份可追问的简报。",
+            "internal_logic": "真实流可以从 `/last30days OpenClaw --github-repo=openclaw/openclaw --emit=compact` 这一类调用理解：宿主模型读 `SKILL.md`，先做实体解析和 query plan，再把 plan 文件路径传给 Python engine（来源：skills/last30days/SKILL.md Research Execution）。\n\n```mermaid\nflowchart TD\n  A[用户话题] --> B[SKILL 合约]\n  B --> C[实体解析]\n  C --> D[Query Plan]\n  D --> E[last30days.py]\n  E --> F[可用源检测]\n  F --> G[并发抓取]\n  G --> H[归一化去重]\n  H --> I[Weighted RRF]\n  I --> J[LLM或本地重排]\n  J --> K[聚类]\n  K --> L[compact json html]\n  L --> M[宿主模型合成]\n  L --> N[raw文件或SQLite]\n```\n\n关键机制很具体：`DEPTH_SETTINGS` 把 `quick/default/deep` 映射到 per-stream、pool、rerank 三个限制；`pipeline.run()` 对每个 subquery/source 提交 future；`_retrieve_stream()` 分别调用 `reddit_public`、`bird_x`/`xai_x`、`youtube_yt`、`polymarket`、`grounding` 等模块（来源：pipeline.py DEPTH_SETTINGS/run/_retrieve_stream）。\n\n最小直跑形态是：\n```bash\npython skills/last30days/scripts/last30days.py \"OpenClaw\" --emit=compact\n```\n这能运行，但 SKILL.md 对 named entity 的正式路径要求宿主模型生成 `--plan` tmpfile，并加 `--x-handle`、`--subreddits`、`--github-repo` 等解析结果；否则会走 deterministic fallback，项目自己把这称为退化路径（来源：skills/last30days/SKILL.md LAW 7；来源：planner.py plan_query）。",
+            "failure_mode": "skills/last30days/SKILL.md STEP 0；README Install；AGENTS.md Orientation",
+            "source_pointer": "https://github.com/mvanhorn/last30days-skill"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v3.3.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/mvanhorn-last30days-skill-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/mvanhorn-last30days-skill-repo]]"
+        ],
+        "metrics": [
+          "stars=34466",
+          "forks=2817",
+          "open_issues=123",
+          "latest_release=v3.3.0",
+          "pushed_at=2026-06-06T16:58:08Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "skills/last30days/SKILL.md STEP 0；README Install；AGENTS.md Orientation",
+          "env.py get_x_source/get_x_source_status；bird_x.py；xai_x.py；docs/how-search-works.md X/Twitter Search",
+          "reddit_keyless.py module docstring；reddit_public.py module docstring；reddit_enrich.py",
+          "youtube_yt.py is_ytdlp_installed/_ytdlp_ssh_host；CHANGELOG.md 3.3.0",
+          "CONFIGURATION.md Source-by-source；grounding.py web_search；http.py request",
+          "last30days.py ensure_supported_python/Windows reconfigure；本地 uv run pytest 2026-06-09",
+          "env.py _check_file_permissions/_load_keychain；.github/workflows/security.yml；AGENTS.md Security hygiene"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/mvanhorn/last30days-skill"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/mvanhorn-last30days-skill-main-claim]],官方 artifact 落库为 [[artifacts/mvanhorn-last30days-skill-repo]]。See [[content/mvanhorn-last30days-skill]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/mvanhorn-last30days-skill-main-claim]],官方 artifact 落库为 [[artifacts/mvanhorn-last30days-skill-repo]]。See [[content/mvanhorn-last30days-skill]]。",
+      "links": [
+        {
+          "target": "claims/mvanhorn-last30days-skill-main-claim",
+          "raw": "[[claims/mvanhorn-last30days-skill-main-claim]]"
+        },
+        {
+          "target": "artifacts/mvanhorn-last30days-skill-repo",
+          "raw": "[[artifacts/mvanhorn-last30days-skill-repo]]"
+        },
+        {
+          "target": "claims/mvanhorn-last30days-skill-main-claim",
+          "raw": "[[claims/mvanhorn-last30days-skill-main-claim]]"
+        },
+        {
+          "target": "artifacts/mvanhorn-last30days-skill-repo",
+          "raw": "[[artifacts/mvanhorn-last30days-skill-repo]]"
+        },
+        {
+          "target": "content/mvanhorn-last30days-skill",
+          "raw": "[[content/mvanhorn-last30days-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/nesquena-hermes-webui-evidence-pack",
       "type": "evidence-pack",
       "slug": "nesquena-hermes-webui-evidence-pack",
@@ -3322,6 +3587,96 @@
       ]
     },
     {
+      "id": "evidence-pack/panniantong-agent-reach-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "panniantong-agent-reach-evidence-pack",
+      "title": "Agent-Reach — Evidence Pack",
+      "file": "evidence-packs/panniantong-agent-reach-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "panniantong-agent-reach",
+        "kind": "evidence-pack",
+        "title": "Agent-Reach — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Agent Reach 是给 AI Agent 装互联网工具箱的安装器和健康检查 CLI，不是把所有平台重新封装成一个 SDK。",
+            "internal_logic": "真实流：用户让 Agent 查 Reddit bug 讨论时，Skill 先路由到 social 文档；Agent 调 `rdt search` 找帖子，再用 `rdt read POST_ID` 读全文和评论；`agent-reach doctor` 只负责检查 `rdt status --json` 是否已认证（来源：agent_reach/skill/references/social.md Reddit；来源：agent_reach/channels/reddit.py）。\n\n```mermaid\nflowchart TD\n  A[用户问题] --> B[SKILL 路由]\n  B --> C[social 文档]\n  C --> D[上游命令 rdt search]\n  D --> E[上游命令 rdt read]\n  E --> F[Agent 总结]\n  G[agent reach doctor] --> H[Channel check]\n  H --> I[rdt status json]\n  I --> J[ok warn off]\n  K[config yaml] --> H\n```\n\n最小命令是两步：\n`rdt search \"query\" --limit 10`\n`rdt read POST_ID`\n第一行找帖子，第二行读正文和评论；如果未登录，代码提示写入 `~/.config/rdt-cli/credential.json` 或运行 `rdt login`（来源：agent_reach/channels/reddit.py）。\n\n同一模式也用于别的平台：YouTube 检测 `yt-dlp` 和 Node/Deno JS runtime，小红书检测 `xhs status`，抖音检测 `mcporter list douyin`，V2EX 直接请求公开 JSON API（来源：agent_reach/channels/youtube.py；来源：agent_reach/channels/xiaohongshu.py；来源：agent_reach/channels/douyin.py；来源：agent_reach/channels/v2ex.py）。",
+            "failure_mode": "agent_reach/channels/twitter.py；agent_reach/skill/references/social.md Twitter",
+            "source_pointer": "https://github.com/panniantong/agent-reach"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/false/MIT/v1.4.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/panniantong-agent-reach-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/panniantong-agent-reach-repo]]"
+        ],
+        "metrics": [
+          "stars=24071",
+          "forks=2030",
+          "open_issues=70",
+          "latest_release=v1.4.0",
+          "pushed_at=2026-05-18T12:39:22Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "agent_reach/channels/twitter.py；agent_reach/skill/references/social.md Twitter",
+          "agent_reach/channels/reddit.py；README FAQ Reddit",
+          "agent_reach/channels/youtube.py；agent_reach/skill/references/video.md",
+          "agent_reach/channels/exa_search.py；config/mcporter.json；agent_reach/guides/setup-exa.md",
+          "agent_reach/skill/references/social.md 小红书；agent_reach/channels/xiaohongshu.py",
+          "docs/install.md 抖音；agent_reach/skill/references/social.md 抖音",
+          "agent_reach/cli.py _ensure_utf8_console；本地 pytest 结果"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/panniantong/agent-reach"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/panniantong-agent-reach-main-claim]],官方 artifact 落库为 [[artifacts/panniantong-agent-reach-repo]]。See [[content/panniantong-agent-reach]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/panniantong-agent-reach-main-claim]],官方 artifact 落库为 [[artifacts/panniantong-agent-reach-repo]]。See [[content/panniantong-agent-reach]]。",
+      "links": [
+        {
+          "target": "claims/panniantong-agent-reach-main-claim",
+          "raw": "[[claims/panniantong-agent-reach-main-claim]]"
+        },
+        {
+          "target": "artifacts/panniantong-agent-reach-repo",
+          "raw": "[[artifacts/panniantong-agent-reach-repo]]"
+        },
+        {
+          "target": "claims/panniantong-agent-reach-main-claim",
+          "raw": "[[claims/panniantong-agent-reach-main-claim]]"
+        },
+        {
+          "target": "artifacts/panniantong-agent-reach-repo",
+          "raw": "[[artifacts/panniantong-agent-reach-repo]]"
+        },
+        {
+          "target": "content/panniantong-agent-reach",
+          "raw": "[[content/panniantong-agent-reach]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/pbakaus-impeccable-evidence-pack",
       "type": "evidence-pack",
       "slug": "pbakaus-impeccable-evidence-pack",
@@ -3398,6 +3753,92 @@
         {
           "target": "content/pbakaus-impeccable",
           "raw": "[[content/pbakaus-impeccable]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/phuryn-pm-skills-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "phuryn-pm-skills-evidence-pack",
+      "title": "pm-skills — Evidence Pack",
+      "file": "evidence-packs/phuryn-pm-skills-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "phuryn-pm-skills",
+        "kind": "evidence-pack",
+        "title": "pm-skills — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "pm-skills 是一套面向产品经理和 AI 应用交付者的 Claude/Codex 技能与工作流市场，不是模型或运行时框架。",
+            "internal_logic": "真实流以 `/discover` 为例：\n```mermaid\nflowchart TD\nA[marketplace.json] --> B[pm-product-discovery plugin]\nB --> C[commands discover.md]\nC --> D[判断新产品或现有产品]\nD --> E[brainstorm ideas skill]\nE --> F[identify assumptions skill]\nF --> G[prioritize assumptions skill]\nG --> H[brainstorm experiments skill]\nH --> I[Discovery Plan markdown]\nI --> J[建议 PRD interview metrics]\n```\n安装入口写在 README：\n`claude plugin marketplace add phuryn/pm-skills`\n`claude plugin install pm-product-discovery@pm-skills`\n这表示宿主平台加载 `.claude-plugin/marketplace.json`，再按 `source: ./pm-product-discovery` 找到插件目录。（来源：README Claude Code CLI；.claude-plugin/marketplace.json）\n\n`/discover` 的具体输入例子是 `/discover Smart notification system for our project management tool`；它要求先问用户已有研究、客户反馈、数据和本次决策目标，再让用户在 10 个想法中选 3-5 个继续压力测试。（来源：pm-product-discovery/commands/discover.md Invocation / Workflow）\n\n关键机制不是代码调用，而是 Markdown 指令组合：command 文件用粗体 skill 名引用同插件 skill；validator 会检查 command 里 `**skill-name** skill` 这种引用是否在同一插件中存在。（来源：validate_plugins.py validate_cross_references）",
+            "failure_mode": "README Installation；.claude-plugin/marketplace.json；validate_plugins.py",
+            "source_pointer": "https://github.com/phuryn/pm-skills"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/MIT/v2.0.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/phuryn-pm-skills-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/phuryn-pm-skills-repo]]"
+        ],
+        "metrics": [
+          "stars=12641",
+          "forks=1497",
+          "open_issues=17",
+          "latest_release=v2.0.0",
+          "pushed_at=2026-06-06T14:12:26Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "README Installation；.claude-plugin/marketplace.json；validate_plugins.py",
+          "README Codex CLI",
+          "README Other AI assistants",
+          "pm-execution/skills/prioritization-frameworks/SKILL.md Templates；pm-product-strategy/skills/product-strategy/SKILL.md Templates",
+          "validate_plugins.py parse_yaml_frontmatter"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/phuryn/pm-skills"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/phuryn-pm-skills-main-claim]],官方 artifact 落库为 [[artifacts/phuryn-pm-skills-repo]]。See [[content/phuryn-pm-skills]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/phuryn-pm-skills-main-claim]],官方 artifact 落库为 [[artifacts/phuryn-pm-skills-repo]]。See [[content/phuryn-pm-skills]]。",
+      "links": [
+        {
+          "target": "claims/phuryn-pm-skills-main-claim",
+          "raw": "[[claims/phuryn-pm-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/phuryn-pm-skills-repo",
+          "raw": "[[artifacts/phuryn-pm-skills-repo]]"
+        },
+        {
+          "target": "claims/phuryn-pm-skills-main-claim",
+          "raw": "[[claims/phuryn-pm-skills-main-claim]]"
+        },
+        {
+          "target": "artifacts/phuryn-pm-skills-repo",
+          "raw": "[[artifacts/phuryn-pm-skills-repo]]"
+        },
+        {
+          "target": "content/phuryn-pm-skills",
+          "raw": "[[content/phuryn-pm-skills]]"
         }
       ],
       "headings": [
@@ -3666,6 +4107,356 @@
       ]
     },
     {
+      "id": "evidence-pack/project-can1357-oh-my-pi-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "project-can1357-oh-my-pi-evidence-pack",
+      "title": "oh-my-pi — Evidence Pack",
+      "file": "evidence-packs/project-can1357-oh-my-pi-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "can1357-oh-my-pi",
+        "kind": "evidence-pack",
+        "title": "oh-my-pi — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "oh-my-pi 是一个终端里的 AI 编程代理框架，把读写文件、命令执行、LSP、DAP 调试、子代理、MCP、技能和扩展放进同一个 `omp` CLI。",
+            "internal_logic": "核心流不是“模型直接乱写文件”，而是模型在一个工具注册表里选工具，工具再进入各自运行时。\n\n```mermaid\nflowchart TD\n  A[用户任务] --> B[omp CLI]\n  B --> C[会话运行时]\n  C --> D[模型路由]\n  C --> E[工具注册表]\n  E --> F[read 统一读取]\n  F --> G[哈希锚快照]\n  G --> H[edit 写入]\n  H --> I[LSP 诊断]\n  E --> J[task 子代理]\n  J --> K[隔离工作区]\n  E --> L[MCP 和扩展]\n  E --> M[eval 和 bash]\n```\n\n一个真实编辑例子：`read` 在 hashline 模式会给可变文件加类似 `¶a.ts#0A3B` 的头，`edit` 再消费这个头和行号。（来源：docs/tools/read.md Local text files；docs/tools/edit.md Worked examples）\n\n```text\n¶a.ts#0A3B\nreplace 1..1:\n```\n\n这两行的意思是：只替换 `a.ts` 当前快照的第 1 行；如果文件内容已经漂移，`packages/hashline` 会按 snapshot 校验并拒绝或恢复。（来源：packages/hashline/README.md Format；docs/tools/edit.md Limits & Caps）\n\n更完整的 agent loop：CLI 入口 `src/cli.ts` 把非子命令默认路由到 `launch`；`main.ts` 初始化 settings、model registry、session；`createTools` 从 `BUILTIN_TOOLS` 和 MCP/custom/extension 工具生成可调用工具；工具执行结果回到会话，再由模型决定下一步。（来源：packages/coding-agent/DEVELOPMENT.md Boot Sequence；packages/coding-agent/src/tools/index.ts createTools）",
+            "failure_mode": "packages/coding-agent/package.json engines；packages/coding-agent/src/cli.ts runSmokeTest",
+            "source_pointer": "https://github.com/can1357/oh-my-pi"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/true/false/MIT/v15.10.7"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/can1357-oh-my-pi-main-claim-2]]"
+        ],
+        "artifacts": [
+          "[[artifacts/project-can1357-oh-my-pi-repo]]"
+        ],
+        "metrics": [
+          "stars=11287",
+          "forks=954",
+          "open_issues=197",
+          "latest_release=v15.10.7",
+          "pushed_at=2026-06-08T23:25:58Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "packages/coding-agent/package.json engines；packages/coding-agent/src/cli.ts runSmokeTest",
+          "README Roughly ~27000 lines of Rust；crates/pi-natives/Cargo.toml",
+          "docs/models.md Provider-level fields/Validation rules",
+          "docs/mcp-config.md File shape；docs/mcp-runtime-lifecycle.md Fast startup gate",
+          "docs/lsp-config.md Auto-detection；docs/tools/debug.md Adapter selection",
+          "docs/approval-mode.md Modes/User overrides"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/can1357/oh-my-pi"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/can1357-oh-my-pi-main-claim-2]],官方 artifact 落库为 [[artifacts/project-can1357-oh-my-pi-repo]]。See [[content/can1357-oh-my-pi]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/can1357-oh-my-pi-main-claim-2]],官方 artifact 落库为 [[artifacts/project-can1357-oh-my-pi-repo]]。See [[content/can1357-oh-my-pi]]。",
+      "links": [
+        {
+          "target": "claims/can1357-oh-my-pi-main-claim-2",
+          "raw": "[[claims/can1357-oh-my-pi-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-can1357-oh-my-pi-repo",
+          "raw": "[[artifacts/project-can1357-oh-my-pi-repo]]"
+        },
+        {
+          "target": "claims/can1357-oh-my-pi-main-claim-2",
+          "raw": "[[claims/can1357-oh-my-pi-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-can1357-oh-my-pi-repo",
+          "raw": "[[artifacts/project-can1357-oh-my-pi-repo]]"
+        },
+        {
+          "target": "content/can1357-oh-my-pi",
+          "raw": "[[content/can1357-oh-my-pi]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/project-chopratejas-headroom-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "project-chopratejas-headroom-evidence-pack",
+      "title": "headroom — Evidence Pack",
+      "file": "evidence-packs/project-chopratejas-headroom-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "chopratejas-headroom",
+        "kind": "evidence-pack",
+        "title": "headroom — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "planner",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Headroom 是给 AI agent 和 LLM 应用用的本地上下文压缩层：在工具输出、日志、RAG 片段、文件内容进模型前先压缩，并用 CCR 保留原文可取回。",
+            "internal_logic": "真实流：示例 `examples/context_compression_demo.py` 构造 OpenAI 格式 messages，第三条是 `role: tool` 的检索输出，然后调用 `compress(messages, model=\"claude-sonnet-4-5-20250929\")`，最后断言 tokens_saved > 0、message count 不变、tool message 仍存在。（来源：examples/context_compression_demo.py）\n\n```mermaid\nflowchart TD\n  A[Agent 或 App messages] --> B[compress 或 proxy]\n  B --> C[Pipeline]\n  C --> D[CacheAligner]\n  D --> E[ContentRouter]\n  E --> F{内容类型}\n  F --> G[JSON SmartCrusher]\n  F --> H[日志 搜索 代码 文本]\n  G --> I[CCR 本地存原文]\n  H --> I\n  I --> J[压缩 messages]\n  J --> K[LLM]\n  K --> L[需要原文]\n  L --> M[headroom_retrieve]\n  M --> I\n```\n\n关键节点：`compress()` 默认 `model=\"claude-sonnet-4-5-20250929\"`、`model_limit=200000`，会把用户 query 提取成 context 后交给 pipeline。（来源：headroom/compress.py compress）ContentRouter 对用户消息、系统/开发者消息、小内容有保护逻辑；不是所有内容都会被压缩。（来源：headroom/transforms/content_router.py apply）MCP 的 `headroom_compress` 会把内容包成 `role: tool` 再走同一个 `compress()`，并把原文存入本地 store。（来源：headroom/ccr/mcp_server.py _compress_content）",
+            "failure_mode": "docs/content/docs/quickstart.mdx；docs/content/docs/proxy.mdx；pyproject.toml",
+            "source_pointer": "https://github.com/chopratejas/headroom"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:agent_framework",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/true/true/true/Apache-2.0/v0.23.0"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/chopratejas-headroom-main-claim-2]]"
+        ],
+        "artifacts": [
+          "[[artifacts/project-chopratejas-headroom-repo]]"
+        ],
+        "metrics": [
+          "stars=18831",
+          "forks=1202",
+          "open_issues=213",
+          "latest_release=v0.23.0",
+          "pushed_at=2026-06-08T23:50:08Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "docs/content/docs/quickstart.mdx；docs/content/docs/proxy.mdx；pyproject.toml",
+          "pyproject.toml tool.maturin；crates/headroom-py/src/lib.rs；headroom/transforms/smart_crusher.py",
+          "docs/content/docs/mcp.mdx Cross-tool compatibility；headroom/cli/wrap.py；tests/test_cli/test_wrap_codex.py",
+          "headroom/cache/compression_store.py；headroom/ccr/mcp_server.py；docs/content/docs/mcp.mdx Troubleshooting",
+          "docs/content/docs/proxy.mdx Cloud providers / API endpoints；crates/headroom-proxy/src；tests/test_proxy_openai_responses_integration.py",
+          "docs/content/docs/proxy.mdx Starting the proxy；docs/content/docs/configuration.mdx Environment Variables"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/chopratejas/headroom"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/chopratejas-headroom-main-claim-2]],官方 artifact 落库为 [[artifacts/project-chopratejas-headroom-repo]]。See [[content/chopratejas-headroom]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/chopratejas-headroom-main-claim-2]],官方 artifact 落库为 [[artifacts/project-chopratejas-headroom-repo]]。See [[content/chopratejas-headroom]]。",
+      "links": [
+        {
+          "target": "claims/chopratejas-headroom-main-claim-2",
+          "raw": "[[claims/chopratejas-headroom-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-chopratejas-headroom-repo",
+          "raw": "[[artifacts/project-chopratejas-headroom-repo]]"
+        },
+        {
+          "target": "claims/chopratejas-headroom-main-claim-2",
+          "raw": "[[claims/chopratejas-headroom-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-chopratejas-headroom-repo",
+          "raw": "[[artifacts/project-chopratejas-headroom-repo]]"
+        },
+        {
+          "target": "content/chopratejas-headroom",
+          "raw": "[[content/chopratejas-headroom]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/project-colbymchenry-codegraph-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "project-colbymchenry-codegraph-evidence-pack",
+      "title": "codegraph — Evidence Pack",
+      "file": "evidence-packs/project-colbymchenry-codegraph-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "colbymchenry-codegraph",
+        "kind": "evidence-pack",
+        "title": "codegraph — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "CodeGraph 是给 AI 编程 agent 用的本地代码知识图谱 CLI/MCP：先把仓库解析成 SQLite 节点和边，再让 agent 用 codegraph_explore 等工具少 grep、少 Read。",
+            "internal_logic": "```mermaid\nflowchart TD\n  A[项目源码] --> B[扫描过滤]\n  B --> C[TreeSitter解析]\n  C --> D[未解析引用]\n  D --> E[框架和导入解析]\n  E --> F[SQLite图]\n  F --> G[MCP工具]\n  G --> H[Agent回答或编辑]\n  A --> I[文件变更]\n  I --> J[Watcher同步]\n  J --> F\n  J --> K[Stale提示]\n  K --> H\n```\n\n真实流：`__tests__/integration/full-pipeline.test.ts` 生成约 120 个 TS 模块，`indexAll()` 后搜索 `entry` 和 `fn50`，再用 `getCallers(fn0)`、`buildContext(\"entry function chain\")` 验证图能被查询；随后 `sync()` 处理三类变更：新增 `src/consumer.ts`、修改 `src/mod0.ts` 加 `newHelper`、删除 `src/mod1.ts`。（来源：__tests__/integration/full-pipeline.test.ts）\n\n最小使用路径是：\n```bash\ncodegraph init -i\ncodegraph serve --mcp\n```\n第一行建 `.codegraph/codegraph.db`，第二行把 MCP 工具暴露给 agent；installer 写入的实际命令也是 `codegraph` + `serve --mcp`。（来源：README CLI Reference；src/installer/targets/shared.ts）",
+            "failure_mode": "package.json engines；src/bin/codegraph.ts node-version gate；src/db/sqlite-adapter.ts；本地测试 warning",
+            "source_pointer": "https://github.com/colbymchenry/codegraph"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/MIT/v0.9.9"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/colbymchenry-codegraph-main-claim-2]]"
+        ],
+        "artifacts": [
+          "[[artifacts/project-colbymchenry-codegraph-repo]]"
+        ],
+        "metrics": [
+          "stars=44809",
+          "forks=2758",
+          "open_issues=206",
+          "latest_release=v0.9.9",
+          "pushed_at=2026-06-08T23:31:52Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "package.json engines；src/bin/codegraph.ts node-version gate；src/db/sqlite-adapter.ts；本地测试 warning",
+          "src/sync/watch-policy.ts；site/src/content/docs/guides/indexing.md",
+          "src/installer/targets/*.ts；__tests__/installer-targets.test.ts",
+          "install.sh；install.ps1；BUNDLING.md",
+          "本地 npm ci 输出；package.json dependencies",
+          "README Methodology；docs/benchmarks/codegraph-ab-matrix.md"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/colbymchenry/codegraph"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/colbymchenry-codegraph-main-claim-2]],官方 artifact 落库为 [[artifacts/project-colbymchenry-codegraph-repo]]。See [[content/colbymchenry-codegraph]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/colbymchenry-codegraph-main-claim-2]],官方 artifact 落库为 [[artifacts/project-colbymchenry-codegraph-repo]]。See [[content/colbymchenry-codegraph]]。",
+      "links": [
+        {
+          "target": "claims/colbymchenry-codegraph-main-claim-2",
+          "raw": "[[claims/colbymchenry-codegraph-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-colbymchenry-codegraph-repo",
+          "raw": "[[artifacts/project-colbymchenry-codegraph-repo]]"
+        },
+        {
+          "target": "claims/colbymchenry-codegraph-main-claim-2",
+          "raw": "[[claims/colbymchenry-codegraph-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-colbymchenry-codegraph-repo",
+          "raw": "[[artifacts/project-colbymchenry-codegraph-repo]]"
+        },
+        {
+          "target": "content/colbymchenry-codegraph",
+          "raw": "[[content/colbymchenry-codegraph]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/project-microsoft-markitdown-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "project-microsoft-markitdown-evidence-pack",
+      "title": "markitdown — Evidence Pack",
+      "file": "evidence-packs/project-microsoft-markitdown-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "microsoft-markitdown",
+        "kind": "evidence-pack",
+        "title": "markitdown — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "MarkItDown 是把 PDF、Office、网页、图片、音频等输入转成 Markdown 的 Python CLI/SDK，定位是给 LLM/RAG 做文档入口清洗。",
+            "internal_logic": "真实例子：`markitdown test.xlsx -o out.md` 会从 CLI 进入 `MarkItDown.convert()`，再走本地文件流、文件类型猜测、converter 选择，最后由 XLSX converter 把每个 sheet 变成 Markdown 表。（来源：README Command-Line；packages/markitdown/src/markitdown/__main__.py；packages/markitdown/src/markitdown/converters/_xlsx_converter.py）\n\n```mermaid\nflowchart TD\n  A[文件或URI] --> B[CLI或Python API]\n  B --> C[MarkItDown convert]\n  C --> D{输入类型}\n  D --> E[本地文件]\n  D --> F[HTTP响应]\n  D --> G[二进制流]\n  D --> H[data URI]\n  E --> I[StreamInfo 猜测]\n  F --> I\n  G --> I\n  H --> I\n  I --> J[扩展名 MIME Magika]\n  J --> K[按优先级排序 converters]\n  K --> L[accepts 检查]\n  L --> M[convert 转 Markdown]\n  M --> N[清理空行和行尾]\n  N --> O[stdout 文件或SDK结果]\n```\n\n关键点：`ZipConverter` 会把 ZIP 内文件递归交回同一个 MarkItDown 实例；`ContentUnderstandingConverter` 在传入 `cu_endpoint` 时才注册到 converter 栈；插件 converter 只有 `enable_plugins=True` 或 `--use-plugins` 才加载。（来源：packages/markitdown/src/markitdown/converters/_zip_converter.py；packages/markitdown/src/markitdown/_markitdown.py enable_builtins/enable_plugins）",
+            "failure_mode": "packages/markitdown/src/markitdown/_markitdown.py _get_stream_info_guesses；packages/markitdown/src/markitdown/__main__.py CLI hints",
+            "source_pointer": "https://github.com/microsoft/markitdown"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:devtool_cli",
+          "verdict:clone_and_run",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/MIT/v0.1.6"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/microsoft-markitdown-main-claim-2]]"
+        ],
+        "artifacts": [
+          "[[artifacts/project-microsoft-markitdown-repo]]"
+        ],
+        "metrics": [
+          "stars=148388",
+          "forks=10183",
+          "open_issues=824",
+          "latest_release=v0.1.6",
+          "pushed_at=2026-05-26T22:41:34Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "packages/markitdown/src/markitdown/_markitdown.py _get_stream_info_guesses；packages/markitdown/src/markitdown/__main__.py CLI hints",
+          "packages/markitdown/src/markitdown/converters/_pdf_converter.py",
+          "README Azure Content Understanding Cost note；packages/markitdown/src/markitdown/converters/_cu_converter.py",
+          "packages/markitdown/src/markitdown/converters/_image_converter.py；packages/markitdown-ocr/README.md Usage",
+          "packages/markitdown-mcp/src/markitdown_mcp/__main__.py；packages/markitdown-mcp/README.md Security Considerations",
+          "Dockerfile"
+        ],
+        "missing_details": [
+          "homepage: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/microsoft/markitdown"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/microsoft-markitdown-main-claim-2]],官方 artifact 落库为 [[artifacts/project-microsoft-markitdown-repo]]。See [[content/microsoft-markitdown]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/microsoft-markitdown-main-claim-2]],官方 artifact 落库为 [[artifacts/project-microsoft-markitdown-repo]]。See [[content/microsoft-markitdown]]。",
+      "links": [
+        {
+          "target": "claims/microsoft-markitdown-main-claim-2",
+          "raw": "[[claims/microsoft-markitdown-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-microsoft-markitdown-repo",
+          "raw": "[[artifacts/project-microsoft-markitdown-repo]]"
+        },
+        {
+          "target": "claims/microsoft-markitdown-main-claim-2",
+          "raw": "[[claims/microsoft-markitdown-main-claim-2]]"
+        },
+        {
+          "target": "artifacts/project-microsoft-markitdown-repo",
+          "raw": "[[artifacts/project-microsoft-markitdown-repo]]"
+        },
+        {
+          "target": "content/microsoft-markitdown",
+          "raw": "[[content/microsoft-markitdown]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
       "id": "evidence-pack/qwen3-coder-next-evidence-pack",
       "type": "evidence-pack",
       "slug": "qwen3-coder-next-evidence-pack",
@@ -3742,6 +4533,93 @@
       "body": "\n## Notes\n\n证据先于综合。关键审稿点是 §5.1 的 baseline 公平性(同 scaffold 复现 + 去 commit 泄漏 + 统一 300 turn),它决定了『强是否诚实』的判断。\n",
       "excerpt": "证据先于综合。关键审稿点是 §5.1 的 baseline 公平性(同 scaffold 复现 + 去 commit 泄漏 + 统一 300 turn),它决定了『强是否诚实』的判断。",
       "links": [],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/refactoringhq-tolaria-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "refactoringhq-tolaria-evidence-pack",
+      "title": "tolaria — Evidence Pack",
+      "file": "evidence-packs/refactoringhq-tolaria-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "refactoringhq-tolaria",
+        "kind": "evidence-pack",
+        "title": "tolaria — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "tool",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "Tolaria 是一个本地优先的 Markdown 知识库桌面应用，把 vault 文件、Git、MCP 和多种 CLI/模型 AI 入口接在一起。",
+            "internal_logic": "真实流：用户打开 `demo-vault-v2/25q2-laputa-v2.md` 这类文件，frontmatter 里有 `type: Project`、`belongs_to`、`related_to`，正文里有 `「laputa-qa-reference」(Obsidian 式双链)`。Rust 扫描后生成 `VaultEntry`，React 显示四栏；AI 面板把 active note、open tabs、note list 和 vault summary 组装成 JSON context；CLI agent 或 MCP tool 再读写同一批文件。（来源：demo-vault-v2/25q2-laputa-v2.md；src-tauri/src/vault/mod.rs；src/utils/ai-context.ts）\n\n```mermaid\nflowchart TD\n  A[Markdown vault] --> B[Rust 扫描]\n  B --> C[VaultEntry 列表]\n  C --> D[React 四栏 UI]\n  D --> E[AI context JSON]\n  E --> F[CLI agent 适配器]\n  F --> G[MCP tools]\n  G --> H[读写 active vault]\n  H --> A\n  D --> I[UI WebSocket 桥]\n  G --> I\n```\n\n关键点：MCP 的 `create_note` 不覆盖已有文件，fallback 内容会写成 `type: \"Project\"` 加 H1；多 vault 同名路径会报 ambiguous，要求传 `vaultPath`。（来源：mcp-server/tool-service.test.js）\n\n```bash\npnpm install\npnpm tauri dev\n```\n这是真桌面开发入口；浏览器 mock 用 `pnpm dev`，不覆盖 Tauri/Rust/MCP 全路径。（来源：README Quick start；docs/GETTING-STARTED Quick Start）",
+            "failure_mode": "package.json dependencies；src-tauri/Cargo.toml；src-tauri/tauri.conf.json",
+            "source_pointer": "https://github.com/refactoringhq/tolaria"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:ai_app",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:true/true/true/false/AGPL-3.0/v2026-06-06"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/refactoringhq-tolaria-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/refactoringhq-tolaria-repo]]"
+        ],
+        "metrics": [
+          "stars=13556",
+          "forks=951",
+          "open_issues=30",
+          "latest_release=v2026-06-06",
+          "pushed_at=2026-06-08T21:50:52Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "package.json dependencies；src-tauri/Cargo.toml；src-tauri/tauri.conf.json",
+          "src-tauri/src/mcp.rs find_mcp_runtime/find_node；docs/GETTING-STARTED Starter Vaults And Remotes",
+          "src-tauri/src/ai_agents.rs；src-tauri/src/codex_cli.rs；src-tauri/src/gemini_cli.rs",
+          "docs/adr/0085-non-git-vault-support.md；docs/ABSTRACTIONS Vault Git Capability",
+          "package.json license；src-tauri/Cargo.toml license；LICENSE",
+          "docs/ARCHITECTURE Telemetry；src-tauri/src/telemetry.rs"
+        ],
+        "missing_details": [],
+        "source_pointers": [
+          "https://github.com/refactoringhq/tolaria"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/refactoringhq-tolaria-main-claim]],官方 artifact 落库为 [[artifacts/refactoringhq-tolaria-repo]]。See [[content/refactoringhq-tolaria]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/refactoringhq-tolaria-main-claim]],官方 artifact 落库为 [[artifacts/refactoringhq-tolaria-repo]]。See [[content/refactoringhq-tolaria]]。",
+      "links": [
+        {
+          "target": "claims/refactoringhq-tolaria-main-claim",
+          "raw": "[[claims/refactoringhq-tolaria-main-claim]]"
+        },
+        {
+          "target": "artifacts/refactoringhq-tolaria-repo",
+          "raw": "[[artifacts/refactoringhq-tolaria-repo]]"
+        },
+        {
+          "target": "claims/refactoringhq-tolaria-main-claim",
+          "raw": "[[claims/refactoringhq-tolaria-main-claim]]"
+        },
+        {
+          "target": "artifacts/refactoringhq-tolaria-repo",
+          "raw": "[[artifacts/refactoringhq-tolaria-repo]]"
+        },
+        {
+          "target": "content/refactoringhq-tolaria",
+          "raw": "[[content/refactoringhq-tolaria]]"
+        }
+      ],
       "headings": [
         {
           "depth": 2,
@@ -3827,6 +4705,95 @@
         {
           "target": "content/rohitg00-agentmemory",
           "raw": "[[content/rohitg00-agentmemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "id": "evidence-pack/rohitg00-ai-engineering-from-scratch-evidence-pack",
+      "type": "evidence-pack",
+      "slug": "rohitg00-ai-engineering-from-scratch-evidence-pack",
+      "title": "ai-engineering-from-scratch — Evidence Pack",
+      "file": "evidence-packs/rohitg00-ai-engineering-from-scratch-evidence-pack.md",
+      "directory": "evidence-packs",
+      "meta": {
+        "content": "rohitg00-ai-engineering-from-scratch",
+        "kind": "evidence-pack",
+        "title": "ai-engineering-from-scratch — Evidence Pack",
+        "technical_objects": [
+          {
+            "name": "README/artifact 中说明的核心项目对象",
+            "type": "schema",
+            "input": "未在 README/artifact 说明",
+            "output": "未在 README/artifact 说明",
+            "role": "这是一个从数学、模型、LLM 到 Agent/MCP/安全的开源 AI 工程课程仓库，不是一个可直接接入生产的 agent framework。",
+            "internal_logic": "```mermaid\nflowchart TD\n  A[README 选路径] --> B[phase lesson]\n  B --> C[docs en]\n  B --> D[code main]\n  B --> E[quiz json]\n  B --> F[outputs skill prompt]\n  F --> G[install skills]\n  B --> H[build catalog]\n  I[workbench pack] --> J[scaffold repo]\n  D --> K[本地运行验证]\n```\n\n真实流：读者从 README 选 phase，进入某个 lesson；每课通常有 `docs/en.md`、`code/`、`quiz.json`、`outputs/`。（来源：README The shape of a lesson）\n\nPhase 14 Lesson 01 的实际例子：\n```bash\npython phases/14-agent-engineering/01-the-agent-loop/code/main.py\n```\n这次运行得到 5 次工具调用：先 `kv_set base=120`，再 `calculator 120 * 0.15` 得 18.0，再算 `120 + 18.0` 得 138.0，最后 `kv_get base` 后 finish。（来源：phases/14-agent-engineering/01-the-agent-loop/code/main.py；本地运行）\n\nMCP 例子走另一条线：Phase 13 Lesson 07 的 server 从 stdin 读 JSON-RPC，一行一个 request；`tools/call` 调 `notes_create` 后返回 text block 和 `notes://...` resource。（来源：phases/13-tools-and-protocols/07-building-an-mcp-server/code/main.py）\n\n可复用交付物走安装线：\n```bash\npython3 scripts/install_skills.py <target> --phase 14\n```\n脚本按前缀识别 `skill-`、`prompt-`、`agent-`，默认写成 `<target>/<name>/SKILL.md` 并生成 manifest。（来源：scripts/install_skills.py target_path/write_manifest）",
+            "failure_mode": "本地 clone 过程 2026-06-09；repo 深层路径如 phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/schemas/scope_contract.schema.json",
+            "source_pointer": "https://github.com/rohitg00/ai-engineering-from-scratch"
+          }
+        ],
+        "pipeline_steps": [
+          "project_type 分诊:template_boilerplate",
+          "verdict:deep_dive",
+          "artifactAudit src/tests/docs/examples/license/release:false/false/false/false/MIT/not_found"
+        ],
+        "experiments": [],
+        "claims": [
+          "[[claims/rohitg00-ai-engineering-from-scratch-main-claim]]"
+        ],
+        "artifacts": [
+          "[[artifacts/rohitg00-ai-engineering-from-scratch-repo]]"
+        ],
+        "metrics": [
+          "stars=30340",
+          "forks=4950",
+          "open_issues=59",
+          "latest_release=not_found",
+          "pushed_at=2026-06-08T10:09:13Z"
+        ],
+        "baselines": [],
+        "failure_modes": [
+          "本地 clone 过程 2026-06-09；repo 深层路径如 phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/schemas/scope_contract.schema.json",
+          "README The toolkit；ROADMAP top/total；scripts/build_catalog.py",
+          "phases/13-tools-and-protocols/07-building-an-mcp-server/code/main.py",
+          "requirements.txt；scripts/lesson_run.py",
+          "vercel.json；site/build.js；CONTRIBUTING.md"
+        ],
+        "missing_details": [
+          "latest_release_tag_name: not_found",
+          "latest_release_published_at: not_found"
+        ],
+        "source_pointers": [
+          "https://github.com/rohitg00/ai-engineering-from-scratch"
+        ]
+      },
+      "body": "\n## Notes\n\n证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/rohitg00-ai-engineering-from-scratch-main-claim]],官方 artifact 落库为 [[artifacts/rohitg00-ai-engineering-from-scratch-repo]]。See [[content/rohitg00-ai-engineering-from-scratch]]。\n",
+      "excerpt": "证据包来自 README 摘要、P1 artifactAudit 和 deep-dive claim ledger。主 claim 落库为 [[claims/rohitg00-ai-engineering-from-scratch-main-claim]],官方 artifact 落库为 [[artifacts/rohitg00-ai-engineering-from-scratch-repo]]。See [[content/rohitg00-ai-engineering-from-scratch]]。",
+      "links": [
+        {
+          "target": "claims/rohitg00-ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/rohitg00-ai-engineering-from-scratch-main-claim]]"
+        },
+        {
+          "target": "artifacts/rohitg00-ai-engineering-from-scratch-repo",
+          "raw": "[[artifacts/rohitg00-ai-engineering-from-scratch-repo]]"
+        },
+        {
+          "target": "claims/rohitg00-ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/rohitg00-ai-engineering-from-scratch-main-claim]]"
+        },
+        {
+          "target": "artifacts/rohitg00-ai-engineering-from-scratch-repo",
+          "raw": "[[artifacts/rohitg00-ai-engineering-from-scratch-repo]]"
+        },
+        {
+          "target": "content/rohitg00-ai-engineering-from-scratch",
+          "raw": "[[content/rohitg00-ai-engineering-from-scratch]]"
         }
       ],
       "headings": [

@@ -1,0 +1,26 @@
+<!-- AI-ONLY AutoSci primitive. Generated from a deep-analyzed GitHub project; not for the public project card. -->
+# AutoSci reuse - harry0703/MoneyPrinterTurbo
+
+## Core Pattern
+分阶段 stop_at 流水线: 把长链路拆成 `script/terms/audio/subtitle/materials/video`，允许只跑到某一步并返回中间产物。 外部素材白名单目录: 上传和读取素材时只允许任务目录、songs 目录、local_videos 目录内的文件。 LLM provider 适配层: 用 `llm_provider` 统一选择 OpenAI 兼容、DashScope、Gemini、LiteLLM、Ollama 等路径。 硬件编码失败回退: 高级编码器先白名单检查，运行失败后用 `libx264` 重试。
+
+## Mapping
+- problem_class: developer-facing-ai-automation-with-observable-feedback
+- components: developer_control_surface, model_or_retrieval_layer, validation_harness, stop-at, project, llm-provider
+- autosci_modules: pattern_library, experiment_runner, developer_tooling, feedback_loop
+
+## Small Experiment
+Compare baseline free-form execution against the extracted devtool pattern from harry0703/MoneyPrinterTurbo on three AutoSci tasks. Measure completion rate, trace inspectability, failure recovery, and cost over 1-3 days.
+
+## Design Principles
+- devtool-boundary-as-module: 分阶段 stop_at 流水线: 把长链路拆成 `script/terms/audio/subtitle/materials/video`，允许只跑到某一步并返回中间产物。 外部素材白名单目录: 上传和读取素材时只允许任务目录、songs 目录、local_videos 目录内的文件。 LLM provider 适配层: 用 `llm_provider` 统一选择 OpenAI 兼容、DashScope、Gemini、LiteLLM、Ollama 等路径。 硬件编码失败回退: 高级编码器先白名单检查，运行失败后用 `libx264` 重试。
+- devtool-observable-flow: 真实流程可以从 API 的 `/videos` 看：控制器创建任务 ID，把 `TaskVideoRequest` 丢给任务管理器，后台线程执行 `app/services/task.py:start`。（来源：app/controllers/v1/video.py create_task；app/controllers/manager/base_manager.py） ```mermaid flowchart TD A[用户主题或脚本] --> B[API 或 WebUI] B --> C[任务队列] C --> D[LLM 写脚本] D --> E[LLM 生成英文搜索词] E --> F[Pexels 或 Pixabay 或本地素材] D --> G[TTS 生成 audio mp3] G --> H[字幕 edge 或 whisper] F --> I[MoviePy FFmpeg 拼接 combined] H --> J[叠字幕和音频 final mp4] J --> K[任务状态和下载链接] ``` 一个具体例子：`VideoParams(video_subject="金钱的作用", voice_name="zh-CN-XiaoyiNeural-Female")` 是 `task.py` 里自带的本地调用示例；完整任务会把脚本写入 `script.json`，音频写入 `audio.mp3`，字幕写入 `subtitle.srt`，最后生成 `final-1.mp4`。（来源：app/services/task.py __main__/save_script_data/generate_final_videos） 最小运行路径是先复制配置，再启动 API：`config.example.toml -> config.toml`，`uv run python main.py`；Docker 路径是 `docker-compose up`，WebUI/API 分别映射到 `8501/8080`。（来源：README 安装部署；docker-compose.yml）
+- devtool-risk-first-transfer: Transfer the architecture together with its main failure boundary: Pexels/Pixabay 素材 API: API key 失效、限流、条款变化或搜索结果不足时，素材下载阶段会失败。.
+
+## Risks
+- Pexels/Pixabay 素材 API: API key 失效、限流、条款变化或搜索结果不足时，素材下载阶段会失败。
+- Edge TTS / Azure Speech / Gemini / SiliconFlow / MiMo TTS: TTS 服务限流、接口变更或网络不可达会导致音频和字幕时间轴生成失败。
+- LLM provider 与模型网关: 模型名下线、响应格式变化、API key 缺失会导致脚本或搜索词生成失败。
+- FFmpeg/ImageMagick/MoviePy: 本机缺少二进制、编码器不可用、素材格式异常，会影响拼接、字幕渲染或最终导出。
+- 公开 API 任务队列: 匿名请求堆积会占内存并消耗外部 API 费用。
+- over_transfer

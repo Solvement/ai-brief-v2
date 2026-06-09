@@ -2,9 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { makeBoard } from "../columns/projects/index.mjs";
 
-function item(fullName, { windows = [], ranksByWindow = {}, score = 80 } = {}) {
+function item(fullName, { windows = [], ranksByWindow = {}, currentWindows, currentRun, score = 80 } = {}) {
   const [owner, name] = fullName.split("/");
-  return {
+  const out = {
     candidate: {
       id: `project:${fullName.toLowerCase()}`,
       raw: { fullName },
@@ -23,6 +23,7 @@ function item(fullName, { windows = [], ranksByWindow = {}, score = 80 } = {}) {
       starsGained: 5,
       windows,
       ranksByWindow,
+      ...(currentWindows ? { currentWindows } : {}),
     },
     eval: { score },
     light: {
@@ -33,6 +34,8 @@ function item(fullName, { windows = [], ranksByWindow = {}, score = 80 } = {}) {
       final_depth: "analysis",
     },
   };
+  if (currentRun !== undefined) out.currentRun = currentRun;
+  return out;
 }
 
 test("project boards only contain repos from that real trending window", () => {
@@ -58,4 +61,33 @@ test("project board limit is an explicit cap, not padding", () => {
 
   assert.deepEqual(board.repos.map((repo) => repo.fullName), ["owner/daily-one"]);
   assert.equal(board.target, 1);
+});
+
+test("project boards drop stale accumulated repos outside the current run", () => {
+  const board = makeBoard("daily", [
+    item("owner/current", { windows: ["daily"], ranksByWindow: { daily: 1 }, currentWindows: ["daily"], currentRun: true }),
+    item("owner/old-deep", { windows: ["daily"], ranksByWindow: { daily: 2 }, currentRun: false, score: 100 }),
+  ], { boardLimit: 12 });
+
+  assert.deepEqual(board.repos.map((repo) => repo.fullName), ["owner/current"]);
+});
+
+test("project boards use current window membership instead of accumulated windows", () => {
+  const board = makeBoard("daily", [
+    item("owner/weekly-now", {
+      windows: ["daily", "weekly"],
+      ranksByWindow: { daily: 1, weekly: 1 },
+      currentWindows: ["weekly"],
+      currentRun: true,
+      score: 100,
+    }),
+    item("owner/daily-now", {
+      windows: ["daily"],
+      ranksByWindow: { daily: 2 },
+      currentWindows: ["daily"],
+      currentRun: true,
+    }),
+  ], { boardLimit: 12 });
+
+  assert.deepEqual(board.repos.map((repo) => repo.fullName), ["owner/daily-now"]);
 });

@@ -2,145 +2,176 @@
 
 ## 一句话总结
 
-大家通常把 **PEFT(参数高效微调,尤其 LoRA)** 当成"全参数微调的省钱替代品"。这篇 Mind Lab 的**立场/纲领论文**换了个野心更大的框架:把一个小小的 LoRA 适配器看成**长在共享大模型之上的"持久个人状态"**——基座模型供给通用智能,适配器(不到 1% 的权重)承载某个人/某个 agent 的偏好、技能、工具习惯、记忆式更新。作者用**生物学类比**串起来:就像所有人共享 99.9% 的基因组、靠不到 0.1% 的差异撑起全部个体多样性,一个共享基座也能托起**几百万个持久的"个人模型"**。论文把这条路拆成**三条互相依赖的扩展轴**(Scale Up / Scale Down / Scale Out),每条配一组自家系统的证据。它**不是单一新方法,而是一份把多项自有工作(万亿级 LoRA RL、秩研究、记忆容量、群体多样性投票、MinT 基础设施)缝成一个愿景的综述式纲领**。[^arxiv]
+这篇不是一篇“又省了多少显存”的 PEFT 论文，而是一份很有野心的系统纲领：把 **PEFT(Parameter-Efficient Fine-Tuning，冻结大模型主体、只训练很小的适配器)** 尤其是 **LoRA(低秩适配器，用两个小矩阵给原权重加一个低秩补丁)** 重解释为“长在共享强基座上的持久个人状态”——少数 trillion-scale base model 提供通用能力，百万级轻量 adapter 承载某个用户/agent 的偏好、技能、工具习惯和记忆式更新。作者把这条路拆成三根互相依赖的轴：**Scale Up** 让共享先验足够强，**Scale Down** 让局部状态足够小且稳定，**Scale Out** 让大量持久 adapter 可以共存、服务、评测、回滚和聚合。[^arxiv]
+
+> [!warn] 先定性
+> 它的价值在“架构蓝图 + 工程判断 + 一组自有实验证据”，不是一个外部可直接复现的单一 benchmark paper。代码仓库未披露；Kimi K2 / GLM5 / MinT 等关键证据来自作者体系内实验。能学的是模式，不能把每个 headline 数字当成已独立验证的通用定律。
 
 ## 问题(Problem)
 
-- 前沿模型已经能写生产级代码、用工具、长上下文推理,但**"能干"不等于"是你的"**:一个强助手能回答更多问题、调更多工具,却**不一定能跨时间和某个人保持连续性**。[^intro]
-- 长上下文、检索(RAG)、提示词、用户画像都能帮一点,但**都不够**:它们要么是临时的(提示),要么是外部的、每轮都要重新解读(检索)。一个真正的"个人模型"需要**能持久、能适应、能塑造未来行为的状态**。[^intro]
-- 作者的主张:**PEFT/LoRA 是表示这种"局部个人状态"的实用载体**——适配器不存"整个人",也不替代检索(原始事实、文档仍放外部记忆),但它能承载"反复交互后沉淀下来的行为后果"(偏好、习惯、技能、工具用法),且**小到可以被命名、评测、服务、回滚、退役**,像一个有生命周期的工件。[^intro]
-- 真正的工程问题是:这件事**能不能规模化**?于是拆成三条轴,而且**三轴是依赖链,不是并列分类**:Scale Up 没 Scale Down → 强先验贵到没法持续适配;Scale Down 没 Scale Up → 便宜但没杠杆的适配器;Scale Out 没有前两者 → 一堆弱的、用完即弃的变体,而非持久个人模型。[^axes]
+- 现在 PEFT 常被当成“比 full fine-tuning 便宜”的工具：少训参数、少存 checkpoint、少占显存。但如果未来每个人、每个 agent、每条长期工作流都要有自己的“持续学习状态”，光说省钱不够。真正的问题是：**一个共享大模型能不能支撑很多个持久、可训练、可治理的个人模型实例**。[^intro]
+- 只靠 prompt / long context / RAG(检索增强生成，把外部资料塞进上下文)也不够。它们能提供当前轮信息，但很难把反复交互沉淀成稳定行为：下次还知道你偏好什么、常用什么工具、在哪些流程里该保守、哪些技能已经学会。
+- 但让每个用户拥有一个 full checkpoint 也不现实。论文反复强调：标题里的“million personal models of trillion parameters”**不是每人训练一份 trillion 参数模型**，而是少数强 base model + 百万级小 adapter。[^conclusion]
 
 > [!key] 立场
-> 这篇**该当"框架与方向"读,不该当"严格实证"读**。它最大的贡献是**把"PEFT = 个人持久状态的可扩展单元"这个 reframe 讲透了**,并给出一条从"一个通用助手"到"千万个持久个人模型"的工程路线图。但要清醒:**每条轴的"证据"多是作者自家系统(Kimi K2、GLM5、MinT)的结果摘要或单点实验**,作者自己在多处反复标注"one seed per cell""一个社区、一个推荐器""不是普适定理""这个对照同时变了模型大小和训练方法、没干净隔离变量"。所以看它**学的是那套 reframe 和三轴依赖结构 + 一批可迁移的工程判断,而不是把任何单个数字当定论**。它对你的真正价值在 Career 栏会展开:这几乎就是 Kevin "外置大脑 / 陪伴 agent / 持久关系记忆"方向的学术化纲领。
+> PEFT 在这里是“局部可写状态”的载体，不是完整记忆系统。原始事实、文档、日历、数据库仍应留在外部 memory / tools；adapter 更适合存“反复经验造成的行为后果”：偏好、技能、工具习惯、策略和部分记忆式更新。
 
 ## 关键术语(Key terms)
 
 | 术语 | 大白话解释 |
 | --- | --- |
-| **PEFT / LoRA** | 参数高效微调 / 低秩适配:冻住大模型,只训一小撮(<1%)低秩矩阵来"调味"。本文把它从"省钱技巧"升格成"个人状态的载体"。[^arxiv] |
-| **持久个人模型(persistent personal model)** | 共享基座 + 一个承载某人/某 agent 局部状态的 LoRA 适配器 + 上下文 + 工具 + 外部记忆,组成的、能跨交互保持连续性的实例。[^intro] |
-| **三条扩展轴** | **Scale Up**=把共享先验做更强(让小更新更有杠杆);**Scale Down**=把可训练状态做更小更稳(降反复学习的边际成本);**Scale Out**=让大量持久适配器共存(从个体到群体)。三者是依赖链。[^axes] |
-| **RL is prior-limited(RL 受先验限制)** | 强化学习只能强化"当前策略本就采样得到"的轨迹;基座越强,有用但不稳的行为越够得着,RL 才有东西可强化。[^scaleup] |
-| **TIM(训练-推理失配)** | 大模型 RL 里,采样用推理引擎、训练用另一套后端;在 MoE 上,微小数值差会**改变专家路由**,导致"训练优化的根本不是当初采样的那条计算路径"。[^tim] |
-| **LoRA-as-memory & 容量律** | 把适配器当有界记忆基质:能存多少,取决于"记忆 token 数 / 可训练参数"这个比值,超过某阈值就崩。[^memory] |
-| **多样性投票(diversity voting)** | 同一基座训出许多只差数据顺序/掩码的 LoRA 变体,各出一个答案、多数投票——不同变体学到互补策略,聚合后准确率随模型数 k 上升。[^voting] |
-| **MinT** | Mind Lab 的基础设施,把适配器当"策略记录 + 可寻址版本",管理它的身份、修订、训练溯源、评测、服务驻留(冷/温/热三档)。[^mint] |
+| **PEFT** | Parameter-Efficient Fine-Tuning。大模型主体冻结，只训练少量新增参数。好处是每个任务/用户只需要存一小块更新，而不是复制整模型。 |
+| **LoRA** | Low-Rank Adaptation。把权重更新写成两个小矩阵相乘 `ΔW = (α/r)BA`，参数量远小于原矩阵。直觉上是“只允许模型沿少数方向改动”。 |
+| **adapter / local adaptive state** | 每个用户或任务独有的小参数块。论文把它看成“本地适应状态”：它不是知识库，而是能改变模型行为的持久补丁。 |
+| **Scale Up** | 共享 base model 越强，小 adapter 越有杠杆。因为 RL 只能强化当前 policy 有概率采样到的行为，弱 base 根本采不到高质量轨迹。 |
+| **Scale Down** | 让 adapter 更小、更稳、更少调参。不是盲目降 rank，而是找到“低秩仍能稳定学习”的操作区间。 |
+| **Scale Out** | 让很多 adapter 共存。重点不是同时把百万 adapter 放进 GPU，而是能命名、加载、缓存、评测、回滚、投票和治理这些 adapter。 |
+| **MinT** | 作者引用的 managed infrastructure 例子：把 adapter 当成 policy record / revision 管，负责身份、版本、provenance、训练、评测、服务驻留。[^mint] |
+| **LoRA-as-memory** | 把 adapter 当成有容量上限的参数化记忆。它适合存行为状态，不适合把所有事实都塞进去。 |
+| **Context Learning** | 一种“写策略”：当前轮用上下文/工具/检索得到更好反馈，再把重复有用的改进蒸馏进 adapter，让未来 query-only 行为变好。[^context] |
 
 ## 核心方法(Core method)
 
-这不是"一个算法",而是**三条轴各自的工程主张**。打个比方:**一座城市里千万个居民共享同一套基础设施(水电路),但各有各的房子和生活史。**
+论文的主线可以压成一句话：**强共享先验 + 小而稳定的本地状态 + 可治理的 adapter population**。
 
-- **Scale Up——把"共享地基"打更强(让小改造更值钱)**:核心论断是 **RL 受先验限制**——强化学习只能强化模型本就采样得到的行为,基座越强,"有用但不稳"的推理/工具行为越够得着,小小的 LoRA 更新就能撬动巨大的行为变化。工程上他们做了**万亿级 LoRA RL**:在 Kimi K2(1.04T 总参 / 32.6B 激活的 MoE 推理模型)上,只训 dense + expert 层上的 LoRA、用 GRPO 在线优化、混合并行,把算力/通信压到全参数 RL 的约 10%。但一上规模就冒出**新的失败模式**(下面单列)。[^scaleup][^kimi]
-- **Scale Down——把"个人状态"做到多小还能稳**:答案是"一个区间,不是一个阈值"。在 Qwen3-8B 上做了 **216 次 PPO 跑**(9 个 LoRA 秩 × 4 个 batch × 6 个种子,500 步)。结论:**秩 16–32 是部署默认区**(均值收益最高、下行风险低);**秩 1–4 是研究前沿区**——它们的**最好那一次种子已经追平秩 16/32,但跨种子均值塌、种子间方差大**,所以低秩"不是容量不够,而是优化不够(under-optimized, not under-capacity)";**秩 >64 是成本警告区**(只涨参数/显存不涨上限)。低秩之所以不稳,关键在初始化:他们提出 **OLoRA-tail** 作为"RL 原生初始化"——因为现成的 SVD 类初始化(PiSSA / MiLoRA)在 SFT 里好用,搬到 RLVR 反而会训练塌。[^scaledown][^init]
-- **Scale Out——许多持久适配器共存能解锁什么**:三件事——① **LoRA 当记忆**有容量律(下面数字);② **Context Learning** 作为"写记忆"的策略(决定哪些上下文期的改进该被固化进适配器参数,本质是反复的 context distillation);③ **群体多样性 = 计算资源**:同一基座训许多只差数据顺序/掩码的 LoRA,多数投票聚合,准确率随模型数 k **以 ln(k) 近线性上升**。[^scaleout][^voting]
-
-> [!key] 补丁:别把"万亿级 LoRA RL 省 10% 算力"误读成"LoRA 总是赢全参数训练"
-> 作者自己澄清两点:① 那个"大基座 + 小 LoRA 胜过小模型全参 RL"的对照(Table 2)**同时变了模型大小和训练方法**,没干净隔离"先验强度"这一个变量,所以它**不是 LoRA 普遍优于全参数训练的排名**,只说明"预算固定时,先验强度可能比可训练面大小更重要"。② LoRA 与全参微调在遗忘行为、表示移动、更新几何上**并不等价**(LoRA 遗忘更少,但表示移动也不同),别简单当替代品。[^lora]
+1. **Scale Up：把强 base 带进训练循环。** 作者认为 RL 是 prior-limited：RL 不是凭空造能力，而是在当前 policy 能采样到的轨迹里挑好行为强化。更强 base model 让有用但不稳定的 reasoning/tool-use 轨迹更容易出现；LoRA 则让这种强 base 可以在固定预算下被反复适配。[^scaleup]
+2. **Scale Down：把 adapter 压到可靠操作区间。** Qwen3-8B PPO sweep 显示 rank 16/32 是当前实用默认；rank 1-4 不是完全没能力，而是 best seed 能接近中秩、mean 和 seed reliability 不稳。作者因此转向 RL-native initialization、rank/alpha/lr 联动规则和 stateful adapter。[^rank]
+3. **Scale Out：把 adapter 数量变成系统变量。** 个人模型先要学会“什么该进 adapter、什么留外部 memory”；然后可以作为用户模拟器；再进一步，多样 adapter 可以通过 majority vote / routing / distillation 变成集体性能资源。[^scaleout]
+4. **MinT：给三轴补系统层。** 如果 adapter 不能命名、版本化、移动、缓存、预热、回滚，Scale Up/Down/Out 都会卡在工程边界。MinT 把 base deployment、policy record、policy session、adapter revision、serving residency 分开管理。[^mint]
 
 ## 架构 / 流程(Architecture / pipeline)
 
 ```mermaid
 flowchart TD
-  BASE[(共享基座<br/>1T+ 参数, 强先验)] --> UP[Scale Up<br/>把先验做更强<br/>万亿级 LoRA RL, ~10% 算力]
-  UP --> DOWN[Scale Down<br/>把适配器做更小更稳<br/>秩16-32默认 / 秩1-4前沿 / RL原生初始化]
-  DOWN --> OUT[Scale Out<br/>许多持久适配器共存<br/>记忆容量律 + 多样性投票]
-  OUT --> POP[(千万个持久个人模型<br/>各承载偏好/技能/记忆)]
-  MINT[MinT 基础设施<br/>策略记录 + 适配器修订 + 冷/温/热驻留] -.托管.-> POP
-  UP -.无 Down 则贵到没法持续适配.-> FAIL1[失败:强但养不起]
-  DOWN -.无 Up 则便宜但没杠杆.-> FAIL2[失败:小但没用]
-  OUT -.无前两者则一堆弃用变体.-> FAIL3[失败:多而弱]
+  BASE([共享强 base model<br/>dense / MoE / trillion-scale prior])
+  EXP[用户/agent 反复交互<br/>工具结果·偏好·失败恢复·技能轨迹]
+  EXT[外部 memory / tools<br/>文档·事实·日历·数据库]
+  CTX[Context system<br/>检索/工具/验证提供当前轮证据]
+  WRITE[Context Learning 写策略<br/>决定什么值得固化]
+  ADAPT[LoRA / PEFT adapter<br/>小型持久本地行为状态]
+  MINT[MinT-style lifecycle<br/>policy record·revision·provenance·eval·residency]
+  POP[adapter population<br/>许多个人模型实例]
+  AGG[投票/路由/蒸馏/模拟<br/>把多样性变成系统资源]
+
+  BASE --> ADAPT
+  EXP --> CTX
+  EXT --> CTX
+  CTX --> WRITE
+  WRITE --> ADAPT
+  ADAPT --> MINT
+  MINT --> POP
+  POP --> AGG
+  AGG --> BASE
 ```
 
 ## 创新点(Innovation points)
 
-| 创新 | 新在哪 | 为什么重要 |
+| 创新 | 新在什么地方 | 为什么重要 |
 | --- | --- | --- |
-| reframe:PEFT = 持久个人状态 | 把 LoRA 从"省钱微调"升格成"个体性的可扩展单元" | 给"千万个个人模型"提供了统一的组织框架 |
-| 三轴依赖链 | Scale Up / Down / Out 不是并列分类,而是相互依赖、各有失败模式 | 把模糊的"个性化"拆成可分别攻关、又必须协同的工程问题 |
-| 万亿级 LoRA RL 的可行性证明 | 在 1.04T MoE 上用 LoRA + GRPO 跑通在线 RL,~10% 算力 | 证明"强先验可被 PEFT 反复适配",而非只能当静态检查点 |
-| 秩的"三区"经验律 | 低秩是"优化不够"而非"容量不够";秩 16–32 是默认区 | 指导适配器选型:别盲目堆秩,该投在初始化/方差控制上 |
-| 群体多样性投票律 | 同基座 LoRA 变体投票,准确率 ≈ 0.386 + 0.0172·ln(k) | 把"模型数量"变成可测的扩展变量,廉价多样性即收益 |
+| PEFT 从“省钱微调”变成“个人状态载体” | adapter 被定义为持久 local state，而不是一次性 task patch | 对长期 agent / personal AI 更关键：状态要可延续、可回滚、可服务 |
+| 三轴框架 Scale Up / Down / Out | 三者是依赖链，不是 taxonomy：强先验 → 稳小更新 → 大量实例 | 解释为什么只堆 base、只降 rank、只存很多 adapter 都不够 |
+| RL-native low-rank 视角 | 低 rank 问题不只是容量，还包括 seed reliability、KL、初始化方向、rank/alpha/lr 联动 | 对真实 RL adapter 训练比“rank 越大越好”更有操作价值 |
+| LoRA-as-memory 容量律 | 用 DishNameBenchmark 测“memory tokens / trainable parameter”上限 | 防止把 adapter 当无限记忆库；迫使系统做 memory layering |
+| adapter population 作为计算资源 | 多个 LoRA 变体 majority vote 比单模型重复采样继续涨 | 把“模型数量”变成可测 scale-out 变量，而不是部署负担 |
+| MinT 生命周期层 | policy record / revision / residency 分离 | 没有身份、版本和驻留控制，百万 adapter 只是硬盘上的文件名 |
 
 ## 实验 / 证据(Experiments / evidence)
 
-> **自报 vs 实测(整节适用,且本篇尤其要警惕)**:本篇是**纲领论文**,下列数字多为**作者自家系统的结果摘要或单点实验**,均属**论文自报**;作者自己在多处标注"one seed per cell""一个社区/一个推荐器""不是普适定理"。本站未做任何独立复现。HF upvotes 为抓取当时快照,会变。**把这些当"方向性证据",别当定论。**
+**1. Scale Up：大先验 + 小 LoRA 在固定预算下更有杠杆。** 论文的 motivating table 比较了 full RL 小模型和 LoRA 大模型，注意作者也承认这里同时变化了 model size 和 training method，不能隔离因果。[^prior]
 
-**Scale Up · 大先验 + 小 LoRA(Table 2,headroom-归一化收益)** [^t2]
-
-| 模型 + 适配方式 | 可训练参数 | AIME25 归一化收益 | GPQA-D 归一化收益 |
+| Model and adaptation | Trainable parameters | AIME 2025 normalized gain | GPQA Diamond normalized gain |
 | --- | ---: | ---: | ---: |
-| DS-Distill-Qwen-1.5B,全参 RL | 1.5B | 8.33% | 25.00% |
-| DS-Distill-Qwen-7B,LoRA r=64 | 0.16B | 11.31% | 27.23% |
-| DS-Distill-Qwen-32B,LoRA r=8 | 0.07B | 20.61% | 33.02% |
+| DS-Distill-Qwen-1.5B, full RL | 1.5B | 8.33% | 25.00% |
+| DS-Distill-Qwen-7B, LoRA r=64 | 0.16B | 11.31% | 27.23% |
+| DS-Distill-Qwen-32B, LoRA r=8 | 0.07B | 20.61% | 33.02% |
 
-- 大基座 + 小 LoRA(可训练参数反而更少)拿到更大的归一化收益——但**这个对照同时变了规模与方法,未干净隔离变量**(作者自陈),只支持"预算固定时先验强度可能更要紧"。[^t2]
-- **Kimi K2**:1.04T 总 / 32.6B 激活 MoE,LoRA(dense+expert)+ GRPO,算力/通信 ≈ 全参 RL 的 **10%**;训练曲线平滑、奖励/成功率稳升。[^kimi]
+**2. trillion-scale LoRA RL 可运行，但证据边界要收窄。** Kimi K2 case 在 **1.04T total parameters / 32.6B activated parameters** 的 MoE 上做 LoRA RL，使用 GRPO-style on-policy loop、dense + expert 层 LoRA、tensor/pipeline/expert/sequence parallelism。作者称 compute/communication footprint 约为 conventional full-parameter RL 的 **10%**，训练曲线平滑、held-out eval 有 task-specific 改进且保留 general capability。这里没有公开仓库与逐点表值，属于作者自报系统实验；曲线数值以原文图为准。[^kimi]
 
-**Scale Up 的代价 · 规模诱发的失败模式**
-- **TIM(训练-推理失配)**:MoE 上微小数值差会改变专家路由 → 训练优化的不是采样时那条计算路径。**Router Replay R3**(录下 rollout 时的路由、训练时回放)把 PPO KL 散度压到 **step 46 时 0.000026**(其它跑法显著上升),并稳住梯度范数与下游准确率。[^tim]
-- **GLM5 / GLM5.1 支持**:MoE + MLA + DSA(稀疏注意力)+ MTP + LoRA + 服务内核 + 检查点桥接,每个零件本地对、全系统却可能"训练-推理-桥接对模型的解释不一致"——**基础设施在前沿规模上变成了模型定义的一部分**,桥接是"语义保持"而非"文件格式转换"。[^glm5]
+**3. 大 MoE 的失败模式不是“小 bug”，而是 policy 语义断裂。** 训练-推理不一致(TIM)在 MoE 上会改变 expert routing，导致训练时优化的 computation path 和 rollout 采样的 path 不同。Router Replay R3 通过记录 rollout routing 并在训练中 replay 来降低 mismatch。原文给的一个明确数字是：R3 run 在 step 46 的 PPO KL divergence 为 **0.000026**，同时图中显示 probability mismatch、critic score、validation accuracy 都优于 original / rollout-corrected baseline；其余曲线逐点值以原文图为准。[^r3]
 
-**Scale Down · Qwen3-8B 秩扫描** [^scaledown]
-- **216 次 PPO 跑**(9 秩 × 4 batch × 6 种子,500 步,可验证奖励的数学语料)。三区:秩 **16–32 部署默认**;秩 **1–4 研究前沿**(最好种子追平 16/32,但均值塌、种子方差大 → "优化不够非容量不够");秩 **>64 成本警告**(footprint 涨、上限不涨)。
+**4. Scale Down：rank sweep 把 LoRA 分成三个操作区间。** Qwen3-8B PPO sweep 覆盖 **216 runs = 9 ranks × 4 batch sizes × 6 seeds**，每个配置固定 **500-step PPO**，用 mixed mathematics corpus + verifiable rewards。结论不是单调“rank 越大越好”：
 
-**Scale Out · 三组数字**
-- **LoRA 记忆容量律**(DishNameBenchmark,Qwen3 系,**263 次跑**):当"记忆 token / 可训练参数"低于约 **10⁻³** 时准确率≈1,在 10⁻³–10⁻² 区间退化,超过约 **10⁻²** 崩到 0——即 LoRA 记忆有可测的容量上限。只训 MLP 上的 LoRA 最省参数。[^memory]
-- **技能记忆(ALFWorld)**:从 Qwen3-235B 起,一个 rank-32 LoRA(Skill-0/MinT 配方)把验证均分从 **0.646 提到 0.845**。[^alfworld]
-- **多样性投票(AIME24,Qwen3-30B,200 个评测源,每 k 取 30 次随机子集)**:协作(不同 LoRA 变体投票)准确率 **0.3644(k=1)→ 0.4267(k=10)→ 0.4633(k=100)→ 0.4867(k=198)**,相对基线 0.3727 最大 **+0.1140**;而"重复"(同一模型多次采样投票)在 k=24 就饱和到 0.4378。拟合 **acc ≈ 0.386 + 0.0172·ln(k)(R²≈0.888)**——随 k 以对数律递增。说明多样性来自不同 LoRA 轨迹的**互补策略**,不只是采样噪声。[^voting]
+- **rank 16/32**：当前实用默认，mean gain、downside risk、token efficiency 平衡最好。
+- **rank 1-4**：best-seed 可以接近 rank 16/32，但 across-seed mean 下降、seed spread 变大；作者解读为“稳定性问题大于硬容量问题”。
+- **rank 64/128/256**：footprint、optimizer state、checkpoint size 增大，但 best-run frontier 没明显抬高，是 cost-warning 区间。[^rank]
 
-> [!warn] 四处别被带偏
-> 1. **这是纲领,不是单一可复现工作**。它把多项自有系统缝成愿景;别期望"按论文跑就能复现",很多结果是系统级摘要。
-> 2. **证据多为单点 / 单种子**。记忆容量、社会模拟、投票律作者都明说"一个受控设定,不是普适定理"——方向可信,数值别钉死。
-> 3. **"个人模型 = 适配器"被作者自己反复设界**:PEFT **不存整个人、不替代检索、不单独解决记忆**;原始事实/文档仍在外部记忆,适配器只承载"行为后果"。
-> 4. **强烈的产品/方向叙事**。最后落点是"不是一个万能助手,而是千万个持久个人助手"——这是愿景陈述,工程上仍是"方向而非已解决问题"(作者原话)。
+**5. OLoRA-tail：低秩 RL 初始化要“有几何，但别太猛”。** 标准 SVD-based 初始化从 SFT 搬到 RL 会出问题。作者提出 OLoRA-tail：用 pretrained weight 的 minor singular vectors 初始化 `B0 = U_-r, A0 = V_-r^T`，但去掉 MiLoRA 的 singular-value scaling。对比中，OLoRA 在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO 上约 step 100 collapse，reward 掉到 **-1.0**、KL 爆到 **~8**；OLoRA-tail 在 **500 steps** 内稳定。随后同样在 DAPO-Math-17k、constant LR **1×10^-5**、effective batch size **32**、LoRA/OLoRA-tail 都为 **r=16, α=32** 的设置下，OLoRA-tail 六个数学推理 benchmark 平均 **58.3%**，LoRA **56.3%**。[^olora]
+
+**6. rank / alpha / learning rate 不能分开记。** LoRA 早期有效扰动量近似和 `η * α_r^2 / r` 成正比。作者在 AG News + DistilBERT 上扫 rank **2-256**，比较 constant `α=32`、fixed `α/r=1`、sqrt rule `α/√r=8`；又在 Qwen3-4B MATH 上做更难的 transfer。结论：fixed `α/r` 会随 rank 增大把好 learning-rate 区域往下推；constant α 在简单任务上较平；`α ∝ √r` 在 harder reasoning setting 更稳。[^triquetra]
+
+**7. δ-Mem：stateful adapter 比“静态补丁”更像个人记忆接口。** 在 Qwen3-4B-Instruct 上，最佳 δ-Mem variant 把平均分从 base **46.79** 提到 **51.66**；MemoryAgentBench Avg 从 **29.54** 到 **38.85**；HotpotQA EM/F1 从 **42.35/56.00** 到 **49.41/63.66**。TSW/SSW 只引入 **4.87M trainable parameters(约 0.12%)**，MSW 引入 **19.47M(约 0.48%)**。注意这是作者文中表格结果，不是外部复现。[^deltamem]
+
+| Method | Avg. | HotpotQA EM/F1 | MemoryAgentBench Avg. | LoCoMo Avg. |
+| --- | ---: | ---: | ---: | ---: |
+| Qwen3-4B-Instruct | 46.79 | 42.35 / 56.00 | 29.54 | 40.79 |
+| Context2LoRA | 44.90 | 37.85 / 50.88 | 32.53 | 48.11 |
+| δ-Mem SSW | 51.44 | 49.22 / 63.43 | 37.84 | 47.05 |
+| δ-Mem TSW | **51.66** | **49.41 / 63.66** | 36.48 | 46.53 |
+| δ-Mem MSW | 50.74 | 46.86 / 60.47 | **38.85** | **49.12** |
+
+**8. LoRA-as-memory 有容量上限，不是无限仓库。** DishNameBenchmark 共 **263 runs**。容量效率低于约 **10^-3 memory tokens / trainable parameter** 时 accuracy 接近 1；在 **10^-3 到 10^-2** 之间进入 transition；超过约 **10^-2** 后 collapse toward zero。模块选择上，原文结论是 **MLP > Attention ≈ All >> Unembed**，即把 memory 写进 MLP LoRA 最 parameter-efficient。[^memorylaw]
+
+**9. LoRA 可以存“技能式行为状态”。** Qwen3-235B shared base + **rank-32 LoRA**，用 Skill-0/MinT ALFWorld recipe 训练后，ALFWorld validation average 从 **0.646** 提到 **0.845**。作者也明确说：这不是证明 LoRA 应该存任意事实，而是支持它可以存 reusable skill-like behavioral state。[^alfworld]
+
+**10. per-user LoRA 改变社交模拟结构。** OASIS 实验取 c8 game-development community，`N ∈ {128,256,512}`；LoRA 条件下每个用户一个 **rank-4 LoRA**，用 **80 historical tweets** 训练；control 是共享 Qwen3-4B-Instruct base。prompt-level cross-side exposure 始终约 **0.16-0.18**，所以 feed 暴露差异不是主解释。[^oasis]
+
+| 指标 | N=128 | N=256 | N=512 | 128→512 |
+| --- | ---: | ---: | ---: | ---: |
+| Final polarization distance | +0.388 | +0.335 | +0.319 | -- |
+| Effective interaction communities | 9.21 | 11.77 | 14.85 | +61% |
+| Co-engagement modularity | 0.502 | 0.561 | 0.716 | +43% |
+| Within-community side-homophily | 0.670 | 0.644 | 0.583 | -13% |
+
+与 shared-base 比，LoRA 条件下 effective communities 为 **1.48× / 2.19× / 1.47×**，supportive stance std 为 **2.28× / 2.18× / 2.45×**，skeptical stance std 为 **2.01× / 1.32× / 1.57×**，comments 增加 **+70 / +247 / +493**，original posts 增加 **+139 / +153 / +306**。作者也限制了解读：一个 community、一个 recommender、每格一个 seed。[^oasis]
+
+**11. adapter diversity 可以被 majority vote 聚合。** 同一 Qwen3-30B base、同一 RL recipe、Math17k training task、AIME24 eval；训练许多只因 data permutation / masking 不同的 LoRA 变体。对 **200 collaboration evaluation sources** 做 majority vote，每个 k 随机子集采样 **30 random samples**。Collaboration accuracy 从 **0.3644(k=1)** 到 **0.4267(k=10)**、**0.4633(k=100)**、最佳 **0.4867(k=198)**；final baseline **0.3727**，最大 gain 约 **+0.1140**。Repetition(同一模型重复采样)最佳 **0.4378(k=24)**；大 k 时 Collaboration advantage 约 **+0.0533**。拟合式为 `accuracy ≈ 0.386 + 0.0172 ln(k)`，`R² ≈ 0.888`。[^vote]
+
+**12. MinT 的系统数字说明“百万 adapter”是 addressability，不是 GPU 同时驻留。**[^mint]
+
+| 证据 | 数字 | 该怎么读 |
+| --- | ---: | --- |
+| adapter-only handoff(Qwen3-4B) | rank-32 LoRA **252 MiB** vs merged full **8.061 GB** | 移动 adapter，而不是整模型 |
+| adapter-only handoff(Qwen3-30B) | rank-16 LoRA **1.692 GB** vs full **61.084 GB** | 大模型上差距更关键 |
+| addressable catalog | built/audited **10^6-entry** packed adapter catalog | 目录可寻址，不代表同时上 GPU |
+| CPU cache | **369** loaded adapters at 512 hotset；**550** at 2048 weak-locality pressure | locality 用 CPU cache 吸收 |
+| GPU batch slots | tested same-batch window **64 distinct adapters** | active diversity 最小窗口 |
+| cold loading | **16** cache misses form **1.375-23.267 s** load staircase | 冷启动必须被调度 |
+| packed MoE LoRA | **37,248 → 672** tensor objects；live loading **8.5-8.7×** faster | 不是字节数，而是 tensor fanout 卡冷加载 |
+| two-phase readiness | old warm TTFT p95 **9.63 s**、stalls>20s **0**；ready request load p95 **0.00 s**；prewarm **409.04 s** | 把冷启动转成可控预热 |
 
 ## 限制与风险(Limitations and risks)
 
-- **证据强度弱(作者自陈)**:多处 one-seed / 单社区 / 单推荐器;关键对照(Table 2)未隔离变量。这也是评分里 evaluation / evidence 都偏低的原因。
-- **大量依赖自家闭源系统**:Kimi K2、GLM5、MinT 的细节与复现性外部无法核验;"~10% 算力""容量律"等都建立在其内部测量上。
-- **可复现性**:万亿级 LoRA RL 远超个人/小团队算力;对你而言**可迁移的是框架与判断,而非实验本身**。
-- **概念边界易被夸大**:"千万个人模型""个性即策略"等表述很有感染力,但作者自己反复降温——务必区分"愿景"与"已验证"。
+- **代码仓库未披露**：HF paper page 没有 linked model / dataset / space，arXiv 也未给 official GitHub；我只核了 arXiv source/PDF/HF metadata，没有可 clone 的论文代码仓库。[^hf]
+- **这是一篇纲领/position+synthesis paper**：很多结果是不同自有项目的拼接证据，不是一个单一、可端到端复现实验。
+- **关键证据闭源或自报**：Kimi K2、GLM5、MinT、OASIS/ALFWorld/majority vote 细节都缺独立复现；“10% compute”“stable curves”等要按作者报告读。
+- **多个变量未隔离**：prior comparison 同时改变模型大小和训练方式；Scale Out majority vote 的 diversity 来自 LoRA 训练轨迹，但是否泛化到别的任务/基座未知。
+- **图多表少**：rank sweep、TIM、R3、memory law 等许多关键证据以曲线呈现，正文没有逐点表；逐点数值以原文图为准。
+- **personal state 有治理风险**：一旦 adapter 存的是工具习惯/策略/权限边界，错误学习或 prompt injection 被固化会比一次性上下文错误更难清理。论文更多讲生命周期，安全治理还远未闭环。
 
 ## 先读什么(What to read first)
 
-1. **Abstract + §1 Introduction + Figure 1(生物学类比)** —— reframe 的全貌与"共享 99.9% 基因 / <0.1% 差异"的类比。[^intro]
-2. **§2 三条扩展轴 + Table 1** —— 三轴为何是依赖链、各自的失败模式。[^axes]
-3. **§3.1–3.2(RL is prior-limited + LoRA as budgeted access)** —— 为什么强先验让小更新更有杠杆。[^scaleup]
-4. **§3.4 Scale-Induced Failure Modes(TIM / R3 / GLM5)** —— 一上规模冒出的新失败面(本篇最扎实的工程部分)。[^tim]
-5. **§4.1 秩扫描三区 + §4.1.2 RL 原生初始化** —— "低秩是优化不够非容量不够"。[^scaledown]
-6. **§5.3 多样性投票(Figure 24)+ §6 MinT** —— 群体作为计算资源 + 托管它的基础设施。[^voting]
+1. **Introduction + Conclusion**：先把“不是每人一个 trillion checkpoint，而是共享 base + 轻量 adapter population”读清楚。
+2. **Table 1 / three scaling axes**：理解 Scale Up / Down / Out 为什么是依赖链。
+3. **Scale Up 的 prior table + Kimi K2 / R3 段落**：看强先验为什么有杠杆，以及大 MoE PEFT 怎么失败。
+4. **Scale Down 的 rank sweep / OLoRA-tail / Triquetra**：这部分最有工程含量，能直接迁移到 LoRA RL 调参。
+5. **Scale Out 的 memory law / OASIS / majority vote**：看 adapter 从“一个用户的状态”变成“群体计算资源”。
+6. **Infrastructure / MinT 表格**：如果你做生产系统，这部分比 headline 更重要。
 
-## 技术细节(选读)
-
-> **MinT 把"适配器文件"升成"策略实例"(Table 8)**
-> 大白话:一个个人模型不是一个 .bin 文件,而是一个能恢复、能审计、能回滚的身份。精确机制:**策略记录**(基座版本、LoRA 秩、目标模块、检查点、rollout 记录、导出修订)/ **策略会话**(训练器上的临时恢复:适配器张量 + 优化器矩 + 调度位 + 梯度)/ **适配器修订**(固定的、服务张量布局的导出件)/ **服务驻留**(冷=存储、温=CPU 缓存、热=GPU batch 槽)。把"匿名 LoRA 文件"变成"可恢复、可评分、可服务、可治理的策略人格"。[^mint]
-
-> **Context Learning = 反复的 context distillation(LoRA 写记忆的策略)**
-> 大白话:决定"哪些上下文期的改进该被固化进参数"。精确机制:它不是独立的 Scale Out 算法,而是 §5.1 里 LoRA-as-memory 的**写策略**——没有写策略时容量是硬上限,有了它,反复交互能选择性地把"行为上有用的状态"填进有限容量。[^scaleout]
-
-## 后续演化 · 这方法后来怎样了
-
-本篇是纲领,周围是它**自身引用、arXiv ID 可验证**的工作脉络(非"后来谁优化了它"):
-
-- **LoRA**(arXiv:2106.09685)— 一切的地基,冻基座 + 低秩可训练矩阵 _[置信度:高]_。
-- **PiSSA / MiLoRA** — SVD 类 LoRA 初始化,本文实测在 RLVR 下会训练塌,据此提出 OLoRA-tail _[置信度:高]_。[^init]
-- **DeepSeek-R1 / Open-Reasoner-Zero** — "RL 释放潜在能力但受先验限制"的证据来源 _[置信度:高]_。[^scaleup]
-- **MemGPT / 生成式 agent(Park 2023)** — 外部记忆 / 用户模拟的对照线,本文主张 LoRA 承载"行为后果"、原始事实仍走外部记忆 _[置信度:高]_。[^memory]
-
-[^arxiv]: 论文 *On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters*,arXiv:2606.02437v2(2026-06-02;Mind Lab〔机构署名,contact@mindlab.ltd〕;HF upvotes 222)。这是一篇综述式立场/纲领论文,缝合多项自有工作。全文经 arXiv PDF 用 pdftotext 抽取(arXiv HTML / ar5iv 当时未渲染);headline 数字照写,图内 2D 表值以原文图表为准。https://arxiv.org/abs/2606.02437
-[^intro]: 同上,§1 Introduction:能干≠是你的;长上下文/检索/提示/画像都不够;个人模型需持久可适应状态;PEFT 承载"行为后果",不存整个人、不替代检索。
-[^axes]: 同上,§2 + Table 1:三轴是依赖链;Scale Up/Down/Out 各自的失败模式(强但养不起 / 便宜但没杠杆 / 多而弱)。
-[^scaleup]: 同上,§3.1 "Why RL is Prior-Limited" + §3.2 "LoRA as Budgeted Access":RL 只能强化当前策略采样得到的轨迹;LoRA 把"强先验"以固定预算带进学习回路;引 DeepSeek-R1、Open-Reasoner-Zero。
-[^lora]: 同上,§3.2 + Table 2 下方"A note on interpretation":对照同时变规模与方法、未隔离变量,非 LoRA 普遍胜全参;引 Biderman 2024(LoRA 遗忘更少)、Shuttleworth 2025(表示移动不等价)。
-[^t2]: 同上,Table 2(motivating Mind Lab 万亿级 LoRA RL 研究的摘要值):1.5B 全参 RL(AIME25 +8.33% / GPQA-D +25.00%);7B LoRA r=64,0.16B(+11.31% / +27.23%);32B LoRA r=8,0.07B(+20.61% / +33.02%)。均为 headroom-归一化收益。
-[^kimi]: 同上,§3.3 "Operationalizing Trillion-Scale LoRA RL":Kimi K2,1.04T 总 / 32.6B 激活 MoE,LoRA(dense+expert)+ GRPO + 混合并行;算力/通信 ≈ 全参 RL 的 10%;Fig.2 训练曲线平滑。
-[^tim]: 同上,§3.4 + Fig.4/5:TIM(训练-推理失配),MoE 路由发散使训练对象偏移;Router Replay R3 录路由 + 回放,PPO KL 在 step 46 为 0.000026,稳住梯度与下游准确率。
-[^glm5]: 同上,§3.4 "GLM5 and GLM5.1 support":MoE+MLA+DSA+MTP+LoRA+服务内核+检查点桥接的全栈语义对齐问题;基础设施在前沿规模成为模型定义的一部分。
-[^scaledown]: 同上,§4.1.1 + Fig.8–11:Qwen3-8B PPO 秩扫描,216 跑(9 秩×4 batch×6 种子,500 步);秩 16–32 默认 / 秩 1–4 前沿("优化不够非容量不够",最好种子追平但均值塌)/ 秩 >64 成本警告。
-[^init]: 同上,§4.1.2 + Fig.12:PiSSA(主奇异方向)/ MiLoRA(次奇异方向)在 RLVR 下可能不如标准 LoRA 且训练塌(本文复现);据此提出 OLoRA-tail 作 RL 原生初始化。
-[^memory]: 同上,§5.1 + Fig.21:DishNameBenchmark,Qwen3 系,263 跑;"记忆 token / 可训练参数"<~10⁻³ 时准确率≈1,10⁻³–10⁻² 退化,>~10⁻² 崩到 0;MLP-only LoRA 最省参数。
-[^alfworld]: 同上,Fig.22:Qwen3-235B + rank-32 LoRA(Skill-0/MinT 配方),ALFWorld 验证均分 0.646→0.845。
-[^scaleout]: 同上,§5 + §5.1 "Context Learning" 注:Context Learning 是 LoRA-as-memory 的写策略(反复 context distillation),非独立 Scale Out 算法。
-[^voting]: 同上,§5.3 + Fig.24:AIME24,Qwen3-30B,200 评测源、每 k 取 30 随机子集;协作 0.3644(k=1)→0.4267(k=10)→0.4633(k=100)→0.4867(k=198),基线 0.3727,最大 +0.1140;重复在 k=24 饱和 0.4378;拟合 acc≈0.386+0.0172·ln(k),R²≈0.888。
-[^mint]: 同上,§6 + Table 8 + Fig.25:MinT 分离策略记录 / 策略会话 / 适配器修订 / 服务驻留(冷-温-热);把适配器从匿名文件升为可恢复可审计的策略实例。
+[^arxiv]: 论文 *On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters*, arXiv:2606.02437v2, submitted 2026-06-01, revised 2026-06-02, Mind Lab. 本文已读取 arXiv TeX source、PDF 和 HF metadata；`hf papers read 2606.02437` 返回 not found，但 `hf papers info` 可用。https://arxiv.org/abs/2606.02437
+[^hf]: Hugging Face paper page, published 2026-06-01, #1 Paper of the day, upvotes 222, linked_models 0, linked_datasets 0, linked_spaces 0；community comment 给了非仓库 PDF 链接。https://huggingface.co/papers/2606.02437
+[^intro]: arXiv source `sections/01-introduction.tex`：论文将 PEFT/LoRA 定义为 persistent personal model instance 的 local adaptive state，并说明 prompt/context/RAG/user profiles 不足以保持长期连续性。
+[^conclusion]: arXiv source `sections/07-conclusion.tex`：作者明确说标题不应读作每个用户拥有并训练单独 trillion-parameter checkpoint，而是少数强 base + millions lightweight adapters。
+[^scaleup]: arXiv source `sections/03-scale-up.tex`，Why RL is Prior-Limited / LoRA as Budgeted Access to Strong Priors。
+[^prior]: arXiv source `tables/scale_up/prior_comparison.tex`；正文也注明该比较同时变化 model size 和 training method，不能 cleanly isolate prior strength。
+[^kimi]: arXiv source `sections/03-scale-up.tex`，Operationalizing Trillion-Scale LoRA RL；明确数字为 1.04T total parameters、32.6B activated parameters、约 10% full-parameter RL footprint。
+[^r3]: arXiv source `sections/03-scale-up.tex`，Scale-Induced Failure Modes；`train_stable_ppo_kl` caption 给出 R3 step 46 KL = 0.000026。
+[^rank]: arXiv source `sections/04-scale-down.tex`，Rank Reduction Under Minimal Parameters；216 runs、9 ranks、4 batch sizes、6 seeds、500-step PPO。
+[^olora]: arXiv source `sections/04-scale-down.tex`，RL-Native Initialization for Stability；OLoRA-tail formula、collapse 数字、DAPO-Math-17k 设置与 58.3% vs 56.3%。
+[^triquetra]: arXiv source `sections/04-scale-down.tex`，Reusable Hyperparameters for Lower Training Effort；早期扰动 proxy `η α_r^2 / r`，AG News / Qwen3-4B MATH transfer。
+[^deltamem]: arXiv source `tables/scale_down/delta-mem_baseline.tex` 与 `sections/04-scale-down.tex`，Beyond LoRA / δ-Mem。
+[^memorylaw]: arXiv source `sections/05-scale-out.tex`，LoRA as memory: capacity scaling law；DishNameBenchmark 263 runs，capacity efficiency `10^-3` 到 `10^-2`。
+[^alfworld]: arXiv source `sections/05-scale-out.tex`，LoRA skill memory on ALFWorld；Qwen3-235B rank-32 LoRA，0.646 → 0.845。
+[^context]: arXiv source `sections/05-scale-out.tex`，Context Learning as write policy；Context Distillation pseudo-code in listing。
+[^oasis]: arXiv source `sections/05-scale-out.tex`，User Simulators and Agent Environments；OASIS c8 community, rank-4 adapters, 80 historical tweets。
+[^vote]: arXiv source `sections/05-scale-out.tex`，Diversity as a Source of Collective Intelligence；Qwen3-30B, Math17k, AIME24, majority vote, log fit。
+[^mint]: arXiv source `sections/06-infrastructure.tex` and `tables/infrastructure/*.tex`；MinT policy identity, handoff, serving bounds, readiness, packed loader。

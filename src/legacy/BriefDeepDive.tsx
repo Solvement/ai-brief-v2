@@ -77,7 +77,7 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
   const tierTpl: ProjectTierTemplate | undefined = dive.meta?.tier_template;
   if (tierTpl && (typeof tierTpl.tier === "number" || tierTpl.one_sentence_positioning)) {
     return (
-      <Shell mode="lightspine">
+      <Shell mode="tier">
         <TierTemplateDeepDive item={dive} tpl={tierTpl} />
       </Shell>
     );
@@ -254,10 +254,13 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
   );
 }
 
-function Shell({ children, mode }: { children: React.ReactNode; mode?: "lightspine" }) {
+function Shell({ children, mode }: { children: React.ReactNode; mode?: "lightspine" | "tier" }) {
+  // `tier` = the project-radar tier paradigm page: full-width treatment (like the
+  // paper page redesign) so architecture diagrams + comparisons use the landscape.
+  const extra = mode === "tier" ? " dd-page brief-deepdive--full" : mode === "lightspine" ? " dd-page" : "";
   return (
     <div className="page">
-      <main className={`workbench-main brief-deepdive${mode === "lightspine" ? " dd-page" : ""}`}>{children}</main>
+      <main className={`workbench-main brief-deepdive${extra}`}>{children}</main>
     </div>
   );
 }

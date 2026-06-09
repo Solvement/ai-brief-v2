@@ -14,6 +14,12 @@ const PUBLIC_TRENDING = path.join(ROOT, "public", "data", "trending.json");
 const BRIEF_WIKI_CONTENT = path.join(ROOT, "brief-wiki", "content");
 const DEFAULT_WINDOWS = ["daily", "weekly", "monthly"];
 const DEFAULT_TRENDING_BOARD_LIMIT = 25;
+const DEFAULT_ELITE_LIMIT = 12;
+const DEFAULT_ELITE_MIN_STARS = 3000;
+const DEFAULT_ELITE_MIN_MONTHLY_STARS = 1500;
+const DEFAULT_ELITE_MIN_SOURCE_COUNT = 2;
+const DEFAULT_HN_MIN_POINTS = 50;
+const DEFAULT_HN_VALIDATION_LIMIT = 60;
 const SEARCH_TERMS = ["agent", "rag", "mcp", "a2a", "memory", "eval", "ai coding", "coding agent"];
 const DEFAULT_USER_AGENT = "Mozilla/5.0 ai-brief-projects/0.3";
 const GITHUB_API_BASE = "https://api.github.com";
@@ -98,12 +104,16 @@ export async function discover(ctx = {}) {
   }
 
   const mergedCandidates = mergeCandidates(rows);
+  const eliteCandidates = options.eliteSelection === false
+    ? mergedCandidates
+    : await applyEliteSelection(mergedCandidates, { options, logger: ctx.logger, offline });
   const deepDivedRepos = readBriefWikiDeepDivedProjectRepos(options.briefWikiContentDir || BRIEF_WIKI_CONTENT);
   const discoveryCap = options.cap == null ? null : numberOption(options.cap, null);
-  const candidates = mergedCandidates.map((candidate) => annotateKnownDeepDive(candidate, deepDivedRepos)).slice(0, discoveryCap || undefined);
+  const candidates = eliteCandidates.map((candidate) => annotateKnownDeepDive(candidate, deepDivedRepos)).slice(0, discoveryCap || undefined);
   const reused = candidates.filter((candidate) => candidate.raw?.alreadyDeepDived).length;
-  const capped = mergedCandidates.length - candidates.length;
+  const capped = eliteCandidates.length - candidates.length;
   if (reused) ctx.logger?.info?.(`projects discover reused ${reused} already deep-dived repo(s) from brief-wiki`);
+  if (options.eliteSelection !== false) ctx.logger?.info?.(`projects discover elite selected ${eliteCandidates.length}/${mergedCandidates.length} repo(s)`);
   if (capped) ctx.logger?.info?.(`projects discover capped ${capped} repo(s) by --cap debug limit`);
   if (options.db) {
     for (const candidate of candidates) options.db.upsertCandidate(candidate);
@@ -326,6 +336,192 @@ function emptyArtifactAudit(repo = {}) {
     key_files: [],
     package_files: emptyPackageFiles(),
   };
+}
+
+export async function applyEliteSelection(candidates = [], { options = {}, logger, offline = false } = {}) {
+  const thresholds = eliteThresholds(options);
+  const plausible = candidates.filter((candidate) => passesEliteHeatGate(candidate.raw, thresholds));
+  const external = offline || options.noExternalValidation
+    ? { hackerNews: new Map(), ossInsight: new Set() }
+    : await collectExternalValidation(plausible, { options, logger, thresholds });
+
+  return candidates
+    .map((candidate) => annotateEliteValidation(candidate, { external, thresholds }))
+    .filter((candidate) => candidate.raw.eliteSelection?.selected)
+    .sort(eliteCandidateSort)
+    .slice(0, thresholds.limit);
+}
+
+export function annotateEliteValidation(candidate, { external = {}, thresholds = eliteThresholds() } = {}) {
+  const repo = candidate.raw || {};
+  const fullName = normalizeRepoFullName(repo.fullName || repo.url);
+  const hn = external.hackerNews?.get(fullName) || null;
+  const ossInsight = external.ossInsight?.has(fullName) || false;
+  const sourceSignals = eliteSourceSignals(repo, { hn, ossInsight });
+  const maxMonthlyStars = monthlyStarsGained(repo);
+  const heatPass = passesEliteHeatGate(repo, thresholds);
+  const selected = Boolean(heatPass && sourceSignals.length >= thresholds.minSourceCount);
+  const raw = normalizeRepo({
+    ...repo,
+    communityValidation: {
+      hackerNews: hn,
+      ossInsight,
+    },
+    eliteSelection: {
+      selected,
+      thresholds,
+      sourceCount: sourceSignals.length,
+      sourceSignals,
+      stars: Number(repo.stars) || 0,
+      monthlyStarsGained: maxMonthlyStars,
+      reasons: [
+        heatPass ? "heat_gate:pass" : "heat_gate:fail",
+        `source_count:${sourceSignals.length}`,
+        ...(sourceSignals || []),
+      ],
+    },
+  });
+  return { ...candidate, raw };
+}
+
+async function collectExternalValidation(candidates, { options = {}, logger, thresholds }) {
+  const [hackerNews, ossInsight] = await Promise.all([
+    collectHackerNewsSignals(candidates, { options, logger, thresholds }),
+    collectOssInsightSignals({ options, logger }),
+  ]);
+  return { hackerNews, ossInsight };
+}
+
+async function collectHackerNewsSignals(candidates, { options = {}, logger, thresholds }) {
+  const out = new Map();
+  const limit = numberOption(options.hnValidationLimit, DEFAULT_HN_VALIDATION_LIMIT);
+  for (const candidate of candidates.slice(0, limit)) {
+    const repo = candidate.raw || {};
+    const key = normalizeRepoFullName(repo.fullName || repo.url);
+    if (!key) continue;
+    try {
+      const signal = await fetchHackerNewsRepoSignal(repo, { options, thresholds });
+      if (signal) out.set(key, signal);
+    } catch (error) {
+      logger?.warn?.(`HN validation skipped ${repo.fullName || key}: ${error.message}`);
+    }
+  }
+  return out;
+}
+
+export async function fetchHackerNewsRepoSignal(repo, { options = {}, thresholds = eliteThresholds() } = {}) {
+  const fullName = normalizeRepoFullName(repo.fullName || repo.url);
+  if (!fullName) return null;
+  const repoUrl = `https://github.com/${fullName}`;
+  const url = new URL("https://hn.algolia.com/api/v1/search");
+  url.searchParams.set("query", repoUrl);
+  url.searchParams.set("restrictSearchableAttributes", "url");
+  url.searchParams.set("tags", "story");
+  url.searchParams.set("hitsPerPage", "10");
+
+  const response = await fetchWithRetry(url, {
+    headers: { accept: "application/json", "user-agent": options.userAgent || DEFAULT_USER_AGENT },
+  }, {
+    logger: options.logger,
+    label: `hn ${fullName}`,
+    retries: numberOption(options.externalRetries, 1),
+    timeoutMs: numberOption(options.externalTimeoutMs, 8000),
+    fetchImpl: options.fetchImpl || globalThis.fetch,
+  });
+  if (!response.ok) throw new Error(`HN API ${response.status}`);
+  const data = await response.json();
+  const hits = (data.hits || []).filter((hit) => repoUrlMatches(hit.url, fullName));
+  const best = hits
+    .map((hit) => ({
+      title: String(hit.title || hit.story_title || ""),
+      url: String(hit.url || ""),
+      points: Number(hit.points) || 0,
+      objectID: String(hit.objectID || ""),
+      createdAt: hit.created_at || null,
+    }))
+    .sort((left, right) => right.points - left.points)[0];
+  if (!best || best.points < thresholds.hnMinPoints) return null;
+  return best;
+}
+
+async function collectOssInsightSignals({ options = {}, logger } = {}) {
+  try {
+    const repos = await fetchOssInsightTrendingRepos({ options });
+    return new Set(repos.map((repo) => normalizeRepoFullName(repo.fullName)).filter(Boolean));
+  } catch (error) {
+    logger?.warn?.(`OSSInsight validation skipped: ${error.message}`);
+    return new Set();
+  }
+}
+
+export async function fetchOssInsightTrendingRepos({ options = {} } = {}) {
+  const period = options.ossInsightPeriod || "past_24_hours";
+  const language = options.ossInsightLanguage || "All";
+  const url = new URL("https://api.ossinsight.io/v1/trends/repos/");
+  url.searchParams.set("period", period);
+  url.searchParams.set("language", language);
+  const response = await fetchWithRetry(url, {
+    headers: { accept: "application/json", "user-agent": options.userAgent || DEFAULT_USER_AGENT },
+  }, {
+    logger: options.logger,
+    label: "ossinsight trending repos",
+    retries: numberOption(options.externalRetries, 1),
+    timeoutMs: numberOption(options.externalTimeoutMs, 8000),
+    fetchImpl: options.fetchImpl || globalThis.fetch,
+  });
+  if (!response.ok) throw new Error(`OSSInsight API ${response.status}`);
+  const data = await response.json();
+  return (data?.data?.rows || []).map((row) => ({
+    fullName: String(row.repo_name || row.fullName || ""),
+    stars: Number(row.stars) || 0,
+    score: Number(row.total_score) || 0,
+  })).filter((repo) => repo.fullName.includes("/"));
+}
+
+function eliteThresholds(options = {}) {
+  return {
+    limit: numberOption(options.eliteLimit, DEFAULT_ELITE_LIMIT),
+    minStars: numberOption(options.eliteMinStars, DEFAULT_ELITE_MIN_STARS),
+    minMonthlyStars: numberOption(options.eliteMinMonthlyStars, DEFAULT_ELITE_MIN_MONTHLY_STARS),
+    minSourceCount: numberOption(options.eliteMinSourceCount, DEFAULT_ELITE_MIN_SOURCE_COUNT),
+    hnMinPoints: numberOption(options.hnMinPoints, DEFAULT_HN_MIN_POINTS),
+  };
+}
+
+function passesEliteHeatGate(repo = {}, thresholds = eliteThresholds()) {
+  return Number(repo.stars) >= thresholds.minStars || monthlyStarsGained(repo) >= thresholds.minMonthlyStars;
+}
+
+function monthlyStarsGained(repo = {}) {
+  return Math.max(
+    Number(repo.starsGainedByWindow?.monthly) || 0,
+    Number(repo.currentStarsGainedByWindow?.monthly) || 0,
+    Number(repo.starsGained) || 0,
+  );
+}
+
+function eliteSourceSignals(repo = {}, { hn = null, ossInsight = false } = {}) {
+  const signals = [];
+  const windows = Array.isArray(repo.currentWindows) && repo.currentWindows.length ? repo.currentWindows : repo.windows || [];
+  if (windows.length > 0) signals.push("github_trending");
+  if (windows.length >= 2) signals.push("github_trending_multi_window");
+  if ((repo.sourceTerms || []).length > 0) signals.push("github_search");
+  if (hn) signals.push("hacker_news");
+  if (ossInsight) signals.push("ossinsight_trending");
+  return unique(signals);
+}
+
+function eliteCandidateSort(left, right) {
+  const leftElite = left.raw?.eliteSelection || {};
+  const rightElite = right.raw?.eliteSelection || {};
+  return Number(rightElite.sourceCount || 0) - Number(leftElite.sourceCount || 0)
+    || monthlyStarsGained(right.raw) - monthlyStarsGained(left.raw)
+    || Number(right.raw?.stars || 0) - Number(left.raw?.stars || 0);
+}
+
+function repoUrlMatches(url, fullName) {
+  const normalized = normalizeRepoFullName(url);
+  return normalized === normalizeRepoFullName(fullName);
 }
 
 function treeAudit(entries) {
@@ -755,6 +951,9 @@ function toCandidate(repo, { source, window, rank, discoveredAt, sourceTerm = nu
     windows: window ? [window] : [],
     ranksByWindow: window ? { [window]: rank } : {},
     starsGainedByWindow: window ? { [window]: Number(repo.starsGained) || 0 } : {},
+    currentWindows: window ? [window] : [],
+    currentRanksByWindow: window ? { [window]: rank } : {},
+    currentStarsGainedByWindow: window ? { [window]: Number(repo.starsGained) || 0 } : {},
     sourceTerms: sourceTerm ? [sourceTerm] : [],
     boostTerms: BOOST_TERMS,
   });
@@ -793,6 +992,9 @@ function mergeRepoRaw(left, right) {
     sourceTerms: unique([...(left.sourceTerms || []), ...(right.sourceTerms || [])]),
     ranksByWindow: { ...(left.ranksByWindow || {}), ...(right.ranksByWindow || {}) },
     starsGainedByWindow: { ...(left.starsGainedByWindow || {}), ...(right.starsGainedByWindow || {}) },
+    currentWindows: unique([...(left.currentWindows || []), ...(right.currentWindows || [])]),
+    currentRanksByWindow: { ...(left.currentRanksByWindow || {}), ...(right.currentRanksByWindow || {}) },
+    currentStarsGainedByWindow: { ...(left.currentStarsGainedByWindow || {}), ...(right.currentStarsGainedByWindow || {}) },
     stars: Math.max(Number(left.stars) || 0, Number(right.stars) || 0),
     forks: Math.max(Number(left.forks) || 0, Number(right.forks) || 0),
     starsGained: Math.max(Number(left.starsGained) || 0, Number(right.starsGained) || 0),
@@ -826,7 +1028,12 @@ function normalizeRepo(repo) {
     windows: repo.windows || [],
     ranksByWindow: repo.ranksByWindow || {},
     starsGainedByWindow: repo.starsGainedByWindow || {},
+    currentWindows: repo.currentWindows || [],
+    currentRanksByWindow: repo.currentRanksByWindow || {},
+    currentStarsGainedByWindow: repo.currentStarsGainedByWindow || {},
     sourceTerms: repo.sourceTerms || [],
+    communityValidation: repo.communityValidation || null,
+    eliteSelection: repo.eliteSelection || null,
   };
 }
 

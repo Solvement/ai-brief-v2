@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T18:13:53.800Z",
+  "generatedAt": "2026-06-09T01:44:55.025Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 106,
+  "count": 128,
   "items": [
     {
       "id": "concept/adaptive-element-relocation",
@@ -176,6 +176,65 @@
       ]
     },
     {
+      "id": "concept/agent-skill",
+      "type": "concept",
+      "slug": "agent-skill",
+      "title": "Agent Skill",
+      "file": "concepts/agent-skill.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Agent Skill",
+        "slug": "agent-skill",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "skill",
+          "distribution"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "mvanhorn-last30days-skill",
+        "related_content": [
+          "mvanhorn-last30days-skill"
+        ],
+        "related_concepts": [],
+        "explanation": "一种给 agent 宿主加载的能力包：`SKILL.md` 告诉模型怎么调用工具，同级 `scripts/` 放真正执行代码。白话说，它是“提示词合约 + 可执行工具”的打包单元。",
+        "examples": [
+          "`skills/last30days/SKILL.md`",
+          "`npx skills add mvanhorn/last30days-skill -g`",
+          "`/plugin marketplace add mvanhorn/last30days-skill`"
+        ],
+        "common_misunderstandings": [
+          "把它当普通 CLI；项目文档明确 slash command 是主路径，Python CLI 是 fallback。",
+          "以为安装一次就能自动覆盖所有宿主；README 说明 Claude Code marketplace 和 npx 安装可并存且会出现两个入口。"
+        ],
+        "open_questions": [
+          "50+ host 的持续兼容性是否有集中 CI 未在仓库看到。"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种给 agent 宿主加载的能力包：`SKILL.md` 告诉模型怎么调用工具，同级 `scripts/` 放真正执行代码。白话说，它是“提示词合约 + 可执行工具”的打包单元。 出处:https://github.com/mvanhorn/last30days-skill。See [[content/mvanhorn-last30days-skill]]。\n\n## Supported by\n- [[claims/mvanhorn-last30days-skill-main-claim]]\n",
+      "excerpt": "一种给 agent 宿主加载的能力包：`SKILL.md` 告诉模型怎么调用工具，同级 `scripts/` 放真正执行代码。白话说，它是“提示词合约 + 可执行工具”的打包单元。 出处:https://github.com/mvanhorn/last30days-skill。See [[content/mvanhorn-last30days-skill]]。",
+      "links": [
+        {
+          "target": "content/mvanhorn-last30days-skill",
+          "raw": "[[content/mvanhorn-last30days-skill]]"
+        },
+        {
+          "target": "claims/mvanhorn-last30days-skill-main-claim",
+          "raw": "[[claims/mvanhorn-last30days-skill-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/agent-skills-catalog",
       "type": "concept",
       "slug": "agent-skills-catalog",
@@ -277,6 +336,64 @@
         {
           "target": "claims/nesquena-hermes-webui-main-claim",
           "raw": "[[claims/nesquena-hermes-webui-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/agent-tool-scaffolding",
+      "type": "concept",
+      "slug": "agent-tool-scaffolding",
+      "title": "Agent Tool Scaffolding",
+      "file": "concepts/agent-tool-scaffolding.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Agent 工具脚手架",
+        "slug": "agent-tool-scaffolding",
+        "kind": "concept",
+        "tags": [
+          "agents",
+          "tooling",
+          "cli"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "panniantong-agent-reach",
+        "related_content": [
+          "panniantong-agent-reach"
+        ],
+        "related_concepts": [],
+        "explanation": "先人话：不是替 Agent 思考，而是替 Agent 准备可调用工具。术语：把安装、配置、健康检查、命令参考和 Skill 路由打包成一层开发者工具。",
+        "examples": [
+          "`agent-reach install --env=auto` 安装核心渠道",
+          "`agent-reach doctor` 检查 channel 状态"
+        ],
+        "common_misunderstandings": [
+          "误以为它是 agent framework",
+          "误以为它代理所有平台请求"
+        ],
+        "open_questions": [
+          "不同 Agent 产品对 Skill 文件的加载规则是否长期稳定"
+        ]
+      },
+      "body": "\n## Explanation\n\n先人话：不是替 Agent 思考，而是替 Agent 准备可调用工具。术语：把安装、配置、健康检查、命令参考和 Skill 路由打包成一层开发者工具。 出处:https://github.com/panniantong/agent-reach。See [[content/panniantong-agent-reach]]。\n\n## Supported by\n- [[claims/panniantong-agent-reach-main-claim]]\n",
+      "excerpt": "先人话：不是替 Agent 思考，而是替 Agent 准备可调用工具。术语：把安装、配置、健康检查、命令参考和 Skill 路由打包成一层开发者工具。 出处:https://github.com/panniantong/agent-reach。See [[content/panniantong-agent-reach]]。",
+      "links": [
+        {
+          "target": "content/panniantong-agent-reach",
+          "raw": "[[content/panniantong-agent-reach]]"
+        },
+        {
+          "target": "claims/panniantong-agent-reach-main-claim",
+          "raw": "[[claims/panniantong-agent-reach-main-claim]]"
         }
       ],
       "headings": [
@@ -787,6 +904,64 @@
       ]
     },
     {
+      "id": "concept/ccr-compress-cache-retrieve",
+      "type": "concept",
+      "slug": "ccr-compress-cache-retrieve",
+      "title": "Ccr Compress Cache Retrieve",
+      "file": "concepts/ccr-compress-cache-retrieve.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "CCR 可逆压缩",
+        "slug": "ccr-compress-cache-retrieve",
+        "kind": "concept",
+        "tags": [
+          "compression",
+          "agent-tools",
+          "retrieval"
+        ],
+        "maturity": "active",
+        "first_seen_in": "chopratejas-headroom",
+        "related_content": [
+          "chopratejas-headroom"
+        ],
+        "related_concepts": [],
+        "explanation": "先压缩给模型看，再把原文存在本地缓存；模型需要细节时用 hash 调 `headroom_retrieve` 取回。它降低丢信息风险，但不等于永久保存。",
+        "examples": [
+          "MCP `headroom_compress` 存原文并返回 hash",
+          "proxy `/v1/retrieve` 根据 hash 取回 CompressionStore 条目"
+        ],
+        "common_misunderstandings": [
+          "以为可逆等于永不过期；默认 proxy store TTL 是 300 秒。",
+          "以为不需要工具调用；模型要原文时仍需 retrieval 工具或客户端处理。"
+        ],
+        "open_questions": [
+          "长会话中 TTL 和容量淘汰如何配置才适合生产工作流？"
+        ]
+      },
+      "body": "\n## Explanation\n\n先压缩给模型看，再把原文存在本地缓存；模型需要细节时用 hash 调 `headroom_retrieve` 取回。它降低丢信息风险，但不等于永久保存。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。\n\n## Supported by\n- [[claims/chopratejas-headroom-main-claim-2]]\n",
+      "excerpt": "先压缩给模型看，再把原文存在本地缓存；模型需要细节时用 hash 调 `headroom_retrieve` 取回。它降低丢信息风险，但不等于永久保存。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。",
+      "links": [
+        {
+          "target": "content/chopratejas-headroom",
+          "raw": "[[content/chopratejas-headroom]]"
+        },
+        {
+          "target": "claims/chopratejas-headroom-main-claim-2",
+          "raw": "[[claims/chopratejas-headroom-main-claim-2]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/channel-health-check",
       "type": "concept",
       "slug": "channel-health-check",
@@ -886,6 +1061,124 @@
         {
           "target": "claims/academic-research-skills-main-claim",
           "raw": "[[claims/academic-research-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/claude-code-skill-suite",
+      "type": "concept",
+      "slug": "claude-code-skill-suite",
+      "title": "Claude Code Skill Suite",
+      "file": "concepts/claude-code-skill-suite.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Claude Code Skill 套件",
+        "slug": "claude-code-skill-suite",
+        "kind": "concept",
+        "tags": [
+          "claude-code",
+          "agent-framework",
+          "workflow"
+        ],
+        "maturity": "active",
+        "first_seen_in": "imbad0202-academic-research-skills",
+        "related_content": [
+          "imbad0202-academic-research-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "把复杂工作流拆成多个 `SKILL.md`、命令、hooks 和 agent prompt，由 Claude Code runtime 负责发现与执行。白话说，就是给 Claude Code 装一套专业工位，而不是发一段万能 prompt。",
+        "examples": [
+          "deep-research/SKILL.md",
+          "academic-paper/SKILL.md",
+          "commands/ars-full.md",
+          "hooks/hooks.json"
+        ],
+        "common_misunderstandings": [
+          "不是普通 Python SDK；`pyproject.toml` 不是产品入口。",
+          "装到 claude.ai Project 只能作为知识读取，不等于执行 Claude Code workflow。"
+        ],
+        "open_questions": [
+          "Claude Code plugin API 变动时，hooks 和 commands 的兼容性如何维护？"
+        ]
+      },
+      "body": "\n## Explanation\n\n把复杂工作流拆成多个 `SKILL.md`、命令、hooks 和 agent prompt，由 Claude Code runtime 负责发现与执行。白话说，就是给 Claude Code 装一套专业工位，而不是发一段万能 prompt。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/imbad0202-academic-research-skills]]。\n\n## Supported by\n- [[claims/imbad0202-academic-research-skills-main-claim]]\n",
+      "excerpt": "把复杂工作流拆成多个 `SKILL.md`、命令、hooks 和 agent prompt，由 Claude Code runtime 负责发现与执行。白话说，就是给 Claude Code 装一套专业工位，而不是发一段万能 prompt。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/imbad0202-academic-research-skills]]。",
+      "links": [
+        {
+          "target": "content/imbad0202-academic-research-skills",
+          "raw": "[[content/imbad0202-academic-research-skills]]"
+        },
+        {
+          "target": "claims/imbad0202-academic-research-skills-main-claim",
+          "raw": "[[claims/imbad0202-academic-research-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/code-knowledge-graph",
+      "type": "concept",
+      "slug": "code-knowledge-graph",
+      "title": "Code Knowledge Graph",
+      "file": "concepts/code-knowledge-graph.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "代码知识图谱",
+        "slug": "code-knowledge-graph",
+        "kind": "concept",
+        "tags": [
+          "static-analysis",
+          "agent-context",
+          "sqlite"
+        ],
+        "maturity": "active",
+        "first_seen_in": "colbymchenry-codegraph",
+        "related_content": [
+          "colbymchenry-codegraph"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：把代码里的函数、类、文件和调用关系做成可查询的图。术语：CodeGraph 用 nodes/edges/files/unresolved_refs 表表达 symbol、依赖、调用和待解析引用。",
+        "examples": [
+          "codegraph_callers 查询谁调用某个函数",
+          "codegraph_impact 查询改一个 symbol 会影响哪些节点"
+        ],
+        "common_misunderstandings": [
+          "不是向量库同义词；它强调结构边而不是只做相似度。",
+          "不是类型检查器；源码限制里写明正确性仍要靠编译器、测试和 lint。"
+        ],
+        "open_questions": [
+          "动态语言和框架反射场景的覆盖边界需要按项目复测。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：把代码里的函数、类、文件和调用关系做成可查询的图。术语：CodeGraph 用 nodes/edges/files/unresolved_refs 表表达 symbol、依赖、调用和待解析引用。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。\n\n## Supported by\n- [[claims/colbymchenry-codegraph-main-claim-2]]\n",
+      "excerpt": "人话：把代码里的函数、类、文件和调用关系做成可查询的图。术语：CodeGraph 用 nodes/edges/files/unresolved_refs 表表达 symbol、依赖、调用和待解析引用。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。",
+      "links": [
+        {
+          "target": "content/colbymchenry-codegraph",
+          "raw": "[[content/colbymchenry-codegraph]]"
+        },
+        {
+          "target": "claims/colbymchenry-codegraph-main-claim-2",
+          "raw": "[[claims/colbymchenry-codegraph-main-claim-2]]"
         }
       ],
       "headings": [
@@ -1244,6 +1537,66 @@
       ]
     },
     {
+      "id": "concept/content-router",
+      "type": "concept",
+      "slug": "content-router",
+      "title": "Content Router",
+      "file": "concepts/content-router.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "内容路由压缩",
+        "slug": "content-router",
+        "kind": "concept",
+        "tags": [
+          "context-engineering",
+          "tool-output",
+          "routing"
+        ],
+        "maturity": "active",
+        "first_seen_in": "chopratejas-headroom",
+        "related_content": [
+          "chopratejas-headroom"
+        ],
+        "related_concepts": [],
+        "explanation": "先判断内容是 JSON、日志、搜索结果、代码、HTML 还是普通文本，再交给不同压缩器；比统一摘要更适合 agent tool output。",
+        "examples": [
+          "JSON arrays -> SmartCrusher",
+          "Logs -> LogCompressor",
+          "Search results -> SearchCompressor",
+          "Code -> CodeCompressor 或保护跳过"
+        ],
+        "common_misunderstandings": [
+          "以为所有消息都会压缩；用户消息、系统/开发者消息、小内容、分析代码场景都有保护分支。",
+          "以为路由等于生成摘要；SmartCrusher 默认保留结构样本、异常、首尾项，不只是自然语言总结。"
+        ],
+        "open_questions": [
+          "不同业务工具的字段重要性如何通过 TOIN 或自定义 profile 稳定学习？"
+        ]
+      },
+      "body": "\n## Explanation\n\n先判断内容是 JSON、日志、搜索结果、代码、HTML 还是普通文本，再交给不同压缩器；比统一摘要更适合 agent tool output。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。\n\n## Supported by\n- [[claims/chopratejas-headroom-main-claim-2]]\n",
+      "excerpt": "先判断内容是 JSON、日志、搜索结果、代码、HTML 还是普通文本，再交给不同压缩器；比统一摘要更适合 agent tool output。 出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。",
+      "links": [
+        {
+          "target": "content/chopratejas-headroom",
+          "raw": "[[content/chopratejas-headroom]]"
+        },
+        {
+          "target": "claims/chopratejas-headroom-main-claim-2",
+          "raw": "[[claims/chopratejas-headroom-main-claim-2]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/context-compression-layer",
       "type": "concept",
       "slug": "context-compression-layer",
@@ -1289,6 +1642,64 @@
         {
           "target": "claims/chopratejas-headroom-main-claim",
           "raw": "[[claims/chopratejas-headroom-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/converter-dispatch",
+      "type": "concept",
+      "slug": "converter-dispatch",
+      "title": "Converter Dispatch",
+      "file": "concepts/converter-dispatch.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "converter 分发",
+        "slug": "converter-dispatch",
+        "kind": "concept",
+        "tags": [
+          "architecture",
+          "plugin-system",
+          "file-conversion"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "microsoft-markitdown",
+        "related_content": [
+          "microsoft-markitdown"
+        ],
+        "related_concepts": [],
+        "explanation": "先人话：一堆格式处理器排队，谁能处理谁上。术语点：每个 DocumentConverter 实现 `accepts()` 和 `convert()`，MarkItDown 按 priority 排序调用。",
+        "examples": [
+          "内置注册 PdfConverter、DocxConverter、XlsxConverter、PptxConverter 等",
+          "OCR 插件用 priority `-1.0` 抢在内置 converter 前"
+        ],
+        "common_misunderstandings": [
+          "不是所有 converter 并行跑后选最佳结果",
+          "注册顺序和 priority 会影响命中路径"
+        ],
+        "open_questions": [
+          "插件之间冲突时的治理策略未在 README 说明"
+        ]
+      },
+      "body": "\n## Explanation\n\n先人话：一堆格式处理器排队，谁能处理谁上。术语点：每个 DocumentConverter 实现 `accepts()` 和 `convert()`，MarkItDown 按 priority 排序调用。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。\n\n## Supported by\n- [[claims/microsoft-markitdown-main-claim-2]]\n",
+      "excerpt": "先人话：一堆格式处理器排队，谁能处理谁上。术语点：每个 DocumentConverter 实现 `accepts()` 和 `convert()`，MarkItDown 按 priority 排序调用。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。",
+      "links": [
+        {
+          "target": "content/microsoft-markitdown",
+          "raw": "[[content/microsoft-markitdown]]"
+        },
+        {
+          "target": "claims/microsoft-markitdown-main-claim-2",
+          "raw": "[[claims/microsoft-markitdown-main-claim-2]]"
         }
       ],
       "headings": [
@@ -1877,6 +2288,62 @@
       ]
     },
     {
+      "id": "concept/from-scratch-ai-curriculum",
+      "type": "concept",
+      "slug": "from-scratch-ai-curriculum",
+      "title": "From Scratch Ai Curriculum",
+      "file": "concepts/from-scratch-ai-curriculum.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "从零实现式 AI 课程",
+        "slug": "from-scratch-ai-curriculum",
+        "kind": "concept",
+        "tags": [
+          "curriculum",
+          "ai-engineering"
+        ],
+        "maturity": "active",
+        "first_seen_in": "rohitg00-ai-engineering-from-scratch",
+        "related_content": [
+          "rohitg00-ai-engineering-from-scratch"
+        ],
+        "related_concepts": [],
+        "explanation": "先手写算法和协议，再对照框架；价值是理解黑盒下的控制流，而不是直接省开发时间。",
+        "examples": [
+          "Phase 14 Lesson 01 手写 ReAct loop",
+          "Phase 13 Lesson 07 手写 stdio MCP server"
+        ],
+        "common_misunderstandings": [
+          "把课程仓库误当生产 SDK"
+        ],
+        "open_questions": [
+          "503 lessons 的维护质量是否能长期保持一致"
+        ]
+      },
+      "body": "\n## Explanation\n\n先手写算法和协议，再对照框架；价值是理解黑盒下的控制流，而不是直接省开发时间。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/rohitg00-ai-engineering-from-scratch]]。\n\n## Supported by\n- [[claims/rohitg00-ai-engineering-from-scratch-main-claim]]\n",
+      "excerpt": "先手写算法和协议，再对照框架；价值是理解黑盒下的控制流，而不是直接省开发时间。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/rohitg00-ai-engineering-from-scratch]]。",
+      "links": [
+        {
+          "target": "content/rohitg00-ai-engineering-from-scratch",
+          "raw": "[[content/rohitg00-ai-engineering-from-scratch]]"
+        },
+        {
+          "target": "claims/rohitg00-ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/rohitg00-ai-engineering-from-scratch-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/graph-investigation-loop",
       "type": "concept",
       "slug": "graph-investigation-loop",
@@ -2148,6 +2615,64 @@
         {
           "target": "claims/can1357-oh-my-pi-main-claim",
           "raw": "[[claims/can1357-oh-my-pi-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/hashline-editing",
+      "type": "concept",
+      "slug": "hashline-editing",
+      "title": "Hashline Editing",
+      "file": "concepts/hashline-editing.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Hashline 内容锚编辑",
+        "slug": "hashline-editing",
+        "kind": "concept",
+        "tags": [
+          "agent-tools",
+          "editing",
+          "safety"
+        ],
+        "maturity": "active",
+        "first_seen_in": "can1357-oh-my-pi",
+        "related_content": [
+          "can1357-oh-my-pi"
+        ],
+        "related_concepts": [],
+        "explanation": "先读文件生成短 TAG，再用 TAG 和行号写补丁；白话说，就是让模型改“刚刚读到的那份文件”，不是凭记忆乱套 diff。",
+        "examples": [
+          "`¶a.ts#0A3B` 加 `replace 1..1:` 是 docs/tools/edit.md 的最小编辑形态。",
+          "`packages/hashline/src/snapshots.ts` 维护每个 path 的短历史版本。"
+        ],
+        "common_misunderstandings": [
+          "它不是普通 unified diff。",
+          "4 位 TAG 不是全局文件 hash，只在当前 snapshot store 中有意义。"
+        ],
+        "open_questions": [
+          "跨长会话、多人同时改同一文件时，恢复成功率需要实测。"
+        ]
+      },
+      "body": "\n## Explanation\n\n先读文件生成短 TAG，再用 TAG 和行号写补丁；白话说，就是让模型改“刚刚读到的那份文件”，不是凭记忆乱套 diff。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。\n\n## Supported by\n- [[claims/can1357-oh-my-pi-main-claim-2]]\n",
+      "excerpt": "先读文件生成短 TAG，再用 TAG 和行号写补丁；白话说，就是让模型改“刚刚读到的那份文件”，不是凭记忆乱套 diff。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。",
+      "links": [
+        {
+          "target": "content/can1357-oh-my-pi",
+          "raw": "[[content/can1357-oh-my-pi]]"
+        },
+        {
+          "target": "claims/can1357-oh-my-pi-main-claim-2",
+          "raw": "[[claims/can1357-oh-my-pi-main-claim-2]]"
         }
       ],
       "headings": [
@@ -2954,6 +3479,181 @@
       ]
     },
     {
+      "id": "concept/markdown-for-llm-ingestion",
+      "type": "concept",
+      "slug": "markdown-for-llm-ingestion",
+      "title": "Markdown For Llm Ingestion",
+      "file": "concepts/markdown-for-llm-ingestion.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "面向 LLM 的 Markdown 入口",
+        "slug": "markdown-for-llm-ingestion",
+        "kind": "concept",
+        "tags": [
+          "rag",
+          "document-ingestion",
+          "markdown"
+        ],
+        "maturity": "active",
+        "first_seen_in": "microsoft-markitdown",
+        "related_content": [
+          "microsoft-markitdown"
+        ],
+        "related_concepts": [],
+        "explanation": "先人话：把复杂文件压成模型更容易读的文本。术语点：Markdown 保留标题、列表、表格、链接等轻结构，适合后续 RAG chunking。",
+        "examples": [
+          "README 里用 `markitdown path-to-file.pdf > document.md`",
+          "XlsxConverter 每个 sheet 输出 `## sheet名` 后接 Markdown 表"
+        ],
+        "common_misunderstandings": [
+          "不是高保真排版转换器",
+          "不是向量库或 chunking 系统"
+        ],
+        "open_questions": [
+          "不同文件格式转 Markdown 后的检索质量没有仓库基准"
+        ]
+      },
+      "body": "\n## Explanation\n\n先人话：把复杂文件压成模型更容易读的文本。术语点：Markdown 保留标题、列表、表格、链接等轻结构，适合后续 RAG chunking。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。\n\n## Supported by\n- [[claims/microsoft-markitdown-main-claim-2]]\n",
+      "excerpt": "先人话：把复杂文件压成模型更容易读的文本。术语点：Markdown 保留标题、列表、表格、链接等轻结构，适合后续 RAG chunking。 出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。",
+      "links": [
+        {
+          "target": "content/microsoft-markitdown",
+          "raw": "[[content/microsoft-markitdown]]"
+        },
+        {
+          "target": "claims/microsoft-markitdown-main-claim-2",
+          "raw": "[[claims/microsoft-markitdown-main-claim-2]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/markdown-vault",
+      "type": "concept",
+      "slug": "markdown-vault",
+      "title": "Markdown Vault",
+      "file": "concepts/markdown-vault.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Markdown vault",
+        "slug": "markdown-vault",
+        "kind": "concept",
+        "tags": [
+          "local-first",
+          "markdown",
+          "knowledge-base"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "refactoringhq-tolaria",
+        "related_content": [
+          "refactoringhq-tolaria"
+        ],
+        "related_concepts": [],
+        "explanation": "一组普通 Markdown 文件组成的知识库；Tolaria 把 YAML frontmatter、H1、wikilinks 解析成可导航图谱。",
+        "examples": [
+          "demo-vault-v2/25q2-laputa-v2.md 用 `type: Project` 和 `related_to` 建关系",
+          "docs/ABSTRACTIONS 说明 `type:`、`status:`、`belongs_to:` 等约定字段"
+        ],
+        "common_misunderstandings": [
+          "不是数据库 schema；类型是导航辅助，不是强校验。",
+          "不是只有根目录文件；当前源码也扫描子目录和 text/binary file kind。"
+        ],
+        "open_questions": [
+          "复杂 Markdown 扩展在 BlockNote 富文本往返中的无损程度需要逐项测试。"
+        ]
+      },
+      "body": "\n## Explanation\n\n一组普通 Markdown 文件组成的知识库；Tolaria 把 YAML frontmatter、H1、wikilinks 解析成可导航图谱。 出处:https://github.com/refactoringhq/tolaria。See [[content/refactoringhq-tolaria]]。\n\n## Supported by\n- [[claims/refactoringhq-tolaria-main-claim]]\n",
+      "excerpt": "一组普通 Markdown 文件组成的知识库；Tolaria 把 YAML frontmatter、H1、wikilinks 解析成可导航图谱。 出处:https://github.com/refactoringhq/tolaria。See [[content/refactoringhq-tolaria]]。",
+      "links": [
+        {
+          "target": "content/refactoringhq-tolaria",
+          "raw": "[[content/refactoringhq-tolaria]]"
+        },
+        {
+          "target": "claims/refactoringhq-tolaria-main-claim",
+          "raw": "[[claims/refactoringhq-tolaria-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/material-passport",
+      "type": "concept",
+      "slug": "material-passport",
+      "title": "Material Passport",
+      "file": "concepts/material-passport.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Material Passport",
+        "slug": "material-passport",
+        "kind": "concept",
+        "tags": [
+          "state",
+          "provenance",
+          "audit"
+        ],
+        "maturity": "active",
+        "first_seen_in": "imbad0202-academic-research-skills",
+        "related_content": [
+          "imbad0202-academic-research-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "跨阶段状态账本：记录材料来源、引用 provenance、实验 provenance、claim intent、verification status。白话说，它让下一个 agent 知道前面到底凭什么写。",
+        "examples": [
+          "examples/passport_with_experiment_provenance.yaml",
+          "shared/handoff_schemas.md",
+          "academic-pipeline/references/passport_as_reset_boundary.md"
+        ],
+        "common_misunderstandings": [
+          "它不是保证可复现的实验系统；`repro_lock` 文档也说是配置记录，不是 byte-replay guarantee。",
+          "实验由研究者外部完成，ARS 只 intake 和对齐 claim。"
+        ],
+        "open_questions": [
+          "长论文多轮修订时，passport 的人工维护成本和错误率是多少？"
+        ]
+      },
+      "body": "\n## Explanation\n\n跨阶段状态账本：记录材料来源、引用 provenance、实验 provenance、claim intent、verification status。白话说，它让下一个 agent 知道前面到底凭什么写。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/imbad0202-academic-research-skills]]。\n\n## Supported by\n- [[claims/imbad0202-academic-research-skills-main-claim]]\n",
+      "excerpt": "跨阶段状态账本：记录材料来源、引用 provenance、实验 provenance、claim intent、verification status。白话说，它让下一个 agent 知道前面到底凭什么写。 出处:https://github.com/imbad0202/academic-research-skills。See [[content/imbad0202-academic-research-skills]]。",
+      "links": [
+        {
+          "target": "content/imbad0202-academic-research-skills",
+          "raw": "[[content/imbad0202-academic-research-skills]]"
+        },
+        {
+          "target": "claims/imbad0202-academic-research-skills-main-claim",
+          "raw": "[[claims/imbad0202-academic-research-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/mcp-code-index",
       "type": "concept",
       "slug": "mcp-code-index",
@@ -3171,6 +3871,122 @@
         {
           "target": "claims/yikart-aitoearn-main-claim",
           "raw": "[[claims/yikart-aitoearn-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-tool-steering",
+      "type": "concept",
+      "slug": "mcp-tool-steering",
+      "title": "Mcp Tool Steering",
+      "file": "concepts/mcp-tool-steering.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP 工具使用引导",
+        "slug": "mcp-tool-steering",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "agent-workflow",
+          "tool-use"
+        ],
+        "maturity": "emerging",
+        "first_seen_in": "colbymchenry-codegraph",
+        "related_content": [
+          "colbymchenry-codegraph"
+        ],
+        "related_concepts": [],
+        "explanation": "人话：工具不只暴露 API，还要告诉 agent 什么时候该用哪个。术语：CodeGraph 在 MCP initialize response 里发送 SERVER_INSTRUCTIONS。",
+        "examples": [
+          "`codegraph_explore` 作为结构问题默认入口",
+          "`codegraph_node` file 模式替代读取源文件"
+        ],
+        "common_misunderstandings": [
+          "只注册 MCP 工具不够；agent 仍可能回到 grep/read。",
+          "过长说明会烧上下文；源码注释也提醒 keep it tight。"
+        ],
+        "open_questions": [
+          "不同 agent 对 initialize 指令的遵循度是否一致，repo 未提供跨客户端实测。"
+        ]
+      },
+      "body": "\n## Explanation\n\n人话：工具不只暴露 API，还要告诉 agent 什么时候该用哪个。术语：CodeGraph 在 MCP initialize response 里发送 SERVER_INSTRUCTIONS。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。\n\n## Supported by\n- [[claims/colbymchenry-codegraph-main-claim-2]]\n",
+      "excerpt": "人话：工具不只暴露 API，还要告诉 agent 什么时候该用哪个。术语：CodeGraph 在 MCP initialize response 里发送 SERVER_INSTRUCTIONS。 出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。",
+      "links": [
+        {
+          "target": "content/colbymchenry-codegraph",
+          "raw": "[[content/colbymchenry-codegraph]]"
+        },
+        {
+          "target": "claims/colbymchenry-codegraph-main-claim-2",
+          "raw": "[[claims/colbymchenry-codegraph-main-claim-2]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/mcp-vault-tools",
+      "type": "concept",
+      "slug": "mcp-vault-tools",
+      "title": "Mcp Vault Tools",
+      "file": "concepts/mcp-vault-tools.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "MCP vault tools",
+        "slug": "mcp-vault-tools",
+        "kind": "concept",
+        "tags": [
+          "mcp",
+          "agent-tools",
+          "local-files"
+        ],
+        "maturity": "active",
+        "first_seen_in": "refactoringhq-tolaria",
+        "related_content": [
+          "refactoringhq-tolaria"
+        ],
+        "related_concepts": [],
+        "explanation": "把 vault 读写能力封装成 Model Context Protocol 工具，让外部 AI 客户端通过 stdio 调用。",
+        "examples": [
+          "mcp-server/index.js 暴露 `search_notes`、`get_note`、`create_note`、`open_note`",
+          "tests/smoke/mcp-config-copy.spec.ts 验证复制出的 config 含 `mcpServers.tolaria`"
+        ],
+        "common_misunderstandings": [
+          "持久 MCP config 不绑定某一个 vault path；active vault 在调用时解析。",
+          "`create_note` 是窄写入能力，不等于任意文件编辑器。"
+        ],
+        "open_questions": [
+          "不同 MCP client 对 annotations、stdio 生命周期和配置格式兼容性仍需实测。"
+        ]
+      },
+      "body": "\n## Explanation\n\n把 vault 读写能力封装成 Model Context Protocol 工具，让外部 AI 客户端通过 stdio 调用。 出处:https://github.com/refactoringhq/tolaria。See [[content/refactoringhq-tolaria]]。\n\n## Supported by\n- [[claims/refactoringhq-tolaria-main-claim]]\n",
+      "excerpt": "把 vault 读写能力封装成 Model Context Protocol 工具，让外部 AI 客户端通过 stdio 调用。 出处:https://github.com/refactoringhq/tolaria。See [[content/refactoringhq-tolaria]]。",
+      "links": [
+        {
+          "target": "content/refactoringhq-tolaria",
+          "raw": "[[content/refactoringhq-tolaria]]"
+        },
+        {
+          "target": "claims/refactoringhq-tolaria-main-claim",
+          "raw": "[[claims/refactoringhq-tolaria-main-claim]]"
         }
       ],
       "headings": [
@@ -3514,6 +4330,65 @@
       ]
     },
     {
+      "id": "concept/panniantong-agent-reach-channel-health-check",
+      "type": "concept",
+      "slug": "panniantong-agent-reach-channel-health-check",
+      "title": "Panniantong Agent Reach Channel Health Check",
+      "file": "concepts/panniantong-agent-reach-channel-health-check.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Channel 健康检查",
+        "slug": "panniantong-agent-reach-channel-health-check",
+        "kind": "concept",
+        "tags": [
+          "observability",
+          "integration",
+          "platform-risk"
+        ],
+        "maturity": "active",
+        "first_seen_in": "panniantong-agent-reach",
+        "related_content": [
+          "panniantong-agent-reach"
+        ],
+        "related_concepts": [],
+        "explanation": "先人话：每个平台先问“能不能用”，再决定怎么用。术语：每个 channel 实现 `check(config)`，返回 ok、warn、off、error。",
+        "examples": [
+          "Twitter channel 调 `twitter status`",
+          "Reddit channel 调 `rdt status --json`",
+          "Douyin channel 调 `mcporter list douyin`"
+        ],
+        "common_misunderstandings": [
+          "健康检查通过不等于平台所有动作都稳定",
+          "warn 不是失败，通常表示需登录或配置"
+        ],
+        "open_questions": [
+          "是否需要真实端到端 smoke test 覆盖外部平台"
+        ]
+      },
+      "body": "\n## Explanation\n\n先人话：每个平台先问“能不能用”，再决定怎么用。术语：每个 channel 实现 `check(config)`，返回 ok、warn、off、error。 出处:https://github.com/panniantong/agent-reach。See [[content/panniantong-agent-reach]]。\n\n## Supported by\n- [[claims/panniantong-agent-reach-main-claim]]\n",
+      "excerpt": "先人话：每个平台先问“能不能用”，再决定怎么用。术语：每个 channel 实现 `check(config)`，返回 ok、warn、off、error。 出处:https://github.com/panniantong/agent-reach。See [[content/panniantong-agent-reach]]。",
+      "links": [
+        {
+          "target": "content/panniantong-agent-reach",
+          "raw": "[[content/panniantong-agent-reach]]"
+        },
+        {
+          "target": "claims/panniantong-agent-reach-main-claim",
+          "raw": "[[claims/panniantong-agent-reach-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/patched-browser-binary",
       "type": "concept",
       "slug": "patched-browser-binary",
@@ -3732,6 +4607,64 @@
         {
           "target": "claims/rohitg00-agentmemory-main-claim",
           "raw": "[[claims/rohitg00-agentmemory-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/phuryn-pm-skills-agent-skill",
+      "type": "concept",
+      "slug": "phuryn-pm-skills-agent-skill",
+      "title": "Phuryn Pm Skills Agent Skill",
+      "file": "concepts/phuryn-pm-skills-agent-skill.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Agent Skill",
+        "slug": "phuryn-pm-skills-agent-skill",
+        "kind": "concept",
+        "tags": [
+          "agent",
+          "prompt-engineering",
+          "workflow"
+        ],
+        "maturity": "active",
+        "first_seen_in": "phuryn-pm-skills",
+        "related_content": [
+          "phuryn-pm-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "给 agent 自动加载的一块领域知识或操作流程；白话说，就是把专家做事方法写成可触发的 Markdown 指令。",
+        "examples": [
+          "`pm-product-discovery/skills/prioritize-assumptions/SKILL.md` 用 Impact x Risk 排序假设。",
+          "`pm-ai-shipping/skills/intended-vs-implemented/SKILL.md` 定义如何比较文档意图和代码实现。"
+        ],
+        "common_misunderstandings": [
+          "skill 不是函数库；它没有强制执行逻辑。",
+          "skill 自动加载不等于模型一定完全遵守。"
+        ],
+        "open_questions": [
+          "不同宿主 agent 对 SKILL.md 的加载和截断策略是否一致，仓库未说明。"
+        ]
+      },
+      "body": "\n## Explanation\n\n给 agent 自动加载的一块领域知识或操作流程；白话说，就是把专家做事方法写成可触发的 Markdown 指令。 出处:https://github.com/phuryn/pm-skills。See [[content/phuryn-pm-skills]]。\n\n## Supported by\n- [[claims/phuryn-pm-skills-main-claim]]\n",
+      "excerpt": "给 agent 自动加载的一块领域知识或操作流程；白话说，就是把专家做事方法写成可触发的 Markdown 指令。 出处:https://github.com/phuryn/pm-skills。See [[content/phuryn-pm-skills]]。",
+      "links": [
+        {
+          "target": "content/phuryn-pm-skills",
+          "raw": "[[content/phuryn-pm-skills]]"
+        },
+        {
+          "target": "claims/phuryn-pm-skills-main-claim",
+          "raw": "[[claims/phuryn-pm-skills-main-claim]]"
         }
       ],
       "headings": [
@@ -4072,6 +5005,121 @@
         {
           "target": "claims/anthropic-cybersecurity-skills-main-claim",
           "raw": "[[claims/anthropic-cybersecurity-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/query-plan",
+      "type": "concept",
+      "slug": "query-plan",
+      "title": "Query Plan",
+      "file": "concepts/query-plan.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Query Plan",
+        "slug": "query-plan",
+        "kind": "concept",
+        "tags": [
+          "planning",
+          "retrieval",
+          "agent-loop"
+        ],
+        "maturity": "active",
+        "first_seen_in": "mvanhorn-last30days-skill",
+        "related_content": [
+          "mvanhorn-last30days-skill"
+        ],
+        "related_concepts": [],
+        "explanation": "把用户问题拆成多个检索子问题，每个子问题有搜索词、排序问题、目标源和权重。白话说，是先让模型写“搜索作战图”，再让脚本执行。",
+        "examples": [
+          "`planner.py` 的 `SubQuery(label, search_query, ranking_query, sources, weight)`",
+          "`--plan <tmpfile>`",
+          "`--competitors-plan <json-or-path>`"
+        ],
+        "common_misunderstandings": [
+          "以为 engine 内部 LLM planner 是必需；SKILL.md 说宿主模型本身就是 planner，named entity 应传 `--plan`。",
+          "把 JSON inline 到 shell；项目已改成 tmpfile 以避开 apostrophe 破坏引用。"
+        ],
+        "open_questions": [
+          "不同宿主模型生成 plan 的质量差异没有基准表。"
+        ]
+      },
+      "body": "\n## Explanation\n\n把用户问题拆成多个检索子问题，每个子问题有搜索词、排序问题、目标源和权重。白话说，是先让模型写“搜索作战图”，再让脚本执行。 出处:https://github.com/mvanhorn/last30days-skill。See [[content/mvanhorn-last30days-skill]]。\n\n## Supported by\n- [[claims/mvanhorn-last30days-skill-main-claim]]\n",
+      "excerpt": "把用户问题拆成多个检索子问题，每个子问题有搜索词、排序问题、目标源和权重。白话说，是先让模型写“搜索作战图”，再让脚本执行。 出处:https://github.com/mvanhorn/last30days-skill。See [[content/mvanhorn-last30days-skill]]。",
+      "links": [
+        {
+          "target": "content/mvanhorn-last30days-skill",
+          "raw": "[[content/mvanhorn-last30days-skill]]"
+        },
+        {
+          "target": "claims/mvanhorn-last30days-skill-main-claim",
+          "raw": "[[claims/mvanhorn-last30days-skill-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/react-agent-loop",
+      "type": "concept",
+      "slug": "react-agent-loop",
+      "title": "React Agent Loop",
+      "file": "concepts/react-agent-loop.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "ReAct Agent Loop",
+        "slug": "react-agent-loop",
+        "kind": "concept",
+        "tags": [
+          "agents",
+          "tools"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "rohitg00-ai-engineering-from-scratch",
+        "related_content": [
+          "rohitg00-ai-engineering-from-scratch"
+        ],
+        "related_concepts": [],
+        "explanation": "让模型在“想、调工具、读结果、继续”之间循环；白话就是别让 LLM 一口气瞎答。",
+        "examples": [
+          "ToolRegistry.dispatch",
+          "AgentLoop.max_turns=10"
+        ],
+        "common_misunderstandings": [
+          "只有用了 LangGraph/CrewAI 才叫 agent loop"
+        ],
+        "open_questions": [
+          "真实 provider 的 tool schema 适配未在该 lesson 中完成"
+        ]
+      },
+      "body": "\n## Explanation\n\n让模型在“想、调工具、读结果、继续”之间循环；白话就是别让 LLM 一口气瞎答。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/rohitg00-ai-engineering-from-scratch]]。\n\n## Supported by\n- [[claims/rohitg00-ai-engineering-from-scratch-main-claim]]\n",
+      "excerpt": "让模型在“想、调工具、读结果、继续”之间循环；白话就是别让 LLM 一口气瞎答。 出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/rohitg00-ai-engineering-from-scratch]]。",
+      "links": [
+        {
+          "target": "content/rohitg00-ai-engineering-from-scratch",
+          "raw": "[[content/rohitg00-ai-engineering-from-scratch]]"
+        },
+        {
+          "target": "claims/rohitg00-ai-engineering-from-scratch-main-claim",
+          "raw": "[[claims/rohitg00-ai-engineering-from-scratch-main-claim]]"
         }
       ],
       "headings": [
@@ -4490,6 +5538,122 @@
       ]
     },
     {
+      "id": "concept/short-video-pipeline",
+      "type": "concept",
+      "slug": "short-video-pipeline",
+      "title": "Short Video Pipeline",
+      "file": "concepts/short-video-pipeline.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "短视频流水线",
+        "slug": "short-video-pipeline",
+        "kind": "concept",
+        "tags": [
+          "ai-app",
+          "video",
+          "workflow"
+        ],
+        "maturity": "active",
+        "first_seen_in": "harry0703-moneyprinterturbo",
+        "related_content": [
+          "harry0703-moneyprinterturbo"
+        ],
+        "related_concepts": [],
+        "explanation": "把主题到成片拆成脚本、搜索词、配音、字幕、素材、合成几个阶段，每阶段有中间产物，便于失败重试和调试。",
+        "examples": [
+          "MoneyPrinterTurbo 的 `app/services/task.py:start`",
+          "`stop_at=audio/subtitle/materials` 分阶段返回"
+        ],
+        "common_misunderstandings": [
+          "这不是从零生成视频画面，而是素材检索加自动剪辑。",
+          "LLM 只负责文案和搜索词，不负责实际视频渲染。"
+        ],
+        "open_questions": [
+          "不同主题下素材相关性的稳定性需要实测。"
+        ]
+      },
+      "body": "\n## Explanation\n\n把主题到成片拆成脚本、搜索词、配音、字幕、素材、合成几个阶段，每阶段有中间产物，便于失败重试和调试。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/harry0703-moneyprinterturbo]]。\n\n## Supported by\n- [[claims/harry0703-moneyprinterturbo-main-claim]]\n",
+      "excerpt": "把主题到成片拆成脚本、搜索词、配音、字幕、素材、合成几个阶段，每阶段有中间产物，便于失败重试和调试。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/harry0703-moneyprinterturbo]]。",
+      "links": [
+        {
+          "target": "content/harry0703-moneyprinterturbo",
+          "raw": "[[content/harry0703-moneyprinterturbo]]"
+        },
+        {
+          "target": "claims/harry0703-moneyprinterturbo-main-claim",
+          "raw": "[[claims/harry0703-moneyprinterturbo-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/slash-command-workflow",
+      "type": "concept",
+      "slug": "slash-command-workflow",
+      "title": "Slash Command Workflow",
+      "file": "concepts/slash-command-workflow.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Slash Command Workflow",
+        "slug": "slash-command-workflow",
+        "kind": "concept",
+        "tags": [
+          "claude-code",
+          "workflow",
+          "pm"
+        ],
+        "maturity": "active",
+        "first_seen_in": "phuryn-pm-skills",
+        "related_content": [
+          "phuryn-pm-skills"
+        ],
+        "related_concepts": [],
+        "explanation": "用户输入 `/command` 后触发的多步骤工作流；白话说，就是把一次复杂咨询拆成固定剧本。",
+        "examples": [
+          "`/discover` 串起想法、假设、排序、实验和 Discovery Plan。",
+          "`/ship-check` 串起文档、agent context、安全审计、性能审计、测试覆盖和 shipping packet。"
+        ],
+        "common_misunderstandings": [
+          "slash command 不是所有 AI 工具都支持；README 自称 Codex 不把它作为 Codex slash command 运行。",
+          "command 文件是 Markdown 指令，不是可测试状态机。"
+        ],
+        "open_questions": [
+          "Claude/Cowork 在长流程中如何处理中途用户选择和上下文长度，仓库未给 transcript。"
+        ]
+      },
+      "body": "\n## Explanation\n\n用户输入 `/command` 后触发的多步骤工作流；白话说，就是把一次复杂咨询拆成固定剧本。 出处:https://github.com/phuryn/pm-skills。See [[content/phuryn-pm-skills]]。\n\n## Supported by\n- [[claims/phuryn-pm-skills-main-claim]]\n",
+      "excerpt": "用户输入 `/command` 后触发的多步骤工作流；白话说，就是把一次复杂咨询拆成固定剧本。 出处:https://github.com/phuryn/pm-skills。See [[content/phuryn-pm-skills]]。",
+      "links": [
+        {
+          "target": "content/phuryn-pm-skills",
+          "raw": "[[content/phuryn-pm-skills]]"
+        },
+        {
+          "target": "claims/phuryn-pm-skills-main-claim",
+          "raw": "[[claims/phuryn-pm-skills-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
       "id": "concept/sqlite-knowledge-graph",
       "type": "concept",
       "slug": "sqlite-knowledge-graph",
@@ -4652,6 +5816,64 @@
         {
           "target": "claims/supermemory-main-claim",
           "raw": "[[claims/supermemory-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/stock-footage-assembly",
+      "type": "concept",
+      "slug": "stock-footage-assembly",
+      "title": "Stock Footage Assembly",
+      "file": "concepts/stock-footage-assembly.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "素材库拼装成片",
+        "slug": "stock-footage-assembly",
+        "kind": "concept",
+        "tags": [
+          "pexels",
+          "pixabay",
+          "moviepy"
+        ],
+        "maturity": "stable",
+        "first_seen_in": "harry0703-moneyprinterturbo",
+        "related_content": [
+          "harry0703-moneyprinterturbo"
+        ],
+        "related_concepts": [],
+        "explanation": "用 Pexels/Pixabay 或本地素材按脚本时长裁剪、拼接，再叠加旁白、字幕和 BGM。",
+        "examples": [
+          "app/services/material.py 搜索和下载素材",
+          "app/services/video.py combine_videos/generate_video"
+        ],
+        "common_misunderstandings": [
+          "“无版权”不能只看项目 README，仍要看素材平台条款。",
+          "素材库拼装不会自动保证画面和脚本逐句精确匹配。"
+        ],
+        "open_questions": [
+          "商业发布场景下素材授权边界需要单独确认。"
+        ]
+      },
+      "body": "\n## Explanation\n\n用 Pexels/Pixabay 或本地素材按脚本时长裁剪、拼接，再叠加旁白、字幕和 BGM。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/harry0703-moneyprinterturbo]]。\n\n## Supported by\n- [[claims/harry0703-moneyprinterturbo-main-claim]]\n",
+      "excerpt": "用 Pexels/Pixabay 或本地素材按脚本时长裁剪、拼接，再叠加旁白、字幕和 BGM。 出处:https://github.com/harry0703/moneyprinterturbo。See [[content/harry0703-moneyprinterturbo]]。",
+      "links": [
+        {
+          "target": "content/harry0703-moneyprinterturbo",
+          "raw": "[[content/harry0703-moneyprinterturbo]]"
+        },
+        {
+          "target": "claims/harry0703-moneyprinterturbo-main-claim",
+          "raw": "[[claims/harry0703-moneyprinterturbo-main-claim]]"
         }
       ],
       "headings": [
@@ -5258,6 +6480,63 @@
         {
           "depth": 2,
           "text": "Explanation"
+        }
+      ]
+    },
+    {
+      "id": "concept/unified-read-path",
+      "type": "concept",
+      "slug": "unified-read-path",
+      "title": "Unified Read Path",
+      "file": "concepts/unified-read-path.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "统一读取路径",
+        "slug": "unified-read-path",
+        "kind": "concept",
+        "tags": [
+          "tool-design",
+          "retrieval",
+          "agent-runtime"
+        ],
+        "maturity": "active",
+        "first_seen_in": "can1357-oh-my-pi",
+        "related_content": [
+          "can1357-oh-my-pi"
+        ],
+        "related_concepts": [],
+        "explanation": "`read({path})` 统一处理本地文件、URL、SQLite、归档和内部协议；白话说，模型只学一个读取动作。",
+        "examples": [
+          "`memory://root/MEMORY.md` 读取长期记忆。",
+          "`agent://<id>/<path>` 从子代理 JSON 输出里抽字段。"
+        ],
+        "common_misunderstandings": [
+          "统一 path 不等于所有格式都可靠；转换失败仍会返回不可读提示。"
+        ],
+        "open_questions": [
+          "URL/PDF/Office 转换在生产数据上的失败率未知。"
+        ]
+      },
+      "body": "\n## Explanation\n\n`read({path})` 统一处理本地文件、URL、SQLite、归档和内部协议；白话说，模型只学一个读取动作。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。\n\n## Supported by\n- [[claims/can1357-oh-my-pi-main-claim-2]]\n",
+      "excerpt": "`read({path})` 统一处理本地文件、URL、SQLite、归档和内部协议；白话说，模型只学一个读取动作。 出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。",
+      "links": [
+        {
+          "target": "content/can1357-oh-my-pi",
+          "raw": "[[content/can1357-oh-my-pi]]"
+        },
+        {
+          "target": "claims/can1357-oh-my-pi-main-claim-2",
+          "raw": "[[claims/can1357-oh-my-pi-main-claim-2]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
         }
       ]
     },

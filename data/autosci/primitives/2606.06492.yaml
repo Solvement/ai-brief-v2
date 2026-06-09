@@ -1,59 +1,82 @@
-primitive_id: hypernetwork-generated-incremental-adapters
+primitive_id: repo-conditioned-versioned-lora-memory
 source_paper: "2606.06492"
-title: "Code2LoRA: 超网络一次前向生成知识适配器 + GRU 增量更新随演化"
-relevance_level: direct_pattern_medium       # 不是 agent 逻辑件,而是'知识怎么进参数 + 怎么随演化增量更新'的可迁移工程范式
+title: "Code2LoRA: Hypernetwork-Generated Repository Adapters under Software Evolution"
+relevance_level: direct_pattern_strong
 audience: ai_only
 core_pattern: >
-  把'让模型懂一个大知识源(代码仓库)'从两种贵做法——① 上下文注入(RAG/长上下文,每次查询重付 token);
-  ② 每实例单训一个 LoRA(训练贵、对演化脆)——换成'训一个超网络,给它知识源、一次前向就生成专属 LoRA,
-  把知识烧进参数、推理零额外 token'。两条正交轴:how(知识怎么进参数)= Static 把快照映成适配器;
-  when(何时刷新)= Evo 用 GRU 把按时序的增量(commit diff)累积进隐状态,做增量更新而非全量重训,
-  得到一条随知识源生命周期演化的'适配器轨迹'。关键红利:超网络学的是'怎么生成适配器'的跨实例迁移,
-  零按实例训练就能追平/超过'每实例单训',即'学生成器 > 学单实例'。
-problem_class: inject-evolving-large-knowledge-into-parameters-without-per-query-context
+  把 repository context 从 per-query retrieved tokens 改造成 versioned parameter memory:
+  先用 frozen code embedder 把 non-test source snapshot 压成 repo embedding,再用 hypernetwork
+  生成 repo-specific LoRA adapter;对活跃仓库,用 initial repo embedding 初始化 GRU state,
+  再按 chronological commit diffs 更新 hidden state,从当前 state 生成 commit-indexed LoRA。
+  关键不是“LoRA 本身”,而是 repo_id + commit_sha 绑定的 adapter state,让仓库知识以可缓存、
+  可失效、可验证的参数先验参与 coding agent 推理。
+problem_class: repository-aware-code-agent-needs-low-token-overhead-and-versioned-memory
 components:
-  - context_to_fixed_vector     # 分块 embed + 加权均值‖最大池化,把大知识源压成定长向量
-  - hypernetwork_lora_head      # 一次前向把条件向量映成 LoRA(全模块覆盖 > 仅 Q/V)
-  - gru_incremental_update      # 用 RNN 隐状态累积增量(diff),每步更新比全量重编码便宜
-  - strengthened_baseline_ablation # 把基线强化到同输入同目标,隔离真正贡献的零件
+  - frozen_repository_encoder
+  - repo_embedding_pooler
+  - hypernetwork_lora_generator
+  - static_snapshot_adapter
+  - recurrent_diff_state_gru
+  - commit_indexed_adapter_cache
+  - execution_verifier
 autosci_modules:
-  - typed_memory             # 生成的适配器 = 一种把知识烧进参数的结构化记忆(零推理开销)
-  - self_evolve_controller   # Evo 的'增量更新适配器随演化' = 知识源增长时的自进化写入
-  - self_skill_distiller     # 超网络把'知识源→可复用适配器'的映射学成一个生成器
-  - guard                    # 评测诚实:EM 表面指标 + OOD 长度伪影 → 只能表内比较,质量门要识破伪影
+  - typed_memory
+  - self_evolve_controller
+  - tool_orchestrator
+  - guard
 inputs:
-  - large_knowledge_source   # 大知识源(代码仓库 / 笔记库 / 文档集)
-  - incremental_diffs        # 按时序的增量更新(commit diff / 新增笔记)
-  - frozen_base_model        # 冻结基座 LLM(只训超网络)
+  - repository_snapshot_non_test_source
+  - commit_diff_stream
+  - repo_id
+  - commit_sha
+  - target_backbone_projection_schema
+  - downstream_code_task_prefix
 outputs:
-  - generated_adapter        # 一次前向生成的知识专属 LoRA(零推理 token 开销)
-  - adapter_trajectory       # 随知识源演化的适配器序列(Evo)
-  - injection_tradeoff       # 上下文注入 vs 参数注入的成本/延迟/准确率取舍
+  - repo_specific_lora_adapter
+  - commit_specific_adapter_state
+  - adapter_version_metadata
+  - assertion_or_code_completion
+  - verifier_trace
 implementation_idea: >
-  单卡可复现的最小版:① 编码器把知识源分块 embed + 加权均值‖最大池化成定长向量;② 一个 2 层 MLP+头的超网络
-  把向量映成 LoRA(先在玩具任务跑通'学生成器');③ Evo 版在头前插 GRU,把'新增 diff/笔记'累积进隐状态做增量更新,
-  截断 BPTT 每 K 步 detach。先做'RAG vs 生成式 LoRA'的成本/延迟/准确率对照台,再把'增量更新适配器随知识增长'
-  接进 AutoSci 的云端共享库(知识增长时增量写参数,而非全量重训)。
+  不先复现论文约 720M/745M 参数 hypernetwork。先做小型版本:
+  从 20-50 个 permissively licensed Python repos 抽 pytest/unittest assertion completion,
+  建 CR/IR/temporal split。实现 A=RAG@k,B=dependency-resolved context,C=shared LoRA,
+  D=repo-conditioned lightweight adapter/router。repo state 绑定 repo_id+commit_sha,
+  每个 commit 更新 diff embedding cache。输出后跑 pytest/ruff/mypy,记录 EM、execution pass、
+  latency、extra tokens、adapter storage 与 stale-after-commit 下降。
 small_experiment: >
-  A=RAG(每查询塞上下文)vs B=超网络生成 LoRA(零推理 token),在同一'懂某知识源'任务上比成本/延迟/准确率;
-  再做演化消融:静态快照适配器 vs GRU 增量适配器,在'知识源随时间更新'后看谁掉点少(复刻 Static 在演化轨道掉点、
-  Evo 不掉);并复刻'强化基线隔离生成头'的方法论。1-7 天(小模型、单卡)。
+  Mini RepoPeftBench:静态 track 用 last snapshot;演化 track 每个修改 assertion 的 commit
+  生成 prefix-target pair,每 commit cap <=8 tasks。比较 Static state vs GRU/diff state,
+  看 temporal CR EM 是否因 diff state 提升。额外做 DRC coverage 分层:imports 可解析 vs 不可解析,
+  检查 RAG/DRC 是否只在 coverage 子集有效。
 design_principles:
-  - id: parametric-injection-beats-repeated-context-payment
-    principle: "知识相对稳定、查询频繁时,把知识一次性烧进参数(零推理 token 开销)常比 RAG 每次查询重付上下文更划算;反之知识极易变、查询稀疏时 RAG 更灵活——这是取舍,不是银弹。"
-    transfers_to: "AutoSci/agent 的知识注入选型:高频稳定知识走参数化适配器,低频易变知识走检索。"
-  - id: learn-a-generator-not-a-per-instance-artifact
-    principle: "与其为每个实例(每仓库/每用户)单训一个适配器,不如训一个超网络学'怎么生成适配器'的跨实例规律——零按实例训练就能追平/超过单训,迁移红利来自跨实例学习。"
-    transfers_to: "任何'每客户/每项目都要定制一份'的场景:改成'学一个适配器生成器',省训练、能泛化到未见实例。"
-  - id: incremental-update-over-full-retrain-for-evolving-knowledge
-    principle: "知识会演化时,别每次全量重训;用 RNN 隐状态累积增量(diff),每步只跑一步更新,既便宜又跟得上变化——静态快照会随演化'变味',增量适配器不会。"
-    transfers_to: "会增长的记忆/知识库(外置大脑随笔记增长):增量写入持久状态,而非周期性全量重建。"
-  - id: strengthen-the-baseline-to-isolate-the-real-contribution
-    principle: "想证明某个核心零件有用,把基线喂到和你同样的输入/同样的目标覆盖,只留那一个零件的差异(本文据此把 Text2LoRA 强化到同输入同 7 投影,仍落后,干净钉死'生成头'为瓶颈)。"
-    transfers_to: "造件/评测方法论:消融要隔离变量,否则赢了也说不清是不是输入/规模占了便宜。"
+  - id: parameter-memory-over-repeated-context
+    principle: "长期 repo conventions 适合进入 adapter 参数;局部证据仍可由 RAG 查,但不要每次把整个仓库当 token 塞进 prompt。"
+    transfers_to: "企业代码助手 / FDE 客户 repo onboarding / coding agent memory layer。"
+  - id: versioned-adapter-state
+    principle: "repo adapter 必须绑定 repo_id + commit_sha + embedding_hash;否则只是把 stale context 换成 stale parameters。"
+    transfers_to: "PR agent / CI bot / 自动测试生成 / 长期运行 copilot。"
+  - id: split-stable-and-evolving-context
+    principle: "稳定 snapshot knowledge 与 commit diff knowledge 分开建模;活跃软件系统需要 incremental refresh policy。"
+    transfers_to: "self-evolving code agents / repo migration agents。"
+  - id: adapter-is-prior-not-proof
+    principle: "生成的 LoRA 提供 repo-specific prior,不证明输出正确;必须接 execution/static-analysis/license verifier。"
+    transfers_to: "AutoSci code generation guard / production coding assistant safety。"
+  - id: evaluate-quality-cost-together
+    principle: "报告 EM/EditSim/CodeBLEU 之外,必须同时报告 extra tokens、latency、adapter storage、训练/刷新成本。"
+    transfers_to: "agent eval dashboards / model routing decisions。"
+evidence_hooks:
+  - "Static track: Code2LoRA-Static 63.8% CR EM / 66.2% IR EM; strongest baseline FFT+RAG 53.9% CR EM."
+  - "Evolution track: Code2LoRA-Evo 60.3% CR EM / 64.5% IR EM; Single LoRA 55.1% / 61.3%."
+  - "OOD: Code2LoRA-Evo 74.1% EM, but target-length artifact inflates absolute EM; within-OOD margin about +1.8 pp."
+  - "Efficiency: RAG ~1,500 extra tokens/query; DRC ~500-2,000; Code2LoRA variants 0 extra tokens but 679 MB / 65 MB shared storage."
 risks:
-  - validated_only_at_1p5b      # 只在 Qwen2.5-Coder-1.5B/Python/断言补全验证;大基座可行性未验证(作者自陈)
-  - surface_metric_em           # EM 漏功能等价;以 EditSim/CodeBLEU + pytest 探针缓解但未逐条执行
-  - ood_length_artifact         # OOD 断言目标更短(中位7 vs 12-13字符)一致抬高 EM,72%+ 只能表内比较
-  - hypernet_size_grows         # 超网络 ~720-745M 随基座投影维增长;参数注入的相对成本随基座变化
+  - source_repo_unavailable_for_audit
+  - hf_artifacts_unavailable_for_audit
+  - narrow_python_assertion_completion_scope
+  - exact_match_misses_functional_equivalence
+  - hypernetwork_parameter_count_large
+  - stale_adapter_without_commit_versioning
+  - private_repo_attribution_and_license_risk
+  - adapter_prior_can_emit_insecure_or_wrong_code
 status: extracted

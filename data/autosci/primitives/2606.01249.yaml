@@ -54,8 +54,19 @@ design_principles:
     transfers_to: "难任务自进化、工具使用训练、长链推理训练。"
 risks:
   - code_not_released
+  - models_not_released
   - teacher_distribution_may_be_unreliable
   - hyperparameter_sensitivity_underexplored
   - controlled_benchmark_no_deployment
   - student_ceiling_remains_below_teacher
+source_audit:
+  paper_read: arxiv_v2_pdf_and_tex
+  repo_clone_head: b4bee6fb98166a9ca173ea201e77b397e2c01899
+  repo_contents_observed:
+    - README.md
+    - LICENSE
+    - imgs/f1-1.PNG
+    - imgs/f2.png
+    - imgs/test.log
+  released_artifacts_observed: "technical report only; training/evaluation code and HuggingFace models not released in README ToDo"
 status: extracted

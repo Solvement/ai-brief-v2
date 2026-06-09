@@ -51,6 +51,8 @@ export interface ProjectTierTemplate {
   tag?: string;
   one_sentence_positioning?: string;
   what_it_does?: string;
+  /** New concise paradigm (2026-06-08): architecture / data-flow as a ```mermaid block. */
+  architecture_diagram?: string;
   metadata?: {
     language?: string | null;
     total_stars?: number | string;

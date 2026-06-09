@@ -6,25 +6,23 @@ relevance_level: "project_pattern"
 audience: "ai_only"
 core_pattern: >
 
-  Compress-Cache-Retrieve marker: 把压缩输出写成可读 marker，例如文档中的 `[1000 items compressed to 20. Retrieve
-  more: hash=abc123]`，同时把原文存到本地 store，用 MCP/工具调用按 hash 取回。 ContentRouter safety gates: 先判
-  role、长度、content type、近期窗口、analysis intent，再决定是否压缩；默认跳过 user/system/developer、近期代码、已有 retrieval
-  marker 和小内容。 Proxy-first SDK: 让 TS SDK 只做格式转换和 HTTP 调用，把压缩算法集中在本地 Python/Rust proxy；默认
-  `HEADROOM_BASE_URL` / `http://localhost:8787`。 Agent failure learning marker block: `headroom
-  learn` 把失败路径和成功修正写入 `CLAUDE.md` / `MEMORY.md`，并用 `<!-- headroom:learn:start -->` 到 `<!--
-  headroom:learn:end -->` 管理自动生成区。
+  ContentRouter 内容路由: 把 tool output 当作异构内容流，先检测 JSON/log/search/code/html/text，再分派到不同
+  compressor；保留 passthrough 和保护分支。 CCR 可逆压缩: 压缩结果里带 hash 或 marker，把原文放本地 store，让模型需要时通过 retrieval
+  tool 查回。 代理优先接入: 提供 `headroom proxy --port 8787`，用 `OPENAI_BASE_URL` 或 `ANTHROPIC_BASE_URL`
+  改流量，不强迫每个应用改 SDK 调用。 MCP retrieval 工具: 把压缩、取回、统计暴露成 MCP stdio 工具，让 Claude Code/Cursor/Codex 类
+  host 自己调用。 CacheAligner 前缀稳定: 把动态内容后移，尽量让 provider prompt prefix cache 命中；与 token 压缩是两条收益线。
 problem_class: "reliable-agent-runtime-and-tool-orchestration"
 status: "extracted"
-extracted_at: "2026-06-08T14:37:57.825Z"
+extracted_at: "2026-06-09T00:08:44.165Z"
 components:
   - "agent_orchestrator"
   - "tool_protocol_adapter"
   - "developer_control_surface"
   - "model_or_retrieval_layer"
   - "validation_harness"
-  - "compress-cache-retrieve-marker"
-  - "contentrouter-safety-gates"
-  - "proxy-first-sdk"
+  - "contentrouter"
+  - "ccr"
+  - "project"
 autosci_modules:
   - "pattern_library"
   - "experiment_runner"
@@ -45,12 +43,13 @@ implementation_idea: >
 
   Rebuild the agent-infra pattern from chopratejas/headroom as a small AutoSci module: extract the
   control flow, define typed inputs/outputs, run it on one synthetic research task, and log traces
-  plus validation results. Reference flow: 人话：一个真实使用流可以从 quickstart 的 500 条搜索结果开始。Python 里构造
-  `messages`：system 是“You analyze search results.”，assistant 里有 `tool_calls`，tool 消息把 500 个
-  `{title, snippet, score}` 结果 JSON 化，最后用户问“What are the top 3 results?”，然后调用 `result =
-  compress(messages, model="gpt-4o")`（来源：docs/content/docs/quickstart.mdx 2. Compress messages）。
-  术语流程：`compress()` 先处理 hooks，再从消息里抽取 user query 给变换器做 relevance scoring，然后调用 pipeline；返回
-  `tokens_before`、`tokens_after`、`tokens_saved`、`compression_ratio`、`transforms_applied`（来源：h
+  plus validation results. Reference flow: 真实流：示例 `examples/context_compression_demo.py` 构造 OpenAI
+  格式 messages，第三条是 `role: tool` 的检索输出，然后调用 `compress(messages,
+  model="claude-sonnet-4-5-20250929")`，最后断言 tokens_saved > 0、message count 不变、tool message
+  仍存在。（来源：examples/context_compression_demo.py） ```mermaid flowchart TD A[Agent 或 App messages]
+  --> B[compress 或 proxy] B --> C[Pipeline] C --> D[CacheAligner] D --> E[ContentRouter] E -->
+  F{内容类型} F --> G[JSON SmartCrusher] F --> H[日志 搜索 代码 文本] G --> I[CCR 本地存原文] H --> I I --> J[压缩
+  messages] J -
 small_experiment: >
 
   Compare baseline free-form execution against the extracted agent-infra pattern from
@@ -58,19 +57,19 @@ small_experiment: >
   failure recovery, and cost over 1-3 days.
 design_principles:
   - id: "agent-infra-boundary-as-module"
-    principle: "Compress-Cache-Retrieve marker: 把压缩输出写成可读 marker，例如文档中的 `[1000 items compressed to 20. Retrieve more: hash=abc123]`，同时把原文存到本地 store，用 MCP/工具调用按 hash 取回。 ContentRouter safety gates: 先判 role、长度、content type、近期窗口、analysis intent，再决定是否压缩；默认跳过 user/system/developer、近期代码、已有 retrieval marker 和小内容。 Proxy-first SDK: 让 TS SDK 只做格式转换和 HTTP 调用，把压缩算法集中在本地 Python/Rust proxy；默认 `HEADROOM_BASE_URL` / `http://localhost:8787`。 Agent failure learning marker block: `headroom learn` 把失败路径和成功修正写入 `CLAUDE.md` / `MEMORY.md`，并用 `<!-- headroom:learn:start -->` 到 `<!-- headroom:learn:end -->` 管理自动生成区。"
+    principle: "ContentRouter 内容路由: 把 tool output 当作异构内容流，先检测 JSON/log/search/code/html/text，再分派到不同 compressor；保留 passthrough 和保护分支。 CCR 可逆压缩: 压缩结果里带 hash 或 marker，把原文放本地 store，让模型需要时通过 retrieval tool 查回。 代理优先接入: 提供 `headroom proxy --port 8787`，用 `OPENAI_BASE_URL` 或 `ANTHROPIC_BASE_URL` 改流量，不强迫每个应用改 SDK 调用。 MCP retrieval 工具: 把压缩、取回、统计暴露成 MCP stdio 工具，让 Claude Code/Cursor/Codex 类 host 自己调用。 CacheAligner 前缀稳定: 把动态内容后移，尽量让 provider prompt prefix cache 命中；与 token 压缩是两条收益线。"
     transfers_to: "Extract the reusable agent-infra boundary from chopratejas/headroom into a typed AutoSci module."
   - id: "agent-infra-observable-flow"
-    principle: "人话：一个真实使用流可以从 quickstart 的 500 条搜索结果开始。Python 里构造 `messages`：system 是“You analyze search results.”，assistant 里有 `tool_calls`，tool 消息把 500 个 `{title, snippet, score}` 结果 JSON 化，最后用户问“What are the top 3 results?”，然后调用 `result = compress(messages, model=\"gpt-4o\")`（来源：docs/content/docs/quickstart.mdx 2. Compress messages）。 术语流程：`compress()` 先处理 hooks，再从消息里抽取 user query 给变换器做 relevance scoring，然后调用 pipeline；返回 `tokens_before`、`tokens_after`、`tokens_saved`、`compression_ratio`、`transforms_applied`（来源：headroom/compress.py compress）。默认 pipeline 在源码注释中是 `CacheAligner -> ContentRouter`，其中 ContentRouter 会跳过 user/system/developer 消息、小内容、近期代码、analysis intent 下的代码和已有 `Retrieve more: hash=` marker 的内容（来源：headroom/compress.py _get_pipeline；headroom/transforms/content_router.py message loop）。 对那条 500 结果 tool 消息，ContentRouter 会把 cache miss 放入 `pending_tasks`，最多用 `HEADROOM_COMPRESS_WORKERS`，默认字符串 `\"4\"`，并行调用 `self.compress(...)`；如果返回的 `result.compression_ratio < min_ratio`，就把压缩文本写回该消息，并记录类似 `router:<strategy>:<ratio>` 的 transform marker（来源：headroom/transforms/content_router.py pending_tasks / merge results）。JSON 数组会走 SmartCrusher；Python 类实际是 Rust-backed，通过 `from headroom._core import SmartCrusher` 和 `SmartCrusherConfig`，配置包括 `min_items_to_analyze=5`、`min_tokens_to_crush=200`、`max_items_after_crush=15`、`first_fraction=0.3`、`last_fraction=0.15`（来源：headroom/transforms/smart_crusher.py SmartCrusherConfig / SmartCrusher）。 可逆部分：SmartCrusher 或其他 compressor 产生 marker 后，Python store 会保存原文；普通 store 的默认 TTL 是 300 秒，hash 默认 `sha256(original)[:24]`；MCP 的 `headroom_compress` 会把输入包装成 `[{\"role\":\"tool\",\"content\":content}]` 调 `compress()`，再把原文存入本地 `CompressionStore(max_entries=500, default_ttl=MCP_SESSION_TTL)`，返回 `compressed`、`hash`、`original_tokens`、`compressed_tokens`、`tokens_saved`、`savings_percent`、`transforms`（来源：headroom/cache/compression_store.py CompressionStore.store；headroom/ccr/mcp_server.py _compress_content）。需要原文时，`headroom_retrieve` 先查本地 store；如果带 `query`，调用 `store.search(hash_key, query)`；否则 `store.retrieve(hash_key)`；失败后再 POST 到 proxy 的 `/v1/retrieve`（来源：headroom/ccr/mcp_server.py _retrieve_content / _retrieve_via_proxy）。"
+    principle: "真实流：示例 `examples/context_compression_demo.py` 构造 OpenAI 格式 messages，第三条是 `role: tool` 的检索输出，然后调用 `compress(messages, model=\"claude-sonnet-4-5-20250929\")`，最后断言 tokens_saved > 0、message count 不变、tool message 仍存在。（来源：examples/context_compression_demo.py） ```mermaid flowchart TD A[Agent 或 App messages] --> B[compress 或 proxy] B --> C[Pipeline] C --> D[CacheAligner] D --> E[ContentRouter] E --> F{内容类型} F --> G[JSON SmartCrusher] F --> H[日志 搜索 代码 文本] G --> I[CCR 本地存原文] H --> I I --> J[压缩 messages] J --> K[LLM] K --> L[需要原文] L --> M[headroom_retrieve] M --> I ``` 关键节点：`compress()` 默认 `model=\"claude-sonnet-4-5-20250929\"`、`model_limit=200000`，会把用户 query 提取成 context 后交给 pipeline。（来源：headroom/compress.py compress）ContentRouter 对用户消息、系统/开发者消息、小内容有保护逻辑；不是所有内容都会被压缩。（来源：headroom/transforms/content_router.py apply）MCP 的 `headroom_compress` 会把内容包成 `role: tool` 再走同一个 `compress()`，并把原文存入本地 store。（来源：headroom/ccr/mcp_server.py _compress_content）"
     transfers_to: "Use the flow as an inspectable experiment harness with logs, checkpoints, and failure reports."
   - id: "agent-infra-risk-first-transfer"
-    principle: "Transfer the architecture together with its main failure boundary: Rust + maturin + PyO3 extension `headroom._core`: 没有预构建 wheel 或本机没有工具链时，安装会尝试从 sdist 编译 Rust 扩展；SmartCrusher 源码是 hard import `headroom._core`，没有 Python fallback。."
+    principle: "Transfer the architecture together with its main failure boundary: 本地 Python proxy / FastAPI / uvicorn: proxy 没启动或端口不可用时，TypeScript SDK 压缩不可用；agent wrapper 也会受影响。."
     transfers_to: "Require an explicit dependency and over-transfer risk review before promoting the pattern into AutoSci."
 risks:
-  - "Rust + maturin + PyO3 extension `headroom._core`: 没有预构建 wheel 或本机没有工具链时，安装会尝试从 sdist 编译 Rust 扩展；SmartCrusher 源码是 hard import `headroom._core`，没有 Python fallback。"
-  - "Windows / Intel macOS wheel availability: docs 明确说当前 release wheels 覆盖 Python 3.10-3.13 的 Linux manylinux_2_28 x86_64/aarch64 和 macOS Apple Silicon；Windows 和 Intel macOS 会 fallback build。"
-  - "Local proxy runtime: FastAPI, uvicorn, httpx, provider SDKs: 如果 proxy 未启动，TS SDK 和 base-url routing 会失败或无法压缩；proxy 模式还要管理端口、upstream URL、telemetry、stateful 文件。"
-  - "MCP stdio registration and agent config files: MCP 工具不可见、proxy URL 配错或 hash 过期时，模型无法取回被压缩内容；docs 明确 `/mcp` HTTP endpoint 不是默认假设。"
-  - "Optional ML/vector/image dependencies: `[ml]` 引入 torch/transformers/huggingface-hub；`[memory]` 引入 hnswlib/sqlite-vec/sentence-transformers；`[image]` 引入 OCR/ONNX/Pillow，安装体积和平台兼容性会上升。"
-  - "外部 CLI 二进制 RTK、lean-ctx、difft、scc: 下载失败、TLS 问题、平台不支持或离线环境会影响 wrap/context-tool 或辅助工具；`headroom/binaries.py` 支持 `HEADROOM_BINARIES_OFFLINE` 直接禁止网络获取。"
+  - "本地 Python proxy / FastAPI / uvicorn: proxy 没启动或端口不可用时，TypeScript SDK 压缩不可用；agent wrapper 也会受影响。"
+  - "Rust/PyO3/maturin 编译产物 `headroom._core`: 没有可用 wheel 或本地 Rust 构建失败时，SmartCrusher、diff/log/search 等 Rust bridge 路径会受影响。"
+  - "MCP host 与 agent CLI 配置格式: Claude Code/Cursor/Codex/Copilot 的 MCP 或 config 格式变化会让 `headroom mcp install`、`headroom wrap ...` 失效。"
+  - "本地 CompressionStore TTL: CCR hash 过期后无法取回原文，模型看到 marker 但 retrieve 失败。"
+  - "外部 provider API 与缓存策略: Anthropic/OpenAI/Google 的缓存、消息格式、Responses/WebSocket 变更会影响 proxy forwarding、CacheAligner、token accounting。"
+  - "匿名 telemetry: 企业环境可能不允许默认 telemetry。"
   - "over_transfer"

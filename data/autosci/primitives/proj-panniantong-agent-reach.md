@@ -1,0 +1,27 @@
+<!-- AI-ONLY AutoSci primitive. Generated from a deep-analyzed GitHub project; not for the public project card. -->
+# AutoSci reuse - Panniantong/Agent-Reach
+
+## Core Pattern
+Channel 注册表: 每个平台一个 `Channel` 子类，声明 `name`、`description`、`backends`、`tier`，再集中放入 `ALL_CHANNELS`。 Doctor 优先于封装 API: `check_all(config)` 收集每个 channel 的 `ok/warn/off/error`，报告按 tier 分组。 Skill 路由文档: 主 `SKILL.md` 只放路由和短命令，复杂平台放 `references/social.md`、`video.md`、`web.md` 等。 输出清洗器: 对高噪声平台输出先做字段裁剪，例如小红书只保留正文、作者、互动数、图片 URL 和评论。
+
+## Mapping
+- problem_class: reliable-agent-runtime-and-tool-orchestration
+- components: agent_orchestrator, tool_protocol_adapter, developer_control_surface, model_or_retrieval_layer, validation_harness, channel, doctor-api, skill
+- autosci_modules: pattern_library, experiment_runner, agent_runtime, tool_governance, trace_memory
+
+## Small Experiment
+Compare baseline free-form execution against the extracted agent-infra pattern from Panniantong/Agent-Reach on three AutoSci tasks. Measure completion rate, trace inspectability, failure recovery, and cost over 1-3 days.
+
+## Design Principles
+- agent-infra-boundary-as-module: Channel 注册表: 每个平台一个 `Channel` 子类，声明 `name`、`description`、`backends`、`tier`，再集中放入 `ALL_CHANNELS`。 Doctor 优先于封装 API: `check_all(config)` 收集每个 channel 的 `ok/warn/off/error`，报告按 tier 分组。 Skill 路由文档: 主 `SKILL.md` 只放路由和短命令，复杂平台放 `references/social.md`、`video.md`、`web.md` 等。 输出清洗器: 对高噪声平台输出先做字段裁剪，例如小红书只保留正文、作者、互动数、图片 URL 和评论。
+- agent-infra-observable-flow: 真实流：用户让 Agent 查 Reddit bug 讨论时，Skill 先路由到 social 文档；Agent 调 `rdt search` 找帖子，再用 `rdt read POST_ID` 读全文和评论；`agent-reach doctor` 只负责检查 `rdt status --json` 是否已认证（来源：agent_reach/skill/references/social.md Reddit；来源：agent_reach/channels/reddit.py）。 ```mermaid flowchart TD A[用户问题] --> B[SKILL 路由] B --> C[social 文档] C --> D[上游命令 rdt search] D --> E[上游命令 rdt read] E --> F[Agent 总结] G[agent reach doctor] --> H[Channel check] H --> I[rdt status json] I --> J[ok warn off] K[config yaml] --> H ``` 最小命令是两步： `rdt search "query" --limit 10` `rdt read POST_ID` 第一行找帖子，第二行读正文和评论；如果未登录，代码提示写入 `~/.config/rdt-cli/credential.json` 或运行 `rdt login`（来源：agent_reach/channels/reddit.py）。 同一模式也用于别的平台：YouTube 检测 `yt-dlp` 和 Node/Deno JS runtime，小红书检测 `xhs status`，抖音检测 `mcporter list douyin`，V2EX 直接请求公开 JSON API（来源：agent_reach/channels/youtube.py；来源：agent_reach/channels/xiaohongshu.py；来源：agent_reach/channels/douyin.py；来源：agent_reach/channels/v2ex.py）。
+- agent-infra-risk-first-transfer: Transfer the architecture together with its main failure boundary: twitter-cli / bird CLI: Twitter 改 GraphQL、cookie 或风控后，搜索、timeline、article 读取会降级或失败。.
+
+## Risks
+- twitter-cli / bird CLI: Twitter 改 GraphQL、cookie 或风控后，搜索、timeline、article 读取会降级或失败。
+- rdt-cli + Reddit cookie: Reddit 未认证时返回 403，cookie 过期或浏览器提取失败会让 Reddit channel 变 warn。
+- yt-dlp + Node/Deno JS runtime: YouTube 或 B站提取逻辑变化，或机器缺 JS runtime，会导致字幕/元数据能力降级。
+- mcporter + Exa MCP: mcporter 未安装、Exa 配置不存在、Exa MCP 认证/免费策略变化，会影响全网搜索和微信公众号搜索。
+- 小红书 xhs-cli 与 xsec_token: 直接用裸 note_id 会被拦，写操作可能 406，高频会验证码。
+- Douyin MCP 配置文档: docs/install.md 写 HTTP 端口 18070；Skill social.md 又说 HTTP 模式无法正常工作、应使用 stdio。
+- over_transfer

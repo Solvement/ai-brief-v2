@@ -3888,6 +3888,12 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ── BriefMem deep-dive page ─────────────────────────────────────────── */
 .brief-deepdive { max-width: 880px; margin: 0 auto; padding: 28px 24px 80px; }
+/* Full-width project deep-dive (tier paradigm, 2026-06-08): use the screen like the
+   paper page redesign. The inner .dd caps at 1180px and its 2-col body fills the width. */
+.brief-deepdive--full { max-width: 1240px; padding-left: 32px; padding-right: 32px; }
+@media (max-width: 720px) {
+  .brief-deepdive--full { padding-left: 18px; padding-right: 18px; }
+}
 .brief-back { display: inline-block; margin-bottom: 18px; font-size: 13px; color: var(--ink-3); text-decoration: none; }
 .brief-back:hover { color: var(--ink-1); }
 .brief-head { border-bottom: 1px solid var(--line); padding-bottom: 20px; }
@@ -4709,6 +4715,42 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 .dd-prose .md-table { width: 100%; border-collapse: collapse; margin: 0 0 12px; font-size: 13.5px; }
 .dd-prose .md-table th, .dd-prose .md-table td { border: 1px solid var(--dd-line); padding: 7px 10px; text-align: left; vertical-align: top; }
 .dd-prose .md-table th { background: var(--dd-bg); font-weight: 700; color: var(--dd-ink); }
+
+/* ── MarkdownRich (react-markdown + Mermaid) inside a project deep-dive section ──
+   The project page now routes its markdown body fields (architecture / how-it-works /
+   comparison) through <MarkdownRich>, which emits `.pd-prose` + `.pd-mermaid`. Those
+   classes are styled globally against `--radar-*` vars that only exist on .radar-page,
+   so here we re-point them at the project page's own `--dd-*` palette and size the
+   architecture diagrams big. Scoped under .dd-page → does not touch the paper page. */
+.dd-page .dd-section .pd-prose { color: var(--dd-ink-2); font-size: 14.5px; line-height: 1.8; }
+.dd-page .dd-section .pd-prose h2 { font-size: 16px; margin: 22px 0 10px; color: var(--dd-ink); border-bottom: none; padding-bottom: 0; }
+.dd-page .dd-section .pd-prose h3 { font-size: 14.5px; margin: 18px 0 8px; color: var(--dd-ink); padding-left: 10px; border-left: 3px solid var(--dd-accent); }
+.dd-page .dd-section .pd-prose p { margin: 0 0 12px; }
+.dd-page .dd-section .pd-prose ul, .dd-page .dd-section .pd-prose ol { margin: 0 0 12px; padding-left: 20px; }
+.dd-page .dd-section .pd-prose li { margin: 4px 0; }
+.dd-page .dd-section .pd-prose strong { color: var(--dd-ink); }
+.dd-page .dd-section .pd-prose a { color: var(--dd-accent-strong); }
+.dd-page .dd-section .pd-prose code {
+  background: var(--dd-bg); color: var(--dd-accent-strong); border: 1px solid var(--dd-line);
+  padding: 1px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.86em;
+}
+.dd-page .dd-section .pd-prose pre {
+  background: #0f172a; color: #cbd5e1; border-radius: var(--dd-radius-sm);
+  padding: 14px 16px; overflow-x: auto; font-size: 12.5px; line-height: 1.6; margin: 0 0 14px;
+}
+.dd-page .dd-section .pd-prose pre code { background: none; border: none; color: inherit; padding: 0; }
+.dd-page .dd-section .pd-prose table { width: 100%; border-collapse: collapse; margin: 0 0 14px; font-size: 13.5px; }
+.dd-page .dd-section .pd-prose th, .dd-page .dd-section .pd-prose td {
+  border: 1px solid var(--dd-line); padding: 7px 10px; text-align: left; vertical-align: top;
+}
+.dd-page .dd-section .pd-prose th { background: var(--dd-bg); font-weight: 700; color: var(--dd-ink); }
+/* architecture diagram: big, centered, light card — fills the (wide) section */
+.dd-page .dd-section .pd-mermaid {
+  display: flex; justify-content: center; margin: 6px 0 18px; padding: 22px;
+  background: var(--dd-bg); border: 1px solid var(--dd-line); border-radius: var(--dd-radius-sm); overflow-x: auto;
+}
+.dd-page .dd-section .pd-mermaid svg { width: 100%; max-width: 920px; min-width: min(100%, 560px); height: auto; }
+.dd-page .dd-section .pd-mermaid-fallback { background: #0f172a; color: #cbd5e1; border-radius: var(--dd-radius-sm); padding: 14px 16px; overflow-x: auto; font-size: 12.5px; }
 
 /* ── 为什么值得看 — verified vs caution checklist ── */
 .dd-checklist { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }

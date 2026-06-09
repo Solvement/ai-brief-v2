@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T18:13:53.800Z",
+  "generatedAt": "2026-06-09T01:44:55.025Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 56,
+  "count": 67,
   "items": [
     {
       "id": "claim/9router-main-claim",
@@ -444,6 +444,46 @@
       ]
     },
     {
+      "id": "claim/can1357-oh-my-pi-main-claim-2",
+      "type": "claim",
+      "slug": "can1357-oh-my-pi-main-claim-2",
+      "title": "Can1357 Oh My Pi Main Claim 2",
+      "file": "claims/can1357-oh-my-pi-main-claim-2.md",
+      "directory": "claims",
+      "meta": {
+        "text": "CLI 可安装并以 `omp` 运行。",
+        "slug": "can1357-oh-my-pi-main-claim-2",
+        "kind": "claim",
+        "content": "can1357-oh-my-pi",
+        "source_pointer": "packages/coding-agent/package.json bin；README Install",
+        "evidence_strength": "high",
+        "supports": [
+          "hashline-editing",
+          "unified-read-path"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "我未实际执行安装、登录模型或跑一次真实任务。",
+          "安装脚本、平台二进制、模型凭据流程仍需在目标机器复验。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n包名是 `@oh-my-pi/pi-coding-agent`，`bin` 把 `omp` 指到 `src/cli.ts`；README 给出 curl、Homebrew、Bun、Windows PowerShell、mise 五种安装入口。\n\n证据:`bin: { \"omp\": \"src/cli.ts\" }`；`bun install -g @oh-my-pi/pi-coding-agent`。。边界:我未实际执行安装、登录模型或跑一次真实任务。。风险:安装脚本、平台二进制、模型凭据流程仍需在目标机器复验。。See [[content/can1357-oh-my-pi]]。\n",
+      "excerpt": "包名是 `@oh-my-pi/pi-coding-agent`，`bin` 把 `omp` 指到 `src/cli.ts`；README 给出 curl、Homebrew、Bun、Windows PowerShell、mise 五种安装入口。",
+      "links": [
+        {
+          "target": "content/can1357-oh-my-pi",
+          "raw": "[[content/can1357-oh-my-pi]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/chopratejas-headroom-main-claim",
       "type": "claim",
       "slug": "chopratejas-headroom-main-claim",
@@ -470,6 +510,46 @@
       },
       "body": "\n## Claim\n\n项目说自己能在本地用库、代理和 MCP 三种方式减少 token，并保留可逆取回。\n\n证据:README 明确列出 `compress(messages)`、`headroom proxy --port 8787`、`headroom wrap ...`、MCP 工具和 CCR；源码也有对应入口。。边界:仓库检查没有独立第三方复现实验；60–95% 是项目声明，不能当外部验证结论。。风险:不同内容类型差异很大；docs/benchmarks.mdx 自称 grep results 和 Python source 在表中为 0.0% 压缩。。See [[content/chopratejas-headroom]]。\n",
       "excerpt": "项目说自己能在本地用库、代理和 MCP 三种方式减少 token，并保留可逆取回。",
+      "links": [
+        {
+          "target": "content/chopratejas-headroom",
+          "raw": "[[content/chopratejas-headroom]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/chopratejas-headroom-main-claim-2",
+      "type": "claim",
+      "slug": "chopratejas-headroom-main-claim-2",
+      "title": "Chopratejas Headroom Main Claim 2",
+      "file": "claims/chopratejas-headroom-main-claim-2.md",
+      "directory": "claims",
+      "meta": {
+        "text": "提供 Python 库、代理、agent wrap、MCP server 四种入口。",
+        "slug": "chopratejas-headroom-main-claim-2",
+        "kind": "claim",
+        "content": "chopratejas-headroom",
+        "source_pointer": "README What it does；README Get started；pyproject.toml project.scripts；headroom/cli/wrap.py command examples；headroom/cli/proxy.py command options",
+        "evidence_strength": "high",
+        "supports": [
+          "ccr-compress-cache-retrieve",
+          "content-router"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不证明每个 wrapper 在所有 agent 版本上都稳定可用。",
+          "CLI 包装依赖外部 agent CLI 的配置格式，Claude/Codex/Copilot 等上游变更会破坏集成。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n你可以改代码调用 `compress()`，也可以把客户端 base URL 指到 `headroom proxy --port 8787`，或用 `headroom wrap claude|codex|cursor|aider|copilot` 包现有 CLI。\n\n证据:`headroom = \"headroom.cli:main\"` 存在；proxy、wrap、mcp、learn、perf 都有 Click 命令文件。。边界:不证明每个 wrapper 在所有 agent 版本上都稳定可用。。风险:CLI 包装依赖外部 agent CLI 的配置格式，Claude/Codex/Copilot 等上游变更会破坏集成。。See [[content/chopratejas-headroom]]。\n",
+      "excerpt": "你可以改代码调用 `compress()`，也可以把客户端 base URL 指到 `headroom proxy --port 8787`，或用 `headroom wrap claude|codex|cursor|aider|copilot` 包现有 CLI。",
       "links": [
         {
           "target": "content/chopratejas-headroom",
@@ -590,6 +670,46 @@
       },
       "body": "\n## Claim\n\n代理不是直接读数据库，而是通过 `codegraph serve --mcp` 暴露的一组工具访问索引。\n\n证据:`getMcpServerConfig()` 返回 `{ type: 'stdio', command: 'codegraph', args: ['serve', '--mcp'] }`；README 列出 8 个 MCP 工具。。边界:不证明所有代理实际都能稳定加载，只证明仓库实现了配置写入和 MCP 入口。。风险:不同 MCP 客户端的配置格式和权限模型会变；安装目标文件需要持续维护。。See [[content/colbymchenry-codegraph]]。\n",
       "excerpt": "代理不是直接读数据库，而是通过 `codegraph serve --mcp` 暴露的一组工具访问索引。",
+      "links": [
+        {
+          "target": "content/colbymchenry-codegraph",
+          "raw": "[[content/colbymchenry-codegraph]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/colbymchenry-codegraph-main-claim-2",
+      "type": "claim",
+      "slug": "colbymchenry-codegraph-main-claim-2",
+      "title": "Colbymchenry Codegraph Main Claim 2",
+      "file": "claims/colbymchenry-codegraph-main-claim-2.md",
+      "directory": "claims",
+      "meta": {
+        "text": "可以通过 MCP 接入多个 agent。",
+        "slug": "colbymchenry-codegraph-main-claim-2",
+        "kind": "claim",
+        "content": "colbymchenry-codegraph",
+        "source_pointer": "src/installer/targets/registry.ts；src/installer/targets/shared.ts",
+        "evidence_strength": "high",
+        "supports": [
+          "code-knowledge-graph",
+          "mcp-tool-steering"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "没有证明这些客户端在 2026-06-09 的最新版本全部可用。",
+          "各 agent 配置格式会变；Antigravity 文件里已写到 unified/legacy config 路径迁移。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n不是只给 Claude Code 写死的插件；installer target 是模块化 registry。\n\n证据:ALL_TARGETS 包含 claude、cursor、codex、opencode、hermes、gemini、antigravity、kiro；公共配置返回 command `codegraph` 和 args `serve --mcp`。。边界:没有证明这些客户端在 2026-06-09 的最新版本全部可用。。风险:各 agent 配置格式会变；Antigravity 文件里已写到 unified/legacy config 路径迁移。。See [[content/colbymchenry-codegraph]]。\n",
+      "excerpt": "不是只给 Claude Code 写死的插件；installer target 是模块化 registry。",
       "links": [
         {
           "target": "content/colbymchenry-codegraph",
@@ -883,6 +1003,46 @@
       ]
     },
     {
+      "id": "claim/harry0703-moneyprinterturbo-main-claim",
+      "type": "claim",
+      "slug": "harry0703-moneyprinterturbo-main-claim",
+      "title": "Harry0703 Moneyprinterturbo Main Claim",
+      "file": "claims/harry0703-moneyprinterturbo-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "输入主题或关键词后自动生成短视频。",
+        "slug": "harry0703-moneyprinterturbo-main-claim",
+        "kind": "claim",
+        "content": "harry0703-moneyprinterturbo",
+        "source_pointer": "README 开头定位；app/models/schema.py VideoParams；app/services/task.py start",
+        "evidence_strength": "high",
+        "supports": [
+          "short-video-pipeline",
+          "stock-footage-assembly"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不能证明成片质量稳定，也不能证明任意主题都能拿到合适素材。",
+          "素材搜索依赖外部 API 和英文搜索词，中文主题会先被 LLM 转成英文搜索词，失败时链路会中断。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\nAPI/WebUI 最小任务围绕 `video_subject` 或 `video_script` 展开；主流程会生成脚本、搜索词、音频、字幕、素材和最终视频。\n\n证据:`VideoParams` 包含 `video_subject`、`video_script`、`video_terms`、`video_source`、`voice_name`、`bgm_type` 等字段；`start()` 逐步调用 generate_script、generate_terms、generate_audio、generate_subtitle、get_video_materials、generate_final_videos。。边界:不能证明成片质量稳定，也不能证明任意主题都能拿到合适素材。。风险:素材搜索依赖外部 API 和英文搜索词，中文主题会先被 LLM 转成英文搜索词，失败时链路会中断。。See [[content/harry0703-moneyprinterturbo]]。\n",
+      "excerpt": "API/WebUI 最小任务围绕 `video_subject` 或 `video_script` 展开；主流程会生成脚本、搜索词、音频、字幕、素材和最终视频。",
+      "links": [
+        {
+          "target": "content/harry0703-moneyprinterturbo",
+          "raw": "[[content/harry0703-moneyprinterturbo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/herdr-main-claim",
       "type": "claim",
       "slug": "herdr-main-claim",
@@ -993,6 +1153,46 @@
         {
           "target": "content/iii",
           "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/imbad0202-academic-research-skills-main-claim",
+      "type": "claim",
+      "slug": "imbad0202-academic-research-skills-main-claim",
+      "title": "Imbad0202 Academic Research Skills Main Claim",
+      "file": "claims/imbad0202-academic-research-skills-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "可通过 Claude Code plugin 安装，并提供 `/ars-*` 命令入口。",
+        "slug": "imbad0202-academic-research-skills-main-claim",
+        "kind": "claim",
+        "content": "imbad0202-academic-research-skills",
+        "source_pointer": "README Quick install；docs/SETUP Method 0；commands/ars-plan.md；commands/ars-full.md",
+        "evidence_strength": "high",
+        "supports": [
+          "claude-code-skill-suite",
+          "material-passport"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未证明 Claude Code 当前 marketplace 在线安装一定成功；本次没有实际安装 plugin。",
+          "强绑定 Claude Code runtime；换到 claude.ai web 或普通 API 不等价。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n不是让用户手动复制一大堆 prompt；Claude Code 里可以装 plugin，然后用 slash command 触发具体模式。\n\n证据:仓库含 `.claude-plugin/plugin.json`，`commands/` 下有 14 个命令文件；`ars-full` frontmatter 固定 `model: opus`，`ars-plan` 固定 `model: sonnet`。。边界:未证明 Claude Code 当前 marketplace 在线安装一定成功；本次没有实际安装 plugin。。风险:强绑定 Claude Code runtime；换到 claude.ai web 或普通 API 不等价。。See [[content/imbad0202-academic-research-skills]]。\n",
+      "excerpt": "不是让用户手动复制一大堆 prompt；Claude Code 里可以装 plugin，然后用 slash command 触发具体模式。",
+      "links": [
+        {
+          "target": "content/imbad0202-academic-research-skills",
+          "raw": "[[content/imbad0202-academic-research-skills]]"
         }
       ],
       "headings": [
@@ -1205,6 +1405,46 @@
       ]
     },
     {
+      "id": "claim/microsoft-markitdown-main-claim-2",
+      "type": "claim",
+      "slug": "microsoft-markitdown-main-claim-2",
+      "title": "Microsoft Markitdown Main Claim 2",
+      "file": "claims/microsoft-markitdown-main-claim-2.md",
+      "directory": "claims",
+      "meta": {
+        "text": "面向 LLM/text analysis 的 Markdown 转换工具",
+        "slug": "microsoft-markitdown-main-claim-2",
+        "kind": "claim",
+        "content": "microsoft-markitdown",
+        "source_pointer": "README opening + Why Markdown",
+        "evidence_strength": "medium",
+        "supports": [
+          "markdown-for-llm-ingestion",
+          "converter-dispatch"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "README 没给 token 节省比例、准确率或召回率基准。",
+          "若业务需要版式级还原或可视化排版，README 自己也说它不是最佳选择。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n它把多种文件转成 Markdown，不追求人类阅读的高保真排版。\n\n证据:README 明确说输出用于 LLM 和文本分析流水线，并强调 Markdown 接近纯文本、保留文档结构。。边界:README 没给 token 节省比例、准确率或召回率基准。。风险:若业务需要版式级还原或可视化排版，README 自己也说它不是最佳选择。。See [[content/microsoft-markitdown]]。\n",
+      "excerpt": "它把多种文件转成 Markdown，不追求人类阅读的高保真排版。",
+      "links": [
+        {
+          "target": "content/microsoft-markitdown",
+          "raw": "[[content/microsoft-markitdown]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/modelscope-funasr-main-claim",
       "type": "claim",
       "slug": "modelscope-funasr-main-claim",
@@ -1275,6 +1515,46 @@
         {
           "target": "content/moneyprinterturbo",
           "raw": "[[content/moneyprinterturbo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/mvanhorn-last30days-skill-main-claim",
+      "type": "claim",
+      "slug": "mvanhorn-last30days-skill-main-claim",
+      "title": "Mvanhorn Last30days Skill Main Claim",
+      "file": "claims/mvanhorn-last30days-skill-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "这是 Agent Skills 包，不只是 CLI。",
+        "slug": "mvanhorn-last30days-skill-main-claim",
+        "kind": "claim",
+        "content": "mvanhorn-last30days-skill",
+        "source_pointer": "CONCEPTS.md Skill/Engine；AGENTS.md Orientation；skills/last30days/SKILL.md frontmatter",
+        "evidence_strength": "high",
+        "supports": [
+          "agent-skill",
+          "query-plan"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不证明所有宿主都能无差异运行。",
+          "多宿主路径依赖重，SKILL.md 和 engine flags 必须同步。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n技能本体是 `SKILL.md` 加同级 `scripts/`，`last30days.py` 是实现层。\n\n证据:`SKILL.md` frontmatter 声明 `user-invocable: true`、`allowed-tools: Bash, Read, Write, AskUserQuestion, WebSearch`，`CONCEPTS.md` 明确 Skill 是分发单元。。边界:不证明所有宿主都能无差异运行。。风险:多宿主路径依赖重，SKILL.md 和 engine flags 必须同步。。See [[content/mvanhorn-last30days-skill]]。\n",
+      "excerpt": "技能本体是 `SKILL.md` 加同级 `scripts/`，`last30days.py` 是实现层。",
+      "links": [
+        {
+          "target": "content/mvanhorn-last30days-skill",
+          "raw": "[[content/mvanhorn-last30days-skill]]"
         }
       ],
       "headings": [
@@ -1524,6 +1804,46 @@
       ]
     },
     {
+      "id": "claim/panniantong-agent-reach-main-claim",
+      "type": "claim",
+      "slug": "panniantong-agent-reach-main-claim",
+      "title": "Panniantong Agent Reach Main Claim",
+      "file": "claims/panniantong-agent-reach-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "它是安装器和健康检查器，不是统一代理框架。",
+        "slug": "panniantong-agent-reach-main-claim",
+        "kind": "claim",
+        "content": "panniantong-agent-reach",
+        "source_pointer": "docs/install.md Goal；agent_reach/core.py AgentReach；docs/README_en.md Design Philosophy",
+        "evidence_strength": "high",
+        "supports": [
+          "agent-tool-scaffolding",
+          "panniantong-agent-reach-channel-health-check"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不支持把它理解成 LangGraph、AutoGen 这类 agent 编排框架。",
+          "README 标题“one-click access to entire internet”容易让人误以为有统一运行时。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\nAgent Reach 负责装工具、检查工具，读取和搜索动作仍由上游 CLI 或 MCP 直接完成。\n\n证据:`AgentReach` 只有 `doctor()` / `doctor_report()`；安装指南明确说安装后直接用 twitter-cli、rdt-cli、xhs-cli、yt-dlp、mcporter、gh CLI。。边界:不支持把它理解成 LangGraph、AutoGen 这类 agent 编排框架。。风险:README 标题“one-click access to entire internet”容易让人误以为有统一运行时。。See [[content/panniantong-agent-reach]]。\n",
+      "excerpt": "Agent Reach 负责装工具、检查工具，读取和搜索动作仍由上游 CLI 或 MCP 直接完成。",
+      "links": [
+        {
+          "target": "content/panniantong-agent-reach",
+          "raw": "[[content/panniantong-agent-reach]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/pbakaus-impeccable-main-claim",
       "type": "claim",
       "slug": "pbakaus-impeccable-main-claim",
@@ -1554,6 +1874,46 @@
         {
           "target": "content/pbakaus-impeccable",
           "raw": "[[content/pbakaus-impeccable]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/phuryn-pm-skills-main-claim",
+      "type": "claim",
+      "slug": "phuryn-pm-skills-main-claim",
+      "title": "Phuryn Pm Skills Main Claim",
+      "file": "claims/phuryn-pm-skills-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "仓库包含 9 个插件、68 个 skills、42 个 commands。",
+        "slug": "phuryn-pm-skills-main-claim",
+        "kind": "claim",
+        "content": "phuryn-pm-skills",
+        "source_pointer": "validate_plugins.py report；.claude-plugin/marketplace.json plugins",
+        "evidence_strength": "high",
+        "supports": [
+          "phuryn-pm-skills-agent-skill",
+          "slash-command-workflow"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不证明这些 workflow 在真实产品团队中有效，也不证明平台安装一定成功。",
+          "数量容易制造完整感；质量仍取决于每个 SKILL.md 的具体指令和模型执行。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n这不是单个 prompt，而是一个多插件市场包。\n\n证据:本地运行 `python validate_plugins.py` 输出 Plugins: 9, Skills: 68, Commands: 42, Total: 110 components。。边界:不证明这些 workflow 在真实产品团队中有效，也不证明平台安装一定成功。。风险:数量容易制造完整感；质量仍取决于每个 SKILL.md 的具体指令和模型执行。。See [[content/phuryn-pm-skills]]。\n",
+      "excerpt": "这不是单个 prompt，而是一个多插件市场包。",
+      "links": [
+        {
+          "target": "content/phuryn-pm-skills",
+          "raw": "[[content/phuryn-pm-skills]]"
         }
       ],
       "headings": [
@@ -1726,6 +2086,46 @@
       ]
     },
     {
+      "id": "claim/refactoringhq-tolaria-main-claim",
+      "type": "claim",
+      "slug": "refactoringhq-tolaria-main-claim",
+      "title": "Refactoringhq Tolaria Main Claim",
+      "file": "claims/refactoringhq-tolaria-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "本地文件优先、无导出锁定",
+        "slug": "refactoringhq-tolaria-main-claim",
+        "kind": "claim",
+        "content": "refactoringhq-tolaria",
+        "source_pointer": "README Principles；src-tauri/src/vault/mod.rs parse_md_file；docs/ABSTRACTIONS Document Model",
+        "evidence_strength": "high",
+        "supports": [
+          "markdown-vault",
+          "mcp-vault-tools"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不证明所有 Markdown 扩展都能无损往返；编辑器序列化仍依赖 BlockNote/CodeMirror 适配。",
+          "富文本编辑器、Mermaid、tldraw、PDF/媒体预览会引入应用层约定；跨工具无损需要逐项验证。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n笔记是普通 `.md` 文件，YAML frontmatter 承载 `type`、`status`、关系等字段；解析入口是 Rust 的 `parse_md_file()`。\n\n证据:`parse_md_file()` 读取磁盘文件、解析 YAML frontmatter、提取 H1、wikilinks、word_count、file_kind。。边界:不证明所有 Markdown 扩展都能无损往返；编辑器序列化仍依赖 BlockNote/CodeMirror 适配。。风险:富文本编辑器、Mermaid、tldraw、PDF/媒体预览会引入应用层约定；跨工具无损需要逐项验证。。See [[content/refactoringhq-tolaria]]。\n",
+      "excerpt": "笔记是普通 `.md` 文件，YAML frontmatter 承载 `type`、`status`、关系等字段；解析入口是 Rust 的 `parse_md_file()`。",
+      "links": [
+        {
+          "target": "content/refactoringhq-tolaria",
+          "raw": "[[content/refactoringhq-tolaria]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
       "id": "claim/rohitg00-agentmemory-main-claim",
       "type": "claim",
       "slug": "rohitg00-agentmemory-main-claim",
@@ -1756,6 +2156,46 @@
         {
           "target": "content/rohitg00-agentmemory",
           "raw": "[[content/rohitg00-agentmemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/rohitg00-ai-engineering-from-scratch-main-claim",
+      "type": "claim",
+      "slug": "rohitg00-ai-engineering-from-scratch-main-claim",
+      "title": "Rohitg00 Ai Engineering From Scratch Main Claim",
+      "file": "claims/rohitg00-ai-engineering-from-scratch-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "仓库覆盖 20 phases、503 lessons。",
+        "slug": "rohitg00-ai-engineering-from-scratch-main-claim",
+        "kind": "claim",
+        "content": "rohitg00-ai-engineering-from-scratch",
+        "source_pointer": "README badges/hero；scripts/build_catalog.py compute_totals；本地运行 2026-06-09",
+        "evidence_strength": "high",
+        "supports": [
+          "from-scratch-ai-curriculum",
+          "react-agent-loop"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "不证明每课质量一致，也不证明总学习时长准确。",
+          "ROADMAP 顶部写 ~314 hours，底部写 ~1,050 hours，README 写 ~320 hours，时长口径冲突。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n不是 README 单说；本次调用 `scripts.build_catalog.build_catalog()` 也得到 phases=20、lessons=503。\n\n证据:目录树和 catalog 构建逻辑按 `phases/NN/MM` 扫描，结果为 20/503。。边界:不证明每课质量一致，也不证明总学习时长准确。。风险:ROADMAP 顶部写 ~314 hours，底部写 ~1,050 hours，README 写 ~320 hours，时长口径冲突。。See [[content/rohitg00-ai-engineering-from-scratch]]。\n",
+      "excerpt": "不是 README 单说；本次调用 `scripts.build_catalog.build_catalog()` 也得到 phases=20、lessons=503。",
+      "links": [
+        {
+          "target": "content/rohitg00-ai-engineering-from-scratch",
+          "raw": "[[content/rohitg00-ai-engineering-from-scratch]]"
         }
       ],
       "headings": [

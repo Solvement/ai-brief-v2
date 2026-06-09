@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-08T18:13:53.800Z",
+  "generatedAt": "2026-06-09T01:44:55.025Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 56,
+  "count": 67,
   "items": [
     {
       "id": "artifact/9router-repo",
@@ -850,6 +850,45 @@
       ]
     },
     {
+      "id": "artifact/harry0703-moneyprinterturbo-repo",
+      "type": "artifact",
+      "slug": "harry0703-moneyprinterturbo-repo",
+      "title": "Harry0703 Moneyprinterturbo Repo",
+      "file": "artifacts/harry0703-moneyprinterturbo-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "harry0703-moneyprinterturbo-repo",
+        "kind": "artifact",
+        "content": "harry0703-moneyprinterturbo",
+        "artifact_type": "repo",
+        "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "生产鉴权默认未启用",
+          "缺少成片质量基准",
+          "外部 provider 端到端可用性需自行验证"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并检查真实上游仓库到指定 checkout；当前源码显示它是一个 Python/Streamlit/FastAPI 短视频生成应用，版本配置为 1.2.9，支持 Docker、uv、本地素材、Pexels/Pixabay、多个 LLM/TTS provider、Edge/Whisper 字幕和 MoviePy/FFmpeg 合成。\n\n出处:https://github.com/harry0703/moneyprinterturbo。See [[content/harry0703-moneyprinterturbo]]。\n",
+      "excerpt": "已克隆并检查真实上游仓库到指定 checkout；当前源码显示它是一个 Python/Streamlit/FastAPI 短视频生成应用，版本配置为 1.2.9，支持 Docker、uv、本地素材、Pexels/Pixabay、多个 LLM/TTS provider、Edge/Whisper 字幕和 MoviePy/FFmpeg 合成。",
+      "links": [
+        {
+          "target": "content/harry0703-moneyprinterturbo",
+          "raw": "[[content/harry0703-moneyprinterturbo]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/herdr-repo",
       "type": "artifact",
       "slug": "herdr-repo",
@@ -959,6 +998,45 @@
         {
           "target": "content/iii",
           "raw": "[[content/iii]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/imbad0202-academic-research-skills-repo",
+      "type": "artifact",
+      "slug": "imbad0202-academic-research-skills-repo",
+      "title": "Imbad0202 Academic Research Skills Repo",
+      "file": "artifacts/imbad0202-academic-research-skills-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "imbad0202-academic-research-skills-repo",
+        "kind": "artifact",
+        "content": "imbad0202-academic-research-skills",
+        "artifact_type": "repo",
+        "url": "https://github.com/Imbad0202/academic-research-skills",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "CC-BY-NC-4.0",
+        "runnable": "unknown",
+        "missing_parts": [
+          "本次未实际安装 Claude Code plugin 或跑完整 pipeline。",
+          "本次 Windows checkout 初次遇到少数深层 tests/fixtures 路径过长；主文档、scripts、examples、schemas 已读取。",
+          "claude.ai Custom Skill 路径在 docs/SETUP 中标为不推荐且未实测。"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并读取真实上游仓库 HEAD b5a3370091eef5ded414daab4260c8500510f211；核实 v3.12.0、4 个核心 skill、14 个 slash commands、hooks、scope guard、verification gate、evals gold set、examples 和 CC-BY-NC-4.0 license。\n\n出处:https://github.com/imbad0202/academic-research-skills。See [[content/imbad0202-academic-research-skills]]。\n",
+      "excerpt": "已克隆并读取真实上游仓库 HEAD b5a3370091eef5ded414daab4260c8500510f211；核实 v3.12.0、4 个核心 skill、14 个 slash commands、hooks、scope guard、verification gate、evals gold set、examples 和 CC-BY-NC-4.0 license。",
+      "links": [
+        {
+          "target": "content/imbad0202-academic-research-skills",
+          "raw": "[[content/imbad0202-academic-research-skills]]"
         }
       ],
       "headings": [
@@ -1240,6 +1318,45 @@
       ]
     },
     {
+      "id": "artifact/mvanhorn-last30days-skill-repo",
+      "type": "artifact",
+      "slug": "mvanhorn-last30days-skill-repo",
+      "title": "Mvanhorn Last30days Skill Repo",
+      "file": "artifacts/mvanhorn-last30days-skill-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "mvanhorn-last30days-skill-repo",
+        "kind": "artifact",
+        "content": "mvanhorn-last30days-skill",
+        "artifact_type": "repo",
+        "url": "https://github.com/mvanhorn/last30days-skill",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "真实全源运行需要外部 API keys、browser cookies、yt-dlp、Node 或 gh 等条件；本次只运行了 `--help` 和测试。",
+          "Windows/Python 3.14.3 下完整 pytest 未全绿：1602 passed, 15 failed, 4 skipped。",
+          "README 的部分源优先级/架构说明与当前代码存在轻微不一致，需要维护者确认。"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并检查真实上游 checkout `122158415ae421da83e739f2668032f6bc78d39c`，版本 `3.3.2`。这是一个 MIT 许可的多源 agent research skill，工程结构完整、可运行入口存在，但生产可靠性受外部平台和宿主 agent 行为影响较大。\n\n出处:https://github.com/mvanhorn/last30days-skill。See [[content/mvanhorn-last30days-skill]]。\n",
+      "excerpt": "已克隆并检查真实上游 checkout `122158415ae421da83e739f2668032f6bc78d39c`，版本 `3.3.2`。这是一个 MIT 许可的多源 agent research skill，工程结构完整、可运行入口存在，但生产可靠性受外部平台和宿主 agent 行为影响较大。",
+      "links": [
+        {
+          "target": "content/mvanhorn-last30days-skill",
+          "raw": "[[content/mvanhorn-last30days-skill]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/nesquena-hermes-webui-repo",
       "type": "artifact",
       "slug": "nesquena-hermes-webui-repo",
@@ -1474,6 +1591,46 @@
       ]
     },
     {
+      "id": "artifact/panniantong-agent-reach-repo",
+      "type": "artifact",
+      "slug": "panniantong-agent-reach-repo",
+      "title": "Panniantong Agent Reach Repo",
+      "file": "artifacts/panniantong-agent-reach-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "panniantong-agent-reach-repo",
+        "kind": "artifact",
+        "content": "panniantong-agent-reach",
+        "artifact_type": "repo",
+        "url": "https://github.com/Panniantong/Agent-Reach",
+        "official_or_third_party": "official",
+        "status": "partial",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "当前 checkout 直接跑 `python -m pytest -q` 为 78 passed, 7 failed；未在按 constraints 安装的干净虚拟环境复测。",
+          "多个可选渠道需要用户 cookie、Groq Key、代理、ffmpeg、Node/Deno、mcporter 或第三方 MCP 服务。",
+          "README/Skill 平台数量与代码注册数量不一致。",
+          "Douyin 的 install 文档和 Skill 参考对 HTTP/stdio 配置说法冲突。"
+        ],
+        "last_checked": "2026-06-08"
+      },
+      "body": "\n## Artifact audit\n\n已克隆真实上游仓库到指定 checkout，并检查 README、docs、pyproject、config、agent_reach 源码、Skill references 和 tests。该项目适合作为 AI Agent 多平台工具接入脚手架参考，但不应按“稳定统一互联网 API”理解。\n\n出处:https://github.com/panniantong/agent-reach。See [[content/panniantong-agent-reach]]。\n",
+      "excerpt": "已克隆真实上游仓库到指定 checkout，并检查 README、docs、pyproject、config、agent_reach 源码、Skill references 和 tests。该项目适合作为 AI Agent 多平台工具接入脚手架参考，但不应按“稳定统一互联网 API”理解。",
+      "links": [
+        {
+          "target": "content/panniantong-agent-reach",
+          "raw": "[[content/panniantong-agent-reach]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/pbakaus-impeccable-repo",
       "type": "artifact",
       "slug": "pbakaus-impeccable-repo",
@@ -1504,6 +1661,45 @@
         {
           "target": "content/pbakaus-impeccable",
           "raw": "[[content/pbakaus-impeccable]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/phuryn-pm-skills-repo",
+      "type": "artifact",
+      "slug": "phuryn-pm-skills-repo",
+      "title": "Phuryn Pm Skills Repo",
+      "file": "artifacts/phuryn-pm-skills-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "phuryn-pm-skills-repo",
+        "kind": "artifact",
+        "content": "phuryn-pm-skills",
+        "artifact_type": "repo",
+        "url": "https://github.com/phuryn/pm-skills",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT（来源：LICENSE；各 plugin.json license）",
+        "runnable": "yes",
+        "missing_parts": [
+          "未发现 package.json、pyproject.toml、requirements.txt、Dockerfile 或 docker-compose.yml。",
+          "未发现传统测试目录或 CI 配置；只有 `validate_plugins.py` 形状校验。",
+          "Codex 路径 README 自称 skills 可用，但 slash commands 不作为 Codex slash commands 运行。"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并检查真实上游仓库 commit d384f0c9eb81fe74656a4f6da168587836939edb。核心资产是 9 个 Claude/Codex 插件目录、68 个 SKILL.md、42 个 command Markdown、root marketplace manifest 和本地 validator。\n\n出处:https://github.com/phuryn/pm-skills。See [[content/phuryn-pm-skills]]。\n",
+      "excerpt": "已克隆并检查真实上游仓库 commit d384f0c9eb81fe74656a4f6da168587836939edb。核心资产是 9 个 Claude/Codex 插件目录、68 个 SKILL.md、42 个 command Markdown、root marketplace manifest 和本地 validator。",
+      "links": [
+        {
+          "target": "content/phuryn-pm-skills",
+          "raw": "[[content/phuryn-pm-skills]]"
         }
       ],
       "headings": [
@@ -1631,6 +1827,164 @@
       ]
     },
     {
+      "id": "artifact/project-can1357-oh-my-pi-repo",
+      "type": "artifact",
+      "slug": "project-can1357-oh-my-pi-repo",
+      "title": "Project Can1357 Oh My Pi Repo",
+      "file": "artifacts/project-can1357-oh-my-pi-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "project-can1357-oh-my-pi-repo",
+        "kind": "artifact",
+        "content": "can1357-oh-my-pi",
+        "artifact_type": "repo",
+        "url": "https://github.com/can1357/oh-my-pi",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未实际安装或启动 omp",
+          "未验证模型登录/API key",
+          "未复跑 README benchmark",
+          "未验证各平台 native binary"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并检查 upstream main：HEAD 为 7a6ce12bdfc28a8b149a71728e61641294babd14，提交信息为 `feat(coding-agent/tools): added bash.enabled setting to hide model-facing bash tool`；npm 包版本和 Rust workspace 版本为 15.10.7。（来源：git log；packages/coding-agent/package.json；Cargo.toml）\n\n出处:https://github.com/can1357/oh-my-pi。See [[content/can1357-oh-my-pi]]。\n",
+      "excerpt": "已克隆并检查 upstream main：HEAD 为 7a6ce12bdfc28a8b149a71728e61641294babd14，提交信息为 `feat(coding-agent/tools): added bash.enabled setting to hide model-facing bash tool`；npm 包版本和 Rust workspace 版本为 15.10.7。（来源：git log；packages/coding-agent/package.json；Cargo.toml）",
+      "links": [
+        {
+          "target": "content/can1357-oh-my-pi",
+          "raw": "[[content/can1357-oh-my-pi]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/project-chopratejas-headroom-repo",
+      "type": "artifact",
+      "slug": "project-chopratejas-headroom-repo",
+      "title": "Project Chopratejas Headroom Repo",
+      "file": "artifacts/project-chopratejas-headroom-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "project-chopratejas-headroom-repo",
+        "kind": "artifact",
+        "content": "chopratejas-headroom",
+        "artifact_type": "repo",
+        "url": "https://github.com/chopratejas/headroom",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "Apache-2.0",
+        "runnable": "yes",
+        "missing_parts": [
+          "本次未运行测试或 benchmark",
+          "未核验 PyPI/npm 发布包与 checkout 完全一致",
+          "初次 git checkout 在 Windows 长路径下遇到 examples 内 node_modules 路径过长；启用 longpaths 后文件可读，但 git status 显示异常 staged/untracked 状态"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已按要求克隆并读取真实上游仓库到指定 checkout；当前 HEAD 为 ec7d0065cc5055e504e79cf24f3951e404fe4cb9，提交时间 2026-06-08T18:50:08-05:00。仓库是 Python + Rust + TypeScript 的上下文压缩工程，核心价值在 proxy/library/MCP/wrap 多入口和 CCR 可逆取回。\n\n出处:https://github.com/chopratejas/headroom。See [[content/chopratejas-headroom]]。\n",
+      "excerpt": "已按要求克隆并读取真实上游仓库到指定 checkout；当前 HEAD 为 ec7d0065cc5055e504e79cf24f3951e404fe4cb9，提交时间 2026-06-08T18:50:08-05:00。仓库是 Python + Rust + TypeScript 的上下文压缩工程，核心价值在 proxy/library/MCP/wrap 多入口和 CCR 可逆取回。",
+      "links": [
+        {
+          "target": "content/chopratejas-headroom",
+          "raw": "[[content/chopratejas-headroom]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/project-colbymchenry-codegraph-repo",
+      "type": "artifact",
+      "slug": "project-colbymchenry-codegraph-repo",
+      "title": "Project Colbymchenry Codegraph Repo",
+      "file": "artifacts/project-colbymchenry-codegraph-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "project-colbymchenry-codegraph-repo",
+        "kind": "artifact",
+        "content": "colbymchenry-codegraph",
+        "artifact_type": "repo",
+        "url": "https://github.com/colbymchenry/codegraph",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "真实上游未覆盖指定 checkout 根目录；因该目录已有非目标 git remote，读取的是 checkout/upstream-codegraph。",
+          "全量 npm test 在本机 Windows 未通过；build 通过，窄测试 146 passed。",
+          "hosted CodeGraph platform 不在当前 repo 中。",
+          "README benchmark 原始临时矩阵脚本位置写为 /tmp/ab-matrix，repo 内没有完整原始产物。"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已检查 README、site docs、docs/benchmarks、package.json、install scripts、BUNDLING.md、src/bin、src/mcp、src/db、src/sync、src/installer、src/extraction、tests；本地 `npm run build` 通过，installer/staleness/full-pipeline 窄测试 146 个通过。\n\n出处:https://github.com/colbymchenry/codegraph。See [[content/colbymchenry-codegraph]]。\n",
+      "excerpt": "已检查 README、site docs、docs/benchmarks、package.json、install scripts、BUNDLING.md、src/bin、src/mcp、src/db、src/sync、src/installer、src/extraction、tests；本地 `npm run build` 通过，installer/staleness/full-pipeline 窄测试 146 个通过。",
+      "links": [
+        {
+          "target": "content/colbymchenry-codegraph",
+          "raw": "[[content/colbymchenry-codegraph]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/project-microsoft-markitdown-repo",
+      "type": "artifact",
+      "slug": "project-microsoft-markitdown-repo",
+      "title": "Project Microsoft Markitdown Repo",
+      "file": "artifacts/project-microsoft-markitdown-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "project-microsoft-markitdown-repo",
+        "kind": "artifact",
+        "content": "microsoft-markitdown",
+        "artifact_type": "repo",
+        "url": "https://github.com/microsoft/markitdown",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未见独立 docs 目录；主要文档在 README 和各 package README",
+          "未见性能或质量 benchmark",
+          "本轮未安装依赖运行全套测试"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已按要求克隆并检查真实 upstream repo 到 logs/codex-deepdive-radar12-20260608/microsoft-markitdown/checkout；检出提交 e144e0a2be95b34df17433bac904e635f2c5e551，核心包 markitdown 版本 0.1.6，另有 markitdown-mcp、markitdown-ocr、markitdown-sample-plugin。\n\n出处:https://github.com/microsoft/markitdown。See [[content/microsoft-markitdown]]。\n",
+      "excerpt": "已按要求克隆并检查真实 upstream repo 到 logs/codex-deepdive-radar12-20260608/microsoft-markitdown/checkout；检出提交 e144e0a2be95b34df17433bac904e635f2c5e551，核心包 markitdown 版本 0.1.6，另有 markitdown-mcp、markitdown-ocr、markitdown-sample-plugin。",
+      "links": [
+        {
+          "target": "content/microsoft-markitdown",
+          "raw": "[[content/microsoft-markitdown]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
       "id": "artifact/qwen3-coder-next-weights",
       "type": "artifact",
       "slug": "qwen3-coder-next-weights",
@@ -1658,6 +2012,46 @@
         {
           "target": "content/qwen3-coder-next",
           "raw": "[[content/qwen3-coder-next]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/refactoringhq-tolaria-repo",
+      "type": "artifact",
+      "slug": "refactoringhq-tolaria-repo",
+      "title": "Refactoringhq Tolaria Repo",
+      "file": "artifacts/refactoringhq-tolaria-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "refactoringhq-tolaria-repo",
+        "kind": "artifact",
+        "content": "refactoringhq-tolaria",
+        "artifact_type": "repo",
+        "url": "https://github.com/refactoringhq/tolaria",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "AGPL-3.0-or-later",
+        "runnable": "yes",
+        "missing_parts": [
+          "未本地运行桌面应用",
+          "未验证 release 安装包",
+          "未实测外部 CLI 登录与 MCP client 兼容性",
+          "未找到公开性能 benchmark"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已按要求克隆并检查真实 upstream 仓库：README、docs/ARCHITECTURE、docs/ABSTRACTIONS、ADR、package/Cargo/Tauri 配置、mcp-server、AI adapter、vault/cache 源码、demo vault 和测试文件。结论：Tolaria 是本地优先 Markdown 知识库桌面应用，AI 价值在 MCP/CLI agent/权限/vault context 的工程组合。\n\n出处:https://github.com/refactoringhq/tolaria。See [[content/refactoringhq-tolaria]]。\n",
+      "excerpt": "已按要求克隆并检查真实 upstream 仓库：README、docs/ARCHITECTURE、docs/ABSTRACTIONS、ADR、package/Cargo/Tauri 配置、mcp-server、AI adapter、vault/cache 源码、demo vault 和测试文件。结论：Tolaria 是本地优先 Markdown 知识库桌面应用，AI 价值在 MCP/CLI agent/权限/vault context 的工程组合。",
+      "links": [
+        {
+          "target": "content/refactoringhq-tolaria",
+          "raw": "[[content/refactoringhq-tolaria]]"
         }
       ],
       "headings": [
@@ -1697,6 +2091,46 @@
         {
           "target": "content/rohitg00-agentmemory",
           "raw": "[[content/rohitg00-agentmemory]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/rohitg00-ai-engineering-from-scratch-repo",
+      "type": "artifact",
+      "slug": "rohitg00-ai-engineering-from-scratch-repo",
+      "title": "Rohitg00 Ai Engineering From Scratch Repo",
+      "file": "artifacts/rohitg00-ai-engineering-from-scratch-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "rohitg00-ai-engineering-from-scratch-repo",
+        "kind": "artifact",
+        "content": "rohitg00-ai-engineering-from-scratch",
+        "artifact_type": "repo",
+        "url": "https://github.com/rohitg00/ai-engineering-from-scratch",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "未看到正式 release tag",
+          "未看到统一 pyproject.toml 作为 Python 包入口",
+          "Windows checkout 需要处理长路径",
+          "README/ROADMAP 存在计数和时长口径漂移"
+        ],
+        "last_checked": "2026-06-09"
+      },
+      "body": "\n## Artifact audit\n\n已克隆并检查真实 upstream。它是 AI 工程课程与模板仓库，最值得抽取 Phase 13/14/19 的 MCP、agent loop、workbench、sandbox、rules engine 模式；不应按生产 agent framework 评估。\n\n出处:https://github.com/rohitg00/ai-engineering-from-scratch。See [[content/rohitg00-ai-engineering-from-scratch]]。\n",
+      "excerpt": "已克隆并检查真实 upstream。它是 AI 工程课程与模板仓库，最值得抽取 Phase 13/14/19 的 MCP、agent loop、workbench、sandbox、rules engine 模式；不应按生产 agent framework 评估。",
+      "links": [
+        {
+          "target": "content/rohitg00-ai-engineering-from-scratch",
+          "raw": "[[content/rohitg00-ai-engineering-from-scratch]]"
         }
       ],
       "headings": [

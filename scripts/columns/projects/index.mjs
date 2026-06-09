@@ -277,9 +277,15 @@ export async function publish(_qaItems = [], ctx = {}) {
         .filter((candidate) => isProjectCompletedDeepDive(candidate, { ...options, db }))
     : [];
   const candidateRows = uniqueCandidates([...baseCandidateRows, ...completedDeepRows]);
-  const enriched = candidateRows.map((candidate) => enrichFromDb(db, candidate)).filter((item) => item.light);
+  const enriched = candidateRows
+    .map((candidate) => enrichFromDb(db, candidate))
+    .filter((item) => item.light)
+    .map((item) => currentIds.size ? { ...item, currentRun: currentIds.has(item.candidate?.id) } : item);
   const boards = Object.fromEntries(WINDOWS.map((window) => [window, makeBoard(window, enriched, options)]));
-  const radar = makeRadar(enriched, options);
+  const radarItems = currentIds.size && options.eliteSelection !== false
+    ? enriched.filter((item) => item.currentRun)
+    : enriched;
+  const radar = makeRadar(radarItems, options);
   const allRepos = radar.repos;
   const deepRepos = allRepos.filter((repo) => repo.final_depth === "deep" || repo.deep);
   const generatedBriefWiki = briefWikiAnalyses(ctx.result?.analyses);
@@ -290,6 +296,9 @@ export async function publish(_qaItems = [], ctx = {}) {
   ));
   const deepDiveCount = briefWikiPipeline ? generatedBriefWiki.length : deepRepos.length;
   const generatedAt = nowIso(options);
+  const eliteMode = options.eliteSelection !== false;
+  const radarTargetMin = eliteMode ? 10 : 25;
+  const radarTargetMax = eliteMode ? numberOption(options.radarLimit, 12) : numberOption(options.radarLimit, 30);
 
   const agentFlow = buildAgentFlow("projects", {
     discover: `${enriched.length} repos from GitHub Trending plus topic/search supplements`,
@@ -318,7 +327,7 @@ export async function publish(_qaItems = [], ctx = {}) {
       gateCheck("cards-have-tldr", "every project card has a TL;DR", allRepos.every((repo) => repo.tldr && repo.light), `${allRepos.length} repos checked`),
       gateCheck("worth-scores", "every project has a numeric worthDeepDive score", allRepos.every((repo) => Number.isFinite(repo.worthDeepDive)), `${allRepos.length} repos checked`),
       gateCheck("depth-fields", "every project card has final_depth and ranking_score", allRepos.every((repo) => repo.final_depth && Number.isFinite(repo.ranking_score)), `${allRepos.length} repos checked`),
-      gateWarning("daily-radar-target", "radar carries the daily target count", allRepos.length >= 25 && allRepos.length <= numberOption(options.radarLimit, 30), `${allRepos.length} radar repos`),
+      gateWarning("daily-radar-target", "radar carries the daily target count", allRepos.length >= radarTargetMin && allRepos.length <= radarTargetMax, `${allRepos.length} radar repos`),
       gateWarning("deep-quality-gate", "deep count is quality-gate only, not quota-limited", true, `${allRepos.filter((repo) => repo.final_depth === "deep").length} deep candidates`),
     ],
   });
@@ -509,11 +518,12 @@ function isAtLeastAsNew(left, right) {
 
 export function makeBoard(window, items, options = {}) {
   const generatedAt = nowIso(options);
+  const hasCurrentRunMarkers = items.some((item) => Object.hasOwn(item, "currentRun"));
   const nativeItems = items
-    .filter((item) => (item.repo.windows || []).includes(window))
+    .filter((item) => (!hasCurrentRunMarkers || item.currentRun) && isCurrentBoardWindow(item.repo, window))
     .sort((left, right) => sortForWindow(left, right, window));
-  const boardLimit = Number.isFinite(Number(options.boardLimit)) ? Number(options.boardLimit) : null;
-  const boardItems = boardLimit == null ? nativeItems : nativeItems.slice(0, boardLimit);
+  const boardLimit = Number.isFinite(Number(options.boardLimit)) ? Number(options.boardLimit) : 12;
+  const boardItems = nativeItems.slice(0, boardLimit);
   const repos = boardItems
     .map((item, index) => repoForBoard(item, window, index + 1, options));
 
@@ -523,6 +533,23 @@ export function makeBoard(window, items, options = {}) {
     target: repos.length,
     repos,
   };
+}
+
+function isCurrentBoardWindow(repo = {}, window) {
+  const hasCurrentWindowFields = Array.isArray(repo.currentWindows)
+    || repo.currentRanksByWindow
+    || repo.currentStarsGainedByWindow;
+  if (Array.isArray(repo.currentWindows) && repo.currentWindows.includes(window)) return true;
+  if (Number(repo.currentRanksByWindow?.[window]) > 0) return true;
+  if (Number(repo.currentStarsGainedByWindow?.[window]) > 0) return true;
+  if (hasCurrentWindowFields) return false;
+
+  return (repo.windows || []).includes(window)
+    && (
+      Number(repo.ranksByWindow?.[window]) > 0
+      || Number(repo.starsGainedByWindow?.[window]) > 0
+      || Number(repo.starsGained) > 0
+    );
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -665,6 +692,8 @@ function repoForBoard(item, window, rank, options = {}) {
     review_issues: Array.isArray(light.review_issues) ? light.review_issues : depthDecision.review_issues || [],
     evidence_summary: light.evidence_summary || depthDecision.evidence_summary || null,
     depth_decision: publicDepthDecision(light),
+    communityValidation: repo.communityValidation || null,
+    eliteSelection: repo.eliteSelection || null,
   };
   if (light.project_type) out.project_type = light.project_type;
   if (light.verdict) out.verdict = light.verdict;

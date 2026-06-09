@@ -587,7 +587,13 @@ Hard requirements:
 - Clone or otherwise read the real repo into this temporary directory: ${checkoutDir}
 - Read README plus deeper docs/examples/config/package files when present. Use source anchors that name the file/section, e.g. （来源：README Quickstart）, （来源：docs/policy.md）, （来源：package.json scripts）.
 - Do not edit the AI-Brief workspace. The caller will write brief-wiki files.
-- Use Chinese plain-language two-layer writing: first explain in human language, then define technical terms.
+
+【新范式·呈现纪律(Kevin 2026-06-08, 最重要 — 旧版"差到不想看", 这次按此写)】
+- **少文字**: 每个 section 只写几句应用判断, 不堆长段、不复述源码。一段话能说清就不要三段。
+- **去英文原文**: 严禁整段贴英文 README/源码/文档。一律中文转述; 只在必要处放**极短**代码/命令/配置片段(≤2 行)且紧跟一句中文说明。术语首次出现给一句中文白话注解。
+- **架构用图, 不用长文**: 核心架构 / 数据流 / agent loop 必须用一个 **Mermaid 图**(在 how_it_works.body_md 里放 \`\`\`mermaid 代码块, flowchart/graph), 用图表达结构, 配几句话点关键节点 — 不要用长段文字描述架构。Mermaid 节点文字用中文/极短英文, 不放特殊字符。
+- **应用判断为主**(读者=做 AI 应用的人): 它是什么(中文一句话) / 解决什么痛点 / 怎么用 / 什么时候用 / **横向对比≥2 个点名同类**(命名竞品+真实差异+取舍) / 成熟度 + 风险。不堆机制数学、不做研究审稿。
+- Use Chinese plain-language two-layer writing: 先人话, 再点术语。
 - No fabrication: undocumented facts become 未知/未在 README/docs/tree 说明.
 - README, badges, benchmark, marketing, "supports N", "fastest/best/only" claims must be attributed as 自称. Facts you verify from files/tree/package config can be 已核实.
 - Keep exact numbers and wording. Do not round, infer, or fill counts.

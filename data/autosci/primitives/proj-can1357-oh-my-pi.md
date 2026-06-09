@@ -2,26 +2,26 @@
 # AutoSci reuse - can1357/oh-my-pi
 
 ## Core Pattern
-Hashline anchored edits: 把 read 输出设计成带 snapshot tag 的可编辑视图，例如 `¶a.ts#0A3B` + `replace 1..1:`；patcher 在写入前验证 full-file hash，multi-section patch 先 preflight，避免部分落盘。 Preview-first structural rewrite: `ast_edit` 固定先 dry-run，显示 per-file replacements，排队一个 `resolve` action；apply 时重新计算并比较 replacement totals/per-file counts，stale preview 报错。 Internal URL filesystem: 让 `read` 统一处理 `agent://`、`artifact://`、`issue://`、`pr://`、`rule://`、`skill://`、`memory://` 等资源；子代理 JSON 输出还能用 `agent://<id>/<path>` 抽字段。 TTSR stream interruption: 规则文件用 frontmatter 写 `condition`、`scope`、`interruptMode`，匹配 stream delta 后可 abort、注入 `<system-interrupt>`、继续生成；工具源非中断匹配则把 `<system-reminder>` prepend 到 tool result。 Subagent artifact protocol: 每个子代理必须通过隐藏 `yield` 工具结束，输出写 `<id>.md`，父代理用 `agent://<id>` 读取；缺失 yield 最多发 3 次 reminder。
+Hashline 内容锚编辑: 让读取工具返回短 hash tag，写入工具必须带 tag；编辑语言只表达“替换哪几行/插入哪里”，不复制旧内容。 统一 path 读取协议: 把文件、URL、SQLite、归档、内部 artifact 都压到 `read({path})`，再用 selector 做分页和范围读取。 隐藏工具加 BM25 发现: 默认只暴露 essential 工具；其它工具隐藏但可检索，需要时由 `search_tool_bm25` 激活。 子代理 artifact 协议: 每个子任务输出 `<id>.md` 或 JSON artifact，父代理用 `agent://<id>` 读取，而不是解析长段聊天文本。 扩展事件拦截: 扩展用 `tool_call` 和 `tool_result` 事件包住所有工具；可注册工具、命令、快捷键和 renderer。
 
 ## Mapping
 - problem_class: domain-agent-workflow-with-validation-and-controls
-- components: agent_orchestrator, tool_protocol_adapter, developer_control_surface, model_or_retrieval_layer, hashline-anchored-edits, preview-first-structural-rewrite, internal-url-filesystem, ttsr-stream-interruption
+- components: agent_orchestrator, tool_protocol_adapter, developer_control_surface, model_or_retrieval_layer, hashline, path, bm25, artifact
 - autosci_modules: pattern_library, experiment_runner, agent_runtime, tool_governance, trace_memory
 
 ## Small Experiment
 Compare baseline free-form execution against the extracted finance_agent pattern from can1357/oh-my-pi on three AutoSci tasks. Measure completion rate, trace inspectability, failure recovery, and cost over 1-3 days.
 
 ## Design Principles
-- finance-agent-boundary-as-module: Hashline anchored edits: 把 read 输出设计成带 snapshot tag 的可编辑视图，例如 `¶a.ts#0A3B` + `replace 1..1:`；patcher 在写入前验证 full-file hash，multi-section patch 先 preflight，避免部分落盘。 Preview-first structural rewrite: `ast_edit` 固定先 dry-run，显示 per-file replacements，排队一个 `resolve` action；apply 时重新计算并比较 replacement totals/per-file counts，stale preview 报错。 Internal URL filesystem: 让 `read` 统一处理 `agent://`、`artifact://`、`issue://`、`pr://`、`rule://`、`skill://`、`memory://` 等资源；子代理 JSON 输出还能用 `agent://<id>/<path>` 抽字段。 TTSR stream interruption: 规则文件用 frontmatter 写 `condition`、`scope`、`interruptMode`，匹配 stream delta 后可 abort、注入 `<system-interrupt>`、继续生成；工具源非中断匹配则把 `<system-reminder>` prepend 到 tool result。 Subagent artifact protocol: 每个子代理必须通过隐藏 `yield` 工具结束，输出写 `<id>.md`，父代理用 `agent://<id>` 读取；缺失 yield 最多发 3 次 reminder。
-- finance-agent-observable-flow: 人话：一个真实 flow 可以这样走：用户运行 `omp -p "List all .ts files in src/"`，`packages/coding-agent/src/cli.ts` 会把非子命令 argv 改写为 `launch`，`packages/coding-agent/src/commands/launch.ts` 定义 `-p/--print`、`--model`、`--tools`、`--no-lsp`、`--approval-mode` 等参数，然后 `runRootCommand` 创建 agent session。session 创建后，`createTools()` 默认注册 `read,bash,edit` 等工具；当模型需要看文件，`read` 对本地文本输出 `¶src/foo.ts#0A1B` 加 `41:def alpha():` 这种 hashline header/行号，并把读取内容写入 `session.fileReadCache`。模型编辑时调用 `edit`，输入像 `¶a.ts#0A3B replace 1..1: +const X = "b";`；`edit` 通过 snapshot tag 验证 live file 是否仍匹配，失败时走 snapshot recovery 或返回 mismatch。结构性替换则走 `ast_edit`：输入 `ops: [{ pat, out }], paths: [...]`，先 dry-run 预览，真正落盘必须后续 `resolve(action:"apply")`。如果任务很大，`task` 会按 `task.maxConcurrency` 分派子代理，子代理输出 `<id>.md`，父代理再读 `agent://<id>` 汇总。术语：这条链路包含 CLI routing、session discovery、tool registry、read snapshot store、hashline patcher、resolve preview queue、subagent artifact protocol；对应源码/文档锚点是 `packages/coding-agent/src/cli.ts runCli`、`packages/coding-agent/src/commands/launch.ts flags/examples`、`docs/tools/read.md Flow`、`docs/tools/edit.md Worked examples`、`docs/tools/ast-edit.md Flow`、`docs/tools/task.md Flow`。
-- finance-agent-risk-first-transfer: Transfer the architecture together with its main failure boundary: Bun >= 1.3.14: Bun 版本不足会直接在 `src/cli.ts` 报错退出；install 脚本也检查 `MIN_BUN_VERSION=1.3.14`。.
+- finance-agent-boundary-as-module: Hashline 内容锚编辑: 让读取工具返回短 hash tag，写入工具必须带 tag；编辑语言只表达“替换哪几行/插入哪里”，不复制旧内容。 统一 path 读取协议: 把文件、URL、SQLite、归档、内部 artifact 都压到 `read({path})`，再用 selector 做分页和范围读取。 隐藏工具加 BM25 发现: 默认只暴露 essential 工具；其它工具隐藏但可检索，需要时由 `search_tool_bm25` 激活。 子代理 artifact 协议: 每个子任务输出 `<id>.md` 或 JSON artifact，父代理用 `agent://<id>` 读取，而不是解析长段聊天文本。 扩展事件拦截: 扩展用 `tool_call` 和 `tool_result` 事件包住所有工具；可注册工具、命令、快捷键和 renderer。
+- finance-agent-observable-flow: 核心流不是“模型直接乱写文件”，而是模型在一个工具注册表里选工具，工具再进入各自运行时。 ```mermaid flowchart TD A[用户任务] --> B[omp CLI] B --> C[会话运行时] C --> D[模型路由] C --> E[工具注册表] E --> F[read 统一读取] F --> G[哈希锚快照] G --> H[edit 写入] H --> I[LSP 诊断] E --> J[task 子代理] J --> K[隔离工作区] E --> L[MCP 和扩展] E --> M[eval 和 bash] ``` 一个真实编辑例子：`read` 在 hashline 模式会给可变文件加类似 `¶a.ts#0A3B` 的头，`edit` 再消费这个头和行号。（来源：docs/tools/read.md Local text files；docs/tools/edit.md Worked examples） ```text ¶a.ts#0A3B replace 1..1: ``` 这两行的意思是：只替换 `a.ts` 当前快照的第 1 行；如果文件内容已经漂移，`packages/hashline` 会按 snapshot 校验并拒绝或恢复。（来源：packages/hashline/README.md Format；docs/tools/edit.md Limits & Caps） 更完整的 agent loop：CLI 入口 `src/cli.ts` 把非子命令默认路由到 `launch`；`main.ts` 初始化 settings、model registry、session；`createTools` 从 `BUILTIN_TOOLS` 和 MCP/custom/extension 工具生成可调用工具；工具执行结果回到会话，再由模型决定下一步。（来源：packages/coding-agent/DEVELOPMENT.md Boot Sequence；packages/coding-agent/src/tools/index.ts createTools）
+- finance-agent-risk-first-transfer: Transfer the architecture together with its main failure boundary: Bun >= 1.3.14: Bun 版本不足时 `src/cli.ts` 会直接报错退出；worker/native 加载也依赖 Bun 行为。.
 
 ## Risks
-- Bun >= 1.3.14: Bun 版本不足会直接在 `src/cli.ts` 报错退出；install 脚本也检查 `MIN_BUN_VERSION=1.3.14`。
-- Rust N-API native addon: grep、shell、AST、highlight、PTY、image、token counting 等路径依赖 `@oh-my-pi/pi-natives` 和 `pi_natives` 二进制；平台构建/加载失败会影响热路径工具。
-- 外部 LLM providers 和 OAuth/API key: 模型不可用、key 过期、quota/429 会影响主代理；registry 会做 auth lookup、fallback、runtime discovery，但最终仍依赖供应商。
-- Web search providers: `web_search` auto 链要有至少一个已配置 provider；否则返回 `Error: No web search provider configured.`。
-- MCP server configs: 粘贴远程 MCP 忘写 `type: http` 会被当成 stdio 并报缺 `command`；server name 还要匹配 `^[a-zA-Z0-9_.-]{1,100}$`。
-- 本地 language servers / debuggers: LSP/DAP 能力依赖用户安装 `rust-analyzer`、`typescript-language-server`、`pyright` 等二进制；缺失时对应操作不可用或冷启动失败。
+- Bun >= 1.3.14: Bun 版本不足时 `src/cli.ts` 会直接报错退出；worker/native 加载也依赖 Bun 行为。
+- Rust N-API native crates: 平台二进制或 N-API 加载失败会影响 grep、shell、AST、PTY、image、token 等热路径。
+- 模型 provider 与 models.yml: provider API、OAuth、订阅计划或 gateway 字段变化会导致模型不可用或路由失败。
+- MCP server: 第三方 MCP server 连接慢、工具变更、OAuth 失效或行为不可信，会影响 agent 工具调用。
+- LSP/DAP 外部二进制: 语言服务器或调试适配器不在 PATH/项目 bin，`lsp`/`debug` 就只能部分工作。
+- 默认审批模式: 文档写 `yolo` 是默认，read/write/exec 都自动批准；模型可执行 bash、browser、子代理等高影响工具。
 - over_transfer

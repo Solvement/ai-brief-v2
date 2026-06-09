@@ -49,13 +49,31 @@ function hideOnError(e: React.SyntheticEvent<HTMLImageElement>) {
   e.currentTarget.style.visibility = "hidden";
 }
 
+/**
+ * One-sentence "what is this project about" for the card (Chinese-first, 2026-06-08).
+ * Prefer the deep-dive's Chinese one-liner (`one_sentence_positioning`); fall back to
+ * the tldr but strip the `GitHub 描述为「…」。` wrapper so the bare description shows.
+ */
+function cardSummary(repo: AnalyzedRepo): string {
+  const positioning = repo.tier_template?.one_sentence_positioning?.trim();
+  if (positioning) return positioning;
+  const tldr = (repo.tldr || "").trim();
+  if (tldr) {
+    // Strip the deterministic wrapper: GitHub 描述为“…”。 / 「…」 / "…"
+    const m = tldr.match(/^GitHub\s*描述为\s*[“"「]([\s\S]*?)[”"」]\s*[。.]?\s*$/);
+    if (m && m[1].trim()) return m[1].trim();
+    return tldr;
+  }
+  return (repo.light || repo.description || "").trim();
+}
+
 interface Props { repo: AnalyzedRepo; featured?: boolean }
 
 export function RepoCard({ repo }: Props) {
   const depth = depthOf(repo);
   const slug = slugOf(repo);
   const score = typeof repo.ranking_score === "number" ? repo.ranking_score : repo.worthDeepDive;
-  const summary = repo.tier_template?.one_sentence_positioning || repo.tldr || repo.light || repo.description || "";
+  const summary = cardSummary(repo);
 
   // Tier paradigm (2026-06-03): tier drives the badge; depth is the legacy fallback.
   const tier = typeof repo.project_tier === "number" ? repo.project_tier : null;
