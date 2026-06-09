@@ -318,13 +318,8 @@ export function KnowledgeGraph() {
     // memoryOnly: 只留有 facet/judgment 的真记忆节点 + 与它们相连的对端 → 干净星座，不是管线毛球
     let pool = allNodes.filter((n) => enabledKinds[n.kind]);
     if (memoryOnly) {
-      const mem = new Set(allNodes.filter((n) => n.facets || n.selfEvoUse || n.designIdea).map((n) => n.id));
-      const keep = new Set(mem);
-      for (const e of allEdges) {
-        if (mem.has(e.source)) keep.add(e.target);
-        if (mem.has(e.target)) keep.add(e.source);
-      }
-      pool = pool.filter((n) => keep.has(n.id));
+      // 只留真·记忆节点：有 facet/判断的，或外搜 ghost。不做邻居扩张（那会把管线子节点拖进来）。
+      pool = pool.filter((n) => n.facets || n.selfEvoUse || n.designIdea || n.ghost);
     }
     const visIds = new Set(pool.map((n) => n.id));
     const ve = allEdges.filter((e) => visIds.has(e.source) && visIds.has(e.target));
