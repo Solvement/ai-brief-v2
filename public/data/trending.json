@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-09T01:44:53.940Z",
+  "generatedAt": "2026-06-09T01:56:28.397Z",
   "analysisModels": {
     "projectLight": "deepseek-v4-flash",
     "projectDeep": "Tier 3: codex:gpt-5.5;model_reasoning_effort=high",
     "projectReview": "deepseek-v4-pro"
   },
   "pipelineRun": {
-    "id": "projects-2026-06-09-1780969496495",
+    "id": "projects-2026-06-09-1780970189558",
     "memoryFile": "data/agent-memory/projects.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -133,7 +133,7 @@
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "0 brief-wiki project analysis/deep briefs with separate reviewer pass, 12 radar cards"
+      "signal": "0 brief-wiki project analysis/deep briefs with separate reviewer pass, 11 radar cards"
     },
     {
       "stage": "verify",
@@ -158,7 +158,7 @@
     "schemaVersion": 1,
     "surface": "projects",
     "status": "pass",
-    "checkedAt": "2026-06-09T01:44:53.941Z",
+    "checkedAt": "2026-06-09T01:56:28.397Z",
     "checks": [
       {
         "id": "boards-present",
@@ -170,25 +170,25 @@
         "id": "cards-have-tldr",
         "label": "every project card has a TL;DR",
         "status": "pass",
-        "details": "12 repos checked"
+        "details": "11 repos checked"
       },
       {
         "id": "worth-scores",
         "label": "every project has a numeric worthDeepDive score",
         "status": "pass",
-        "details": "12 repos checked"
+        "details": "11 repos checked"
       },
       {
         "id": "depth-fields",
         "label": "every project card has final_depth and ranking_score",
         "status": "pass",
-        "details": "12 repos checked"
+        "details": "11 repos checked"
       },
       {
         "id": "daily-radar-target",
         "label": "radar carries the daily target count",
         "status": "pass",
-        "details": "12 radar repos"
+        "details": "11 radar repos"
       },
       {
         "id": "deep-quality-gate",
@@ -200,7 +200,7 @@
   },
   "radar": {
     "window": "radar",
-    "generatedAt": "2026-06-09T01:44:53.940Z",
+    "generatedAt": "2026-06-09T01:56:28.396Z",
     "target": 30,
     "repos": [
       {
@@ -212,7 +212,7 @@
         "description": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 18959,
+        "stars": 18973,
         "forks": 1209,
         "starsGained": 16237,
         "starsGainedByWindow": {
@@ -248,7 +248,7 @@
           "what_it_does": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
           "metadata": {
             "language": "Python",
-            "total_stars": 18959,
+            "total_stars": 18973,
             "stars_in_period": 16237,
             "author": "chopratejas"
           },
@@ -269,8 +269,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "16237 period stars / 18959 total stars",
-            "recent_commit": "2026-06-09T01:44:19Z",
+            "star_velocity": "16237 period stars / 18973 total stars",
+            "recent_commit": "2026-06-09T01:56:08Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -454,7 +454,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 18959,
+          "stars": 18973,
           "monthlyStarsGained": 16237,
           "reasons": [
             "heat_gate:pass",
@@ -510,7 +510,7 @@
         "description": "⌥ AI Coding agent for the terminal — hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 11301,
+        "stars": 11304,
         "forks": 957,
         "starsGained": 7167,
         "starsGainedByWindow": {
@@ -546,7 +546,7 @@
           "what_it_does": "⌥ AI Coding agent for the terminal — hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 11301,
+            "total_stars": 11304,
             "stars_in_period": 7167,
             "author": "can1357"
           },
@@ -567,8 +567,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "7167 period stars / 11301 total stars",
-            "recent_commit": "2026-06-09T01:40:27Z",
+            "star_velocity": "7167 period stars / 11304 total stars",
+            "recent_commit": "2026-06-09T01:51:07Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -744,7 +744,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 11301,
+          "stars": 11304,
           "monthlyStarsGained": 7167,
           "reasons": [
             "heat_gate:pass",
@@ -800,8 +800,8 @@
         "description": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 34657,
-        "forks": 2837,
+        "stars": 34680,
+        "forks": 2839,
         "starsGained": 6616,
         "starsGainedByWindow": {
           "daily": 3558,
@@ -836,7 +836,7 @@
           "what_it_does": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
           "metadata": {
             "language": "Python",
-            "total_stars": 34657,
+            "total_stars": 34680,
             "stars_in_period": 6616,
             "author": "mvanhorn"
           },
@@ -857,8 +857,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "6616 period stars / 34657 total stars",
-            "recent_commit": "2026-06-09T01:43:07Z",
+            "star_velocity": "6616 period stars / 34680 total stars",
+            "recent_commit": "2026-06-09T01:54:47Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -1026,7 +1026,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 34657,
+          "stars": 34680,
           "monthlyStarsGained": 6616,
           "reasons": [
             "heat_gate:pass",
@@ -1082,7 +1082,7 @@
         "description": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 24239,
+        "stars": 24263,
         "forks": 2038,
         "starsGained": 3006,
         "starsGainedByWindow": {
@@ -1118,7 +1118,7 @@
           "what_it_does": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
           "metadata": {
             "language": "Python",
-            "total_stars": 24239,
+            "total_stars": 24263,
             "stars_in_period": 3006,
             "author": "Panniantong"
           },
@@ -1139,8 +1139,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "3006 period stars / 24239 total stars",
-            "recent_commit": "2026-06-09T01:44:28Z",
+            "star_velocity": "3006 period stars / 24263 total stars",
+            "recent_commit": "2026-06-09T01:56:12Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -1306,7 +1306,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 24239,
+          "stars": 24263,
           "monthlyStarsGained": 3006,
           "reasons": [
             "heat_gate:pass",
@@ -1362,7 +1362,7 @@
         "description": "PM Skills Marketplace: 100+ agentic skills, commands, and plugins — from discovery to strategy, execution, launch, and growth.",
         "language": null,
         "languageColor": null,
-        "stars": 12723,
+        "stars": 12731,
         "forks": 1500,
         "starsGained": 640,
         "starsGainedByWindow": {
@@ -1398,7 +1398,7 @@
           "what_it_does": "PM Skills Marketplace: 100+ agentic skills, commands, and plugins — from discovery to strategy, execution, launch, and growth.",
           "metadata": {
             "language": "not_found",
-            "total_stars": 12723,
+            "total_stars": 12731,
             "stars_in_period": 640,
             "author": "phuryn"
           },
@@ -1419,8 +1419,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "640 period stars / 12723 total stars",
-            "recent_commit": "2026-06-09T01:43:36Z",
+            "star_velocity": "640 period stars / 12731 total stars",
+            "recent_commit": "2026-06-09T01:54:55Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -1590,7 +1590,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 12723,
+          "stars": 12731,
           "monthlyStarsGained": 640,
           "reasons": [
             "heat_gate:pass",
@@ -1646,8 +1646,8 @@
         "description": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 29015,
-        "forks": 2404,
+        "stars": 29022,
+        "forks": 2405,
         "starsGained": 24020,
         "starsGainedByWindow": {
           "monthly": 24020
@@ -1681,7 +1681,7 @@
           "what_it_does": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
           "metadata": {
             "language": "Python",
-            "total_stars": 29015,
+            "total_stars": 29022,
             "stars_in_period": 24020,
             "author": "Imbad0202"
           },
@@ -1865,7 +1865,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 29015,
+          "stars": 29022,
           "monthlyStarsGained": 24020,
           "reasons": [
             "heat_gate:pass",
@@ -1921,8 +1921,8 @@
         "description": "Pre-indexed code knowledge graph for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent — fewer tokens, fewer tool calls, 100% local",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 44888,
-        "forks": 2762,
+        "stars": 44901,
+        "forks": 2763,
         "starsGained": 43749,
         "starsGainedByWindow": {
           "monthly": 43749
@@ -1956,7 +1956,7 @@
           "what_it_does": "Pre-indexed code knowledge graph for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent — fewer tokens, fewer tool calls, 100% local",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 44888,
+            "total_stars": 44901,
             "stars_in_period": 43749,
             "author": "colbymchenry"
           },
@@ -1977,8 +1977,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "43749 period stars / 44888 total stars",
-            "recent_commit": "2026-06-09T01:43:49Z",
+            "star_velocity": "43749 period stars / 44901 total stars",
+            "recent_commit": "2026-06-09T01:56:08Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -2147,7 +2147,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 44888,
+          "stars": 44901,
           "monthlyStarsGained": 43749,
           "reasons": [
             "heat_gate:pass",
@@ -2202,8 +2202,8 @@
         "description": "Python tool for converting files and office documents to Markdown.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 148451,
-        "forks": 10190,
+        "stars": 148459,
+        "forks": 10192,
         "starsGained": 26881,
         "starsGainedByWindow": {
           "weekly": 11177,
@@ -2238,7 +2238,7 @@
           "what_it_does": "Python tool for converting files and office documents to Markdown.",
           "metadata": {
             "language": "Python",
-            "total_stars": 148451,
+            "total_stars": 148459,
             "stars_in_period": 26881,
             "author": "microsoft"
           },
@@ -2258,8 +2258,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "26881 period stars / 148451 total stars",
-            "recent_commit": "2026-06-09T01:43:33Z",
+            "star_velocity": "26881 period stars / 148459 total stars",
+            "recent_commit": "2026-06-09T01:55:43Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -2423,7 +2423,7 @@
             "github_trending_multi_window",
             "hacker_news"
           ],
-          "stars": 148451,
+          "stars": 148459,
           "monthlyStarsGained": 26881,
           "reasons": [
             "heat_gate:pass",
@@ -2479,7 +2479,7 @@
         "description": "Learn it. Build it. Ship it for others.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 30367,
+        "stars": 30373,
         "forks": 4954,
         "starsGained": 23852,
         "starsGainedByWindow": {
@@ -2514,7 +2514,7 @@
           "what_it_does": "Learn it. Build it. Ship it for others.",
           "metadata": {
             "language": "Python",
-            "total_stars": 30367,
+            "total_stars": 30373,
             "stars_in_period": 23852,
             "author": "rohitg00"
           },
@@ -2687,7 +2687,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 30367,
+          "stars": 30373,
           "monthlyStarsGained": 23852,
           "reasons": [
             "heat_gate:pass",
@@ -2742,7 +2742,7 @@
         "description": "Desktop app to manage markdown knowledge bases",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 13608,
+        "stars": 13616,
         "forks": 954,
         "starsGained": 651,
         "starsGainedByWindow": {
@@ -2777,7 +2777,7 @@
           "what_it_does": "Desktop app to manage markdown knowledge bases",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 13608,
+            "total_stars": 13616,
             "stars_in_period": 651,
             "author": "refactoringhq"
           },
@@ -2798,8 +2798,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "651 period stars / 13608 total stars",
-            "recent_commit": "2026-06-09T01:44:31Z",
+            "star_velocity": "651 period stars / 13616 total stars",
+            "recent_commit": "2026-06-09T01:51:02Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -2983,7 +2983,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 13608,
+          "stars": 13616,
           "monthlyStarsGained": 651,
           "reasons": [
             "heat_gate:pass",
@@ -3039,8 +3039,8 @@
         "description": "利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 82148,
-        "forks": 11707,
+        "stars": 82154,
+        "forks": 11709,
         "starsGained": 25436,
         "starsGainedByWindow": {
           "weekly": 5574,
@@ -3075,7 +3075,7 @@
           "what_it_does": "利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
           "metadata": {
             "language": "Python",
-            "total_stars": 82148,
+            "total_stars": 82154,
             "stars_in_period": 25436,
             "author": "harry0703"
           },
@@ -3248,7 +3248,7 @@
             "github_trending",
             "github_trending_multi_window"
           ],
-          "stars": 82148,
+          "stars": 82154,
           "monthlyStarsGained": 25436,
           "reasons": [
             "heat_gate:pass",
@@ -3293,268 +3293,15 @@
         "briefSlug": "harry0703-moneyprinterturbo",
         "brief_slug": "harry0703-moneyprinterturbo",
         "deep_status": "available"
-      },
-      {
-        "fullName": "roboflow/supervision",
-        "owner": "roboflow",
-        "name": "supervision",
-        "url": "https://github.com/roboflow/supervision",
-        "ownerAvatarUrl": "https://github.com/roboflow.png?size=80",
-        "description": "We write your reusable computer vision tools. 💜",
-        "language": "Python",
-        "languageColor": "#3572A5",
-        "stars": 42368,
-        "forks": 3783,
-        "starsGained": 1288,
-        "starsGainedByWindow": {
-          "daily": 1288
-        },
-        "rank": 12,
-        "tldr": "roboflow/supervision：GitHub 描述为“We write your reusable computer vision tools. 💜”。",
-        "tags": [
-          "计算机视觉",
-          "目标检测",
-          "数据集处理",
-          "标注工具"
-        ],
-        "light": "Supervision是Roboflow开源的计算机视觉工具库，提供Detections、Annotators等统一API，支持模型输出转换、图像/视频标注、数据集加载/拆分/合并/格式转换。项目拥有完整文档、示例和Colab演示，使用pip即可安装。依赖模型推理库（Ultralytics、Transformers等），本身不提供推理能力。缺少性能基准和与其他工具（如detectron2）的对比。推荐用于快速构建CV原型的工具层。",
-        "worthDeepDive": 65,
-        "ranking_score": 65,
-        "max_allowed_depth": "deep",
-        "final_depth": "light",
-        "project_tier": 1,
-        "project_tier_label": "Tier 1",
-        "project_bucket": "真·新项目",
-        "bucket": "真·新项目",
-        "tier_tag": "[Tier 1｜真·新项目]",
-        "model_tier": "cheap-extraction",
-        "requires_manual_confirmation": false,
-        "tier_template": {
-          "tier": 1,
-          "bucket": "真·新项目",
-          "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "可复用的计算机视觉工具库，适用于目标检测、分割、跟踪等任务的快速原型开发与生产部署。",
-          "what_it_does": "提供统一的API加载模型输出、绘制标注、处理数据集，支持COCO/YOLO/Pascal VOC格式，兼容Ultralytics、Transformers等主流检测/分割模型库。",
-          "metadata": {
-            "language": "Python",
-            "total_stars": 42368,
-            "stars_in_period": 1288,
-            "author": "roboflow"
-          },
-          "labels": [
-            "工具",
-            "infra"
-          ],
-          "prose_body": "roboflow/supervision 得分 65，信号是 bucket:真·新项目, novelty:ai_builder_shape。按确定性深度门控进入 light，建议 try。"
-        },
-        "recommended_action": "try",
-        "needs_enrichment": false,
-        "ranking_reasons": [
-          "bucket:真·新项目",
-          "novelty:ai_builder_shape",
-          "novelty:substantive_artifact",
-          "heat:stars_in_period=1288",
-          "heat:daily_only_flash_penalty",
-          "deep_gate:stars_gained_below_3000",
-          "agent/workflow evidence",
-          "model/RAG evidence",
-          "AI terms found in README/tree/topics",
-          "substantial README",
-          "repo tree available",
-          "key files available",
-          "docs signal",
-          "examples/demo signal",
-          "install/quickstart signal",
-          "package/config files present"
-        ],
-        "rejection_reasons": [],
-        "review_verdict": "not_applicable",
-        "review_issues": [],
-        "evidence_summary": {
-          "readme_found": true,
-          "readme_fetch_failed": false,
-          "readme_empty": false,
-          "readme_length": 11851,
-          "top_level_dirs": [
-            ".github",
-            "docs",
-            "examples",
-            "src",
-            "tests"
-          ],
-          "key_files": [
-            "README.md",
-            "pyproject.toml"
-          ],
-          "has_docs": true,
-          "has_examples": true,
-          "has_tests": true,
-          "has_install": true,
-          "has_docker": false,
-          "has_cli": false,
-          "has_agents": true,
-          "has_mcp": false,
-          "has_skills": false,
-          "has_models": true,
-          "has_demo": true,
-          "package_files": {
-            "package_json": false,
-            "pyproject_toml": true,
-            "cargo_toml": false,
-            "requirements_txt": false,
-            "docker_compose_yml": false,
-            "dockerfile": false
-          },
-          "stars_gained_by_window": {
-            "daily": 1288
-          }
-        },
-        "depth_decision": {
-          "ranking_score": 65,
-          "max_allowed_depth": "deep",
-          "final_depth": "light",
-          "ranking_reasons": [
-            "bucket:真·新项目",
-            "novelty:ai_builder_shape",
-            "novelty:substantive_artifact",
-            "heat:stars_in_period=1288",
-            "heat:daily_only_flash_penalty",
-            "deep_gate:stars_gained_below_3000",
-            "agent/workflow evidence",
-            "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available",
-            "key files available",
-            "docs signal",
-            "examples/demo signal",
-            "install/quickstart signal",
-            "package/config files present"
-          ],
-          "rejection_reasons": [],
-          "recommended_action": "try",
-          "needs_enrichment": false,
-          "review_verdict": "not_applicable",
-          "review_issues": [],
-          "evidence_summary": {
-            "readme_found": true,
-            "readme_fetch_failed": false,
-            "readme_empty": false,
-            "readme_length": 11851,
-            "top_level_dirs": [
-              ".github",
-              "docs",
-              "examples",
-              "src",
-              "tests"
-            ],
-            "key_files": [
-              "README.md",
-              "pyproject.toml"
-            ],
-            "has_docs": true,
-            "has_examples": true,
-            "has_tests": true,
-            "has_install": true,
-            "has_docker": false,
-            "has_cli": false,
-            "has_agents": true,
-            "has_mcp": false,
-            "has_skills": false,
-            "has_models": true,
-            "has_demo": true,
-            "package_files": {
-              "package_json": false,
-              "pyproject_toml": true,
-              "cargo_toml": false,
-              "requirements_txt": false,
-              "docker_compose_yml": false,
-              "dockerfile": false
-            },
-            "stars_gained_by_window": {
-              "daily": 1288
-            }
-          }
-        },
-        "communityValidation": {
-          "hackerNews": {
-            "title": "Supervision: Reusable Computer Vision",
-            "url": "https://github.com/roboflow/supervision",
-            "points": 236,
-            "objectID": "39812259",
-            "createdAt": "2024-03-25T01:58:33Z"
-          },
-          "ossInsight": true
-        },
-        "eliteSelection": {
-          "selected": true,
-          "thresholds": {
-            "limit": 12,
-            "minStars": 3000,
-            "minMonthlyStars": 1500,
-            "minSourceCount": 2,
-            "hnMinPoints": 50
-          },
-          "sourceCount": 3,
-          "sourceSignals": [
-            "github_trending",
-            "hacker_news",
-            "ossinsight_trending"
-          ],
-          "stars": 42368,
-          "monthlyStarsGained": 1288,
-          "reasons": [
-            "heat_gate:pass",
-            "source_count:3",
-            "github_trending",
-            "hacker_news",
-            "ossinsight_trending"
-          ]
-        },
-        "project_type": "library_sdk",
-        "verdict": "L1",
-        "ratings": {
-          "relevance_to_ai_engineer": 4,
-          "engineering_depth": 4,
-          "reuse_value": 5,
-          "maturity": 5
-        },
-        "rankingReason": {
-          "decision": "deterministic",
-          "rawScore": 65,
-          "finalScore": 65,
-          "matchedBoostTerms": [
-            "bucket:真·新项目",
-            "novelty:ai_builder_shape",
-            "novelty:substantive_artifact",
-            "heat:stars_in_period=1288",
-            "heat:daily_only_flash_penalty",
-            "deep_gate:stars_gained_below_3000",
-            "agent/workflow evidence",
-            "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available",
-            "key files available",
-            "docs signal",
-            "examples/demo signal",
-            "install/quickstart signal",
-            "package/config files present"
-          ],
-          "matchedCapTerms": [],
-          "explanation": "score=65; max=deep; final=light"
-        },
-        "deep_status": "not_applicable"
       }
     ],
     "depthCounts": {
-      "deep": 11,
-      "light": 1
+      "deep": 11
     }
   },
   "daily": {
     "window": "daily",
-    "generatedAt": "2026-06-09T01:44:53.939Z",
+    "generatedAt": "2026-06-09T01:56:28.343Z",
     "target": 5,
     "repos": [
       {
@@ -3566,8 +3313,8 @@
         "description": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 34657,
-        "forks": 2837,
+        "stars": 34680,
+        "forks": 2839,
         "starsGained": 6616,
         "starsGainedByWindow": {
           "daily": 3558,
@@ -3602,7 +3349,7 @@
           "what_it_does": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
           "metadata": {
             "language": "Python",
-            "total_stars": 34657,
+            "total_stars": 34680,
             "stars_in_period": 6616,
             "author": "mvanhorn"
           },
@@ -3623,8 +3370,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "6616 period stars / 34657 total stars",
-            "recent_commit": "2026-06-09T01:43:07Z",
+            "star_velocity": "6616 period stars / 34680 total stars",
+            "recent_commit": "2026-06-09T01:54:47Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -3792,7 +3539,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 34657,
+          "stars": 34680,
           "monthlyStarsGained": 6616,
           "reasons": [
             "heat_gate:pass",
@@ -3848,7 +3595,7 @@
         "description": "Desktop app to manage markdown knowledge bases",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 13608,
+        "stars": 13616,
         "forks": 954,
         "starsGained": 651,
         "starsGainedByWindow": {
@@ -3883,7 +3630,7 @@
           "what_it_does": "Desktop app to manage markdown knowledge bases",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 13608,
+            "total_stars": 13616,
             "stars_in_period": 651,
             "author": "refactoringhq"
           },
@@ -3904,8 +3651,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "651 period stars / 13608 total stars",
-            "recent_commit": "2026-06-09T01:44:31Z",
+            "star_velocity": "651 period stars / 13616 total stars",
+            "recent_commit": "2026-06-09T01:51:02Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -4089,7 +3836,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 13608,
+          "stars": 13616,
           "monthlyStarsGained": 651,
           "reasons": [
             "heat_gate:pass",
@@ -4145,7 +3892,7 @@
         "description": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 24239,
+        "stars": 24263,
         "forks": 2038,
         "starsGained": 3006,
         "starsGainedByWindow": {
@@ -4181,7 +3928,7 @@
           "what_it_does": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
           "metadata": {
             "language": "Python",
-            "total_stars": 24239,
+            "total_stars": 24263,
             "stars_in_period": 3006,
             "author": "Panniantong"
           },
@@ -4202,8 +3949,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "3006 period stars / 24239 total stars",
-            "recent_commit": "2026-06-09T01:44:28Z",
+            "star_velocity": "3006 period stars / 24263 total stars",
+            "recent_commit": "2026-06-09T01:56:12Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -4369,7 +4116,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 24239,
+          "stars": 24263,
           "monthlyStarsGained": 3006,
           "reasons": [
             "heat_gate:pass",
@@ -4425,7 +4172,7 @@
         "description": "PM Skills Marketplace: 100+ agentic skills, commands, and plugins — from discovery to strategy, execution, launch, and growth.",
         "language": null,
         "languageColor": null,
-        "stars": 12723,
+        "stars": 12731,
         "forks": 1500,
         "starsGained": 640,
         "starsGainedByWindow": {
@@ -4461,7 +4208,7 @@
           "what_it_does": "PM Skills Marketplace: 100+ agentic skills, commands, and plugins — from discovery to strategy, execution, launch, and growth.",
           "metadata": {
             "language": "not_found",
-            "total_stars": 12723,
+            "total_stars": 12731,
             "stars_in_period": 640,
             "author": "phuryn"
           },
@@ -4482,8 +4229,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "640 period stars / 12723 total stars",
-            "recent_commit": "2026-06-09T01:43:36Z",
+            "star_velocity": "640 period stars / 12731 total stars",
+            "recent_commit": "2026-06-09T01:54:55Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -4653,7 +4400,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 12723,
+          "stars": 12731,
           "monthlyStarsGained": 640,
           "reasons": [
             "heat_gate:pass",
@@ -4709,8 +4456,8 @@
         "description": "We write your reusable computer vision tools. 💜",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 42368,
-        "forks": 3783,
+        "stars": 42372,
+        "forks": 3784,
         "starsGained": 1288,
         "starsGainedByWindow": {
           "daily": 1288
@@ -4720,10 +4467,11 @@
         "tags": [
           "计算机视觉",
           "目标检测",
-          "数据集处理",
-          "标注工具"
+          "工具库",
+          "标注",
+          "数据集"
         ],
-        "light": "Supervision是Roboflow开源的计算机视觉工具库，提供Detections、Annotators等统一API，支持模型输出转换、图像/视频标注、数据集加载/拆分/合并/格式转换。项目拥有完整文档、示例和Colab演示，使用pip即可安装。依赖模型推理库（Ultralytics、Transformers等），本身不提供推理能力。缺少性能基准和与其他工具（如detectron2）的对比。推荐用于快速构建CV原型的工具层。",
+        "light": "Supervision是Roboflow开发的开源Python计算机视觉工具库，提供目标检测、实例分割、分类和跟踪等任务的标注（annotators）、数据集加载/转换（支持COCO、YOLO、Pascal VOC格式）和模型无关接口（支持Ultralytics、Transformers等）。项目进入雷达因其高星标（42k+）和每日增长1288星。已知事实：代码库包含src、tests、docs、examples，提供pip安装，有详细的文档和教程。缺失证据：架构细节、性能对比、复杂的agent/workflow应用案例。推荐尝试安装使用，其低代码特性适合快速验证CV方案。",
         "worthDeepDive": 65,
         "ranking_score": 65,
         "max_allowed_depth": "deep",
@@ -4739,17 +4487,16 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "可复用的计算机视觉工具库，适用于目标检测、分割、跟踪等任务的快速原型开发与生产部署。",
-          "what_it_does": "提供统一的API加载模型输出、绘制标注、处理数据集，支持COCO/YOLO/Pascal VOC格式，兼容Ultralytics、Transformers等主流检测/分割模型库。",
+          "one_sentence_positioning": "一个可复用的计算机视觉工具库，面向AI工程师和学生，提供标注、数据集处理和模型集成能力。",
+          "what_it_does": "提供丰富的可视化标注器、数据集加载/分割/合并/转换工具，以及模型无关的检测结果封装。",
           "metadata": {
             "language": "Python",
-            "total_stars": 42368,
+            "total_stars": 42372,
             "stars_in_period": 1288,
             "author": "roboflow"
           },
           "labels": [
-            "工具",
-            "infra"
+            "工具"
           ],
           "prose_body": "roboflow/supervision 得分 65，信号是 bucket:真·新项目, novelty:ai_builder_shape。按确定性深度门控进入 light，建议 try。"
         },
@@ -4907,7 +4654,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 42368,
+          "stars": 42372,
           "monthlyStarsGained": 1288,
           "reasons": [
             "heat_gate:pass",
@@ -4956,7 +4703,7 @@
   },
   "weekly": {
     "window": "weekly",
-    "generatedAt": "2026-06-09T01:44:53.939Z",
+    "generatedAt": "2026-06-09T01:56:28.344Z",
     "target": 7,
     "repos": [
       {
@@ -4968,7 +4715,7 @@
         "description": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 18959,
+        "stars": 18973,
         "forks": 1209,
         "starsGained": 16237,
         "starsGainedByWindow": {
@@ -5004,7 +4751,7 @@
           "what_it_does": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
           "metadata": {
             "language": "Python",
-            "total_stars": 18959,
+            "total_stars": 18973,
             "stars_in_period": 16237,
             "author": "chopratejas"
           },
@@ -5025,8 +4772,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "16237 period stars / 18959 total stars",
-            "recent_commit": "2026-06-09T01:44:19Z",
+            "star_velocity": "16237 period stars / 18973 total stars",
+            "recent_commit": "2026-06-09T01:56:08Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -5210,7 +4957,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 18959,
+          "stars": 18973,
           "monthlyStarsGained": 16237,
           "reasons": [
             "heat_gate:pass",
@@ -5266,8 +5013,8 @@
         "description": "Python tool for converting files and office documents to Markdown.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 148451,
-        "forks": 10190,
+        "stars": 148459,
+        "forks": 10192,
         "starsGained": 26881,
         "starsGainedByWindow": {
           "weekly": 11177,
@@ -5302,7 +5049,7 @@
           "what_it_does": "Python tool for converting files and office documents to Markdown.",
           "metadata": {
             "language": "Python",
-            "total_stars": 148451,
+            "total_stars": 148459,
             "stars_in_period": 26881,
             "author": "microsoft"
           },
@@ -5322,8 +5069,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "26881 period stars / 148451 total stars",
-            "recent_commit": "2026-06-09T01:43:33Z",
+            "star_velocity": "26881 period stars / 148459 total stars",
+            "recent_commit": "2026-06-09T01:55:43Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -5487,7 +5234,7 @@
             "github_trending_multi_window",
             "hacker_news"
           ],
-          "stars": 148451,
+          "stars": 148459,
           "monthlyStarsGained": 26881,
           "reasons": [
             "heat_gate:pass",
@@ -5543,8 +5290,8 @@
         "description": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 34657,
-        "forks": 2837,
+        "stars": 34680,
+        "forks": 2839,
         "starsGained": 6616,
         "starsGainedByWindow": {
           "daily": 3558,
@@ -5579,7 +5326,7 @@
           "what_it_does": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
           "metadata": {
             "language": "Python",
-            "total_stars": 34657,
+            "total_stars": 34680,
             "stars_in_period": 6616,
             "author": "mvanhorn"
           },
@@ -5600,8 +5347,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "6616 period stars / 34657 total stars",
-            "recent_commit": "2026-06-09T01:43:07Z",
+            "star_velocity": "6616 period stars / 34680 total stars",
+            "recent_commit": "2026-06-09T01:54:47Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -5769,7 +5516,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 34657,
+          "stars": 34680,
           "monthlyStarsGained": 6616,
           "reasons": [
             "heat_gate:pass",
@@ -5825,7 +5572,7 @@
         "description": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 24239,
+        "stars": 24263,
         "forks": 2038,
         "starsGained": 3006,
         "starsGainedByWindow": {
@@ -5861,7 +5608,7 @@
           "what_it_does": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
           "metadata": {
             "language": "Python",
-            "total_stars": 24239,
+            "total_stars": 24263,
             "stars_in_period": 3006,
             "author": "Panniantong"
           },
@@ -5882,8 +5629,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "3006 period stars / 24239 total stars",
-            "recent_commit": "2026-06-09T01:44:28Z",
+            "star_velocity": "3006 period stars / 24263 total stars",
+            "recent_commit": "2026-06-09T01:56:12Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -6049,7 +5796,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 24239,
+          "stars": 24263,
           "monthlyStarsGained": 3006,
           "reasons": [
             "heat_gate:pass",
@@ -6105,8 +5852,8 @@
         "description": "利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 82148,
-        "forks": 11707,
+        "stars": 82154,
+        "forks": 11709,
         "starsGained": 25436,
         "starsGainedByWindow": {
           "weekly": 5574,
@@ -6141,7 +5888,7 @@
           "what_it_does": "利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
           "metadata": {
             "language": "Python",
-            "total_stars": 82148,
+            "total_stars": 82154,
             "stars_in_period": 25436,
             "author": "harry0703"
           },
@@ -6314,7 +6061,7 @@
             "github_trending",
             "github_trending_multi_window"
           ],
-          "stars": 82148,
+          "stars": 82154,
           "monthlyStarsGained": 25436,
           "reasons": [
             "heat_gate:pass",
@@ -6369,7 +6116,7 @@
         "description": "⌥ AI Coding agent for the terminal — hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 11301,
+        "stars": 11304,
         "forks": 957,
         "starsGained": 7167,
         "starsGainedByWindow": {
@@ -6405,7 +6152,7 @@
           "what_it_does": "⌥ AI Coding agent for the terminal — hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 11301,
+            "total_stars": 11304,
             "stars_in_period": 7167,
             "author": "can1357"
           },
@@ -6426,8 +6173,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "7167 period stars / 11301 total stars",
-            "recent_commit": "2026-06-09T01:40:27Z",
+            "star_velocity": "7167 period stars / 11304 total stars",
+            "recent_commit": "2026-06-09T01:51:07Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -6603,7 +6350,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 11301,
+          "stars": 11304,
           "monthlyStarsGained": 7167,
           "reasons": [
             "heat_gate:pass",
@@ -6659,7 +6406,7 @@
         "description": "PM Skills Marketplace: 100+ agentic skills, commands, and plugins — from discovery to strategy, execution, launch, and growth.",
         "language": null,
         "languageColor": null,
-        "stars": 12723,
+        "stars": 12731,
         "forks": 1500,
         "starsGained": 640,
         "starsGainedByWindow": {
@@ -6695,7 +6442,7 @@
           "what_it_does": "PM Skills Marketplace: 100+ agentic skills, commands, and plugins — from discovery to strategy, execution, launch, and growth.",
           "metadata": {
             "language": "not_found",
-            "total_stars": 12723,
+            "total_stars": 12731,
             "stars_in_period": 640,
             "author": "phuryn"
           },
@@ -6716,8 +6463,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "640 period stars / 12723 total stars",
-            "recent_commit": "2026-06-09T01:43:36Z",
+            "star_velocity": "640 period stars / 12731 total stars",
+            "recent_commit": "2026-06-09T01:54:55Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -6887,7 +6634,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 12723,
+          "stars": 12731,
           "monthlyStarsGained": 640,
           "reasons": [
             "heat_gate:pass",
@@ -6938,7 +6685,7 @@
   },
   "monthly": {
     "window": "monthly",
-    "generatedAt": "2026-06-09T01:44:53.939Z",
+    "generatedAt": "2026-06-09T01:56:28.345Z",
     "target": 7,
     "repos": [
       {
@@ -6950,8 +6697,8 @@
         "description": "Pre-indexed code knowledge graph for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent — fewer tokens, fewer tool calls, 100% local",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 44888,
-        "forks": 2762,
+        "stars": 44901,
+        "forks": 2763,
         "starsGained": 43749,
         "starsGainedByWindow": {
           "monthly": 43749
@@ -6985,7 +6732,7 @@
           "what_it_does": "Pre-indexed code knowledge graph for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent — fewer tokens, fewer tool calls, 100% local",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 44888,
+            "total_stars": 44901,
             "stars_in_period": 43749,
             "author": "colbymchenry"
           },
@@ -7006,8 +6753,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "43749 period stars / 44888 total stars",
-            "recent_commit": "2026-06-09T01:43:49Z",
+            "star_velocity": "43749 period stars / 44901 total stars",
+            "recent_commit": "2026-06-09T01:56:08Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -7176,7 +6923,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 44888,
+          "stars": 44901,
           "monthlyStarsGained": 43749,
           "reasons": [
             "heat_gate:pass",
@@ -7231,7 +6978,7 @@
         "description": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 18959,
+        "stars": 18973,
         "forks": 1209,
         "starsGained": 16237,
         "starsGainedByWindow": {
@@ -7267,7 +7014,7 @@
           "what_it_does": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.",
           "metadata": {
             "language": "Python",
-            "total_stars": 18959,
+            "total_stars": 18973,
             "stars_in_period": 16237,
             "author": "chopratejas"
           },
@@ -7288,8 +7035,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "16237 period stars / 18959 total stars",
-            "recent_commit": "2026-06-09T01:44:19Z",
+            "star_velocity": "16237 period stars / 18973 total stars",
+            "recent_commit": "2026-06-09T01:56:08Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -7473,7 +7220,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 18959,
+          "stars": 18973,
           "monthlyStarsGained": 16237,
           "reasons": [
             "heat_gate:pass",
@@ -7529,8 +7276,8 @@
         "description": "利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 82148,
-        "forks": 11707,
+        "stars": 82154,
+        "forks": 11709,
         "starsGained": 25436,
         "starsGainedByWindow": {
           "weekly": 5574,
@@ -7565,7 +7312,7 @@
           "what_it_does": "利用AI大模型，一键生成高清短视频 Generate short videos with one click using AI LLM.",
           "metadata": {
             "language": "Python",
-            "total_stars": 82148,
+            "total_stars": 82154,
             "stars_in_period": 25436,
             "author": "harry0703"
           },
@@ -7738,7 +7485,7 @@
             "github_trending",
             "github_trending_multi_window"
           ],
-          "stars": 82148,
+          "stars": 82154,
           "monthlyStarsGained": 25436,
           "reasons": [
             "heat_gate:pass",
@@ -7793,8 +7540,8 @@
         "description": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 29015,
-        "forks": 2404,
+        "stars": 29022,
+        "forks": 2405,
         "starsGained": 24020,
         "starsGainedByWindow": {
           "monthly": 24020
@@ -7828,7 +7575,7 @@
           "what_it_does": "Academic Research Skills for Claude Code: research → write → review → revise → finalize",
           "metadata": {
             "language": "Python",
-            "total_stars": 29015,
+            "total_stars": 29022,
             "stars_in_period": 24020,
             "author": "Imbad0202"
           },
@@ -8012,7 +7759,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 29015,
+          "stars": 29022,
           "monthlyStarsGained": 24020,
           "reasons": [
             "heat_gate:pass",
@@ -8068,7 +7815,7 @@
         "description": "Learn it. Build it. Ship it for others.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 30367,
+        "stars": 30373,
         "forks": 4954,
         "starsGained": 23852,
         "starsGainedByWindow": {
@@ -8103,7 +7850,7 @@
           "what_it_does": "Learn it. Build it. Ship it for others.",
           "metadata": {
             "language": "Python",
-            "total_stars": 30367,
+            "total_stars": 30373,
             "stars_in_period": 23852,
             "author": "rohitg00"
           },
@@ -8276,7 +8023,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 30367,
+          "stars": 30373,
           "monthlyStarsGained": 23852,
           "reasons": [
             "heat_gate:pass",
@@ -8331,7 +8078,7 @@
         "description": "⌥ AI Coding agent for the terminal — hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 11301,
+        "stars": 11304,
         "forks": 957,
         "starsGained": 7167,
         "starsGainedByWindow": {
@@ -8367,7 +8114,7 @@
           "what_it_does": "⌥ AI Coding agent for the terminal — hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 11301,
+            "total_stars": 11304,
             "stars_in_period": 7167,
             "author": "can1357"
           },
@@ -8388,8 +8135,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "7167 period stars / 11301 total stars",
-            "recent_commit": "2026-06-09T01:40:27Z",
+            "star_velocity": "7167 period stars / 11304 total stars",
+            "recent_commit": "2026-06-09T01:51:07Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -8565,7 +8312,7 @@
             "github_trending_multi_window",
             "ossinsight_trending"
           ],
-          "stars": 11301,
+          "stars": 11304,
           "monthlyStarsGained": 7167,
           "reasons": [
             "heat_gate:pass",
@@ -8621,8 +8368,8 @@
         "description": "Python tool for converting files and office documents to Markdown.",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 148451,
-        "forks": 10190,
+        "stars": 148459,
+        "forks": 10192,
         "starsGained": 26881,
         "starsGainedByWindow": {
           "weekly": 11177,
@@ -8657,7 +8404,7 @@
           "what_it_does": "Python tool for converting files and office documents to Markdown.",
           "metadata": {
             "language": "Python",
-            "total_stars": 148451,
+            "total_stars": 148459,
             "stars_in_period": 26881,
             "author": "microsoft"
           },
@@ -8677,8 +8424,8 @@
             "minimal_example": "数据不足"
           },
           "maturity_signals": {
-            "star_velocity": "26881 period stars / 148451 total stars",
-            "recent_commit": "2026-06-09T01:43:33Z",
+            "star_velocity": "26881 period stars / 148459 total stars",
+            "recent_commit": "2026-06-09T01:55:43Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -8842,7 +8589,7 @@
             "github_trending_multi_window",
             "hacker_news"
           ],
-          "stars": 148451,
+          "stars": 148459,
           "monthlyStarsGained": 26881,
           "reasons": [
             "heat_gate:pass",

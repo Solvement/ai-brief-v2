@@ -282,8 +282,12 @@ export async function publish(_qaItems = [], ctx = {}) {
     .filter((item) => item.light)
     .map((item) => currentIds.size ? { ...item, currentRun: currentIds.has(item.candidate?.id) } : item);
   const boards = Object.fromEntries(WINDOWS.map((window) => [window, makeBoard(window, enriched, options)]));
+  // Elite radar shows ONLY locally-analyzed projects (Kevin 2026-06-08: every shown elite must have
+  // a completed local deep-dive; an un-analyzed elite — e.g. one whose codex deep-dive failed or hit
+  // a credit limit, like roboflow/supervision — is DROPPED, not shown as a bare light card). It
+  // re-appears automatically once it has been deep-dived.
   const radarItems = currentIds.size && options.eliteSelection !== false
-    ? enriched.filter((item) => item.currentRun)
+    ? enriched.filter((item) => item.currentRun && isProjectCompletedDeepDive(item.candidate, { ...options, db }))
     : enriched;
   const radar = makeRadar(radarItems, options);
   const allRepos = radar.repos;
