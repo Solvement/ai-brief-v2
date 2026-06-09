@@ -111,7 +111,8 @@ Dynamic workflows use **Claude's subagents (this Claude Code subscription)**. He
 
 ## Harness 治理（2026-06-09 Kevin 定，结构化调度全套）
 本项目=长期每日更新知识库+自进化+研究 agent，按 CMU+腾讯《Harness 工程化》落**完整结构化调度**。Claude 与 Codex 同等。
-- **底线**：[RULES.md](./RULES.md) §工作流红线（#11–17）——>100 行先写 plan、不自审、只三种停、可运行交付、子 agent 四件套。
+- **底线**：[RULES.md](./RULES.md) §工作流红线（#11–18）——>100 行先写 plan、不自审、只三种停、可运行交付、子 agent 四件套。
+- **找问题 / 优化结构**：[docs/method/research-loop.md](./docs/method/research-loop.md)（RULES #18）——**科研不照抄**：论文当镜子照自己、自审找不出→真跑+跨模型对抗审、多法竞赛指标判、先把 benchmark 做强。L1 自进化 = 在**自己语料**上验证假设、进化自己结构，不搬别人的栈。
 - **角色**：[docs/agents/README.md](./docs/agents/README.md) = 7 角色契约 + 模型分层 + 硬边界 + §编排决策。
 - **接力**：[docs/workflow/](./docs/workflow/)（人 .md + AI .yaml）。**态势/进度**：[task-board.md](./task-board.md)。**plan 模板**：`docs/plans/_TEMPLATE.md`。
 - **编排决策（研究 CMU+腾讯/LangGraph/CrewAI/AutoGen 四家后定）**：① 开发期多 agent（建造/审计/研究）= Claude sub-agent + dynamic workflow + codex，**采纳 AutoGen reflection / CrewAI 角色+记忆 的模式，不引库**（我们 agent 是订阅 CLI 非 API model-client；harness 本身即运行时）；② **每日管线 = 真上 LangGraph (Python)**（管线=带条件门+有界循环的状态图，要 checkpoint/断点续跑/可观测/HITL；手搓 .mjs 是挂起/timeout/静默发布 bug 根源）。

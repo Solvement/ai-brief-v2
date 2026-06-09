@@ -24,3 +24,5 @@
 15. **活文档随时更新。** 任务态势写 `task-board.md`（人+AI 可读：大/小方向 + 阶段 + 阻塞 + 交付结论）；接力规则在 `docs/workflow/`（人版 + AI 版同步）。
 16. **子 agent 派发必带四件：** 角色分工 / eval 方式 / 模型选择 / effort（见 docs/agents 派发模板）。
 17. **编排分两层**（研究 CMU+腾讯 / LangGraph / CrewAI / AutoGen 后定，2026-06-09，详见 docs/agents/README.md §编排决策）：① **开发期**多 agent（建造/审计/研究）= Claude sub-agent + dynamic workflow + codex，**采纳模式不引运行时库**（我们的 agent 是订阅 CLI 非 API model-client）；② **每日管线 = LangGraph (Python)**——管线=带条件门+有界循环的状态图，要 checkpoint/断点续跑/可观测/HITL。**不引 AutoGen/CrewAI 运行时。**
+
+18. **找问题/优化结构用 research-loop（科研不照抄）**，详见 [docs/method/research-loop.md](./docs/method/research-loop.md)：读论文/项目**当镜子照自己**（不只找有用，问"我们结构有没有它治的病/适不适合我们"）；**自审找不出问题** → 真跑真测(对抗) + **跨模型对抗审(codex⇄claude 升到架构层)**；同一问题**多法竞赛、指标当裁判**，选最适合我们的（**不照抄** papers 的栈）；**先把 benchmark 做强**再比方法（弱测试给假绿）。
