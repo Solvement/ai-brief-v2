@@ -1,0 +1,113 @@
+{
+  "schema_version": "kg-design-assessments/v1",
+  "generated_at": "2026-06-09",
+  "generated_by": "claude-opus-4-8 (self_evo_use assessment of existing deep nodes)",
+  "framing": "客观评估本站已深读的论文+项目:它的实现思路对造研究/自进化 agent 的可用性——能复用什么设计、短板、怎么接进记忆库/自进化循环。批判且具体。",
+  "assessments": [
+    {
+      "id": "paper:2308.00352-metagpt-multi-agent-sop",
+      "type": "paper",
+      "self_evo_use": "可复用:把 SOP(标准作业流程)写成提示序列 + 结构化产物(PRD/接口/任务单)+ 共享消息池/发布订阅,是多 agent 不互相带偏的可靠角色分工骨架,研究 agent 的『分工 + 结构化交接』可直接抄。可执行反馈闭环(写完真跑、按报错改、限 3 轮)= 自改的最小验证回路。短板(对自进化致命):SOP 是人写死的、流程不变,agent 不会改自己的工作流——这恰是 AgentDisCo/DGM 在补的差;它是『编排』不是『进化』。怎么接:当 L2/L3 的角色分工模板,把跑出的好流程交给 OpenSpace/AgentDisCo 的 policy bank 去让它能进化;消息池可当记忆库的会话级 episodic 写入源。"
+    },
+    {
+      "id": "paper:2402.16823-gptswarm-agents-as-graphs",
+      "type": "paper",
+      "self_evo_use": "高可用且与本站『图即记忆』同构。可复用:把 agent 系统建成可优化的计算图(节点=LLM/工具调用,边=信息流),用 REINFORCE 自动学『谁连谁』并剪掉有害边——这正是『让编排从手搭线变成可梯度优化』的范式,本图的 typed 边权学习可借此思路(从静态共标签边升级为学出来的连接强度)。短板:优化的是单任务内的 agent 拓扑、需可微/可采样的奖励,且图是任务级而非持久记忆;不学权重。怎么接:GPTSwarm 的『可学边』给本站记忆库的边赋权(哪些关联真有用),把它的图优化器接到本图的簇上,让强关联自动浮现、弱边自动剪。"
+    },
+    {
+      "id": "paper:2508.07407-comprehensive-self-evolving-agents-survey",
+      "type": "paper",
+      "self_evo_use": "作为坐标系直接可用,是本站自进化层的顶层蓝图。可复用:『系统输入→agent 系统→环境→优化器』四组件优化回路给 L1 提供统一语言;『自进化三定律(安全>性能>进化)』可直接当本站自改的红线约束;按『优化哪个对象』(单 agent/多 agent/领域/评估)分类,正好指导本图该往哪个簇补深读。短板:综述不给实现,需自己落地;四组件较抽象。怎么接:用它的优化回路 + 三定律当记忆库自进化模块的规格书,用它的分类学给本图打标签、定缺口发现的维度。"
+    },
+    {
+      "id": "paper:2507.21046-self-evolving-agents-survey",
+      "type": "paper",
+      "self_evo_use": "与上一篇互补的坐标系。可复用:What/When/How/Where 四轴 + 把 agent 形式化成 Π=(架构Γ, 模型ψ, 上下文C, 工具W)、自进化=Π→Π′,给本站一个清晰的『进化什么(改记忆?改提示?改工具?改架构?)』决策树,能落成记忆库自进化动作空间的枚举。短板:目录式、无优先级、无实现。怎么接:用 Π 四元组当本站 agent 状态的 schema,用 What/When/How/Where 给每个 ghost 节点(EvolveMem 改记忆、Alita 改工具、DGM 改架构)归位,辅助选下一步进化哪个部件。"
+    },
+    {
+      "id": "paper:2605.31264-colleague-skill",
+      "type": "paper",
+      "self_evo_use": "高可用,直击本站『把零散轨迹蒸馏成可复用工件』的需求。可复用:从异构轨迹(Slack/PDF/评审)端到端蒸馏出『可检视/可纠正/可版本化/可跨宿主安装』的 skill package,且产物显式带来源边界 + 纠错历史——这套『工件契约 + 生成/纠错/回滚/安装工作流』正是记忆库写入 procedural 节点该有的规范(比 agentmemory 的被动 hook 更结构化)。短板:蒸馏是一次性的,skill 本身不自进化(需配 OpenSpace);person-grounded 偏个人助理场景。怎么接:用 COLLEAGUE.SKILL 的工件契约当本站 skill 节点的 schema,把深读/任务轨迹蒸馏成带 provenance 的可版本化 skill,再交 OpenSpace 进化。"
+    },
+    {
+      "id": "paper:2410.10934-agent-as-a-judge",
+      "type": "paper",
+      "self_evo_use": "高可用,且本站冷审门已是它的同类思想。可复用:用一个 agent 系统评另一个 agent,看完整轨迹(建工程图谱/定位文件/检索长轨迹/逐需求判定)给逐步反馈,成本约人工 1/40——这种过程级反馈既是评测,又能当自进化的奖励信号(对应 Reflexion 的反思源、AgeMem 的训练信号)。短板:judge 本身也是 LLM、有上限,需防 judge 被骗;偏代码/工程任务。怎么接:当本站自进化循环的评估器(survey 四组件里的 Optimiser 反馈源),把逐步反馈写进记忆库当『失败经验』边,喂给 Reflexion 式的便宜自改或 AgeMem 式的 RL。"
+    },
+    {
+      "id": "paper:2606.02373-harness-1-search-agent-rl",
+      "type": "paper",
+      "self_evo_use": "高可用,提出的概念对记忆库设计有指导性。可复用:『stateful cognitive offloading(有状态认知卸载)』——把记账(看过哪些文档/哪些证据/哪些约束没满足)从模型脑子搬到外置 harness,模型只留语义决策——这正是本站记忆库的存在理由(agent 的搜索状态/研究状态外置成可恢复接口)。它证明『性能一大半藏在你给的接口层,不只在权重里』,直接支撑『先做好记忆库再谈进化』的次序。短板:聚焦检索 agent;harness 接口仍需人设计(没自进化那层接口)。怎么接:把 Harness-1 的外置状态接口当本站研究 agent 的记忆库读写规范,EvolveMem 那种自调优可去优化这层接口本身。"
+    },
+    {
+      "id": "paper:2605.30611-crafter-multi-agent-harness",
+      "type": "paper",
+      "self_evo_use": "中等可用,模式比领域更值钱。可复用:不换更强模型,而给现成生成器套一层带结构化记忆的多 agent harness,反复『诊断→定点修正局部错误』——这套『弱模型 + 强 harness + 结构化记忆纠错循环』是本站『便宜层 + 外置记忆做对』的范例,可迁移到研究产物的局部纠错(如深读里某段数据错了定点修)。短板:领域是科学配图,任务很特定;harness 流程人设计、不自进化。怎么接:借它的『结构化记忆 + 诊断-修正循环』当记忆库的纠错子例程,接到冷审门的逐维补差上。"
+    },
+    {
+      "id": "paper:2606.02437-scaling-peft-million-personal-models",
+      "type": "paper",
+      "self_evo_use": "高可用,提供自进化的『权重级持久状态』那一档(比 prompt/skill 进化更深)。可复用:把 LoRA/PEFT 重解释为『长在共享强基座上的持久个人状态』——少数大基座 + 百万级小 adapter 承载某 agent 的偏好/技能/记忆式更新,且 Scale Out 轴明确要求 adapter 可共存/服务/评测/回滚/聚合。这正是自进化记忆库的权重层落点:把跨任务沉淀固化成可回滚的 adapter,而非只存文本记忆。短板:架构蓝图 + 自有实验,代码未披露、关键数字体系内自报,不是可直接复现的方法;训练 adapter 成本高于改 prompt。怎么接:作为 L1 的『深层进化』选项——文本记忆(agentmemory)管短期,稳定下来的行为周期性蒸馏进 LoRA adapter(可回滚)管长期,本图记录 adapter 血缘。"
+    },
+    {
+      "id": "paper:2606.02060-drift-agent-error-localization",
+      "type": "paper",
+      "self_evo_use": "中高可用,补自进化最缺的一环:定位『错在哪一步』。可复用:对失败的 agent 轨迹做误差定位(把整条轨迹归因到出错的具体步骤),这是 EvolveMem『读失败日志定位根因』、DGM『实证 fitness』、AgeMem『奖励归因』共同需要的前置能力;没有精准归因,自改就是瞎调。可当本站自进化循环的归因模块。短板:归因本身可能错/受 judge 上限限制。怎么接:放在评估(Agent-as-a-Judge)和优化器之间,把『哪步错了』写进记忆库当定向修正信号,驱动 Reflexion/EvolveMem 式的定点自改。"
+    },
+    {
+      "id": "paper:2606.00408-masking-stale-observations-search-agents",
+      "type": "paper",
+      "self_evo_use": "中等可用,是记忆/上下文卫生的具体招。可复用:屏蔽搜索 agent 上下文里的过期观察(stale observations),避免被陈旧信息带偏——对应记忆库该有的『时效性管理/陈旧驱逐』(和 agentmemory 的遗忘曲线、Generative Agents 的近时性打分同向)。是长跑研究 agent 防上下文污染的实用细节。短板:点状技巧、范围窄(检索 agent 上下文)。怎么接:当记忆库检索层的一个过滤规则(按时效降权/屏蔽),并入 EvolveMem 可自调的检索配置动作空间。"
+    },
+    {
+      "id": "project:agemem",
+      "type": "project",
+      "self_evo_use": "高可用,提供记忆进化的 RL 那一档。可复用:把记忆操作(何时存/取/改/删)做成一等 policy action,用 step-wise GRPO 端到端学——证明『策略内置记忆 > 模块化记忆基线』,且增益主要来自 RL 阶段(+8.5pp)。这给本站记忆库一个关键判断:记忆策略值得学,不该写死规则(直接反驳 agentmemory 的固定 hook)。短板:要 RL 训练基础设施(Trinity-RFT)和奖励信号,成本高;偏对话记忆。怎么接:当 L1 自进化的『学出来的记忆管理器』,替换 agentmemory 的规则 hook;用 MemoryAgentBench 当训练/评测床,Agent-as-a-Judge 供奖励。"
+    },
+    {
+      "id": "project:memoryagentbench",
+      "type": "project",
+      "self_evo_use": "高可用,是自进化的『回归测床』。可复用:增量多轮 + 四维能力(准确检索/测试时学习/长程留存/冲突消解)的记忆评测协议,且实测发现『无单一方法全维领先、多跳冲突消解全行业≤6% 是盲区』——这给本站记忆库一份明确的能力 checklist 和最该补的方向(冲突消解)。任何自改记忆库都需要它当 revert-on-regression 的判据。短板:是基准不是方法,不提供实现。怎么接:当 EvolveMem/AgeMem 自进化时的固定回归测床,把四维当本图记忆簇的覆盖度坐标,冲突消解盲区列为缺口发现的高优目标。"
+    },
+    {
+      "id": "project:ai-scientist-v2",
+      "type": "project",
+      "self_evo_use": "高可用,是 L3 研究 agent 的端到端参照。可复用:agentic best-first tree search 实现『话题→实验→分析→workshop 论文』全自主、无需人类模板——树搜索式的研究探索可借给本站研究 agent 当探索骨架(和 AgentDisCo 的 explore/exploit、DGM 的 archive 树同族)。短板:无持久跨项目记忆(每次偏从头)、依赖可执行实验的反馈、产出质量参差;不自进化(流程固定)。怎么接:AI-Scientist 的树搜索探索 + 本图当它的持久外脑(复用过往研究路径/失败教训)+ AgentDisCo 的 policy bank 让研究流程能进化。"
+    },
+    {
+      "id": "project:supermemory",
+      "type": "project",
+      "self_evo_use": "中高可用,即插即用的记忆中间件参照。可复用:状态化事实图谱 + 自动事实抽取/更新/遗忘 + 混合搜索,通过 MCP/SDK 接 agent——『事实图谱 + 自动维护』是关联记忆的工程实现(对标 agentmemory 的 semantic 层 + 知识图谱)。短板:偏检索/RAG 中间件,不自进化、不跨条目综合洞察;SOTA 为厂商自报。怎么接:当本站记忆库的事实图谱底座之一,本图的 typed 边补它的跨条目语义关联,reflection 机制补它缺的综合层。"
+    },
+    {
+      "id": "project:mempalace",
+      "type": "project",
+      "self_evo_use": "中等可用,本地优先记忆的轻量参照。可复用:逐字存对话 + 语义搜索 + 结构化索引(wings/rooms/drawers)+ 可插拔后端 + 零 API 本地运行——『本地、无 key、结构化索引』正贴本站运行模型(boot 时本地订阅、便宜层无 key)。短板:逐字存储不压缩/不抽象、无遗忘/无进化,规模化召回成本高;偏存储不偏智能。怎么接:当本地优先记忆存储的备选底座,但需在其上加 agentmemory 的分层压缩 + Generative Agents 的反思综合,否则只是个存档不是记忆库。"
+    },
+    {
+      "id": "project:colbymchenry-codegraph",
+      "type": "project",
+      "self_evo_use": "高可用,是『代码记忆库』的成功范例(且本站正在用)。可复用:预索引代码知识图谱(符号/边/文件,本地 SQLite)给 agent 当结构化外脑,实测更少 token、更少工具调用——证明『把代码理解外置成图,agent 查图而非反复 grep』有效,正是本站记忆库要对 agent 做的事(把知识外置成可查图)。它本身就是 stateful cognitive offloading 的工程落地。短板:静态索引(改代码后要 sync)、不自进化、限代码域。怎么接:codegraph 是『代码维度』的关联记忆;本图是『研究/项目知识维度』的关联记忆——同构,可借它的图 schema/查询接口设计,并把它当 agent 导航本站代码的记忆层。"
+    },
+    {
+      "id": "project:panniantong-agent-reach",
+      "type": "project",
+      "self_evo_use": "中等可用,是研究 agent 的『感官层』。可复用:一个 CLI 零 API 费让 agent 读/搜全网(Twitter/Reddit/YouTube/GitHub/小红书等)——研究/自进化 agent 必须能主动取外部信息,这是 explore 那一半的工具底座(对应 AgentDisCo 的探索、deep-research 的外部交互),且零 key 贴本站运行模型。短板:是采集工具不是记忆/智能,信息进来后仍需本站记忆库去结构化沉淀;源稳定性依赖第三方。怎么接:当研究 agent 的输入工具(Survey 四组件里的 Environment 接口),抓回的内容经蒸馏进本图;也是缺口发现的外部探针。"
+    },
+    {
+      "id": "project:imbad0202-academic-research-skills",
+      "type": "project",
+      "self_evo_use": "中高可用,是研究 agent 的现成工作流 skill。可复用:research→write→review→revise→finalize 的学术研究 skill 链(Claude Code),把研究流程拆成可调用阶段——可直接当 L3 研究 agent 的流程骨架,且 review/revise 阶段呼应本站冷审门。短板:是写死的 skill 流程(像 AutoSci 那种工作流模板),不自进化、无持久记忆,每次偏冷启动;价值在流程编排不在智能。怎么接:当研究 agent 的初始流程模板,交 OpenSpace/AgentDisCo 让它能进化,过程产物(检索/草稿/评审)进本图当 episodic 记忆复用。"
+    },
+    {
+      "id": "project:chopratejas-headroom",
+      "type": "project",
+      "self_evo_use": "中等可用,是长跑 agent 的『上下文经济』工具。可复用:在工具输出/日志/文件/RAG chunk 到达 LLM 前压缩(自报省 60-95% token 同样答案),库/代理/MCP 三形态——长跑研究/自进化 agent 必然爆上下文,这是记忆库写入前的压缩层(对应 agentmemory 的 episodic 压缩、Deep Researcher 的定长记忆)。短板:是压缩中间件不是记忆智能,压缩可能丢信息;省 token 数为自报。怎么接:放在记忆库写入管线最前端当压缩闸门,与 masking-stale-observations 的时效过滤、agentmemory 的分层一起组成『进库前清洗』。"
+    },
+    {
+      "id": "project:rohitg00-agentmemory",
+      "type": "project",
+      "self_evo_use": "高可用(注:已深读,也作为 ghost 缺口种子)。可复用:四层记忆(working/episodic/semantic/procedural)+ 三路 RRF 混合检索(BM25+向量+图谱)+ 遗忘曲线衰减 + 生命周期 hook 自动写入,本地 SQLite、53 MCP 工具——几乎是本站记忆库的参考实现,分层与混合检索可直接对标。短板:被动 hook 记账、记忆只增删不重组、不跨条目综合洞察(本站要补的差),进化靠人改 hook(该换成 AgeMem 学的策略)。怎么接:当 L0 记忆底座,本图 typed 边补它的跨条目关联,Generative Agents 的反思补综合层,AgeMem/EvolveMem 补可学的进化层。"
+    }
+  ]
+}

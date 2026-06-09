@@ -161,6 +161,27 @@ export async function runBriefLintGuard({ wikiRoot: wikiRootInput = DEFAULT_WIKI
 export async function publishBriefMirror({ options = {}, logger = console } = {}) {
   const index = await buildBriefData(relativeToRoot(wikiRoot(options)));
   logger?.info?.(`brief:build refreshed ${Object.keys(index.outputs || {}).length} brief output(s)`);
+
+  // DURABLE knowledge graph (Kevin 2026-06-09): brief:build emits a sparse (~1-edge) graph.json.
+  // Rebuild the rich ASSOCIATIVE graph on top of it every run so it survives projects:daily —
+  // real typed edges (wikilink/same_track/implements + focus-cluster builds_on/shares_method/
+  // same_use_case) + ghost nodes (external self-evolving/research-agent architectures) +
+  // self_evo_use assessments + the add/replace/merge edges (improves_on / composes_with). All
+  // deterministic (reads brief-wiki + content/papers + committed data/knowledge-graph/*.json).
+  // Best-effort — a failure here never blocks the brief pipeline.
+  try {
+    const { spawnSync } = await import("node:child_process");
+    const nodePath = (await import("node:path")).default;
+    const { fileURLToPath } = await import("node:url");
+    const kgRoot = nodePath.resolve(nodePath.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+    for (const script of ["build-brief-graph.mjs", "integrate-kg.mjs"]) {
+      const r = spawnSync(process.execPath, [nodePath.join(kgRoot, "scripts", "kg", script)], { encoding: "utf8" });
+      if (r.status !== 0) logger?.warn?.(`kg rebuild (${script}) exit ${r.status}: ${(r.stderr || "").slice(-150)}`);
+    }
+    logger?.info?.("knowledge graph rebuilt (associative edges + ghost nodes + self_evo_use assessments)");
+  } catch (error) {
+    logger?.warn?.(`kg rebuild skipped (non-fatal): ${error.message}`);
+  }
   return index;
 }
 
