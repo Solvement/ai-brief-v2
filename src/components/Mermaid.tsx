@@ -22,6 +22,10 @@ export function Mermaid({ chart }: { chart: string }) {
     let active = true;
     loadMermaid()
       .then(async (mermaid) => {
+        // parse-first with suppressErrors: invalid diagrams return false WITHOUT
+        // mermaid injecting a global "Syntax error" element into the DOM.
+        const ok = await mermaid.parse(chart, { suppressErrors: true });
+        if (ok === false) { if (active) setFailed(true); return; }
         const id = "m" + Math.random().toString(36).slice(2);
         const { svg } = await mermaid.render(id, chart);
         if (active && ref.current) ref.current.innerHTML = svg;

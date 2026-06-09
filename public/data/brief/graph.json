@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-09T13:53:24.014Z",
+  "generatedAt": "2026-06-09T14:40:54.206Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -514,7 +514,7 @@
         "innovation": "把\"记忆能力\"从单一事实 recall 拆成四个正交维度（AR/TTL/LRU/CR），并用\"增量逐块喂入 + 每块请记住\"的供给方式取代一次性长上下文—— 证明了不存在\"最佳记忆系统\"这一命题，并把\"多跳+冲突\"识别为范式级共同短板（而非实现 bug）。\n",
         "weakness": "数据集主要为人工合成（作者 §5 自承 \"primarily synthetic, may not fully reflect real-world conversations\"）—— 所以\"多跳 CR 全体≤6%\"有几分是真范式短板、几分是 FactConsolidation 反事实拼接所致，尚不可分辨（构念效度风险）； 开放题用 GPT-4o 当 judge，评判模型偏好会渗进排名（评判效度风险）；复现门槛是付费 OpenAI API（judge + 多个商用 agent 对象），非算力； 主要英文、跨语言/领域泛化未讨论；Mem0/MemGPT 随产品版本漂移，结论有保鲜期。\n",
         "transfer": "几乎为 AI-Brief/BriefMem 量身定做的体检表：AR=写 deep-dive 时能否准确取回旧论文/方法卡不漏不串；TTL=新论文推翻旧结论时能否即时纳入并改后续选择； LRU=跨多篇形成专题综述/赛道判断；CR=检测矛盾结论，正对应图谱里的 contradicts 边。 路线建议：①先立 contradicts/supports 边（已做）→②用\"增量多轮+四维\"做 BriefMem 自测集→③把\"多跳冲突消解\"当红线指标盯死。 复用它的\"四维+增量协议\"当验收尺，别复刻它的合成数据集。\n",
-        "architecture": "```mermaid\nflowchart TD\n  subgraph 供给（增量，非一次性）\n    C1[c1 +请记住] --> C2[c2 +请记住] --> Cn[cn +请记住]\n  end\n  Cn --> MEM[(被测记忆系统<br/>长上下文 / RAG / 结构RAG / agentic)]\n  Q[q1..qm 提问<br/>原文已收走] --> MEM\n  MEM --> EVAL{四维正交评测}\n  EVAL --> AR[AR 精确检索<br/>SubEM/Recall]\n  EVAL --> TTL[TTL 测试时学习<br/>Acc/Recall@5]\n  EVAL --> LRU[LRU 长程理解<br/>GPT-4o judge F1]\n  EVAL --> CR[CR 冲突消解<br/>SubEM 单跳/多跳]\n  CR -.->|多跳全体≤6% 系统性盲区| GAP[暴露范式短板而非排名]\n```\n"
+        "architecture": "```mermaid\nflowchart TD\n  subgraph S1[\"供给（增量，非一次性）\"]\n    C1[\"c1 请记住\"] --> C2[\"c2 请记住\"] --> Cn[\"cn 请记住\"]\n  end\n  Cn --> MEM[(被测记忆系统<br/>长上下文 / RAG / 结构RAG / agentic)]\n  Q[q1..qm 提问<br/>原文已收走] --> MEM\n  MEM --> EVAL{四维正交评测}\n  EVAL --> AR[AR 精确检索<br/>SubEM/Recall]\n  EVAL --> TTL[TTL 测试时学习<br/>Acc/Recall@5]\n  EVAL --> LRU[LRU 长程理解<br/>GPT-4o judge F1]\n  EVAL --> CR[CR 冲突消解<br/>SubEM 单跳/多跳]\n  CR -.->|多跳全体≤6% 系统性盲区| GAP[暴露范式短板而非排名]\n```\n"
       },
       "facet_slug": "memoryagentbench",
       "facet_status": "extracted"

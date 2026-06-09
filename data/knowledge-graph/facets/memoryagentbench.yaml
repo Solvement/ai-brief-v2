@@ -41,8 +41,8 @@ facets:
   architecture: |
     ```mermaid
     flowchart TD
-      subgraph 供给（增量，非一次性）
-        C1[c1 +请记住] --> C2[c2 +请记住] --> Cn[cn +请记住]
+      subgraph S1["供给（增量，非一次性）"]
+        C1["c1 请记住"] --> C2["c2 请记住"] --> Cn["cn 请记住"]
       end
       Cn --> MEM[(被测记忆系统<br/>长上下文 / RAG / 结构RAG / agentic)]
       Q[q1..qm 提问<br/>原文已收走] --> MEM
