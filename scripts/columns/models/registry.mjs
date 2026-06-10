@@ -19,26 +19,8 @@ export const MODEL_REGISTRY = Object.freeze([
     familySearch: "Qwen3.6",
     evalThirdPartyPending: ["LMArena", "OpenLLM Leaderboard"],
   },
-  {
-    id: "llama",
-    name: "Llama 4",
-    vendor: "Meta",
-    country: "美国",
-    kind: "open",
-    hfId: "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-    familySearch: "Llama-4",
-    evalThirdPartyPending: ["LMArena", "OpenLLM Leaderboard"],
-  },
-  {
-    id: "mistral",
-    name: "Mistral Large 3",
-    vendor: "Mistral AI",
-    country: "法国",
-    kind: "open",
-    hfId: "mistralai/Mistral-Large-3-675B-Instruct-2512",
-    familySearch: "Mistral-Large-3",
-    evalThirdPartyPending: ["LMArena", "OpenLLM Leaderboard"],
-  },
+  // Llama / Mistral removed 2026-06-10 (Kevin): 模型栏只保留主流五家
+  // (DeepSeek / Qwen / Google / Claude / GPT)。需要恢复时从 git 历史取回条目即可。
   {
     id: "openai-gpt",
     name: "OpenAI GPT",

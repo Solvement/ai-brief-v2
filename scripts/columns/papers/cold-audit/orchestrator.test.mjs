@@ -309,6 +309,42 @@ test("batch: HOLD triggers alert + notify, pass does not", async () => {
   assert.ok(notified[0].message.includes("HOLD"));
 });
 
+test("batch: one paper's gate crash is ISOLATED — audit_error recorded, rest of batch continues", async () => {
+  // 2026-06-10 regression: an unparseable auditor JSON threw out of runColdAuditGate and killed the
+  // whole batch (0/3 audited that day). A single paper's failure must never starve the others.
+  const papers = [
+    { arxivId: "2606.0030", title: "crashes" },
+    { arxivId: "2606.0031", title: "passes" },
+  ];
+  const authorFn = makeMockAuthorFn({
+    author: (paper, ctx) => ({ paper: paper.arxivId, round: ctx.round }),
+  });
+  const auditFn = makeMockAuditFn({
+    audit: (artifact) => {
+      if (artifact.paper === "2606.0030") throw new Error("could not parse JSON from output");
+      return passDiagnosis();
+    },
+  });
+
+  const notified = [];
+  const out = await runBatch(papers, {
+    authorFn,
+    auditFn,
+    dailyCap: 5,
+    writeFiles: false,
+    logger: silent(),
+    notify: async (alert) => notified.push(alert),
+    now: () => new Date("2026-06-10T08:00:00Z"),
+  });
+
+  const crashed = out.results.find((r) => r.paperId === "2606.0030");
+  const pass = out.results.find((r) => r.paperId === "2606.0031");
+  assert.equal(crashed.status, "audit_error");
+  assert.match(crashed.error, /could not parse JSON/);
+  assert.equal(pass.status, "ready_to_publish", "second paper still audited after first crashed");
+  assert.ok(notified.some((a) => a.kind === "cold-audit-error" && a.paperId === "2606.0030"));
+});
+
 test("batch: notifier failure is non-fatal (gate still completes)", async () => {
   const papers = [{ arxivId: "2606.0020", title: "holds" }];
   const authorFn = makeMockAuthorFn({ artifacts: [{ v: "a" }, { v: "b" }, { v: "c" }] });

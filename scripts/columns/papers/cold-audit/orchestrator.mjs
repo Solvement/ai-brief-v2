@@ -321,7 +321,38 @@ export async function runBatch(papers = [], deps = {}) {
   const results = [];
 
   for (const paper of toProcess) {
-    const gate = await runColdAuditGate(paper, deps);
+    // PER-PAPER ISOLATION (2026-06-10): one paper's gate failure (e.g. an unparseable auditor
+    // response) must not kill the rest of the batch — that exact crash left 0/3 audited and nothing
+    // published on 2026-06-10. On error: record audit_error + alert, leave the paper's metadata
+    // untouched (still needs_human, so the next daily run re-audits it), and move on.
+    let gate;
+    try {
+      gate = await runColdAuditGate(paper, deps);
+    } catch (error) {
+      const errId = paperId(paper);
+      logger.warn?.(`[cold-audit] ${errId}: gate crashed (${error.message?.slice(0, 160)}); isolating, continuing batch`);
+      const errStatus = {
+        paperId: errId,
+        title: paper.title || "",
+        status: "audit_error",
+        rounds: 0,
+        generatedAt: now().toISOString(),
+        finalVerdict: null,
+        majorGaps: [],
+        error: String(error.message || error).slice(0, 500),
+        history: [],
+      };
+      if (writeFiles) {
+        const errDir = path.join(auditRoot, slugify(errId));
+        await mkdir(errDir, { recursive: true });
+        await writeJson(path.join(errDir, "status.json"), errStatus);
+      }
+      results.push(errStatus);
+      try {
+        await notify({ kind: "cold-audit-error", paperId: errId, title: paper.title || "", error: errStatus.error });
+      } catch { /* notifier failure is non-fatal */ }
+      continue;
+    }
     const id = paperId(paper);
     const itemDir = path.join(auditRoot, slugify(id));
     const status = {
@@ -544,15 +575,28 @@ export function makeClaudeAuditFn(config = {}) {
   const callClaude = runClaude || (async function callClaude(prompt, label, ctx) {
     // -p with no positional prompt = headless print mode reading the prompt from stdin.
     const args = ["-p", "--output-format", "json"];
-    logger.log?.(`[cold-audit] auditor(claude) ${label} round ${ctx.round ?? "?"}: ${claudeBin} -p --output-format json (prompt on stdin)`);
-    const result = await spawnWithInput(claudeBin, args, prompt, { cwd, timeoutMs });
-    if (result.code !== 0) {
-      throw new Error(`claude audit (${label}) exited ${result.code}: ${lastLines(result.stderr || result.stdout, 8)}`);
+    // PARSE-RETRY (2026-06-10): the auditor hand-writes JSON; dense numeric notes occasionally break
+    // it (unescaped quotes/truncation). 2026-06-10 chain run: one malformed stageB response threw
+    // here and killed the WHOLE daily batch (0/3 audited). A malformed sample is usually transient —
+    // re-sample once before giving up; the per-paper isolation in runBatch is the second net.
+    let lastError;
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      logger.log?.(`[cold-audit] auditor(claude) ${label} round ${ctx.round ?? "?"}${attempt > 1 ? ` (parse-retry ${attempt}/2)` : ""}: ${claudeBin} -p --output-format json (prompt on stdin)`);
+      const result = await spawnWithInput(claudeBin, args, prompt, { cwd, timeoutMs });
+      if (result.code !== 0) {
+        throw new Error(`claude audit (${label}) exited ${result.code}: ${lastLines(result.stderr || result.stdout, 8)}`);
+      }
+      // `claude --output-format json` emits an envelope { result: "<text>", ... }; the auditor's text
+      // is itself JSON. Unwrap both layers defensively.
+      try {
+        const envelope = parseJsonLoose(result.stdout);
+        return typeof envelope?.result === "string" ? parseJsonLoose(envelope.result) : envelope;
+      } catch (error) {
+        lastError = error;
+        logger.warn?.(`[cold-audit] auditor(claude) ${label}: unparseable JSON on attempt ${attempt}/2 (${error.message?.slice(0, 120)})`);
+      }
     }
-    // `claude --output-format json` emits an envelope { result: "<text>", ... }; the auditor's text
-    // is itself JSON. Unwrap both layers defensively.
-    const envelope = parseJsonLoose(result.stdout);
-    return typeof envelope?.result === "string" ? parseJsonLoose(envelope.result) : envelope;
+    throw lastError;
   });
 
   return async function claudeAuditFn(artifact, source, ctx = {}) {

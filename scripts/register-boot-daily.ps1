@@ -9,8 +9,11 @@
 $proj = "C:\Users\Ykw18\OneDrive\Desktop\Study\Project\AI-Brief v2"
 $script = Join-Path $proj "scripts\boot-daily.ps1"
 
+# Hidden (2026-06-10): Minimized still creates a closable console window in the user's session —
+# three runs died with 0xC000013A (console CTRL_C/close) on 6-09/6-10, killing the whole pipeline
+# including in-flight codex audits. Hidden = no window to close; pipeline output lives in the log.
 $action = New-ScheduledTaskAction -Execute "powershell.exe" `
-  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Minimized -File `"$script`"" `
+  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`"" `
   -WorkingDirectory $proj
 
 # Two triggers: at logon (delayed 5 min) + daily wall-clock 09:00.
@@ -31,4 +34,20 @@ Register-ScheduledTask -TaskName "AI-Brief Daily" `
   -Description "Daily refresh: deterministic (news/papers/projects/models) + full-auto deep-read gated by cross-model cold-audit (needs_human->ready_to_publish/HOLD) + quality gate + push. Triggers: logon(+5m) and 09:00; once/day via marker." `
   -Force | Out-Null
 
-Write-Output "Registered 'AI-Brief Daily' (logon+5m AND daily 09:00; restart 3x; 2h limit; once/day via marker)."
+Write-Output "Registered 'AI-Brief Daily' (logon+5m AND daily 09:00; restart 3x; 4h limit; Hidden; once/day via marker)."
+
+# --- Watchdog (2026-06-10): every 30 min, revive a silently-killed pipeline (max 3/day inside the
+# script). Stages are ledger-idempotent so a revive only reruns the unfinished tail. ---
+$wdScript = Join-Path $proj "scripts\watchdog-daily.ps1"
+$wdAction = New-ScheduledTaskAction -Execute "powershell.exe" `
+  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$wdScript`"" `
+  -WorkingDirectory $proj
+$wdTrigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).Date.AddHours(9)) `
+  -RepetitionInterval (New-TimeSpan -Minutes 30) -RepetitionDuration (New-TimeSpan -Hours 12)
+$wdSettings = New-ScheduledTaskSettingsSet -StartWhenAvailable `
+  -ExecutionTimeLimit (New-TimeSpan -Minutes 5) -MultipleInstances IgnoreNew
+Register-ScheduledTask -TaskName "AI-Brief Daily Watchdog" `
+  -Action $wdAction -Trigger $wdTrigger -Settings $wdSettings `
+  -Description "Every 30 min 09:00-21:00: if no done-marker for today and no boot-daily.ps1 process, re-run 'AI-Brief Daily' (max 3 revives/day; stages are idempotent via ledger)." `
+  -Force | Out-Null
+Write-Output "Registered 'AI-Brief Daily Watchdog' (every 30 min, 09:00-21:00, revive max 3/day)."

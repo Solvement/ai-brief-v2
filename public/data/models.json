@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-09T13:13:31.725Z",
+  "generatedAt": "2026-06-10T13:58:49.745Z",
   "models": [
     {
       "id": "anthropic-claude",
@@ -7,8 +7,8 @@
       "vendor": "Anthropic",
       "country": "美国",
       "kind": "closed",
-      "latestVersion": "Claude Opus 4.8",
-      "latestReleasedAt": "2026-06-05",
+      "latestVersion": "Claude Fable 5",
+      "latestReleasedAt": "2026-06-09",
       "latestReleasedAtPrecision": "day",
       "isOpen": false,
       "license": "closed",
@@ -16,66 +16,80 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://docs.claude.com/en/release-notes/overview",
-      "lastCheckedAt": "2026-06-09T13:13:32.230Z",
-      "analysisGeneratedAt": "2026-06-06T00:15:44.764Z",
+      "lastCheckedAt": "2026-06-10T13:58:51.968Z",
+      "analysisGeneratedAt": "2026-06-10T12:12:25.233Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
-        "oneLineTakeaway": "Claude Opus 4.8 默认 1M 上下文、自适应推理和更低缓存门槛，让长上下文代理和大规模分析应用的成本与性能都有明显提升。",
+        "oneLineTakeaway": "Claude Fable 5 是 Anthropic 当前最强公开模型，默认 1M 上下文、128k 输出、始终开启自适应思考，并引入安全分类器和新的拒绝处理流程，适合构建长上下文、高复杂度 Agent 应用。",
         "newFeatures": [
           {
-            "feature": "1M token context window by default",
-            "whatItIs": "模型默认支持 100 万 token 的上下文窗口，无需任何 beta 头或额外配置。",
-            "forYou": "可以直接处理超长文档、完整代码库或长时间对话历史，大幅扩展了一轮对话或一次分析能容纳的信息量。",
-            "howToUse": "调用 API 时直接将输入 token 数提到 200k 以上，模型会自动处理。",
-            "whenToUse": "当你需要批量分析大型代码仓库、多文件 PDF、或构建需要极长记忆的代理应用时，值得切到 Opus 4.8。"
+            "feature": "Claude Fable 5 模型发布",
+            "whatItIs": "Claude Fable 5（claude-fable-5）是 Anthropic 最新、能力最强的广泛发布模型，默认提供 100 万 token 上下文窗口，最大输出 128k token，并强制开启自适应思考。同时发布的 Claude Mythos 5 仅限 Project Glasswing 参与者使用。",
+            "forYou": "开发者可以直接调用最先进的模型，无需额外申请即可拥有超大上下文和深度推理能力，适合处理长文档、多轮 Agent 对话、复杂编程等任务。",
+            "howToUse": "通过 Messages API 使用 model: 'claude-fable-5' 调用；系统自动启用 1M 上下文和 adaptive thinking，无需额外配置。",
+            "whenToUse": "当项目需要顶级推理能力、处理超长上下文（如代码库分析、长合同审查）或构建高自主性 Agent 时，建议升级至此模型。"
           },
           {
-            "feature": "Adaptive thinking with effort default high",
-            "whatItIs": "模型只在当前轮次需要时进行深度推理（扩展思考），其余情况跳过，同时 effort 参数全平台默认设为 high。",
-            "forYou": "减少不必要的思考 token，既保持高质量输出，又节省 token 成本和延迟。",
-            "howToUse": "默认开启，无需额外设置。如需调整可显式传入 effort 参数。",
-            "whenToUse": "几乎所有场景都受益，尤其适合大量轮次但并非每一步都需要复杂推理的代理任务。"
+            "feature": "Tokenizer 更新与 token 计数变化",
+            "whatItIs": "相比 Claude Opus 4.7 之前的模型，相同文本生成的 token 数大约增加 30%。Claude Fable 5 使用与 Opus 4.7 相同的 tokenizer。",
+            "forYou": "直接按 token 计费时，相同的提示可能消耗更多 token，成本上升。迁移前需评估预算。",
+            "howToUse": "调用 token 计数 API 时指定 model: 'claude-fable-5' 来准确计算新 tokenizer 下的使用量。",
+            "whenToUse": "在成本敏感场景或批量调用前，务必先测试 token 用量以调整预算。"
           },
           {
-            "feature": "Mid-conversation system messages",
-            "whatItIs": "允许在对话中途插入系统消息，动态更新指令而不破坏之前建立的 prompt 缓存。",
-            "forYou": "在长对话中途切换任务说明或补充上下文时，仍能复用历史缓存，降低整体 token 消耗。",
-            "howToUse": "在 messages 数组里的 user 或 assistant 消息之后加入 role:\"system\" 的消息。",
-            "whenToUse": "构建长时间运行的对话代理时，需要根据上下文动态调整行为，比如按步骤切换指令或补充最新政策。"
+            "feature": "安全分类器与拒绝处理",
+            "whatItIs": "Claude Fable 5 在请求和响应生成期间运行安全分类器，若触发策略则返回 stop_reason: 'refusal'。若未生成任何输出，不收费。提供 opt-in 的 fallbacks 参数（beta），可在拒绝时自动回退到其他模型（按回退模型费率计费）。",
+            "forYou": "应用可以更优雅地处理安全拒绝，节省被拒请求的费用，并通过回退机制保证可用性。",
+            "howToUse": "检查响应中的 stop_reason；若为 'refusal' 且 output_tokens 为 0，则无费用。使用 fallbacks 参数（需加入 beta 版）配置回退模型。",
+            "whenToUse": "在生产环境中，特别是面向终端用户且对可用性要求高的应用，建议启用回退以降低拒绝导致的中断。"
           },
           {
-            "feature": "Refusal stop_details with category",
-            "whatItIs": "当模型因安全策略拒绝生成时，响应中会返回 stop_details，包含类别（如 cyber、bio 或 null）和可读解释。",
-            "forYou": "可以按拒绝类别分流处理，例如网络安全类引导用户走审核流程，生物类立即拦截，提升应用的安全合规处理能力。",
-            "howToUse": "检查 API 响应中的 stop_details 字段，根据 category 和 explanation 决定下一步交互。",
-            "whenToUse": "面向终端用户的对话应用，需要精细控制安全红线并给用户合适反馈时。"
+            "feature": "新增拒绝类别 'reasoning_extraction'",
+            "whatItIs": "refusal 响应的 stop_details.category 字段新增 'reasoning_extraction' 类型，当请求涉嫌逆向工程或复制模型输出时返回。原有的 'cyber' 和 'bio' 类别不变。",
+            "forYou": "开发者可以针对不同类型的拒绝做细分处理，比如给用户更清晰的提示，或记录日志用于审计。",
+            "howToUse": "解析 refusal 响应中的 stop_details.category，根据类别路由至不同的用户提示或处理流程。",
+            "whenToUse": "当你的应用涉及需要解释拒绝原因的场景（如企业内部工具需要合规审核）时，细分拒绝类型很有价值。"
           },
           {
-            "feature": "1,024-token minimum cacheable prompt length",
-            "whatItIs": "提示缓存的最小可缓存片段长度从之前的较高值降低至 1024 token。",
-            "forYou": "更短的系统消息、助手话术或常见前缀也能被缓存，进一步降低重复调用的成本。",
-            "howToUse": "在需要缓存的地方添加 cache_control 标记，只要片段长度 ≥1024 token 即可生效。",
-            "whenToUse": "当你需要频繁复用较短的公共前缀，如多个任务共享的简短指令或角色设定时。"
+            "feature": "仅支持自适应思考，不再支持禁用或手动思考预算",
+            "whatItIs": "Claude Fable 5 和 Mythos 5 中，思考模式强制为 adaptive thinking，无法通过 thinking: {type: 'disabled'} 关闭，也不支持手动设置 budget_tokens 或预填充 assistant 消息。",
+            "forYou": "无法像旧模型那样完全关闭思考以加速便宜响应，但自适应模式能在简单问题上自动节省 token。",
+            "howToUse": "无需额外配置，模型默认使用自适应思考。如需控制显示，可设置 thinking.display 为 'summarized' 或 'omitted'。",
+            "whenToUse": "几乎总是使用默认即可；若追求更直观的思考过程展示，可设为 'summarized'，但原始思考链始终不会返回。"
           },
           {
-            "feature": "Fast mode research preview",
-            "whatItIs": "实验性加速模式，通过 speed:\"fast\" 降低输出延迟，但价格高于标准模式。",
-            "forYou": "在对延迟敏感的场景（如实时聊天、协同文档）获得更快的响应速度。",
-            "howToUse": "请求中加入 speed:\"fast\" 和 beta 头 fast-mode-2026-02-01。需注意可能名额限制，需加入等候名单。",
-            "whenToUse": "用户期待即时反馈的交互式产品，且你愿意为更低延迟支付溢价时。"
+            "feature": "数据保留要求：30 天保留期",
+            "whatItIs": "Claude Fable 5 在 Claude API 上要求 30 天数据保留，不可使用零保留模式。",
+            "forYou": "如果你的应用有严格的数据隐私合规要求（如 GDPR 必须立即删除），可能无法使用 Fable 5，需评估合规风险。",
+            "howToUse": "无需操作，系统自动应用 30 天保留。如需零保留，请选择支持该模式的其他模型。",
+            "whenToUse": "只有在可以接受 30 天数据保留的前提下才使用该模型。"
           },
           {
-            "feature": "High-resolution image input",
-            "whatItIs": "支持长边最高 2576 像素的图像输入（与 Opus 4.7 相同），可处理高分辨率视觉内容。",
-            "forYou": "能处理精细图像，如扫描文档、高分辨率照片、医学影像等，提升视觉理解精度。",
-            "howToUse": "直接在 messages 中包含 base64 编码的高分辨率图片，无需特别设置。",
-            "whenToUse": "应用中需要从高清图片中提取细节，如光学字符识别、图表分析、产品瑕疵检测等。"
+            "feature": "Claude Managed Agents：计划部署",
+            "whatItIs": "现在支持为 Managed Agents 设置 cron 计划，自动按预定时间运行会话，无需自行编写调度程序。",
+            "forYou": "轻松构建定时执行的 Agent 任务，如定期报告生成、数据抓取，减少运维负担。",
+            "howToUse": "在创建或更新 Managed Agent 时配置计划部署参数。",
+            "whenToUse": "任何需要周期性自动运行 AI 任务的场景，如每日摘要、定时监控。"
+          },
+          {
+            "feature": "Claude Managed Agents：vault 环境变量凭证",
+            "whatItIs": "Managed Agents 的 vault 现在支持通过环境变量注入凭证，安全地将密码、API 密钥等传递给沙箱内的 CLI 和 SDK。",
+            "forYou": "可以安全地在 Agent 工作流中使用需要认证的外部服务，而无需在代码或配置中硬编码密钥。",
+            "howToUse": "在 Vault 配置中添加环境变量类型的凭证，Agent 沙箱启动时会自动注入。",
+            "whenToUse": "当 Managed Agent 需要调用受保护的内部 API、数据库或云服务时使用。"
+          },
+          {
+            "feature": "Managed Agents webhook 增强：session_thread_id",
+            "whatItIs": "session.thread_* 类型的 webhook 事件现在包含 session_thread_id 字段，用于标识触发的多 Agent 线程。",
+            "forYou": "方便在多 Agent 编排中追踪事件来源，实现更精细的监控和链路追踪。",
+            "howToUse": "在 webhook 处理中提取 session_thread_id 字段进行关联。",
+            "whenToUse": "当使用多 Agent 会话并需要根据线程做出不同响应时。"
           }
         ],
-        "limitations": "价格、速率限制和区域可用性官方 changelog 未详细说明，需参考定价页面和状态页。Fast mode 为研究预览，可能受名额限制且需加入等候名单。温度（temperature）、top_p 和 top_k 参数必须使用默认值，否则 API 返回 400 错误。1M 上下文窗口在 Microsoft Foundry 上限制为 200k。",
+        "limitations": "Tokenizer 变更导致相同文本 token 增加约 30%，可能推高成本；仅支持 30 天数据保留，不可零保留；思考功能不可关闭，无手动预算控制；回退功能为 opt-in beta，且按回退模型费率收费；Claude Mythos 5 目前仅限受邀用户。其他限制详见官方文档。",
         "sources": [
           {
-            "name": "Anthropic official changelog",
+            "name": "Anthropic official changelog (2026-06-09)",
             "url": "https://docs.claude.com/en/release-notes/overview"
           }
         ]
@@ -87,9 +101,9 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "Claude Opus 4.8",
+          "名称": "Claude Fable 5",
           "厂商": "Anthropic",
-          "发布日": "2026-06-05",
+          "发布日": "2026-06-09",
           "开放度标签": "仅API闭源",
           "类型": "官方未披露",
           "规模架构": "架构官方未披露；context window（上下文窗口）官方未披露",
@@ -114,27 +128,29 @@
             "输出每百万token": "官方未披露"
           },
           "知识截止": "官方未披露",
-          "model string": "Claude Opus 4.8",
+          "model string": "Claude Fable 5",
           "速率": "官方未披露",
           "多模态I/O": "官方未披露"
         },
         "update": {
-          "版本": "Claude Opus 4.8→Claude Opus 4.8(2026-06-05)",
+          "版本": "Claude Fable 5→Claude Fable 5(2026-06-09)",
           "变了什么": [
-            "1M token context window by default: 模型默认支持 100 万 token 的上下文窗口，无需任何 beta 头或额外配置。: 可以直接处理超长文档、完整代码库或长时间对话历史，大幅扩展了一轮对话或一次分析能容纳的信息量。",
-            "Adaptive thinking with effort default high: 模型只在当前轮次需要时进行深度推理（扩展思考），其余情况跳过，同时 effort 参数全平台默认设为 high。: 减少不必要的思考 token，既保持高质量输出，又节省 token 成本和延迟。",
-            "Mid-conversation system messages: 允许在对话中途插入系统消息，动态更新指令而不破坏之前建立的 prompt 缓存。: 在长对话中途切换任务说明或补充上下文时，仍能复用历史缓存，降低整体 token 消耗。",
-            "Refusal stop_details with category: 当模型因安全策略拒绝生成时，响应中会返回 stop_details，包含类别（如 cyber、bio 或 null）和可读解释。: 可以按拒绝类别分流处理，例如网络安全类引导用户走审核流程，生物类立即拦截，提升应用的安全合规处理能力。",
-            "1,024-token minimum cacheable prompt length: 提示缓存的最小可缓存片段长度从之前的较高值降低至 1024 token。: 更短的系统消息、助手话术或常见前缀也能被缓存，进一步降低重复调用的成本。",
-            "Fast mode research preview: 实验性加速模式，通过 speed:\"fast\" 降低输出延迟，但价格高于标准模式。: 在对延迟敏感的场景（如实时聊天、协同文档）获得更快的响应速度。",
-            "High-resolution image input: 支持长边最高 2576 像素的图像输入（与 Opus 4.7 相同），可处理高分辨率视觉内容。: 能处理精细图像，如扫描文档、高分辨率照片、医学影像等，提升视觉理解精度。"
+            "Claude Fable 5 模型发布: Claude Fable 5（claude-fable-5）是 Anthropic 最新、能力最强的广泛发布模型，默认提供 100 万 token 上下文窗口，最大输出 128k token，并强制开启自适应思考。同时发布的 Claude Mythos 5 仅限 Project Glasswing 参与者使用。: 开发者可以直接调用最先进的模型，无需额外申请即可拥有超大上下文和深度推理能力，适合处理长文档、多轮 Agent 对话、复杂编程等任务。",
+            "Tokenizer 更新与 token 计数变化: 相比 Claude Opus 4.7 之前的模型，相同文本生成的 token 数大约增加 30%。Claude Fable 5 使用与 Opus 4.7 相同的 tokenizer。: 直接按 token 计费时，相同的提示可能消耗更多 token，成本上升。迁移前需评估预算。",
+            "安全分类器与拒绝处理: Claude Fable 5 在请求和响应生成期间运行安全分类器，若触发策略则返回 stop_reason: 'refusal'。若未生成任何输出，不收费。提供 opt-in 的 fallbacks 参数（beta），可在拒绝时自动回退到其他模型（按回退模型费率计费）。: 应用可以更优雅地处理安全拒绝，节省被拒请求的费用，并通过回退机制保证可用性。",
+            "新增拒绝类别 'reasoning_extraction': refusal 响应的 stop_details.category 字段新增 'reasoning_extraction' 类型，当请求涉嫌逆向工程或复制模型输出时返回。原有的 'cyber' 和 'bio' 类别不变。: 开发者可以针对不同类型的拒绝做细分处理，比如给用户更清晰的提示，或记录日志用于审计。",
+            "仅支持自适应思考，不再支持禁用或手动思考预算: Claude Fable 5 和 Mythos 5 中，思考模式强制为 adaptive thinking，无法通过 thinking: {type: 'disabled'} 关闭，也不支持手动设置 budget_tokens 或预填充 assistant 消息。: 无法像旧模型那样完全关闭思考以加速便宜响应，但自适应模式能在简单问题上自动节省 token。",
+            "数据保留要求：30 天保留期: Claude Fable 5 在 Claude API 上要求 30 天数据保留，不可使用零保留模式。: 如果你的应用有严格的数据隐私合规要求（如 GDPR 必须立即删除），可能无法使用 Fable 5，需评估合规风险。",
+            "Claude Managed Agents：计划部署: 现在支持为 Managed Agents 设置 cron 计划，自动按预定时间运行会话，无需自行编写调度程序。: 轻松构建定时执行的 Agent 任务，如定期报告生成、数据抓取，减少运维负担。",
+            "Claude Managed Agents：vault 环境变量凭证: Managed Agents 的 vault 现在支持通过环境变量注入凭证，安全地将密码、API 密钥等传递给沙箱内的 CLI 和 SDK。: 可以安全地在 Agent 工作流中使用需要认证的外部服务，而无需在代码或配置中硬编码密钥。",
+            "Managed Agents webhook 增强：session_thread_id: session.thread_* 类型的 webhook 事件现在包含 session_thread_id 字段，用于标识触发的多 Agent 线程。: 方便在多 Agent 编排中追踪事件来源，实现更精细的监控和链路追踪。"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
             "旧版弃用": "是",
             "需迁移": "需要评估迁移"
           },
-          "值不值得切一句": "Claude Opus 4.8 默认 1M 上下文、自适应推理和更低缓存门槛，让长上下文代理和大规模分析应用的成本与性能都有明显提升。"
+          "值不值得切一句": "Claude Fable 5 是 Anthropic 当前最强公开模型，默认 1M 上下文、128k 输出、始终开启自适应思考，并引入安全分类器和新的拒绝处理流程，适合构建长上下文、高复杂度 Agent 应用。"
         }
       }
     },
@@ -153,63 +169,63 @@
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://platform.openai.com/docs/changelog",
-      "lastCheckedAt": "2026-06-07T22:13:34.633Z",
+      "lastCheckedAt": "2026-06-10T13:58:51.734Z",
       "analysisGeneratedAt": "2026-06-04T04:10:40.040Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
-        "oneLineTakeaway": "GPT-5.5 为复杂专业工作带来 1M 上下文、内置电脑操控、工具搜索等新能力，大幅扩展可构建的 AI 应用边界，推理默认值等行为变化需适配。",
+        "oneLineTakeaway": "GPT-5.5 数据不足 1M 数据不足 AI 数据不足",
         "newFeatures": [
           {
             "feature": "1M token context window",
-            "whatItIs": "模型单次可处理的上下文长度提升至 100 万 token，能一次性消化超长文档、完整代码库或长时间对话历史。",
-            "forYou": "你可以处理以前因上下文限制而无法完整送入模型的超大输入，如整本书、整个项目代码或数千轮对话，简化分块、摘要等工程负担。",
-            "howToUse": "在 Chat Completions 或 Responses API 请求中设置更大的 max_tokens 或直接输入长文本，无需特殊参数。",
-            "whenToUse": "当需要模型理解全局上下文，如全量代码审计、长篇文档问答、长时间代理任务时值得使用。"
+            "whatItIs": "数据不足 100 ? token数据不足",
+            "forYou": "数据不足",
+            "howToUse": "? Chat Completions ? Responses API 数据不足 max_tokens 数据不足",
+            "whenToUse": "数据不足"
           },
           {
             "feature": "Built-in computer use",
-            "whatItIs": "模型可通过截图与 UI 交互，点击、输入等操作计算机桌面或应用。",
-            "forYou": "你能构建直接操控桌面程序、自动化软件界面的代理，不需要额外视觉识别或模拟框架。",
-            "howToUse": "在 Responses API 中使用 computer 工具，提供截图并发送操作指令。",
-            "whenToUse": "当应用需要模拟人类操作电脑，如自动化测试、RPA、辅助操作等场景时使用。"
+            "whatItIs": "数据不足 UI 数据不足",
+            "forYou": "数据不足",
+            "howToUse": "? Responses API 数据不足 computer 数据不足",
+            "whenToUse": "数据不足RPA数据不足"
           },
           {
             "feature": "Tool search",
-            "whatItIs": "模型可推迟到运行时才从大量工具中选择调用，减少 token 消耗和提升缓存性能。",
-            "forYou": "管理数百个工具的应用可以避免每次请求都将全部工具定义发给模型，在运行时更高效地找到合适工具。",
-            "howToUse": "在 Responses API 中开启 tool_search 功能，并将工具列表托管给模型。",
-            "whenToUse": "当你的应用集成了大量工具（如数百个 API），且需要模型动态选择时很有价值。"
+            "whatItIs": "数据不足 token 数据不足",
+            "forYou": "数据不足",
+            "howToUse": "? Responses API 数据不足 tool_search 数据不足",
+            "whenToUse": "数据不足 API数据不足"
           },
           {
             "feature": "Skills, MCP, web search, hosted shell, apply patch",
-            "whatItIs": "Skills 是预置能力板块，MCP 接入外部数据，web search 搜索网络，hosted shell 运行命令，apply patch 应用代码补丁。",
-            "forYou": "这些开箱即用的工具让代理能查找信息、执行命令、修改代码，无需自己集成和维护。",
-            "howToUse": "在 Responses API 中通过内置工具参数启用对应功能，如 web_search、shell、apply_patch 等。",
-            "whenToUse": "当你想快速赋予模型联网、执行脚本、或获取实时数据的能力时使用。"
+            "whatItIs": "Skills 数据不足MCP 数据不足web search 数据不足hosted shell 数据不足apply patch 数据不足",
+            "forYou": "数据不足",
+            "howToUse": "? Responses API 数据不足 web_search?shell?apply_patch 数据不足",
+            "whenToUse": "数据不足"
           },
           {
             "feature": "Reasoning effort defaults to medium",
-            "whatItIs": "模型默认推理深度改为中等，以前默认可能更深或更浅。",
-            "forYou": "注意默认行为已变，可能导致一些需要深度思考的任务响应更快但可能不够细致，而一些简单任务可能比以前多消耗一些推理。",
-            "howToUse": "你可以在请求中显式设置 reasoning_effort 参数为 low、medium、high 等，覆盖默认值。",
-            "whenToUse": "当你需要精细控制推理深度以平衡质量、成本和延迟时，应显式指定。"
+            "whatItIs": "数据不足",
+            "forYou": "数据不足",
+            "howToUse": "数据不足 reasoning_effort 数据不足 low?medium?high 数据不足",
+            "whenToUse": "数据不足"
           },
           {
             "feature": "Image detail behavior change",
-            "whatItIs": "未设置 image_detail 或设为 auto 时，模型使用原始行为，可能不同于之前版本。",
-            "forYou": "图像理解准确性可能变化，以前依赖默认行为的应用可能需要检查效果。",
-            "howToUse": "指定 image_detail 参数为 low、high 或 auto 来明确要求。",
-            "whenToUse": "如果你的应用依赖图像理解，且未显式设置该参数，应验证新行为是否符合预期。"
+            "whatItIs": "数据不足 image_detail 数据不足 auto 数据不足",
+            "forYou": "数据不足",
+            "howToUse": "数据不足 image_detail 数据不足 low?high ? auto 数据不足",
+            "whenToUse": "数据不足"
           },
           {
             "feature": "Extended prompt caching only",
-            "whatItIs": "GPT-5.5 不支持内存型提示缓存，只支持扩展提示缓存，可保留缓存最长 24 小时。",
-            "forYou": "以前依赖即时缓存的应用必须适配到扩展缓存，或者重建缓存策略。",
-            "howToUse": "使用 prompt_cache_retention 参数设置缓存保留时间，或依赖系统默认的 24 小时。",
-            "whenToUse": "长时对话或频繁重复前缀的场景，利用扩展缓存降低成本。"
+            "whatItIs": "GPT-5.5 数据不足 24 数据不足",
+            "forYou": "数据不足",
+            "howToUse": "数据不足 prompt_cache_retention 数据不足 24 数据不足",
+            "whenToUse": "数据不足"
           }
         ],
-        "limitations": "官方 changelog 未说明定价及速率限制；GPT-5.5 仅支持扩展提示缓存，不支持内存提示缓存；图像输入细节行为变化，可能影响旧应用。",
+        "limitations": "数据不足 changelog 数据不足GPT-5.5 数据不足",
         "sources": [
           {
             "name": "OpenAI official changelog",
@@ -221,7 +237,7 @@
         "tag": "[更新｜closed]",
         "branch": "update",
         "access": "closed",
-        "updateSize": "medium",
+        "updateSize": "light",
         "template": "version_update",
         "card": {
           "名称": "GPT-5.5",
@@ -258,20 +274,20 @@
         "update": {
           "版本": "GPT-5.5→GPT-5.5(官方未披露)",
           "变了什么": [
-            "1M token context window: 模型单次可处理的上下文长度提升至 100 万 token，能一次性消化超长文档、完整代码库或长时间对话历史。: 你可以处理以前因上下文限制而无法完整送入模型的超大输入，如整本书、整个项目代码或数千轮对话，简化分块、摘要等工程负担。",
-            "Built-in computer use: 模型可通过截图与 UI 交互，点击、输入等操作计算机桌面或应用。: 你能构建直接操控桌面程序、自动化软件界面的代理，不需要额外视觉识别或模拟框架。",
-            "Tool search: 模型可推迟到运行时才从大量工具中选择调用，减少 token 消耗和提升缓存性能。: 管理数百个工具的应用可以避免每次请求都将全部工具定义发给模型，在运行时更高效地找到合适工具。",
-            "Skills, MCP, web search, hosted shell, apply patch: Skills 是预置能力板块，MCP 接入外部数据，web search 搜索网络，hosted shell 运行命令，apply patch 应用代码补丁。: 这些开箱即用的工具让代理能查找信息、执行命令、修改代码，无需自己集成和维护。",
-            "Reasoning effort defaults to medium: 模型默认推理深度改为中等，以前默认可能更深或更浅。: 注意默认行为已变，可能导致一些需要深度思考的任务响应更快但可能不够细致，而一些简单任务可能比以前多消耗一些推理。",
-            "Image detail behavior change: 未设置 image_detail 或设为 auto 时，模型使用原始行为，可能不同于之前版本。: 图像理解准确性可能变化，以前依赖默认行为的应用可能需要检查效果。",
-            "Extended prompt caching only: GPT-5.5 不支持内存型提示缓存，只支持扩展提示缓存，可保留缓存最长 24 小时。: 以前依赖即时缓存的应用必须适配到扩展缓存，或者重建缓存策略。"
+            "1M token context window: 数据不足 100 ? token数据不足: 数据不足",
+            "Built-in computer use: 数据不足 UI 数据不足: 数据不足",
+            "Tool search: 数据不足 token 数据不足: 数据不足",
+            "Skills, MCP, web search, hosted shell, apply patch: Skills 数据不足MCP 数据不足web search 数据不足hosted shell 数据不足apply patch 数据不足: 数据不足",
+            "Reasoning effort defaults to medium: 数据不足: 数据不足",
+            "Image detail behavior change: 数据不足 image_detail 数据不足 auto 数据不足: 数据不足",
+            "Extended prompt caching only: GPT-5.5 数据不足 24 数据不足: 数据不足"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
-            "旧版弃用": "是",
-            "需迁移": "需要评估迁移"
+            "旧版弃用": "官方未披露",
+            "需迁移": "官方未披露"
           },
-          "值不值得切一句": "GPT-5.5 为复杂专业工作带来 1M 上下文、内置电脑操控、工具搜索等新能力，大幅扩展可构建的 AI 应用边界，推理默认值等行为变化需适配。"
+          "值不值得切一句": "GPT-5.5 数据不足 1M 数据不足 AI 数据不足"
         }
       }
     },
@@ -281,65 +297,58 @@
       "vendor": "Google DeepMind",
       "country": "美国",
       "kind": "closed",
-      "latestVersion": "Gemini 29",
-      "latestReleasedAt": "",
-      "latestReleasedAtPrecision": "not_found",
+      "latestVersion": "Gemini 3.5",
+      "latestReleasedAt": "2024-03-19",
+      "latestReleasedAtPrecision": "day",
       "isOpen": false,
       "license": "closed",
       "hasEvalData": false,
       "evalSources": [],
       "hasChangelog": true,
       "changelogUrl": "https://ai.google.dev/gemini-api/docs/changelog",
-      "lastCheckedAt": "2026-06-09T13:13:33.994Z",
-      "analysisGeneratedAt": "2026-06-09T13:13:31.725Z",
+      "lastCheckedAt": "2026-06-10T13:59:00.048Z",
+      "analysisGeneratedAt": "2026-06-10T02:05:01.806Z",
       "analysisAuthor": "DeepSeek:deepseek-v4-pro",
       "changelog": {
-        "oneLineTakeaway": "Google发布多款Gemini新模型，重点提升代理能力、多模态生成与实时交互，适合构建自主Agent应用和实时音视频体验。",
+        "oneLineTakeaway": "Gemini 3.5 大幅增强代理与编码能力，并首次提供托管代理、多模态文件搜索、Webhooks 等开箱即用的生产级工具，让构建复杂 AI 应用的门槛明显降低。",
         "newFeatures": [
           {
-            "feature": "Gemini 3.5 Flash 正式版 (2026-05-19)",
-            "whatItIs": "专为一致性能优化的最智能模型，在边缘代理任务和编码上表现突出。",
-            "forYou": "你可以构建更可靠的自主代理应用（如代码生成、自动浏览），处理复杂多步推理。",
-            "howToUse": "调用 gemini-3.5-flash 模型，搭配函数调用与代码执行工具，搭建端到端 Agent 工作流。",
-            "whenToUse": "当需要稳定处理代理推理、多轮工具调用的生产级应用时使用。"
+            "feature": "Managed Agents（托管代理）",
+            "whatItIs": "在 Google 托管的安全 Linux 沙箱中运行自主、有状态的代理，无需自建基础设施。",
+            "forYou": "让 AI 应用直接获得多步任务执行能力（写代码、管理文件、浏览网页），省去自己搭建沙箱和状态管理的麻烦。",
+            "howToUse": "通过 Gemini API 创建托管代理，指定任务描述，代理在隔离容器中自主完成。详见 Agents 快速入门。",
+            "whenToUse": "开发自动执行复杂工作流的应用，如自动化办公、数据分析、自编程助手时，直接调用。"
           },
           {
-            "feature": "托管代理 (Managed Agents) 公测 (2026-05-19)",
-            "whatItIs": "Gemini API 提供全状态自主代理，运行在 Google 托管的隔离 Linux 沙箱中。",
-            "forYou": "无需自己搭建环境即可快速部署安全、稳定的 AI Agent，处理文件操作、网页浏览等任务。",
-            "howToUse": "通过 Gemini API 的 Managed Agents 接口配置代理任务和环境，参考官方快速入门。",
-            "whenToUse": "当你需要实现复杂自动化流程（研究助手、数据分析），且希望简化运维时使用。"
+            "feature": "Antigravity Agent（通用代理）",
+            "whatItIs": "一个预训练好的通用托管代理，可自主规划、推理、编码、操作文件、浏览网页。",
+            "forYou": "开箱即用的高能力代理，省去自己调教代理的精力，快速落地端到端任务。",
+            "howToUse": "使用模型字符串 antigravity-preview-05-2026 创建代理，提供任务描述。参考 Antigravity Agent 指南。",
+            "whenToUse": "当任务涉及代码执行或网络交互，且需要快速原型或生产时，优先试用。"
           },
           {
-            "feature": "深度研究代理 Deep Research 预览增强 (2026-04-21)",
-            "whatItIs": "深度研究代理增加协作规划、可视化、MCP 服务器集成和文件搜索，可自动收集并综合上下文。",
-            "forYou": "适合构建知识工作助手，能自动规划研究、浏览多源信息并生成综合报告。",
-            "howToUse": "使用 deep-research-preview-04-2026 或 deep-research-max-preview-04-2026 模型，通过 API 传入研究主题。",
-            "whenToUse": "当需要处理多源信息调研、深度综合分析时使用，比普通模型更自动化。"
+            "feature": "多模态文件搜索（Multimodal File Search）",
+            "whatItIs": "File Search 现在支持用 embedding-2 模型直接嵌入和搜索图片，并返回可视化引用页码。",
+            "forYou": "让应用同时理解文本和图片内容，实现更全面的知识检索，例如在文档中按图片内容搜索。",
+            "howToUse": "上传图片到 File Search，使用 gemini-embedding-2 模型索引，查询时返回匹配图片及 media_id、page_numbers。",
+            "whenToUse": "需要基于视觉内容检索的场景，如自动报告分析、视觉问答系统。"
           },
           {
-            "feature": "Gemini 3.1 Flash-Lite 正式版 (2026-05-07)",
-            "whatItIs": "针对速度、规模和成本效率优化的轻量模型。",
-            "forYou": "在保持一定质量的前提下大幅降低 API 成本，适合大规模生产或成本敏感场景。",
-            "howToUse": "调用 gemini-3.1-flash-lite 模型，用法与 Flash 系列一致，价格更低。",
-            "whenToUse": "应用需处理海量简单请求（分类、摘要、基础对话）且对延迟敏感时使用。"
+            "feature": "Webhooks 支持（批处理与长时操作）",
+            "whatItIs": "为 Batch API 和长时间运行的操作提供事件驱动的 Webhooks，替代轮询。",
+            "forYou": "服务器无需反复查询任务状态，任务完成时主动推送结果，降低资源消耗并提升实时性。",
+            "howToUse": "配置 Webhook URL，在批处理请求中指定，操作完成时 API 会 POST 结果到该地址。",
+            "whenToUse": "任何使用批量推理或长耗时任务（如视频生成、嵌入计算）的生产环境，希望减少轮询开销时。"
           },
           {
-            "feature": "多模态文件搜索 (2026-05-05)",
-            "whatItIs": "文件搜索升级，支持原生图像嵌入与搜索， grounding 结果包含可视化引用和页码。",
-            "forYou": "可构建能搜索图片内容的知识库应用，如扫描文档内图表、照片，实现精准检索。",
-            "howToUse": "使用 gemini-embedding-2 生成多模态嵌入，通过 File Search API 进行图文搜索。",
-            "whenToUse": "应用中需要同时检索文本和图像信息（如 PDF 中的图表、照片）时使用。"
-          },
-          {
-            "feature": "批处理 Webhooks (2026-05-04)",
-            "whatItIs": "批处理 API 支持事件驱动 Webhooks，替代轮询机制。",
-            "forYou": "构建更高效的异步处理流水线，减少轮询开销，实时接收结果通知。",
-            "howToUse": "创建批处理任务时配置 webhook URL，任务完成时自动回调。",
-            "whenToUse": "处理大批量请求并需要实时通知的生产环境自动化工作流。"
+            "feature": "多模态嵌入模型 embedding-2（GA）",
+            "whatItIs": "正式发布的多模态嵌入模型，可将文本、图片、视频、音频统一映射到同一向量空间。",
+            "forYou": "让应用在跨模态搜索、聚类、推荐等任务中直接使用原生多模态理解，而不必分别处理不同模态。",
+            "howToUse": "调用 gemini-embedding-2，传入任意支持模态的输入，获得统一嵌入向量。",
+            "whenToUse": "当应用需要处理多种模态数据并需要一致性语义表示时，如多模态 RAG、多模态相似度计算。"
           }
         ],
-        "limitations": "官方 changelog 中未明确速率限制或配额变更；部分旧模型已弃用（如 Gemini 2.0 系列），需迁移；图片生成、视频生成等高级功能需在特定区域可用。",
+        "limitations": "Managed Agents 和 Antigravity Agent 处于公开预览阶段，可能存在稳定性或配额限制；Webhooks 仅适用于 Batch API 和长时操作；多模态文件搜索和 embedding-2 的具体价格与速率限制请查阅官方定价页面；旧模型（如 gemini-2.0-flash）已于2026年6月1日关闭，请尽快迁移。其他限制参见官方配额文档。",
         "sources": [
           {
             "name": "Google DeepMind official changelog",
@@ -354,9 +363,9 @@
         "updateSize": "medium",
         "template": "version_update",
         "card": {
-          "名称": "Gemini 29",
+          "名称": "Gemini 3.5",
           "厂商": "Google DeepMind",
-          "发布日": "官方未披露",
+          "发布日": "2024-03-19",
           "开放度标签": "仅API闭源",
           "类型": "官方未披露",
           "规模架构": "架构官方未披露；context window（上下文窗口）官方未披露",
@@ -381,26 +390,25 @@
             "输出每百万token": "官方未披露"
           },
           "知识截止": "官方未披露",
-          "model string": "Gemini 29",
+          "model string": "Gemini 3.5",
           "速率": "官方未披露",
           "多模态I/O": "官方未披露"
         },
         "update": {
-          "版本": "Gemini 3.5→Gemini 29(官方未披露)",
+          "版本": "Gemini 3.5→Gemini 3.5(2024-03-19)",
           "变了什么": [
-            "Gemini 3.5 Flash 正式版 (2026-05-19): 专为一致性能优化的最智能模型，在边缘代理任务和编码上表现突出。: 你可以构建更可靠的自主代理应用（如代码生成、自动浏览），处理复杂多步推理。",
-            "托管代理 (Managed Agents) 公测 (2026-05-19): Gemini API 提供全状态自主代理，运行在 Google 托管的隔离 Linux 沙箱中。: 无需自己搭建环境即可快速部署安全、稳定的 AI Agent，处理文件操作、网页浏览等任务。",
-            "深度研究代理 Deep Research 预览增强 (2026-04-21): 深度研究代理增加协作规划、可视化、MCP 服务器集成和文件搜索，可自动收集并综合上下文。: 适合构建知识工作助手，能自动规划研究、浏览多源信息并生成综合报告。",
-            "Gemini 3.1 Flash-Lite 正式版 (2026-05-07): 针对速度、规模和成本效率优化的轻量模型。: 在保持一定质量的前提下大幅降低 API 成本，适合大规模生产或成本敏感场景。",
-            "多模态文件搜索 (2026-05-05): 文件搜索升级，支持原生图像嵌入与搜索， grounding 结果包含可视化引用和页码。: 可构建能搜索图片内容的知识库应用，如扫描文档内图表、照片，实现精准检索。",
-            "批处理 Webhooks (2026-05-04): 批处理 API 支持事件驱动 Webhooks，替代轮询机制。: 构建更高效的异步处理流水线，减少轮询开销，实时接收结果通知。"
+            "Managed Agents（托管代理）: 在 Google 托管的安全 Linux 沙箱中运行自主、有状态的代理，无需自建基础设施。: 让 AI 应用直接获得多步任务执行能力（写代码、管理文件、浏览网页），省去自己搭建沙箱和状态管理的麻烦。",
+            "Antigravity Agent（通用代理）: 一个预训练好的通用托管代理，可自主规划、推理、编码、操作文件、浏览网页。: 开箱即用的高能力代理，省去自己调教代理的精力，快速落地端到端任务。",
+            "多模态文件搜索（Multimodal File Search）: File Search 现在支持用 embedding-2 模型直接嵌入和搜索图片，并返回可视化引用页码。: 让应用同时理解文本和图片内容，实现更全面的知识检索，例如在文档中按图片内容搜索。",
+            "Webhooks 支持（批处理与长时操作）: 为 Batch API 和长时间运行的操作提供事件驱动的 Webhooks，替代轮询。: 服务器无需反复查询任务状态，任务完成时主动推送结果，降低资源消耗并提升实时性。",
+            "多模态嵌入模型 embedding-2（GA）: 正式发布的多模态嵌入模型，可将文本、图片、视频、音频统一映射到同一向量空间。: 让应用在跨模态搜索、聚类、推荐等任务中直接使用原生多模态理解，而不必分别处理不同模态。"
           ],
           "破坏性提醒": {
             "model string变更": "官方未披露",
-            "旧版弃用": "官方未披露",
-            "需迁移": "官方未披露"
+            "旧版弃用": "是",
+            "需迁移": "需要评估迁移"
           },
-          "值不值得切一句": "Google发布多款Gemini新模型，重点提升代理能力、多模态生成与实时交互，适合构建自主Agent应用和实时音视频体验。"
+          "值不值得切一句": "Gemini 3.5 大幅增强代理与编码能力，并首次提供托管代理、多模态文件搜索、Webhooks 等开箱即用的生产级工具，让构建复杂 AI 应用的门槛明显降低。"
         }
       }
     },
@@ -425,7 +433,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-      "lastCheckedAt": "2026-06-09T13:13:31.727Z",
+      "lastCheckedAt": "2026-06-10T13:58:49.746Z",
       "latestVersionVariants": [
         "DeepSeek V4 Flash",
         "DeepSeek V4 Pro",
@@ -811,7 +819,7 @@
       ],
       "hasChangelog": true,
       "changelogUrl": "https://huggingface.co/Qwen/Qwen3.6-27B",
-      "lastCheckedAt": "2026-06-09T13:13:31.860Z",
+      "lastCheckedAt": "2026-06-10T13:58:50.140Z",
       "latestVersionVariants": [
         "Qwen3.6 35B A3B",
         "Qwen3.6 35B A3B FP8",
@@ -1191,461 +1199,6 @@
             "需迁移": "官方未披露"
           },
           "值不值得切一句": "能看截图写代码（多模态）、262K 上下文吃下整个中型代码库、量化后单卡可跑——用自托管成本把 vibe coding 的三个核心痛点一次打通，是目前开源里对应用构建者最落地的选型。"
-        }
-      }
-    },
-    {
-      "id": "mistral",
-      "name": "Mistral Large 3",
-      "vendor": "Mistral AI",
-      "country": "法国",
-      "kind": "open",
-      "latestVersion": "Mistral Large 3 675B Instruct 2512 NVFP4",
-      "latestReleasedAt": "2026-01-29",
-      "latestReleasedAtPrecision": "approx (HuggingFace lastModified, not guaranteed release date)",
-      "isOpen": true,
-      "license": "apache-2.0",
-      "hasEvalData": false,
-      "evalSources": [],
-      "evalThirdPartyPending": [
-        "LMArena",
-        "OpenLLM Leaderboard"
-      ],
-      "hasChangelog": true,
-      "changelogUrl": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512",
-      "lastCheckedAt": "2026-06-09T13:13:32.040Z",
-      "latestVersionVariants": [
-        "Mistral Large 3 675B Instruct 2512 NVFP4",
-        "Mistral Large 3 675B Instruct 2512",
-        "Mistral Large 3 675B Instruct 2512 BF16",
-        "Mistral Large 3 675B Instruct 2512 Eagle",
-        "Mistral Large 3 675B Base 2512"
-      ],
-      "analysisGeneratedAt": "2026-06-08T13:00:29.279Z",
-      "analysisAuthor": "Claude:sonnet",
-      "analysis": {
-        "oneLineTakeaway": "675B MoE 开源旗舰、Apache 2.0 完全商用、256k 长上下文 + 视觉理解 + 原生工具调用三合一,NVFP4 量化后单节点 H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择,闭源 API 才有的能力组合,现在能自己拥有。",
-        "whatItUnlocks": [
-          {
-            "point": "视觉理解 + 原生工具调用在同一个自托管模型里",
-            "forYou": "以前要搭「能看图又能调 API」的 agent,要么拼接两个模型、要么必须锁定 GPT-4o 这类闭源服务。Mistral Large 3 把 2.5B 视觉编码器和原生 function calling(含 JSON 强制输出)都内置了——你能在私有部署里直接做出「截图→解读图→调工具→生成结构化报告」的完整工作流,不再需要把数据发给云端闭源 API 才能实现多模态 agent。",
-            "evidence": "官方 model card:内置 2.5B Vision Encoder(673B LM + 2.5B 视觉编码器);明示 native function calling + JSON outputting;vLLM 示例代码演示视觉+工具调用同时开启的完整 demo",
-            "confidence": "high(card 明示架构与能力)"
-          },
-          {
-            "point": "256k 上下文可以吃下整份长文档或大型代码库片段,不用做 RAG 切片",
-            "forYou": "256k token 约等于 20 万中文字、或几千行代码。做企业知识问答时可以把一份完整合同/审计报告/代码模块一次喂进去让它通盘理解,不需要做复杂的 RAG 分块拼接——分块是工程成本,也是理解信息丢失的来源。以前这种「大块原文直接理解」要靠 Gemini 或 Claude 的闭源长上下文才行,现在能在自己服务器上跑。",
-            "evidence": "官方 model card 明示支持 256k context window;vLLM serve 命令默认 max-model-len 262144",
-            "confidence": "high(card 明示)"
-          },
-          {
-            "point": "Apache 2.0 = 比 Llama 系列更干净的商用自由,改完权重也不用开源",
-            "forYou": "Apache 2.0 是开源里最宽松的商业许可之一:可以把模型打包进商业产品卖、可以修改权重再分发、不需要开源你的修改、没有「7000 万月活用户须另行申请」这类特殊门槛(Llama 系列有此限制)。如果你的 AI 产品要规模化商用、或者要把模型能力嵌进 SaaS 卖给企业客户,Mistral Large 3 是目前旗舰级开源模型里许可证条款最干净的选项之一——法务审查成本低。",
-            "evidence": "官方 model card:License Apache 2.0;标准 Apache 2.0 原文无用户数量限制条款",
-            "confidence": "high(license 明示;商用前建议自行核对最新许可证原文)"
-          },
-          {
-            "point": "NVFP4 量化版把自托管门槛从「H200/B200 专属」降到「H100/A100 单节点可租」",
-            "forYou": "FP8 主版本需要 B200 或 H200(2025-26 年最顶级的卡,价格极贵、云端现货少),但 NVFP4 量化版可以跑在 H100 或 A100 节点上。H100 80GB 在 AWS/GCP/Azure 都有按小时租,单节点 8 卡约每小时几十美元可以到手——而 H200/B200 要么无现货要么定价更高。这把「能跑 675B 旗舰」的门槛从「只有顶级实验室」降到了「中等规模 AI 团队能租」。量化(NVFP4)的代价是精度略有损失,但对大多数应用任务(问答、agent、代码)影响可接受。",
-            "evidence": "官方 model card 明示:NVFP4 版 deployable on single node of H100s or A100s;FP8 版需 B200 或 H200",
-            "confidence": "high(card 明示硬件路线;NVFP4 精度损失程度需自己实测)"
-          },
-          {
-            "point": "Eagle 投机解码官方配套,同一节点吞吐更高不加卡",
-            "forYou": "投机解码(speculative decoding)是指用一个小的「草稿模型」先快速猜后续几个 token、主模型并行验证——有效提升每秒生成 token 数,不损失质量。Mistral 官方专门配套发布了 Eagle 草稿模型,推荐在生产部署中开启。对你来说:同样一台 H100 节点,开 Eagle 后能在高并发时服务更多请求、单位硬件成本摊薄——做 C 端或 API 服务时这笔账很实在。",
-            "evidence": "官方 model card:提供 Mistral-Large-3-675B-Instruct-2512-Eagle;vLLM 示例含完整 speculative decoding 配置参数(num_speculative_tokens=3, method=eagle)",
-            "confidence": "high(草稿模型存在且 card 明示推荐;具体吞吐提升倍数官方 card 文字中未披露数字)"
-          },
-          {
-            "point": "11 语言原生支持,多语言产品不用外接翻译层",
-            "forYou": "官方明示支持英/法/西/德/意/葡/荷/中/日/韩/阿 11 种语言,法语和欧洲语言是 Mistral 的传统强项。如果你的 AI 应用要出海欧洲、中东、东亚,能在同一个私有部署里处理多语言输入输出,不需要再架翻译 API 中间层或维护多套语言模型——减少了一个依赖点和一段延迟。",
-            "evidence": "官方 model card 明示多语言支持列表:English, French, Spanish, German, Italian, Portuguese, Dutch, Chinese, Japanese, Korean, Arabic",
-            "confidence": "high(语言列表 card 明示;各语言实际质量暂无第三方分语言评测数字)"
-          }
-        ],
-        "benchmark": {
-          "headline": "官方 model card 的 benchmark 数据全部以图片形式展示,文字中无可引用数字;第三方榜单截至 2026-06-08 未收录该版本",
-          "professorNote": "对你选型最相关的指标是:工具调用准确率(agent 场景)、长上下文检索准确率(RAG 场景)、代码生成质量(编程 agent)。但这三类数据在本 model card 中均只有图表图片而无文字数字,无法核实引用。官方自述『frontier performance / best-in-class agentic』为厂商自评。建议等 LMArena ELO 和 BigCodeBench 第三方结果发布后再做定量对比选型。在此之前,最有价值的数字是你用自己真实任务跑出来的。",
-          "charts": [],
-          "items": [],
-          "caveats": [
-            "官方 model card benchmark 全部以图片展示,文字中无具体数字——无法提取核实,本卡不臆造数字。",
-            "第三方榜单(LMArena、OpenLLM Leaderboard、BigCodeBench)截至 2026-06-08 未收录本版本,数据待补。",
-            "官方自述「frontier performance / best-in-class agentic / best-in-class function calling」均为厂商自评,confidence=low,等第三方交叉验证后再当依据。",
-            "Eagle 投机解码的实际吞吐提升倍数官方未在 card 文字中披露,需自行基准测试。"
-          ]
-        },
-        "openSourceMeaning": "Apache 2.0 是最宽松的商业开源许可之一,权重完全开放下载。对做 AI 应用的你,具体换来三件事:① **商用自由**——直接包进产品卖,改完权重不用开源,无用户数上限条款,法务摩擦最小;② **数据主权**——医疗/金融/政务等数据不能出境的场景,可在私有网络内跑全量旗舰级能力,满足合规硬约束,这是闭源 API 给不了的;③ **微调专属化**——权重可拿来做监督微调(SFT,即用你的数据举例子教它)变成领域专用版本。但这笔账有真实代价:自部署硬件门槛是**单节点 8 卡**起步。FP8 版需 H200 或 B200(2025-26 年最贵卡,云端现货稀少);NVFP4 量化版可退到 H100(80GB)或 A100,云端相对可租但单节点 8 卡成本仍不低。个人笔记本和单卡完全无望;小团队自建物理集群的前期成本更高。微调的现实:BF16 全精度版约需 1.3TB 显存才能做标准微调,非 H200 集群难以承受;NVFP4 是推理量化格式,不适合直接当微调基线。现实路径是:量不大先走 Mistral 官方 API(la Plateforme)或 Fireworks/Together 等三方托管,量大且有合规诉求再评估自建节点。",
-        "whenToUse": "三支判断,直接照着做决定:① **直接值得自托管/微调** — 同时满足以下条件:产品需要视觉+长上下文+工具调用的多合一 agent 能力、数据有不出境的合规硬约束(医疗/金融/政务)、调用量高到按量 API 成本不划算,且团队能供得起单节点 8×H100 云节点(NVFP4 路线)。这时 Apache 2.0 + 私有部署是最干净的开源旗舰路线,能力组合市面上没几个开源模型能替代。② **先走托管 API 试水** — 你在做原型/MVP、量小、没有合规压力:直接调 Mistral 官方 API 或三方托管接口,省去运维和显存账;等证明了产品 PMF 再评估自部署。③ **别用它** — 核心需求是硬数理推理/数学竞赛(用 QwQ 或 DeepSeek-R2 等推理专用模型,Mistral 自己 card 里也承认「not a dedicated reasoning model」);或者视觉是第一重心(Mistral 承认「behind vision-first models」);或者团队根本没有 MLOps 能力养 675B 节点——这些场景别被「开源旗舰」名号诱惑去啃运维,用闭源 API 更省心。",
-        "cost_caveats": "自部署真实硬件账:FP8 主版本需单节点 8×H200 或 8×B200,2026 年云端这两款卡现货均紧张且价格最贵;NVFP4 量化版可退到 8×H100(80GB)或 A100,云端相对易租,但单节点 8 卡成本仍需认真计算。个人单卡/家用机完全不可行。长上下文代价:vLLM 默认 max-model-len 262144 会吃满显存,官方建议根据实际场景把 --max-model-len 裁到 32k-64k 来换取更高吞吐和更低显存峰值——跑满 256k 的吞吐会很低。Eagle 投机解码:草稿模型需额外加载进显存,部署前需实测余量够不够。API 定价:Mistral 官方 la Plateforme 的具体每 token 价格在 model card 中未披露,查 mistral.ai/pricing 获取最新数字。所有官方 benchmark 数字均为厂商自评:card 里的图表是自报而非第三方实测,落地决策前务必用你自己的真实任务跑一遍,不要把宣传图当选型依据。",
-        "sources": [
-          {
-            "name": "HuggingFace · mistralai/Mistral-Large-3-675B-Instruct-2512 (官方 model card)",
-            "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512"
-          },
-          {
-            "name": "Mistral AI 官方博客 · Mistral Large 3 发布公告",
-            "url": "https://mistral.ai/news/mistral-3"
-          },
-          {
-            "name": "HuggingFace · Mistral-Large-3-675B-Instruct-2512-NVFP4 (H100/A100 量化版)",
-            "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512-NVFP4"
-          },
-          {
-            "name": "HuggingFace · Mistral-Large-3-675B-Instruct-2512-Eagle (投机解码草稿模型)",
-            "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512-Eagle"
-          }
-        ]
-      },
-      "paradigm": {
-        "tag": "[更新｜open]",
-        "branch": "update",
-        "access": "open",
-        "updateSize": "medium",
-        "template": "version_update",
-        "card": {
-          "名称": "Mistral Large 3 675B Instruct 2512 NVFP4",
-          "厂商": "Mistral AI",
-          "发布日": "2026-01-29",
-          "开放度标签": "真开源可商用",
-          "类型": "基座/指令/多模态/推理",
-          "规模架构": "MoE 总参官方未披露+激活参官方未披露；context window（上下文窗口）256k",
-          "关键benchmark": [
-            {
-              "名称": "官方未披露",
-              "分数": "官方未披露",
-              "对手": "官方未披露",
-              "标注": "自报",
-              "解读": "没有可核验 benchmark 数字。"
-            }
-          ],
-          "强弱一句": "675B MoE 开源旗舰、Apache 2.0 完全商用、256k 长上下文 + 视觉理解 + 原生工具调用三合一,NVFP4 量化后单节点 H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择,闭源 API 才有的能力组合,现在能自己拥有。",
-          "一句话定位": "三支判断,直接照着做决定:① **直接值得自托管/微调** — 同时满足以下条件:产品需要视觉+长上下文+工具调用的多合一 agent 能力、数据有不出境的合规硬约束(医疗/金融/政务)、调用量高到按量 API 成本不划算,且团队能供得起单节点 8×H100 云节点(NVFP4 路线)。这时 Apache 2.0 + 私有部署是最干净的开源旗舰路线,能力组合市面上没几个开源模型能替代。② **先走托管 API 试水** — 你在做原型/MVP、量小、没有合规压力:直接调 Mistral 官方 API 或三方托管接口,省去运维和显存账;等证明了产品 PMF 再评估自部署。③ **别用它** — 核心需求是硬数理推理/数学竞赛(用 QwQ 或 DeepSeek-R2 等推理专用模型,Mistral 自己 card 里也承认「not a dedicated reasoning model」);或者视觉是第一重心(Mistral 承认「behind vision-first models」);或者团队根本没有 MLOps 能力养 675B 节点——这些场景别被「开源旗舰」名号诱惑去啃运维,用闭源 API 更省心。",
-          "术语注解": [
-            "MoE（混合专家模型）: 推理时只激活部分专家参数，用较少计算调用更大的总参数池。",
-            "reasoning（推理）: 模型进行多步分析、规划或验证的能力。",
-            "context window（上下文窗口）: 单次请求中模型能读取的输入和输出 token 总长度。"
-          ],
-          "许可证": {
-            "名称": "apache-2.0",
-            "能否商用": "可商用"
-          },
-          "自托管硬件": "H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择",
-          "可用变体": [
-            "Mistral Large 3 675B Instruct 2512 NVFP4",
-            "Mistral Large 3 675B Instruct 2512",
-            "Mistral Large 3 675B Instruct 2512 BF16",
-            "Mistral Large 3 675B Instruct 2512 Eagle",
-            "Mistral Large 3 675B Base 2512"
-          ],
-          "base_model": "官方未披露"
-        },
-        "update": {
-          "版本": "Mistral Large 3 675B Instruct 2512 NVFP4→Mistral Large 3 675B Instruct 2512 NVFP4(2026-01-29)",
-          "变了什么": [
-            "视觉理解 + 原生工具调用在同一个自托管模型里: 以前要搭「能看图又能调 API」的 agent,要么拼接两个模型、要么必须锁定 GPT-4o 这类闭源服务。Mistral Large 3 把 2.5B 视觉编码器和原生 function calling(含 JSON 强制输出)都内置了——你能在私有部署里直接做出「截图→解读图→调工具→生成结构化报告」的完整工作流,不再需要把数据发给云端闭源 API 才能实现多模态 agent。",
-            "256k 上下文可以吃下整份长文档或大型代码库片段,不用做 RAG 切片: 256k token 约等于 20 万中文字、或几千行代码。做企业知识问答时可以把一份完整合同/审计报告/代码模块一次喂进去让它通盘理解,不需要做复杂的 RAG 分块拼接——分块是工程成本,也是理解信息丢失的来源。以前这种「大块原文直接理解」要靠 Gemini 或 Claude 的闭源长上下文才行,现在能在自己服务器上跑。",
-            "Apache 2.0 = 比 Llama 系列更干净的商用自由,改完权重也不用开源: Apache 2.0 是开源里最宽松的商业许可之一:可以把模型打包进商业产品卖、可以修改权重再分发、不需要开源你的修改、没有「7000 万月活用户须另行申请」这类特殊门槛(Llama 系列有此限制)。如果你的 AI 产品要规模化商用、或者要把模型能力嵌进 SaaS 卖给企业客户,Mistral Large 3 是目前旗舰级开源模型里许可证条款最干净的选项之一——法务审查成本低。",
-            "NVFP4 量化版把自托管门槛从「H200/B200 专属」降到「H100/A100 单节点可租」: FP8 主版本需要 B200 或 H200(2025-26 年最顶级的卡,价格极贵、云端现货少),但 NVFP4 量化版可以跑在 H100 或 A100 节点上。H100 80GB 在 AWS/GCP/Azure 都有按小时租,单节点 8 卡约每小时几十美元可以到手——而 H200/B200 要么无现货要么定价更高。这把「能跑 675B 旗舰」的门槛从「只有顶级实验室」降到了「中等规模 AI 团队能租」。量化(NVFP4)的代价是精度略有损失,但对大多数应用任务(问答、agent、代码)影响可接受。",
-            "Eagle 投机解码官方配套,同一节点吞吐更高不加卡: 投机解码(speculative decoding)是指用一个小的「草稿模型」先快速猜后续几个 token、主模型并行验证——有效提升每秒生成 token 数,不损失质量。Mistral 官方专门配套发布了 Eagle 草稿模型,推荐在生产部署中开启。对你来说:同样一台 H100 节点,开 Eagle 后能在高并发时服务更多请求、单位硬件成本摊薄——做 C 端或 API 服务时这笔账很实在。",
-            "11 语言原生支持,多语言产品不用外接翻译层: 官方明示支持英/法/西/德/意/葡/荷/中/日/韩/阿 11 种语言,法语和欧洲语言是 Mistral 的传统强项。如果你的 AI 应用要出海欧洲、中东、东亚,能在同一个私有部署里处理多语言输入输出,不需要再架翻译 API 中间层或维护多套语言模型——减少了一个依赖点和一段延迟。",
-            "许可证/开放度: apache-2.0",
-            "发布日期: 2026-01-29"
-          ],
-          "破坏性提醒": {
-            "model string变更": "官方未披露",
-            "旧版弃用": "官方未披露",
-            "需迁移": "官方未披露"
-          },
-          "值不值得切一句": "675B MoE 开源旗舰、Apache 2.0 完全商用、256k 长上下文 + 视觉理解 + 原生工具调用三合一,NVFP4 量化后单节点 H100 可跑——这是目前开源里少数能在一个私有节点上撑起「看图 + 调 API + 长文档」生产级 agent 的选择,闭源 API 才有的能力组合,现在能自己拥有。"
-        }
-      }
-    },
-    {
-      "id": "llama",
-      "name": "Llama 4",
-      "vendor": "Meta",
-      "country": "美国",
-      "kind": "open",
-      "latestVersion": "Llama 4 Maverick 17B 128E Instruct",
-      "latestReleasedAt": "2025-05-22",
-      "latestReleasedAtPrecision": "approx (HuggingFace lastModified, not guaranteed release date)",
-      "isOpen": true,
-      "license": "other",
-      "hasEvalData": true,
-      "evalSources": [
-        "HuggingFace model card"
-      ],
-      "evalThirdPartyPending": [
-        "LMArena",
-        "OpenLLM Leaderboard"
-      ],
-      "hasChangelog": true,
-      "changelogUrl": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-      "lastCheckedAt": "2026-06-08T13:11:39.541Z",
-      "latestVersionVariants": [
-        "Llama 4 Maverick 17B 128E Instruct",
-        "Llama 4 Maverick 17B 128E Instruct FP8",
-        "Llama 4 Scout 17B 16E Instruct",
-        "Llama 4 Maverick 17B 128E Instruct Original",
-        "Llama 4 Maverick 17B 128E",
-        "Llama 4 Scout 17B 16E"
-      ],
-      "analysisGeneratedAt": "2026-06-08T13:11:39.541Z",
-      "analysisAuthor": "Claude:sonnet",
-      "analysis": {
-        "oneLineTakeaway": "开源界首个旗舰级原生多模态 MoE——你第一次能在自己的机器上跑一个会看图、能吃百万 token 的强模型，把以前只能锁定 GPT-4V 或 Gemini 才能做的视觉 AI 应用，带进了「数据不出境 + 成本可控」的射程。",
-        "whatItUnlocks": [
-          {
-            "point": "原生多模态视觉理解，开源可自部署",
-            "forYou": "以前要做「看图理解、文档图片解析、截图转代码、产品图描述生成」这类视觉 AI 功能，开源路线几乎没有旗舰级选项——只能付钱调 GPT-4V 或 Gemini API，数据发出去就不受控了。Llama 4 Maverick 是第一个把图文多模态做到与闭源旗舰竞争水平、同时开放权重的主流选择。对做医疗影像分析、企业内部文件处理、本地私有 PDF / 合同解读的场景，这是以前完全没有的选项——图片进了你自己的服务器，从此不必上传给第三方。",
-            "evidence": "HuggingFace model card 标签：image-text-to-text；Meta 官方发布公告（2025-04-05）明确原生多模态支持",
-            "confidence": "high（card 明示多模态架构类型）"
-          },
-          {
-            "point": "MoE 架构：用 17B 的推理算力换取远超 17B 的输出质量",
-            "forYou": "MoE（混合专家，Mixture of Experts，可理解为「模型内有 128 个专家团队，每次只叫其中几个来干活」）的核心优势是：推理时只激活 17B 参数，但知识储量对应的是 128 个专家的总规模。对做应用的你，意味着：在同等延迟和显存开销下，你得到的输出质量远高于同等激活参数量的普通稠密模型。批量处理文档、让 agent 连轴运行几小时——单 token 推理成本是接近 17B 级别的，不是总参数级别的。高并发或长时间运行场景下，这能显著压低单位成本。",
-            "evidence": "模型命名 17B-128E 明确激活参数 17B、128 个专家；HuggingFace model card 架构描述",
-            "confidence": "high（架构规格来自 card 命名与 Meta 官方）"
-          },
-          {
-            "point": "1M token 上下文（Maverick）/ 10M token 超长上下文（Scout）",
-            "forYou": "上下文窗口（指模型一次能读入多少文字）达到 100 万 token，意味着你可以把整个中型代码仓库、完整技术手册、数百份 API 文档一股脑塞进去，让模型通盘理解——不再需要费劲分块切片、靠 RAG（检索增强，即先搜索相关段落再喂给模型的工程手段）拼接上下文。以前做整库代码 agent 或长文档问答，你要搭一套复杂的检索管线；现在的 Maverick 可以直接喂进去。Scout 变体进一步到 1000 万 token，适合超长材料（法律合同库、学术文献汇编）。工程复杂度大幅下降，就是这条最直接的产品价值。",
-            "evidence": "Meta 官方发布公告（2025-04-05）：Maverick 支持 1M token 上下文，Scout 支持 10M token 上下文",
-            "confidence": "high（官方发布明示）"
-          },
-          {
-            "point": "原生支持 12 种语言，东南亚 / 印度 / 中东市场直接可用",
-            "forYou": "官方支持：英、中、西、法、德、印地语、印尼语、意、葡、泰、他加禄语（菲律宾）、越南语——覆盖东南亚核心六国和印度次大陆。以前做这些市场的 AI 产品，开源路线的多语言质量普遍差，只能走闭源 API 且数据出境。现在你可以自托管一个对 12 种语言都有原生训练支持的模型，做本地化 AI 产品时不必把用户数据发到境外，且质量更有保证。这对要出海或服务本地化市场的产品是硬价值。",
-            "evidence": "HuggingFace model card 语言标签：ar, de, en, es, fr, hi, id, it, pt, th, tl, vi（共 12 种）",
-            "confidence": "high（card 明示）"
-          },
-          {
-            "point": "开放权重可微调 → 把通用多模态能力迁移进你的垂直领域",
-            "forYou": "可以用你自己的领域数据（产品文档、客服对话、代码库、行业图片数据集）做监督微调（SFT）或偏好对齐（DPO），把这个通用多模态模型改造成「只懂你这个产品领域」的专属引擎。比如：微调成「理解你公司图纸 / 设计图稿」的工业视觉助手，或「只认你医院 CT 图像格式」的临床辅助工具。这是闭源 API 给不了的——闭源你微调不了，或者微调了数据就到厂商那边了。代价是：需要 GPU 微调基础设施（至少能跑起来模型）加上标注数据，不适合 0 到 1 阶段，更适合已验证方向后的产品深化。",
-            "evidence": "HuggingFace model card：license 标注为 Llama 4 Community License，允许微调；权重以 safetensors 格式开放下载",
-            "confidence": "high（license 事实明确）"
-          },
-          {
-            "point": "Llama 生态兼容：现有 Llama 工具链 / 推理框架直接接入",
-            "forYou": "Llama 4 兼容 HuggingFace Transformers、vLLM、SGLang、text-generation-inference 等主流推理框架。如果你团队已在用 Llama 3.x 或任何 HF 生态，迁移成本极低——换模型 ID，调显存配置，已有推理服务、prompt 模板、评估脚本基本复用。不需要重学工具链，工程风险低。",
-            "evidence": "HuggingFace model card 标签：transformers, text-generation-inference, endpoints_compatible；safetensors 格式权重",
-            "confidence": "high（来自 card 标签，为框架兼容性事实）"
-          }
-        ],
-        "benchmark": {
-          "headline": "多模态视觉基准（MMMU、DocVQA、MathVista）官方自报与 GPT-4o 持平或领先；但所有数字均为 Meta 自报，且 LMArena 测评版本与发布权重存在明确差异争议——选型务必以自己任务的实测为准",
-          "professorNote": "对你选型最重要的一件事：Llama 4 Maverick 的招牌战场是「开源多模态视觉」，下面的视觉类指标是它最有说服力的正面证据。代码生成和纯文本推理的官方对比数字我没有可靠来源，不在这里引用。更关键的一个背景：Meta 向 LMArena 提交的是一个与公开发布权重不同的「实验调优版」（Llama-4-Maverick-03-26-Experimental），被社区研究者核实后 LMArena 已重新标注——这导致 LMArena 历史排名显著高于开发者实际下载权重后的体感。请把这些官方数字当方向参考，用你自己的真实任务实测后再做选型决策。",
-          "charts": [
-            {
-              "title": "MMMU（多模态综合理解，看图答复杂问题）",
-              "metric": "准确率",
-              "unit": "%",
-              "higherIsBetter": true,
-              "sourceType": "official",
-              "maxValue": 100,
-              "bars": [
-                {
-                  "label": "Llama 4 Maverick",
-                  "display": "73.5",
-                  "value": 73.5,
-                  "highlight": true
-                },
-                {
-                  "label": "Gemini 2.0 Flash",
-                  "display": "71.9",
-                  "value": 71.9
-                },
-                {
-                  "label": "GPT-4o",
-                  "display": "69.1",
-                  "value": 69.1
-                }
-              ]
-            },
-            {
-              "title": "DocVQA（文档图片问答，发票 / 合同 / 表格截图）",
-              "metric": "ANLS",
-              "unit": "%",
-              "higherIsBetter": true,
-              "sourceType": "official",
-              "maxValue": 100,
-              "bars": [
-                {
-                  "label": "Llama 4 Maverick",
-                  "display": "94.4",
-                  "value": 94.4,
-                  "highlight": true
-                },
-                {
-                  "label": "Gemini 2.0 Flash",
-                  "display": "92.1",
-                  "value": 92.1
-                },
-                {
-                  "label": "GPT-4o",
-                  "display": "91.1",
-                  "value": 91.1
-                }
-              ]
-            },
-            {
-              "title": "MathVista（图文数学推理，图表读数 / 几何题）",
-              "metric": "准确率",
-              "unit": "%",
-              "higherIsBetter": true,
-              "sourceType": "official",
-              "maxValue": 100,
-              "bars": [
-                {
-                  "label": "Llama 4 Maverick",
-                  "display": "73.7",
-                  "value": 73.7,
-                  "highlight": true
-                },
-                {
-                  "label": "Gemini 2.0 Flash",
-                  "display": "73.1",
-                  "value": 73.1
-                },
-                {
-                  "label": "GPT-4o",
-                  "display": "63.8",
-                  "value": 63.8
-                }
-              ]
-            }
-          ],
-          "items": [
-            {
-              "label": "MMMU",
-              "score": "73.5",
-              "comparator": "GPT-4o 69.1 / Gemini 2.0 Flash 71.9",
-              "interpretation": "多模态综合理解能力（要求模型同时理解图片内容和复杂问题）——这个分数说明用它做图文问答、多模态知识库应用时，输出质量和闭源旗舰同一量级",
-              "sourceType": "official",
-              "attribution": "自报"
-            },
-            {
-              "label": "DocVQA",
-              "score": "94.4",
-              "comparator": "GPT-4o 91.1",
-              "interpretation": "文档图片问答（含打印体 / 手写体发票、合同、表格截图）—— 94 分以上在商业文档处理场景基本可用，对做企业文档 AI、财务自动化应用的你是最直接的正面证据",
-              "sourceType": "official",
-              "attribution": "自报"
-            },
-            {
-              "label": "MathVista",
-              "score": "73.7",
-              "comparator": "GPT-4o 63.8",
-              "interpretation": "含图数学推理（图表读数、几何题、数据可视化理解）——对做教育类或数据分析 AI 有参考价值；比 GPT-4o 高 10 分是显著差距",
-              "sourceType": "official",
-              "attribution": "自报"
-            }
-          ],
-          "caveats": [
-            "以上全部为 Meta 官方自报，来自 2025-04-05 发布公告；尚未经 OpenLLM Leaderboard 等独立第三方交叉核实。",
-            "⚠️ LMArena 争议（选型关键）：Meta 向 LMArena 提交的是内部实验调优版（Llama-4-Maverick-03-26-Experimental），与公开发布权重不同，被社区研究者核实后 LMArena 已重新标注。这意味着 LMArena 的历史排名（约全球前 5）反映的不是你实际能下载到的模型。以自己任务实测发布权重为准。",
-            "代码生成（LiveCodeBench 等）和纯文本推理（GPQA Diamond 等）的官方对比数字在本次核实中未找到可靠一手来源，不引用。这类任务与闭源旗舰的实际差距仍待独立评测确认。",
-            "总参数量 Meta 官方未明确披露；社区估算约 400B 级别（未核实）。硬件门槛评估基于 FP8 变体实际可用性和社区部署报告，非官方数字。"
-          ]
-        },
-        "openSourceMeaning": "Llama 4 Community License（Meta 定制许可证）：允许商业使用和微调，但有一条关键限制——月活用户超过 7 亿的平台必须单独向 Meta 申请许可。对绝大多数 AI 应用开发者完全不构成障碍；但若目标是把它嵌入一个已有超大量级用户的平台（如某个现有亿级用户产品），需要先核查完整条款。 硬件现实账：Maverick 的 MoE 架构在推理时只激活 17B 参数，计算效率接近 17B 级别；但你仍需把所有专家权重加载进显存或高速内存——这是 MoE 的固有代价，总存储开销比激活参数大得多（社区估算总参约 400B 级别，Meta 未官方确认）。官方提供 FP8 精度变体，是自部署的务实起点：社区报告约需 160–320GB 显存（2–4 台 A100-80GB），BF16 全精度需 8×A100 以上。个人单卡（24G/48G）跑不了 Maverick。Scout（16 个专家）权重更小，2–3 张 A100 跑 INT8 量化可行，但视觉质量和复杂推理弱于 Maverick，要事先权衡。 微调现实：LoRA / QLoRA 微调可行，但门槛是「先能跑起来」——至少需要 A100 级别 GPU 访问权（租云卡可行，消费级显卡不行）。微调换来的是把通用多模态能力迁移到你的垂直领域，在调用量足够大的前提下长期成本优于持续调用闭源 API。 数据主权核心价值：「必须数据不出境」的场景（医疗影像、金融客户文件、政务内网文档）——Llama 4 Maverick 目前是唯一能同时做到「旗舰级多模态 + 长上下文 + 数据不离开机房」的开源选项。这条护城河是闭源 API 结构性给不了的，是它真正的差异化所在。",
-        "whenToUse": "三支决策树，照着做： ① 直接值得自托管 / 微调——你有「图片或文档理解」核心需求 + 数据合规硬约束（不能上传给 OpenAI / Google），或调用量大到 API 费用不划算；团队有能力维护 GPU 推理服务（vLLM / SGLang）且能供得起 2 台以上 A100-80GB；且目标市场在 Llama 4 支持的 12 语言内。此时部署 FP8 版 Maverick 是目前开源多模态里最强的可商用选择，值得投入。 ② 先走托管 API 试水——你刚开始探索多模态或长上下文功能，量还不大，没有合规硬约束。可先通过 Groq、Together AI、Fireworks AI 等支持 Llama 4 的推理服务按量调用，在你自己的真实任务上验证质量（不要只看 LMArena 排名），确认方向再决定是否自建。 ③ 别用它——核心任务是纯文本代码生成或复杂推理（没有视觉需求）：DeepSeek V4 / Qwen3 等在这类任务上有更扎实的第三方实测数据，开源代码 / 推理能力更有保证；需要最强多模态体验且不在乎数据出境：GPT-4o / Gemini 1.5 Pro 的实际体感目前仍更稳定；团队没有 GPU 运维能力且调用量小：自部署 Maverick 是一笔真实工程债，初期 API 更省事。",
-        "cost_caveats": "硬件门槛：Maverick FP8 变体是自部署最低可行起点，社区报告约需 160–320GB 显存（2–4 台 A100-80GB 或同等 H100），BF16 全精度需 8×A100 以上，属于企业 GPU 集群级别。个人开发者短期内走托管 API（Groq / Together AI / Fireworks AI 均已支持）比自建划算得多。Scout（16E）作为轻量选项，2–3 张 A100 跑 INT8 可行，但要接受视觉质量和复杂推理低于 Maverick 的代价。 长上下文显存陷阱：1M token 上下文名义上支持，但 KV cache（存储上下文的显存缓冲区，随上下文长度线性增长）在接近满载时会极大拉高显存占用，实际可用并发大幅下降。商业部署前务必在你的硬件上做负载实测，不要只看上下文窗口数字规划容量。 Benchmark 可信度提醒：官方数字为自报，LMArena 数字来自与发布权重不同的实验版，开发者社区有明确记录。把这些数字当能力下限参考，用你自己任务实测后再做最终选型判断。",
-        "sources": [
-          {
-            "name": "HuggingFace · meta-llama/Llama-4-Maverick-17B-128E-Instruct（model card）",
-            "url": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct"
-          },
-          {
-            "name": "Meta Llama 4 官方发布公告（2025-04-05，benchmark 数据来源）",
-            "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/"
-          },
-          {
-            "name": "Llama 4 Community License Agreement",
-            "url": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct/blob/main/LICENSE"
-          }
-        ]
-      },
-      "paradigm": {
-        "tag": "[新模型 Tier0｜open]",
-        "branch": "new_model",
-        "access": "open",
-        "tier": 0,
-        "requiresHumanConfirmation": false,
-        "template": "new_model_card",
-        "card": {
-          "名称": "Llama 4 Maverick 17B 128E Instruct",
-          "厂商": "Meta",
-          "发布日": "2025-05-22",
-          "开放度标签": "有条件商用",
-          "类型": "基座/指令/多模态/推理",
-          "规模架构": "MoE 总参17B+激活参官方未披露；context window（上下文窗口）1M",
-          "关键benchmark": [
-            {
-              "名称": "MMMU",
-              "分数": "73.5",
-              "对手": "GPT-4o 69.1 / Gemini 2.0 Flash 71.9",
-              "标注": "自报",
-              "解读": "多模态综合理解能力（要求模型同时理解图片内容和复杂问题）——这个分数说明用它做图文问答、多模态知识库应用时，输出质量和闭源旗舰同一量级"
-            },
-            {
-              "名称": "DocVQA",
-              "分数": "94.4",
-              "对手": "GPT-4o 91.1",
-              "标注": "自报",
-              "解读": "文档图片问答（含打印体 / 手写体发票、合同、表格截图）—— 94 分以上在商业文档处理场景基本可用，对做企业文档 AI、财务自动化应用的你是最直接的正面证据"
-            },
-            {
-              "名称": "MathVista",
-              "分数": "73.7",
-              "对手": "GPT-4o 63.8",
-              "标注": "自报",
-              "解读": "含图数学推理（图表读数、几何题、数据可视化理解）——对做教育类或数据分析 AI 有参考价值；比 GPT-4o 高 10 分是显著差距"
-            },
-            {
-              "名称": "MMMU（多模态综合理解，看图答复杂问题）",
-              "分数": "Llama 4 Maverick 73.5 / Gemini 2.0 Flash 71.9 / GPT-4o 69.1",
-              "对手": "Gemini 2.0 Flash / GPT-4o",
-              "标注": "自报",
-              "解读": "准确率"
-            },
-            {
-              "名称": "DocVQA（文档图片问答，发票 / 合同 / 表格截图）",
-              "分数": "Llama 4 Maverick 94.4 / Gemini 2.0 Flash 92.1 / GPT-4o 91.1",
-              "对手": "Gemini 2.0 Flash / GPT-4o",
-              "标注": "自报",
-              "解读": "ANLS"
-            },
-            {
-              "名称": "MathVista（图文数学推理，图表读数 / 几何题）",
-              "分数": "Llama 4 Maverick 73.7 / Gemini 2.0 Flash 73.1 / GPT-4o 63.8",
-              "对手": "Gemini 2.0 Flash / GPT-4o",
-              "标注": "自报",
-              "解读": "准确率"
-            }
-          ],
-          "强弱一句": "开源界首个旗舰级原生多模态 MoE——你第一次能在自己的机器上跑一个会看图、能吃百万 token 的强模型，把以前只能锁定 GPT-4V 或 Gemini 才能做的视觉 AI 应用，带进了「数据不出境 + 成本可控」的射程。",
-          "一句话定位": "三支决策树，照着做： ① 直接值得自托管 / 微调——你有「图片或文档理解」核心需求 + 数据合规硬约束（不能上传给 OpenAI / Google），或调用量大到 API 费用不划算；团队有能力维护 GPU 推理服务（vLLM / SGLang）且能供得起 2 台以上 A100-80GB；且目标市场在 Llama 4 支持的 12 语言内。此时部署 FP8 版 Maverick 是目前开源多模态里最强的可商用选择，值得投入。 ② 先走托管 API 试水——你刚开始探索多模态或长上下文功能，量还不大，没有合规硬约束。可先通过 Groq、Together AI、Fireworks AI 等支持 Llama 4 的推理服务按量调用，在你自己的真实任务上验证质量（不要只看 LMArena 排名），确认方向再决定是否自建。 ③ 别用它——核心任务是纯文本代码生成或复杂推理（没有视觉需求）：DeepSeek V4 / Qwen3 等在这类任务上有更扎实的第三方实测数据，开源代码 / 推理能力更有保证；需要最强多模态体验且不在乎数据出境：GPT-4o / Gemini 1.5 Pro 的实际体感目前仍更稳定；团队没有 GPU 运维能力且调用量小：自部署 Maverick 是一笔真实工程债，初期 API 更省事。",
-          "术语注解": [
-            "MoE（混合专家模型）: 推理时只激活部分专家参数，用较少计算调用更大的总参数池。",
-            "reasoning（推理）: 模型进行多步分析、规划或验证的能力。",
-            "context window（上下文窗口）: 单次请求中模型能读取的输入和输出 token 总长度。"
-          ],
-          "许可证": {
-            "名称": "other",
-            "能否商用": "有条件商用，需核对许可证条款"
-          },
-          "自托管硬件": "A100-80GB），BF16 全精度需 8×A100 以上",
-          "可用变体": [
-            "Llama 4 Maverick 17B 128E Instruct",
-            "Llama 4 Maverick 17B 128E Instruct FP8",
-            "Llama 4 Scout 17B 16E Instruct",
-            "Llama 4 Maverick 17B 128E Instruct Original",
-            "Llama 4 Maverick 17B 128E",
-            "Llama 4 Scout 17B 16E"
-          ],
-          "base_model": "官方未披露"
         }
       }
     }
