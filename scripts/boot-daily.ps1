@@ -7,7 +7,12 @@
 #   RED LINE (no unreviewed auto-publish) holds: only ready_to_publish/grandfathered reach the index.
 #   The author/gate stage is BEST-EFFORT (non-fatal) so a failure never blocks the deterministic push.
 # Register: scripts\register-boot-daily.ps1   Logs: logs\boot-daily-<date>.log   Remove: schtasks /Delete /TN "AI-Brief Daily" /F
-$ErrorActionPreference = "Stop"
+# ROOT-CAUSE FIX (2026-06-09): was $ErrorActionPreference="Stop" — in PS 5.1, `native 2>&1 | Tee`
+# wraps every child stderr line in an ErrorRecord, and EAP=Stop turns the FIRST one into a terminating
+# error. 2026-06-09 boot died at 09:15 on a benign news-script retry notice ("transient fetch rss
+# openai ... retry 1/3"). Continue + explicit $LASTEXITCODE checks below = real failures still stop,
+# stderr chatter doesn't.
+$ErrorActionPreference = "Continue"
 $proj = "C:\Users\Ykw18\OneDrive\Desktop\Study\Project\AI-Brief v2"
 Set-Location $proj
 $today = Get-Date -Format "yyyy-MM-dd"
@@ -21,6 +26,7 @@ function Log($m) { $line = "$(Get-Date -Format HH:mm:ss) $m"; Write-Output $line
 Log "=== AI-Brief daily boot (deterministic) $today ==="
 try {
   Log "git pull..."; git pull --rebase --autostash 2>&1 | Tee-Object -FilePath $log -Append
+  if ($LASTEXITCODE -ne 0) { throw "git pull failed (exit $LASTEXITCODE)" }
 
   # last30days community-signal discovery sub-layer for the news column (Reddit/HN/Polymarket/GitHub,
   # deterministic/headless, zero keys). Supplements official-blog RSS — which can underperform on a
@@ -36,6 +42,7 @@ try {
 
   Log "deterministic daily (npm run daily: news / papers-curation / projects / models + build-index)..."
   npm run daily 2>&1 | Tee-Object -FilePath $log -Append
+  if ($LASTEXITCODE -ne 0) { throw "npm run daily failed (exit $LASTEXITCODE)" }
 
   # --- full-auto deep-read + cold-audit gate (best-effort; never blocks the deterministic push) ---
   # New reads are authored as needs_human, then the cross-model gate flips PASS->ready_to_publish
@@ -84,6 +91,7 @@ try {
   if (git status --porcelain) {
     git commit -m "chore(daily): boot deterministic refresh $today" 2>&1 | Tee-Object -FilePath $log -Append
     git push origin feat/nextjs-migration:main 2>&1 | Tee-Object -FilePath $log -Append
+    if ($LASTEXITCODE -ne 0) { throw "git push to main failed (exit $LASTEXITCODE)" }
     git push origin feat/nextjs-migration 2>&1 | Tee-Object -FilePath $log -Append
     Log "pushed -> Vercel production updates"
   } else { Log "no data changes, nothing to push" }

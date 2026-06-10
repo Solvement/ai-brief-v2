@@ -119,6 +119,9 @@ export async function loadArtifact(contentDir, deps = {}) {
 export function buildPrompt(paper = {}, ctx = {}, opts = {}) {
   const { round = 1, fixes = [], prevArtifact = null } = ctx;
   const goldSampleDir = opts.goldSampleDir || GOLD_SAMPLE_DIR;
+  // Canonical paradigm = single source of truth (docs/paradigms/papers.md). The run-shell spec
+  // defers to it; pass both so the author reads the canonical, not a drifted copy.
+  const canonicalParadigm = opts.canonicalParadigm || "docs/paradigms/papers.md";
   const paradigmSpec = opts.paradigmSpec || "docs/superpowers/specs/daily-deepread-prompt.md";
   const id = paper.arxivId || paper.arxiv_id || paper.id || "?";
   const contentDir = paper.contentDir || `content/papers/${id}-<slug>`;
@@ -132,7 +135,8 @@ export function buildPrompt(paper = {}, ctx = {}, opts = {}) {
 - 不编造:数字/结论来自全文;不确定标「以原文表为准」或「数据不足 / 原文未披露」。自报(README/作者自称) vs 实测要分。
 - 全中文(代码/数字/专有名词/英文术语保留);术语第一次出现用大白话解释机制。
 - 架构图用 Mermaid 围栏;代码围栏配平。
-- 范式严格按 ${paradigmSpec};金样参照 ${goldSampleDir}/(忠实满分)。
+- 范式唯一真相 = ${canonicalParadigm}(canonical;含密度分区、立场段、技术细节(选读)、解法是怎么找到的(选读)、后续演化、防张冠李戴、解法发现不准反推);运行壳见 ${paradigmSpec};两者冲突以 canonical 为准。
+- 金样参照 ${goldSampleDir}/(忠实满分),但金样早于范式新增节(立场/技术细节/解法发现) → **结构以 canonical 范式为准,不照抄金样的章节集合**。
 
 论文:
 - arxiv_id: ${id}
@@ -279,6 +283,10 @@ export function buildStageBPrompt(artifact, source = {}, stageA = {}, ctx = {}) 
 # 「透彻」= 这 5 条全部「无重大缺口」(反向定义)
 1. retellable(可复述):盲读能正确复述 问题/机制/证据。任一错或跟不上 = 重大。
 2. faithful(忠实):无原文不支持的话;自报 vs 实测分清;无编造数字。任一编造 = 重大。
+   **额外查 3 类范式漂移幻觉(任一坐实 = faithful 重大):**
+   (a) **解法发现反推**:若有「解法是怎么找到的(选读)」节,每句必须锚原文 §/段;原文无解法发现叙事却凭 abstract 编了「先试 X 失败→改 Y」的动机链 = 编造。综述/benchmark 类出现此节即可疑。
+   (b) **后续演化未核实**:「后续演化」里引用的前向 arXiv ID 若不可解析、或无「置信度:高/中/低」标注却当既定事实 = 忠实失败。
+   (c) **张冠李戴**:把某机制/RL 用法/首创权错安到本论文(或本论文错安给他人)且无原文出处 = 重大。
 3. mechanism(机制可懂):用具体例子/类比讲到「为什么成立」,非翻译机。核心机制只报名词没解释 = 重大。
 4. concrete(具体):真实 config/代码/数字来自原文;原文有而分析停在类目层 = 重大。
 5. judgment(对建造者的判断):解锁了什么 + 诚实弱点(成本/评测偏置/成熟度);纯描述零判断 = 重大。

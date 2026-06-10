@@ -22,7 +22,6 @@
 ## 产品形态（2026-05-31 Kevin 定，再次推翻 GPT 决策稿）
 
 学术论文栏目 = **精读伴读 / 论文解读**,核心体验是「**先让我自己想,再看 AI 的**」。不是"研究决策工作台"。
-
 - **学术论文只有一档:deep dive**。没有 light/速览。
 - **没有"读不读"的决策层**:值不值得深读的判断**前移到选题闸门**,机器筛选时已替 Kevin 判断过——能进详情页的就是值得的。所以详情页**不含任何"判断要不要读"的东西**。
   - **删除**:Verdict / decision card / readDecision / fdeFit / 一句话判断 / whyNow / whyNotOverclaim / readFor / doNotUseFor。

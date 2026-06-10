@@ -20,7 +20,7 @@ $tDaily = New-ScheduledTaskTrigger -Daily -At 9:00am
 
 $settings = New-ScheduledTaskSettingsSet `
   -StartWhenAvailable `
-  -ExecutionTimeLimit (New-TimeSpan -Hours 2) `
+  -ExecutionTimeLimit (New-TimeSpan -Hours 4) `
   -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 10) `
   -MultipleInstances IgnoreNew
 

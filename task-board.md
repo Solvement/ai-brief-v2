@@ -70,5 +70,10 @@
 ## 已交付
 （迁移自 docs/plans 历史：Plan-1/2 多批 P0/P1 已上线——详见 [docs/plans/README.md](./docs/plans/README.md)。本表从 2026-06-09 起接管态势记录。）
 
+### DAILY-0609 · 2026-06-09 日常更新（重跑中）
+- 今晨 09:15 boot **挂在新闻第一步**：根因=PS5.1 `$EAP=Stop` + `native 2>&1|Tee` 把子进程 stderr 的瞬时重试日志（openai RSS retry 1/3）误判为致命错误 → 整管线死、无 marker。**根因已修**（boot-daily.ps1: EAP=Continue + git pull/npm daily/push 显式 `$LASTEXITCODE` 检查——真失败仍停，stderr 噪声不再炸）。此事故=PIPE-1(LangGraph) 论据 +1。
+- 21:5x 修复后重跑中（后台）。跑完接 **KG-2 增量入图首跑**：今日新深读 → facet 蒸馏 → 判边 → 冷审 → mind palace。
+- Loop Contract Gate（loop-engineering 协议 v2 机器硬门）今晚已实装并实弹验证（armed 时 npm 被拒/契约齐开闸/管线 LOOP_GATE=off 旁路）。
+
 ## 阻塞 / 等人
 - codex 额度：2026-06-08 晚耗尽，深读/管线改用 opus 子 agent 顶（见 memory feedback-subagent-fallback-and-durable）。

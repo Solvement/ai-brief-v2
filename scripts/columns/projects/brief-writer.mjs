@@ -819,8 +819,26 @@ function normalizeTierTemplate(input, { repo = {}, triage = {}, lightSpine = nul
     essential_design_difference: cleanString(input.essential_design_difference || input.essentialDesignDifference || reusableBody || ""),
     practitioner_meaning: cleanString(input.practitioner_meaning || input.practitionerMeaning || judgmentBody || ""),
     cross_links: normalizeStringArray(input.cross_links || input.crossLinks),
+    core_concepts: normalizeCoreConcepts(input.core_concepts || input.coreConcepts),
     prose_body: cleanString(input.prose_body || input.proseBody || ""),
   });
+}
+
+// KG-2 标准件:Tier 3 承重概念 {name, role, evidence},是 paper↔project 判边的项目侧锚。
+// 保留原始结构(不压成字符串),空则不写入(compactObject 会丢弃空数组)。
+function normalizeCoreConcepts(input) {
+  const concepts = asArray(input)
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const name = cleanString(entry.name || entry.concept || "");
+      const role = cleanString(entry.role).toLowerCase() === "primary" ? "primary" : "supporting";
+      const evidence = cleanString(entry.evidence || entry.why || "");
+      if (!name || !evidence) return null;
+      return { name, role, evidence };
+    })
+    .filter(Boolean)
+    .slice(0, 5);
+  return concepts.length ? concepts : undefined;
 }
 
 function tierTemplateFromLightSpine(lightSpine, input = {}) {

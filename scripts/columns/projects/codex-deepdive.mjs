@@ -693,6 +693,9 @@ Return only a JSON object matching this schema shape:
     "comparison": {"body_md": "..."},
     "dependency_platform_risk": {"body_md": "...", "items": [{"dependency": "...", "what_if_change": "...", "exposure": "high|medium|low|unknown", "mitigation_or_unknown": "...", "source": "..."}]},
     "unknowns_to_confirm": {"body_md": "...", "items": ["..."]},
+    "core_concepts": [
+      {"name": "规范概念名(中文优先,跨文件统一锚)", "role": "primary|supporting", "evidence": "为什么承重:逐字引用 README/源码/文档原词 + 文件/章节锚(来源：...);拿掉它该项目的核心范式不成立。营销词不算承重概念。"}
+    ],
     "judgment": {"action": "skip|watch|read-docs|clone-and-run|extract-pattern", "ratings": {"相关度": 1, "工程深度": 1, "复用价值": 1, "成熟度": 1}, "body_md": "..."}
   },
   "concepts": [
@@ -706,6 +709,7 @@ Concreteness contract:
 - "how_it_works" must walk a real flow with a real example from the repo. Include actual config/code/commands/file paths where present, such as a policy rule text, a function call, a CLI command, a deny/allow path, or a package/module path. A sentence like "it uses a policy engine to intercept tools" fails unless it shows the concrete mechanism and example.
 - "comparison" is required for Tier 3 horizontal judgment. Name at least 2 concrete alternatives, predecessors, or common practices, not vague labels like "similar systems". For each, state a real difference dimension (retrieval mechanism, integration path, self-hosting, license, maturity, workflow fit, or equivalent) and the tradeoff for building AI applications: when to pick this project, and when to pick the alternative. If a competitor capability is only vendor/project claimed or not independently verified, mark it as self-claimed/unverified. If you cannot find a directly comparable alternative, write "未找到直接可比同类" and describe the searched scope; do not invent competitors or numbers.
 - "key_claims_evidence.items" must make each claim concrete: state the literal mechanism, number, config, path, command, or example that supports it. Do not write abstract claims like "provides governance capabilities" unless you also quote what it literally does and where.
+- "tier_template.core_concepts" is a required Tier 3 standard piece (KG-2 paradigm): emit 3-5 LOAD-BEARING concepts, each {name, role: primary|supporting, evidence}. A concept is load-bearing only if removing it makes the project's core paradigm collapse; marketing words, generic buzzwords (e.g. "AI", "fast", "easy"), and undocumented features are NOT concepts. Each concept MUST appear in the actual README/source/docs (not invented) and its evidence MUST quote the source wording verbatim plus a file/section anchor (来源：...). Use a stable canonical name (中文优先) so the same concept matches across files — these feed the Mind Palace core-concept gate and are the project-side anchor for paper↔project edge judging. If you cannot find 3 genuinely load-bearing documented concepts, emit fewer rather than padding.
 - Actively pull real snippets, config keys, commands, numbers, module names, and file paths from README plus source/docs/examples/config/tests. The result should read like someone inspected the code, not someone skimmed the README.
 - Standard: "more useful than a full translation." Preserve the concrete details a raw translation would carry, then organize and judge them. Any section that contains only a framework/category with no concrete example, number, snippet, command, or path is a failure.
 - If a section fails that concreteness standard, add a top-level "render_warnings" array explaining which section is too abstract and why.
