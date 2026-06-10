@@ -14,6 +14,28 @@
 
 ## 进行中
 
+### DAILY-0610 · 2026-06-10 每日链 + 冷审硬化 + KG-2 增量入图（本日态势汇总）
+- **发布**：GrepSeek 2605.29307 冷审 1 轮 PASS 已发布；LatentSkill 2606.06087 晚间批次 1 轮 PASS（待批次收尾 build-index 发布）。
+- **质量门实战**：FlashMemory 2606.09079 三轮 **HOLD**（显存数字与原文 Table 1 矛盾 + 反直觉头条缺机制解释）——门真拦了坏深读，未发布已告警；待路由 codex 按 diagnosis 修订后重审。
+- **两个管线 bug 根治**（含回归测试，52/52 绿）：① 批次内一篇 crash 不再杀全批（audit_error 隔离，545e422）；② audit_error 不再被收尾错写成终态 hold 埋掉论文（5817d3d，已修复被埋的 05563/05622，dry-run 确认重新进候选）。
+- **配额实证**：claude -p 与交互会话共享订阅 5h 时段窗（429 session limit）→ 重批量任务排交互不活跃时段（boot 09:00 合适）；memory 已记。
+- **KG-2 增量**：grepseek + latentskill facet v2 入图（14 facets，validator OK，recall@3=1.0，判边 NO_EDGE×10 全记录在 facet 注释）。
+- **待办**：SpatialWorld 2606.09669 批次审理中；05563/05622 明日 09:00 自动重审；FlashMemory 修订路由；main 推送待 Kevin。
+
+### PAPER-2606.09079 · FlashMemory-DeepSeek-V4 深读第 1 轮（plan `docs/plans/2026-06-10-flashmemory-deepread-round1.md`）
+- **大方向**：按 canonical 论文范式把 FlashMemory-DeepSeek-V4 写成 AI-Brief 可收录的深读资产，重点沉淀 Lookahead Sparse Attention、KV cache 预测式预取、解耦训练与 oracle 诊断对 agent 记忆/长上下文工程的迁移价值。
+- **小方向**：读 arXiv HTML/PDF/TeX 全文 + HF paper/model 页面 + clone `libertywing/FlashMemory-Deepseek-V4` 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09079.yaml`；修正原表内存数字、15 位作者列表、仓库 release 范围，区分论文自报 / HF&GitHub 动态核验 / 仓库实读。
+- **阶段**：✅ 开发完成 + 机器门禁通过。
+- **阻塞**：无机器阻塞；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
+- **交付结论**：已写入四个目标文件；`node scripts/columns/papers/build-index.mjs`、`node scripts/validate-papers-deepread.mjs`、`npm run verify` 全绿。验证仅余既有 lint/build warning 与人工冷审待执行，不自审、不自动发布。
+
+### PAPER-2606.06087 · LatentSkill 深读从头写（plan `docs/plans/2026-06-10-latentskill-deepread-round1.md`）
+- **大方向**：按 canonical 论文范式把 LatentSkill 写成 AI-Brief 可收录的深读资产，重点沉淀“agent textual skill 从 prompt/context 搬到 LoRA weight space”的工程价值与限制。
+- **小方向**：读 arXiv HTML/PDF/TeX 全文 + HF 页面 + clone `yuaofan0-oss/LatentSkill`；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.06087.yaml`；区分论文自报、HF 页面、仓库实读。
+- **阶段**：✅ 开发完成 + 机器门禁通过。
+- **阻塞**：无机器阻塞；官方 GitHub 当前仅 README + 图片，Code/Data/Checkpoints 仍 Coming soon，已在内容中诚实标注；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
+- **交付结论**：已写入 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.06087.yaml`；`node scripts/columns/papers/build-index.mjs`、`node scripts/validate-papers-deepread.mjs`、`npm run verify` 全绿。验证仅余既有 lint/build warning 与人工冷审待执行，不自审、不自动发布。
+
 ### PAPER-2606.05622 · AdaPlanBench 深读从头重写（plan `docs/plans/2026-06-10-adaplanbench-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 AdaPlanBench 写成可进入 AI-Brief 知识库的深读资产，重点沉淀 hidden world/user constraints、progressive disclosure、adaptive replanning eval 对 agent 产品与自进化验收的价值。
 - **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + clone `JiayuJeff/AdaPlanBench` 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05622.yaml`；数字集中在实验节并区分论文自报/仓库实读/原文未披露。

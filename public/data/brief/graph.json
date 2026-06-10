@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T22:15:02.325Z",
+  "generatedAt": "2026-06-10T22:53:03.103Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -6741,7 +6741,52 @@
       ],
       "file": "content/papers/2606.06087-latentskill-weight-space-skills/metadata.json",
       "arxiv_id": "2606.06087",
-      "topic": "agent"
+      "topic": "agent",
+      "facets": {
+        "problem_solved": "agent 的技能文档每步决策都塞 prompt：同一份说明反复进上下文（涨 prefill token）、技能明文和外部观察挤同一个 instruction channel（提示注入更容易干扰）、直接微调进 backbone 又不可单独更新/卸载/组合。 核心问题：能不能让技能像插件一样存在于权重空间，同时保留 prompt skill 的可替换性？\n",
+        "method": "把技能文档从「便利贴」变成「可插拔刀头」：训练一个 skill compiler（hypernetwork），读技能文本 s 一次前向吐出 LoRA 补丁 Δs=Gφ(s)；backbone 冻住，执行时 θ⊕αΔs，技能原文不再进 prompt。两阶段训练：先在 171K GitHub 技能文档上预训练（重建/补全），再用 (技能文档+teacher 轨迹) 做 SFT——同一个 adapter 挂整条轨迹，学跨多步稳定 的行为偏置。推理时技能库预编译成 adapter cache，selector 选技能挂载，α 当强度旋钮；多技能组合先拆成 general/task-specific/mistakes 语义组件分别编译再相加，不直接整 LoRA 相加。\n",
+        "result": "[自报·论文表格，未第三方复现，仓库无代码] Qwen3-8B backbone：ALFWorld seen 74.3 vs in-context skill 52.9 （+21.4），unseen 69.4 vs 56.0，prefill token/step 1.21k→0.44k；Search-QA 平均 EM 35.6 最高（RAG 34.4 / in-context 32.6），cost/step 0.31k vs in-context 1.10k——但非全胜：NQ 输 RAG（36.2 vs 39.0）、Bamboogle 输 in-context（25.6 vs 38.4）。α 倒 U 曲线：seen 峰值 α=0.6（74.29%），α=1.2 崩到 22.86%。组合：Component Merging unseen 77.8% > Direct/Text Merging 都 61.1%。Hijack 攻击下 in-context 52.9→8.57，Latent 仍 38.6。\n",
+        "innovation": "同赛道：prompt skill（SOP 文本、每步检索拼接）和 SKILL0 式不可逆内化（训练时撤掉 skill context 融进 backbone）。 LatentSkill 的新点：① 技能承载介质从 context space 推到 weight space，但保留模块化接口（可缓存/卸载/替换/缩放）； ② 两阶段 compiler 训练分工明确——文档预训练管「懂技能文本」，轨迹 SFT 管「变成稳定行为」；③ α 连续强度控制 而非有/无开关；④ 发现完整 LoRA 直接相加会重复放大共享组件、文本拼接是 hypernetwork 的 OOD 输入，给出组件级 组合原则；⑤ 用 MDS/低秩分析（stable rank ~2.2 vs 随机 837.87）证明生成的权重补丁有可解释结构非黑箱噪声。\n",
+        "weakness": "[仓库不可复现] 官方 repo 只有 README+图片，Code/Data/Checkpoints 全 Coming soon，数字全为自报。 评测域窄（只 ALFWorld+Search-QA）；backbone/LoRA 配置固定 Qwen3-8B，换家族/规模未知。训练贵：171K 文档、 300M tokens、8×H100 两阶段——只适合高复用技能，不适合一次性指令。技能选择理想化（按类别直接匹配，真实 selector 会犯错）。组合结论窄：只在 Look+Pick 一对互补技能上展示且需人工组件对齐。「不暴露明文」≠安全： adapter 仍可携带敏感行为、可被恶意 skill 文档或装载接口攻击。统一 α 在 unseen 上比各自最优低至 21.74 点。\n",
+        "transfer": "对 AI-Brief 北极星（L1 自进化）的关键启发：长期复用的知识不一定永远以文本形式检索进 context——高频技能可以 「编译」而非「检索」。本站对应物：深读范式、判边 rubric、冷审 prompt 这些每天重复进 context 的「技能文本」， 在未来有自有模型/可训练层时是编译候选。眼下可借的设计模式：① 技能强度应该是连续旋钮不是开关（α 思路适用于 prompt 权重/指令优先级）；② 组合可复用单元时先拆语义组件再合并，整块叠加会重复放大共享部分——这条对我们 拼接多个范式 prompt 时同样成立（共享的 house rules 不要在多个范式里重复注入）。\n",
+        "architecture": "```mermaid\nflowchart TD\n  S[技能文档 s<br/>策略·工具模式·恢复规则] --> G[Skill compiler G_phi<br/>hypernetwork]\n  subgraph Train[两阶段训练]\n    P[文档预训练<br/>重建/补全 171K GitHub docs] --> F[轨迹 SFT<br/>skill+teacher trajectory 整条挂载]\n  end\n  Train --> G\n  G --> L[生成 LoRA 补丁 Delta_s]\n  L --> C[Adapter cache<br/>编译一次反复用]\n  C --> M[Frozen backbone<br/>theta + alpha*Delta_s]\n  H[任务历史 h_t 不含技能原文] --> M\n  M --> Y[agent 动作/答案]\n  C --> A[alpha 强度旋钮<br/>倒U曲线 峰值~0.5-0.6]\n  C --> K[组件级组合<br/>拆 general/task/mistakes 再相加]\n```\n"
+      },
+      "self_evo_use": "方法论能用，系统不能用（源码未放）。给自进化的承重原则：「技能的承载介质是设计变量」——context 检索、权重编译、 不可逆内化是一条光谱，按复用频率和更新需求选位置。本站当下全在 context 端（范式 prompt/skills 文件），这是对的 （无自有可训练模型），但 facet/语料设计应保持「可编译性」：结构化、组件化（general vs task-specific 分开）， 未来介质迁移时不用重写。α 倒 U 和组件级组合是两条今天就能用的工程直觉。\n",
+      "core_concepts": [
+        {
+          "name": "技能编译器（skill compiler / hypernetwork 生成 LoRA）",
+          "role": "primary",
+          "evidence": "训练一个 skill compiler：它读入技能文档 s，输出一组 LoRA 更新 Δs = Gφ(s)……它不是每个技能单独训练一次 LoRA，而是一次前向生成"
+        },
+        {
+          "name": "权重空间技能（latent skill）",
+          "role": "primary",
+          "evidence": "同一份技能不再以可读文本出现，而是被 skill compiler 编成 LoRA 权重补丁；执行时模型看不到技能文档，只感受到这块权重对行为的偏置"
+        },
+        {
+          "name": "组件级技能组合（component-level LoRA arithmetic）",
+          "role": "primary",
+          "evidence": "完整 LoRA 直接相加会重复放大共享行为……更推荐把技能拆成 general / task-specific / mistakes 等语义组件，分别编译后再组合……Component Merging unseen 77.8% > Direct/Text Merging 61.1%"
+        },
+        {
+          "name": "注入系数 α（技能强度旋钮）",
+          "role": "supporting",
+          "evidence": "α 太小技能没激活，α 太大又会压坏 backbone 原能力……seen 平均峰值在 α=0.6，α=1.2 在两个 split 都明显崩"
+        },
+        {
+          "name": "两阶段编译器训练（文档预训练+轨迹 SFT）",
+          "role": "supporting",
+          "evidence": "预训练任务有两类：重建完整技能文档、从截断前缀补全文档……SFT 阶段同一个 skill LoRA 挂完整条轨迹，让它学到跨多步稳定生效的行为偏置"
+        }
+      ],
+      "discovery_trace": {
+        "hypothesis": "两个技能各自编译成 LoRA 后，直接把完整权重相加（或把两份技能文本拼接再编译）就能得到组合技能。",
+        "failed_attempts": "论文实测两条直觉路线都失败：Direct Merging（完整 LoRA 相加）unseen 只 61.1% 且丢掉 Look-Only 原本成功的样本—— Appendix H Case 2 显示模型能识别 keychain 却不触发 pick-up，归因于 Look/Pick 共享 general/mistakes 组件被重复 放大，扰乱 perception-to-action 阈值；Text Merging（文本拼接再编译）同样 61.1%——拼接文本超出 hypernetwork 训练分布（OOD），能执行单个动作但无法形成连贯序列。由此走到组件级方案：先拆语义组件分别编译再组合 （unseen 77.8% > 61.1%）。\n",
+        "source_span": "paper.mdx「为什么完整 LoRA 不能直接相加」节：「Direct Merging 能识别 keychain，却不触发 pick-up……共享权重重复放大」；§4.5 Table 3 组合实验数字；Appendix H Case 2/ep4/ep6/ep36"
+      },
+      "facet_slug": "latentskill",
+      "facet_status": "extracted",
+      "href": "/papers/2606.06087-latentskill-weight-space-skills"
     },
     {
       "id": "paper:2606.06492",
@@ -31414,7 +31459,7 @@
     "associativeEdges": 24,
     "crossDocEdges": 41,
     "ghosts": 21,
-    "assessed": 37,
-    "facetedNodes": 13
+    "assessed": 38,
+    "facetedNodes": 14
   }
 }
