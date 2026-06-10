@@ -1,0 +1,76 @@
+{
+  "paper_id": "2606.05563",
+  "arxiv_id": "2606.05563",
+  "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
+  "authors": [
+    "Taewon Yun",
+    "Hyeonseong Park",
+    "Jeonghwan Choi",
+    "Hayoon Park",
+    "Yeeun Choi",
+    "Hwanjun Song"
+  ],
+  "date": "2026-06-04",
+  "huggingface_url": "https://huggingface.co/papers/2606.05563",
+  "paper_url": "https://arxiv.org/abs/2606.05563",
+  "code_url": "",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "project_url": "https://disl-lab.github.io/SoCRATES/",
+  "source_rankings": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.05563.yaml",
+  "first_seen_date": "2026-06-08",
+  "must_read": false,
+  "track": "hf",
+  "topic": "eval",
+  "agent_relevant": true,
+  "tags": [
+    "benchmark",
+    "llm-as-judge",
+    "judge-calibration",
+    "topic-localized-evaluation",
+    "counterfactual-baseline",
+    "hard-task-filtering",
+    "proactive-agents",
+    "mediation",
+    "social-cognition",
+    "multi-agent-simulation"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 7,
+    "system_design_value": 8,
+    "career_value": 8,
+    "autosci_reuse_value": 8,
+    "buildability": 7,
+    "evaluation_value": 9,
+    "breadth_value": 8,
+    "evidence_quality": 7
+  },
+  "one_sentence_judgment": "SoCRATES 的核心价值不是证明某个 LLM 会不会调解，而是给开放式多轮干预任务提供一套可迁移的评测工序：agentic 场景策展 + 无调解模拟筛硬题 + 5 根社会认知轴独立扰动 + topic-localized evaluator + 反事实 consensus gain；最硬证据是裁判与专家 trajectory-level Pearson r=0.823，显著高于 ProMediate per-turn judge 的 0.372，并在 4,800 个 mediator runs 上显示最强 GPT-5.4-mini 也只达到 34.4 consensus gain。限制也明确：代码/数据 Coming soon、全 LLM 仿真非真人田野、DeepSeek-V3.2 同时做 party simulator/evaluator/被测 mediator、被测闭源模型是 mini/Flash-Lite 档，且全部对话为英语。",
+  "cold_audit": {
+    "status": "hold",
+    "rounds": 0,
+    "audited_at": "2026-06-10T15:05:41.633Z",
+    "auditor": "claude-cold-audit",
+    "author": "codex-gpt-5.5-high",
+    "final_verdict": null,
+    "major_gaps": [],
+    "arxiv_citation_audit": {
+      "checkedCount": 0,
+      "checked": [],
+      "unresolved": [],
+      "downgradeLabel": "推断/待核"
+    },
+    "unresolved_arxiv_references": []
+  }
+}

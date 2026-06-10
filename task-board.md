@@ -14,6 +14,27 @@
 
 ## 进行中
 
+### PAPER-2606.05622 · AdaPlanBench 深读从头重写（plan `docs/plans/2026-06-10-adaplanbench-deepread-round1.md`）
+- **大方向**：按 canonical 论文范式把 AdaPlanBench 写成可进入 AI-Brief 知识库的深读资产，重点沉淀 hidden world/user constraints、progressive disclosure、adaptive replanning eval 对 agent 产品与自进化验收的价值。
+- **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + clone `JiayuJeff/AdaPlanBench` 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05622.yaml`；数字集中在实验节并区分论文自报/仓库实读/原文未披露。
+- **阶段**：✅ 开发完成 + 机器门禁通过。
+- **阻塞**：无；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
+- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.05622.yaml`；`build-index`、`validate-papers-deepread`、`npm run verify` 全绿。验证仅余既有 lint/build warning 与人工冷审待执行，不自审、不自动发布。
+
+### PAPER-2606.05563 · SoCRATES 深读从头重写（plan `docs/plans/2026-06-10-socrates-deepread-round1.md`）
+- **大方向**：按 canonical 论文范式把 SoCRATES 写成可进入 AI-Brief 知识库的深读资产，重点沉淀 topic-localized LLM judge、hard-task gate、counterfactual baseline 对 agent eval / 冷审门的可迁移价值。
+- **小方向**：读 arXiv HTML/PDF/HF/项目页全文与附录；确认代码/数据项目页仍为 Coming soon；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05563.yaml`；数字集中在实验节并标论文自报。
+- **阶段**：✅ 开发完成 + 机器门禁通过。
+- **阻塞**：无；独立冷审未在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
+- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.05563.yaml`；`build-index`、`validate-papers-deepread`、`npm run verify` 全绿。验证过程遇到 OneDrive `.next` 缓存 EPERM，清理构建缓存后通过；冷审仍为 `needs_human`，不自动发布。
+
+### PAPER-2605.29307 · GrepSeek 深读从头重写（plan `docs/plans/2026-06-10-grepseek-deepread.md`）
+- **大方向**：按 canonical 论文范式把 GrepSeek 写成可进入 AI-Brief 知识库的深读资产，重点沉淀 Direct Corpus Interaction 对 agent/RAG 工程的可迁移价值。
+- **小方向**：读 arXiv HTML/PDF/TeX 全文 + HF 页面 + clone 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2605.29307.yaml`；数字集中在实验节并区分论文自报/源码实读。
+- **阶段**：✅ 开发完成 + 机器门禁通过。
+- **阻塞**：无机器阻塞；独立冷审未在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`，不自动发布。
+- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2605.29307.yaml`；`build-index`、`validate-papers-deepread`、`npm run verify` 全绿。验证过程中发现既有 `public/data/models.json` 连续问号编码风险，已做最小占位修复后通过。
+
 ### KG-2 · 知识关联层全语料化 + 自进化反哺 + 综合栏（plan `docs/plans/KG-2-association-layer.md`）
 - **大方向**：北极星 L1/L3——关联层覆盖全语料且**被机器真用**（gap-map 反哺选稿=自进化；跨记忆综合产 derived 节点=auto-research 种子）。Kevin 2026-06-09 loop 7 格确认（回填部分+增量、paper↔project 词表+核心概念门、竞赛+批判 agent、综合=单独栏、增量入图长在 PIPE-1、授权批判性改现有结构/范式）。
 - **与 AM 的关系**：吸收 AM Wave 2-4 的「沉淀管线」决策——增量入图=PIPE-1 LangGraph 节点（不塞 boot .mjs），落地前用幂等回填脚本；判边候选召回用 AM Wave 1 竞赛胜出的 **hybrid(BM25+向量+RRF)**，非纯向量。原 🔴「动上游管线」由此解除（不动现 boot 管线）。

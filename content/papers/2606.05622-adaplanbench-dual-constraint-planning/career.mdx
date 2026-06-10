@@ -1,0 +1,74 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你以后做的 agent 很可能不是“回答一次就结束”，而是要在用户反馈、环境限制、业务规则里来回改方案。AdaPlanBench 的价值就是提醒你：**agent 失败不只是不听话，也可能是很听话但没用**。它把这个差别用 Acc. 和 VPR 拆开了。
+
+> [!key] 和我们自己的系统直接相关
+> AI-Brief 的深读/冷审门也有类似问题：格式 lint 过了，不代表内容有效；记住上一轮冷审意见，不代表修订后没有破坏已过项。AdaPlanBench 给我们的工程提醒是：任何自进化/多轮修订系统都要同时量化**规则合规**、**结果质量**、**重复违规**和**修新坏旧**。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 交互式 eval harness | 把一次性测试改成“模型输出 -> 环境反馈 -> 模型修订”的闭环 | 给一个 RAG/agent 任务藏 5 条规则，只在违反时披露，统计几轮收敛 |
+| 双门评估 | 分开记录合规率(VPR)和真实成功率(Acc.) | 做一个表：格式/约束 pass、内容质量 pass、两者同时 pass |
+| 约束状态管理 | 已披露约束要结构化保存，不只塞进自然语言历史 | 实现 `ConstraintTracker`：new/repeated/disclosed 三种状态 |
+| 早停设计 | 什么时候判 agent 原地打转，停止烧预算 | 用 “连续 N 轮无新信息增量” 作为 stop rule，和最大轮数分开 |
+| LLM-as-judge 校准 | 评测可以用 LLM judge，但要人类抽验、阈值 ablation、换裁判家族 | 抽 30 条样本做人类多数票，对比 exact match / within-one-error |
+| 失败模式诊断 | 不只看总分，拆 VPR/Acc/AWRV/AURV/ATWC/ATUC | 画出“守规矩但没用”“忘旧约束”“修新坏旧”三类指纹 |
+
+## 系统设计心法
+
+- **合规 >? 成功：必须分开记**。一个 agent 可以完全不违反已知约束，但最终方案不可执行。不要用单一 pass/fail 掩盖这个差别。
+- **记忆不是万能药**。把已披露约束贴回 prompt 只提升 VPR 5%–15%，Acc. 多数小于 3%；真正难的是在约束下重新搜索有效方案。
+- **反馈可能 destabilize**。给新反馈会让模型过度关注最近的问题，破坏旧约束。返工指令要带“已过项不得破坏”的全局清单。
+- **评测协议会塑造行为**。AdaPlanBench 的“违反才披露”会鼓励撞墙式探索；产品里最好加主动澄清通道，别让用户靠纠错训练 agent。
+- **早停是预算护栏**。多轮 agent 没有 stop rule 就会烧钱；“无新约束/无新证据连续 N 轮”是可复用的停机件。
+
+## 作品集角度
+
+这篇最适合做一个 **Adaptive Agent Eval Harness** 作品：不是再造聊天机器人，而是展示你会给 agent 建测试环境、隐藏规则、反馈循环、状态追踪和诊断指标。面试时这比“我接了某个 API”更能证明工程成熟度。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Hidden-Constraint Eval Mini | 20 个任务，每题藏 5-8 条规则，违规才披露 | 2-3 天 | 复刻 AdaPlanBench 的核心评测思想，适合放作品集 |
+| ConstraintTracker SDK | 维护 disclosed/new/repeated 状态，输出 AWRV/AURV/early stop | 1-2 天 | 多轮 agent 产品通用基础件 |
+| Claim/Constraint Cold Audit | 对深读稿隐藏若干事实门，冷审只在发现违规时返工 | 3-5 天 | 直接反哺 AI-Brief 的冷审流程 |
+| Rubric-Feedback Regression Test | 每次返工后检查旧约束是否被破坏 | 2-4 天 | 解决“修新坏旧”的真实工程痛点 |
+| Judge Calibration Dashboard | LLM judge vs 人类抽验，展示 exact match、within-one、judge std | 1 周 | 让 LLM-as-judge 从玄学变成可监控组件 |
+
+## 简历 / 面试故事
+
+诚实写法：
+
+- *"Built an adaptive-agent evaluation harness with hidden world/user constraints, progressive disclosure, repeated-violation tracking, and separate compliance vs task-success metrics."*
+- *"Implemented a constraint-state tracker and early-stop policy for multi-turn agent evaluation, preventing unproductive replanning loops while preserving diagnostic traces."*
+- *"Designed judge-calibration checks for LLM-as-judge evaluation, comparing automated constraint/rubric decisions against human-labeled samples."*
+
+> [!key] 面试可讲
+> “你怎么评估一个 agent 是否真的会根据反馈改计划？”不要只答 final accuracy。可以讲 AdaPlanBench 的拆法：隐藏约束、违规披露、VPR/Acc 双门、重复违规、试探强度、early stop，再指出产品侧要补主动澄清和跨家族 judge 校准。
+
+## 学习清单
+
+**必学**
+
+- Progressive disclosure eval：隐藏规则、违规才披露、多轮重规划。
+- VPR vs Acc：合规和结果质量分开计量。
+- Constraint tracking：new/repeated/disclosed 状态机。
+- Early stopping：连续无新信息增量的停机设计。
+
+**有用**
+
+- LLM-as-judge 人工校准：抽样、多数票、exact match、within-one。
+- Rubric threshold ablation：验证结论不是某个阈值凑出来的。
+- 反馈稳定性测试：看追加反馈是否导致旧约束回归。
+
+**可选**
+
+- 把 hidden-constraint 协议迁移到软件工程 agent：隐藏 repo 约束、测试约束、用户偏好。
+- 做主动澄清版 AdaPlanBench：允许 agent 问问题，而不是只能靠提交违规方案来探测约束。

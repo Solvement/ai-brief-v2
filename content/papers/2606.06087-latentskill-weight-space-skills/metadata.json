@@ -1,0 +1,67 @@
+{
+  "paper_id": "2606.06087",
+  "arxiv_id": "2606.06087",
+  "title": "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
+  "authors": [
+    "Aofan Yu",
+    "Chenyu Zhou",
+    "Tianyi Xu",
+    "Zihan Guo",
+    "Rong Shan",
+    "Zhihui Fu",
+    "Jun Wang",
+    "Weiwen Liu",
+    "Yong Yu",
+    "Weinan Zhang",
+    "Jianghao Lin"
+  ],
+  "date": "2026-06",
+  "huggingface_url": "https://huggingface.co/papers/2606.06087",
+  "paper_url": "https://arxiv.org/abs/2606.06087",
+  "code_url": "https://github.com/yuaofan0-oss/LatentSkill",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "project_url": "",
+  "source_rankings": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.06087.yaml",
+  "first_seen_date": "2026-06-09",
+  "must_read": false,
+  "track": "hf",
+  "topic": "agent",
+  "agent_relevant": true,
+  "tags": [
+    "agent-skills",
+    "lora",
+    "hypernetwork",
+    "weight-space",
+    "context-compression",
+    "skill-composition",
+    "prompt-injection-robustness",
+    "modular-adapters",
+    "qwen3-8b"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 8,
+    "career_value": 8,
+    "autosci_reuse_value": 9,
+    "buildability": 6,
+    "evaluation_value": 6,
+    "breadth_value": 7,
+    "evidence_quality": 5
+  },
+  "one_sentence_judgment": "用超网络把技能文档一次前向编译成可装卸 LoRA,正面回应「技能=塞 prompt」范式的三难(零上下文开销×模块化×可组合):同文本对照下 ALFWorld +21.4 分且 prefill -64.1%,真正的增量是证明技能权重空间有语义几何(OOD 技能也成簇)、强度可旋钮(α 倒 U)、组合须按语义组件对齐(整加/文本拼接都失败)、技能知识集中在 attn_o+mlp_down(2/7 位置保 93.3% 性能);但有一个未拆分的混淆——编译器在这两个基准的教师轨迹上 SFT 过而 in-context 基线没有,增益里轨迹监督占多少不可知,加上技能库仅 5+3 个、α 在评测集上扫、单骨干,绝对分数别当生产承诺,看它学「知识放哪」的三轴权衡与组件化组合纪律。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

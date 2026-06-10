@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T01:29:10.783Z",
+  "generatedAt": "2026-06-10T13:58:49.669Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -949,6 +949,23 @@
       "file": "brief-wiki/content/refactoringhq-tolaria.md"
     },
     {
+      "id": "content/roboflow-supervision",
+      "type": "content",
+      "family": "project",
+      "slug": "roboflow-supervision",
+      "title": "supervision — We write your reusable computer vision tools. 💜",
+      "tags": [
+        "tier-2",
+        "project",
+        "agents",
+        "models",
+        "docs",
+        "agent-framework",
+        "python"
+      ],
+      "file": "brief-wiki/content/roboflow-supervision.md"
+    },
+    {
       "id": "content/rohitg00-agentmemory",
       "type": "content",
       "family": "project",
@@ -1736,6 +1753,15 @@
       "file": "brief-wiki/source-packs/refactoringhq-tolaria-source-pack.md"
     },
     {
+      "id": "source-pack/roboflow-supervision-source-pack",
+      "type": "source-pack",
+      "family": "project",
+      "slug": "roboflow-supervision-source-pack",
+      "title": "supervision — Source Pack",
+      "tags": [],
+      "file": "brief-wiki/source-packs/roboflow-supervision-source-pack.md"
+    },
+    {
       "id": "source-pack/rohitg00-agentmemory-source-pack",
       "type": "source-pack",
       "family": "project",
@@ -2348,6 +2374,15 @@
       "file": "brief-wiki/evidence-packs/refactoringhq-tolaria-evidence-pack.md"
     },
     {
+      "id": "evidence-pack/roboflow-supervision-evidence-pack",
+      "type": "evidence-pack",
+      "family": "project",
+      "slug": "roboflow-supervision-evidence-pack",
+      "title": "supervision — Evidence Pack",
+      "tags": [],
+      "file": "brief-wiki/evidence-packs/roboflow-supervision-evidence-pack.md"
+    },
+    {
       "id": "evidence-pack/rohitg00-agentmemory-evidence-pack",
       "type": "evidence-pack",
       "family": "project",
@@ -2942,6 +2977,15 @@
       "file": "brief-wiki/deep-dives/refactoringhq-tolaria-deep-dive.md"
     },
     {
+      "id": "deep-dive/roboflow-supervision-deep-dive",
+      "type": "deep-dive",
+      "family": "project",
+      "slug": "roboflow-supervision-deep-dive",
+      "title": "supervision — 深度拆解",
+      "tags": [],
+      "file": "brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+    },
+    {
       "id": "deep-dive/rohitg00-agentmemory-deep-dive",
       "type": "deep-dive",
       "family": "project",
@@ -3221,6 +3265,19 @@
         "generation"
       ],
       "file": "brief-wiki/concepts/agentic-video-generation.md"
+    },
+    {
+      "id": "concept/annotator-composition",
+      "type": "concept",
+      "family": "project",
+      "slug": "annotator-composition",
+      "title": "Annotator Composition",
+      "tags": [
+        "visualization",
+        "pipeline",
+        "cv"
+      ],
+      "file": "brief-wiki/concepts/annotator-composition.md"
     },
     {
       "id": "concept/artifact-authority",
@@ -3508,6 +3565,19 @@
         "cli-wrapper"
       ],
       "file": "brief-wiki/concepts/desktop-companion-for-cli-agent.md"
+    },
+    {
+      "id": "concept/detections-standardization",
+      "type": "concept",
+      "family": "project",
+      "slug": "detections-standardization",
+      "title": "Detections Standardization",
+      "tags": [
+        "cv",
+        "abstraction",
+        "connector"
+      ],
+      "file": "brief-wiki/concepts/detections-standardization.md"
     },
     {
       "id": "concept/deterministic-policy-interception",
@@ -5250,6 +5320,15 @@
       "file": "brief-wiki/claims/refactoringhq-tolaria-main-claim.md"
     },
     {
+      "id": "claim/roboflow-supervision-main-claim",
+      "type": "claim",
+      "family": "project",
+      "slug": "roboflow-supervision-main-claim",
+      "title": "Roboflow Supervision Main Claim",
+      "tags": [],
+      "file": "brief-wiki/claims/roboflow-supervision-main-claim.md"
+    },
+    {
       "id": "claim/rohitg00-agentmemory-main-claim",
       "type": "claim",
       "family": "project",
@@ -5889,6 +5968,15 @@
       "file": "brief-wiki/artifacts/refactoringhq-tolaria-repo.md"
     },
     {
+      "id": "artifact/roboflow-supervision-repo",
+      "type": "artifact",
+      "family": "project",
+      "slug": "roboflow-supervision-repo",
+      "title": "Roboflow Supervision Repo",
+      "tags": [],
+      "file": "brief-wiki/artifacts/roboflow-supervision-repo.md"
+    },
+    {
       "id": "artifact/rohitg00-agentmemory-repo",
       "type": "artifact",
       "family": "project",
@@ -6245,6 +6333,28 @@
       "arxiv_id": "2605.28556"
     },
     {
+      "id": "paper:2605.29307",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2605.29307-grepseek-dci-search-agent",
+      "title": "GrepSeek: Training Search Agents for Direct Corpus Interaction",
+      "tags": [
+        "search-agent",
+        "direct-corpus-interaction",
+        "shell-retrieval",
+        "ripgrep",
+        "cold-start-synthesis",
+        "grpo",
+        "reinforcement-learning",
+        "sharded-parallel-execution",
+        "lexical-vs-dense",
+        "qwen3.5-9b"
+      ],
+      "file": "content/papers/2605.29307-grepseek-dci-search-agent/metadata.json",
+      "arxiv_id": "2605.29307",
+      "topic": "agent"
+    },
+    {
       "id": "paper:2605.29707",
       "type": "paper",
       "family": "paper",
@@ -6547,6 +6657,48 @@
       "topic": "data"
     },
     {
+      "id": "paper:2606.05622",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.05622-adaplanbench-dual-constraint-planning",
+      "title": "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model Agents under World and User Constraints",
+      "tags": [
+        "benchmark",
+        "adaptive-planning",
+        "dual-constraints",
+        "progressive-disclosure",
+        "interactive-evaluation",
+        "user-simulator",
+        "llm-judge-calibration",
+        "replanning",
+        "early-stopping"
+      ],
+      "file": "content/papers/2606.05622-adaplanbench-dual-constraint-planning/metadata.json",
+      "arxiv_id": "2606.05622",
+      "topic": "eval"
+    },
+    {
+      "id": "paper:2606.06087",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.06087-latentskill-weight-space-skills",
+      "title": "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
+      "tags": [
+        "agent-skills",
+        "lora",
+        "hypernetwork",
+        "weight-space",
+        "context-compression",
+        "skill-composition",
+        "prompt-injection-robustness",
+        "modular-adapters",
+        "qwen3-8b"
+      ],
+      "file": "content/papers/2606.06087-latentskill-weight-space-skills/metadata.json",
+      "arxiv_id": "2606.06087",
+      "topic": "agent"
+    },
+    {
       "id": "paper:2606.06492",
       "type": "paper",
       "family": "paper",
@@ -6583,18 +6735,6 @@
       "radar": true
     },
     {
-      "id": "radar:can1357/oh-my-pi",
-      "type": "project",
-      "family": "project",
-      "slug": "oh-my-pi",
-      "title": "can1357/oh-my-pi",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/can1357/oh-my-pi",
-      "ghost": true,
-      "radar": true
-    },
-    {
       "id": "radar:mvanhorn/last30days-skill",
       "type": "project",
       "family": "project",
@@ -6603,6 +6743,18 @@
       "tags": [],
       "file": "public/data/trending.json",
       "url": "https://github.com/mvanhorn/last30days-skill",
+      "ghost": true,
+      "radar": true
+    },
+    {
+      "id": "radar:can1357/oh-my-pi",
+      "type": "project",
+      "family": "project",
+      "slug": "oh-my-pi",
+      "title": "can1357/oh-my-pi",
+      "tags": [],
+      "file": "public/data/trending.json",
+      "url": "https://github.com/can1357/oh-my-pi",
       "ghost": true,
       "radar": true
     },
@@ -8935,6 +9087,48 @@
       "evidence": "链接出现在 brief-wiki/content/refactoringhq-tolaria.md"
     },
     {
+      "from": "content/roboflow-supervision",
+      "to": "source-pack/roboflow-supervision-source-pack",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+    },
+    {
+      "from": "content/roboflow-supervision",
+      "to": "evidence-pack/roboflow-supervision-evidence-pack",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+    },
+    {
+      "from": "content/roboflow-supervision",
+      "to": "deep-dive/roboflow-supervision-deep-dive",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+    },
+    {
+      "from": "content/roboflow-supervision",
+      "to": "concept/detections-standardization",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+    },
+    {
+      "from": "content/roboflow-supervision",
+      "to": "concept/annotator-composition",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+    },
+    {
+      "from": "content/roboflow-supervision",
+      "to": "claim/roboflow-supervision-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+    },
+    {
+      "from": "content/roboflow-supervision",
+      "to": "artifact/roboflow-supervision-repo",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+    },
+    {
       "from": "content/rohitg00-agentmemory",
       "to": "source-pack/rohitg00-agentmemory-source-pack",
       "type": "references",
@@ -9815,6 +10009,12 @@
       "to": "content/refactoringhq-tolaria",
       "type": "references",
       "evidence": "链接出现在 brief-wiki/source-packs/refactoringhq-tolaria-source-pack.md"
+    },
+    {
+      "from": "source-pack/roboflow-supervision-source-pack",
+      "to": "content/roboflow-supervision",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/source-packs/roboflow-supervision-source-pack.md"
     },
     {
       "from": "source-pack/rohitg00-agentmemory-source-pack",
@@ -10799,6 +10999,24 @@
       "to": "content/refactoringhq-tolaria",
       "type": "references",
       "evidence": "链接出现在 brief-wiki/evidence-packs/refactoringhq-tolaria-evidence-pack.md"
+    },
+    {
+      "from": "evidence-pack/roboflow-supervision-evidence-pack",
+      "to": "claim/roboflow-supervision-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/evidence-packs/roboflow-supervision-evidence-pack.md"
+    },
+    {
+      "from": "evidence-pack/roboflow-supervision-evidence-pack",
+      "to": "artifact/roboflow-supervision-repo",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/evidence-packs/roboflow-supervision-evidence-pack.md"
+    },
+    {
+      "from": "evidence-pack/roboflow-supervision-evidence-pack",
+      "to": "content/roboflow-supervision",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/evidence-packs/roboflow-supervision-evidence-pack.md"
     },
     {
       "from": "evidence-pack/rohitg00-agentmemory-evidence-pack",
@@ -12289,6 +12507,30 @@
       "evidence": "链接出现在 brief-wiki/deep-dives/refactoringhq-tolaria-deep-dive.md"
     },
     {
+      "from": "deep-dive/roboflow-supervision-deep-dive",
+      "to": "concept/detections-standardization",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+    },
+    {
+      "from": "deep-dive/roboflow-supervision-deep-dive",
+      "to": "concept/annotator-composition",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+    },
+    {
+      "from": "deep-dive/roboflow-supervision-deep-dive",
+      "to": "content/roboflow-supervision",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+    },
+    {
+      "from": "deep-dive/roboflow-supervision-deep-dive",
+      "to": "claim/roboflow-supervision-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+    },
+    {
       "from": "deep-dive/rohitg00-agentmemory-deep-dive",
       "to": "concept/persistent-agent-memory",
       "type": "references",
@@ -12751,6 +12993,18 @@
       "evidence": "链接出现在 brief-wiki/concepts/agentic-video-generation.md"
     },
     {
+      "from": "concept/annotator-composition",
+      "to": "content/roboflow-supervision",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/annotator-composition.md"
+    },
+    {
+      "from": "concept/annotator-composition",
+      "to": "claim/roboflow-supervision-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/annotator-composition.md"
+    },
+    {
       "from": "concept/artifact-authority",
       "to": "content/hkuds-vimax",
       "type": "references",
@@ -13013,6 +13267,18 @@
       "to": "claim/fathah-hermes-desktop-main-claim",
       "type": "references",
       "evidence": "链接出现在 brief-wiki/concepts/desktop-companion-for-cli-agent.md"
+    },
+    {
+      "from": "concept/detections-standardization",
+      "to": "content/roboflow-supervision",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/detections-standardization.md"
+    },
+    {
+      "from": "concept/detections-standardization",
+      "to": "claim/roboflow-supervision-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/detections-standardization.md"
     },
     {
       "from": "concept/deterministic-policy-interception",
@@ -14491,6 +14757,12 @@
       "evidence": "链接出现在 brief-wiki/claims/refactoringhq-tolaria-main-claim.md"
     },
     {
+      "from": "claim/roboflow-supervision-main-claim",
+      "to": "content/roboflow-supervision",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/claims/roboflow-supervision-main-claim.md"
+    },
+    {
       "from": "claim/rohitg00-agentmemory-main-claim",
       "to": "content/rohitg00-agentmemory",
       "type": "references",
@@ -14935,6 +15207,12 @@
       "evidence": "链接出现在 brief-wiki/artifacts/refactoringhq-tolaria-repo.md"
     },
     {
+      "from": "artifact/roboflow-supervision-repo",
+      "to": "content/roboflow-supervision",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/artifacts/roboflow-supervision-repo.md"
+    },
+    {
       "from": "artifact/rohitg00-agentmemory-repo",
       "to": "content/rohitg00-agentmemory",
       "type": "references",
@@ -15180,6 +15458,24 @@
       "weak": true
     },
     {
+      "from": "paper:2605.29307",
+      "to": "paper:2606.02373",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签 search-agent、reinforcement-learning",
+      "weight": 2,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.06087",
+      "to": "paper:2606.06492",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签 lora、hypernetwork",
+      "weight": 2,
+      "weak": true
+    },
+    {
       "from": "ghost:hkuds-openspace",
       "to": "ghost:voyager-skill-library",
       "type": "same_track",
@@ -15334,6 +15630,16 @@
     },
     {
       "from": "content/agemem",
+      "to": "paper:2605.29307",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:reinforcement-learning",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "content/agemem",
       "to": "paper:2606.02373",
       "type": "same_track",
       "confidence": "medium",
@@ -15375,6 +15681,16 @@
     {
       "from": "content/memoryagentbench",
       "to": "paper:2606.02060",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "content/memoryagentbench",
+      "to": "paper:2606.05622",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:benchmark",
@@ -15493,6 +15809,16 @@
       "weak": true
     },
     {
+      "from": "paper:2605.31264",
+      "to": "paper:2606.06087",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-skills",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
       "from": "paper:2605.31584",
       "to": "paper:2606.02060",
       "type": "same_track",
@@ -15518,6 +15844,26 @@
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:long-context",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.02060",
+      "to": "paper:2606.05622",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.02437",
+      "to": "paper:2606.06087",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:lora",
       "kg_integrated": true,
       "cross_doc": true,
       "weak": true
@@ -19385,6 +19731,83 @@
     },
     {
       "type": "references",
+      "source": "content/roboflow-supervision",
+      "target": "source-pack/roboflow-supervision-source-pack",
+      "edge": {
+        "from": "content/roboflow-supervision",
+        "to": "source-pack/roboflow-supervision-source-pack",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/roboflow-supervision",
+      "target": "evidence-pack/roboflow-supervision-evidence-pack",
+      "edge": {
+        "from": "content/roboflow-supervision",
+        "to": "evidence-pack/roboflow-supervision-evidence-pack",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/roboflow-supervision",
+      "target": "deep-dive/roboflow-supervision-deep-dive",
+      "edge": {
+        "from": "content/roboflow-supervision",
+        "to": "deep-dive/roboflow-supervision-deep-dive",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/roboflow-supervision",
+      "target": "concept/detections-standardization",
+      "edge": {
+        "from": "content/roboflow-supervision",
+        "to": "concept/detections-standardization",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/roboflow-supervision",
+      "target": "concept/annotator-composition",
+      "edge": {
+        "from": "content/roboflow-supervision",
+        "to": "concept/annotator-composition",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/roboflow-supervision",
+      "target": "claim/roboflow-supervision-main-claim",
+      "edge": {
+        "from": "content/roboflow-supervision",
+        "to": "claim/roboflow-supervision-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/roboflow-supervision",
+      "target": "artifact/roboflow-supervision-repo",
+      "edge": {
+        "from": "content/roboflow-supervision",
+        "to": "artifact/roboflow-supervision-repo",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/roboflow-supervision.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "content/rohitg00-agentmemory",
       "target": "source-pack/rohitg00-agentmemory-source-pack",
       "edge": {
@@ -20998,6 +21421,17 @@
         "to": "content/refactoringhq-tolaria",
         "type": "references",
         "evidence": "链接出现在 brief-wiki/source-packs/refactoringhq-tolaria-source-pack.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "source-pack/roboflow-supervision-source-pack",
+      "target": "content/roboflow-supervision",
+      "edge": {
+        "from": "source-pack/roboflow-supervision-source-pack",
+        "to": "content/roboflow-supervision",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/source-packs/roboflow-supervision-source-pack.md"
       }
     },
     {
@@ -22802,6 +23236,39 @@
         "to": "content/refactoringhq-tolaria",
         "type": "references",
         "evidence": "链接出现在 brief-wiki/evidence-packs/refactoringhq-tolaria-evidence-pack.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "evidence-pack/roboflow-supervision-evidence-pack",
+      "target": "claim/roboflow-supervision-main-claim",
+      "edge": {
+        "from": "evidence-pack/roboflow-supervision-evidence-pack",
+        "to": "claim/roboflow-supervision-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/evidence-packs/roboflow-supervision-evidence-pack.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "evidence-pack/roboflow-supervision-evidence-pack",
+      "target": "artifact/roboflow-supervision-repo",
+      "edge": {
+        "from": "evidence-pack/roboflow-supervision-evidence-pack",
+        "to": "artifact/roboflow-supervision-repo",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/evidence-packs/roboflow-supervision-evidence-pack.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "evidence-pack/roboflow-supervision-evidence-pack",
+      "target": "content/roboflow-supervision",
+      "edge": {
+        "from": "evidence-pack/roboflow-supervision-evidence-pack",
+        "to": "content/roboflow-supervision",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/evidence-packs/roboflow-supervision-evidence-pack.md"
       }
     },
     {
@@ -25534,6 +26001,50 @@
     },
     {
       "type": "references",
+      "source": "deep-dive/roboflow-supervision-deep-dive",
+      "target": "concept/detections-standardization",
+      "edge": {
+        "from": "deep-dive/roboflow-supervision-deep-dive",
+        "to": "concept/detections-standardization",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "deep-dive/roboflow-supervision-deep-dive",
+      "target": "concept/annotator-composition",
+      "edge": {
+        "from": "deep-dive/roboflow-supervision-deep-dive",
+        "to": "concept/annotator-composition",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "deep-dive/roboflow-supervision-deep-dive",
+      "target": "content/roboflow-supervision",
+      "edge": {
+        "from": "deep-dive/roboflow-supervision-deep-dive",
+        "to": "content/roboflow-supervision",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "deep-dive/roboflow-supervision-deep-dive",
+      "target": "claim/roboflow-supervision-main-claim",
+      "edge": {
+        "from": "deep-dive/roboflow-supervision-deep-dive",
+        "to": "claim/roboflow-supervision-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/roboflow-supervision-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "deep-dive/rohitg00-agentmemory-deep-dive",
       "target": "concept/persistent-agent-memory",
       "edge": {
@@ -26381,6 +26892,28 @@
     },
     {
       "type": "references",
+      "source": "concept/annotator-composition",
+      "target": "content/roboflow-supervision",
+      "edge": {
+        "from": "concept/annotator-composition",
+        "to": "content/roboflow-supervision",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/annotator-composition.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "concept/annotator-composition",
+      "target": "claim/roboflow-supervision-main-claim",
+      "edge": {
+        "from": "concept/annotator-composition",
+        "to": "claim/roboflow-supervision-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/annotator-composition.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "concept/artifact-authority",
       "target": "content/hkuds-vimax",
       "edge": {
@@ -26861,6 +27394,28 @@
         "to": "claim/fathah-hermes-desktop-main-claim",
         "type": "references",
         "evidence": "链接出现在 brief-wiki/concepts/desktop-companion-for-cli-agent.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "concept/detections-standardization",
+      "target": "content/roboflow-supervision",
+      "edge": {
+        "from": "concept/detections-standardization",
+        "to": "content/roboflow-supervision",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/detections-standardization.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "concept/detections-standardization",
+      "target": "claim/roboflow-supervision-main-claim",
+      "edge": {
+        "from": "concept/detections-standardization",
+        "to": "claim/roboflow-supervision-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/detections-standardization.md"
       }
     },
     {
@@ -29571,6 +30126,17 @@
     },
     {
       "type": "references",
+      "source": "claim/roboflow-supervision-main-claim",
+      "target": "content/roboflow-supervision",
+      "edge": {
+        "from": "claim/roboflow-supervision-main-claim",
+        "to": "content/roboflow-supervision",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/claims/roboflow-supervision-main-claim.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "claim/rohitg00-agentmemory-main-claim",
       "target": "content/rohitg00-agentmemory",
       "edge": {
@@ -30385,6 +30951,17 @@
     },
     {
       "type": "references",
+      "source": "artifact/roboflow-supervision-repo",
+      "target": "content/roboflow-supervision",
+      "edge": {
+        "from": "artifact/roboflow-supervision-repo",
+        "to": "content/roboflow-supervision",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/artifacts/roboflow-supervision-repo.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "artifact/rohitg00-agentmemory-repo",
       "target": "content/rohitg00-agentmemory",
       "edge": {
@@ -30695,6 +31272,19 @@
     },
     {
       "type": "same_track",
+      "source": "paper:2605.29307",
+      "target": "paper:2606.02373",
+      "edge": {
+        "from": "paper:2605.29307",
+        "to": "paper:2606.02373",
+        "type": "same_track",
+        "confidence": "medium",
+        "evidence": "共享标签 search-agent、reinforcement-learning",
+        "weight": 2
+      }
+    },
+    {
+      "type": "same_track",
       "source": "paper:2606.00408",
       "target": "paper:2606.02060",
       "edge": {
@@ -30703,6 +31293,19 @@
         "type": "same_track",
         "confidence": "medium",
         "evidence": "共享标签 deep-research-agent、trajectory-analysis",
+        "weight": 2
+      }
+    },
+    {
+      "type": "same_track",
+      "source": "paper:2606.06087",
+      "target": "paper:2606.06492",
+      "edge": {
+        "from": "paper:2606.06087",
+        "to": "paper:2606.06492",
+        "type": "same_track",
+        "confidence": "medium",
+        "evidence": "共享标签 lora、hypernetwork",
         "weight": 2
       }
     },
@@ -30721,34 +31324,34 @@
     }
   ],
   "summary": {
-    "nodes": 577,
-    "edges": 1409,
+    "nodes": 588,
+    "edges": 1437,
     "nodeByType": {
-      "content": 62,
-      "source-pack": 68,
-      "evidence-pack": 68,
-      "deep-dive": 66,
-      "concept": 129,
+      "content": 63,
+      "source-pack": 69,
+      "evidence-pack": 69,
+      "deep-dive": 67,
+      "concept": 131,
       "method": 3,
-      "claim": 68,
+      "claim": 69,
       "evidence": 3,
-      "artifact": 68,
+      "artifact": 69,
       "taste": 1,
-      "paper": 28,
+      "paper": 31,
       "project": 13
     },
     "edgeByType": {
-      "references": 1353,
+      "references": 1374,
       "builds_on": 2,
       "shares_method": 6,
       "same_use_case": 3,
       "composes_with": 9,
-      "same_track": 32,
+      "same_track": 39,
       "improves_on": 2,
       "contradicts": 2
     },
     "wikilinks": {
-      "resolved": 1486,
+      "resolved": 1509,
       "unresolved": 0
     },
     "focusTags": [
@@ -30762,9 +31365,9 @@
       "agentic-search"
     ],
     "ghostCandidates": 12,
-    "references": 1353,
+    "references": 1374,
     "associativeEdges": 24,
-    "crossDocEdges": 36,
+    "crossDocEdges": 41,
     "ghosts": 21,
     "assessed": 36,
     "facetedNodes": 12

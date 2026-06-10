@@ -1,0 +1,82 @@
+primitive_id: unified-interface-terminal-verified-agent-eval
+source_paper: "2606.09669"
+title: "SpatialWorld: Benchmarking Interactive Spatial Reasoning of Multimodal Agents in Real-World Tasks"
+relevance_level: direct                     # agent 评测工程模板:接口瓶颈+终态验证+双指标+任务三件套
+audience: ai_only
+core_pattern: >
+  评一个跨异构后端的 agent:① 把所有后端的观察/动作封进严格 I/O 瓶颈(观察统一、动作=文本化
+  高层指令,后端各自做 action-to-code 翻译),让得分可归因到能力而非环境适配;② 成败用任务专属
+  终态 verifier 查最终世界状态(开放路径,不比对轨迹);③ 成功率(TSR)与步效率(SE=参考步数/实际
+  步数)分开报,识破穷举型选手;④ 每任务自带三件套(人工校验初始状态+人类参考轨迹+verifier),
+  独立专家交叉复核;⑤ 加一组剥离领域语义的抽象对照任务,把目标能力从常识捷径里隔离出来。
+problem_class: evaluate-one-agent-policy-across-heterogeneous-environments-attributably
+components:
+  - io_bottleneck_interface   # 观察统一(egocentric RGB)+动作统一(四类文本高层动作)
+  - action_to_code_mapper     # 统一动作 → 各后端专属执行码;agent 策略零修改跨环境
+  - terminal_state_verifier   # 任务专属脚本只查终态;预算=2×参考步数+10
+  - dual_metric_reporter      # TSR + SE;SE 仅在成功集上算(幸存者偏差要声明)
+  - task_artifact_pipeline    # 设计→人类执行录真值→独立交叉复核 三段工序
+  - semantics_stripped_probe  # 抽象 3D 游戏对照组:剥照片级语义,单测几何/状态追踪
+autosci_modules:
+  - eval_harness              # 本库评测协议的固定结构件:验产物不验过程+效率维度+三件套
+  - cold_critic               # verifier=确定性判分器,generator≠critic 的机器化形态
+  - self_evolve_controller    # L1 进化验收同构:新结构在统一协议下跨任务族测,不许特化单环境
+  - gap_map                   # 断崖诊断法(单项 50.2% vs 复合 4.2%)= 用任务分类法定位真瓶颈
+inputs:
+  - heterogeneous_backends    # 异构环境/系统(它用 8 个模拟器;可换成任意后端集)
+  - task_taxonomy             # 场景×复杂度两维分类法(归因的前提)
+outputs:
+  - attributable_scores       # 可归因到能力维度的分数矩阵(非单一 leaderboard 数)
+  - bottleneck_diagnosis      # 断崖位置:哪类组合能力是真瓶颈
+implementation_idea: >
+  本库已有多栏目管线(papers/projects/models/news 各自后端不同):可仿其 I/O 瓶颈把
+  「栏目无关的质量评测协议」抽出来——统一输入(artifact+source)统一动作(判分 rubric),
+  各栏目自带 verifier(lint/结构门)。终态验证精神已在用(按渲染前端验收);缺的是 SE 型
+  效率维度(深读重试轮数/冷审返工次数)和显式任务三件套。1 周内可把现有冷审门改造对齐。
+small_experiment: >
+  给 KG-2 判边/mind-palace 召回评测补两件:① SE 型指标——每个正确判定消耗的候选检查数
+  (参考=最短证据链长度),看现有 agent 是"真懂"还是"穷举";② 抽象对照组——把概念名替换成
+  无语义代号重跑判边,若分数大掉则说明判的是词面不是结构(剥语义探针)。各 1-2 天。
+design_principles:                          # 跨篇沉淀的"怎么评跨环境 agent"零件
+  - id: io-bottleneck-for-attribution
+    principle: "把异构后端压进一层严格 I/O 契约(统一观察+文本高层动作+各端 action-to-code),agent 零修改跨环境——否则分数=环境适配度,不可归因。"
+    transfers_to: "本库跨栏目质量协议/任何多后端 agent 产品的评测层。"
+  - id: verify-terminal-state-not-trajectory
+    principle: "成败=查最终世界状态的确定性脚本,不比对动作序列;开放解法路径,判分客观可复现(承自 OSWorld/Spider2-V,带进 3D 域)。"
+    transfers_to: "质量门验产物不验过程;冷审按 artifact 终态判,不管生成路径。"
+  - id: success-needs-efficiency-twin
+    principle: "TSR 相近的模型 SE 可以反转(9.2%/0.486 vs 6.6%/0.569)——不配效率指标,穷举试错和真能力分不开;且 SE 只在成功集上算,跨大 TSR 差距不可比要显式声明。"
+    transfers_to: "与 AdaPlanBench 的 VPR≠Acc 同族:本库评测一律双指标分报(质量线+代价线)。"
+  - id: strip-semantics-to-isolate-capability
+    principle: "写实环境的难度和视觉常识捷径纠缠;自建剥离语义的抽象任务(3D 游戏)单测目标能力,魔方/Block3D 系统性溃败暴露真瓶颈在几何变换+状态追踪。"
+    transfers_to: "评 agent 时加'去常识捷径'对照组(如概念名换代号重跑判边)。"
+  - id: task-equals-three-artifacts
+    principle: "合格评测任务=人工校验初始状态+人类参考轨迹+终态 verifier,独立专家交叉复核;参考轨迹同时供步数预算(2g+10)和 SE 分母。"
+    transfers_to: "RULES#18'先把 benchmark 做强'的具体工序;本库新评测集按此三件套生产。"
+  - id: cliff-diagnosis-beats-leaderboard
+    principle: "评测价值在归因不在排名:单项交互 50.2% vs 导航+交互复合 4.2% 的断崖、手工布局 34.8% vs 程序化布局 5.9% 的协作分层,都靠任务分类法设计才看得见。"
+    transfers_to: "gap-map 反哺选稿:按能力维度切格子找断崖,而非总分排序。"
+risks:
+  - sim_only                  # 全模拟器,"real-world"指任务类型;sim-to-real 未触及
+  - interface_fit_variance    # GPT-5.4 异常低于 GPT-5(6.6 vs 14.4)未解释,分数对模型×接口适配敏感
+  - no_agreement_numbers      # 人工交叉复核未报一致率(对比 AdaPlanBench 报 89.76%)
+  - thin_cells                # 760 题切 8 环境×5 域×3 复杂度,细格子(VirtualHome 38/Multi-ProcTHOR 17)波动大
+  - high_level_actions_only   # 屏蔽低层控制,结论不可外推到 VLA/机器人控制栈
+core_concepts:                              # KG-2 §3.1 受控命名,evidence 为源文逐字短语
+  - name: "交互式空间推理（interactive spatial reasoning）"
+    role: primary
+    evidence: "evaluating the interactive spatial understanding of multimodal agents in complex real-world tasks"
+  - name: "统一跨平台接口（unified cross-platform interface）"
+    role: primary
+    evidence: "Integrating eight heterogeneous simulation backends under a shared, simulator-agnostic protocol"
+  - name: "终态验证（terminal-state verification）"
+    role: supporting
+    evidence: "adopts terminal-state verification rather than static trajectory matching"
+  - name: "视觉单一部分可观测（vision-only partial observability）"
+    role: supporting
+    evidence: "Agents must solve tasks under vision-only partial observability, actively gathering egocentric visual evidence"
+  - name: "步效率（step efficiency）"
+    role: mentioned
+    evidence: "Jointly reporting TSR and SE distinguishes efficient agents from exhaustive trial-and-error"
+discovery_trace: 数据不足                    # benchmark 论文,原文无"先试了什么失败了"的解法发现叙事
+status: extracted

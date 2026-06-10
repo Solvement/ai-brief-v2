@@ -1,0 +1,64 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+长上下文的**服务成本**正在成为 agent 产品的第一性约束:你的 agent 带着几十万 token 的历史、记忆、工具输出跑,每个并发会话都在交"全量 KV 内存税"。这篇教的不是怎么训大模型,而是一个你做应用层就能用的思维:**上下文管理可以是预测问题,不是携带问题**。更重要的是它示范了"便宜实验"的工程范式——把贵的冻住、只训小件,一周 500 次实验扫出架构甜点。这个做事方法比模型本身更可迁移。
+
+> [!key] 与我们的 north star 挂钩
+> 我们的 agent 记忆系统(mind-palace 一类)现在是"每步按需检索";这篇给出另一极:**前瞻预取**——预测接下来一段任务会用到哪些记忆,提前装载、其余冷存。"阈值召回允许空手而归"也和我们 KG-2 判边"门会说不、默认 NO_EDGE"是同一个设计精神。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| KV cache 经济学 | KV 显存怎么随上下文涨、HCA/CSA/滑窗各管什么、为什么"省 FLOPs ≠ 省显存" | 用 sglang/vLLM 部署一个开源长上下文模型,看部署日志里 KV 占用随输入长度的曲线 |
+| 双塔检索器训练 | dual-encoder、冻结一侧只训一侧、Focal Loss、负采样比、阈值 vs Top-k 召回 | 在自己语料上训一个小双塔(sentence-transformers 起步),对比固定 Top-k 和阈值召回的精度/召回曲线 |
+| 从模型内部蒸馏标签 | 离线跑冻结模型、抽中间表示当训练数据、跨源投票去噪 | 复刻 mini 版金标签管线:拿任一开源模型多层注意力分数,做 Softmax→Top-p→跨层投票,看标签量怎么从爆炸压到可用 |
+| 便宜实验设计 | 怎么把一个贵问题切出"可独立训练的小件",换来实验吞吐 | 找你手头一个慢管线,识别可预计算冻结的部分,把迭代周期从小时压到分钟 |
+| oracle 诊断法 | 组件背锅还是任务本身难?把真值直接喂给下游,隔离根因 | 给你的 RAG 系统做一次 oracle 实验:检索器换成"直接给金文档",看端到端还差多少 |
+
+## 系统设计心法
+
+- **预测式预取 > 全量驻留**:贵资源(显存/上下文窗)里只放"预测会用到的",其余冷存——这是 OS 页面置换的老智慧在 LLM 时代的还魂。
+- **冻结贵的,只训便宜的**:能在预计算表示上独立训练的小模块,实验吞吐高一个数量级;实验吞吐本身就是发现引擎。
+- **阈值召回 > 固定 Top-k**:让"召回多少"由置信度决定,允许零召回——固定 k 既是噪声源也是浪费源。
+- **共识去噪 > 单源标签**:单层/单源的"重要性"信号噪声极大,跨层(跨评委)多数投票才配叫金标签。
+- **负结果也是交付物**:被排除的 trick、被推翻的假设写成正式章节,后来者少走 500 次弯路。
+
+## 作品集角度(Portfolio angle)
+
+"会管上下文/记忆的 agent 工程师"是比"会调 prompt"稀缺得多的定位。这篇给你一个能讲清楚的故事原型:从"被动携带"到"预测装载"的记忆架构,加上一套可量化的验证方法(对照组:只留近期 / 随机留——正是论文的 Recency Only / Random 10% 设计)。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Agent 记忆预取器 | 在已有 agent 上加一层:用便宜 embedding 预测"下一段任务要用哪些记忆",提前注入上下文,其余不带;对照"每步全量带历史" | 4–6 天 | 直接复用 LSA 思想到应用层,token 成本可量化(省多少 context token、掉不掉任务成功率) |
+| 阈值 vs Top-k 召回对比实验 | 在自己 RAG/记忆系统上跑两种召回门,报告精度/召回/上下文长度三曲线 | 2–3 天 | 小而硬的工程判断力展示;面试讲得清"为什么固定 k 是错的默认值" |
+| oracle 诊断工具 | 给任意检索增强系统做"金文档直喂"模式,输出"检索器背锅 vs 任务本身难"的归因报告 | 3–4 天 | 复刻论文 §3.3.2 方法论,这是排障思维不是调参思维,很加分 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Built a predictive memory-prefetch layer for a long-running agent: a lightweight scorer predicts which memory chunks the next task segment needs, cutting average context tokens by X% with no task-success regression (Recency-only and Random-k ablation controls)."*
+- *"Implemented an oracle-injection diagnostic for retrieval-augmented systems to attribute failures between retriever quality and task-intrinsic difficulty."*
+
+> [!key] 面试可讲
+> "长上下文 serving 为什么贵、怎么破?"——用本文论证:稀疏注意力解决的是**算力**,显存税要靠**预测式 KV 管理**;再补一句它的边界(MRCR 类密集全局检索任务预取范式会崩,76→48),展示你知道方案的适用域。知道边界比知道方案更像 senior。
+
+## 学习清单
+
+**必学**
+- KV cache 机制与显存占用模型(任一 serving 框架的部署日志读懂)
+- 双塔检索训练(冻结侧/可训侧、负采样、Focal Loss)
+- 阈值召回 vs Top-k 的取舍
+
+**有用**
+- DeepSeek-V4 的 MLA/HCA/Lightning Indexer 架构(理解本文的宿主)
+- sglang/FlashInfer 的 KV 分页与 offload 机制
+
+**可选**
+- ColBERT 式 late-interaction(论文 roadmap 里的"下一步",理解双塔天花板)

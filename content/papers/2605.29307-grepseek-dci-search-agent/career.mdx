@@ -1,0 +1,85 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你每天在 coding agent 里看 `rg` 翻代码库，但企业知识库/RAG 项目里常常默认先上 embedding、vector DB、chunking、reranker。GrepSeek 给你一个更硬的架构问题：**当 agent 会主动探索时，检索接口到底该是 top-k API，还是一个可执行 workspace？**
+
+它的职业价值不在于让你宣称「向量库过时了」，而在于让你能做检索架构选型：精确实体、符号、ID、文件名、版本号、错误日志这类强词法锚点，DCI/shell search 可能更便宜、更可审；别名、释义、语义改写、拼写漂移这类问题，dense/hybrid 仍然必要。能讲清这个 trade-off 的 AI engineer，比只会说「RAG + 向量数据库」的人更像系统设计者。
+
+> [!key] 和我们正在做的东西直接相连
+> AI-Brief 的 Mind Palace / KG 召回已经走 hybrid(BM25 + 向量 + RRF)。GrepSeek 给的是另一个极端参照：**当查询有强词法锚点时，直接 `rg -F` 可能是最透明、最低成本、最容易冷审的召回通道**。对我们来说，不是替换 hybrid，而是补一个「可解释直查」工具面，并用 benchmark 决定哪些查询该走它。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 检索架构选型 | 词法 DCI、BM25、dense embedding、hybrid 各自适合什么 query 分布 | 拿一个真实语料做 50 个问题，记录 accuracy / latency / memory / indexing cost |
+| 工具使用轨迹合成 | 有标准答案但不能泄漏答案时，如何用 answer-aware backward verification + answer-blind forward assembly 造训练数据 | 给自己的工具 agent 造 100 条「答案屏蔽」轨迹，再人工抽查泄漏 |
+| Agent RL 稳定化 | 直接 RL 会先学坏工具行为；先用 SFT 固定格式和基本习语，再让 RL 调策略 | 复现实验思想：比较 prompt-only、SFT-only、SFT+RL 三档行为差异 |
+| Shell 安全沙箱 | whitelist、禁止 redirection/chaining/substitution、只读 corpus mount、timeout/output cap | 写一个最小 `shell` tool validator，并用恶意命令测试它 |
+| 语义保持并行化 | 并行提速必须证明和顺序执行 byte-exact 等价，不确定就 fallback | 实现 `rg | head` / `rg | wc -l` / `sort | uniq | head` 的分片版，加 byte-equivalence test |
+| 可解释 eval | shell command 本身就是检索日志，可统计命令数、级联过滤率、输出行数、fallback 率 | 给 agent 跑 100 条问题，做一张 command behavior dashboard |
+
+## 系统设计心法
+
+**强词法锚点先直查，语义漂移再向量化。**  
+如果问题里有 exact entity、SKU、ticket id、commit hash、error string、API name，先用 shell/BM25 直接打穿语料；如果问题是「和这个意思差不多的东西」「换一种说法」「可能有别名」，dense retrieval 或 reranker 更可靠。真实系统通常不是二选一，而是 router + hybrid。
+
+**工具自由度要先收窄，再交给学习。**  
+GrepSeek 的失败起点很典型：不先约束工具行为，RL 会学出过宽命令和超长上下文。生产 agent 也一样，先用规则、示例、沙箱、输出上限钉住底层习语，再让模型在高层策略上优化。
+
+**执行层是 agent 产品的一部分。**  
+同一个 agent，如果每次 search 5 秒，产品形态就不成立；如果能把安全 pipeline 分片到 0.7 秒，并且保留 byte-exact 等价，系统边界就完全不同。FDE 做客户现场系统时，这种「工具执行账」经常比模型选择更关键。
+
+## 作品集角度
+
+最有含金量的作品不是复刻论文表格，而是把它带到一个非 Wikipedia 语料上，回答一个真实工程问题：**我的业务语料到底适不适合 DCI？**
+
+选一个你能公开的 corpus：开源 issue、技术文档、SEC filings、课程讲义、论坛存档、自己的 AI-Brief 内容库。做三路对比：`rg`/shell DCI、BM25、embedding/hybrid。报告四件事：准确率、平均延迟、内存/索引成本、失败类型。这个作品能直接展示你会做系统选型，而不是会接 API。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Mini DCI-vs-Hybrid Benchmark | 一个真实语料、50-100 个问题、三路检索、失败案例分析 | 3-5 天 | 最适合作品集：结论可量化，trade-off 好讲 |
+| Semantics-preserving `rg` Engine | line-aligned shards + CONCAT/HEAD/COUNT/SORT_HEAD + fallback + byte test | 1 周 | 系统工程含金量高，能讲 correctness-first optimization |
+| Leakage-free Trajectory Factory | answer-aware backward search + target masking + answer-blind forward trace | 1-2 周 | 展示你会造 agent 训练数据，而不只是调 prompt |
+| Claim-grounded Knowledge Base Agent | agent 对本地文档发 `rg`，每个 answer 附 command trace 和 evidence lines | 1 周 | 把 DCI 的可审计性做成产品特性 |
+| Query Router for RAG | 根据 query 是否有强词法锚点选择 `rg` / BM25 / dense / hybrid | 3-5 天 | 贴近 FDE 工作：省成本、保 recall、可解释 |
+
+## 简历 / 面试故事
+
+诚实写法：
+
+- *"Built a direct-corpus-interaction benchmark comparing shell search, BM25, dense embeddings, and hybrid retrieval on a domain corpus, measuring accuracy, latency, memory footprint, and indexing cost."*
+- *"Implemented a byte-equivalent sharded `grep` execution layer with conservative pipeline classification and fallback, validated by equivalence tests against sequential execution."*
+- *"Designed leakage-free tool-use training traces using answer-aware backward evidence construction, target masking, and answer-blind forward trajectory assembly."*
+- *"Added a query router that sends exact-entity and identifier queries to lexical search while preserving dense/hybrid retrieval for semantic paraphrases."*
+
+> [!key] 面试可讲
+> 面试官问「RAG 一定要向量数据库吗？」你可以答：不一定。先看 query distribution。强 lexical anchor 的问题，shell/BM25 可能更省、更准、更可审；semantic drift 大的问题，dense 更稳。GrepSeek 的证据是 Wikipedia QA 上 micro-F1 0.5691 最高、内存 14GB vs dense 70/221GB，但 PopQA 显著下降且端到端延迟更高。成熟答案不是站队，而是 router + hybrid + 失败类型监控。
+
+## 学习清单
+
+**必学**
+
+- `rg` / `grep` / `awk` / `sed` / `head` / `wc` 的安全子集
+- BM25、dense retrieval、hybrid RRF 的成本和失败模式
+- ReAct 工具调用轨迹：`think -> tool_call -> tool_response -> answer`
+- SFT cold start 与 RL fine-tuning 的分工
+
+**有用**
+
+- GRPO 的组内相对优势思想
+- SQuAD-style EM / token-F1 scoring
+- Shell command sandbox 与 output truncation
+- Byte-equivalence test 怎么写
+
+**可选**
+
+- `verl` 训练框架
+- vLLM tool-calling serving
+- 大规模 corpus sharding 与 daemon 化执行
+- DCI 后续方向：bounded interaction space、fuzzy matching、hybrid retrieval

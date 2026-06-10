@@ -1,0 +1,88 @@
+primitive_id: progressive-constraint-disclosure-eval
+source_paper: "2606.05622"
+title: "AdaPlanBench: Progressive Dual-Constraint Evaluation for Adaptive Planning Agents"
+relevance_level: direct_pattern_strong
+audience: ai_only
+core_pattern: >
+  评测 agent 自适应规划时，不把全部规则写进输入，而是把 world constraints 与 user constraints
+  分成隐藏档案；agent 每轮提交方案后，judge 用完整档案检查，但 user simulator 只披露被选中的违规约束
+  （世界约束优先，用户约束其次）。成功指标分两层：VPR=最终约束满足，Acc=最终约束满足且 rubric 质量门通过。
+  诊断指标额外记录重复违规、每轮触发的新约束数、平均轮数与 early stop，借此区分“守规矩但无效”“忘旧约束”
+  “修新坏旧”和“探索不足”。
+problem_class: evaluate-adaptive-replanning-under-hidden-accumulating-constraints
+components:
+  - constraint_profile_builder
+  - hidden_dual_constraint_gate
+  - world_first_progressive_disclosure
+  - user_simulator_feedback
+  - constraint_state_tracker
+  - stagnation_early_stop
+  - compliance_quality_dual_gate
+  - judge_human_calibration
+core_concepts:
+  - name: "增量多轮评测协议"
+    role: primary
+    evidence: "progressively disclosed through interaction"
+  - name: "可执行反馈（executable feedback）"
+    role: primary
+    evidence: "the user simulator rewrites the selected constraint items into explicit user feedback"
+  - name: "结构化产物代替对话"
+    role: supporting
+    evidence: "constraint profile \\mathcal{E}=(\\mathcal{B}_{w},\\mathcal{B}_{u})"
+  - name: "stability-plasticity（稳定-可塑权衡）"
+    role: supporting
+    evidence: "recency-biased adaptation pattern"
+discovery_trace:
+  hypothesis: "数据不足"
+  failed_attempts: "数据不足"
+  source_span: "paper.mdx 未写「解法是怎么找到的」节；原文没有逐步试错发现叙事，只给 benchmark 动机、构造算法与实验分析。"
+autosci_modules:
+  - eval_harness
+  - self_evolve_controller
+  - cold_critic
+  - typed_memory
+  - guard
+inputs:
+  - task_set
+  - hidden_world_constraints
+  - hidden_user_constraints
+  - rubric_judges
+  - user_feedback_generator
+outputs:
+  - valid_plan_rate
+  - accuracy_with_quality_gate
+  - repeated_violation_rates
+  - triggered_constraint_rates
+  - early_stop_rate
+  - failure_fingerprint
+implementation_idea: >
+  Mini 版可在 AI-Brief 内部任务上跑：给 20 个“深读/判边/选稿”任务各藏 5-8 条约束（来源范围、概念命名、
+  禁止边型、证据粒度、脚注要求），generator 每轮产出后由 judge 查完整约束，但只披露一个维度的违规；
+  tracker 记录已披露/新披露/重复违规，连续 2 轮无新违规 early stop。最后同时报告 compliance pass 与
+  content-quality pass，防止 lint 绿但内容没用。
+small_experiment: >
+  在冷审返工流程上复刻两组干预：A=每轮把全部已披露冷审意见贴回 prompt，B=只给最新失败 rubric 反馈。
+  对比最终内容通过率、旧问题回归率、重复违规率和轮数。预期 A 提升合规但不显著提升内容质量，B 容易修新坏旧。
+design_principles:
+  - id: separate-compliance-from-success
+    principle: "VPR 与 Acc 必须分开；合规通过不代表任务成功，格式/约束 lint 绿也不代表内容有效。"
+    transfers_to: "AI-Brief 冷审门、agent 产品验收、RAG 答案质量门。"
+  - id: hide-constraints-reveal-on-violation
+    principle: "把约束藏起来，违反才披露，才能测 adaptive replanning，而不是测模型是否一次性读懂长规则。"
+    transfers_to: "自进化 agent 验收、长任务评测、个性化偏好适配测试。"
+  - id: track-repeated-violations
+    principle: "重复违反已披露约束是独立失败信号；它不同于首次探索，也不同于最终答案错误。"
+    transfers_to: "多轮修订系统、冷审返工、工具调用 agent 的状态追踪。"
+  - id: feedback-can-destabilize
+    principle: "追加 rubric 反馈可能导致 recency bias，修新问题时破坏旧约束；返工提示必须显式保护已过项。"
+    transfers_to: "冷审返工模板、代码 review 修复、agent plan refinement。"
+  - id: stagnation-early-stop
+    principle: "连续 N 轮没有新信息增量时停止；这比只设最大轮数更能防止原地打转。"
+    transfers_to: "每日管线冷审重试、agent loop budget、self-evolve controller。"
+risks:
+  - judge_family_bias
+  - perverse_elicitation_by_violation
+  - text_only_physicality
+  - no_human_baseline
+  - household_domain_narrowness
+status: extracted

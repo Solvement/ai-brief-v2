@@ -1,0 +1,69 @@
+{
+  "paper_id": "2606.09079",
+  "arxiv_id": "2606.09079",
+  "title": "FlashMemory-DeepSeek-V4: Lightning Index Ultra-Long Context via Lookahead Sparse Attention",
+  "authors": [
+    "Yan Wang",
+    "Qifan Zhang",
+    "Jiachen Yu",
+    "Tian Liang",
+    "Dongyang Ma",
+    "Xiang Hu",
+    "Zibo Lin",
+    "Chunyang Li",
+    "Zhichao Wang",
+    "Jia Li",
+    "Yujiu Yang",
+    "Haitao Mi",
+    "Dong Yu"
+  ],
+  "date": "2026-06",
+  "huggingface_url": "https://huggingface.co/papers/2606.09079",
+  "paper_url": "https://arxiv.org/abs/2606.09079",
+  "code_url": "https://github.com/libertywing/FlashMemory-Deepseek-V4",
+  "dataset_url": "",
+  "model_url": "https://huggingface.co/libertywing/FlashMemory-Deepseek-V4",
+  "space_url": "",
+  "project_url": "",
+  "source_rankings": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.09079.yaml",
+  "first_seen_date": "2026-06-09",
+  "must_read": false,
+  "track": "hf",
+  "topic": "inference",
+  "agent_relevant": true,
+  "tags": [
+    "long-context",
+    "kv-cache",
+    "sparse-attention",
+    "predictive-prefetch",
+    "dual-encoder",
+    "decoupled-training",
+    "memory-management",
+    "deepseek-v4",
+    "negative-results"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 9,
+    "career_value": 9,
+    "autosci_reuse_value": 8,
+    "buildability": 7,
+    "evaluation_value": 6,
+    "breadth_value": 7,
+    "evidence_quality": 7
+  },
+  "one_sentence_judgment": "把「该留哪些 KV」改写成标准双塔检索问题:每 64 步预测未来要用的历史块、阈值召回(≥0.5 全取,允许空手)从 CPU 冷池预取,平均物理 KV cache 压到基线 13.5%、精度自报 +0.6%——最值钱的不是数字而是两个方法论:解耦训练(冻结骨干、只训 <0.1% 查询塔,1 GPU 时/次 → 一周 500 次配置扫描)和罕见诚实的失败剖析(O(1) 假设被自己的对抗测试推翻、MRCR 76→48 经 oracle 诊断归因为任务本质需要密集全局记忆、长度泛化硬性止于训练长度 2 倍);保留:项目中途叫停 τ/阈值无消融、RULER 128K/256K 实为掉分、对照是 DS-V4-Flash 非 full attention、repo 18★ 无第三方复现。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

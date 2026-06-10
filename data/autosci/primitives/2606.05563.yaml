@@ -1,0 +1,88 @@
+primitive_id: calibrated-topic-localized-trajectory-judge
+source_paper: "2606.05563"
+title: "SoCRATES: Reliable Automated Evaluation of Proactive LLM Mediation"
+relevance_level: direct_pattern_strong
+audience: ai_only
+core_pattern: >
+  对没有唯一正确答案的多轮干预任务，先把评测拆成四个可控件：1) 用 agentic scenario curation
+  从真实种子改写任务，再用 no-intervention simulations 做 hard-task rejection gate，只保留无干预也稳定失败的样本；
+  2) 对每个 with-agent run 配 matched no-agent baseline，用 consensus gain / gap closure 报告干预价值；
+  3) 对裁判做 topic-localized evaluation，先定位每个 topic 真被讨论或立场移动的 turns，只在这些 turns 更新分数，
+  inactive turns carry forward previous score；4) 裁判上线前必须与人类标注校准，再换 evaluator backbone 和多次重跑检查排序稳定性。
+problem_class: reliable-evaluation-for-open-ended-multi-turn-intervention-agents
+components:
+  - agentic_scenario_curator
+  - hard_task_rejection_gate
+  - matched_counterfactual_baseline
+  - topic_localized_judge
+  - human_calibration_ladder
+  - single_axis_socio_cognitive_probe
+  - timing_window_profiler
+autosci_modules:
+  - eval_harness
+  - cold_critic
+  - self_evolve_controller
+  - benchmark_generator
+  - companion_agent
+inputs:
+  - real_world_task_seeds
+  - axis_vocab
+  - no_agent_baseline_policy
+  - human_annotation_set
+outputs:
+  - calibrated_trajectory_judge
+  - hard_task_pool
+  - counterfactual_gap_closure_scores
+  - per_axis_agent_diagnosis
+core_concepts:
+  - name: "话题局部化评估（topic-localized evaluation）"
+    role: primary
+    evidence: "scores agreement only at the turns that actively move it and carries scores forward otherwise"
+  - name: "agentic 场景策展（agentic scenario curation）"
+    role: primary
+    evidence: "treats scenario construction itself as an agentic process that scales without human authoring"
+  - name: "社会认知轴探针（socio-cognitive probing）"
+    role: supporting
+    evidence: "axes are applied independently rather than stacked"
+  - name: "共识增益（consensus gain）"
+    role: primary
+    evidence: "fraction of the unmediated consensus gap closed at the end state"
+  - name: "模拟筛硬题（simulation-based filtering）"
+    role: supporting
+    evidence: "retain the scenario only when all three replays end in impasse"
+discovery_trace: 数据不足
+implementation_idea: >
+  在 AI-Brief 冷审门先做一个小切片：给每篇深读的 rubric 维度建立 topic/claim ledger，
+  裁判先标出每个维度在哪些段落或版本里真的发生变化，只在这些位置打分，未变化维度继承前值。
+  同时保留一个 cheap summary / no-review baseline，把深读收益按 gap closure 思路报告：
+  (deep_read_score - baseline_score) / (max_score - baseline_score)。先在 30 条历史冷审上验证与人工判定的相关性。
+small_experiment: >
+  取 30 条已有论文深读及其人工/冷审结论，跑两版 judge：A=每个维度全篇打分，B=先定位相关段落再局部化打分。
+  比较 Pearson/Spearman、误报类型、token 成本；如果 B 显著减少“无关段落牵连扣分”，再把它接入 cold_critic。
+design_principles:
+  - id: localize-before-judge
+    principle: "在开放式多轮任务里，LLM judge 先定位有效评价位置，再打分；不要让它每轮评所有 topic。"
+    transfers_to: "论文冷审、RAG 事实核查、agent 轨迹评估、对话质量评分。"
+  - id: calibrate-judge-before-ranking
+    principle: "任何 LLM judge 排行榜上线前，必须先有人类标注校准、IAA、judge-human correlation、backbone-swap robustness。"
+    transfers_to: "AI-Brief 冷审门、模型榜单、项目筛选器、自动选题打分。"
+  - id: use-counterfactual-credit
+    principle: "评干预型 agent 时报告相对无干预基线弥合了多少缺口，而不是只报绝对终局分。"
+    transfers_to: "self-evolve controller、陪伴 agent、客服 agent、FDE 需求澄清 agent。"
+  - id: reject-self-solving-cases
+    principle: "评测题必须先过 no-agent hard gate；基线自己能解决的软题会制造虚假进步。"
+    transfers_to: "gap-map 选题、benchmark 生成、冷审样本池。"
+  - id: perturb-one-axis-at-a-time
+    principle: "为了诊断，难度轴一次只动一根；堆叠变量更真实，但会毁掉失败归因。"
+    transfers_to: "agent eval 切片、回归测试、能力剖面分析。"
+  - id: pair-timeliness-with-effectiveness
+    principle: "主动 agent 不能只奖励快；timeliness 必须和 effectiveness 同报，否则会养出抢话型策略。"
+    transfers_to: "主动客服、辅导 agent、copilot interrupt policy。"
+risks:
+  - code_and_dataset_not_released
+  - all_llm_simulation_not_field_study
+  - judge_simulator_contestant_overlap
+  - mini_tier_models_may_understate_frontier
+  - english_only_culture_probe
+  - thin_per_domain_sample_size
+status: extracted

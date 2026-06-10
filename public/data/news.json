@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-09T13:00:13.333Z",
+  "generatedAt": "2026-06-10T13:44:20.561Z",
   "column": "news",
   "mode": "aggregate+optional-llm",
   "llmEnabled": true,
@@ -47,7 +47,7 @@
       "source": "Anthropic",
       "sourceType": "official",
       "ok": true,
-      "count": 10,
+      "count": 11,
       "error": ""
     },
     {
@@ -103,7 +103,7 @@
       "source": "Hacker News",
       "sourceType": "community",
       "ok": true,
-      "count": 28,
+      "count": 30,
       "error": ""
     },
     {
@@ -111,7 +111,7 @@
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
       "ok": true,
-      "count": 14,
+      "count": 12,
       "error": ""
     },
     {
@@ -119,7 +119,7 @@
       "source": "r/MachineLearning",
       "sourceType": "reddit",
       "ok": true,
-      "count": 0,
+      "count": 2,
       "error": ""
     },
     {
@@ -156,103 +156,382 @@
     "model": "deepseek-v4-flash",
     "imageCandidateLimit": 10
   },
-  "totalDiscovered": 186,
-  "totalAfterDedupe": 197,
-  "totalPublished": 174,
-  "totalPublishedForGeneratedDay": 10,
+  "totalDiscovered": 189,
+  "totalAfterDedupe": 226,
+  "totalPublished": 202,
+  "totalPublishedForGeneratedDay": 20,
   "items": [
     {
-      "title": "Apple’s AI pitch will live or die by its privacy promise",
-      "source": "The Verge AI",
-      "sourceType": "press",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/946705/apple-private-cloud-compute-ai-siri-intelligence-wwdc",
-      "publishedAt": "2026-06-09T12:55:33.000Z",
-      "summary": "As expected, yesterday's WWDC keynote was mostly about AI. And also as expected, Apple tried to turn its late arrival into its sales pitch: it didn't rush into AI because it was taking its time to do things right. In thi",
-      "imageUrl": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/06/apple-intelligence-siri-ai-private-cloud-compute.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-      "titleZh": "苹果的人工智能宣传将以其隐私承诺为生死关键",
-      "summaryZh": "昨日WWDC主题演讲主要是AI，苹果将迟到作为卖点：没有急于进入AI，因为它花时间做好。"
+      "title": "AWS Bedrock to require sharing data with Anthropic for Mythos and future models",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://news.ycombinator.com/item?id=48473166",
+      "publishedAt": "2026-06-10T08:21:38.000Z",
+      "points": 203,
+      "titleZh": "AWS Bedrock 要求与 Anthropic 共享数据以支持 Mythos 及未来模型"
     },
     {
-      "title": "Semantic distance as routing layer: an on-device, serverless alternative to the central-index model",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u12pqv/semantic_distance_as_routing_layer_an_ondevice/",
-      "publishedAt": "2026-06-09T11:49:32.000Z",
-      "titleZh": "语义距离作为路由层：一种设备端、无服务器的中心索引模型替代方案",
-      "summaryZh": "语义距离作为路由层：一种设备端、无服务器的中心索引模型替代方案"
+      "title": "Show HN: macOS menu bar gauges for your Claude Code quota",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/grzegorz-raczek-unit8/claude-quota",
+      "publishedAt": "2026-06-10T09:43:16.000Z",
+      "points": 26,
+      "imageUrl": "https://opengraph.githubassets.com/270b28ccca6dbe26f00b122beec5bcac030d3761d1c4248cda75dcce77ec45a6/grzegorz-raczek-unit8/claude-quota",
+      "titleZh": "Show HN：macOS 菜单栏仪表盘显示你的 Claude Code 配额"
     },
     {
-      "title": "Jetson Orin NX Build for Hermes Agent + Benchmarking",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u11wvo/jetson_orin_nx_build_for_hermes_agent_benchmarking/",
-      "publishedAt": "2026-06-09T11:10:02.000Z",
-      "titleZh": "用于Hermes Agent的Jetson Orin NX构建与基准测试",
-      "summaryZh": "用于Hermes Agent的Jetson Orin NX构建与基准测试"
+      "title": "Initial impressions of Claude Fable 5",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://simonwillison.net/2026/Jun/9/claude-fable-5/",
+      "publishedAt": "2026-06-10T03:42:37.000Z",
+      "points": 18,
+      "imageUrl": "https://static.simonwillison.net/static/2026/fable-max.jpg",
+      "titleZh": "Claude Fable 5 的初步印象"
     },
     {
-      "title": "Amazon employees ask Seattle to put the brakes on new data centers",
-      "source": "The Verge AI",
-      "sourceType": "press",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/945809/amazon-employees-seattle-data-center-moratorium",
-      "publishedAt": "2026-06-09T10:00:00.000Z",
-      "summary": "On Tuesday, the Seattle City Council will vote on whether to enact a one-year moratorium on new data centers - just two months after several companies proposed building five large-scale centers in the city. Among the mor",
-      "imageUrl": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/04/STKS528_DATA_CENTERS_A.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-      "titleZh": "亚马逊员工要求西雅图暂停建设新数据中心",
-      "summaryZh": "周二，西雅图市议会将投票决定是否实施为期一年的数据中心暂停令，此前几家公司提议建设五个大型数据中心。"
+      "title": "Claude Fable 5 feels less like a launch and more like a preview of AI inequality",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://old.reddit.com/r/ClaudeAI/comments/1u1fsdi/claude_fable_5_feels_less_like_a_model_launch_and/",
+      "publishedAt": "2026-06-10T01:50:14.000Z",
+      "points": 9,
+      "imageUrl": "https://www.redditstatic.com/new-icon.png",
+      "titleZh": "Claude Fable 5 感觉更像是对 AI 不平等的预览而非发布"
     },
     {
-      "title": "Does CPU matter for GPU inference?",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u0xlyd/does_cpu_matter_for_gpu_inference/",
-      "publishedAt": "2026-06-09T07:00:12.000Z",
-      "titleZh": "CPU对GPU推理是否重要？"
+      "title": "Apple pays Google $1B/yr for Gemini. Google pays Apple $20B/yr for search",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.matteast.io/competition-is-for-losers.html",
+      "publishedAt": "2026-06-10T05:40:53.000Z",
+      "points": 8,
+      "titleZh": "苹果每年向谷歌支付10亿美元用于 Gemini。谷歌每年向苹果支付200亿美元用于搜索"
     },
     {
-      "title": "silx-ai/Quasar-Preview • Huggingface (5M context length)",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u0vtik/silxaiquasarpreview_huggingface_5m_context_length/",
-      "publishedAt": "2026-06-09T05:19:41.000Z",
-      "titleZh": "silx-ai/Quasar-Preview • Huggingface (5M上下文长度)",
-      "summaryZh": "silx-ai/Quasar-Preview • Huggingface (5M上下文长度)"
+      "title": "German ruling declares Google liable for false answers in AI Overviews",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://the-decoder.com/landmark-german-ruling-declares-googles-ai-overviews-are-googles-own-words-and-makes-it-liable-for-false-answers/",
+      "publishedAt": "2026-06-10T01:44:13.000Z",
+      "points": 8,
+      "titleZh": "德国裁决认定谷歌对AI概览中的虚假回答承担责任",
+      "summaryZh": "德国裁决认定谷歌对AI概览中的虚假回答承担责任",
+      "imageUrl": "https://the-decoder.com/wp-content/uploads/2026/06/ai_overviews_hammer_law.png"
     },
     {
-      "title": "ggml-webgpu: Improve prefill speeds for k-quants + refactor matmul for Q4/Q5/Q8 and k-quants by yomaytk · Pull Request #24225 · ggml-org/llama.cpp",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u0snw6/ggmlwebgpu_improve_prefill_speeds_for_kquants/",
-      "publishedAt": "2026-06-09T02:41:24.000Z",
-      "titleZh": "ggml-webgpu: 提升k-quants的预填充速度并重构Q4/Q5/Q8和k-quants的矩阵乘法 —— yomaytk 的拉取请求 #24225 · ggml-org/llama.cpp",
-      "summaryZh": "ggml-webgpu: 提升k-quants的预填充速度并重构Q4/Q5/Q8和k-quants的矩阵乘法 —— yomaytk 的拉取请求 #24225 · ggml-org/llama.cpp"
-    },
-    {
-      "title": "Why Apple&#8217;s slow-and-steady AI bet is starting to look pretty smart",
+      "title": "Jedify raises $24M to help companies arm AI agents with context on their business",
       "source": "TechCrunch AI",
       "sourceType": "press",
-      "url": "https://techcrunch.com/2026/06/08/why-apples-slow-and-steady-ai-bet-is-starting-to-look-pretty-smart/",
-      "publishedAt": "2026-06-09T01:56:48.000Z",
-      "summary": "Can Apple's new AI glow up put to bed accusations that it's losing an all-important industry race?",
-      "imageUrl": "https://techcrunch.com/wp-content/uploads/2026/06/apple-siri-ai-use-cases.png?w=1186",
-      "titleZh": "为什么苹果缓慢而稳健的人工智能策略开始显得非常明智",
-      "summaryZh": "苹果缓慢而稳健的人工智能策略开始显得非常明智。"
+      "url": "https://techcrunch.com/2026/06/10/jedify-raises-24m-to-help-companies-arm-ai-agents-with-context-on-their-business/",
+      "publishedAt": "2026-06-10T13:33:09.000Z",
+      "summary": "The funding round was led by Norwest, with participation S Capital VC, Cerca Partners, and Oceans Ventures. Snowflake Ventures also participated as a strategic investor.",
+      "imageUrl": "https://techcrunch.com/wp-content/uploads/2026/06/Jedify-Co-founders.jpg?resize=1200,800",
+      "titleZh": "Jedify 融资2400万美元，帮助企业为 AI 代理提供业务上下文",
+      "summaryZh": "本轮融资由 Norwest 领投，S Capital VC、Cerca Partners 和 Oceans Ventures 参投。Snowflake Ventures 作为战略投资者也参与了投资。"
     },
     {
-      "title": "Jetbrains Mellum 2: a really good and performant model",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u0r3jh/jetbrains_mellum_2_a_really_good_and_performant/",
-      "publishedAt": "2026-06-09T01:28:54.000Z",
-      "titleZh": "Jetbrains Mellum 2: 一个非常好且性能卓越的模型"
+      "title": "Decart&#8217;s new world model can simulate hours of photorealistic driving — with some caveats",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/10/decarts-new-world-model-can-simulate-hours-of-photorealistic-driving-with-some-caveats/",
+      "publishedAt": "2026-06-10T13:07:56.000Z",
+      "summary": "Decart is launching Oasis 3, a real-time world model that generates photorealistic driving environments for autonomous vehicle testing, now available via API for developers to build on.",
+      "imageUrl": "https://techcrunch.com/wp-content/uploads/2026/06/Decart-Oasis-3.png?resize=1200,675",
+      "titleZh": "Decart 的新世界模型可模拟数小时的逼真驾驶——但有一些注意事项",
+      "summaryZh": "Decart 发布了 Oasis 3，一个实时世界模型，可生成用于自动驾驶车辆测试的逼真驾驶环境，现已通过 API 提供给开发者使用。"
     },
     {
-      "title": "Here's a llama.cpp CLI Command builder.",
+      "title": "Cohere released North Mini Code: It's first Open-Source Agentic Coding Model",
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u0ptwi/heres_a_llamacpp_cli_command_builder/",
-      "publishedAt": "2026-06-09T00:30:58.000Z",
-      "titleZh": "这是一个llama.cpp命令行构建器。"
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1za0m/cohere_released_north_mini_code_its_first/",
+      "publishedAt": "2026-06-10T11:18:53.000Z",
+      "titleZh": "Cohere 发布了 North Mini Code：这是首个开源代理编程模型"
+    },
+    {
+      "title": "All agents have awful security. Mine isn't vibecoded. You might have seen my post about OpenLumara... i challenge you all to hack my public instance of it!",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1yxcr/all_agents_have_awful_security_mine_isnt/",
+      "publishedAt": "2026-06-10T11:01:25.000Z",
+      "titleZh": "所有智能体安全都很糟。我的没有vibecoded。挑战你们来黑我的OpenLumara公开实例。"
+    },
+    {
+      "title": "How long do you think it will take for the stock market to notice that Apple and Microsoft announced at the same time that they're all-in for local AI?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1ykqb/how_long_do_you_think_it_will_take_for_the_stock/",
+      "publishedAt": "2026-06-10T10:42:38.000Z",
+      "titleZh": "你认为股市多久才会注意到苹果和微软同时宣布全力投入本地AI？"
+    },
+    {
+      "title": "Qwen3.6-MTP-27B on Tesla V100 @ 55 TPS (llama.cpp) — Any way to push this higher without quality loss?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1ygkw/qwen36mtp27b_on_tesla_v100_55_tps_llamacpp_any/",
+      "publishedAt": "2026-06-10T10:36:10.000Z",
+      "titleZh": "在特斯拉V100上运行Qwen3.6-MTP-27B，速度55 TPS (llama.cpp)——有什么办法能在不损失质量的情况下提升速度？"
+    },
+    {
+      "title": "Qwen 3.6 27B AutoRound GGUF, need your feedback",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1yak0/qwen_36_27b_autoround_gguf_need_your_feedback/",
+      "publishedAt": "2026-06-10T10:27:05.000Z",
+      "titleZh": "Qwen 3.6 27B AutoRound GGUF，需要你的反馈"
+    },
+    {
+      "title": "Can you really replace paid models with a local model?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1wo8p/can_you_really_replace_paid_models_with_a_local/",
+      "publishedAt": "2026-06-10T08:55:33.000Z",
+      "titleZh": "你真的可以用本地模型取代付费模型吗？"
+    },
+    {
+      "title": "What is the best 7b-12b coding model in 2026?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1w35p/what_is_the_best_7b12b_coding_model_in_2026/",
+      "publishedAt": "2026-06-10T08:20:11.000Z",
+      "titleZh": "2026年最好的7b-12b编程模型是什么？"
+    },
+    {
+      "title": "Meta signs first AI data center deal in India with Reliance",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/10/meta-signs-first-ai-data-center-deal-in-india-with-reliance/",
+      "publishedAt": "2026-06-10T07:05:26.000Z",
+      "summary": "The 168-megawatt facility will support Meta's global AI computing needs and can be expanded over time.",
+      "titleZh": "Meta与Reliance签署在印度的首个AI数据中心协议",
+      "summaryZh": "该设施将支持Meta的全球AI计算需求并可扩展。"
+    },
+    {
+      "title": "What's up on CPU inference these days?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1sj9d/whats_up_on_cpu_inference_these_days/",
+      "publishedAt": "2026-06-10T05:01:02.000Z",
+      "titleZh": "现在CPU推理怎么样了？"
+    },
+    {
+      "title": "Without open source LLMs, US AI companies could have already monopoled the technology",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1siyl/without_open_source_llms_us_ai_companies_could/",
+      "publishedAt": "2026-06-10T05:00:42.000Z",
+      "titleZh": "如果没有开源大语言模型，美国AI公司可能已经垄断了该技术",
+      "summaryZh": "如果没有开源大语言模型，美国AI公司可能已经垄断了该技术"
+    },
+    {
+      "title": "Anthropic is intentionally nerfing Fable when asked to develop other LLMs",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1s2oz/anthropic_is_intentionally_nerfing_fable_when/",
+      "publishedAt": "2026-06-10T04:36:49.000Z",
+      "titleZh": "Anthropic在要求开发其他LLM时故意削弱Fable",
+      "summaryZh": "Anthropic在要求开发其他LLM时故意削弱Fable"
+    },
+    {
+      "title": "I Built Paper Deck: A Better Way to Discover AI/ML Papers [P]",
+      "source": "r/MachineLearning",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1u1rf09/i_built_paper_deck_a_better_way_to_discover_aiml/",
+      "publishedAt": "2026-06-10T04:02:25.000Z",
+      "titleZh": "我构建了Paper Deck：一种发现AI/ML论文的更好方式",
+      "summaryZh": "我构建了Paper Deck：一种发现AI/ML论文的更好方式"
+    },
+    {
+      "title": "Claude Fable 5 and Claude Mythos 5 Announcements Jun 9, 2026 Our next generation of intelligence for the hardest knowledge work and coding problems.",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+      "publishedAt": "2026-06-09T04:00:00.000Z",
+      "titleZh": "Claude Fable 5和Claude Mythos 5于2026年6月9日发布，面向最困难的知识工作和编程问题",
+      "summaryZh": "Claude Fable 5和Claude Mythos 5于2026年6月9日发布，面向最困难的知识工作和编程问题"
+    },
+    {
+      "title": "Microsoft's open source tools were hacked to steal passwords of AI developers",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://techcrunch.com/2026/06/08/microsofts-open-source-tools-were-hacked-to-steal-passwords-of-ai-developers/",
+      "publishedAt": "2026-06-09T00:00:00.000Z",
+      "points": 545,
+      "titleZh": "微软的开源工具被黑客用于窃取AI开发者的密码",
+      "summaryZh": "微软的开源工具被黑客用于窃取AI开发者的密码"
+    },
+    {
+      "title": "If Claude Fable stops helping you, you'll never know",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://jonready.com/blog/posts/claude-fable5-is-allowed-to-sabotage-your-app-if-youre-a-competitor.html",
+      "publishedAt": "2026-06-09T21:19:11.000Z",
+      "points": 495,
+      "titleZh": "如果Claude Fable停止帮助你，你永远不会知道",
+      "summaryZh": "如果Claude Fable停止帮助你，你永远不会知道"
+    },
+    {
+      "title": "System Card: Claude Fable 5 and Claude Mythos 5 [pdf]",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www-cdn.anthropic.com/d00db56fa754a1b115b6dd7cb2e3c342ee809620.pdf",
+      "publishedAt": "2026-06-09T16:58:13.000Z",
+      "points": 211,
+      "titleZh": "系统卡：Claude Fable 5和Claude Mythos 5 [pdf]",
+      "summaryZh": "系统卡：Claude Fable 5和Claude Mythos 5 [pdf]"
+    },
+    {
+      "title": "AI misidentification results in wrongful arrest; man seeks justice",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.wsoctv.com/news/local/ai-misidentification-results-wrongful-arrest-man-seeks-justice/I7UQJWV33FBN3LMKHCSXI6FIVA/",
+      "publishedAt": "2026-06-09T22:37:49.000Z",
+      "points": 73,
+      "titleZh": "AI错误识别导致误捕，男子寻求正义",
+      "summaryZh": "AI错误识别导致误捕，男子寻求正义"
+    },
+    {
+      "title": "Grit: Rewriting Git in Rust with agents",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://blog.gitbutler.com/true-grit",
+      "publishedAt": "2026-06-09T19:58:21.000Z",
+      "points": 71,
+      "titleZh": "Grit：用代理以Rust重写Git",
+      "summaryZh": "Grit：用代理以Rust重写Git"
+    },
+    {
+      "title": "Claude Fable 5 will sabotage \"frontier LLM research\" tasks",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://twitter.com/i/status/2064399902684139852",
+      "publishedAt": "2026-06-09T21:16:20.000Z",
+      "points": 45,
+      "titleZh": "Claude Fable 5将破坏‘前沿LLM研究’任务",
+      "summaryZh": "Claude Fable 5将破坏‘前沿LLM研究’任务"
+    },
+    {
+      "title": "Show HN: Claw Patrol, a security firewall for agents",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/denoland/clawpatrol",
+      "publishedAt": "2026-06-09T16:06:50.000Z",
+      "points": 21,
+      "titleZh": "Show HN：Claw Patrol，一个面向代理的安全防火墙",
+      "summaryZh": "Show HN：Claw Patrol，一个面向代理的安全防火墙"
+    },
+    {
+      "title": "Claude Mythos 5 / Fable 5",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.anthropic.com/claude/fable",
+      "publishedAt": "2026-06-09T17:10:39.000Z",
+      "points": 17,
+      "titleZh": "Claude Mythos 5 / Fable 5"
+    },
+    {
+      "title": "Anthropic Kept Every Promise It Could Afford",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://techtrenches.dev/p/anthropic-kept-every-promise-it-could",
+      "publishedAt": "2026-06-09T18:06:32.000Z",
+      "points": 16,
+      "titleZh": "Anthropic兑现了它力所能及的每一个承诺"
+    },
+    {
+      "title": "Show HN: Open-source version of Anthropic's internal analytics engine",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/Kaelio/ktx",
+      "publishedAt": "2026-06-09T16:17:36.000Z",
+      "points": 13,
+      "titleZh": "Show HN: Anthropic内部分析引擎的开源版本"
+    },
+    {
+      "title": "The zot coding agent temporarily added Claude Fable 5 to its built-in catalog",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/patriceckhart/zot",
+      "publishedAt": "2026-06-09T18:27:00.000Z",
+      "points": 9,
+      "titleZh": "zot编码代理临时将Claude Fable 5添加到内置目录",
+      "summaryZh": "zot编码代理临时将Claude Fable 5添加到内置目录"
+    },
+    {
+      "title": "Show HN: We post-trained a model that pen tests instead of refusing your code",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.argusred.com/cli",
+      "publishedAt": "2026-06-09T12:26:34.000Z",
+      "points": 9,
+      "titleZh": "Show HN: 我们后训练了一个模型，它会执行渗透测试而不是拒绝你的代码"
+    },
+    {
+      "title": "Stack Overflow for Agents",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://agents.stackoverflow.com/",
+      "publishedAt": "2026-06-09T19:12:26.000Z",
+      "points": 8,
+      "titleZh": "面向AI代理的Stack Overflow"
+    },
+    {
+      "title": "I tried Siri AI, and so far it actually works",
+      "source": "The Verge AI",
+      "sourceType": "press",
+      "url": "https://www.theverge.com/tech/947432/siri-ai-apple-intelligence-ios-27-wwdc",
+      "publishedAt": "2026-06-09T23:43:00.000Z",
+      "summary": "Parents want one thing, and one thing only, out of AI: to add a list of soccer games or \"spirit week\" theme days from an email or a poorly formatted flyer onto their calendar in one shot. And I have good news for parents",
+      "titleZh": "我尝试了Siri AI，目前看来它确实有效"
+    },
+    {
+      "title": "Furiosa AI selling inference chip to consumer market will be a game changer to local llm",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u1l9u4/furiosa_ai_selling_inference_chip_to_consumer/",
+      "publishedAt": "2026-06-09T23:20:57.000Z",
+      "titleZh": "Furiosa AI 向消费市场销售推理芯片，将对本地大语言模型产生重大改变。",
+      "summaryZh": "Furiosa AI 向消费市场销售推理芯片，将对本地大语言模型产生重大改变。"
+    },
+    {
+      "title": "How Justin Ernest invested nearly $500M into hot startups without a traditional VC fund",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/09/how-justin-ernest-invested-nearly-500m-into-hot-startups-without-a-traditional-vc-fund/",
+      "publishedAt": "2026-06-09T23:17:51.000Z",
+      "summary": "Instead of spending a year raising a formal venture fund, the Sabertooth VC founder used a captive network of LPs to invest in startups like Anthropic, Anduril, and SpaceX.",
+      "titleZh": "Justin Ernest如何在没有传统风投基金的情况下向热门初创公司投资近5亿美元",
+      "summaryZh": "Sabertooth VC创始人Justin Ernest没有花一年时间筹集正式风险基金，而是利用一个专属LP网络投资了Anthropic、Anduril和SpaceX等初创公司。"
+    },
+    {
+      "title": "Phinite — multi-agent OS with first-class agent identity, composable skills, behavioral evaluation [P]",
+      "source": "r/MachineLearning",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1u1jqmf/phinite_multiagent_os_with_firstclass_agent/",
+      "publishedAt": "2026-06-09T22:17:47.000Z",
+      "titleZh": "Phinite — 多智能体操作系统，具有一流的智能体身份、可组合技能、行为评估 [P]"
+    },
+    {
+      "title": "GM thinks EVs can help offset AI’s energy suck with vehicle-to-grid tech",
+      "source": "The Verge AI",
+      "sourceType": "press",
+      "url": "https://www.theverge.com/transportation/946820/gm-energy-ev-v2g-storage-sodium-ion",
+      "publishedAt": "2026-06-09T21:00:00.000Z",
+      "summary": "At an event in San Francisco today, General Motors made a series of announcements around EV batteries, energy storage, and grid resiliency in the face of growing electricity demand from AI data centers. The automaker ann",
+      "titleZh": "通用汽车认为电动车可通过车网互联技术抵消AI的能源消耗",
+      "summaryZh": "通用汽车在旧金山活动中宣布了一系列关于电动车电池、储能和电网韧性的公告，以应对AI数据中心日益增长的电力需求。"
+    },
+    {
+      "title": "Hey, Siri, here&#8217;s what I actually want from AI",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/09/hey-siri-heres-what-i-actually-want-from-ai/",
+      "publishedAt": "2026-06-09T20:50:17.000Z",
+      "summary": "I'm desperate for a personal AI assistant, but do I really want to become the kind of person who can't function without the friendly robot voice in my phone?",
+      "titleZh": "嘿，Siri，这就是我对AI的真正期望",
+      "summaryZh": "作者表达了对个人AI助手的渴望，但质疑自己是否愿意变得离不开手机中的机器人声音。"
     },
     {
       "title": "Apple reveals new AI architecture built around Google Gemini models",
@@ -260,8 +539,9 @@
       "sourceType": "community",
       "url": "https://www.macrumors.com/2026/06/08/apple-reveals-new-ai-architecture/",
       "publishedAt": "2026-06-08T19:14:47.000Z",
-      "points": 644,
-      "titleZh": "苹果发布基于Google Gemini模型的新AI架构"
+      "points": 722,
+      "titleZh": "苹果发布了基于Google Gemini模型构建的新AI架构",
+      "summaryZh": "苹果发布了基于Google Gemini模型构建的新AI架构"
     },
     {
       "title": "DeepSeek V4 Pro beats GPT-5.5 Pro on precision",
@@ -269,8 +549,9 @@
       "sourceType": "community",
       "url": "https://runtimewire.com/article/deepseek-v4-pro-beats-gpt-5-5-pro-on-precision",
       "publishedAt": "2026-06-08T01:39:30.000Z",
-      "points": 391,
-      "titleZh": "DeepSeek V4 Pro在精度上击败GPT-5.5 Pro"
+      "points": 395,
+      "titleZh": "DeepSeek V4 Pro在精度上击败GPT-5.5 Pro",
+      "summaryZh": "DeepSeek V4 Pro在精度上击败GPT-5.5 Pro"
     },
     {
       "title": "Confidential submission of draft S-1 to the SEC",
@@ -278,7 +559,7 @@
       "sourceType": "community",
       "url": "https://openai.com/index/openai-submits-confidential-s-1/",
       "publishedAt": "2026-06-08T21:22:43.000Z",
-      "points": 347,
+      "points": 358,
       "titleZh": "向SEC秘密提交S-1草案"
     },
     {
@@ -287,8 +568,9 @@
       "sourceType": "community",
       "url": "https://www.cc.dev/",
       "publishedAt": "2026-06-08T00:00:00.000Z",
-      "points": 53,
-      "titleZh": "Show HN: Command Center，为注重质量的开发者打造的AI编程环境"
+      "points": 64,
+      "titleZh": "Show HN：Command Center，为关注质量的用户打造的AI编码环境",
+      "summaryZh": "Show HN：Command Center，为关注质量的用户打造的AI编码环境"
     },
     {
       "title": "Do agents.md files help coding agents?",
@@ -307,7 +589,8 @@
       "url": "https://www.schneier.com/blog/archives/2026/06/anthropics-project-glasswing-update.html",
       "publishedAt": "2026-06-08T12:33:14.000Z",
       "points": 40,
-      "titleZh": "Anthropic的Project Glasswing更新"
+      "titleZh": "Anthropic的Project Glasswing更新",
+      "summaryZh": "Anthropic的Project Glasswing更新"
     },
     {
       "title": "OpenAI Confidentially Files for IPO",
@@ -316,7 +599,8 @@
       "url": "https://www.cnbc.com/2026/06/08/openai-confidentially-files-for-ipo-prepping-wall-street-for-ai-debut.html",
       "publishedAt": "2026-06-08T21:16:20.000Z",
       "points": 24,
-      "titleZh": "OpenAI秘密提交IPO申请"
+      "titleZh": "OpenAI秘密提交IPO申请",
+      "summaryZh": "OpenAI秘密提交IPO申请"
     },
     {
       "title": "Microsoft Hacked to Deliver Malware to Claude and Gemini Users",
@@ -324,9 +608,9 @@
       "sourceType": "community",
       "url": "https://www.404media.co/microsoft-hacked-to-deliver-malware-to-claude-and-gemini-users/",
       "publishedAt": "2026-06-08T18:34:04.000Z",
-      "points": 18,
-      "titleZh": "Microsoft 被黑，向 Claude 和 Gemini 用户分发恶意软件",
-      "summaryZh": "Microsoft 被黑，向 Claude 和 Gemini 用户分发恶意软件"
+      "points": 19,
+      "titleZh": "微软遭黑客攻击，向Claude和Gemini用户分发恶意软件",
+      "summaryZh": "微软遭黑客攻击，向Claude和Gemini用户分发恶意软件"
     },
     {
       "title": "Built to benefit everyone: our plan",
@@ -335,7 +619,7 @@
       "url": "https://openai.com/index/built-to-benefit-everyone-our-plan/",
       "publishedAt": "2026-06-08T20:56:24.000Z",
       "points": 13,
-      "titleZh": "为所有人谋福祉：我们的计划"
+      "titleZh": "为所有人谋福利：我们的计划"
     },
     {
       "title": "Show HN: Rayline routes Claude Code subagents to on-device and cheaper models",
@@ -354,8 +638,18 @@
       "url": "https://news.ycombinator.com/item?id=48450521",
       "publishedAt": "2026-06-08T19:36:15.000Z",
       "points": 10,
-      "titleZh": "Anthropic 的 Claude Fable 5 将于明天发布",
-      "summaryZh": "Anthropic 的 Claude Fable 5 将于明天发布"
+      "titleZh": "Anthropic的Claude Fable 5，明日发布",
+      "summaryZh": "Anthropic的Claude Fable 5，明日发布"
+    },
+    {
+      "title": "Ask HN: Why won't you be replaced by AI?",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://news.ycombinator.com/item?id=48450261",
+      "publishedAt": "2026-06-08T19:21:45.000Z",
+      "points": 10,
+      "titleZh": "Ask HN: 为什么你不会被AI取代？",
+      "summaryZh": "Ask HN: 为什么你不会被AI取代？"
     },
     {
       "title": "OpenAI Files S-1",
@@ -364,8 +658,8 @@
       "url": "https://twitter.com/openainewsroom/status/2064094175541461220",
       "publishedAt": "2026-06-08T21:16:43.000Z",
       "points": 9,
-      "titleZh": "OpenAI 提交 S-1 文件",
-      "summaryZh": "OpenAI 提交 S-1 文件"
+      "titleZh": "OpenAI提交S-1文件",
+      "summaryZh": "OpenAI提交S-1文件"
     },
     {
       "title": "OpenAI plots biggest ChatGPT overhaul since launch",
@@ -374,17 +668,8 @@
       "url": "https://www.ft.com/content/ca0f5f5e-fb9a-41a0-a2a9-0127e15b7db9",
       "publishedAt": "2026-06-08T22:28:18.000Z",
       "points": 8,
-      "titleZh": "OpenAI 计划自推出以来最大规模的 ChatGPT 改版",
-      "summaryZh": "OpenAI 计划自推出以来最大规模的 ChatGPT 改版"
-    },
-    {
-      "title": "Ask HN: Why won't you be replaced by AI?",
-      "source": "Hacker News",
-      "sourceType": "community",
-      "url": "https://news.ycombinator.com/item?id=48450261",
-      "publishedAt": "2026-06-08T19:21:45.000Z",
-      "points": 8,
-      "titleZh": "Ask HN：为什么你不会被 AI 取代？"
+      "titleZh": "OpenAI计划自推出以来最大的ChatGPT改版",
+      "summaryZh": "OpenAI计划自推出以来最大的ChatGPT改版"
     },
     {
       "title": "\"Chat is dead\": OpenAI preps overhaul of ChatGPT",
@@ -393,8 +678,8 @@
       "url": "https://arstechnica.com/ai/2026/06/chat-is-dead-openai-preps-overhaul-of-chatgpt/",
       "publishedAt": "2026-06-08T15:09:38.000Z",
       "points": 8,
-      "titleZh": "“聊天已死”：OpenAI 准备对 ChatGPT 进行重大改版",
-      "summaryZh": "“聊天已死”：OpenAI 准备对 ChatGPT 进行重大改版"
+      "titleZh": "“聊天已死”：OpenAI准备对ChatGPT进行改革",
+      "summaryZh": "“聊天已死”：OpenAI准备对ChatGPT进行改革"
     },
     {
       "title": "Pipeline parallelism in llama.cpp may be wasting your VRAM",
@@ -402,7 +687,8 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u0p3b2/pipeline_parallelism_in_llamacpp_may_be_wasting/",
       "publishedAt": "2026-06-08T23:58:42.000Z",
-      "titleZh": "llama.cpp中的流水线并行可能浪费你的VRAM"
+      "titleZh": "llama.cpp中的流水线并行可能浪费你的VRAM",
+      "summaryZh": "llama.cpp中的流水线并行可能浪费你的VRAM"
     },
     {
       "title": "As OpenAI files for IPO, Sam Altman&#8217;s eye-scanning company is doing layoffs, report says",
@@ -411,8 +697,8 @@
       "url": "https://techcrunch.com/2026/06/08/as-openai-files-for-ipo-sam-altmans-eye-scanning-company-is-doing-layoffs-report-says/",
       "publishedAt": "2026-06-08T22:41:45.000Z",
       "summary": "Tools for Humanity, Sam Altman's identity verification company, is reportedly struggling to generate revenue and will downsize its staff.",
-      "titleZh": "OpenAI提交IPO申请之际，Sam Altman的眼部扫描公司据报道正在进行裁员",
-      "summaryZh": "据报告，Sam Altman的身份验证公司Tools for Humanity收入困难，将裁员。"
+      "titleZh": "OpenAI申请IPO之际，Sam Altman的眼部扫描公司据报道正在进行裁员",
+      "summaryZh": "据报告，Sam Altman的身份验证公司Tools for Humanity因难以产生收入而将裁员。"
     },
     {
       "title": "Apple&#8217;s WWDC AI demos looked more real after $250M false ad settlement",
@@ -421,8 +707,8 @@
       "url": "https://techcrunch.com/2026/06/08/apples-wwdc-ai-demos-looked-more-real-after-250m-false-ad-settlement/",
       "publishedAt": "2026-06-08T22:39:57.000Z",
       "summary": "The vibe of Apple's 2026 WWDC keynote felt like a spouse proudly listing all the honey-do-list items tackled. One subtle example: the many AI demos of someone standing, phone in hand.",
-      "titleZh": "苹果WWDC的AI演示在2.5亿美元虚假广告和解后显得更真实",
-      "summaryZh": "苹果2026年WWDC主题演讲的氛围如同配偶自豪地列出已完成的家务清单，其中AI演示展示了用户手持手机的场景。"
+      "titleZh": "苹果在WWDC上的AI演示在2.5亿美元虚假广告和解后看起来更真实",
+      "summaryZh": "苹果在WWDC上的AI演示在支付2.5亿美元虚假广告和解后显得更加逼真。"
     },
     {
       "title": "Apple is using AI to fix Safari’s extension problem",
@@ -431,8 +717,8 @@
       "url": "https://www.theverge.com/tech/946345/apple-safari-ai-update-extensions",
       "publishedAt": "2026-06-08T22:14:17.000Z",
       "summary": "Apple is trying to solve one of Safari's biggest weaknesses with AI. Safari has long lacked the robust library of extensions that its rivals have, mainly due to the stringent development requirements from Apple. But now,",
-      "titleZh": "苹果正利用AI解决Safari的扩展问题",
-      "summaryZh": "苹果正尝试用AI解决Safari长期以来因严格开发要求而缺乏丰富扩展库的弱点。"
+      "titleZh": "苹果正在用AI修复Safari的扩展问题",
+      "summaryZh": "苹果正在用AI修复Safari的扩展问题，这是其最大的弱点之一。"
     },
     {
       "title": "OpenAI files for IPO, following Anthropic",
@@ -451,7 +737,7 @@
       "url": "https://github.com/anthropics/claude-code/issues/65697",
       "publishedAt": "2026-06-07T13:06:52.000Z",
       "points": 529,
-      "titleZh": "Anthropic，请发布官方Claude桌面版Linux"
+      "titleZh": "Anthropic，请发布官方Linux版Claude桌面应用"
     },
     {
       "title": "I design with Claude more than Figma now",
@@ -460,7 +746,7 @@
       "url": "https://blog.janestreet.com/i-design-with-claude-code-more-than-figma-now-index/",
       "publishedAt": "2026-06-07T05:04:24.000Z",
       "points": 290,
-      "titleZh": "我现在用Claude设计比用Figma更多"
+      "titleZh": "我现在使用Claude进行设计多于Figma"
     },
     {
       "title": "The OnlyFans Economy of American AI",
@@ -468,8 +754,9 @@
       "sourceType": "community",
       "url": "https://leoveanu.com/2026-06-06-qwen3.7max/",
       "publishedAt": "2026-06-07T14:47:17.000Z",
-      "points": 144,
-      "titleZh": "美国AI的OnlyFans经济"
+      "points": 145,
+      "titleZh": "美国AI的OnlyFans经济",
+      "summaryZh": "美国AI的OnlyFans经济"
     },
     {
       "title": "Anthropic/OpenAI may be spending more than $1000 for every $100 you pay them",
@@ -487,9 +774,9 @@
       "sourceType": "community",
       "url": "https://github.com/ninoxAI/nightwatch",
       "publishedAt": "2026-06-07T20:24:36.000Z",
-      "points": 32,
-      "titleZh": "Show HN: Nightwatch，开源、只读的AI SRE",
-      "summaryZh": "Show HN: Nightwatch，开源、只读的AI SRE"
+      "points": 33,
+      "titleZh": "Show HN：Nightwatch，开源只读AI SRE",
+      "summaryZh": "Show HN：Nightwatch，开源只读AI SRE"
     },
     {
       "title": "Ask HN: Are we as society going to let LLM companies take all the values?",
@@ -498,7 +785,8 @@
       "url": "https://news.ycombinator.com/item?id=48439240",
       "publishedAt": "2026-06-07T22:30:08.000Z",
       "points": 29,
-      "titleZh": "Ask HN: 我们作为社会是否会让LLM公司夺走所有价值？"
+      "titleZh": "Ask HN：我们作为社会是否会让LLM公司夺走所有价值？",
+      "summaryZh": "Ask HN：我们作为社会是否会让LLM公司夺走所有价值？"
     },
     {
       "title": "Show HN: TakoVM – Isolated model and tool execution used by enterprises",
@@ -517,7 +805,8 @@
       "url": "https://www.wmbriggs.com/post/61049/",
       "publishedAt": "2026-06-07T19:48:14.000Z",
       "points": 8,
-      "titleZh": "没有模型能拯救我们：教皇利奥、Miserostat和AI的觉醒程序员"
+      "titleZh": "没有模型能拯救我们：教皇利奥、Miserostat和AI的觉醒程序员",
+      "summaryZh": "没有模型能拯救我们：教皇利奥、Miserostat和AI的觉醒程序员"
     },
     {
       "title": "Automated QA and Testing with AI",
@@ -526,7 +815,8 @@
       "url": "https://antirez.com/news/168",
       "publishedAt": "2026-06-07T09:57:18.000Z",
       "points": 8,
-      "titleZh": "使用AI进行自动化QA和测试"
+      "titleZh": "利用AI进行自动化质量保证和测试",
+      "summaryZh": "利用AI进行自动化质量保证和测试"
     },
     {
       "title": "The ROI of AI coding looks different when you are a bootstrapped founder",
@@ -535,7 +825,8 @@
       "url": "https://octavio.substack.com/p/the-roi-of-ai-coding-looks-completely",
       "publishedAt": "2026-06-07T00:00:00.000Z",
       "points": 8,
-      "titleZh": "当你是一个自力更生的创始人时，AI编程的投资回报率看起来不同"
+      "titleZh": "当你是一名自力更生的创始人时，AI编码的投资回报率看起来不同",
+      "summaryZh": "当你是一名自力更生的创始人时，AI编码的投资回报率看起来不同"
     },
     {
       "title": "Agentic AI solved coding and exposed every other problem in SE",
@@ -544,7 +835,18 @@
       "url": "https://venturebeat.com/technology/agentic-ai-solved-coding-and-exposed-every-other-problem-in-software-engineering",
       "publishedAt": "2026-06-07T00:00:00.000Z",
       "points": 6,
-      "titleZh": "Agentic AI解决了编码问题并暴露了软件工程中所有其他问题"
+      "titleZh": "Agentic AI解决了编码问题，并暴露了软件工程中的其他所有问题",
+      "summaryZh": "Agentic AI解决了编码问题，并暴露了软件工程中的其他所有问题"
+    },
+    {
+      "title": "What is your current local LLM setup?",
+      "source": "Reddit",
+      "sourceType": "community",
+      "url": "https://www.reddit.com/r/machinelearningnews/comments/1tz4jb2/what_is_your_current_local_llm_setup/",
+      "publishedAt": "2026-06-07T00:00:00.000Z",
+      "points": 20,
+      "titleZh": "你当前使用的本地LLM设置是什么？",
+      "summaryZh": "你当前使用的本地LLM设置是什么？"
     },
     {
       "title": "Is this the dawn of the Tokenpocalypse?",
@@ -616,16 +918,7 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tzbxsm/whats_your_most_unusual_nonllm_ai_you_actually/",
       "publishedAt": "2026-06-07T13:18:32.000Z",
-      "titleZh": "你每天实际使用的最不寻常的非LLM AI是什么？"
-    },
-    {
-      "title": "llama.cpp Gemma4 MTP support merged!",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tzbcyp/llamacpp_gemma4_mtp_support_merged/",
-      "publishedAt": "2026-06-07T12:53:17.000Z",
-      "titleZh": "llama.cpp的Gemma4 MTP支持已合并！",
-      "summaryZh": "llama.cpp的Gemma4 MTP支持已合并！"
+      "titleZh": "你每天使用的最不寻常的非LLM AI是什么？"
     },
     {
       "title": "S&P 500 rejects SpaceX, also blocking entry for OpenAI and Anthropic",
@@ -634,7 +927,8 @@
       "url": "https://arstechnica.com/tech-policy/2026/06/sp-500-blocks-fast-spacex-entry-wont-waive-rule-for-unprofitable-ai-firms/",
       "publishedAt": "2026-06-06T04:38:36.000Z",
       "points": 1470,
-      "titleZh": "标普500拒绝SpaceX，同时阻止OpenAI和Anthropic进入"
+      "titleZh": "标普500拒绝SpaceX，也阻止OpenAI和Anthropic加入",
+      "summaryZh": "标普500拒绝SpaceX，也阻止OpenAI和Anthropic加入"
     },
     {
       "title": "Ask HN: Why is the HN crowd so anti-AI?",
@@ -643,7 +937,7 @@
       "url": "https://news.ycombinator.com/item?id=48420827",
       "publishedAt": "2026-06-06T02:31:51.000Z",
       "points": 421,
-      "titleZh": "Ask HN：为什么HN用户如此反AI？"
+      "titleZh": "HN社区为何如此反AI？"
     },
     {
       "title": "Lockdown Mode",
@@ -661,7 +955,8 @@
       "url": "https://gwern.net/llm-catapult",
       "publishedAt": "2026-06-06T23:45:36.000Z",
       "points": 43,
-      "titleZh": "通过弹射实现类人神经网络"
+      "titleZh": "弹射实现类人神经网络",
+      "summaryZh": "弹射实现类人神经网络"
     },
     {
       "title": "Claude, Teach Me Something",
@@ -700,7 +995,7 @@
       "url": "https://www.reddit.com/r/LocalLLM/comments/1tyl3ov/whats_a_open_source_llm_for_software_development/",
       "publishedAt": "2026-06-06T00:00:00.000Z",
       "points": 16,
-      "titleZh": "什么是用于软件开发的开放源代码LLM？"
+      "titleZh": "用于软件开发的轻量开源LLM是什么？"
     },
     {
       "title": "dvlt.cu: inference engine written from scratch in CUDA/C++ for NVIDIA's DVLT 3D transformer model",
@@ -736,7 +1031,7 @@
       "sourceType": "reddit",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1tyresc/zai_we_need_air_glm_gguf_wen/",
       "publishedAt": "2026-06-06T20:06:46.000Z",
-      "titleZh": "Z.ai，我们需要Air！GLM GGUF何时？"
+      "titleZh": "Z.ai，我们需要Air！GLM GGUF何时有？"
     },
     {
       "title": "Fuck, sucessfully ran minecraft server on GLM AI's Agent lol.",
@@ -883,7 +1178,7 @@
       "url": "https://news.ycombinator.com/item?id=48413629",
       "publishedAt": "2026-06-05T15:13:54.000Z",
       "points": 108,
-      "titleZh": "Ask HN：你（AI）的开发技术栈/工作流是什么？"
+      "titleZh": "Ask HN: 你的AI开发技术栈/工作流程是什么？"
     },
     {
       "title": "Microsoft wants users to be addicted to Scout, their AI personal assistant",
@@ -913,8 +1208,7 @@
       "url": "https://news.ycombinator.com/item?id=48410589",
       "publishedAt": "2026-06-05T10:43:28.000Z",
       "points": 36,
-      "titleZh": "问HN：为机器设计的网络（/llm.txt）是否就是我们人类曾希望拥有的网络？",
-      "summaryZh": "问HN：为机器设计的网络（/llm.txt）是否就是我们人类曾希望拥有的网络？"
+      "titleZh": "Ask HN: 面向机器的网络（/llm.txt）是人类所期望的吗？"
     },
     {
       "title": "Show HN: I nerfed our coding agents on purpose",
@@ -923,8 +1217,7 @@
       "url": "https://news.ycombinator.com/item?id=48419614",
       "publishedAt": "2026-06-05T23:19:14.000Z",
       "points": 27,
-      "titleZh": "Show HN：我故意削弱了我们的编码代理",
-      "summaryZh": "Show HN：我故意削弱了我们的编码代理"
+      "titleZh": "Show HN: 我故意削弱了我们的编程智能体"
     },
     {
       "title": "ZEC drops 30% after Anthropic AI finds Zcash counterfeit vulnerability",
@@ -1083,9 +1376,8 @@
       "sourceType": "community",
       "url": "https://github.com/anthropics/defending-code-reference-harness",
       "publishedAt": "2026-06-04T00:00:00.000Z",
-      "points": 536,
-      "titleZh": "Anthropic 开源框架：用于 AI 驱动的漏洞发现",
-      "summaryZh": "Anthropic 开源框架：用于 AI 驱动的漏洞发现"
+      "points": 538,
+      "titleZh": "Anthropic 开源框架用于AI驱动的漏洞发现"
     },
     {
       "title": "When AI Builds Itself: Our progress toward recursive self-improvement",
@@ -1144,9 +1436,8 @@
       "sourceType": "community",
       "url": "https://cost.dev/",
       "publishedAt": "2026-06-04T11:30:13.000Z",
-      "points": 36,
-      "titleZh": "Show HN：Cost.dev (YC W21) – 让代理成本感知并降低调用成本",
-      "summaryZh": "Show HN：Cost.dev (YC W21) – 让代理成本感知并降低调用成本"
+      "points": 47,
+      "titleZh": "Show HN: Cost.dev (YC W21) – 让智能体成本感知并降低成本调用"
     },
     {
       "title": "Nemotron 3 Ultra: Open Moe Hybrid Mamba-Transformer for Agentic Reasoning [pdf]",
@@ -1283,8 +1574,7 @@
       "url": "https://www.theverge.com/ai-artificial-intelligence/941388/gemini-spark-ai-agent-trip-planning",
       "publishedAt": "2026-06-03T21:20:43.000Z",
       "points": 13,
-      "titleZh": "Gemini Spark 是我迄今为止体验过的最令人印象深刻且最令人恐惧的 AI 体验",
-      "summaryZh": "Gemini Spark 是我迄今为止体验过的最令人印象深刻且最令人恐惧的 AI 体验"
+      "titleZh": "Gemini Spark 是我迄今为止遇到的最令人印象深刻且最令人恐惧的AI体验"
     },
     {
       "title": "EU wants households to cut peak time energy use as industry and AI demand soars",
@@ -1372,9 +1662,8 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/webdev/comments/1tvsfgj/im_calling_it_now_the_adoption_of_ai_agents_into/",
       "publishedAt": "2026-06-03T00:00:00.000Z",
-      "points": 3988,
-      "titleZh": "\"我现在就断言，将 AI 代理引入软件开发将是该领域历史上代价最昂贵的错误之一。\" - George Hotz，《永恒之秋》",
-      "summaryZh": "\"我现在就断言，将 AI 代理引入软件开发将是该领域历史上代价最昂贵的错误之一。\" - George Hotz，《永恒之秋》"
+      "points": 3989,
+      "titleZh": "“我现在就断言，将AI智能体引入软件开发将是该领域历史上代价最大的错误之一。”——George Hotz，《永恒的Sloptember》"
     },
     {
       "title": "I turned an Android phone into a Vulkan-accelerated local LLM node (GGUF + LiteLLM + Tailscale)",
@@ -1439,8 +1728,7 @@
       "url": "https://fergusfinn.com/blog/deepseek-v4-flash-mi300x/",
       "publishedAt": "2026-06-02T17:52:48.000Z",
       "points": 120,
-      "titleZh": "在 AMD MI300X 上启动 DeepSeek-V4-Flash",
-      "summaryZh": "在 AMD MI300X 上启动 DeepSeek-V4-Flash"
+      "titleZh": "在AMD MI300X上启动DeepSeek-V4-Flash"
     },
     {
       "title": "Now AI agents need what RSS does",
@@ -1449,8 +1737,18 @@
       "url": "https://julienreszka.com/blog/rss-is-back-ai-agents-are-reading-it/",
       "publishedAt": "2026-06-02T00:00:00.000Z",
       "points": 85,
-      "titleZh": "现在 AI 代理需要 RSS 所做的功能",
-      "summaryZh": "现在 AI 代理需要 RSS 所做的功能"
+      "titleZh": "现在AI代理需要RSS的功能",
+      "summaryZh": "现在AI代理需要RSS的功能"
+    },
+    {
+      "title": "What’s the coolest thing you’ve automated with AI Agents so far in 2026?",
+      "source": "Reddit",
+      "sourceType": "community",
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1tugo0h/whats_the_coolest_thing_youve_automated_with_ai/",
+      "publishedAt": "2026-06-02T00:00:00.000Z",
+      "points": 132,
+      "titleZh": "迄今为止，你在2026年用AI代理自动化了哪些最酷的事情？",
+      "summaryZh": "迄今为止，你在2026年用AI代理自动化了哪些最酷的事情？"
     },
     {
       "title": "Uber caps employee AI spending after blowing through budget in 4 months",
@@ -1598,8 +1896,8 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/technology/comments/1turcd2/resistance_is_futile_says_qualcomm_ceo_ai_agents/",
       "publishedAt": "2026-06-02T00:00:00.000Z",
-      "titleZh": "高通CEO称“抵抗是徒劳的”，AI代理将变得无形、无处不在，跨设备跟随用户",
-      "summaryZh": "高通CEO称“抵抗是徒劳的”，AI代理将变得无形、无处不在，跨设备跟随用户"
+      "titleZh": "高通CEO表示“抵抗是徒劳的”，AI代理将变得无形、无处不在，并跨设备跟随你",
+      "summaryZh": "高通CEO表示“抵抗是徒劳的”，AI代理将变得无形、无处不在，并跨设备跟随你"
     },
     {
       "title": "Jun 1, 2026 Announcements Anthropic confidentially submits draft S-1 to the SEC",
@@ -1651,6 +1949,16 @@
       "summaryZh": "大学系统全力投入人工智能，如今正撕裂自身"
     },
     {
+      "title": "How would you build an AI agent from zero as a beginner?",
+      "source": "Reddit",
+      "sourceType": "community",
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1tty1og/how_would_you_build_an_ai_agent_from_zero_as_a/",
+      "publishedAt": "2026-06-01T00:00:00.000Z",
+      "points": 132,
+      "titleZh": "作为初学者，如何从零开始构建一个AI代理？",
+      "summaryZh": "作为初学者，如何从零开始构建一个AI代理？"
+    },
+    {
       "title": "Finetuning a Reasoning LLM with Supervised or Reinforcement Learning? [D]",
       "source": "r/MachineLearning",
       "sourceType": "reddit",
@@ -1675,7 +1983,8 @@
       "url": "https://cate.cero-ai.com/blog/ui-problem-ai-coding-agents",
       "publishedAt": "2026-05-31T00:00:00.000Z",
       "points": 9,
-      "titleZh": "AI 编码代理的用户界面问题"
+      "titleZh": "AI编程代理的UI问题",
+      "summaryZh": "AI编程代理的UI问题"
     },
     {
       "title": "Robinhood now lets your AI agents trade stocks",
@@ -1684,8 +1993,8 @@
       "url": "https://techcrunch.com/2026/05/27/robinhood-now-lets-your-ai-agents-trade-stocks/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
       "points": 112,
-      "titleZh": "Robinhood 现在允许你的 AI 代理交易股票",
-      "summaryZh": "Robinhood 现在允许你的 AI 代理交易股票"
+      "titleZh": "Robinhood现在允许你的AI代理交易股票",
+      "summaryZh": "Robinhood现在允许你的AI代理交易股票"
     },
     {
       "title": "CAPTCHAs can still detect AI agents",
@@ -1694,8 +2003,8 @@
       "url": "https://research.roundtable.ai/captchas-detect-ai/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
       "points": 84,
-      "titleZh": "CAPTCHA 依然能检测到 AI 代理",
-      "summaryZh": "CAPTCHA 依然能检测到 AI 代理"
+      "titleZh": "CAPTCHA仍然可以检测到AI代理",
+      "summaryZh": "CAPTCHA仍然可以检测到AI代理"
     },
     {
       "title": "Undisclosed addition in jqwik instructed AI coding agents to delete app output",
@@ -1704,8 +2013,8 @@
       "url": "https://arstechnica.com/security/2026/05/fed-up-with-vibe-coders-dev-sneaks-data-nuking-prompt-injection-into-their-code/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
       "points": 67,
-      "titleZh": "jqwik 中的未公开添加指示 AI 编码代理删除应用输出",
-      "summaryZh": "jqwik 中的未公开添加指示 AI 编码代理删除应用输出"
+      "titleZh": "jqwik中未公开的添加内容指示AI编程代理删除应用输出",
+      "summaryZh": "jqwik中未公开的添加内容指示AI编程代理删除应用输出"
     },
     {
       "title": "Claude Opus 4.8 distilled Alibaba Qwen models",
@@ -1724,8 +2033,8 @@
       "url": "https://businessanalytics.substack.com/p/deepseek-slashes-ai-costs-to-cents",
       "publishedAt": "2026-05-29T10:43:03.000Z",
       "points": 13,
-      "titleZh": "DeepSeek 将 AI 成本降至几美分",
-      "summaryZh": "DeepSeek 将 AI 成本降至几美分"
+      "titleZh": "DeepSeek将AI成本降至美分级别",
+      "summaryZh": "DeepSeek将AI成本降至美分级别"
     },
     {
       "title": "China Limits Overseas Travel for AI Talent at DeepSeek, Alibaba, Private Firms",
@@ -1734,8 +2043,8 @@
       "url": "https://www.bloomberg.com/news/articles/2026-05-26/china-expands-travel-curbs-to-top-ai-talent-at-private-firms",
       "publishedAt": "2026-05-29T23:54:21.000Z",
       "points": 10,
-      "titleZh": "中国限制 DeepSeek、阿里巴巴及私营企业的 AI 人才出国旅行",
-      "summaryZh": "中国限制 DeepSeek、阿里巴巴及私营企业的 AI 人才出国旅行"
+      "titleZh": "中国限制DeepSeek、阿里巴巴及私营企业AI人才出境",
+      "summaryZh": "中国限制DeepSeek、阿里巴巴及私营企业AI人才出境"
     },
     {
       "title": "Claude Opus 4.8 may have distilled Qwen",
@@ -1763,8 +2072,8 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/vibecoding/comments/1tqwxxb/ai_coding_is_getting_expensive_and_cannot_afford/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
-      "points": 148,
-      "titleZh": "AI编程越来越贵，现在付不起100美元😔。2026年每月20美元以下的最佳编程方案是什么？"
+      "points": 149,
+      "titleZh": "AI编程成本上升，现在付不起100美元😔。2026年每月20美元以下的最佳编程方案是什么？"
     },
     {
       "title": "May 28, 2026 Announcements Anthropic raises $65B in Series H funding at $965B post-money valuation",
@@ -1791,25 +2100,8 @@
       "url": "https://twitter.com/kevinsays/status/2059724146221662339",
       "publishedAt": "2026-05-28T11:27:36.000Z",
       "points": 27,
-      "titleZh": "我通过从Claude切换到DeepSeek将AI API成本降低99%"
-    },
-    {
-      "title": "May 27, 2026 Announcements Anthropic opens Milan office to support Italian enterprise, research, and developers",
-      "source": "Anthropic",
-      "sourceType": "official",
-      "url": "https://www.anthropic.com/news/milan-office-opening",
-      "publishedAt": "2026-05-27T00:00:00.000Z",
-      "titleZh": "2026年5月27日公告：Anthropic开设米兰办公室支持意大利企业、研究和开发者",
-      "summaryZh": "2026年5月27日公告：Anthropic开设米兰办公室支持意大利企业、研究和开发者"
-    },
-    {
-      "title": "Research Physics AI research that’s shaping the industry. Published breakthroughs pushing the state of the art. May 27, 2026 Mistral",
-      "source": "Mistral AI",
-      "sourceType": "official",
-      "url": "https://mistral.ai/news/physics-ai-research",
-      "publishedAt": "2026-05-27T00:00:00.000Z",
-      "titleZh": "塑造行业的物理学AI研究：发布推动技术前沿的突破 – 2026年5月27日 Mistral",
-      "summaryZh": "塑造行业的物理学AI研究：发布推动技术前沿的突破 – 2026年5月27日 Mistral"
+      "titleZh": "我通过从Claude切换到DeepSeek将AI API成本削减了99%",
+      "summaryZh": "我通过从Claude切换到DeepSeek将AI API成本削减了99%"
     },
     {
       "title": "Gemini, Gophers, and Fingers. Oh My Alternative Internets Beyond HTTPS",
@@ -1820,25 +2112,6 @@
       "points": 147,
       "titleZh": "Gemini、Gophers和Fingers：哦，超越HTTPS的替代互联网",
       "summaryZh": "Gemini、Gophers和Fingers：哦，超越HTTPS的替代互联网"
-    },
-    {
-      "title": "Why AI Agents Cannot Change Software Systems",
-      "source": "Hacker News",
-      "sourceType": "community",
-      "url": "https://phroneses.com/articles/build/notes/agents-cannot-maintain-systems.html",
-      "publishedAt": "2026-05-27T00:00:00.000Z",
-      "points": 46,
-      "titleZh": "为何AI Agent无法改变软件系统"
-    },
-    {
-      "title": "DeepSWE: A contamination-free benchmark for long-horizon coding agents",
-      "source": "Hacker News",
-      "sourceType": "community",
-      "url": "https://deepswe.datacurve.ai/blog",
-      "publishedAt": "2026-05-26T19:40:59.000Z",
-      "points": 67,
-      "titleZh": "DeepSWE：面向长周期编码代理的无污染基准测试",
-      "summaryZh": "DeepSWE：面向长周期编码代理的无污染基准测试"
     }
   ]
 }

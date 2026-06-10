@@ -1,0 +1,90 @@
+primitive_id: lookahead-predictive-memory-prefetch
+source_paper: "2606.09079"
+title: "FlashMemory-DeepSeek-V4: Lightning Index Ultra-Long Context via Lookahead Sparse Attention"
+relevance_level: direct                     # agent 记忆/上下文管理的"预测式预取"范式 + 便宜实验方法论
+audience: ai_only
+core_pattern: >
+  把"贵资源里该驻留什么"从被动携带改成主动预测:小检索器(双塔,文档侧表示冻结预计算)
+  周期性(每 τ 步)预测未来窗口要用的记忆块,阈值召回(≥0.5 全取、允许零召回)从冷存预取;
+  标签由冻结宿主离线自产并经 Softmax→Top-p→跨源多数投票去噪;训练与宿主物理解耦
+  (只训 <0.1% 查询端,1 GPU 时/次),实验吞吐(一周 500 次扫描)本身成为架构发现引擎。
+problem_class: keep-only-predicted-relevant-state-in-expensive-resource
+components:
+  - memory_indexer            # 双塔查询塔:低秩投影 → 多头 ReLU 点积 → Sigmoid 概率
+  - threshold_recall_gate     # ≥0.5 全取,数量动态;固定 Top-k 被弃(噪声+浪费源)
+  - golden_label_pipeline     # 冻结宿主离线跑 → Softmax → Top-p(0.6) → ≥3/21 层共识投票
+  - tiered_selection          # 粗选(预取进显存)→ 细选(原生 Top-k 在子集内)两级
+  - cpu_cold_pool             # 未被预测需要的块冷存,按需搬运
+  - oracle_diagnoser          # 真值直喂下游,隔离"组件背锅 vs 任务本质难"(MRCR 归因用)
+autosci_modules:
+  - typed_memory              # mind-palace 可加"前瞻预取"通道:预测下一任务段要用的记忆,替代每步按需检索
+  - cheap_layer_optimizer     # 冻结贵表示+只训小件 = 本库便宜层改造的通用切面
+  - eval_harness              # Recency-only / Random-k 对照组设计 + oracle 诊断可直接进评测协议
+  - self_evolve_controller    # "门会说不"(阈值召回允许空手) 与 KG-2 判边默认 NO_EDGE 同构
+inputs:
+  - host_traces               # 宿主(模型/agent)自身的历史注意/使用模式,离线抽取
+  - memory_pool               # 可冷存的历史块(KV/记忆条目)
+outputs:
+  - prefetch_policy           # 训好的"未来要用什么"预测器
+  - diagnostic_report         # oracle 归因:预取器不行 vs 任务本质需要密集全局记忆
+implementation_idea: >
+  应用层复刻不必动注意力:给长程 agent 加预取层——便宜 embedding 模型每个任务段预测
+  要装载的记忆条目(阈值召回),其余不进上下文;对照①每步全量带历史②只带最近 N 条
+  ③随机带 k 条,量 token 成本与任务成功率。标签可用"事后真被引用的记忆"自产。3-5 天。
+small_experiment: >
+  在 mind-palace 召回上做两改造实验:① Top-k 改阈值召回,统计"空手而归"比例与下游
+  引用命中率(预期:低相关查询空手率上升、假引用下降,呼应零假边精神);② 复刻 oracle
+  诊断:把人工挑的金记忆直喂生成端,若仍答错则瓶颈在生成不在召回。各 1-2 天。
+design_principles:                          # 跨篇沉淀的"怎么管贵资源/怎么便宜做实验"零件
+  - id: predict-then-fetch-not-carry-all
+    principle: "贵资源(显存/上下文窗)只放'预测会用到的',其余冷存按需搬——上下文管理是预测问题不是携带问题。"
+    transfers_to: "agent 上下文工程:历史/记忆/工具输出不全量注入,预取层先判'下一段要什么'。"
+  - id: freeze-expensive-train-tiny
+    principle: "把宿主和文档侧表示全部冻结预计算,只训 <0.1% 的查询端小件 → 单次实验 1 GPU 时,一周 500 次扫描;实验吞吐本身是架构发现的前提。"
+    transfers_to: "本库任何贵管线改造先找'可冻结表示 + 可独立训练小件'的切面,买实验吞吐。"
+  - id: threshold-recall-allows-empty
+    principle: "固定 Top-k 强迫召回固定数量,既是标签噪声源也是资源浪费源;阈值召回让数量随置信度动态、允许零召回。"
+    transfers_to: "mind-palace/判边召回门:按相关性阈值,允许空手而归(同 KG-2 默认 NO_EDGE)。"
+  - id: consensus-denoise-self-labels
+    principle: "宿主自产标签噪声极大(naive 并集 ~10000 正样本/窗);Softmax→Top-p→跨层 ≥3/21 多数投票压到 100-1000 才可训。"
+    transfers_to: "任何'用系统自身行为当监督信号'的场景(轨迹蒸馏/冷审聚合)先过共识去噪门。"
+  - id: oracle-isolates-root-cause
+    principle: "组件背锅还是任务本质难?把真值直喂下游:MRCR 给 50% 金块仍掉 2% → 任务需要密集全局记忆,非索引器之过;另三个基准 10-25% 金块即 100% 保底。"
+    transfers_to: "RAG/判边排障标准动作:金文档直喂,先归因再修。"
+  - id: negative-results-are-deliverables
+    principle: "被排除的 trick(pairwise 链式/强负例挖掘/加权 loss)和被推翻的假设(O(1) 内存/无限长度泛化)写成正式章节,各带证据。"
+    transfers_to: "research-loop 的负结果记录纪律;省后来者 500 次弯路。"
+risks:
+  - false_positive_leak       # Sigmoid 点式打分在超大干扰池累积假阳性,拿不到 O(1) 下限
+  - capacity_ceiling          # 双塔一次粗点积,密集全局检索任务(MRCR 76→48)范式性崩盘
+  - length_generalization_2x  # 只在训练长度 2 倍内可靠,出界退化近随机(位置编码出分布)
+  - host_specific_labels      # 标签学的是"这个宿主习惯看哪",换宿主须重抽重训
+  - immature_no_ablation      # 项目中途叫停:τ=64/阈值 0.5 无消融,repo 18★ 无第三方复现
+core_concepts:                              # KG-2 §3.1 受控命名,evidence 为源文逐字短语
+  - name: "前瞻稀疏注意力（lookahead sparse attention）"
+    role: primary
+    evidence: "proactively predicts future context demands and preserves only the query-critical KV chunks in the GPU memory"
+  - name: "解耦训练（backbone-free decoupled training）"
+    role: primary
+    evidence: "train it independently using standard retrieval training frameworks without ever loading the massive backbone model into GPU memory"
+  - name: "阈值召回（threshold-based recall）"
+    role: supporting
+    evidence: "we replace the rigid Top-k selector with a threshold-based mechanism to recall a dynamic number of historical entries"
+  - name: "跨层多数投票（cross-layer majority voting）"
+    role: supporting
+    evidence: "uses a Cross-Layer Majority Voting mechanism to identify the true \"golden entries\""
+  - name: "oracle 诊断（oracle simulation）"
+    role: mentioned
+    evidence: "we conducted a rigorous oracle simulation: we pre-computed the global golden attention weights"
+discovery_trace:
+  hypothesis: "该留哪些 KV 可以表述为独立的双塔检索问题,从而在不加载骨干的情况下便宜地训练与搜索架构"
+  failed_attempts:
+    - "浅层放索引器:早期探索发现浅层只装低级 token 统计,lookahead 预测奇差(§2.4)"
+    - "8 层联合索引(6-20 层):召回 mask 过松,实测取 30-49% 历史块进显存,违背省内存初衷 → 退到 10/12/20 三层 Pareto 甜点(§2.4)"
+    - "pairwise→pointwise 链式训练:无统计增益,弃(§2.4)"
+    - "LLM 标注语义块当强负例:引入二次标签噪声,随机负采样反而更稳,弃(§2.4)"
+    - "按层匹配数加权 loss:精度微涨但伤召回下界,违背安全网目标,弃(§2.4)"
+    - "初始假设'上下文无关时 Sigmoid 门塌缩到零召回 → O(1) 内存':No-Context 对抗测试证伪,绝对块数随长度涨 2.5 倍(§3.3.1)"
+    - "初始假设'点式打分可短训长推到 1M+':实测在训练长度 2 倍处硬性崩坏,归因位置编码出分布(§3.3.3)"
+  source_span: "原文 §2.3(解耦动机)、§2.4(层配置探索与 500-run 扫描、被排除 trick、Note on Hyperparameter Selection)、§3.3.1/§3.3.3(两个被推翻的假设);对应 paper.mdx「解法是怎么找到的(选读)」节"
+status: extracted

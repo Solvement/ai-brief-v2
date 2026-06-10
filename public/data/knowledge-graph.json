@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-06-09T13:07:12.959Z",
+  "generatedAt": "2026-06-10T13:52:49.071Z",
   "note": "L0 knowledge-graph DAG. forward_lineage = verified 'edge effect' only.",
   "stats": {
-    "nodes": 103,
-    "edges": 79,
+    "nodes": 118,
+    "edges": 93,
     "nodeByType": {
-      "paper": 36,
-      "principle": 67
+      "paper": 39,
+      "principle": 79
     },
     "edgeByType": {
-      "exhibits_principle": 55,
-      "shares_tag": 3,
+      "exhibits_principle": 67,
+      "shares_tag": 5,
       "forward_lineage": 21
     },
     "forwardSource": "forward-edges.json (21 edges)"
@@ -350,6 +350,53 @@
       "is_lineage_seed": false,
       "seed_priority": null,
       "primitive": "reverse-synthesis-coverage-aware-eval",
+      "external": false,
+      "primitive_relevance": "direct"
+    },
+    {
+      "id": "paper:2605.29307",
+      "type": "paper",
+      "arxiv_id": "2605.29307",
+      "slug": "2605.29307-grepseek-dci-search-agent",
+      "title": "GrepSeek: Training Search Agents for Direct Corpus Interaction",
+      "date": "2026-05",
+      "authors": [
+        "Alireza Salemi",
+        "Chang Zeng",
+        "Atharva Nijasure",
+        "Jui-Hui Chung",
+        "Razieh Rahimi",
+        "Fernando Diaz",
+        "Hamed Zamani"
+      ],
+      "tags": [
+        "search-agent",
+        "direct-corpus-interaction",
+        "shell-retrieval",
+        "ripgrep",
+        "cold-start-synthesis",
+        "grpo",
+        "reinforcement-learning",
+        "sharded-parallel-execution",
+        "lexical-vs-dense",
+        "qwen3.5-9b"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 8,
+        "buildability": 7,
+        "evaluation_value": 6,
+        "breadth_value": 7,
+        "evidence_quality": 5
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "trained-direct-corpus-interaction",
       "external": false,
       "primitive_relevance": "direct"
     },
@@ -897,6 +944,106 @@
       "primitive_relevance": "direct"
     },
     {
+      "id": "paper:2606.05622",
+      "type": "paper",
+      "arxiv_id": "2606.05622",
+      "slug": "2606.05622-adaplanbench-dual-constraint-planning",
+      "title": "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model Agents under World and User Constraints",
+      "date": "2026-06",
+      "authors": [
+        "Jiayu Liu",
+        "Cheng Qian",
+        "Zhenhailong Wang",
+        "Bingxuan Li",
+        "Jiateng Liu",
+        "Heng Wang",
+        "Jeonghwan Kim",
+        "Yumeng Wang",
+        "Xiusi Chen",
+        "Yi R. Fung",
+        "Heng Ji"
+      ],
+      "tags": [
+        "benchmark",
+        "adaptive-planning",
+        "dual-constraints",
+        "progressive-disclosure",
+        "interactive-evaluation",
+        "user-simulator",
+        "llm-judge-calibration",
+        "replanning",
+        "early-stopping"
+      ],
+      "topic": "eval",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 7,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 9,
+        "breadth_value": 8,
+        "evidence_quality": 6
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "progressive-constraint-disclosure-eval",
+      "external": false,
+      "primitive_relevance": "direct"
+    },
+    {
+      "id": "paper:2606.06087",
+      "type": "paper",
+      "arxiv_id": "2606.06087",
+      "slug": "2606.06087-latentskill-weight-space-skills",
+      "title": "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
+      "date": "2026-06",
+      "authors": [
+        "Aofan Yu",
+        "Chenyu Zhou",
+        "Tianyi Xu",
+        "Zihan Guo",
+        "Rong Shan",
+        "Zhihui Fu",
+        "Jun Wang",
+        "Weiwen Liu",
+        "Yong Yu",
+        "Weinan Zhang",
+        "Jianghao Lin"
+      ],
+      "tags": [
+        "agent-skills",
+        "lora",
+        "hypernetwork",
+        "weight-space",
+        "context-compression",
+        "skill-composition",
+        "prompt-injection-robustness",
+        "modular-adapters",
+        "qwen3-8b"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 6,
+        "evaluation_value": 6,
+        "breadth_value": 7,
+        "evidence_quality": 5
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "skill-to-weight-compilation",
+      "external": false,
+      "primitive_relevance": "direct"
+    },
+    {
       "id": "paper:2606.06492",
       "type": "paper",
       "arxiv_id": "2606.06492",
@@ -1129,6 +1276,42 @@
       "principle": "优化器+安全视角(本篇)+ What/When/How/Where(2507.21046)叠用,设计自进化最不漏环。",
       "papers": [
         "2508.07407"
+      ]
+    },
+    {
+      "id": "principle:route-by-lexical-anchor",
+      "type": "principle",
+      "key": "route-by-lexical-anchor",
+      "principle": "query 有强词法锚点(精确实体/符号/id)走直查,语义漂移大走稠密;hybrid 按查询类型路由,别二选一。",
+      "papers": [
+        "2605.29307"
+      ]
+    },
+    {
+      "id": "principle:backward-verify-forward-mask",
+      "type": "principle",
+      "key": "backward-verify-forward-mask",
+      "principle": "有标准答案但不能泄漏时:答案感知者倒推并逐步执行验证证据链,答案盲者顺写推理,目标屏蔽+泄漏终审保因果干净。",
+      "papers": [
+        "2605.29307"
+      ]
+    },
+    {
+      "id": "principle:sft-idioms-rl-strategy",
+      "type": "principle",
+      "key": "sft-idioms-rl-strategy",
+      "principle": "SFT 定底层行为习语(窄命令/限量/级联),RL 只调高层策略(几条命令/捞多少/想多久);直接 RL 会因行为未约束而崩。",
+      "papers": [
+        "2605.29307"
+      ]
+    },
+    {
+      "id": "principle:semantics-preserving-acceleration",
+      "type": "principle",
+      "key": "semantics-preserving-acceleration",
+      "principle": "给 agent 工具提速必须语义保持(字节级等价),先保守分类哪些操作可并行,不确定就回退顺序执行。",
+      "papers": [
+        "2605.29307"
       ]
     },
     {
@@ -1390,6 +1573,78 @@
       "principle": "正确诊断病因(误差几何拆分→幅度是罪魁)+ 巧妙组合已有零件(Hadamard+方差归一化),常比发明新算子更快见效、更可靠。",
       "papers": [
         "2606.03458"
+      ]
+    },
+    {
+      "id": "principle:hide-constraints-reveal-on-violation",
+      "type": "principle",
+      "key": "hide-constraints-reveal-on-violation",
+      "principle": "测自适应能力时约束不进输入:违反哪条披露哪条(硬约束优先),考'边撞边改'而非'读题理解'。",
+      "papers": [
+        "2606.05622"
+      ]
+    },
+    {
+      "id": "principle:separate-compliance-from-success",
+      "type": "principle",
+      "key": "separate-compliance-from-success",
+      "principle": "合规率(VPR)与结果成功率会大幅背离(>90% vs <45%);两者必须分开计量,背离模式即失败机制指纹。",
+      "papers": [
+        "2606.05622"
+      ]
+    },
+    {
+      "id": "principle:stagnation-early-stop",
+      "type": "principle",
+      "key": "stagnation-early-stop",
+      "principle": "连续 τ 轮无新信息增量即终止判失败——防 agent 原地打转烧预算。",
+      "papers": [
+        "2606.05622"
+      ]
+    },
+    {
+      "id": "principle:feedback-can-destabilize",
+      "type": "principle",
+      "key": "feedback-can-destabilize",
+      "principle": "给质量反馈让 agent 改,会近因偏置修新坏旧(VPR 暴跌 20-40%);全局一致的修订不能只靠追加反馈。",
+      "papers": [
+        "2606.05622"
+      ]
+    },
+    {
+      "id": "principle:knowledge-placement-three-axis",
+      "type": "principle",
+      "key": "knowledge-placement-three-axis",
+      "principle": "知识放上下文/适配器/骨干是 成本×模块化×暴露面 的三轴权衡,不是默认塞 prompt;每步重复 prefill 的技能文本要算账。",
+      "papers": [
+        "2606.06087"
+      ]
+    },
+    {
+      "id": "principle:force-information-through-artifact",
+      "type": "principle",
+      "key": "force-information-through-artifact",
+      "principle": "训练'生成物'时把源信息只喂生成器不喂使用者——使用者要答对,信息就必须穿过生成物(重建/补全任务)。",
+      "papers": [
+        "2606.06087"
+      ]
+    },
+    {
+      "id": "principle:decompose-before-compose",
+      "type": "principle",
+      "key": "decompose-before-compose",
+      "principle": "组合模块化产物前先拆共享件/专属件,共享件只加一次;整体直加=共享行为过度放大,文本拼接=分布外输入。",
+      "papers": [
+        "2606.06087"
+      ]
+    },
+    {
+      "id": "principle:audit-who-ate-what-data",
+      "type": "principle",
+      "key": "audit-who-ate-what-data",
+      "principle": "读对比实验先画'谁吃了什么监督'表——它的编译器 SFT 过教师轨迹而基线没有,增益归因即不清。",
+      "papers": [
+        "2606.06087"
       ]
     },
     {
@@ -1829,6 +2084,26 @@
       "type": "exhibits_principle"
     },
     {
+      "source": "paper:2605.29307",
+      "target": "principle:route-by-lexical-anchor",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2605.29307",
+      "target": "principle:backward-verify-forward-mask",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2605.29307",
+      "target": "principle:sft-idioms-rl-strategy",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2605.29307",
+      "target": "principle:semantics-preserving-acceleration",
+      "type": "exhibits_principle"
+    },
+    {
       "source": "paper:2605.31584",
       "target": "principle:harvest-training-signal-from-agent-behavior",
       "type": "exhibits_principle"
@@ -1974,6 +2249,46 @@
       "type": "exhibits_principle"
     },
     {
+      "source": "paper:2606.05622",
+      "target": "principle:hide-constraints-reveal-on-violation",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05622",
+      "target": "principle:separate-compliance-from-success",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05622",
+      "target": "principle:stagnation-early-stop",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05622",
+      "target": "principle:feedback-can-destabilize",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06087",
+      "target": "principle:knowledge-placement-three-axis",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06087",
+      "target": "principle:force-information-through-artifact",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06087",
+      "target": "principle:decompose-before-compose",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.06087",
+      "target": "principle:audit-who-ate-what-data",
+      "type": "exhibits_principle"
+    },
+    {
       "source": "paper:2606.06492",
       "target": "principle:parameter-memory-over-repeated-context",
       "type": "exhibits_principle"
@@ -2019,6 +2334,16 @@
       ]
     },
     {
+      "source": "paper:2605.29307",
+      "target": "paper:2606.02373",
+      "type": "shares_tag",
+      "weight": 2,
+      "tags": [
+        "search-agent",
+        "reinforcement-learning"
+      ]
+    },
+    {
       "source": "paper:2606.00408",
       "target": "paper:2606.02060",
       "type": "shares_tag",
@@ -2026,6 +2351,16 @@
       "tags": [
         "deep-research-agent",
         "trajectory-analysis"
+      ]
+    },
+    {
+      "source": "paper:2606.06087",
+      "target": "paper:2606.06492",
+      "type": "shares_tag",
+      "weight": 2,
+      "tags": [
+        "lora",
+        "hypernetwork"
       ]
     },
     {

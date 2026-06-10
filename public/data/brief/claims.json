@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-09T13:13:30.452Z",
+  "generatedAt": "2026-06-10T13:58:48.679Z",
   "entity": "claim",
   "directory": "claims",
-  "count": 68,
+  "count": 69,
   "items": [
     {
       "id": "claim/9router-main-claim",
@@ -2155,6 +2155,46 @@
         {
           "target": "content/refactoringhq-tolaria",
           "raw": "[[content/refactoringhq-tolaria]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Claim"
+        }
+      ]
+    },
+    {
+      "id": "claim/roboflow-supervision-main-claim",
+      "type": "claim",
+      "slug": "roboflow-supervision-main-claim",
+      "title": "Roboflow Supervision Main Claim",
+      "file": "claims/roboflow-supervision-main-claim.md",
+      "directory": "claims",
+      "meta": {
+        "text": "README 自称 'model agnostic'（模型无关）。",
+        "slug": "roboflow-supervision-main-claim",
+        "kind": "claim",
+        "content": "roboflow-supervision",
+        "source_pointer": "README models 节首句 'Supervision was designed to be model agnostic.'",
+        "evidence_strength": "medium",
+        "supports": [
+          "detections-standardization",
+          "annotator-composition"
+        ],
+        "contradicts": [],
+        "open_challenges": [
+          "未展示对所有可能模型（如 TensorFlow Object Detection API）的直接支持，但连接器可扩展。",
+          "若新模型库不提供适配器，用户需要自己编写。"
+        ],
+        "status": "supported"
+      },
+      "body": "\n## Claim\n\n项目宣称可以对接任意分类、检测或分割模型。\n\n证据:提供了 Ultralytics、Transformers、MMDetection 等多个模型库的连接器示例。。边界:未展示对所有可能模型（如 TensorFlow Object Detection API）的直接支持，但连接器可扩展。。风险:若新模型库不提供适配器，用户需要自己编写。。See [[content/roboflow-supervision]]。\n",
+      "excerpt": "项目宣称可以对接任意分类、检测或分割模型。",
+      "links": [
+        {
+          "target": "content/roboflow-supervision",
+          "raw": "[[content/roboflow-supervision]]"
         }
       ],
       "headings": [

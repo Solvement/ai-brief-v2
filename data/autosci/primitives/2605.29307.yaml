@@ -1,0 +1,87 @@
+primitive_id: trained-direct-corpus-interaction-agent
+source_paper: "2605.29307"
+title: "GrepSeek: Training Search Agents for Direct Corpus Interaction"
+relevance_level: direct_pattern_strong
+audience: ai_only
+core_pattern: >
+  将「agent 直接对原始语料执行 shell 管道」训练成小模型能力，而不是每次靠强模型推理期临场编排。
+  核心配方是：答案感知 Tutor 从 gold answer 倒推已验证证据链，并用 target masking 禁止拿答案词搜索；
+  答案盲 Planner 再按可观测历史顺写轨迹，Tutor 受限对齐并由 coherence judge 过滤未来信息泄漏；
+  Qwen3.5-9B 先 SFT 学会窄命令、限量输出、级联过滤，再用 GRPO 以格式门乘 token-F1 优化；
+  执行层用 conservative pipeline classifier 将安全的 rg/grep 管道分片并行，不能证明 byte-exact 等价就回退顺序执行。
+problem_class: index-free-agentic-search-over-large-text-corpus
+components:
+  - answer_aware_backward_tutor
+  - target_masking
+  - answer_blind_forward_planner
+  - causal_consistency_judge
+  - format_gated_f1_reward
+  - semantics_preserving_sharded_executor
+autosci_modules:
+  - corpus_retriever
+  - self_skill_distiller
+  - eval_harness
+  - cold_critic
+  - cheap_layer_optimizer
+inputs:
+  - qa_pairs_with_gold_answers
+  - line_oriented_raw_corpus
+  - whitelisted_shell_tool_contract
+outputs:
+  - trained_dci_search_policy
+  - executable_search_traces
+  - byte_equivalent_tool_observations
+core_concepts:
+  - name: "直接语料交互（DCI）"
+    role: primary
+    evidence: "treats the corpus itself as the search environment"
+  - name: "答案屏蔽倒推轨迹合成"
+    role: primary
+    evidence: "answer-aware Tutor and answer-blind Planner"
+  - name: "格式门奖励"
+    role: supporting
+    evidence: "binary format indicator"
+  - name: "语义保持分片并行"
+    role: primary
+    evidence: "preserving byte-exact equivalence with sequential execution"
+  - name: "混合搜索"
+    role: supporting
+    evidence: "hybrid retrieval architectures that combine direct corpus interaction with index-based retrieval models"
+discovery_trace:
+  hypothesis: "直接让基础模型用 RL 学大语料 shell 搜索会不稳定，因此需要先用结构化冷启动轨迹初始化工具行为，再做 GRPO。"
+  failed_attempts:
+    - "原文 §2.1 明确说直接优化 corpus-interaction agent 会产生 overly broad commands、excessive context retrieval，并导致 VRAM/host RAM OOM。"
+    - "原文 Table 2 / 消融脚注说明 w/o SFT 直接优化高度不稳定，报告的是 training collapse 前最后 checkpoint。"
+  source_span: "paper.mdx#解法是怎么找到的(选读); arXiv §2.1; Table 2 ablation footnote"
+implementation_idea: >
+  在 AI-Brief 的 KG/Mind Palace 召回层做一个零训练 DCI 通道：把 papers/projects/facets 的 mdx/json 暴露为只读 corpus，
+  提供 rg -F、rg -i、head、wc 等安全工具，先在现有 recall benchmark 上与 hybrid(BM25+向量+RRF)竞赛。
+  规则不是替换 hybrid，而是按查询类型路由：arxiv id、概念名、文件名、精确术语走 DCI；同义改写和语义泛化走 dense/hybrid。
+small_experiment: >
+  取 50 个 KG-2 判边/召回查询，标注为 strong lexical anchor vs semantic paraphrase。
+  对比 A=现有 hybrid，B=rg-DCI，C=hybrid+DCI RRF；报告 recall@3、precision@1、平均延迟和失败类型。
+  成功标准不是 DCI 全胜，而是找出可路由子集，并证明强词法锚点场景下直查更可解释或更便宜。
+design_principles:
+  - id: route-by-lexical-anchor
+    principle: "按 query 是否有强词法锚点路由检索：精确实体/符号/id 先直查，语义漂移大保留 dense/hybrid。"
+    transfers_to: "Mind Palace 召回、判边证据检索、文档内引用定位。"
+  - id: backward-verify-forward-mask
+    principle: "有标准答案但不能泄漏答案时，用答案感知者倒推可执行证据链，再由答案盲者顺写可观测轨迹，并用 target masking 和泄漏 judge 守因果。"
+    transfers_to: "工具 agent 训练数据合成、冷审样本扩增、已知正确边的 evidence path 生成。"
+  - id: sft-idioms-before-rl-strategy
+    principle: "先用 SFT 或规则示例钉住底层工具习语，再让 RL/搜索优化高层策略；直接放开 RL 容易学出过宽工具调用和上下文爆炸。"
+    transfers_to: "任何工具使用 agent 的训练/提示设计，尤其是 shell、browser、database 工具。"
+  - id: byte-equivalence-before-speed
+    principle: "给 agent 工具做并行化时，先证明输出与顺序执行 byte-exact 等价；无法证明的 pipeline 保守 fallback。"
+    transfers_to: "本地管线并行化、语料扫描提速、工具 daemon 优化。"
+  - id: logs-as-eval-surface
+    principle: "DCI 的命令就是可解释日志，评估不仅看答案，还看命令数、级联过滤率、head 限量、fallback 率和输出膨胀。"
+    transfers_to: "agent eval harness、冷审诊断、检索行为回归测试。"
+risks:
+  - lexical_brittleness
+  - no_semantic_ranking
+  - corpus_selection_bias
+  - short_answer_reward_only
+  - shell_sandbox_expansion_risk
+  - latency_misread
+status: extracted

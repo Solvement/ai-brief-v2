@@ -1,0 +1,57 @@
+primitive_id: skill-to-weight-compilation
+source_paper: "2606.06087"
+title: "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents"
+relevance_level: direct                     # L1 自进化:蒸馏出的技能可参数化,不必永远占上下文
+audience: ai_only
+core_pattern: >
+  把文本技能经超网络一次前向编译成 LoRA 适配器挂在冻结骨干上:技能从上下文空间移到权重空间,
+  零 per-step 技能 token、可装卸/缓存/缩放(α 注入系数)/组合。训练诀窍=技能文本只喂编译器不喂骨干,
+  骨干要重建/补全原文就逼信息穿过生成的适配器。组合铁律:先按语义组件拆分再加权重,
+  共享组件只加一次——整技能直加会过度放大共享行为。
+problem_class: deliver-reusable-procedural-knowledge-without-per-step-context-cost
+components:
+  - skill_compiler            # Transformer 超网络:技能文档→全模块 LoRA A/B,一次前向
+  - document_pretrain         # 重建+补全双任务,171K GitHub 技能文档;信息必须经适配器的设计
+  - trajectory_sft            # 一轨迹一适配器全程共挂,逼出技能级(非逐步)策略
+  - adapter_cache             # 每技能编译一次缓存;挂载=O(1)
+  - alpha_controller          # 注入强度旋钮;倒 U 曲线,弱基线任务要更大 α
+  - component_merger          # 语义组件分别编译再加;共享件去重
+autosci_modules:
+  - self_skill_distiller      # 蒸馏出的 skill 若给本地小模型用,可走编译进权重这条路(对订阅 CLI 强模型不可用)
+  - typed_memory              # 「知识放哪」三轴(上下文/适配器/骨干)= 记忆分层的参数化端
+  - cheap_layer_optimizer     # 便宜层(本地 DeepSeek/小模型)技能多了之后省 prefill 的路线
+  - cold_critic               # 监督不对称混淆的识别模板:对比实验先画「谁吃了什么数据」表
+inputs:
+  - skill_documents           # 文本技能(markdown 正文)
+  - teacher_trajectories      # 技能配对的成功轨迹(它用 237+500 条)
+outputs:
+  - skill_adapters            # 可装卸/缩放/组合的 LoRA 模块
+  - weight_space_geometry     # 技能簇结构(可用于技能去重/相似检索)
+implementation_idea: >
+  不必复刻超网络:最小版=同一技能分别做 ①prompt 注入 ②直接 LoRA-SFT,在小任务上对比
+  成功率/token 成本/抗注入三轴,补上原文缺的公平基线(骨干吃同样轨迹+in-context)。
+  peft + 7B 级模型,单卡可跑。
+small_experiment: >
+  取本库 2-3 个高频 skill(如判边规则、深读模板),统计一周 per-step prefill 中技能文本占比,
+  算参数化的盈亏平衡点;若值得,先做 LoRA-SFT 版并测乱序/去格式鲁棒性(原文显示权重形态
+  对表面扰动不敏感)。3-5 天。
+design_principles:                          # 跨篇沉淀的"知识放哪/怎么组合模块"零件(喂 L1 与便宜层架构)
+  - id: knowledge-placement-three-axis
+    principle: "知识放上下文/适配器/骨干是 成本×模块化×暴露面 的三轴权衡,不是默认塞 prompt;每步重复 prefill 的技能文本要算账。"
+    transfers_to: "本站 skill/范式文档的交付形态选择;便宜层(本地小模型)技能多了走参数化。"
+  - id: force-information-through-artifact
+    principle: "训练'生成物'时把源信息只喂生成器不喂使用者——使用者要答对,信息就必须穿过生成物(重建/补全任务)。"
+    transfers_to: "L1 蒸馏 skill 的保真度验证:把原文撤掉,只靠蒸馏物能否复原行为。"
+  - id: decompose-before-compose
+    principle: "组合模块化产物前先拆共享件/专属件,共享件只加一次;整体直加=共享行为过度放大,文本拼接=分布外输入。"
+    transfers_to: "多 skill/多 prompt 片段组合的通用纪律;KG-2 概念合并同理(共享 facet 去重)。"
+  - id: audit-who-ate-what-data
+    principle: "读对比实验先画'谁吃了什么监督'表——它的编译器 SFT 过教师轨迹而基线没有,增益归因即不清。"
+    transfers_to: "冷审 rubric 固定检查项:基线监督对称性。"
+risks:
+  - supervision_asymmetry     # 原文编译器 SFT 过教师轨迹而基线没有 → 增益归因不清,复用前须自补对照
+  - tiny_skill_library        # 仅 5+3 技能、类别硬匹配无检索 → 规模化未证
+  - test_set_alpha_tuning     # 最优 α 在评测集上扫出 → 生产要留出集调
+  - recompile_cost            # 技能更新=重编译;换骨干=重训编译器(8×H100 级)
+  - not_injection_immune      # Hijack 下也从 74.3 掉 38.6,只是比明文强,非免疫
+status: extracted

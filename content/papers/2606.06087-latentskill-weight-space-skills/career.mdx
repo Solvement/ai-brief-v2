@@ -1,0 +1,58 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你现在做 agent 的默认姿势是"技能=markdown 塞 prompt"(Claude Code 的 skills 就是这个范式)。这篇论文给了这个范式一个**认真的对照组**:同一份技能文本,放权重里比放上下文里更便宜(prefill -64~72%)、更稳(乱序/去格式不掉点)、更抗注入(Hijack 下 38.6% vs 8.57%)。即使你不自己训超网络,它的三个分析结论(权重空间有结构、强度可旋钮、组合要按组件)也直接改变你对"LoRA 市场""适配器路由"这类基建的判断力——这是面试聊 agent 基建时的差异化弹药。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| LoRA 的工程语义 | W'=W+(α/r)BA 里每个量的含义;α 当旋钮、适配器当模块装卸 | 用 peft 给小模型挂/卸/缩放一个 LoRA,扫 α 画倒 U 曲线 |
+| 超网络→适配器范式 | "信息必须穿过生成物"的训练设计(重建/补全任务) | 读 §3.2 + Text-to-LoRA/SHINE 两篇,写 1 页对比笔记 |
+| 上下文成本核算 | 每步重复 prefill 的技能 token 怎么算账;什么时候值得参数化 | 给你的 agent 统计一周技能 token 占比,算盈亏平衡点 |
+| 适配器组合/路由 | 整加 vs 组件加的失效模式;skill-to-task 匹配(本文是类别硬匹配,生产要检索) | 复现它的 Direct/Text/Component Merging 三连对比(小模型即可) |
+| 基线公平性审查 | 识别"监督不对称"混淆(它的编译器吃过教师轨迹,基线没有) | 养成习惯:读任何 agent 论文先画"谁吃了什么数据"表 |
+
+## 系统设计心法
+
+一句话:**把"知识放哪"当成本/安全/模块化的三轴权衡,而不是默认塞 prompt。** 上下文=灵活但每步付费且明文裸奔;骨干微调=便宜但焊死;适配器=中间档,代价是要养编译/管理基建。第二条:**组合任何模块化产物(LoRA、prompt 片段、skill)前,先把共享部分和专属部分拆开**——共享件重复叠加=过度放大,是本文用实验钉死的失效模式,prompt 工程里同样适用。
+
+## 作品集角度(Portfolio angle)
+
+"weight-space skill"还很新(本文 2026-06 才挂出),复现+扩展空间大。一个能讲的作品:**技能形态对比台**——同一组技能分别做成 ①prompt 注入 ②RAG 检索注入 ③LoRA(直接 SFT)三种形态,在同一任务上报成功率/token 成本/抗注入三轴。这正好打在"agent 成本优化"这个企业刚需上,而且暴露你能做受控对比(包括补上论文缺的那个公平基线)。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| 技能三形态对比台 | 3-5 个技能 × (prompt/RAG/LoRA-SFT) × 一个小基准 | 1-2 周 | 直接可讲的成本-效果-安全权衡实验,顺手补公平基线 |
+| α 扫描工具 | 给任意 LoRA 挂载强度做自动扫描+曲线报告 | 2-3 天 | 小而硬:验证"倒 U+任务相关最优 α"是否在你的场景成立 |
+| 技能 token 审计器 | 统计 agent 轨迹里技能文本的重复 prefill 开销 | 1-2 天 | 用数据说话"我们该不该参数化技能",PM 都看得懂 |
+
+## 简历 / 面试故事
+
+诚实写法:
+
+- *"Benchmarked skill-delivery mechanisms (prompt injection vs RAG vs LoRA adapters) for an LLM agent, quantifying success rate, per-step prefill cost, and prompt-injection robustness."*
+- *"Reproduced weight-space skill composition experiments, confirming that component-aligned adapter merging avoids the over-amplification failure of naive LoRA addition."*
+
+> [!key] 面试可讲
+> "agent 的技能该放上下文还是放权重?"——用本文的数据讲三轴权衡,再主动指出它的基线监督不对称(编译器吃过教师轨迹而基线没有)。能同时讲清"结论有用"和"证据哪里软",比单纯吹论文强一个段位。
+
+## 学习清单
+
+**必学**
+- LoRA 机制与 peft 实操(挂载/缩放/合并)
+- 上下文 vs 参数化的成本模型
+- 受控对比中的监督不对称识别
+
+**有用**
+- hypernetwork→LoRA 文献线(Text-to-LoRA / Generative Adapter / SHINE)
+- 提示注入与技能明文暴露的威胁模型
+
+**可选**
+- MDS/权重空间几何分析(诊断用,生产少见)
+- 子模块定位(attn_o/mlp_down)类机制分析

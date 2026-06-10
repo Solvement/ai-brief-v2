@@ -1,0 +1,73 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你以后很可能要评一个“没有标准答案”的 agent：客服安抚、销售跟进、学习陪练、社区运营、代码审查助理、FDE 的需求澄清助手，都是多轮轨迹里的软任务。SoCRATES 的价值不在调解本身，而在它给出了一套可以复用的评测工序：先筛硬题，再配无 agent 反事实基线，再只在真正发生变化的位置打分，最后用人类标注校准裁判。
+
+> [!key] 和 AI-Brief 的 north star 直接相连
+> 我们自己的冷审门也在做 LLM-as-judge。SoCRATES 最可迁移的一句是：**裁判不可靠，常常不是因为模型太弱，而是因为你让它评了无关内容**。它把 ProMediate 逐轮全打的 trajectory correlation 从 `0.372` 拉到 `0.823`，靠的正是 topic-localized evaluation。这个思路可以直接迁移到论文深读冷审、agent 轨迹评估、gap-map 选题、以及任何“什么时候该介入”的主动 agent。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| LLM judge 校准 | 不把裁判当神谕；用双人/多人标注、IAA、Pearson/Spearman、换 backbone 复测来验裁判 | 取 50 条你自己的 judge 样本，请人标注，报告 IAA 与 judge-human correlation |
+| 局部化评分 | 先定位“该维度在哪些回合真的变化”，再评分；其余回合继承 | 把一个多轮评测改成两版：逐轮全打 vs 变化点打分，对比与人工标注相关性 |
+| 反事实基线 | 干预型 agent 的价值不能看绝对分，要看比 no-agent/no-mediator 多带来多少 | 给一个客服或辅导 agent 任务加 no-agent baseline，算 `(with-without)/(1-without)` |
+| 硬题筛选 | 软题会让系统看起来强；题目必须在无干预下稳定失败，才适合评干预价值 | 出题后先跑 3 次 no-agent simulation，自动剔除能自然解决的样本 |
+| 单轴扰动 | 真实复杂度可堆叠，但诊断时要一次只动一根变量 | 给一个 agent benchmark 拆出情绪、上下文长度、工具失败、用户类型等独立轴 |
+| 主动介入策略 | “快插话”不等于好；timeliness 必须和 effectiveness 配对看 | 做一个 interrupt/assist agent，分别统计首次介入、介入频率、介入后收益 |
+
+## 系统设计心法
+
+- **裁判先验货，榜单再上线**：没有人类校准和换骨干稳定性，leaderboard 只是漂亮 JSON。
+- **评分作用域越准，LLM judge 越可信**：缩小到“话题真动了”的回合，比盲目换更强模型更便宜。
+- **功劳必须用反事实算**：没有 no-agent baseline，就分不清是 agent 帮了忙，还是题本来就会好。
+- **诊断时不要把变量堆在一起**：一次只拧一根轴，牺牲一点真实复杂度，换来可归因。
+- **timeliness 和 effectiveness 必须成对出现**：只奖励快，会养出抢话型 agent。
+- **能力是剖面，不是一个总分**：同样总分的模型可能一个怕多方状态，一个怕情绪升级；这才是系统调优需要的信息。
+
+## 作品集角度(Portfolio angle)
+
+一个很硬的作品集方向是：**Calibrated LLM Judge for Open-ended Agent Trajectories**。别做又一个聊天机器人，做一个“开放式多轮任务的可信评测器”：输入多轮轨迹、rubric、人类标注小集，输出局部化评分、反事实增益、裁判-人类相关性、换 backbone 稳定性。这个项目面试时很好讲，因为它解决的是所有 agent 团队都会踩的坑。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Judge Calibration Kit | 输入 judge prompt + 人类标注集，输出 IAA、Pearson/Spearman、换 backbone 差异报告 | 4-6 天 | 直接对标 SoCRATES §4，是每个 LLM-as-judge 系统都需要的验货工具 |
+| Topic-localized RAG Judge | 对 RAG/深读答案先抽 claim/topic，再只在相关证据段评分，非相关段不打分 | 3-5 天 | 把“别评无关内容”迁移到事实核查和冷审 |
+| Counterfactual Intervention Bench | 两个 role-play users + 一个可选介入 assistant，配 no-assistant baseline，算 gap closure | 1-2 周 | 练主动 agent 的 when/how 介入，比做普通 chatbot 更有技术含量 |
+| Hard-task Generator | 用 cheap agent 先跑 no-agent baseline，自动剔除自然成功样本 | 3-4 天 | 给 benchmark 和选题系统加“题目门”，防止软题制造假进步 |
+
+## 简历 / 面试故事
+
+诚实写法：
+
+- *"Built a calibrated LLM-judge pipeline for open-ended multi-turn agent trajectories: localized scoring to turns where each topic actually changes, validated against human annotations with IAA, Pearson correlation, backbone-swap robustness, and multi-run stability checks."*
+- *"Designed a counterfactual baseline metric for intervention agents, reporting the fraction of remaining gap closed versus a no-agent rollout rather than raw outcome scores."*
+- *"Implemented a hard-task rejection gate for agent evaluation: samples are admitted only when repeated no-intervention simulations fail, reducing inflated performance from self-solving tasks."*
+
+> [!key] 面试可讲
+> “LLM-as-judge 不可靠怎么办？”不要只回答“多模型投票”。更强的回答是：先缩小评分作用域，再做人类校准，再换骨干复测。SoCRATES 的数字故事很利落：同一类任务里，逐轮全打和专家相关性 `0.372`，topic-localized 后到 `0.823`。这说明工程关键不是盲目堆模型，而是别让裁判评它不该评的东西。
+
+## 学习清单
+
+**必学**
+
+- LLM judge 校准：IAA、Pearson/Spearman、p-value、换 backbone robustness。
+- 局部化/事件驱动评分：先定位变化点，再打分。
+- 反事实基线：with-agent vs without-agent 的 gap closure。
+
+**有用**
+
+- 角色扮演仿真：hidden state、private profile、BATNA、inner thought。
+- Thomas-Kilmann conflict mode 与 Hofstede cultural dimensions：做社会类 agent 扰动轴的现成词表。
+- 多轮轨迹稳定性：multi-run variance、Kendall's W、half-range。
+
+**可选**
+
+- 调解/谈判任务脉络：Tessler 2024 → ProMediate 2025 → SoCRATES。
+- 多语种社会互动评测：本文没做，但这是自然后续方向。

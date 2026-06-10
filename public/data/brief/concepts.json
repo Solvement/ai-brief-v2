@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-09T13:13:30.452Z",
+  "generatedAt": "2026-06-10T13:58:48.679Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 129,
+  "count": 131,
   "items": [
     {
       "id": "concept/adaptive-element-relocation",
@@ -659,6 +659,62 @@
         {
           "target": "claims/vimax-main-claim",
           "raw": "[[claims/vimax-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/annotator-composition",
+      "type": "concept",
+      "slug": "annotator-composition",
+      "title": "Annotator Composition",
+      "file": "concepts/annotator-composition.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "标注器组合",
+        "slug": "annotator-composition",
+        "kind": "concept",
+        "tags": [
+          "visualization",
+          "pipeline",
+          "cv"
+        ],
+        "maturity": "active",
+        "first_seen_in": "roboflow-supervision",
+        "related_content": [
+          "roboflow-supervision"
+        ],
+        "related_concepts": [],
+        "explanation": "多个标注器（框、掩码、关键点）可独立配置并组合绘制在同一图像上，形成灵活的可视化管道。",
+        "examples": [
+          "box_annotator = sv.BoxAnnotator(); mask_annotator = sv.MaskAnnotator(); ..."
+        ],
+        "common_misunderstandings": [
+          "标注器不自动叠加，需显式按顺序调用 annotate 方法。"
+        ],
+        "open_questions": [
+          "是否有性能优化用于高帧率视频？"
+        ]
+      },
+      "body": "\n## Explanation\n\n多个标注器（框、掩码、关键点）可独立配置并组合绘制在同一图像上，形成灵活的可视化管道。 出处:https://github.com/roboflow/supervision。See [[content/roboflow-supervision]]。\n\n## Supported by\n- [[claims/roboflow-supervision-main-claim]]\n",
+      "excerpt": "多个标注器（框、掩码、关键点）可独立配置并组合绘制在同一图像上，形成灵活的可视化管道。 出处:https://github.com/roboflow/supervision。See [[content/roboflow-supervision]]。",
+      "links": [
+        {
+          "target": "content/roboflow-supervision",
+          "raw": "[[content/roboflow-supervision]]"
+        },
+        {
+          "target": "claims/roboflow-supervision-main-claim",
+          "raw": "[[claims/roboflow-supervision-main-claim]]"
         }
       ],
       "headings": [
@@ -1927,6 +1983,63 @@
         {
           "target": "claims/fathah-hermes-desktop-main-claim",
           "raw": "[[claims/fathah-hermes-desktop-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/detections-standardization",
+      "type": "concept",
+      "slug": "detections-standardization",
+      "title": "Detections Standardization",
+      "file": "concepts/detections-standardization.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Detections 标准化",
+        "slug": "detections-standardization",
+        "kind": "concept",
+        "tags": [
+          "cv",
+          "abstraction",
+          "connector"
+        ],
+        "maturity": "active",
+        "first_seen_in": "roboflow-supervision",
+        "related_content": [
+          "roboflow-supervision"
+        ],
+        "related_concepts": [],
+        "explanation": "定义一个通用的检测结果数据结构（Detections），包含边界框、置信度、类别标签等，并通过适配器从不同模型库转换，实现模型无关性。",
+        "examples": [
+          "sv.Detections.from_ultralytics(result)",
+          "sv.Detections.from_transformers(result)"
+        ],
+        "common_misunderstandings": [
+          "不是所有模型输出都直接兼容，需要适配器支持。"
+        ],
+        "open_questions": [
+          "如何扩展新的模型适配器？是否支持自定义属性？"
+        ]
+      },
+      "body": "\n## Explanation\n\n定义一个通用的检测结果数据结构（Detections），包含边界框、置信度、类别标签等，并通过适配器从不同模型库转换，实现模型无关性。 出处:https://github.com/roboflow/supervision。See [[content/roboflow-supervision]]。\n\n## Supported by\n- [[claims/roboflow-supervision-main-claim]]\n",
+      "excerpt": "定义一个通用的检测结果数据结构（Detections），包含边界框、置信度、类别标签等，并通过适配器从不同模型库转换，实现模型无关性。 出处:https://github.com/roboflow/supervision。See [[content/roboflow-supervision]]。",
+      "links": [
+        {
+          "target": "content/roboflow-supervision",
+          "raw": "[[content/roboflow-supervision]]"
+        },
+        {
+          "target": "claims/roboflow-supervision-main-claim",
+          "raw": "[[claims/roboflow-supervision-main-claim]]"
         }
       ],
       "headings": [
