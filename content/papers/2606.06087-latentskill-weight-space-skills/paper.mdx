@@ -2,85 +2,190 @@
 
 ## 一句话总结
 
-LatentSkill 用一个**超网络(hypernetwork:生成另一个网络权重的网络)**把文本技能文档**一次前向编译成 LoRA 适配器**,挂到冻结的 Qwen3-8B 上——技能从"每步塞进 prompt 的文本"变成"weight space(权重空间)里可装卸、可调强度、可组合的模块",ALFWorld 成功率比同文本的 in-context skill 高 21.4 分(seen)且 prefill token 省 64.1%。
+LatentSkill 想解决的是一个很工程的问题：agent 的“技能文档”如果每一步都塞进 prompt，会占上下文、涨 prefill token、还把技能明文暴露出来；它的做法是训练一个 **skill compiler(技能编译器)**，把文本技能一次性编成可插拔的 **LoRA adapter(低秩权重补丁)**，执行时只挂权重，不再把技能原文反复喂给模型。[^arxiv]
 
 ## 问题(Problem)
 
-- Agent 生态(包括 Anthropic Agent Skills 规范、Claude Code/Cursor 等 harness)统一把技能当**文本**:检索→插进 prompt。三个代价:① 同一段技能文本在长轨迹里每步重复 prefill,贵;② 长上下文让模型"用不全"给的信息(lost in the middle);③ 技能明文暴露在 prompt 里,可被提示注入劫持或直接套取。
-- 另一极端是把技能**练进模型参数**(agent fine-tuning / SKILL0 的课程式内化),省了上下文但技能**焊死**了:没法单独更新、卸载、组合。
-- 这就是一个三难:**零上下文开销 × 模块化可更新 × 推理时可组合**,现有方案最多占两头。
+很多 agent 系统把“技能”写成自然语言：比如“遇到找物品任务时，先系统搜索容器，再执行拿取动作；失败后如何恢复”。这很直观，也方便人改，但有三个麻烦：
+
+- **每一步都重复带技能文本**：长任务里 agent 要多轮决策，同一份技能说明会反复进入上下文。
+- **技能和环境文本挤在同一个 instruction channel**：外部观察、网页、工具结果和技能文本混在 prompt 里，提示注入或恶意覆盖更容易干扰它。
+- **直接微调又太死**：把技能永久写进 backbone 参数可以省 prompt，但技能就不容易单独更新、卸载、替换、缩放或组合。[^intro]
+
+所以这篇的核心问题不是“怎么再写一份更好的 skill prompt”，而是：**能不能让技能像插件一样存在于权重空间，同时保留 prompt skill 的可替换性？**
 
 > [!key] 立场
-> 方法上它是把 hypernetwork→LoRA 这条已有路线(Text-to-LoRA / Generative Adapter / SHINE / Doc-to-LoRA)**对准 agent 技能这个场景**,真正的增量是后半篇:系统地证明生成的 LoRA 权重空间**有语义几何结构、强度可旋钮、按组件可加法**——"技能权重不是压缩的 prompt,是可操作的程序性知识表示"。
+> 这篇值得看，不是因为它证明“LoRA 一定比 prompt 好”，而是因为它把 agent skill 的承载介质从 **context space(上下文空间)** 推到 **weight space(权重空间)**，并且保留了三个工程师真正在意的接口：可缓存、可缩放、可组合。它给 AI-Brief / 自进化 agent 最有价值的启发是：长期复用的知识不一定永远以文本记忆形式检索进来，有些可以被编译成参数补丁；但它还只是两类 benchmark 上的初步证明，仓库也尚未开放训练/推理源码，不能当成可直接落地的成熟系统。
 
 ## 关键术语(Key terms)
 
-| 术语 | 解释 |
+| 术语 | 大白话解释 |
 | --- | --- |
-| **in-context skill(上下文内技能)** | 把技能文档(怎么做事的步骤/策略文本)直接插进 prompt 的主流做法;本文的对照基线,用**同一份**技能文本。 |
-| **latent skill(潜技能)** | 同一技能文档经编译器变成的一组 LoRA 低秩更新 \Delta_s,挂载后模型只看任务历史、不看技能文本。 |
-| **skill compiler(技能编译器)** | Transformer 超网络 G_φ:读技能文档,一次前向产出全部目标模块的 LoRA A/B 矩阵。 |
-| **注入系数 α** | 挂载强度旋钮:W' = W + (α/r)·BA;α=0 等于裸骨干,越大技能影响越强。 |
-| **skill arithmetic(技能算术)** | 多个技能 LoRA 在参数空间相加组合;关键发现是**整技能直加会坏**,要按语义组件分别编译再加。 |
-| **component merging(组件级合并)** | 把技能文档拆成"共享通用 / 任务专属"等语义组件,各自编译成 LoRA,共享件只加一次——组合成功的关键。 |
+| **textual skill(文本技能)** | 像 SOP 一样写在文档里的可复用 procedure：任务策略、工具使用模式、失败恢复规则。传统做法是在 agent 每步决策时把它贴进 prompt。[^intro] |
+| **latent skill(潜技能 / 权重技能)** | 同一份技能不再以可读文本出现，而是被 skill compiler 编成 LoRA 权重补丁；执行时模型看不到技能文档，只感受到这块权重对行为的偏置。[^method] |
+| **LoRA adapter(低秩适配器)** | 可以理解成“不重写整本说明书，只在关键页贴几条小补丁”。它给 frozen backbone 的某些矩阵加低秩更新，本文把每个技能编成一组这样的更新。[^method] |
+| **hypernetwork(超网络)** | 一个“会生成另一个网络权重”的网络。这里的 skill compiler 读技能文本，然后吐出对应 LoRA 权重；它不是每个技能单独训练一次 LoRA，而是一次前向生成。[^related] |
+| **injection coefficient α(注入系数)** | 控制 LoRA 补丁影响力的旋钮。α 太小技能没激活，α 太大又会压坏 backbone 原能力，所以论文专门扫了 α 曲线。[^scale] |
+| **parameter-space arithmetic(参数空间算术)** | 不是把两段技能文本拼起来，而是在 LoRA 权重上做加法/组合。论文发现只有先把技能拆成对齐组件，再组合组件 LoRA，才比较稳定。[^compose] |
 
 ## 核心方法(Core method)
 
-两阶段训练,**骨干永远冻结,只训编译器**:
+可以把 LatentSkill 想成“把技能文档从便利贴变成可插拔刀头”：
 
-1. **技能文档预训练**:爬 GitHub 上 ~17.1 万份去重技能文档(约 3 亿 token,剥掉元数据只留正文)。两个任务随机选:**重建**(编译器读全文→挂上适配器的骨干凭重建指令吐出原文)和**补全**(读截断前缀→骨干补全文)。妙处在:技能文本**只给编译器不给骨干**,骨干要答对就必须让信息**穿过生成的适配器**——逼着编译器学会"把文本知识写进权重"。
-2. **轨迹监督微调(SFT)**:用 SkillRL 放出的教师轨迹(237 条 ALFWorld + 500 条 Search-QA)和技能库(5+3 个技能)。每条轨迹配一个技能文档,编译出**一个**适配器**全轨迹共用**,逼适配器装"技能级、全轨迹一致"的策略,而不是逐步的小修小补。
-3. **推理**:技能库每个技能**编译一次缓存**;选择器按任务类别挂载(本文无检索,按类别硬匹配);多技能 = 参数空间加权和,共享子组件多时用组件级合并。
+1. **训练一个 skill compiler**：它读入技能文档 `s`，输出一组 LoRA 更新 `Δs = Gφ(s)`。backbone LLM 的参数 `θ` 冻住不动，执行时变成 `θ ⊕ αΔs`。[^method]
+2. **先做技能文档预训练**：给 compiler 看大量 GitHub 技能文档，让它学会把 procedure text 压进 adapter。预训练任务有两类：重建完整技能文档、从截断前缀补全文档。[^pretrain]
+3. **再做轨迹监督微调**：给 compiler 看“技能文档 + teacher agent trajectory”。同一个 skill LoRA 挂完整条轨迹，让它学到跨多步稳定生效的行为偏置，而不是只记某一步答案。[^sft]
+4. **推理时缓存与挂载**：技能库里的每个技能可以预先编译成 adapter cache。任务来了，selector 选相关技能，挂上对应 LoRA，用 α 控制强度。技能原文不再进入 prompt。[^method]
+5. **组合时先拆组件再相加**：如果两个技能有共享部分，直接把完整 LoRA 相加会重复放大共享行为；本文更推荐把技能拆成 general / task-specific / mistakes 等语义组件，分别编译后再组合。[^compose]
 
-## 架构 / 流程(Architecture / pipeline)
+这和“压缩 prompt”有关键区别：压缩 prompt 仍然是在输入侧塞一个短表示；LatentSkill 是把可复用过程知识变成参数侧的可挂载补丁。
+
+## 架构 / 流程
 
 ```mermaid
 flowchart TD
-  S[技能文档(文本)] --> G[技能编译器 G_φ<br/>Transformer 超网络]
-  G -->|一次前向| L[(LoRA 适配器缓存<br/>每技能一份)]
-  subgraph 训练(只训 G_φ)
-    P1[阶段1 文档预训练<br/>171K GitHub 技能文档<br/>重建+补全] --> G
-    P2[阶段2 轨迹 SFT<br/>SkillRL 教师轨迹 237+500 条<br/>一轨迹一适配器] --> G
+  S[Textual skill document<br/>任务策略·工具模式·恢复规则] --> G[Skill compiler G_phi<br/>hypernetwork]
+  G --> L[Generated LoRA adapter Delta_s<br/>latent skill in weight space]
+
+  subgraph Train[训练 skill compiler]
+    P[Skill document pretraining<br/>reconstruct / complete skill docs] --> F[Trajectory-supervised fine-tuning<br/>skill + teacher trajectories]
   end
-  L -->|α 注入系数| M[冻结骨干 Qwen3-8B<br/>W' = W + α/r·BA]
-  L -->|多技能: 组件级合并<br/>Σ γ_c·G_φ(组件)| M
-  M --> A[Agent 只看任务历史<br/>prompt 零技能 token]
+  Train --> G
+
+  L --> C[Adapter cache<br/>compile once, reuse many times]
+  C --> M[Frozen backbone LLM<br/>theta plus alpha Delta_s]
+  H[Task history h_t<br/>不含技能原文] --> M
+  M --> Y[Agent action / answer y_t]
+
+  C --> A[Alpha scaling<br/>控制技能强度]
+  C --> K[Component-level composition<br/>对齐组件后做 LoRA 加法]
 ```
 
 ## 创新点(Innovation points)
 
 | 创新 | 新在哪 | 为什么重要 |
 | --- | --- | --- |
-| 技能=可装卸 LoRA | 对比 SKILL0 等"焊死进参数"方案,适配器独立于骨干 | 同时拿到零上下文开销和插拔式模块化,破三难 |
-| 权重空间有语义几何 | 域内 5+3 技能在 MDS 下成簇(域内余弦 0.982 vs 跨域 0.910);GitHub 上 Code/Finance/Writing 的 OOD 技能**没训过也成簇** | 说明编译器学到的是"文本→语义组织的权重空间"映射,不是过拟合 8 个技能 |
-| α 旋钮可控 | 性能随 α 倒 U 形(seen 峰值 α=0.6 达 74.29%,α=1.2 崩到 22.86%);弱基线任务要更大 α | 文本技能只有"放/不放"二值;权重技能有连续强度,可按任务调 |
-| 组件级组合 | Look+Pick 组合:组件合并 84.6%/77.8%,整技能直加和文本拼接都不行 | 给出"参数空间技能算术成立的条件=文本拆分粒度对齐权重加法粒度" |
-| 技能知识有定位 | 消融发现技能差异集中在 attn_o + mlp_down 两个位置;只注入这 2/7 位置保留 93.3% 性能、unseen 还更好 | 部署可省 5/7 适配器参数,也提示"信息输出/整合层"是程序性知识的载体 |
+| 技能从 context 搬到 LoRA weight | 不是每步检索/拼接 skill text，而是由 hypernetwork 生成 adapter | 同时减少重复 token、降低明文暴露、保留模块化加载 |
+| 两阶段 compiler 训练 | 文档级预训练负责“懂技能文本”，轨迹 SFT 负责“把技能变成稳定行为” | 避免只做文本重建，强化 agent 多步决策里的行为一致性 |
+| α 连续控制 | 技能影响不是有/无二值开关，而是可扫强度曲线 | 工程上可以按任务难度调节，不必每个技能都满强度挂载 |
+| 组件级 skill arithmetic | 明确指出完整 LoRA 直接相加会干扰，文本拼接也会 OOD | 给“多技能组合”提出了更细粒度的安全组合原则 |
+| 权重空间结构分析 | 用 MDS、相似度、低秩分析说明生成 LoRA 不是纯黑箱噪声 | 让“权重技能”有可解释空间，而不是只看最终分数 |
 
 ## 实验 / 证据(Experiments / evidence)
 
-骨干统一 Qwen3-8B,技能文本与 in-context 基线**同一份**:
+**实验设置(论文自报)**：所有实验使用 **Qwen3-8B** 作为 frozen backbone；skill compiler 是 Transformer-based hypernetwork。预训练数据约 **171K** 个去重 GitHub skill documents，约 **300M tokens**；预训练在 **8×H100** 上跑 **10 epochs**，batch size **64**，learning rate **5e-5**。SFT 使用 SkillRL 释放的 teacher trajectories：**237** 条完整 ALFWorld 轨迹和 **500** 条完整 Search-QA 轨迹；SFT 同样 **8×H100**、**10 epochs**，batch size **32**，learning rate **1e-5**。[^train]
 
-- **ALFWorld**(成功率):seen 74.3% vs in-context skill 52.9%(+21.4);unseen 69.4% vs 56.0%(+13.4);prefill -64.1%(0.44k vs 1.21k/步);平均步数 35.0→28.4(全方法最少)。unseen Pick2 70.6%,比第二名高 41.2 分。
-- **Search-QA**(7 数据集 EM):平均 35.6 vs in-context 32.6(+3.0),技能 token 开销 -72.2%;但单看数据集互有胜负(RAG 在 NQ/Triv/Pop 更强,LatentSkill 强在 HotpotQA/MuSiQue)。
-- **鲁棒性**:技能文本改写/去格式/乱序/加噪后,ALFWorld 平均 70.7%(只掉 3.6);**Hijack 提示注入**下 in-context 从 52.9% 崩到 8.57%,latent 保住 38.6%;Extract 套取攻击下权重形态天然少暴露明文。
-- 训练成本(自报):两阶段各 8×H100 × 10 epochs;预训练 batch 64 / lr 5e-5,SFT batch 32 / lr 1e-5。
+**评测设置(论文自报)**：ALFWorld 在 seen split **140 episodes**、unseen split **134 episodes** 上评 success rate，每个 episode 最多 **50 steps**，按任务类别匹配技能，不做检索。Search-QA 每个数据集随机采样 **500** 例，Bamboogle 用全量 **125** 例；E5 retriever top-k=**3**，每个 query 最多 **4** 次检索，指标是 Exact Match。[^eval]
 
-> [!warn] 最大的保留:基线监督不对称
-> LatentSkill 的编译器在**这两个基准的教师轨迹上做过 SFT**,而 in-context skill 基线的骨干**没有**吃过这些轨迹——增益里有多少来自"权重空间表示"、多少来自"多了 737 条教师轨迹的监督",论文没有"骨干 LoRA-SFT 同轨迹 + in-context skill"的对照,无法拆分。另外:技能库只有 5+3 个、按类别硬匹配(没有检索环节)、α 最优值是在评测集上扫出来的(等于测试集调参)、只测了 Qwen3-8B 一个骨干。结构/可控/可组合三组分析是真发现,**绝对分数别当生产承诺**。
+**主结果 1：ALFWorld。LatentSkill 对同一份 skill 内容的 in-context baseline 有明显优势(论文自报 Table 1)。**[^alf]
+
+| Split | In-context Skill Avg | LatentSkill Avg | 提升 | Prefill token/step | Decode token/step |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Seen | 52.9 | 74.3 | +21.4 | 1.21k → 0.44k | 0.50k → 0.34k |
+| Unseen | 56.0 | 69.4 | +13.4 | 1.23k → 0.44k | 0.61k → 0.51k |
+
+ALFWorld 里最醒目的单项是 unseen Pick2：LatentSkill **70.6%**，第二名 AdaPlanner / In-context Skill 都是 **29.4% / 23.5%** 附近，论文正文称其超过 second-best **41.2 points**。但它也不是每格都赢：比如 seen Clean 是 In-context Skill **70.4%**，LatentSkill **63.0%**；unseen Clean 是 In-context Skill **74.2%**，LatentSkill **64.5%**。[^alf]
+
+**主结果 2：Search-QA。平均 EM 最高，但不是所有数据集都赢(论文自报 Table 2)。**[^search]
+
+| Method | Avg EM | Cost/step |
+| --- | ---: | ---: |
+| Vanilla | 28.1 | 0.24k |
+| CoT | 24.5 | 0.09k |
+| Few-shot | 31.7 | 0.94k |
+| R1-Instruct | 30.1 | 0.24k |
+| RAG | 34.4 | 0.89k |
+| In-context Skill | 32.6 | 1.10k |
+| LatentSkill | 35.6 | 0.31k |
+
+LatentSkill 在 HotpotQA **39.6**、MuSiQue **9.8** 上是 best；但 NQ 仍低于 RAG(**36.2 vs 39.0**)，Bamboogle 低于 In-context Skill(**25.6 vs 38.4**)。所以正确说法是“平均更好、token overhead 更低”，不是“所有 QA 子集都压倒性胜出”。[^search]
+
+**权重空间结构(论文自报)**：对 **5 个 ALFWorld skills + 3 个 Search skills** 的 LoRA weights 做 MDS，pretrain 阶段两个域分开，inter-cluster distance **0.0887**，within-domain similarity **0.982** 高于 cross-domain **0.910**；SFT 后 inter-cluster distance 降到 **0.0704**，减少 **20.6%**，作者解释为 SFT 引入共享 agent-level 行为模式但保留 skill-specific structure。OOD skill 文本来自 GitHub：Code **18**、Finance **13**、Writing **11**，三个域也形成分离 cluster，within-domain similarities 分别为 **0.783 / 0.9664 / 0.9681**。[^geometry]
+
+**α 控制曲线(论文自报)**：ALFWorld seen 平均 success 从 `α=0` 的 **43.57%** 升到 `α=0.6` 的 **74.29%**，再在 `α=1.2` 掉到 **22.86%**；unseen 从 `α=0` 的 **47.01%** 升到 `α=0.5` 的 **70.90%**，`α=1.2` 掉到 **8.21%**。这说明 LoRA skill 不是越强越好，过强会破坏 backbone。[^scale]
+
+**组合实验(论文自报 Table 3)**：在 **31 个 Look episodes** 上，Component Merging 达到 seen **11/13 = 84.6%**、unseen **14/18 = 77.8%**，高于 Look-Only 的 **61.5% / 72.2%**。Direct Merging 和 Text Merging 在 unseen 都只有 **61.1%**，并且会丢掉 Look-Only 原本成功的一些样本。作者的 case study 指向同一个机制：完整 LoRA 直接合并会重复放大共享组件；文本拼接会成为 hypernetwork 训练外的 OOD 输入。[^compose]
+
+**扰动与 prompt-level attack(论文自报 Table 4)**：Base 下 ALFWorld 是 In-context **52.9** vs Latent **74.3**；四种 skill text 扰动下 Latent 平均仍保持 **67.9 / 74.3 / 69.3 / 71.4**。Hijack 攻击下 In-context ALFWorld 从 **52.9** 掉到 **8.57**，Latent 仍有 **38.6**；Search-QA Hijack 下 Latent 从 **35.6** 到 **34.0**。Extract 攻击下 In-context Search-QA **21.3**，Latent **29.3**。注意：这只能说明明文 skill 不在 prompt 里更难直接抽取，不等于 adapter 本身没有安全风险。[^security]
+
+**低秩与模块消融(论文自报附录)**：生成的 `ΔW` stable rank 约从 pretrain **2.35-2.40** 到 SFT **2.17-2.23**，同形状随机 LoRA stable rank 是 **837.87**；top-2 singular directions 捕获约 **67%** 能量，top-5 约 **93%**。模块辨别度显示 `attn_o` 和 `mlp_down` 的 gap 最高；只保留全部层的 `attn_o + mlp_down`，seen 保留 full 配置 **93.3%** 性能(**59.3 vs 63.6**)，unseen 还略高 **63.4 vs 61.2**。[^lowrank]
+
+**仓库实读(2026-06-10)**：`yuaofan0-oss/LatentSkill` 当前只有 `README.md`、`framework.png`、`table1.png`、`table2.png`，没有训练/推理源码、数据或 checkpoints；README 的 release 表也写着 Code/Data/Checkpoints 都是 “Coming soon”。README 顶部 Paper badge 链到 `2604.02029`，citation 和正文才是 `2606.06087`，应按 arXiv 页面和 BibTeX 的 `2606.06087` 为准。[^repo]
+
+> [!warn] 别被带偏
+> 1. **“权重空间”不是免费午餐**：训练 skill compiler 需要 171K 文档、300M tokens 和 8×H100 两阶段训练；适合高复用技能，不适合一次性指令。
+> 2. **“不暴露明文”不等于安全**：技能内容不在 prompt 里，确实减少直接 Extract，但 adapter 仍可能携带敏感行为，也可能被恶意 skill document / adapter-loading interface 攻击。
+> 3. **组合结论很窄**：composition 只在 Look + Pick 这一对互补 ALFWorld skills 上展示，且依赖人工语义组件对齐；不能推广成“任意 LoRA 技能可随便相加”。
+> 4. **仓库还不能复现**：官方 GitHub 是 README + 图片状态，源码/数据/checkpoints 未开放。本文数字是论文自报，不是第三方复现实测。
 
 ## 限制与风险(Limitations and risks)
 
-- 作者自认:仅两个基准、单骨干单 LoRA 配置;web/SWE/多 agent 场景未验证。
-- 每个新技能要过编译器,**技能更新=重编译**;编译器本身 ~17 万文档+轨迹训出来,换骨干要重训。
-- 组合性有前提(组件语义对齐),任意技能对不保证可加;Heat 任务的 α 规律也有例外。
-- 安全增益是"少暴露明文",**不是**对注入免疫(Hijack 下也从 74.3 掉到 38.6)。
+- **评测域窄**：原文只评 ALFWorld 和 Search-QA；web browsing、software engineering、多工具 side effects、多 agent collaboration 都未测。[^limit]
+- **backbone / LoRA 配置固定**：所有实验使用 Qwen3-8B 和固定 LoRA configuration；换模型家族、模型规模、target modules、rank、hypernetwork 架构后是否稳定，原文未披露。[^limit]
+- **训练与服务复杂度未完整计账**：论文报告 token overhead，但没有给 production latency、adapter cache 策略、显存/存储成本、compiler 生成时间的完整成本账。
+- **技能选择很理想化**：ALFWorld 按类别直接匹配 skill，Search-QA 按数据集与问题子类型匹配；真实 agent 里 skill selector 本身会犯错。
+- **安全只是表层验证**：Hijack/Extract 是有用起点，但不覆盖 adapter poisoning、反向工程、权限隔离、恶意 adapter 装载等问题。
 
 ## 先读什么(What to read first)
 
-1. Figure 1+2 —— 三难问题和两阶段训练一图懂。
-2. §3.2 —— 重建/补全预训练的设计(信息必须穿过适配器)是全文最巧的一处。
-3. Table 1 + §4.2 —— 主结果和 token 账。
-4. §4.3–4.5 —— 几何/旋钮/算术三连,本文真正的增量。
-5. Appendix D —— attn_o+mlp_down 定位,部署党直接受益。
-6. 代码:GitHub `yuaofan0-oss/LatentSkill`。
+1. **Introduction + Figure 1/2**：先看它要在 prompt skill、微调 skill 中间找哪条路。[^intro]
+2. **Method §3**：读懂 `Gφ(s) -> Δs`、pretraining、trajectory SFT、adapter cache、α 和 composition。[^method]
+3. **Table 1 / Table 2**：确认它赢在哪里、没赢在哪里，尤其不要漏掉 Search-QA 子集差异。[^alf]
+4. **§4.3-§4.5 + Appendix H**：这是论文最有意思的部分，说明权重技能的结构、强度旋钮和组合失败模式。[^compose]
+5. **Limitations + GitHub README**：最后确认它目前不是可复现实装代码，而是论文自报 + official placeholder repo。[^repo]
+
+## 技术细节(选读)
+
+### Skill compiler 到底学什么
+
+**大白话**：它不是给每个技能单独 fine-tune 一个 LoRA，而是训练一个“通用编译器”。以后来一份新技能文本，编译器一次前向就吐出对应 LoRA。
+
+**精确机制**：预训练阶段，输入是 GitHub skill documents 的 markdown body，metadata(name/description) 被去掉；任务是 reconstruction 或 completion。SFT 阶段，每个样本是 `(skill document, teacher trajectory)`，同一个 adapter 挂完整条 trajectory，loss 对所有 decision steps 和 target tokens 求和。backbone 冻结，只更新 compiler 参数 `φ`。[^train]
+
+### 为什么 α 会有倒 U 曲线
+
+**大白话**：技能像药量，少了没效果，多了会中毒。α 控制 LoRA 补丁的强度，适中时补足策略，太大时压坏原模型。
+
+**精确机制**：原文扫 `α ∈ {0, 0.1, 0.2, 0.3, 0.5, 0.6, 0.8, 1.0, 1.2}`。seen 平均峰值在 `α=0.6`，unseen 平均峰值在 `α=0.5`；`α=1.2` 在两个 split 都明显崩。原文还指出，统一使用 seen 最优 `α=0.6` 会让 unseen Heat / Pick2 / Clean 分别比各自最优低 **21.74 / 17.65 / 12.90 points**，因此未来需要 adaptive α selection。[^scale]
+
+### 为什么完整 LoRA 不能直接相加
+
+**大白话**：两个技能都有“通用注意事项”和“常见错误”部分，如果完整相加，就像把同一条安全规范喊两遍，反而压过真正 task-specific 的动作。
+
+**精确机制**：Appendix H 的 Case 2 显示 Direct Merging 能识别 keychain，却不触发 pick-up；作者归因于 Look/Pick 共享 general 和 mistakes components，完整 LoRA 合并导致共享权重重复放大，扰乱 perception-to-action decision threshold。Text Merging 的失败不同：把两个技能文本拼成一个输入，超出 hypernetwork 训练分布，模型能执行单个动作但无法形成连贯序列。[^case]
+
+### 防张冠李戴
+
+LatentSkill **不是 RL 方法**：它使用 SkillRL 释放的 teacher trajectories 做 supervised fine-tuning，但本文没有训练 agent policy 的 RL loop。把它讲成“用 RL 学技能 LoRA”是错的。[^sft]
+
+LatentSkill 也 **不是 SKILL0 式不可逆内化**：相关工作里提到 SKILL0 通过训练时逐步撤掉 skill context，把技能融合进 backbone；LatentSkill 的区别恰恰是技能以独立 LoRA module 存在，可以加载、卸载、替换、缩放。[^related]
+
+## 后续演化 · 这方法后来怎样了
+
+截至 2026-06-10，LatentSkill 是 2026-06-04 新提交论文，HF 页面显示 models / datasets / spaces citing this paper 均为 **0**；我没有找到可核实的“后续优化/替代 LatentSkill”的论文。因此这里不伪造前向引用，只标相邻赛道：[^hf]
+
+- **Skill is Not One-Size-Fits-All: Model-Aware Skill Alignment for LLM Agents**(arXiv:2605.30723)：相邻但不同路线，仍在 prompt skill 侧做 model-aware rewriting，不把 skill 编成 LoRA。_[置信度:高]_。[^masa]
+- **Scaling Self-Evolving Agents via Parametric Memory**(arXiv:2606.04536)：同周 parametric memory 路线，把经验吸收到 fast LoRA weights；更像在线记忆/自进化，不是离线 skill compiler。_[置信度:高]_。[^tmem]
+- **LatentSkill 官方仓库**：当前仍是 Coming soon placeholder，后续是否释放代码/数据/checkpoints 需要再查。_[置信度:高]_。[^repo]
+
+[^arxiv]: arXiv 摘要页：*LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents*, arXiv:2606.06087, submitted 2026-06-04。https://arxiv.org/abs/2606.06087
+[^hf]: Hugging Face paper page, `2606.06087`, published Jun 4, submitted Jun 9, upvote 57 at read time; page also shows models/datasets/spaces citing this paper as 0。https://huggingface.co/papers/2606.06087
+[^intro]: 原文 Introduction：textual skills 的 context overhead、plaintext exposure、parametric alternatives 的不可模块化，以及三点 contributions。
+[^related]: 原文 §2 Related Work：LLM Agents and Skill Systems；Hypernetworks for LoRA Generation；对 SKILL0、Text-to-LoRA、SHINE、Doc-to-LoRA 的定位。
+[^method]: 原文 §3 Method：latent skill definition、`Δs=Gφ(s)`、`p_{θ⊕αΔs}(yt|ht)`、adapter cache 与 parameter-space composition。
+[^pretrain]: 原文 §3.2 Skill Document Pretraining：reconstruction / completion objectives。
+[^sft]: 原文 §3.3 Trajectory-Supervised Fine-Tuning：teacher trajectories、同一 adapter 跨整条 trajectory、只更新 compiler。
+[^train]: 原文 Appendix A Training Details：171K skill docs、300M tokens、8×H100、10 epochs；SFT 的 237 ALFWorld + 500 Search-QA trajectories。
+[^eval]: 原文 Appendix C Evaluation Details：ALFWorld seen/unseen episodes、50-step cap；Search-QA sampling、E5 top-k=3、max 4 retrieval steps。
+[^alf]: 原文 Table 1：ALFWorld success rate、steps、prefill/decode cost。
+[^search]: 原文 Table 2：Search-QA exact match 与 cost。
+[^geometry]: 原文 §4.3 与 Appendix G：MDS、domain clusters、OOD skill sources。
+[^scale]: 原文 §4.4 与 Appendix G Table：injection coefficient α sweep。
+[^compose]: 原文 §4.5 Table 3：Look/Pick composition；component merging vs direct/text merging。
+[^security]: 原文 §5 Table 4 与 Appendix E：Paraphrase/Plaintext/Reorder/Noise、Hijack/Extract。
+[^lowrank]: 原文 Appendix D/F：sub-module ablation、low-rank encoding analysis。
+[^case]: 原文 Appendix H：composition case studies, ep4/ep6/ep36。
+[^limit]: 原文 Limitations：只评 ALFWorld/Search-QA，固定 Qwen3-8B 与 LoRA 配置。
+[^repo]: GitHub `yuaofan0-oss/LatentSkill`，commit `2fc748a`; 仓库实读只有 README 和图片，release 表写 Code/Data/Checkpoints 为 Coming soon。https://github.com/yuaofan0-oss/LatentSkill
+[^masa]: arXiv:2605.30723, *Skill is Not One-Size-Fits-All: Model-Aware Skill Alignment for LLM Agents*。https://arxiv.org/abs/2605.30723
+[^tmem]: arXiv:2606.04536, *Scaling Self-Evolving Agents via Parametric Memory*。https://arxiv.org/abs/2606.04536

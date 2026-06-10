@@ -4,61 +4,80 @@
 
 ## 为什么这对我重要
 
-你大概率不做机器人,但你一定会遇到这篇真正在解的工程问题:**怎么让一个 agent 策略跨 N 个异构后端跑、还能客观判分**。把"8 个模拟器"换成"8 个客户环境/8 套内部系统",这就是 FDE 的日常。SpatialWorld 的观察-动作瓶颈接口、终态验证、任务三件套(初始状态+参考轨迹+verifier),是一套可以原样搬走的 agent 评测工程模板——而"会做评测"正在成为 agent 工程师里最稀缺的分层技能。
+如果你做的是 agent 产品，迟早会遇到一个问题：demo 里 agent 能点按钮、走流程、调用工具，但一到真实任务就开始迷路、乱试、提前说完成、或者用很多无效步骤碰巧成功。SpatialWorld 给你的不是一个可直接部署的机器人框架，而是一套**评 agent 是否真的能在部分可观测世界里闭环做事**的工程范式。
 
-> [!key] 与我们的 north star 挂钩
-> 我们自己的质量门哲学和它完全同构:**验产物不验过程**(终态验证 = 我们"按渲染前端验收",不管中间代码怎么写);**成功率和效率分开计量**(TSR vs SE = AdaPlanBench 的 VPR vs Acc 同款教训);**先把 benchmark 做强**(每任务人工三件套 + 交叉复核 = RULES#18 的"先把判分做可信")。这是第三篇往同一个方向敲钉子的 eval 论文,这个模式可以沉淀为我们评测协议的固定结构件了。
+> [!key] 和我们正在做的东西直接同源
+> AI-Brief 的自进化/冷审门也需要这种思想：统一输入输出契约，生成器不能偷看答案；用 verifier 查最终产物，而不是看生成路径像不像；质量分和代价分分开报；再按任务类型切片找能力断崖。SpatialWorld 是 embodied spatial agent 的版本，但它的评测骨架可以迁移到我们自己的 research agent、KG 判边、深读冷审和自动回归。
 
 ## 该学的 AI 工程技能
 
 | 技能 | 学什么 | 怎么练 |
 | --- | --- | --- |
-| 统一接口设计(adapter 瓶颈) | 怎么把异构后端的输入输出收敛到一个严格 I/O 契约,让 agent 策略零修改跨环境 | 挑两个长得不一样的 API/环境,设计一层统一动作 schema + 各自的 action-to-code 翻译器 |
-| 终态验证器编写 | 怎么把"任务完成"写成查询最终状态的确定性脚本,而不是比对步骤 | 给自己的 agent 任务写 5 个 verifier:只查结果状态,允许任意路径;再故意走野路子验证 verifier 不误杀 |
-| 双指标评测 | 成功率之外加一个"代价/效率"维度,识别穷举型选手 | 在现有 agent 评测里补一个 SE 型指标(参考步数/实际步数),看排名变不变 |
-| 任务数据生产工序 | 设计→人类执行录真值→独立交叉复核 的三段流水线 | 为一个小评测集走完整三段(哪怕 10 个任务),体会"参考轨迹"有多贵 |
-| 对照组设计 | 用"剥离语义的抽象任务"隔离单一能力(它用 3D 游戏隔离几何推理) | 给你的 agent 评测加一组"去掉领域常识捷径"的合成任务,看分数掉多少 |
+| Agent eval harness 设计 | 统一 observation/action interface、task artifact、verifier、metric reporter | 给一个浏览器/代码 agent 设计同构评测：输入、动作、终态 verifier、质量/代价双指标 |
+| 终态验证思维 | 不比过程像不像参考答案，只查最终产物是否满足条件 | 把“深读是否合格”拆成结构门、事实门、来源门，而不是让 reviewer 主观打分 |
+| 部分可观测任务设计 | agent 不能拿上帝视角，只能逐步取证 | 设计一个只能看当前页面/当前文件片段的 agent 任务，不给完整答案上下文 |
+| 动作接口抽象 | 把异构后端压成统一高层动作，再由 adapter 翻成本地命令 | 为多个工具后端定义同一套 `Search/Read/Edit/Verify/Stop` 动作 |
+| 双指标评估 | TSR 这类质量线 + SE/token/步骤这类代价线分开报 | 给自己的 agent 同时报 success rate、steps、token、返工轮数 |
+| 切片诊断 | 不只看总分，按场景、复杂度、后端、失败模式找断崖 | 做一张矩阵：单步 vs 多步、检索 vs 规划、单 agent vs 多 agent |
 
 ## 系统设计心法
 
-- **接口瓶颈 > 逐环境适配**:把异构性压进一层严格定义的 I/O,复杂度 O(N) 变 O(1);agent 侧永远只见统一协议。
-- **验终态 > 验轨迹**:开放路径、客观判分、可复现——凡是"过程可以多样、结果必须确定"的任务都该这么验。
-- **成功率必须配效率指标**:单看成功率,穷举试错和真有能力分不开。
-- **隔离变量再下结论**:"复合任务 4.2% vs 单项 50.2%"这种诊断,只有任务分类法设计对了才看得见——评测的价值在归因,不在排名。
-- **每个任务自带判分器**:任务=指令+初始状态+verifier 三件套,缺一件就不是合格的评测数据。
+一句话：**可归因的 agent 评测，要先把接口收窄，再把判分做硬。**
+
+- **统一接口 > 单点 leaderboard**：后端不同、动作不同、状态暴露不同，分数就不可比。先建 I/O 瓶颈，再谈模型能力。
+- **验终态 > 验轨迹**：开放式 agent 会有多条合理路径；评测应看 artifact / state 是否满足条件，而不是像不像 golden trace。
+- **质量线和代价线分开**：成功率高但步数爆炸，和成功率低但偶尔高效，是两种不同问题。
+- **抽象对照组很值钱**：写实任务容易混入常识捷径；把语义剥掉的 3D games 类似我们给 KG 判边做“概念名替换成代号”的测试。
+- **断崖比排名更有用**：Navigation-Interaction 只有 4.2% mean TSR，比“谁第一”更能告诉你下一步该修哪里。
 
 ## 作品集角度(Portfolio angle)
 
-"给 agent 做了一套可信评测"比"做了一个 agent"更稀缺。这篇给了完整的模仿对象:统一协议 + 终态验证 + 双指标 + 工序化数据生产。哪怕规模只有它的 2%,只要工序齐全,就是一个能在面试里讲 20 分钟的项目。
+这篇能撑起一个很硬的作品集方向：**“agent 评测基础设施”**。不要再做一个只能展示成功 demo 的 agent；做一个能证明 agent 何时失败、为什么失败、成功代价多少、是否跨环境泛化的评测器。
+
+你可以把它讲成三层：
+
+1. **统一动作协议**：让多个工具/环境后端共享一套高层动作。
+2. **终态 verifier**：每个任务都有可执行判分器，不靠人工看日志。
+3. **能力矩阵报告**：成功率、效率、失败类型、任务切片同时输出。
 
 ## 可造(Build ideas)
 
 | 造什么 | 范围 | 时间 | 为什么有用 |
 | --- | --- | --- | --- |
-| Mini 统一 agent 测床 | 把 2-3 个异构环境(如:浏览器任务 + 文件系统任务 + 一个文字游戏)封进同一套观察/动作接口,跑 3 个模型对比 | 1-2 周 | 完整复刻"接口瓶颈+终态验证"模式,跨环境归因能力是硬通货 |
-| Verifier 库 | 为常见 agent 任务类型(文件操作/数据处理/网页操作)写可复用的终态验证器集合 | 4-6 天 | 评测基建件,每个 agent 项目都用得上 |
-| 穷举检测器 | 给任意 agent 轨迹算 SE 型效率分 + 重复动作率,输出"真能力 vs 试错蹭分"报告 | 2-3 天 | 小而锋利,直接回应"demo 能跑 ≠ 能力达标" |
+| BrowserWorld-lite | 给浏览器 agent 做 30 个任务，统一 `Click/Type/Search/Stop`，用 DOM/截图终态 verifier 判分 | 1-2 周 | 直接复刻 SpatialWorld 的 eval 骨架到 FDE 常见网页自动化 |
+| CodeAgent verifier harness | 代码 agent 做 issue 修复，终态由 tests/lint/build + diff invariants 判分，另报 token/steps | 1 周 | 比“模型修好了没”更可归因，能面试讲可靠性 |
+| Deepread cold-audit SE | 给 AI-Brief 深读管线加效率指标：每篇过审前返工轮数、事实修正数、source checks 数 | 2-4 天 | 把我们已有冷审门从质量门升级成质量+代价双指标 |
+| KG 抽象对照组 | 把 concept names 替换成无语义代号，重跑判边/召回，看系统是否真按结构证据判断 | 2-3 天 | 检测“词面相似”伪泛化，和 SpatialWorld 3D games 同一个思想 |
+| Multi-tool unified action layer | 为 Gmail/Drive/GitHub/Browser 工具定义统一 high-level action schema，再由 adapter 翻工具调用 | 1-2 周 | 多后端 agent 产品的可维护性会明显提高 |
 
 ## 简历 / 面试故事
 
-诚实写法:
+诚实写法：
 
-- *"Designed a simulator-agnostic evaluation harness: a unified observation/action interface over N heterogeneous backends with execution-based terminal-state verification, so one agent policy runs unmodified across environments."*
-- *"Built task artifacts (initial state + human reference trajectory + verifier) with independent cross-review, and reported success rate jointly with step-efficiency to separate capable agents from trial-and-error."*
+- *"Built an agent evaluation harness with a unified action interface, terminal-state verifiers, and dual metrics for success rate and step efficiency across heterogeneous tool environments."*
+- *"Designed benchmark tasks as three artifacts: validated initial state, reference trajectory for budgeting, and deterministic terminal-state verifier; reported capability breakdowns by task complexity rather than a single leaderboard score."*
+- *"Added abstraction probes that remove semantic shortcuts, revealing whether an agent relies on surface cues or robust state tracking."*
 
 > [!key] 面试可讲
-> "怎么评一个多环境 agent?"——用本文论证:接口统一才能归因(否则分数=模拟器适配度)、验终态才能开放路径、双指标才能识破穷举;再引用它的断崖数据(单项交互 50.2% vs 导航+交互复合 4.2%)说明**长程组合才是当前 agent 的真瓶颈**——这句话对任何做 agent 产品的团队都值钱。
+> “你怎么判断一个 agent 不是靠乱试成功？”——用 SpatialWorld 的答案：不要只报 success rate；统一接口后，用终态 verifier 判成败，再用 SE / steps / token 成本看成功代价，并按任务复杂度切片。这样才能区分真能力、接口适配和试错成本。
 
 ## 学习清单
 
 **必学**
-- 终态验证器设计(OSWorld/Spider2-V → 本文一脉的执行验证范式)
-- 统一动作 schema + action-to-code 适配层
-- 评测双指标(成功率 × 效率)与其可比性边界
+
+- POMDP / partial observability 的工程含义：只能看局部、要主动取证。
+- Terminal-state verification：判最终状态，不判路径相似。
+- Unified action interface：高层动作协议 + 后端 adapter。
+- TSR vs SE：质量与效率分开报告。
 
 **有用**
-- POMDP 基本形式化(读懂 agent 评测论文的通用语言)
-- AI2-THOR/CARLA 等模拟器生态概览(知道有哪些现成测床)
+
+- Benchmark task 三件套：初始状态、参考轨迹、verifier。
+- 失败模式分类：Spatial Disorientation、Object Hallucination、Premature Termination、Action Loop。
+- 抽象 probe：剥离语义捷径，单测几何/状态追踪/结构推理。
 
 **可选**
-- 多 agent 协作评测设计(它的 Multi-AI2THOR vs Multi-ProcTHOR 分层值得细看)
+
+- AI2-THOR / ProcTHOR / CARLA / VirtualHome / EmbodiedCity 的 simulator 生态。
+- 多 agent collaboration eval：通信、角色分配、共享进度追踪。
+- 评测成本工程：抽样、分层回归、GPU/API 成本预算。

@@ -12,12 +12,14 @@
     "Zibo Lin",
     "Chunyang Li",
     "Zhichao Wang",
+    "Miao Peng",
+    "Nuo Chen",
     "Jia Li",
     "Yujiu Yang",
     "Haitao Mi",
     "Dong Yu"
   ],
-  "date": "2026-06",
+  "date": "2026-06-09",
   "huggingface_url": "https://huggingface.co/papers/2606.09079",
   "paper_url": "https://arxiv.org/abs/2606.09079",
   "code_url": "https://github.com/libertywing/FlashMemory-Deepseek-V4",
@@ -30,6 +32,10 @@
     "weekly",
     "monthly"
   ],
+  "hf_upvotes_verified_at": "2026-06-10",
+  "hf_upvotes": 52,
+  "github_stars_verified_at": "2026-06-10",
+  "github_stars": 25,
   "human_tabs": [
     "paper",
     "career"
@@ -62,8 +68,30 @@
     "breadth_value": 7,
     "evidence_quality": 7
   },
-  "one_sentence_judgment": "把「该留哪些 KV」改写成标准双塔检索问题:每 64 步预测未来要用的历史块、阈值召回(≥0.5 全取,允许空手)从 CPU 冷池预取,平均物理 KV cache 压到基线 13.5%、精度自报 +0.6%——最值钱的不是数字而是两个方法论:解耦训练(冻结骨干、只训 <0.1% 查询塔,1 GPU 时/次 → 一周 500 次配置扫描)和罕见诚实的失败剖析(O(1) 假设被自己的对抗测试推翻、MRCR 76→48 经 oracle 诊断归因为任务本质需要密集全局记忆、长度泛化硬性止于训练长度 2 倍);保留:项目中途叫停 τ/阈值无消融、RULER 128K/256K 实为掉分、对照是 DS-V4-Flash 非 full attention、repo 18★ 无第三方复现。",
+  "one_sentence_judgment": "把「该留哪些 KV」改写成标准双塔检索问题:每 64 步预测未来要用的历史 CSA 块、阈值召回(≥0.5 全取,允许空手)从 CPU 冷池预取;Table 1 实值为平均物理 KV cache 0.10 vs 0.93 GB、精度 77.5 vs 76.9(+0.6),LongBench-v2-L 为 0.18 vs 1.80 GB 且原文正文称 10.0% memory budget,另有 13.5% 是原文 §3.2 逐基准占比平均而非 Avg 行直接相除——最值钱的是两个方法论:解耦训练(冻结骨干、只训 <0.1% 查询塔,单个 H20 GPU-hour 收敛,8×H20 一周 500 次配置扫描)和罕见诚实的失败剖析(O(1) 假设被 No-Context 对抗测试推翻、MRCR 76→48 经 oracle 诊断归因为任务本质需要密集全局记忆、长度泛化止于训练长度 2 倍);保留:项目中途叫停 τ/阈值无消融、RULER 128K/256K 实为掉分、对照是 DS-V4-Flash 而非 dense full attention、开源仓库截至 2026-06-10 只有 retriever/toy loop 无生产 KV swap 且无第三方复现。",
   "cold_audit": {
-    "status": "needs_human"
+    "status": "hold",
+    "rounds": 3,
+    "audited_at": "2026-06-10T23:00:42.870Z",
+    "auditor": "claude-cold-audit",
+    "author": "codex-gpt-5.5-high",
+    "final_verdict": "revise",
+    "major_gaps": [
+      {
+        "criterion": "faithful",
+        "gap": "显存绝对值与原文 Table 1 矛盾:总平均 0.42/3.90 GB(原表 0.10/0.93 GB)、LongBench-v2-L 0.74/7.52 GB 与 9.8%(原表 0.18/1.80 GB,原文 10.0%)。脚注[^t1]自称'逐格以 Table 1 为准'却与之冲突。"
+      },
+      {
+        "criterion": "mechanism",
+        "gap": "'丢 86.5% KV 精度反升 +0.6'这一反直觉头条结果,原文有明确机制解释(§3.2:LSA=attention denoiser,滤掉无关历史块、减少注意力点积污染与事实幻觉),深读全篇未提,盲读读者明确表示无法理解为何精度会涨。"
+      }
+    ],
+    "arxiv_citation_audit": {
+      "checkedCount": 0,
+      "checked": [],
+      "unresolved": [],
+      "downgradeLabel": "推断/待核"
+    },
+    "unresolved_arxiv_references": []
   }
 }

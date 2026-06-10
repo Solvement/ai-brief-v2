@@ -15,18 +15,15 @@
     "Weinan Zhang",
     "Jianghao Lin"
   ],
-  "date": "2026-06",
+  "date": "2026-06-04",
   "huggingface_url": "https://huggingface.co/papers/2606.06087",
   "paper_url": "https://arxiv.org/abs/2606.06087",
   "code_url": "https://github.com/yuaofan0-oss/LatentSkill",
   "dataset_url": "",
   "model_url": "",
   "space_url": "",
-  "project_url": "",
   "source_rankings": [
-    "daily",
-    "weekly",
-    "monthly"
+    "daily"
   ],
   "human_tabs": [
     "paper",
@@ -34,34 +31,46 @@
   ],
   "autosci_primitive": "data/autosci/primitives/2606.06087.yaml",
   "first_seen_date": "2026-06-09",
-  "must_read": false,
-  "track": "hf",
   "topic": "agent",
   "agent_relevant": true,
   "tags": [
     "agent-skills",
-    "lora",
+    "latent-skill",
+    "lora-adapter",
     "hypernetwork",
-    "weight-space",
-    "context-compression",
+    "weight-space-memory",
     "skill-composition",
-    "prompt-injection-robustness",
-    "modular-adapters",
-    "qwen3-8b"
+    "parameter-efficient-adaptation",
+    "self-evolving-agent",
+    "agent-efficiency"
   ],
   "status": "deep_read",
+  "track": "hf",
   "scores": {
     "idea_novelty": 8,
-    "system_design_value": 8,
+    "system_design_value": 9,
     "career_value": 8,
     "autosci_reuse_value": 9,
-    "buildability": 6,
-    "evaluation_value": 6,
+    "buildability": 5,
+    "evaluation_value": 7,
     "breadth_value": 7,
-    "evidence_quality": 5
+    "evidence_quality": 7
   },
-  "one_sentence_judgment": "用超网络把技能文档一次前向编译成可装卸 LoRA,正面回应「技能=塞 prompt」范式的三难(零上下文开销×模块化×可组合):同文本对照下 ALFWorld +21.4 分且 prefill -64.1%,真正的增量是证明技能权重空间有语义几何(OOD 技能也成簇)、强度可旋钮(α 倒 U)、组合须按语义组件对齐(整加/文本拼接都失败)、技能知识集中在 attn_o+mlp_down(2/7 位置保 93.3% 性能);但有一个未拆分的混淆——编译器在这两个基准的教师轨迹上 SFT 过而 in-context 基线没有,增益里轨迹监督占多少不可知,加上技能库仅 5+3 个、α 在评测集上扫、单骨干,绝对分数别当生产承诺,看它学「知识放哪」的三轴权衡与组件化组合纪律。",
+  "one_sentence_judgment": "LatentSkill 把 agent textual skill 从每步 prompt 注入改成 hypernetwork 生成的可插拔 LoRA 权重技能，在 ALFWorld/Search-QA 上自报同时提升平均表现并降低 skill-token overhead，还展示了 α 控制和组件级组合；它对 AI-Brief 的价值是提供“长期技能可编译为参数模块”的系统设计原语，但当前官方仓库仍是 README+图片、Code/Data/Checkpoints 未开放，结论应按论文自报而非第三方复现实测处理。",
   "cold_audit": {
-    "status": "needs_human"
+    "status": "ready_to_publish",
+    "rounds": 1,
+    "audited_at": "2026-06-10T23:00:42.869Z",
+    "auditor": "claude-cold-audit",
+    "author": "codex-gpt-5.5-high",
+    "final_verdict": "pass",
+    "major_gaps": [],
+    "arxiv_citation_audit": {
+      "checkedCount": 0,
+      "checked": [],
+      "unresolved": [],
+      "downgradeLabel": "推断/待核"
+    },
+    "unresolved_arxiv_references": []
   }
 }

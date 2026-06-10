@@ -1,12 +1,154 @@
 {
-  "generatedAt": "2026-06-10T22:44:08.344Z",
+  "generatedAt": "2026-06-10T23:00:43.146Z",
   "date": "2026-06-10",
   "counts": {
-    "deepReads": 21,
+    "deepReads": 24,
     "radar": 10,
     "deepCandidates": 3
   },
   "deepReads": [
+    {
+      "slug": "2606.05563-socrates-mediation-eval",
+      "arxiv_id": "2606.05563",
+      "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
+      "date": "2026-06-04",
+      "first_seen_date": "2026-06-08",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Taewon Yun",
+        "Hyeonseong Park",
+        "Jeonghwan Choi",
+        "Hayoon Park",
+        "Yeeun Choi",
+        "Hwanjun Song"
+      ],
+      "tags": [
+        "benchmark",
+        "llm-as-judge",
+        "judge-calibration",
+        "topic-localized-evaluation",
+        "counterfactual-baseline",
+        "hard-task-filtering",
+        "proactive-agents",
+        "mediation",
+        "social-cognition",
+        "multi-agent-simulation"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 8,
+        "buildability": 7,
+        "evaluation_value": 9,
+        "breadth_value": 8,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "SoCRATES 的核心价值不是证明某个 LLM 会不会调解，而是给开放式多轮干预任务提供一套可迁移的评测工序：agentic 场景策展 + 无调解模拟筛硬题 + 5 根社会认知轴独立扰动 + topic-localized evaluator + 反事实 consensus gain；最硬证据是裁判与专家 trajectory-level Pearson r=0.823，显著高于 ProMediate per-turn judge 的 0.372，并在 4,800 个 mediator runs 上显示最强 GPT-5.4-mini 也只达到 34.4 consensus gain。限制也明确：代码/数据 Coming soon、全 LLM 仿真非真人田野、DeepSeek-V3.2 同时做 party simulator/evaluator/被测 mediator、被测闭源模型是 mini/Flash-Lite 档，且全部对话为英语。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05563.png"
+    },
+    {
+      "slug": "2606.05622-adaplanbench-dual-constraint-planning",
+      "arxiv_id": "2606.05622",
+      "title": "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model Agents under World and User Constraints",
+      "date": "2026-06-04",
+      "first_seen_date": "2026-06-05",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Jiayu Liu",
+        "Cheng Qian",
+        "Zhenhailong Wang",
+        "Bingxuan Li",
+        "Jiateng Liu",
+        "Heng Wang"
+      ],
+      "tags": [
+        "benchmark",
+        "adaptive-planning",
+        "dual-constraints",
+        "progressive-disclosure",
+        "interactive-evaluation",
+        "user-simulator",
+        "constraint-tracking",
+        "llm-judge-calibration",
+        "replanning",
+        "early-stopping",
+        "agent-eval"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 9,
+        "breadth_value": 8,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "AdaPlanBench 把“约束不会一次性说清”做成了可复用的 agent eval 协议：307 个家务任务、隐藏 world/user 双约束、违规才披露、连续 2 轮无新约束 early stop，并用 VPR/Acc/AWRV/AURV/ATWC/ATUC 拆出失败指纹；最有价值的结论不是 GPT-5 最高 67.75%，而是 VPR>90% 仍可 Acc<45%、显式贴回已披露约束只救合规不救效果、rubric 反馈会修新坏旧；主要保留是 GPT-5.4 裁判与 GPT-5 赢家同家族、纯文本家务域、无真实执行和人类 baseline。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05622.png"
+    },
+    {
+      "slug": "2606.06087-latentskill-weight-space-skills",
+      "arxiv_id": "2606.06087",
+      "title": "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
+      "date": "2026-06-04",
+      "first_seen_date": "2026-06-09",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Aofan Yu",
+        "Chenyu Zhou",
+        "Tianyi Xu",
+        "Zihan Guo",
+        "Rong Shan",
+        "Zhihui Fu"
+      ],
+      "tags": [
+        "agent-skills",
+        "latent-skill",
+        "lora-adapter",
+        "hypernetwork",
+        "weight-space-memory",
+        "skill-composition",
+        "parameter-efficient-adaptation",
+        "self-evolving-agent",
+        "agent-efficiency"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 5,
+        "evaluation_value": 7,
+        "breadth_value": 7,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily"
+      ],
+      "one_sentence_judgment": "LatentSkill 把 agent textual skill 从每步 prompt 注入改成 hypernetwork 生成的可插拔 LoRA 权重技能，在 ALFWorld/Search-QA 上自报同时提升平均表现并降低 skill-token overhead，还展示了 α 控制和组件级组合；它对 AI-Brief 的价值是提供“长期技能可编译为参数模块”的系统设计原语，但当前官方仓库仍是 README+图片、Code/Data/Checkpoints 未开放，结论应按论文自报而非第三方复现实测处理。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.06087.png"
+    },
     {
       "slug": "2606.06492-code2lora-hypernetwork-repo-adapters",
       "arxiv_id": "2606.06492",
@@ -1005,7 +1147,7 @@
         "evidence_quality": 6
       },
       "one_line": "构建多领域多社会认知轴基准，通过agentic pipeline生成真实冲突场景评估LLM调解员",
-      "deep_slug": null
+      "deep_slug": "2606.05563-socrates-mediation-eval"
     }
   ],
   "radar": [

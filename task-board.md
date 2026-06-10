@@ -22,6 +22,13 @@
 - **KG-2 增量**：grepseek + latentskill facet v2 入图（14 facets，validator OK，recall@3=1.0，判边 NO_EDGE×10 全记录在 facet 注释）。
 - **待办**：SpatialWorld 2606.09669 批次审理中；05563/05622 明日 09:00 自动重审；FlashMemory 修订路由；main 推送待 Kevin。
 
+### PAPER-2606.09669 · SpatialWorld 深读从头重写（plan `docs/plans/2026-06-10-spatialworld-deepread-round1.md`）
+- **大方向**：按 canonical 论文范式把 SpatialWorld 写成可进入 AI-Brief 知识库的深读资产，重点沉淀“统一 I/O 瓶颈 + 终态 verifier + TSR/SE 双指标 + 任务三件套”对 multimodal agent / 自进化 agent eval 的价值。
+- **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + 项目页 + clone `Hongcheng-Gao/SpatialWorld` 源码/数据；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09669.yaml`；区分论文自报、项目页/HF/GitHub 动态核验、仓库实读。
+- **阶段**：开发完成，机器门禁待跑。
+- **阻塞**：无机器阻塞；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
+- **交付结论**：四个目标文件已从全文/源码重写，下一步跑 `build-index`、`validate-papers-deepread`、`npm run verify` 后回填。
+
 ### PAPER-2606.09079 · FlashMemory-DeepSeek-V4 深读第 1 轮（plan `docs/plans/2026-06-10-flashmemory-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 FlashMemory-DeepSeek-V4 写成 AI-Brief 可收录的深读资产，重点沉淀 Lookahead Sparse Attention、KV cache 预测式预取、解耦训练与 oracle 诊断对 agent 记忆/长上下文工程的迁移价值。
 - **小方向**：读 arXiv HTML/PDF/TeX 全文 + HF paper/model 页面 + clone `libertywing/FlashMemory-Deepseek-V4` 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09079.yaml`；修正原表内存数字、15 位作者列表、仓库 release 范围，区分论文自报 / HF&GitHub 动态核验 / 仓库实读。

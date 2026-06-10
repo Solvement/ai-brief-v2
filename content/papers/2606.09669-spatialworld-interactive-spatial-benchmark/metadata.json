@@ -25,53 +25,56 @@
     "Nan Duan",
     "Yinpeng Dong"
   ],
-  "date": "2026-06",
+  "date": "2026-06-08",
   "huggingface_url": "https://huggingface.co/papers/2606.09669",
   "paper_url": "https://arxiv.org/abs/2606.09669",
   "code_url": "https://github.com/Hongcheng-Gao/SpatialWorld",
-  "dataset_url": "https://huggingface.co/datasets/TTTCHHDDD/SpatialWorld-data",
+  "dataset_url": "https://github.com/Hongcheng-Gao/SpatialWorld/tree/main/data",
   "model_url": "",
   "space_url": "",
-  "project_url": "https://spatial-world.github.io",
+  "project_url": "https://spatial-world.github.io/",
   "source_rankings": [
     "daily",
     "weekly",
     "monthly"
   ],
+  "hf_upvotes_verified_at": "2026-06-10",
+  "hf_upvotes": 39,
+  "github_stars_verified_at": "2026-06-10",
+  "github_stars": 40,
   "human_tabs": [
     "paper",
     "career"
   ],
   "autosci_primitive": "data/autosci/primitives/2606.09669.yaml",
   "first_seen_date": "2026-06-09",
-  "must_read": false,
+  "must_read": true,
   "track": "hf",
-  "topic": "eval",
+  "topic": "agent-evaluation",
   "agent_relevant": true,
   "tags": [
+    "multimodal-agent",
+    "interactive-spatial-reasoning",
+    "embodied-agent",
+    "agent-eval",
     "benchmark",
-    "spatial-reasoning",
-    "multimodal-agents",
-    "unified-interface",
     "terminal-state-verification",
-    "pomdp",
-    "embodied",
+    "unified-action-interface",
+    "partial-observability",
     "step-efficiency",
-    "multi-agent"
+    "simulator-suite",
+    "self-improving-agent"
   ],
   "status": "deep_read",
   "scores": {
     "idea_novelty": 7,
-    "system_design_value": 8,
+    "system_design_value": 9,
     "career_value": 8,
-    "autosci_reuse_value": 7,
-    "buildability": 7,
-    "evaluation_value": 9,
-    "breadth_value": 7,
-    "evidence_quality": 7
+    "autosci_reuse_value": 9,
+    "buildability": 8,
+    "evaluation_value": 10,
+    "breadth_value": 8,
+    "evidence_quality": 8
   },
-  "one_sentence_judgment": "把空间推理评测从「看图答题」改成「8 个异构模拟器里真下场干活」:统一观察-动作瓶颈接口(只给第一人称 RGB+文本化高层动作)+ 终态验证替代轨迹匹配 + TSR/SE 双指标 + 抽象 3D 游戏剥离视觉捷径——最有用的不是 GPT-5 仅 17.4% 这个头条,而是断崖诊断:单项交互 50.2% vs 导航+交互复合 4.2%(瓶颈在长程组合)、程序化多 agent 布局最好也只 5.9%(协作靠的是熟悉布局);评测三件套(初始状态+人类参考轨迹+verifier+交叉复核)是可原样搬走的 agent 评测工程模板;保留:全模拟器非真实世界、GPT-5.4 异常低分暗示接口适配方差、人工复核未报一致率、SE 有幸存者偏差且作者自认跨大差距不可比。",
-  "cold_audit": {
-    "status": "needs_human"
-  }
+  "one_sentence_judgment": "SpatialWorld 的价值不是又报一个 MLLM 排名，而是把跨异构 3D 后端的空间 agent 评测做成可归因协议：8 个 simulator、760 题、vision-only partial observability、统一文本动作、终态 verifier、TSR+SE 双指标和任务三件套；论文自报当前最强 GPT-5 全 benchmark 平均 TSR 17.4%、Physical Overall 14.4%，Qwen-3.5-397B-A17B Physical Overall 12.2%，并暴露 Navigation-Interaction 复合任务 mean TSR 仅 4.2%、Multi-ProcTHOR 最好仅 5.9%、GPT-5.4 大量 premature termination；保留意见是它仍是模拟器 benchmark、高层动作屏蔽低层控制、760 题切细后格子偏薄、人工一致率未披露，且模型结果全部是论文自报而非第三方实测。"
 }

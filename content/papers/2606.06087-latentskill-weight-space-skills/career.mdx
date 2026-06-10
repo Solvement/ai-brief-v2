@@ -4,55 +4,78 @@
 
 ## 为什么这对我重要
 
-你现在做 agent 的默认姿势是"技能=markdown 塞 prompt"(Claude Code 的 skills 就是这个范式)。这篇论文给了这个范式一个**认真的对照组**:同一份技能文本,放权重里比放上下文里更便宜(prefill -64~72%)、更稳(乱序/去格式不掉点)、更抗注入(Hijack 下 38.6% vs 8.57%)。即使你不自己训超网络,它的三个分析结论(权重空间有结构、强度可旋钮、组合要按组件)也直接改变你对"LoRA 市场""适配器路由"这类基建的判断力——这是面试聊 agent 基建时的差异化弹药。
+你做 agent 产品时，迟早会遇到一个结构性矛盾：**技能、规则、经验、SOP 越积越多，但每次都塞进 prompt 会越来越贵、越来越乱、也越来越容易被外部文本干扰。** LatentSkill 给你的不是现成代码，而是一种系统设计方向：把高复用、稳定的 agent procedure 从“每轮检索文本”升级成“可挂载参数模块”。
+
+> [!key] 和我们正在做的东西直接同源
+> AI-Brief 的 L1 自进化想沉淀“读论文、查证、冷审、写作”的长期技能。今天这些技能大多是文本范式和 harness 规则；LatentSkill 提醒我们，未来可复用程度足够高的能力也许可以有第二种形态：不是每次把长规则贴进上下文，而是编译成可加载、可缩放、可回滚的 adapter。短期别急着上 LoRA，先学它的抽象：**技能生命周期要从文本管理，进化到“文本 + 参数 + 验证门”的双轨管理。**
 
 ## 该学的 AI 工程技能
 
 | 技能 | 学什么 | 怎么练 |
 | --- | --- | --- |
-| LoRA 的工程语义 | W'=W+(α/r)BA 里每个量的含义;α 当旋钮、适配器当模块装卸 | 用 peft 给小模型挂/卸/缩放一个 LoRA,扫 α 画倒 U 曲线 |
-| 超网络→适配器范式 | "信息必须穿过生成物"的训练设计(重建/补全任务) | 读 §3.2 + Text-to-LoRA/SHINE 两篇,写 1 页对比笔记 |
-| 上下文成本核算 | 每步重复 prefill 的技能 token 怎么算账;什么时候值得参数化 | 给你的 agent 统计一周技能 token 占比,算盈亏平衡点 |
-| 适配器组合/路由 | 整加 vs 组件加的失效模式;skill-to-task 匹配(本文是类别硬匹配,生产要检索) | 复现它的 Direct/Text/Component Merging 三连对比(小模型即可) |
-| 基线公平性审查 | 识别"监督不对称"混淆(它的编译器吃过教师轨迹,基线没有) | 养成习惯:读任何 agent 论文先画"谁吃了什么数据"表 |
+| Skill 生命周期建模 | skill 不只是 prompt 文件，还可以有 source text、compiled artifact、版本、适用域、验证结果 | 给一个 agent skill 设计 metadata：文本版、编译版、适用任务、失效条件、回滚策略 |
+| PEFT / LoRA 工程直觉 | LoRA 是可插拔的低秩权重补丁，不等于重训整个模型 | 跑一个小模型 LoRA adapter，观察 α/scale 改变输出风格或任务能力 |
+| Hypernetwork 思维 | 用一个网络生成另一个 adapter，避免每个技能单独训练 | 做一个 toy “text -> small adapter/config” 实验，先不追求大模型规模 |
+| 成本账 | 区分训练成本、prefill token 成本、decode 成本、adapter cache/显存成本 | 给 in-context skill vs cached adapter 列生产成本表 |
+| 多技能组合安全 | 技能合并不是简单拼文本或加权重，共享组件会重复放大 | 手动把两个技能拆成 general / task-specific / mistakes，再设计冲突检测 |
+| 评测诚实性 | 平均提升不代表每个子任务赢；官方自报不等于第三方复现 | 复盘 Table 1/2，把“赢、输、未披露”三类分别标出来 |
 
 ## 系统设计心法
 
-一句话:**把"知识放哪"当成本/安全/模块化的三轴权衡,而不是默认塞 prompt。** 上下文=灵活但每步付费且明文裸奔;骨干微调=便宜但焊死;适配器=中间档,代价是要养编译/管理基建。第二条:**组合任何模块化产物(LoRA、prompt 片段、skill)前,先把共享部分和专属部分拆开**——共享件重复叠加=过度放大,是本文用实验钉死的失效模式,prompt 工程里同样适用。
+一句话：**高频稳定技能可以被编译，低频变化指令仍应留在上下文。**
+
+- **稳定知识 > 临时文本**：长期复用的 procedure 可以考虑参数化；当天变、因用户变、需人审的规则别急着写进权重。
+- **可卸载 > 永久融合**：比起把技能 fine-tune 进 backbone，可插拔 adapter 更适合产品系统，因为你能回滚、禁用、分租户加载。
+- **强度旋钮 > 二值开关**：LatentSkill 的 α 曲线提醒我们，技能影响力应可调；“挂上就是满强度”会有过拟合和干扰。
+- **组件对齐 > 粗暴合并**：多技能组合要先解决共享组件、冲突组件、task-specific 组件的边界，不要把两个 SOP 直接拼在一起。
+- **效率账要算全**：prefill token 降了，不代表系统总成本一定降；训练 compiler、缓存 adapter、热切换 LoRA、显存占用都要入账。
 
 ## 作品集角度(Portfolio angle)
 
-"weight-space skill"还很新(本文 2026-06 才挂出),复现+扩展空间大。一个能讲的作品:**技能形态对比台**——同一组技能分别做成 ①prompt 注入 ②RAG 检索注入 ③LoRA(直接 SFT)三种形态,在同一任务上报成功率/token 成本/抗注入三轴。这正好打在"agent 成本优化"这个企业刚需上,而且暴露你能做受控对比(包括补上论文缺的那个公平基线)。
+这篇最适合做成一个 **“agent skill compiler / skill lifecycle manager”** 方向作品，而不是复刻论文训练 8×H100。目标是展示你理解 agent skill 的工程瓶颈，并能把它拆成可运行系统：
+
+- 文本 skill registry：版本、来源、适用域、风险、评测结果。
+- 轻量 compiled artifact：先用 prompt-compressed rule、router config、small adapter 或 mock LoRA 表示，不必一开始真训 hypernetwork。
+- 评测门：同一任务对比 no skill / in-context skill / compiled skill，记录 success、token、latency、失败类型。
+- 组合门：技能合并前先做 shared component detection 和 conflict check。
 
 ## 可造(Build ideas)
 
 | 造什么 | 范围 | 时间 | 为什么有用 |
 | --- | --- | --- | --- |
-| 技能三形态对比台 | 3-5 个技能 × (prompt/RAG/LoRA-SFT) × 一个小基准 | 1-2 周 | 直接可讲的成本-效果-安全权衡实验,顺手补公平基线 |
-| α 扫描工具 | 给任意 LoRA 挂载强度做自动扫描+曲线报告 | 2-3 天 | 小而硬:验证"倒 U+任务相关最优 α"是否在你的场景成立 |
-| 技能 token 审计器 | 统计 agent 轨迹里技能文本的重复 prefill 开销 | 1-2 天 | 用数据说话"我们该不该参数化技能",PM 都看得懂 |
+| Skill Registry + Cost Profiler | 管理 skill 文本、版本、调用次数、token cost、适用任务 | 3-5 天 | 先把“哪些技能值得编译”量化出来 |
+| Prompt Skill -> Adapter Mock | 不真训 LoRA，用 small routing vector / system patch 模拟 compiled artifact | 1 周 | 练生命周期、缓存、加载、回滚，不被训练成本卡死 |
+| Alpha Tuner for LoRA Skills | 对已有 LoRA adapter 扫 scale，画倒 U 曲线并选任务级 α | 4-7 天 | 直接复用本文最实用的控制思想 |
+| Component-aware Skill Composer | 把两个技能拆成 shared / task-specific / mistakes，再组合并跑冲突测试 | 1 周 | 对应论文最重要的 composition 限制，作品集很好讲 |
+| Secure Skill Loading Gate | 给 adapter/skill 加 provenance、signature、sandbox policy、red-team prompt tests | 1-2 周 | 补本文“权重技能不等于安全”的生产级缺口 |
 
 ## 简历 / 面试故事
 
-诚实写法:
+诚实写法：
 
-- *"Benchmarked skill-delivery mechanisms (prompt injection vs RAG vs LoRA adapters) for an LLM agent, quantifying success rate, per-step prefill cost, and prompt-injection robustness."*
-- *"Reproduced weight-space skill composition experiments, confirming that component-aligned adapter merging avoids the over-amplification failure of naive LoRA addition."*
+- *"Built a skill lifecycle manager for LLM agents that tracks textual skills, compiled artifacts, token cost, versioning, and evaluation results across in-context and cached skill modes."*
+- *"Implemented an alpha-scaling evaluation harness for LoRA-based agent skills, showing that skill strength follows a task-dependent inverted-U curve and requires adaptive scaling."*
+- *"Designed a component-aware skill composition pipeline that separates shared, task-specific, and mistake-avoidance components before merging agent skills, reducing interference from naive prompt concatenation."*
 
 > [!key] 面试可讲
-> "agent 的技能该放上下文还是放权重?"——用本文的数据讲三轴权衡,再主动指出它的基线监督不对称(编译器吃过教师轨迹而基线没有)。能同时讲清"结论有用"和"证据哪里软",比单纯吹论文强一个段位。
+> “如果 agent 的技能库越来越大，你怎么避免 prompt 越来越长？”可以用 LatentSkill 讲一个成熟答案：短期用 skill registry 和 cost profiler 找高复用技能；中期做缓存/压缩；长期把稳定技能编译成可插拔 adapter。但你要主动补一句：LatentSkill 目前仓库未开源训练代码，论文只在 ALFWorld/Search-QA 上自报结果，所以生产落地要先做小规模验证、成本账和安全门。
 
 ## 学习清单
 
 **必学**
-- LoRA 机制与 peft 实操(挂载/缩放/合并)
-- 上下文 vs 参数化的成本模型
-- 受控对比中的监督不对称识别
+
+- LoRA / PEFT 基础：低秩更新、adapter loading、scale/α 的作用。
+- Agent skill 抽象：textual skill、skill library、selector、版本和适用域。
+- 成本拆解：prefill tokens、decode tokens、训练成本、adapter cache、显存/延迟。
 
 **有用**
-- hypernetwork→LoRA 文献线(Text-to-LoRA / Generative Adapter / SHINE)
-- 提示注入与技能明文暴露的威胁模型
+
+- Hypernetwork for adapter generation：为什么“一次前向生成 LoRA”不同于“每技能单独 fine-tune”。
+- Skill composition：共享组件重复放大、OOD 文本拼接、组件级合并。
+- 安全设计：prompt extract 降低了，不代表 adapter 泄露、投毒、滥用都解决。
 
 **可选**
-- MDS/权重空间几何分析(诊断用,生产少见)
-- 子模块定位(attn_o/mlp_down)类机制分析
+
+- MDS / cosine similarity / stable rank：用来解释 adapter weight space 是否有结构。
+- ALFWorld / Search-QA eval：理解交互式 agent 与检索式 QA 两类任务的差异。
+- 自进化 agent 的 parametric memory 路线：把 LatentSkill 和 TMEM 这类 fast-weight memory 放在同一张图里比较。
