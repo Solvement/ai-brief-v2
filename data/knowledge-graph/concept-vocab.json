@@ -16,6 +16,28 @@
     ]
   },
   {
+    "name": "GRPO（组相对策略优化）",
+    "count": 2,
+    "nodes": [
+      "grepseek",
+      "longtracerl"
+    ]
+  },
+  {
+    "name": "按需查询解码接口（query-based decoding）",
+    "count": 1,
+    "nodes": [
+      "d4rt"
+    ]
+  },
+  {
+    "name": "查询独立解码（无查询间 self-attention）",
+    "count": 1,
+    "nodes": [
+      "d4rt"
+    ]
+  },
+  {
     "name": "答案感知倒推 + 答案盲顺写（冷启动轨迹合成）",
     "count": 1,
     "nodes": [
@@ -41,6 +63,13 @@
     "count": 1,
     "nodes": [
       "metagpt"
+    ]
+  },
+  {
+    "name": "轨迹分级干扰（traj-tiered distractor）",
+    "count": 1,
+    "nodes": [
+      "longtracerl"
     ]
   },
   {
@@ -93,6 +122,13 @@
     ]
   },
   {
+    "name": "全局场景表示 F（时空记忆）",
+    "count": 1,
+    "nodes": [
+      "d4rt"
+    ]
+  },
+  {
     "name": "权重空间技能（latent skill）",
     "count": 1,
     "nodes": [
@@ -142,6 +178,13 @@
     ]
   },
   {
+    "name": "稀疏查询训练（sparse query training）",
+    "count": 1,
+    "nodes": [
+      "d4rt"
+    ]
+  },
+  {
     "name": "想法生成 agent",
     "count": 1,
     "nodes": [
@@ -160,6 +203,20 @@
     "count": 1,
     "nodes": [
       "memoryagentbench"
+    ]
+  },
+  {
+    "name": "占用网格（occupancy grid）",
+    "count": 1,
+    "nodes": [
+      "d4rt"
+    ]
+  },
+  {
+    "name": "知识图谱随机游走出题（KG random-walk QA synthesis）",
+    "count": 1,
+    "nodes": [
+      "longtracerl"
     ]
   },
   {
@@ -212,13 +269,6 @@
     ]
   },
   {
-    "name": "GRPO（组相对策略优化）",
-    "count": 1,
-    "nodes": [
-      "grepseek"
-    ]
-  },
-  {
     "name": "intra- vs inter-test-time",
     "count": 1,
     "nodes": [
@@ -251,6 +301,20 @@
     "count": 1,
     "nodes": [
       "tropd"
+    ]
+  },
+  {
+    "name": "positive-only（只给正例的过程分门）",
+    "count": 1,
+    "nodes": [
+      "longtracerl"
+    ]
+  },
+  {
+    "name": "rubric reward（实体级评分细则奖励）",
+    "count": 1,
+    "nodes": [
+      "longtracerl"
     ]
   },
   {

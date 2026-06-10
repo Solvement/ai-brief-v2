@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T22:53:03.103Z",
+  "generatedAt": "2026-06-10T23:18:51.218Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -6312,7 +6312,52 @@
       ],
       "file": "content/papers/2512.08924-d4rt-4d-reconstruction/metadata.json",
       "arxiv_id": "2512.08924",
-      "topic": "perception"
+      "topic": "perception",
+      "facets": {
+        "problem_solved": "从视频恢复动态 3D 场景（4D 重建）的真问题不是「缺一个更准的深度网络」，而是老范式本身跑不起： 要么拼一堆专用模型/给每种输出配专用解码头（MegaSaM、VGGT），要么每段新视频现场做测试时优化（几秒的片子跑几分钟）， 而且「每帧把所有像素一次性解码」是 O(H×W)/帧——想给视频里每个像素都求跨帧 3D 对应根本算不起， 现有前馈方法还大多给不出动态物体上同一个点的跨帧对应。\n",
+        "method": "把整件事做成「一块可寻址的 4D 记忆 + 一个读取头」。编码器（ViT-g 40 层，时空 patch 2×16×16）一次性看完整段视频， 压成一块全局时空记忆 F∈ℝ^{N×C}；解码器是个轻量 8 层 cross-attention 读取头——你递一张「查询单」 q=(u,v,t_src,t_tgt,t_cam)（源帧哪个像素、想知道它在哪个时刻、以哪个相机为坐标系），它直接吐出该点的 3D 位置。 关键设计三件：① 每个查询完全独立处理、查询间不做 self-attention（任意稀疏/稠密都行、可并行）； ② 每个查询带上源点周围 9×9 像素的 RGB 小块当「指纹」，保细节帮分割；③ 训练时每段只随机采 2,048 个稀疏查询， 推理时想稠密就稠密、不用重训；全像素跟踪再用占用网格把「已被轨迹路过的像素」标记掉防重复。 深度、点云、3D 点轨迹、相机内外参（Umeyama / 针孔反解焦距）全是「换一种问法」问同一个接口——无测试时优化，一遍前馈出结果。\n",
+        "result": "[自报·arXiv 表值 + DeepMind 官方博客，未本机复测] 4D 跟踪 TAPVid-3D（相机系无 GT 内参）AP_D3D 0.345 / AJ 0.257， 对比 SpatialTrackerV2 仅 0.100 / 0.064（3 倍级领先）；视频深度 Sintel AbsRel 0.171（vs SpatialTrackerV2 0.209 / π³ 0.241）、 KITTI 0.051（vs π³ 0.053）；相机位姿 Sintel ATE 0.065（vs MegaSaM 0.074 / VGGT 0.168）。速度是杀手锏： 位姿估计 200+ FPS（比 VGGT 快 9×、比 MegaSaM 快 100×）；同帧率产出轨迹数多 18–300×（60 FPS 时 550 条 vs 29 条）； 一分钟视频单块 TPU 约 5 秒跑完，上一代最多要 10 分钟。消融：去掉 9×9 RGB patch，AbsRel(S) 0.302→0.366、ATE 0.091→0.173； 骨干 ViT-B→g AbsRel(S) 0.319→0.191；随机初始化 0.738 vs VideoMAE 预训练 0.302；查询间开 self-attention 反而明显掉点。 训练成本：11 个带 GT 几何的数据集、48 帧@256²、batch 1 × 64 块 TPU、500k 步约 2 天。\n",
+        "innovation": "同赛道三条老路各有病灶——VGGT 单网络但每种输出配专用解码头；MegaSaM 拼装多个现成模型 + 测试时优化（慢两个数量级）； SpatialTrackerV2 能处理动态但靠昂贵迭代精修。D4RT 的新点：① 用一个「按点查询」接口统一深度/点云/跨帧轨迹/相机位姿四件事， 靠改查询参数换任务而非加头；② 查询相互独立（无 self-attention）这个反直觉设计被消融证实是对的，换来任意稀疏/稠密、可并行可扩展； ③「稀疏查询训练 + 占用网格推理」把全像素 4D 从算不起做到能实时（占用网格 5–15× 提速）；④ 全程纯前馈， 证明 4D 重建既不需要测试时优化也不需要一堆专用头。\n",
+        "weakness": "[代码/权重未确认公开] 项目页只有摘要级信息和联系邮箱，未见 GitHub/HF 链接——短期只能「读思想」不能「拿来跑」。 SOTA 的成本是巨型模型+重算力（ViT-g 主干、64 块 TPU 训 2 天），个人/小团队难以复现训练。 11 个训练集全带 GT 几何监督（合成/扫描数据），迁移到无标注真实长视频的鲁棒性论文未充分展开。 论文没有正面给失败案例，仅附录提到省掉了回环检测/全局优化——暗示很长序列可能漂移。默认针孔相机，强畸变镜头需额外处理。 另注意：这是视觉感知工作不是 agent 论文，对本库是「底座/视野」条目而非可搬的 agent 原语。\n",
+        "transfer": "可搬的是接口设计心法，不是模型。① 「重编码一次 + 轻查询多次」：把昂贵的理解压成一块统一表示，下游一切产物都是对它的廉价查询—— 对应 AI-Brief 的 KG/Mind Palace：语料一次性蒸馏成 facet+嵌入后，列表/召回/判边/gap-map 都应是「换一种问法」查同一索引， 而不是每个功能再起一条专用管线（D4RT 用一个接口干掉多专用头，正是反「每栏目一套散装脚本」）。 ② 「稀疏训练、按需稠密」：质量门可以只抽样冷审、部署后按需全量核查，不必为最坏情况付全量成本。 ③ 占用网格的去重思想与 ledger 的 arxiv_id 去重同构：已处理项显式标记，确定性防重复计算。 ④ 消融纪律值得学：每个看似不起眼的零件（9×9 patch、查询独立）都有数字背书——本站范式改动也该小样消融再全量。\n",
+        "architecture": "```mermaid\nflowchart TD\n  VID[\"输入视频 T×H×W×3<br/>统一缩放 256×256\"] --> ENC[\"编码器 ViT-g 40 层<br/>时空 patch 2×16×16\"]\n  ENC --> F[\"全局场景表示 F<br/>一块可寻址的时空记忆\"]\n  Q[\"查询 q = u v t_src t_tgt t_cam<br/>+ 9×9 局部 RGB patch\"] --> DEC[\"解码器 8 层 cross-attn<br/>查询完全独立 无查询间 self-attn\"]\n  F --> DEC\n  DEC --> P[\"P = 该点的 3D 位置\"]\n  P --> T1[\"点轨迹: 固定 u v t_src 扫 t_tgt\"]\n  P --> T2[\"深度/点云: 扫 u v\"]\n  P --> T3[\"相机位姿: 网格点 + Umeyama/针孔\"]\n  P -.-> OCC[\"全像素跟踪: 占用网格去重<br/>5-15x 加速\"]\n```\n"
+      },
+      "self_evo_use": "不能直接用（CV 感知底座，非 agent/记忆/训练原语，且代码权重未确认公开、训练门槛 64 TPU 级）。 能搬的是三条结构心法：统一查询接口替代多专用管线（对 KG 查询层的架构启示）、稀疏训练稠密推理的成本策略（对质量门抽审的启示）、 显式去重表防重复计算（与 ledger 同构，互证设计正确）。另作为「快到能实时的 4D 感知」里程碑， 是未来具身/视频类 agent 选稿的谱系锚点——后续改进/替代工作出现时以本节点为前作参照。\n",
+      "core_concepts": [
+        {
+          "name": "按需查询解码接口（query-based decoding）",
+          "role": "primary",
+          "evidence": "一个查询写成 `q = (u, v, t_src, t_tgt, t_cam)`……模型回你一个 3D 坐标；深度图、3D 点轨迹、相机位姿,全都只是「换一种问法」问同一个接口"
+        },
+        {
+          "name": "查询独立解码（无查询间 self-attention）",
+          "role": "primary",
+          "evidence": "每个查询完全独立处理,查询之间不做 self-attention……早期实验里让查询间做 self-attention 会明显掉点,故最终不用"
+        },
+        {
+          "name": "全局场景表示 F（时空记忆）",
+          "role": "primary",
+          "evidence": "编码器把整段视频压成的那块「时空记忆」(`F ∈ ℝ^{N×C}`),解码器所有查询都从它里面取信息"
+        },
+        {
+          "name": "稀疏查询训练（sparse query training）",
+          "role": "supporting",
+          "evidence": "训练时每段只随机采 2,048 个查询(稀疏),推理时想稀疏(几条轨迹)想稠密(全像素)都行,不用重训"
+        },
+        {
+          "name": "占用网格（occupancy grid）",
+          "role": "supporting",
+          "evidence": "把「已经被某条轨迹路过的像素」标记掉,不再为它新起一条轨迹,省掉大量重复计算……带来 5–15× 加速"
+        }
+      ],
+      "discovery_trace": {
+        "hypothesis": "让查询之间互相 attend（self-attention）应该能共享上下文、让多个查询的结果更一致。",
+        "failed_attempts": "论文早期实验里让查询间做 self-attention，结果明显掉点，故最终方案不用—— 走到「每个查询完全独立处理、只对全局表示 F 做 cross-attention」的设计； 独立性反而成为卖点：任意稀疏/稠密查询都行、可并行、可扩展，且训练时只需稀疏采 2,048 查询、推理可按需放稠。\n",
+        "source_span": "paper.mdx 核心方法节第 2 点「关键设计:每个查询完全独立处理,查询之间不做 self-attention」+ 消融节「查询独立是对的:早期实验里让查询间做 self-attention 会明显掉点,故最终不用」[^method]"
+      },
+      "facet_slug": "d4rt",
+      "facet_status": "extracted",
+      "href": "/papers/2512.08924-d4rt-4d-reconstruction"
     },
     {
       "id": "paper:2605.28556",
@@ -6471,7 +6516,47 @@
       ],
       "file": "content/papers/2605.31584-longtracerl-rubric-rewards/metadata.json",
       "arxiv_id": "2605.31584",
-      "topic": "agent"
+      "topic": "agent",
+      "facets": {
+        "problem_solved": "长上下文 RL 的两个硬伤：训练数据的干扰文档是随机抽的、一眼能筛掉，练不出「在高度相似内容里辨别」； 奖励只看最终答案对不对，几十万 token 输入下信号又稀又吵——模型走错路也能蒙对（中间引错实体照样拿满分）， 检索失败被结果奖励整个掩盖。真问题不是「读不到」，是「干扰不够像 + 奖励管不到中间步」。\n",
+        "method": "两半：一个造数据的工厂 + 一个改奖励的开关。数据工厂像「出一套刁钻考题，干扰项全是学霸真做题时差点选错的选项」： 先在 KILT Wikipedia 超链接图上随机游走 8 跳、让强模型据路径合成一道必须逐跳推理的八跳题并吐出每跳黄金实体； 再让一个搜索 agent（search/open/cite）真去答题、每题采 5 条轨迹只留答对的；然后把 agent「读了却没引用」的文档 当 Tier-1 高混淆干扰（它一度觉得值得读，最像）、「搜到但没点开」的当 Tier-2，先塞 Tier-1 不够 128K 再补 Tier-2，打乱防位置捷径。 奖励侧：rubric 分 = 回答命中的黄金实体占比（实体召回率），在 GRPO 组内除以最大值归一； 关键防作弊开关 positive-only——r=(1−α)·r_oc+α·r_rb 只在最终答对时才算，答错一律 0 分， 让过程分只在「答对的回答之间」分高下：奖励答对且中间扎实的，压低蒙对的。默认 α=0.3。\n",
+        "result": "[自报·论文 Table 1-5，未独立复现] 训练 2,815 条八跳 128K QA，GRPO G=8 / 200 步 / 32×H800。 五 benchmark 平均：Qwen3-4B-Thinking 53.3→59.0（+5.7 over base / +2.5 over 最强基线 LongRLVR）； DeepSeek-R1-0528-Qwen3-8B 42.7→43.8（仅 +1.1）；Qwen3-30B-A3B 60.5→63.7（+3.2）；最难的 AA-LCR 上 4B 33.2→41.8（+8.6）。 三个基线数据集在 8B 上反而负优化（42.7 拉到 40.6/40.1/40.9）。消融：去 rubric 奖励 4B 平均 59.0→53.7（增益几乎全没）； 去 positive-only 59.0→57.1（AA-LCR −4.8、MRCR −5.3）；α=0.5 过强反伤（57.1）。 干扰难度与下游分严格同序：traj-tiered 59.0 > search 56.7 > random 55.7，对应「含黄金实体比例」50.03% > 15.00% > 1.35%，Tier-1 单独高达 63.23%（随机抽仅 1.35%）。\n",
+        "innovation": "同赛道过程奖励——LongRLVR 用 chunk 级 F_β 上下文奖励、LongR 用冻结 verifier 算文档信息增益、EAPO 用协同进化奖励模型给证据抽取打分—— 粒度都比本文粗；本文把过程监督做到「推理链每跳的黄金实体」这个实体级。出题法承自 DeepDive 的 KG 随机游走+多轮 RL。 真正的新点有三：① 干扰物不随机抽、不靠 embedding 相似，而用 agent 真实搜索行为里「读了没引」的文档，混淆度可量化可分级； ② positive-only 开关——意识到 rubric 分本质是实体召回率不是推理正确性，必须只发给答对者才不被「堆实体名」刷分； ③ 用「干扰含黄金实体比例」把数据难度从玄学变成可测设计变量，且实测难度排名与下游分排名一致。\n",
+        "weakness": "绝对增益偏小且对骨干敏感：8B 上只有 +1.1，远小于 4B 的 +5.7——方法方向对但收益不均匀，别夸大。 rubric 分度量的是「该提的实体提没提」，不是推理逻辑对不对；脱离 positive-only 单用会直接助长 reward hacking。 训练问题全部源自 KILT Wikipedia 单一知识源，推理模式多样性可能受限；干扰质量依赖采集轨迹那个搜索 agent 的能力， 换强/弱 agent 干扰分布就变，泛化性存疑。全部分数为论文自报；只给训练侧配置，数据合成的算力/成本账未披露。\n",
+        "transfer": "最值得搬的是两条工程心法。① 「难负例不该随机造，该从真实处理轨迹的副产物里捞」：AI-Brief 的判边 NO_EDGE 候选、 冷审 borderline 稿、选稿淘汰项，正是自家 agent「读了却没采纳」的高混淆样本——拿它们当质量门/判边器的对抗测试集， 比随机抽负例难得多，且难度可用类似「含黄金要素比例」量化。② positive-only 心法：过程分（rubric 评分、结构检查分） 只对结果过门的产出发放，防止深读/facet 被「堆关键词、堆实体名」刷过程分——这正是冷审 rubric 设计该有的防作弊开关。 与 [[tropd]] 的「监督信号先过可靠度门」互补：那条管该不该信老师，这条管过程分该不该发。\n",
+        "architecture": "```mermaid\nflowchart TD\n  KG([KILT Wikipedia 超链接图]) --> WALK[随机游走 8 跳得实体路径]\n  WALK --> QGEN[强模型合成八跳问题<br/>+ 吐出每跳黄金实体]\n  QGEN --> AGENT[搜索 agent 真去答题<br/>search/open/cite, 每题 5 条留答对]\n  AGENT --> TIER[分级干扰: Tier-1 读了没引<br/>Tier-2 搜到没点开]\n  TIER --> ASM[traj-tiered 装配到 128K<br/>先 Tier-1 后 Tier-2 再打乱]\n  ASM --> RL[GRPO 训练 G=8]\n  QGEN -. 黄金实体 .-> RUB[rubric 奖励: 实体召回率<br/>组内归一]\n  RL --> GATE{结果奖励 r_oc>0 ?}\n  GATE -->|是| COMB[组合奖励 1-a 结果 + a 过程, a=0.3]\n  GATE -->|否| ZERO[奖励=0 positive-only]\n  RUB --> COMB\n```\n"
+      },
+      "self_evo_use": "能用（方法论原语，非可跑系统——本站没有 RL 训练栈，不是抄它的 GRPO 管线）。可直接搬两件设计模式： 「高混淆负样本工厂」（用自家 agent 真实轨迹里读了没采纳的产物当难例，难度可量化）用于把判边/冷审的 benchmark 做强（正合 RULES#18「先把 benchmark 做强」）； 「positive-only 过程分门」用于任何 rubric 式评分——过程分只发给结果过门者，防堆关键词刷分。 代码/模型已开源（4B/8B/30B），但 32×H800 的训练本站不可复现，借的是设计不是栈。\n",
+      "core_concepts": [
+        {
+          "name": "rubric reward（实体级评分细则奖励）",
+          "role": "primary",
+          "evidence": "回答里命中的黄金实体 / 全部黄金实体(实体召回率);再在 GRPO 的一组回答内除以组内最大值归一化到 [0,1]"
+        },
+        {
+          "name": "positive-only（只给正例的过程分门）",
+          "role": "primary",
+          "evidence": "过程分只发给最终答对的回答;答错的一律 0 分。防止模型靠堆实体名刷过程分"
+        },
+        {
+          "name": "轨迹分级干扰（traj-tiered distractor）",
+          "role": "primary",
+          "evidence": "Tier-1(高混淆)= agent「读了却没引用」的文档(它一度觉得值得读,最像);Tier-2(低混淆)= 出现在搜索结果里但 agent 压根没点开的"
+        },
+        {
+          "name": "知识图谱随机游走出题（KG random-walk QA synthesis）",
+          "role": "supporting",
+          "evidence": "在 KILT 版 Wikipedia 的超链接图上,从一个种子实体出发走 k=8 跳……合成一道「必须逐跳推理、不能靠关键词匹配抄近路」的八跳问题"
+        },
+        {
+          "name": "GRPO（组相对策略优化）",
+          "role": "supporting",
+          "evidence": "GRPO 每题采一组 G 个回答,把每个回答的原始 rubric 分 r̂_rb 除以这组里的最大值"
+        }
+      ],
+      "facet_slug": "longtracerl",
+      "facet_status": "extracted",
+      "href": "/papers/2605.31584-longtracerl-rubric-rewards"
     },
     {
       "id": "paper:2606.00408",
@@ -31459,7 +31544,7 @@
     "associativeEdges": 24,
     "crossDocEdges": 41,
     "ghosts": 21,
-    "assessed": 38,
-    "facetedNodes": 14
+    "assessed": 40,
+    "facetedNodes": 16
   }
 }

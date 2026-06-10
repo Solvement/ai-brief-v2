@@ -1,57 +1,89 @@
-primitive_id: skill-to-weight-compilation
+primitive_id: weight-space-agent-skill-compiler
 source_paper: "2606.06087"
-title: "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents"
-relevance_level: direct                     # L1 自进化:蒸馏出的技能可参数化,不必永远占上下文
+title: "LatentSkill: Compiling Textual Agent Skills into LoRA Weight Modules"
+relevance_level: direct_pattern_strong
 audience: ai_only
 core_pattern: >
-  把文本技能经超网络一次前向编译成 LoRA 适配器挂在冻结骨干上:技能从上下文空间移到权重空间,
-  零 per-step 技能 token、可装卸/缓存/缩放(α 注入系数)/组合。训练诀窍=技能文本只喂编译器不喂骨干,
-  骨干要重建/补全原文就逼信息穿过生成的适配器。组合铁律:先按语义组件拆分再加权重,
-  共享组件只加一次——整技能直加会过度放大共享行为。
-problem_class: deliver-reusable-procedural-knowledge-without-per-step-context-cost
+  把高复用 agent textual skill 从每步 prompt 注入迁移到可插拔 weight-space module：
+  skill compiler G_phi 读取技能文档 s，一次前向生成 LoRA adapter Delta_s；执行时 frozen backbone
+  挂载 theta plus alpha Delta_s，只接收任务历史 h_t，不再携带技能原文。训练分两段：文档级
+  reconstruction/completion 预训练让 compiler 学会把 procedure text 压进权重；trajectory-supervised SFT
+  让同一个 skill adapter 在完整 teacher trajectory 中稳定影响多步行为。推理侧支持 adapter cache、
+  alpha scaling 与 component-level skill composition。
+problem_class: reusable-agent-procedures-are-too-expensive-and-exposed-when-repeatedly-injected-as-prompt-text
 components:
-  - skill_compiler            # Transformer 超网络:技能文档→全模块 LoRA A/B,一次前向
-  - document_pretrain         # 重建+补全双任务,171K GitHub 技能文档;信息必须经适配器的设计
-  - trajectory_sft            # 一轨迹一适配器全程共挂,逼出技能级(非逐步)策略
-  - adapter_cache             # 每技能编译一次缓存;挂载=O(1)
-  - alpha_controller          # 注入强度旋钮;倒 U 曲线,弱基线任务要更大 α
-  - component_merger          # 语义组件分别编译再加;共享件去重
+  - skill_document_corpus
+  - hypernetwork_skill_compiler
+  - lora_adapter_cache
+  - trajectory_supervised_alignment
+  - alpha_scaling_controller
+  - component_level_skill_composer
 autosci_modules:
-  - self_skill_distiller      # 蒸馏出的 skill 若给本地小模型用,可走编译进权重这条路(对订阅 CLI 强模型不可用)
-  - typed_memory              # 「知识放哪」三轴(上下文/适配器/骨干)= 记忆分层的参数化端
-  - cheap_layer_optimizer     # 便宜层(本地 DeepSeek/小模型)技能多了之后省 prefill 的路线
-  - cold_critic               # 监督不对称混淆的识别模板:对比实验先画「谁吃了什么数据」表
+  - typed_memory
+  - self_skill_distiller
+  - self_evolve_controller
+  - guard
+  - evaluator
 inputs:
-  - skill_documents           # 文本技能(markdown 正文)
-  - teacher_trajectories      # 技能配对的成功轨迹(它用 237+500 条)
+  - textual_skill_document
+  - teacher_agent_trajectory
+  - task_history_without_skill_text
+  - optional_component_decomposition
 outputs:
-  - skill_adapters            # 可装卸/缩放/组合的 LoRA 模块
-  - weight_space_geometry     # 技能簇结构(可用于技能去重/相似检索)
+  - latent_skill_lora_adapter
+  - adapter_cache_entry
+  - alpha_scaled_agent_policy
+  - composed_skill_adapter
 implementation_idea: >
-  不必复刻超网络:最小版=同一技能分别做 ①prompt 注入 ②直接 LoRA-SFT,在小任务上对比
-  成功率/token 成本/抗注入三轴,补上原文缺的公平基线(骨干吃同样轨迹+in-context)。
-  peft + 7B 级模型,单卡可跑。
+  Mini 版不要先训 8xH100 hypernetwork。先做 skill lifecycle manager：记录文本 skill、版本、适用域、
+  调用频率、token cost、评测结果；再对高复用 skill 用现成 PEFT LoRA 或 mock adapter 做 compiled artifact，
+  跑 no-skill / in-context-skill / compiled-skill 对照。第二阶段实现 alpha sweep 与 component-aware composer，
+  验证“技能强度倒 U 曲线”和“共享组件不能重复放大”。
 small_experiment: >
-  取本库 2-3 个高频 skill(如判边规则、深读模板),统计一周 per-step prefill 中技能文本占比,
-  算参数化的盈亏平衡点;若值得,先做 LoRA-SFT 版并测乱序/去格式鲁棒性(原文显示权重形态
-  对表面扰动不敏感)。3-5 天。
-design_principles:                          # 跨篇沉淀的"知识放哪/怎么组合模块"零件(喂 L1 与便宜层架构)
-  - id: knowledge-placement-three-axis
-    principle: "知识放上下文/适配器/骨干是 成本×模块化×暴露面 的三轴权衡,不是默认塞 prompt;每步重复 prefill 的技能文本要算账。"
-    transfers_to: "本站 skill/范式文档的交付形态选择;便宜层(本地小模型)技能多了走参数化。"
-  - id: force-information-through-artifact
-    principle: "训练'生成物'时把源信息只喂生成器不喂使用者——使用者要答对,信息就必须穿过生成物(重建/补全任务)。"
-    transfers_to: "L1 蒸馏 skill 的保真度验证:把原文撤掉,只靠蒸馏物能否复原行为。"
-  - id: decompose-before-compose
-    principle: "组合模块化产物前先拆共享件/专属件,共享件只加一次;整体直加=共享行为过度放大,文本拼接=分布外输入。"
-    transfers_to: "多 skill/多 prompt 片段组合的通用纪律;KG-2 概念合并同理(共享 facet 去重)。"
-  - id: audit-who-ate-what-data
-    principle: "读对比实验先画'谁吃了什么监督'表——它的编译器 SFT 过教师轨迹而基线没有,增益归因即不清。"
-    transfers_to: "冷审 rubric 固定检查项:基线监督对称性。"
+  选 3 个本站固定工作流技能（论文深读、忠实度冷审、源码实读），构造 20 个回放任务。对照 A=无技能，
+  B=每轮 in-context skill，C=缓存 compiled skill/mock adapter。指标：成功率、人工纠错数、prefill token、
+  latency、失败类型。再对 C 扫 alpha 或等价强度参数，确认是否出现任务级最优强度而非单调提升。1-14 天。
+core_concepts:
+  - name: "SOP（标准作业流程）"
+    role: primary
+    evidence: "textual skills — reusable procedures that encode task strategies, tool-use patterns, and recovery heuristics"
+  - name: "可学习的记忆操作"
+    role: primary
+    evidence: "stores skill knowledge in weight space rather than context space"
+  - name: "stability-plasticity（稳定-可塑权衡）"
+    role: supporting
+    evidence: "skills can be loaded, unloaded, replaced, or scaled without retraining the backbone"
+  - name: "结构化产物代替对话"
+    role: supporting
+    evidence: "The skill text is consumed by a skill compiler, while inference uses the generated adapter"
+  - name: "冲突消解"
+    role: mentioned
+    evidence: "skill composition in LoRA space requires semantic alignment between text decomposition and weight addition"
+discovery_trace:
+  hypothesis: "数据不足"
+  failed_attempts: "原文没有逐步叙述 LatentSkill 解法如何从失败尝试中被发现；composition case study 解释了直接合并和文本合并为什么失败，但不是整体方法发现过程。"
+  source_span: "paper.mdx#技术细节(选读)"
+design_principles:
+  - id: compile-stable-skills-keep-volatile-context
+    principle: "高频稳定技能可以编译成可缓存参数模块；低频、易变、需审计的指令仍留在上下文或显式文档。"
+    transfers_to: "AI-Brief 深读/冷审 harness 的长期技能沉淀；agent 产品的 skill registry。"
+  - id: modular-parametric-memory-over-permanent-fusion
+    principle: "参数化技能应优先做可加载/卸载/缩放/回滚的 adapter，而不是永久融合进 backbone。"
+    transfers_to: "自进化 agent 的 memory/skill 生命周期管理。"
+  - id: strength-control-is-a-first-class-interface
+    principle: "技能影响力需要连续强度旋钮；LatentSkill 的 alpha sweep 显示过强会破坏 backbone。"
+    transfers_to: "Online guard、skill router、adapter serving 的任务级控制策略。"
+  - id: component-alignment-before-skill-composition
+    principle: "组合技能前先对齐语义组件，共享组件只保留一次，task-specific 组件按需叠加。"
+    transfers_to: "多技能 agent、工具 SOP 合并、prompt/harness 规则组合。"
+  - id: token-savings-are-not-total-cost-savings
+    principle: "prefill token 降低不等于系统总成本降低；训练 compiler、adapter cache、显存、热切换与安全门都要计入。"
+    transfers_to: "生产 agent 成本模型与上线评审。"
 risks:
-  - supervision_asymmetry     # 原文编译器 SFT 过教师轨迹而基线没有 → 增益归因不清,复用前须自补对照
-  - tiny_skill_library        # 仅 5+3 技能、类别硬匹配无检索 → 规模化未证
-  - test_set_alpha_tuning     # 最优 α 在评测集上扫出 → 生产要留出集调
-  - recompile_cost            # 技能更新=重编译;换骨干=重训编译器(8×H100 级)
-  - not_injection_immune      # Hijack 下也从 74.3 掉 38.6,只是比明文强,非免疫
+  - code_not_released
+  - limited_benchmarks
+  - fixed_backbone_and_lora_config
+  - composition_demo_narrow
+  - security_not_complete
+  - training_cost_high
 status: extracted

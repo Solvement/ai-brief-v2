@@ -7,7 +7,7 @@ core_pattern: >
   把"贵资源里该驻留什么"从被动携带改成主动预测:小检索器(双塔,文档侧表示冻结预计算)
   周期性(每 τ 步)预测未来窗口要用的记忆块,阈值召回(≥0.5 全取、允许零召回)从冷存预取;
   标签由冻结宿主离线自产并经 Softmax→Top-p→跨源多数投票去噪;训练与宿主物理解耦
-  (只训 <0.1% 查询端,1 GPU 时/次),实验吞吐(一周 500 次扫描)本身成为架构发现引擎。
+  (只训 <0.1% 查询端,单个 H20 GPU-hour 收敛),实验吞吐(8×H20 一周 500 次扫描)本身成为架构发现引擎。
 problem_class: keep-only-predicted-relevant-state-in-expensive-resource
 components:
   - memory_indexer            # 双塔查询塔:低秩投影 → 多头 ReLU 点积 → Sigmoid 概率
@@ -40,7 +40,7 @@ design_principles:                          # 跨篇沉淀的"怎么管贵资源
     principle: "贵资源(显存/上下文窗)只放'预测会用到的',其余冷存按需搬——上下文管理是预测问题不是携带问题。"
     transfers_to: "agent 上下文工程:历史/记忆/工具输出不全量注入,预取层先判'下一段要什么'。"
   - id: freeze-expensive-train-tiny
-    principle: "把宿主和文档侧表示全部冻结预计算,只训 <0.1% 的查询端小件 → 单次实验 1 GPU 时,一周 500 次扫描;实验吞吐本身是架构发现的前提。"
+    principle: "把宿主和文档侧表示全部冻结预计算,只训 <0.1% 的查询端小件 → 单个 H20 GPU-hour 收敛,8×H20 一周 500 次扫描;实验吞吐本身是架构发现的前提。"
     transfers_to: "本库任何贵管线改造先找'可冻结表示 + 可独立训练小件'的切面,买实验吞吐。"
   - id: threshold-recall-allows-empty
     principle: "固定 Top-k 强迫召回固定数量,既是标签噪声源也是资源浪费源;阈值召回让数量随置信度动态、允许零召回。"
@@ -59,7 +59,8 @@ risks:
   - capacity_ceiling          # 双塔一次粗点积,密集全局检索任务(MRCR 76→48)范式性崩盘
   - length_generalization_2x  # 只在训练长度 2 倍内可靠,出界退化近随机(位置编码出分布)
   - host_specific_labels      # 标签学的是"这个宿主习惯看哪",换宿主须重抽重训
-  - immature_no_ablation      # 项目中途叫停:τ=64/阈值 0.5 无消融,repo 18★ 无第三方复现
+  - immature_no_ablation      # 项目中途叫停:τ=64/阈值 0.5 无消融,无第三方复现
+  - release_not_production_stack # 开源 release 只有 retriever/toy loop;真实 KV swap、sglang+DS-V4 CSA 集成、fallback/routing 未放出
 core_concepts:                              # KG-2 §3.1 受控命名,evidence 为源文逐字短语
   - name: "前瞻稀疏注意力（lookahead sparse attention）"
     role: primary

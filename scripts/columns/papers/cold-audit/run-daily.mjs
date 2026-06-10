@@ -313,10 +313,23 @@ export async function runDaily(deps = {}) {
 
   const batch = await runBatch(auditPapers, {
     authorFn,
-    // The auditor ALWAYS reads the pre-loaded on-disk artifact (Stage A source of truth). No
-    // fallback to the author handle: if it isn't on disk, the paper was force-held above.
+    // The auditor ALWAYS reads the ON-DISK artifact — RELOADED fresh per audit call (2026-06-10
+    // integrity fix). The old behavior audited the batch-start preloaded snapshot, so author-round
+    // disk edits were INVISIBLE to the auditor: a PASS could publish content that was never audited
+    // (LatentSkill shipped +152/−47 unaudited lines), and revision rounds could never converge
+    // (the auditor kept re-judging the stale original). Reload failure falls back to the preloaded
+    // snapshot (still disk-sourced) — NEVER the in-memory author handle (could be thin → false PASS).
     auditFn: async (artifact, source, ctx) => {
-      const toAudit = preloaded.get(ctx?.paper?.slug) ?? artifact;
+      const slug = ctx?.paper?.slug;
+      const rec = slug ? recBySlug.get(slug) : null;
+      let toAudit = preloaded.get(slug) ?? artifact;
+      if (rec) {
+        try {
+          toAudit = await loadArtifactFn(rec.contentDir);
+        } catch {
+          logger.warn?.(`[cold-audit:daily] re-load failed for ${slug}; auditing batch-start snapshot`);
+        }
+      }
       return auditFn(toAudit, source, ctx);
     },
     loadSource: loadSourceFn,

@@ -1,0 +1,109 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
+# 不编造，未知标「数据不足」，自报数字标「自报/受控」。源：content/papers/2512.08924-d4rt-4d-reconstruction/paper.mdx
+# 注：CVPR 2026 Best Paper，计算机视觉感知工作（非 agent 论文），入库定位=具身/视频 AI 应用的感知底座 + 接口设计方法论。
+schema: v2
+node_id: paper:2512.08924
+slug: d4rt
+kind: paper
+title: "D4RT — 一块可寻址的 4D 时空记忆 + 一个按需查询的读取头，把动态场景重建压成纯前馈"
+source: "arxiv:2512.08924（CVPR 2026 Best Paper，Google DeepMind × Oxford × UCL）+ content/papers/2512.08924-d4rt-4d-reconstruction/paper.mdx + DeepMind 官方博客；代码/权重是否公开：数据不足"
+
+facets:
+  problem_solved: >    # Y：一句犀利
+    从视频恢复动态 3D 场景（4D 重建）的真问题不是「缺一个更准的深度网络」，而是老范式本身跑不起：
+    要么拼一堆专用模型/给每种输出配专用解码头（MegaSaM、VGGT），要么每段新视频现场做测试时优化（几秒的片子跑几分钟），
+    而且「每帧把所有像素一次性解码」是 O(H×W)/帧——想给视频里每个像素都求跨帧 3D 对应根本算不起，
+    现有前馈方法还大多给不出动态物体上同一个点的跨帧对应。
+
+  method: >            # X：大白话 + 类比
+    把整件事做成「一块可寻址的 4D 记忆 + 一个读取头」。编码器（ViT-g 40 层，时空 patch 2×16×16）一次性看完整段视频，
+    压成一块全局时空记忆 F∈ℝ^{N×C}；解码器是个轻量 8 层 cross-attention 读取头——你递一张「查询单」
+    q=(u,v,t_src,t_tgt,t_cam)（源帧哪个像素、想知道它在哪个时刻、以哪个相机为坐标系），它直接吐出该点的 3D 位置。
+    关键设计三件：① 每个查询完全独立处理、查询间不做 self-attention（任意稀疏/稠密都行、可并行）；
+    ② 每个查询带上源点周围 9×9 像素的 RGB 小块当「指纹」，保细节帮分割；③ 训练时每段只随机采 2,048 个稀疏查询，
+    推理时想稠密就稠密、不用重训；全像素跟踪再用占用网格把「已被轨迹路过的像素」标记掉防重复。
+    深度、点云、3D 点轨迹、相机内外参（Umeyama / 针孔反解焦距）全是「换一种问法」问同一个接口——无测试时优化，一遍前馈出结果。
+
+  result: >            # Z：真实数字，标自报/受控
+    [自报·arXiv 表值 + DeepMind 官方博客，未本机复测] 4D 跟踪 TAPVid-3D（相机系无 GT 内参）AP_D3D 0.345 / AJ 0.257，
+    对比 SpatialTrackerV2 仅 0.100 / 0.064（3 倍级领先）；视频深度 Sintel AbsRel 0.171（vs SpatialTrackerV2 0.209 / π³ 0.241）、
+    KITTI 0.051（vs π³ 0.053）；相机位姿 Sintel ATE 0.065（vs MegaSaM 0.074 / VGGT 0.168）。速度是杀手锏：
+    位姿估计 200+ FPS（比 VGGT 快 9×、比 MegaSaM 快 100×）；同帧率产出轨迹数多 18–300×（60 FPS 时 550 条 vs 29 条）；
+    一分钟视频单块 TPU 约 5 秒跑完，上一代最多要 10 分钟。消融：去掉 9×9 RGB patch，AbsRel(S) 0.302→0.366、ATE 0.091→0.173；
+    骨干 ViT-B→g AbsRel(S) 0.319→0.191；随机初始化 0.738 vs VideoMAE 预训练 0.302；查询间开 self-attention 反而明显掉点。
+    训练成本：11 个带 GT 几何的数据集、48 帧@256²、batch 1 × 64 块 TPU、500k 步约 2 天。
+
+  innovation: >        # 创新：同赛道对比
+    同赛道三条老路各有病灶——VGGT 单网络但每种输出配专用解码头；MegaSaM 拼装多个现成模型 + 测试时优化（慢两个数量级）；
+    SpatialTrackerV2 能处理动态但靠昂贵迭代精修。D4RT 的新点：① 用一个「按点查询」接口统一深度/点云/跨帧轨迹/相机位姿四件事，
+    靠改查询参数换任务而非加头；② 查询相互独立（无 self-attention）这个反直觉设计被消融证实是对的，换来任意稀疏/稠密、可并行可扩展；
+    ③「稀疏查询训练 + 占用网格推理」把全像素 4D 从算不起做到能实时（占用网格 5–15× 提速）；④ 全程纯前馈，
+    证明 4D 重建既不需要测试时优化也不需要一堆专用头。
+
+  weakness: >          # 缺点/适用边界/坑
+    [代码/权重未确认公开] 项目页只有摘要级信息和联系邮箱，未见 GitHub/HF 链接——短期只能「读思想」不能「拿来跑」。
+    SOTA 的成本是巨型模型+重算力（ViT-g 主干、64 块 TPU 训 2 天），个人/小团队难以复现训练。
+    11 个训练集全带 GT 几何监督（合成/扫描数据），迁移到无标注真实长视频的鲁棒性论文未充分展开。
+    论文没有正面给失败案例，仅附录提到省掉了回环检测/全局优化——暗示很长序列可能漂移。默认针孔相机，强畸变镜头需额外处理。
+    另注意：这是视觉感知工作不是 agent 论文，对本库是「底座/视野」条目而非可搬的 agent 原语。
+
+  transfer: >          # 指向本站自进化用途
+    可搬的是接口设计心法，不是模型。① 「重编码一次 + 轻查询多次」：把昂贵的理解压成一块统一表示，下游一切产物都是对它的廉价查询——
+    对应 AI-Brief 的 KG/Mind Palace：语料一次性蒸馏成 facet+嵌入后，列表/召回/判边/gap-map 都应是「换一种问法」查同一索引，
+    而不是每个功能再起一条专用管线（D4RT 用一个接口干掉多专用头，正是反「每栏目一套散装脚本」）。
+    ② 「稀疏训练、按需稠密」：质量门可以只抽样冷审、部署后按需全量核查，不必为最坏情况付全量成本。
+    ③ 占用网格的去重思想与 ledger 的 arxiv_id 去重同构：已处理项显式标记，确定性防重复计算。
+    ④ 消融纪律值得学：每个看似不起眼的零件（9×9 patch、查询独立）都有数字背书——本站范式改动也该小样消融再全量。
+
+  architecture: |      # Mermaid（从 paper.mdx 精简改写）
+    ```mermaid
+    flowchart TD
+      VID["输入视频 T×H×W×3<br/>统一缩放 256×256"] --> ENC["编码器 ViT-g 40 层<br/>时空 patch 2×16×16"]
+      ENC --> F["全局场景表示 F<br/>一块可寻址的时空记忆"]
+      Q["查询 q = u v t_src t_tgt t_cam<br/>+ 9×9 局部 RGB patch"] --> DEC["解码器 8 层 cross-attn<br/>查询完全独立 无查询间 self-attn"]
+      F --> DEC
+      DEC --> P["P = 该点的 3D 位置"]
+      P --> T1["点轨迹: 固定 u v t_src 扫 t_tgt"]
+      P --> T2["深度/点云: 扫 u v"]
+      P --> T3["相机位姿: 网格点 + Umeyama/针孔"]
+      P -.-> OCC["全像素跟踪: 占用网格去重<br/>5-15x 加速"]
+    ```
+
+self_evo_use: >        # 客观判断
+  不能直接用（CV 感知底座，非 agent/记忆/训练原语，且代码权重未确认公开、训练门槛 64 TPU 级）。
+  能搬的是三条结构心法：统一查询接口替代多专用管线（对 KG 查询层的架构启示）、稀疏训练稠密推理的成本策略（对质量门抽审的启示）、
+  显式去重表防重复计算（与 ledger 同构，互证设计正确）。另作为「快到能实时的 4D 感知」里程碑，
+  是未来具身/视频类 agent 选稿的谱系锚点——后续改进/替代工作出现时以本节点为前作参照。
+
+core_concepts:
+  - name: 按需查询解码接口（query-based decoding）
+    role: primary
+    evidence: "一个查询写成 `q = (u, v, t_src, t_tgt, t_cam)`……模型回你一个 3D 坐标；深度图、3D 点轨迹、相机位姿,全都只是「换一种问法」问同一个接口"
+  - name: 查询独立解码（无查询间 self-attention）
+    role: primary
+    evidence: "每个查询完全独立处理,查询之间不做 self-attention……早期实验里让查询间做 self-attention 会明显掉点,故最终不用"
+  - name: 全局场景表示 F（时空记忆）
+    role: primary
+    evidence: "编码器把整段视频压成的那块「时空记忆」(`F ∈ ℝ^{N×C}`),解码器所有查询都从它里面取信息"
+  - name: 稀疏查询训练（sparse query training）
+    role: supporting
+    evidence: "训练时每段只随机采 2,048 个查询(稀疏),推理时想稀疏(几条轨迹)想稠密(全像素)都行,不用重训"
+  - name: 占用网格（occupancy grid）
+    role: supporting
+    evidence: "把「已经被某条轨迹路过的像素」标记掉,不再为它新起一条轨迹,省掉大量重复计算……带来 5–15× 加速"
+
+discovery_trace:
+  hypothesis: "让查询之间互相 attend（self-attention）应该能共享上下文、让多个查询的结果更一致。"
+  failed_attempts: >
+    论文早期实验里让查询间做 self-attention，结果明显掉点，故最终方案不用——
+    走到「每个查询完全独立处理、只对全局表示 F 做 cross-attention」的设计；
+    独立性反而成为卖点：任意稀疏/稠密查询都行、可并行、可扩展，且训练时只需稀疏采 2,048 查询、推理可按需放稠。
+  source_span: "paper.mdx 核心方法节第 2 点「关键设计:每个查询完全独立处理,查询之间不做 self-attention」+ 消融节「查询独立是对的:早期实验里让查询间做 self-attention 会明显掉点,故最终不用」[^method]"
+
+# latentskill(同为「把能力压进一块潜表示再按需取用」的抽象——技能→LoRA vs 视频→时空记忆)：域不同(权重空间技能 vs 4D 几何感知)、机制不同(hypernetwork 生成参数 vs cross-attn 读取坐标)，深读原文无任何互证交集 → NO_EDGE
+# supermemory(表面同有「压成记忆 + 按需检索」词汇)：supermemory 是文本事实图谱记忆系统，D4RT 的「时空记忆」是视觉特征张量，仅隐喻同名、无方法或评测交集 → NO_EDGE
+# grepseek(同强调「按需查询代替全量处理」)：DCI 是 agent 对语料库的工具调用范式，D4RT 是网络内部的解码接口设计，证据链不通 → NO_EDGE
+# tropd/agemem/metagpt/ai-scientist-v2/memoryagentbench/self-evolving-agents-survey(训练稳定性/记忆/多agent/自进化赛道)：与 4D 视觉感知无方法、数据或评测交集 → NO_EDGE
+edges: []
+
+status: extracted

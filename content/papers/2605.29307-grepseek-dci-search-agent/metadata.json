@@ -58,21 +58,5 @@
     "breadth_value": 7,
     "evidence_quality": 8
   },
-  "one_sentence_judgment": "GrepSeek 的价值不是“grep 取代向量库”，而是把 Direct Corpus Interaction 训练成 9B search agent 的稳定工具能力：答案感知 Tutor 倒推已验证证据链、答案盲 Planner 顺写因果轨迹、SFT 固定窄命令习语、GRPO 用格式门×token-F1 调高层策略，再用 byte-exact 分片并行引擎把 14GB Wikipedia corpus 上的 shell 检索从 5.39s 降到 0.71s；论文自报七个 QA 基准 micro-F1 0.5691、micro-EM 0.4948 全场最高，内存 14GB vs dense index 70/221GB，但端到端 8.67s 仍慢于 dense baseline，PopQA 因表面形式变化显著下降，正确采纳方式应是 query-router/hybrid，而不是二选一站队。",
-  "cold_audit": {
-    "status": "ready_to_publish",
-    "rounds": 1,
-    "audited_at": "2026-06-10T15:05:41.632Z",
-    "auditor": "claude-cold-audit",
-    "author": "codex-gpt-5.5-high",
-    "final_verdict": "pass",
-    "major_gaps": [],
-    "arxiv_citation_audit": {
-      "checkedCount": 0,
-      "checked": [],
-      "unresolved": [],
-      "downgradeLabel": "推断/待核"
-    },
-    "unresolved_arxiv_references": []
-  }
+  "one_sentence_judgment": "GrepSeek 的价值不是“grep 取代向量库”，而是把 Direct Corpus Interaction 训练成 9B search agent 的稳定工具能力：答案感知 Tutor 倒推已验证证据链、答案盲 Planner 顺写因果轨迹、SFT 固定窄命令习语、GRPO 用格式门×token-F1 调高层策略，再用 byte-exact 分片并行引擎把 14GB Wikipedia corpus 上的 shell 检索从 5.39s 降到 0.71s；论文自报七个 QA 基准 micro-F1 0.5691、micro-EM 0.4948 全场最高，内存 14GB vs dense index 70/221GB，但端到端 8.67s 仍慢于 dense baseline，PopQA 因表面形式变化显著下降，正确采纳方式应是 query-router/hybrid，而不是二选一站队。"
 }

@@ -380,3 +380,33 @@ test("runDaily: auditor reads the on-disk artifact (Stage A), not the author han
   });
   assert.equal(auditedArtifact.paperMdx, "ON-DISK MDX", "auditor saw the on-disk deep-read");
 });
+
+test("runDaily: auditor sees AUTHOR-ROUND disk edits, not the batch-start snapshot (2026-06-10 integrity fix)", async () => {
+  // Regression: the published version must be the audited version. The old code preloaded the
+  // artifact once before the gate; author rounds then edited the file on disk, and a PASS shipped
+  // content the auditor never read (LatentSkill: +152/−47 unaudited lines published).
+  const records = [deepRead("p")];
+  const disk = { content: "v0-original" }; // mutable stand-in for the on-disk file
+  const auditedVersions = [];
+  await runDaily({
+    dailyCap: 1,
+    writeFiles: false,
+    logger: silent(),
+    now: () => new Date("2026-06-10T23:30:00Z"),
+    scan: async () => records,
+    loadArtifactFn: async () => ({ paperMdx: disk.content, careerMdx: "", metadata: {} }),
+    loadSourceFn: async () => ({ fullText: "t", available: true }),
+    authorFn: async () => {
+      disk.content = "v1-author-revised"; // author round writes to disk before the audit
+      return { v: "handle" };
+    },
+    auditFn: makeMockAuditFn({
+      audit: (artifact) => {
+        auditedVersions.push(artifact.paperMdx);
+        return passDiagnosis();
+      },
+    }),
+    markFn: async () => {},
+  });
+  assert.deepEqual(auditedVersions, ["v1-author-revised"], "audit judged the post-author on-disk version");
+});

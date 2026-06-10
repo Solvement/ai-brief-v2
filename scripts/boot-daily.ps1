@@ -62,6 +62,13 @@ try {
     Log "rebuild index (apply gate statuses: ready_to_publish in, hold/needs_human out)..."
     node scripts/columns/papers/build-index.mjs 2>&1 | Tee-Object -FilePath $log -Append
 
+    # Mind Palace auto-ingest (2026-06-10, Kevin acceptance: "中午打开已是…+mind palace"): newly
+    # published (ready_to_publish) deep-reads get facet-v2 distilled (fixed-prompt claude -p, cap 2)
+    # behind a DOUBLE gate (structural precheck + validate-mind-palace; fail => rollback, no graph
+    # pollution). Best-effort: a failure never blocks the deterministic push.
+    Log "mind-palace auto-ingest (facet distill -> validator gate -> embed/integrate; cap 2)..."
+    npm run kg:ingest 2>&1 | Tee-Object -FilePath $log -Append
+
     # DURABLE deep-read gap guard (Kevin 2026-06-08): the deep-read stage above is best-effort and
     # used to fail SILENTLY (no alert, no retry) — it sat broken for 2 days (6-07/08) unnoticed. Now:
     # compute a VISIBLE health file (public/data/papers-deepread-health.json, deploys with the site)
