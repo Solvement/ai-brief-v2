@@ -28,3 +28,12 @@
 - **无停止条件会死循环** → 硬门 = 他说"对"才停提问、才动手。
 - **反思不持久则改进是临时的** → 沉进 memory。
 - **会幻觉他的意图** → 7 格里不确定的标"断层"问他，不替他脑补。
+
+## v2 升级：Loop Contract Gate（2026-06-09，Kevin 定）
+
+7 格协议从"软提醒"加装**机器硬门**（`.claude/hooks/loop_contract_gate.py`，PreToolUse deny）：
+
+- **两层不互替**：7 格对话 = Kevin 确认方向（训练他的设计表述）；contract 文件 = 机器可验的实施许可。流程：**7 格确认 → 把确认结果落进 `.agent/loop-contract.md` → 填齐才许写业务代码**。
+- **机制**：实施类 prompt（实现/修复/部署/build/fix…）→ UserPromptSubmit 布防（state + 契约模板，prompt hash 绑定防陈旧复用）；契约填齐（无占位符 + `Ready to implement: yes` + 范围/验收/验证/迭代预算/停止/回滚全非空）前，PreToolUse 拒绝：业务 Write/Edit、副作用 Bash（rm/npm/git commit/python…）、ExitPlanMode；放行：读/搜、安全侦察命令、契约文件本身。契约齐 → 开闸（state.active=false）。
+- **三处本地适配**（GPT 原稿直接装会出事故）：① **state 门**——只有布防后才拦，否则锁死一切会话；② **`LOOP_GATE=off` 旁路**——每日确定性管线（boot-daily.ps1 已设）的 headless `claude -p` 不走此门，否则深读死锁；③ Windows 用 `python` + 脚本内强制 UTF-8（否则中文关键词静默失配）。
+- **逃生口**：状态文件 hook 托管不许 Claude 改；误布防时人工删 `.agent/` 即拆防。`.agent/` 已 gitignore（契约是任务级临时件，归档在 `.agent/archive/`）。
