@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T13:58:49.669Z",
+  "generatedAt": "2026-06-10T22:15:02.325Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -6352,7 +6352,52 @@
       ],
       "file": "content/papers/2605.29307-grepseek-dci-search-agent/metadata.json",
       "arxiv_id": "2605.29307",
-      "topic": "agent"
+      "topic": "agent",
+      "facets": {
+        "problem_solved": "主流搜索 agent 隔着 top-k retriever 看世界：切块/表示/排序都在 agent 推理前焊死，精确实体名、稀有符号、跨文档桥接实体 只能祈祷 retriever 没把证据滤掉。同期 DCI 工作证明强闭源模型能临场写 shell 直查语料，但贵且慢（一个 query 可到小时级）。 真问题是「能不能把 DCI 训练成 9B 小模型能力，并让每次 shell 检索不慢到不可用」。\n",
+        "method": "一条「先铺轨、再开车、最后给路面提速」的装配线：① 铺轨——答案感知 Tutor 从 gold answer 倒推证据链（命令禁含答案词的 target masking，逐 hop 真实执行验证），答案盲 Planner 再只凭可观测历史把轨迹顺写成因果干净的 think+command， 过 F1>0 + coherence judge 双门，得 10k 冷启动 SFT 轨迹；② 开车——Qwen3.5-9B 先 SFT 学会窄命令/head 限量/级联过滤， 再用 GRPO（格式门 × token-F1 奖励）在 NQ+HotpotQA 上 200 steps 调高层策略；③ 提速——语义保持分片并行引擎： 能证明 byte-exact 等价的 rg/grep 管道切 shard 并发跑（CONCAT/HEAD/COUNT/SORTHEAD 合并），证不了就回退顺序执行。\n",
+        "result": "[自报·论文表格，未本机复现] 七个 open-domain QA 基准（仅 NQ/HotpotQA 训练，余五个 OOD）：micro-F1 0.5691 > 最强 baseline Search-R1+Qwen3-Embedding-4B 的 0.5441，4/7 数据集最高（NQ 0.5223 / HotpotQA 0.6231 / 2Wiki 0.5178 / MuSiQue 0.3006），但 PopQA 0.4861 显著低于 0.5101（词法脆弱实锤）。消融：完整 0.5691 → 去 GRPO 0.4249 → 去 SFT 0.3314（训练崩溃前 checkpoint）。 效率账：端到端 8.67s/query 比 dense 慢（解码占 7.86s），但内存 14GB vs E5 70GB / Qwen3-4B 221GB，离线索引 1 分钟 vs 3.2 / 62.4 A100-hours； 分片引擎 shell 执行 5.39s→0.71s（32 shards，约 7.6x，非端到端加速）。\n",
+        "innovation": "同赛道 Search-R1 是「训练 agent 把固定 retriever 用得更好」，DCI-Agent/「Is Grep All You Need?」是「强模型推理期临场写 shell」； GrepSeek 的新点：① 第一个把 DCI 训练进 9B 小模型（SFT+GRPO），让范式从 demo 走向可部署；② 「答案感知倒推 + 答案盲顺写」 解掉「造好轨迹需要答案、训练又不能偷看答案」的矛盾；③ 分片并行引擎承诺 byte-exact 等价——给工具提速但不偷改观察语义； ④ 公开承认词法边界（PopQA 下降、diacritics 失败案例写进正文），导向 hybrid 而非「向量库已死」。\n",
+        "weakness": "纯词法脆：Édouard Vaillant 因 diacritics 没命中答错，rg 无语义排序、权威页可能被文件序更早的命中埋掉。 只测 2018 Wikipedia 这一个实体密集、格式干净的语料，企业文档/OCR/论坛噪声语料不能外推。reward 与评测都是短答案 token-F1/EM， 长文报告、拒答、引用质量未被优化。算力门槛 4x A100 80GB。安全完全靠 read-only whitelist 工具约束，shell 接口放宽即成安全问题。 后续 RISE（arXiv:2606.06880）指出无边界 DCI 扫全 corpus 会随规模退化，主张先用 retrieval 圈 bounded interaction space。\n",
+        "transfer": "对 AI-Brief 最值得搬的是两层判断：① 检索接口也是 agent 能力的一部分——本站语料是 markdown 文件，Mind Palace 召回不必只走 embedding top-k，「rg 直查 + 向量召回」hybrid 正是我们 AM Wave 1 竞赛胜出法的同构验证（精确实体/代号用 grep，语义近邻用向量）； ② 自由工具使用必须先行为初始化再 RL/优化——映射到本站 agent 设计：给 agent 新工具（如 shell 查语料）时先用范例轨迹立规矩 （窄命令、限量取回），否则它会学会一把捞爆 context。冷启动数据的「答案感知倒推+答案盲顺写」也是造高质量 agent 训练/评测轨迹的通用配方。\n",
+        "architecture": "```mermaid\nflowchart TD\n  Q[QA 样本 question+gold] --> TUTOR[答案感知 Tutor<br/>倒推证据链+target masking]\n  TUTOR --> PLANNER[答案盲 Planner<br/>只看可观测历史顺写]\n  PLANNER --> GATE[质量门 F1>0 + coherence judge]\n  GATE --> SFT[SFT 初始化 Qwen3.5-9B]\n  SFT --> GRPO[GRPO 200 steps<br/>reward = 格式门 x token-F1]\n  GRPO --> AGENT[9B DCI search agent]\n  AGENT --> CMD[生成 shell pipeline rg/grep/head...]\n  CMD --> CLS{pipeline 分类器<br/>byte-exact 可证?}\n  CLS -->|安全| PAR[分片并行 CONCAT/HEAD/COUNT/SORTHEAD]\n  CLS -->|不可证| SEQ[顺序回退]\n  PAR --> CORPUS[(wiki-18 21M 段 ~14GB)]\n  SEQ --> CORPUS\n  CORPUS --> OBS[截断 tool_response] --> AGENT\n```\n"
+      },
+      "self_evo_use": "能用（方法论原语 + 可跑资产双重）。方法论层：「行为初始化先于自由探索」「检索接口可重新设计」「答案感知造数据/答案盲保因果」 三条都能直接进本站 agent/语料管线设计。资产层：官方放出 SFT/GRPO 模型与 10k 冷启动数据集（HF alireza7/GrepSeek-*）， 源码含可独立复用的 parallel_search 引擎（带 byte-equivalence 测试）。但本站语料仅 ~百篇级 markdown，分片并行引擎本身用不上， 借的是「语义保持才能给工具提速」的工程纪律。\n",
+      "core_concepts": [
+        {
+          "name": "Direct Corpus Interaction（直接语料交互 DCI）",
+          "role": "primary",
+          "evidence": "让 agent 像读代码库一样读知识库，直接用 terminal 工具在原始文本上查、滤、数、截断、组合……action 是 whitelisted Unix command 或 final answer"
+        },
+        {
+          "name": "答案感知倒推 + 答案盲顺写（冷启动轨迹合成）",
+          "role": "primary",
+          "evidence": "Tutor 看得到答案，所以它从最后一个证据目标倒着找……答案盲 Planner 不看未来证据，只凭当前历史草拟每一步 think + command……F1 必须大于 0，整条轨迹还要由 coherence judge 检查是否存在未来信息泄漏"
+        },
+        {
+          "name": "语义保持分片并行执行（semantics-preserving sharded-parallel）",
+          "role": "primary",
+          "evidence": "把 14GB corpus 按行切成多个 shard，能安全并行的 rg|...|head 等管道就在 shard 上并发跑……关键承诺是输出与单文件顺序执行 byte-exact 等价；不能证明等价的命令就回退顺序执行"
+        },
+        {
+          "name": "格式门 × token-F1 奖励",
+          "role": "supporting",
+          "evidence": "reward 是「格式门 × token-level F1」：格式不合规直接 0，格式合规则按答案 token overlap 给分……先防格式/协议崩坏，再优化答案质量"
+        },
+        {
+          "name": "GRPO（组相对策略优化）",
+          "role": "supporting",
+          "evidence": "用 GRPO 在 NQ 与 HotpotQA 训练集上跑 200 steps，每题采 5 条轨迹……每个问题采样一组轨迹，用组内相对分数算优势，不需要单独 critic"
+        }
+      ],
+      "discovery_trace": {
+        "hypothesis": "直接把基础模型丢进 RL（GRPO）里，让它在大语料上自由学 shell 交互，应该能学会 DCI。",
+        "failed_attempts": "作者明说直接对 corpus-interaction policy 做 RL 不稳定：命令过宽、取回上下文过长，甚至在 1024GB 主机内存机器上也出现 OOM—— 不先立规矩，RL 会先学会把语料库一把捞爆而不是外科手术式检索。消融实证：w/o SFT 的 RL 变体 training collapse（报崩溃前最后 checkpoint F1 0.3314 vs 完整 0.5691），原文脚注称直接优化 base model highly unstable。由此走到「先冷启动 SFT 行为初始化 （学窄命令/head 限量/级联过滤），再 GRPO 调高层策略」的两段式。\n",
+        "source_span": "paper.mdx「解法是怎么找到的(选读)」节：「作者先观察到直接对 corpus-interaction policy 做 RL 不稳定……因此先构造冷启动 SFT 数据」；及「问题(Problem)」节 OOM 段、Table 2 消融 w/o SFT 0.3314 + footnote training collapse"
+      },
+      "facet_slug": "grepseek",
+      "facet_status": "extracted",
+      "href": "/papers/2605.29307-grepseek-dci-search-agent"
     },
     {
       "id": "paper:2605.29707",
@@ -15367,16 +15412,6 @@
       "evidence": "MemoryAgentBench 评测智能体长期记忆系统、PEFT 论文用 LoRA 承载个性化持久状态,都围绕「给智能体一份可持续累积的记忆」这一用途,前者是后者一类方法的潜在评测台。"
     },
     {
-      "from": "content/memoryagentbench",
-      "to": "content/agemem",
-      "type": "composes_with",
-      "confidence": "high",
-      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
-      "kg_integrated": true,
-      "cross_doc": true,
-      "verified_from_facet": true
-    },
-    {
       "from": "concept/agentic-memory",
       "to": "content/agemem",
       "type": "same_track",
@@ -15574,6 +15609,16 @@
       "type": "composes_with",
       "confidence": "high",
       "evidence": "两者都用 Tree-sitter 把代码库抽成知识图谱给 agent 用；codegraph 强在低层索引基础设施（SQLite schema+MCP工具+staleness），understand-anything 强在上层多agent语义导览+可视化仪表盘——一个做底座一个做表现层，互补而非重复。",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "verified_from_facet": true
+    },
+    {
+      "from": "content/memoryagentbench",
+      "to": "content/agemem",
+      "type": "composes_with",
+      "confidence": "high",
+      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
       "kg_integrated": true,
       "cross_doc": true,
       "verified_from_facet": true
@@ -31345,9 +31390,9 @@
       "builds_on": 2,
       "shares_method": 6,
       "same_use_case": 3,
-      "composes_with": 9,
       "same_track": 39,
       "improves_on": 2,
+      "composes_with": 9,
       "contradicts": 2
     },
     "wikilinks": {
@@ -31369,7 +31414,7 @@
     "associativeEdges": 24,
     "crossDocEdges": 41,
     "ghosts": 21,
-    "assessed": 36,
-    "facetedNodes": 12
+    "assessed": 37,
+    "facetedNodes": 13
   }
 }
