@@ -261,6 +261,55 @@ test("runDaily: writeFiles=false still skips markFn (status only persisted when 
   assert.equal(marks.length, 0, "markFn not called when writeFiles=false");
 });
 
+test("runDaily: audit_error (infra failure) does NOT mark metadata — paper stays re-pickable", async () => {
+  // Regression for 2026-06-10: a claude 429 session-limit crash produced an audit_error batch
+  // result, but the marking loop collapsed it into terminal "hold" in metadata.json — burying a
+  // paper that was never actually audited. audit_error must leave metadata untouched.
+  const { mkdtemp, rm } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const path = (await import("node:path")).default;
+  const auditRoot = await mkdtemp(path.join(tmpdir(), "cold-audit-test-"));
+  try {
+    const records = [deepRead("crashes"), deepRead("passes")];
+    const marks = [];
+    const notified = [];
+    const out = await runDaily({
+      dailyCap: 3,
+      writeFiles: true,
+      auditRoot,
+      logger: silent(),
+      now: () => new Date("2026-06-10T18:00:00Z"),
+      scan: async () => records,
+      loadArtifactFn: async () => ({ paperMdx: "x", careerMdx: "", metadata: {} }),
+      loadSourceFn: async () => ({ fullText: "t", available: true }),
+      authorFn: makeMockAuthorFn({ artifacts: [{ v: "a" }, { v: "b" }] }),
+      auditFn: makeMockAuditFn({
+        audit: (artifact, source, ctx) => {
+          if (ctx.paper.slug === "crashes") throw new Error("claude audit (stageA) exited 1: 429 session limit");
+          return passDiagnosis();
+        },
+      }),
+      notify: async (alert) => notified.push(alert),
+      markFn: async (r, gate) => marks.push({ slug: r.slug, status: gate.status }),
+    });
+
+    const byId = Object.fromEntries(out.batch.results.map((r) => [r.paperId, r.status]));
+    assert.equal(byId.crashes, "audit_error");
+    assert.equal(byId.passes, "ready_to_publish");
+
+    // markFn called ONLY for the genuinely-audited paper; the crashed one is left unmarked
+    // (no cold_audit state → selectUnaudited re-picks it on the next run).
+    assert.deepEqual(marks, [{ slug: "passes", status: "ready_to_publish" }]);
+
+    // audited report still surfaces the failure for observability.
+    const auditedById = Object.fromEntries(out.audited.map((a) => [a.paperId, a.status]));
+    assert.equal(auditedById.crashes, "audit_error");
+    assert.equal(auditedById.passes, "ready_to_publish");
+  } finally {
+    await rm(auditRoot, { recursive: true, force: true });
+  }
+});
+
 test("runDaily: no candidates → no batch, returns cleanly", async () => {
   const out = await runDaily({
     logger: silent(),

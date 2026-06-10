@@ -375,6 +375,13 @@ export async function runDaily(deps = {}) {
   for (const result of batch.results) {
     const rec = selected.find((r) => recordToPaper(r).arxivId === result.paperId);
     if (!rec) continue;
+    if (result.status === "audit_error") {
+      // Infra failure (e.g. claude 429 session limit / codex timeout) — NOT an editorial verdict.
+      // Leave metadata.cold_audit unmarked so the next run re-picks this paper; writing "hold"
+      // here (pre-2026-06-10 behavior) terminally buried papers that were never actually audited.
+      audited.push({ slug: rec.slug, paperId: result.paperId, status: "audit_error", rounds: result.rounds });
+      continue;
+    }
     const gateResult = {
       status: result.status === "ready_to_publish" ? "ready_to_publish" : "hold",
       rounds: result.rounds,
