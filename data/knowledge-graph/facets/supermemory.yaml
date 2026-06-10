@@ -1,5 +1,6 @@
 # Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
 # 不编造，未知标「数据不足」，自报数字标「自报/受称」。源：brief-wiki/deep-dives/supermemory-deep-dive.md
+schema: v2
 node_id: content/supermemory
 slug: supermemory
 kind: project
@@ -53,6 +54,22 @@ facets:
       CT[containerTag 多项目隔离] -.-> KG
     ```
 
+core_concepts:
+  - name: 事实图谱记忆
+    role: primary
+    evidence: "深读技术拆解逐字『Supermemory 将记忆定义为随时间和对话更新的事实知识图谱，而非简单的文档分块。它从对话中提取原子事实，并维护一个动态更新的用户画像』——拿掉它整个『记忆≠RAG』范式不成立（规范名『事实图谱记忆』，源文原词『事实知识图谱』）。"
+  - name: 冲突消解
+    role: primary
+    evidence: "深读事实提取与更新节逐字『当新信息与旧事实冲突时（如我搬到了 SF vs 我住在 NYC），自动消解矛盾，旧事实被覆盖』——有状态记忆区别于无状态 RAG 的承重件（规范名统一为『冲突消解』=跨文件锚，源文原词『消解矛盾』）。"
+  - name: 自动遗忘
+    role: supporting
+    evidence: "深读自动遗忘节逐字『临时事实（如我明天有考试）在时间点后自动过期；矛盾和新信息会触发旧记忆的降权或删除』。"
+  - name: 混合搜索
+    role: supporting
+    evidence: "深读 API 节逐字『client.search.memories()：混合搜索（Hybrid Search），同时检索个人记忆和知识库文档，解决通用知识和个人上下文结合的问题』。"
+  - name: containerTag 多租户隔离
+    role: supporting
+    evidence: "深读状态与存储设计节逐字『隔离机制：通过 containerTag（项目标签）实现多租户/多项目隔离，每个标签下的记忆和画像独立演化，可用于区分不同用户或不同项目』。"
 self_evo_use: >
   有限可用、且要打折。它的"自动遗忘 + 矛盾消解 + 画像随对话演进"确实是自进化记忆需要的能力，可当设计参考；
   但记忆处理是黑箱托管 API、无自托管、无开放评测，无法当可掌控的自进化记忆引擎核心，更适合当"它是怎么把记忆当有状态图谱来做的"概念参照，不适合直接做研究底座。

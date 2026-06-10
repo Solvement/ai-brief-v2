@@ -1,0 +1,83 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
+# 不编造，未知标「数据不足」，自报数字标「自报/受控」。源：content/papers/2507.21046-self-evolving-agents-survey/{paper,career}.mdx + metadata.json
+schema: v2
+node_id: content/self-evolving-agents-survey
+slug: self-evolving-agents-survey
+kind: paper
+title: "自进化 agent 综述 — 用 What/When/How/Where 四轴钉住整片领域"
+source: "arxiv:2507.21046v4 + content/papers/2507.21046-self-evolving-agents-survey + repo github.com/CharlesQ9/Self-Evolving-Agents (1.2k★ awesome-list)"
+
+facets:
+  problem_solved: >    # Y：一句犀利
+    静态 LLM 部署后不会变，但真实环境开放、交互、会变；大量「让 agent 自己变强」的工作散、没统一坐标系，难比较难复用——
+    综述要给「自进化 agent」建一张全景地图与统一语言，让人能定位「该动哪个部件、什么时候动、用什么方法动」。
+
+  method: >            # X：大白话 + 类比
+    像给一整片乱糟糟的领域画一张「四问坐标系 + 零件目录」：先把 agent 系统形式化成 Π=(Γ架构, ψ模型, C上下文, W工具)，
+    把自进化定义成一个把 Π 升级成更好 Π′ 的变换 f(Π,τ,r)=Π′（拿轨迹 τ 和反馈 r 升级，环境建成 POMDP）；
+    再用四个轴把所有方法归位——What 进化什么（模型/上下文/工具/架构）、When 何时（任务内 intra vs 任务间 inter）、
+    How 怎么（奖励式/模仿示范/群体进化，on/off-policy，online/offline）、Where 在哪（通用域 + 编程/GUI/金融/医疗/教育）。
+    它不提新方法，只给地图：先按「要进化哪个部件」定位章节、再顺代表方法往下挖。
+
+  result: >            # Z：综述无性能背书，标明性质
+    [综述·非实验论文，不证明任何单一方法最好] 产出是分类框架本身 + 自进化定义（三条门槛：经验依赖 / 持久且改变策略 / 自主探索）
+    + 形式化 Π=(Γ,ψ,C,W) 与 f(Π,τ,r)=Π′ + 评估五维（适应/保持/泛化/效率/安全）与三范式（静态/短程/长程终身）+ 安全风险清单。
+    归档的代表工作：Reflexion/Expel（文本反馈）、Voyager（终身 skill 库）、Promptbreeder/TextGrad/DSPy（提示管线自优化）、
+    Mem0（记忆进化）、ADAS/AFlow/SICA/Alita（架构自动设计）、ToolGen（工具进化）、STaR/RAGEN/WebRL/ReMA（自训/课程 RL）。
+
+  innovation: >        # 创新：同赛道对比
+    相对其它自进化综述（如姊妹综述 arXiv:2508.07407 的「四组件优化回路」视角），本篇的坐标系是 What/When/How/Where 四问轴 +
+    Π=(Γ,ψ,C,W)/f(Π,τ,r)=Π′ 的统一形式化，并把自进化 agent 明确定位成「静态 LLM → ASI」之间的中间形态。
+    价值是把散落的可复用模式一次性归档成决策树，而非提出新算法。
+
+  weakness: >          # 缺点/适用边界/坑
+    [是综述非方法] 只给坐标系与目录，不证明任何单一方法最优，具体效果要回原论文看（当地图用、别当性能背书）。
+    自承安全是真难题且未解：价值漂移、灾难性遗忘（stability-plasticity 权衡）、奖励错配驱动有害进化、多 agent 协同进化的涌现行为。
+    评估尚不成熟——长程终身学习评估仍在早期，现有基准（TRACE 连续学习、PDDL/Gym）覆盖有限。
+    「通往 ASI」是愿景叙事而非已达成结论。
+
+  transfer: >          # 指向本站自进化用途
+    这几乎是本站北极星 L1 自进化 / L2 导师 / L3 研究的「零件目录与决策树」：四轴 = 造自己学习 agent 时「该动哪个部件、何时动、用什么方法动」的设计图。
+    直接用法：① 用 What 轴定位 AI-Brief 该先进化哪个部件（上下文/记忆是最近的落点，对应 Mem0/记忆进化章）；
+    ② 用 When 轴决定增量入图是任务内还是任务间进化；③ 用评估五维 + 安全风险清单当自进化系统的验收尺与红线（尤其灾难性遗忘、价值漂移）。
+    它是本站 agent-only 栏的脉络源 + 跨篇综合时的归类骨架。
+
+  architecture: |      # Mermaid（从 paper.mdx 精简改写）
+    ```mermaid
+    flowchart TD
+      SE([自进化 agent<br/>Pi=·Gamma,psi,C,W·<br/>f·Pi,tau,r·=Pi prime]) --> W1[What 进化什么<br/>模型·上下文·工具·架构]
+      SE --> W2[When 何时<br/>任务内 intra / 任务间 inter]
+      SE --> W3[How 怎么<br/>奖励·模仿·群体进化·on/off-policy]
+      SE --> W4[Where 在哪<br/>通用域 + 编程/GUI/金融/医疗/教育]
+      SE --> EV[评估<br/>适应·保持·泛化·效率·安全]
+      SE --> SF[安全<br/>价值漂移·灾难性遗忘·奖励错配]
+    ```
+
+self_evo_use: >        # 客观判断
+  能用（最高复用价值，但属「地图/语料源」而非可跑系统）。它是本站 L1/L2/L3 的设计参照系——四轴决策树 + Π/f 形式化 + 评估五维 + 安全红线
+  可直接当自进化系统的设计语言与验收尺。注意它本身不进 L3 方法论池的「具体方法」槽（综述不证方法），而是当归类骨架与脉络索引用。
+
+core_concepts:
+  - name: What/When/How/Where 四轴
+    role: primary
+    evidence: "用四个问题把整片领域钉清楚：进化什么(What)、何时进化(When)、怎么进化(How)、在哪进化(Where)"
+  - name: 自进化 agent 形式化 Π=(Γ,ψ,C,W) / f(Π,τ,r)=Π′
+    role: primary
+    evidence: "把'agent 系统'形式化成 Π=(架构 Γ, 大模型 ψ, 上下文 C, 工具 W)……自进化 = 一个变换 f(Π,τ,r)=Π′"
+  - name: 自进化 agent（定义三门槛）
+    role: primary
+    evidence: "三条门槛：① 更新依赖经验 ② 更新有持久、改变策略的效果 ③ 有自主探索机制"
+  - name: stability-plasticity（稳定-可塑权衡）
+    role: supporting
+    evidence: "学新东西又不忘旧东西的矛盾；学太狠会'灾难性遗忘'……综述自己点名价值漂移、灾难性遗忘"
+  - name: intra- vs inter-test-time
+    role: supporting
+    evidence: "进化发生在'一次任务内'(in-context/SFT/RL 即时调)还是'任务之间'(跨任务积累)"
+
+discovery_trace: 数据不足
+# 理由：这是综述（paper.mdx 开篇即标「这是一篇综述」），产出是分类框架而非单篇方法的解法探索。
+# 原文没有「先试了什么/为什么失败/怎么走到最终方案」的发现叙事。按 §3.1 铁律：综述类填数据不足，且禁止从 abstract 反推动机链。
+
+edges: []
+
+status: extracted

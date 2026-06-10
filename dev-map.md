@@ -28,6 +28,7 @@ scripts/
 ├── ingest.mjs               # GitHub Trending → README → DeepSeek → trending.json
 ├── papers-radar.mjs         # AI Job Research Radar：discover/triage/review/daily/run
 ├── columns/papers/          # papers-radar 单一学术引擎；publish 产出 public/data/articles.json
+├── kg/                      # Mind Palace / KG：build-brief-graph、integrate-kg、embed、concept-vocab
 ├── lib/{agentic-pipeline, github-trending, project-ranking, project-prompts}.mjs
 ├── validate-*.mjs           # 各数据契约 + 文本编码校验
 └── lint.mjs
@@ -37,8 +38,10 @@ scripts/
 
 ```
 public/data/   trending / models / articles / articles-archive / paper-radar / pipeline-status .json
-data/          agent-memory/*.json、papers/*  （本地生成，不直接服务前端）
+data/          agent-memory/*.json、papers/*、knowledge-graph/*  （本地生成，不直接服务前端）
 ```
+
+KG-2 / Mind Palace 入口（2026-06-10）：`npm run kg:build` = brief graph → facet integrate → concept vocab → local embeddings。v2 schema 门在 `scripts/validate-mind-palace.mjs`；概念词表生成在 `scripts/kg/concept-vocab.mjs`，输出 `data/knowledge-graph/concept-vocab.json`；facet 集成在 `scripts/kg/integrate-kg.mjs`，paper facet 按 `node_id` / `slug` / `arxiv_id` / `content/papers/<dir>` 合并或创建 paper 节点。
 
 ## 验证
 

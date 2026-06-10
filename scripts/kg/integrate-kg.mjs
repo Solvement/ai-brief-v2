@@ -16,7 +16,8 @@ const GRAPH = path.join(ROOT, "public", "data", "brief", "graph.json");
 const ASSESS = path.join(ROOT, "data", "knowledge-graph", "design-assessments.json");
 const CAND = path.join(ROOT, "data", "knowledge-graph", "discovery-candidates.json");
 const FACETS = path.join(ROOT, "data", "knowledge-graph", "facets");
-const VERIFIED_FACET_EDGE_TYPES = new Set(["improves_on", "composes_with", "contradicts", "special_case_of", "derives_from"]);
+const PAPERS_DIR = path.join(ROOT, "content", "papers");
+const VERIFIED_FACET_EDGE_TYPES = new Set(["improves_on", "extends", "contradicts", "composes_with", "implements", "applies", "tool_for"]);
 
 const readJson = async (p) => JSON.parse(await readFile(p, "utf8"));
 const arxivOf = (s) => (/(\d{4}\.\d{4,5})/.exec(String(s || "")) || [])[1] || "";
@@ -26,10 +27,31 @@ const graph = await readJson(GRAPH);
 const nodes = graph.nodes || [];
 const byId = new Map(nodes.map((n) => [n.id, n]));
 const bySlug = new Map();
+const byArxiv = new Map();
 for (const node of nodes) {
   if (node.slug && !bySlug.has(node.slug)) bySlug.set(node.slug, node);
   const stripped = slugOf(node.id);
   if (stripped && !bySlug.has(stripped)) bySlug.set(stripped, node);
+  const ax = node.arxiv_id || arxivOf(node.id) || arxivOf(node.slug) || arxivOf(node.file);
+  if (ax && !byArxiv.has(ax)) byArxiv.set(ax, node);
+}
+
+function paperDirFromSource(source) {
+  const match = String(source || "").replace(/\\/g, "/").match(/content\/papers\/([^/\s]+)/);
+  return match?.[1] || "";
+}
+
+function registerNode(node) {
+  byId.set(node.id, node);
+  if (node.slug && !bySlug.has(node.slug)) bySlug.set(node.slug, node);
+  const stripped = slugOf(node.id);
+  if (stripped && !bySlug.has(stripped)) bySlug.set(stripped, node);
+  const ax = node.arxiv_id || arxivOf(node.id) || arxivOf(node.slug) || arxivOf(node.file);
+  if (ax && !byArxiv.has(ax)) byArxiv.set(ax, node);
+}
+
+function registerAlias(alias, node) {
+  if (alias && node && !bySlug.has(alias)) bySlug.set(alias, node);
 }
 
 // Primary-node resolver: find the best node for a keyword (prefer content/paper/project/ghost,
@@ -44,6 +66,10 @@ function findNode(keyword) {
 
 function resolveFacetNode(facet) {
   if (facet?.node_id && byId.has(facet.node_id)) return byId.get(facet.node_id);
+  const arxiv = facet?.arxiv_id || arxivOf(facet?.node_id) || arxivOf(facet?.slug) || arxivOf(facet?.source);
+  if (arxiv && byArxiv.has(arxiv)) return byArxiv.get(arxiv);
+  const paperDir = paperDirFromSource(facet?.source);
+  if (paperDir && bySlug.has(paperDir)) return bySlug.get(paperDir);
   if (facet?.slug && bySlug.has(facet.slug)) return bySlug.get(facet.slug);
   return facet?.slug ? findNode(facet.slug) : null;
 }
@@ -71,6 +97,48 @@ async function loadFacets() {
   return facets;
 }
 
+async function readPaperMetadata(dir) {
+  if (!dir) return {};
+  try {
+    return JSON.parse(await readFile(path.join(PAPERS_DIR, dir, "metadata.json"), "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+async function ensurePaperFacetNode(facet) {
+  const existing = resolveFacetNode(facet);
+  if (existing) return existing;
+  if (facet?.kind !== "paper") return null;
+
+  const paperDir = paperDirFromSource(facet.source) || (facet.slug && bySlug.has(facet.slug) ? facet.slug : "");
+  const metadata = await readPaperMetadata(paperDir);
+  const arxiv = facet.arxiv_id || arxivOf(facet.source) || arxivOf(paperDir) || metadata.arxiv_id || metadata.paper_id || "";
+  const slug = paperDir || facet.slug || (arxiv ? arxiv : slugOf(facet.node_id));
+  const id = arxiv ? `paper:${arxiv}` : facet.node_id || `content/${slug}`;
+  if (byId.has(id)) return byId.get(id);
+
+  const node = {
+    id,
+    type: "paper",
+    kind: "paper",
+    family: "paper",
+    slug,
+    ...(arxiv ? { arxiv_id: arxiv } : {}),
+    title: metadata.title || facet.title || slug,
+    tags: Array.isArray(metadata.tags) ? metadata.tags.map(String) : [],
+    ...(metadata.topic ? { topic: metadata.topic } : {}),
+    file: paperDir ? `content/papers/${paperDir}/metadata.json` : undefined,
+    href: slug ? `/papers/${encodeURIComponent(slug)}` : "/articles",
+    source: facet.source || undefined,
+    kg_integrated: true,
+    ghost: false,
+  };
+  nodes.push(node);
+  registerNode(node);
+  return node;
+}
+
 // (1) merge assessments
 const assess = await readJson(ASSESS);
 let merged = 0;
@@ -87,15 +155,20 @@ const facets = await loadFacets();
 let facetedNodes = 0;
 let facetEdgesAdded = 0;
 for (const facet of facets) {
-  const node = resolveFacetNode(facet);
+  const node = await ensurePaperFacetNode(facet);
   if (!node) {
     console.warn(`[integrate-kg] WARN facet node unresolved: ${facet._file || facet.slug || facet.node_id}`);
     continue;
   }
   if (facet.facets) node.facets = facet.facets;
   if (facet.self_evo_use) node.self_evo_use = facet.self_evo_use;
+  if (Array.isArray(facet.core_concepts) && facet.core_concepts.length) node.core_concepts = facet.core_concepts;
+  if (facet.discovery_trace && typeof facet.discovery_trace === "object") node.discovery_trace = facet.discovery_trace;
   if (facet.slug) node.facet_slug = facet.slug;
   if (facet.status) node.facet_status = facet.status;
+  if (facet.kind === "paper" && node.slug && !node.href) node.href = `/papers/${encodeURIComponent(node.slug)}`;
+  registerAlias(facet.slug, node);
+  registerAlias(paperDirFromSource(facet.source), node);
   facetedNodes += 1;
 }
 
@@ -144,7 +217,7 @@ for (const [ka, kb, type, confidence, evidence] of CURATED) {
 // (3b) facet-authored verified typed edges. These are the reasoning layer;
 // unlike tag-derived same_track edges, they passed the facet gate.
 for (const facet of facets) {
-  const fromNode = resolveFacetNode(facet);
+  const fromNode = await ensurePaperFacetNode(facet);
   if (!fromNode || !Array.isArray(facet.edges)) continue;
   for (const edge of facet.edges) {
     if (!edge || !VERIFIED_FACET_EDGE_TYPES.has(edge.type)) continue;

@@ -1,0 +1,46 @@
+# Research agent state — 方向: agent 自进化 (Kevin 2026-06-09 授权:可改项目结构/训模型(5060/HPC)/发论文)
+# 工作方式: autoresearch 双循环 + research-loop(锁 eval 先于方法/不照抄/跨模型对抗审)。
+
+project: self-evolving-research-memory
+north_star: "L0 语料 → L1 自进化 → L2 tutor → L3 research"
+
+research_question: >
+  一个"自进化的研究记忆"——从自己不断累积的深读语料 + 跨模型冷审/Kevin 反馈中,
+  自适应它的检索与"活论点"——能否在我们这套精选 agent-research 语料上,可度量地
+  比"静态记忆"更好地理解(检索精度↑ / 综合质量↑ / 建造目标回答↑)?
+  这是 agemem「记忆即可学习策略」+ self-evolving-agents survey「reward from feedback」
+  在一个真实累积语料上的落地与检验。
+
+unique_assets:
+  - 精选深读语料(9→N 篇 agent/自进化 论文+项目, 已 facet 内化)
+  - 跨模型冷审门(generator≠critic) = 质量/reward 信号
+  - Kevin 反馈 = 人类 reward
+  - Mind Palace(typed 边 + 嵌入) = 结构化可查记忆
+  - RTX 5060 (8GB) 本地训练 + 可选 HPC
+
+eval_locked:    # research-loop: 裁判先于方法, 已锁
+  retrieval: "data/knowledge-graph/recall-bench.json (20 对抗查询) via scripts/kg/bench-retrieval.mjs — precision@1/recall@3/MRR"
+  baseline:  "hybrid(BM25+向量+RRF): precision@1=1.000, MRR=0.967 (2026-06-09 实测)"
+  caveat:    "题与记忆都我写的→绝对分偏乐观; 需别人/模型出题 + 真实查询 + scale 放大才硬"
+
+hypotheses:
+  - id: H1
+    status: planned
+    claim: "在我们语料上对比微调嵌入(e5-small contrastive on our facets+queries)能提升检索精度 beyond hybrid baseline"
+    needs: "GPU env (Py3.12 + Blackwell CUDA torch + sentence-transformers)"
+    why: "嵌入区分度不足是 live 暴露的病; 领域自适应是最小可训练自进化步"
+  - id: H2
+    status: planned
+    claim: "活论点外循环(每日深读 deepen/replace/merge 论点 + 沉进 memory)随语料增长提升综合质量"
+    needs: "更强 benchmark(别人出题) + 论点质量评估"
+  - id: H3
+    status: idea
+    claim: "用冷审/反馈当 reward 训一个'论点更新策略'(agemem 式 memory-as-action),比启发式规则好"
+
+blocking:
+  - "GPU 训练 env 未就绪 (CPU torch / Py3.14 太新 / 无 ML 库) — 需先搭 (🔴 大工具链安装)"
+
+next_actions:
+  - "(无需GPU) ship hybrid 到生产检索 = Kevin 的'关键词→相关'搜索地图 (Part 2)"
+  - "搭 GPU 训练 env (Py3.12 venv + cu128 torch for sm_120 + libs)"
+  - "H1 第一个实验: 微调嵌入 → 锁定 benchmark 判 vs hybrid baseline"

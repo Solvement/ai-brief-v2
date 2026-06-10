@@ -1,0 +1,90 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
+# 不编造，未知标「数据不足」，自报数字标「自报/受控」。源：content/papers/2606.01249-tropd-trust-region-distillation/{paper,career}.mdx + metadata.json
+schema: v2
+node_id: content/tropd
+slug: tropd
+kind: paper
+title: "TrOPD — 给在策略蒸馏的逐 token 监督装一道信任门"
+source: "arxiv:2606.01249v2 + content/papers/2606.01249-tropd-trust-region-distillation + repo github.com/Xingrun-Xing2/TrOPD（代码未发布）"
+
+facets:
+  problem_solved: >    # Y：一句犀利
+    在策略蒸馏（学生自己写推理轨迹、老师逐 token 给分）里，省显存的 K1 reverse-KL 估计器遇到师生分布错位时，
+    会对老师几乎不给概率的离群 token 产生趋于 -∞ 的梯度——少数坏 token 就能把训练带崩。真问题不是「监督太少」，是「少数不可信监督太强」。
+
+  method: >            # X：大白话 + 类比
+    把学生写出的每个 token 当成「过海关的旅客」逐个查信任度：用投机解码的接受率 P_trust=min(π_T/π_S,1) 判定——
+    老师也愿意给高概率的 token 进信任区，照常用 K1 reverse KL 学；老师明显不认可的离群 token 不去围着这个坏词罚（那会爆梯度），
+    改看老师 top-k 最可能写的词、用 forward KL 给一个温和的正面方向。再加冷启动「扶上马」：训练初期老师写一段前缀、学生续写（off-policy guidance），
+    前缀长度随 cosine 退火到 0，最后完全回到学生自己的分布。一句话：可靠区照学、不可靠区降级回退、起步先给脚手架。
+
+  result: >            # Z：真实数字，标自报/受控
+    [自报·arXiv v2 表格，未本机复训] 同一统一训练设定（200 steps / lr 5e-6 / top-k=64 / β=0.001 / batch 128 / 4 rollouts / 8096 tokens）下：
+    数学域 Table 1 TrOPD Avg. 49.85 > FKL Outlier 49.00 > Mask 47.72 / Clip 47.86 > OPD 46.79，而「全局 FKL」只有 1.40（几乎训不动）——
+    证明不是 FKL 神奇，是「只把它放到不可靠区」才有效。DeepSeek-1.5B 学生单域 TrOPD 40.63 vs OPD 37.11 vs REOPOLD 38.79（老师 58.48）；
+    Qwen3-SFT-1.7B 多域 TrOPD 51.73 vs OPD 48.29，分项较 OPD 提升 GPQA +6.18 / IFBench +5.11 / LCB +4.00 / AIME25 +3.34；
+    与并发 AOPD 正交可叠（40.63 → 41.67）。
+
+  innovation: >        # 创新：同赛道对比
+    同赛道处理离群 token 的两条老路——REOPOLD 用 reward clipping、EOPD/Entropy 用高熵 token 筛选——本文证明它们要么不稳、要么把有用监督一起裁掉。
+    TrOPD 的新点：① 用 min(π_T/π_S,1) 自适应划信任区，省掉固定阈值 τ；② 离群区不丢弃而用老师 top-k FKL「温和回退」，比 mask/clip 多保留可用监督（消融里最高）；
+    ③ 先把 OPD/EOPD/REOPOLD/FKL/JSD/Entropy 放进同一统一基准，才定位出真病灶是 K1 reverse KL 在分布错位下不可靠。
+
+  weakness: >          # 缺点/适用边界/坑
+    [代码未发布] 仓库 HEAD b4bee6f 只有 README/LICENSE/imgs，训练/评测代码与模型均未释放——结果可读不可复跑，README 自称含训练代码但 ToDo 未勾。
+    作者自承缺真实部署/应用研究、只做 OPD 后训练（未含 pre/mid-training，SRM 性能上限受限）。
+    信任尺子 π_T/π_S 依赖老师本身可信、且师生 tokenizer/能力可比，老师不可靠时这把尺子失真，原文未充分展开此失败模式。
+    提升是 +3~6 点级别（非数量级跃迁），且目标是稳定逼近老师不是超过老师。超参（k=64/β=0.001/退火日程）跨任务敏感性无系统表。
+
+  transfer: >          # 指向本站自进化用途
+    最值得搬的不是蒸馏代码，是「强监督先过可靠度门再进训练/自进化闭环」的系统心法：
+    AI-Brief 的深读作者→冷审→补差、agent self-improvement、critic 给步骤打分，都不能默认「强模型每一步分数同样可信」。
+    可直接迁移成「分区可靠度门」——高信任步骤进训练样本/正常学，低信任步骤只给温和建议或老师示范，而非统一加权或一刀切裁剪。
+    与 AgeMem 的「可训练记忆接口」互补：那条管接口设计，这条管接口里的监督信号该不该信。
+
+  architecture: |      # Mermaid（从 paper.mdx 精简改写）
+    ```mermaid
+    flowchart TD
+      P([训练 prompt]) --> S[学生生成 SoG x~pi_S]
+      S --> A{逐 token 信任度<br/>P_trust=min·pi_T/pi_S,1·}
+      A -->|trust region| RKL[K1 reverse KL<br/>Memory O·n·]
+      A -->|outlier| FKL[老师 top-k forward KL<br/>Memory O·nk·]
+      P --> T[老师写前缀 x·:l·] --> C[学生续写<br/>off-policy guidance<br/>beta=0.001, 前缀 cosine 退火到 0]
+      RKL --> L[TrOPD 统一目标]
+      FKL --> L
+      C --> L
+      L --> U[更新学生模型]
+    ```
+
+self_evo_use: >        # 客观判断
+  能用（属方法论原语，非可跑系统）。它给自进化的训练/反馈回路提供一条承重原则：逐步监督必须分区——信得过的正常回灌、低信任的降级或示范。
+  但代码未发布、只验证于 OPD 后训练，本站可借的是「可靠度门 + 温和回退 + 冷启动退火」三件设计模式，不是直接抄一套蒸馏栈。
+
+core_concepts:
+  - name: trust region（信任区）
+    role: primary
+    evidence: "P_trust(x)=min(π_T(x)/π_S(x),1) 自适应划 reliable token，进正常 OPD 区用 K1 reverse KL"
+  - name: K1 estimator（K1 估计器）
+    role: primary
+    evidence: "不在整个词表上算 KL，只用学生采样到的 token 估计……遇到师生分布错位时更容易出现离群梯度"
+  - name: policy-gradient outlier（策略梯度离群点）
+    role: primary
+    evidence: "当老师给学生某个 token 的概率接近 0，梯度形如 (1/π_S(x))·log(π_T(x)/π_S(x)) -> -∞，少数 token 就可能主导训练"
+  - name: outlier top-k forward KL（离群区 top-k 正向 KL）
+    role: primary
+    evidence: "outlier token 不再用爆炸 reverse-KL 信号，改从老师 top-k 分布给正面示范……消融里最高"
+  - name: off-policy guidance（老师前缀退火）
+    role: supporting
+    evidence: "老师先写一段前缀 x[:l]，学生从 x[l:] 继续写……cosine schedule 退火到 0……β=0.001"
+
+discovery_trace:
+  hypothesis: "离群 token 不可信，那就直接屏蔽/裁剪掉它（Mask Outlier / Clip Outlier）应该能稳住训练。"
+  failed_attempts: >
+    论文先试了 Mask Outlier 和 Clip Outlier。两者确实比 vanilla OPD 稳（Mask 维持更高 policy entropy、较低 gradient norm），
+    但「只屏蔽」会把离群区里仍然有用的老师信号一起丢掉。另一条极端「全局 top-k FKL」几乎训不动（Avg. 仅 1.40）。
+    由此走到最终方案：离群 token 本身不可靠，但老师 top-k 分布仍可当正面示范——用 FKL Outlier 保住这部分信号，而非丢弃（消融里 FKL Outlier 49.00 > Mask 47.72 / Clip 47.86）。
+  source_span: "paper.mdx 核心方法节 > [!key] 补丁:为什么不是\"直接丢掉离群点\"——「论文先试了 Mask Outlier 和 Clip Outlier……只屏蔽会丢掉离群区里仍然有用的老师信号」；并见 Table 1/Table 5 Full FKL 1.40 vs FKL Outlier 49.00 反差"
+
+edges: []
+
+status: extracted

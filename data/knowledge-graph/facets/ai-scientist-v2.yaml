@@ -1,5 +1,6 @@
 # Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z + 创新/缺点。
 # 不编造，未知标「数据不足」，自报数字标「自报/受控」。
+schema: v2
 node_id: content/ai-scientist-v2
 slug: ai-scientist-v2
 kind: project
@@ -41,6 +42,22 @@ facets:
       LIT[(Semantic Scholar 文献)] -.新颖性检查/引用.-> EM
       NODE -. 持久化到实验日志树 .-> STATE[(搜索树状态)]
     ```
+core_concepts:
+  - name: 实验树搜索
+    role: primary
+    evidence: "深读 reasoning_trace.central_contribution 逐字『通过 agentic best-first tree search 实现了从话题到 workshop 论文的端到端自主科研』；技术拆解 Agent Loop 逐字『核心循环是最优优先树搜索：根据 JSON 格式的研究想法创建根节点 → 实验管理器 agent 评估当前所有叶子节点，选择最有希望的节点进行扩展（best-first）→ 对选中节点生成代码变体并运行实验 → 达到 steps 上限停止』。"
+  - name: 实验管理器 agent
+    role: primary
+    evidence: "深读 Planner 节逐字『Experiment Manager：在树搜索中扮演 planner + critic 角色，决定扩展哪个节点、如何修改代码、何时停止并进入写稿阶段』；系统概览逐字『一个 experiment manager agent 决定搜索方向』。"
+  - name: 想法生成 agent
+    role: supporting
+    evidence: "深读 Planner 节逐字『Ideation Agent：根据用户提供的主题描述 Markdown，通过反复生成与反思（reflection）产生结构化研究想法列表』——是树搜索根节点的供给者（规范名取『想法生成 agent』，源文原词 Ideation Agent）。"
+  - name: 代码执行沙箱
+    role: supporting
+    evidence: "深读 Tool Interface 逐字『代码执行工具：在本地 GPU 环境中运行由 LLM 生成的 Python 实验代码』+ Sandbox 节逐字『This codebase will execute LLM-written code，推荐在 Docker 容器等受控环境中运行。系统本身未内建沙盒机制，依赖外部隔离』——规范名『代码执行沙箱』指代源文的『代码执行工具 + Sandbox』这一对。"
+  - name: 文献新颖性检查
+    role: mentioned
+    evidence: "深读 Tool Interface 逐字『文献搜索工具：通过 Semantic Scholar API 进行新颖性检查和引用收集，依赖 S2_API_KEY』——规范名『文献新颖性检查』取自源文原词『文献搜索工具…新颖性检查』。"
 self_evo_use: >
   能用，作为「探索引擎」原语。它示范了自进化 agent 怎么把试错过程结构化成一棵可回溯的树、用一个 manager 节点做选择与停止判断——
   这正是自进化所需的「提出假设→实验→评分→改方向」闭环骨架。局限：它的「学习」是搜索内的方向调整，不会把经验沉淀成可复用技能/记忆（那部分要靠 hermes-agent 的 skills 或 agemem 的可训练记忆补）。

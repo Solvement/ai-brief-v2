@@ -65,6 +65,7 @@ for (const f of facets) {
   facetIndex[f.slug] = {
     node_id: f.node_id, title: f.title, kind: f.kind || "paper", status: f.status || "extracted",
     facets: f.facets || {}, self_evo_use: f.self_evo_use ?? null, edges: f.edges || [],
+    core_concepts: f.core_concepts || [], discovery_trace: f.discovery_trace ?? null,
   };
 }
 await writeFile(FACETS_OUT, JSON.stringify({ generated_at: new Date().toISOString(), count: Object.keys(facetIndex).length, facets: facetIndex }, null, 0) + "\n", "utf8");

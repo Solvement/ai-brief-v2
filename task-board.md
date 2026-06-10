@@ -14,6 +14,24 @@
 
 ## 进行中
 
+### KG-2 · 知识关联层全语料化 + 自进化反哺 + 综合栏（plan `docs/plans/KG-2-association-layer.md`）
+- **大方向**：北极星 L1/L3——关联层覆盖全语料且**被机器真用**（gap-map 反哺选稿=自进化；跨记忆综合产 derived 节点=auto-research 种子）。Kevin 2026-06-09 loop 7 格确认（回填部分+增量、paper↔project 词表+核心概念门、竞赛+批判 agent、综合=单独栏、增量入图长在 PIPE-1、授权批判性改现有结构/范式）。
+- **与 AM 的关系**：吸收 AM Wave 2-4 的「沉淀管线」决策——增量入图=PIPE-1 LangGraph 节点（不塞 boot .mjs），落地前用幂等回填脚本；判边候选召回用 AM Wave 1 竞赛胜出的 **hybrid(BM25+向量+RRF)**，非纯向量。原 🔴「动上游管线」由此解除（不动现 boot 管线）。
+- **阶段**：✅ Phase 0 完成（codex+Claude 两路对抗审独立收敛：solution_path→可空 discovery_trace+source_span 硬门 / same_problem KILL / core_concepts 升对象数组 role 化使核心概念门机器可判 / 判边默认 NO_EDGE+双端 evidence+negative rationale / eval 重标基线防假绿 / Phase B 指标去 self_evo_use 循环论证。schema v2 定稿 plan §3.1；范式增量已落 papers.md#14「解法是怎么找到的(选读)」+ projects.md Tier3 core_concepts+claim_ledger）。→ 🔄 pilot 切片 2 跑中（TrOPD/MetaGPT/survey 三论文 facet v2 + 项目侧 core_concepts 升级 + codex validator v2，并行）。
+- **进度续 (2026-06-10)**：✅ codex pilot 后端门完成（plan `docs/plans/KG-2-pilot-backend-gate.md`）：`validate-mind-palace` 落 v2 字段门 + bad fixture 三类 reject 实测；`concept-vocab.json` 生成；`kg:build` 链接入 vocab；TrOPD/MetaGPT/self-evolving survey 三个 paper facet 已合并到 paper 节点，`facetedNodes:12`、vectors:12。
+- **✅ pilot 切片 2 完成 (2026-06-10)**：① 独立判边（opus，generator≠judge）8 候选**全 NO_EDGE**（含 TrOPD 阴性对照；MAB 受测清单实证不含 AgeMem/supermemory，"类目级配对"被证据门挡住）→ 补 `evaluates` 边型 + `evidence_kind` 机器门；② 跨模型冷审：3 新 facet PASS（discovery_trace"数据不足"判定确认正当），4 升级文件概念命名 FAIL → 裁定**两层命名制**（name=跨文件统一规范名 / evidence=源文逐字短语）→ 修复 agent 改完、共用锚（冲突消解/可学习的记忆操作）保住、validator+vocab(31 概念)全绿；③ 前端节点面板新增**承重概念 chips + 解法发现链块**；④ kg:build + npm build 全绿 → 部署。**产品可见**：/mind-palace 点 TrOPD 看 discovery_trace、点任意 12 faceted 节点看承重概念。
+- **切片**：① 审计+schema v2 定稿 ② pilot 3 节点入图(产品可见停点) ③ 存量批量回填 ④ gap-map 反哺字段进选稿 ⑤ 综合栏第一篇(🔴 新栏目 Kevin 自审)。
+- **阻塞**：无。
+
+### AM · Agent Memory 撑得住大数据量沉淀（研究驱动，plan `docs/plans/2026-06-09-agent-memory-at-scale.md`）
+- **大方向**：Mind Palace 从"9 条卡片"→可累积/精确召回/不糊/会自更新的 agent 记忆。停止=上线+撑大数据量沉淀+上线后 AI 审。
+- **方法**：学了科研 agent 工作流（autoresearch 双循环 + ara exploration-tree）→ research-loop（锁 eval 先于方法、多法竞赛、跨模型对抗审、不照抄）。
+- **Wave 1 ✅（已做）**：① 锁定对抗 benchmark（`recall-bench.json` 20 查询）② 方法竞赛（`bench-retrieval.mjs`）：**hybrid(BM25+向量+RRF) 胜出 precision@1 1.000 vs 单法 0.857**（我们语料实测，非照抄）③ codex 跨模型架构审 → 3 大 scale 优先级。
+- **决策(exploration-tree)**：检索用 **hybrid**（vector 漏改写/bm25 漏建造目标，RRF 各补其短）。
+- **Wave 2-4 待做**：② **ship hybrid 到生产检索**（前端 client 端嵌入+BM25+RRF 或 API）③ **沉淀管线**（新深读自动 facet+边+嵌入+质量态,🔴 改上游每日管线=需 Kevin 拍上线策略）④ **冲突/staleness**（active/superseded/contradicted 态+信任排序,检索/UI 降级 stale 不只贴标签）⑤ 聚类层次呈现 ⑥ scale-stress(放大 100/500/1000 测)。
+- **阻塞**：沉淀管线动上游=🔴。codex 可继续后端。
+
+
 ### ✅ MP-0 · Harness 治理层（结构化调度落地）— 已落地（含编排决策修正）
 - **大方向**：本项目=长期每日更新知识库+自进化+研究 agent，必须有可约束/可交接/可审计的工程骨架，否则越迭代越乱（Kevin 2026-06-09）。
 - **小方向**：① 7 角色契约 ② 接力 workflow（人+AI+进度） ③ plan 模板 ④ RULES 工作流红线 ⑤ AGENTS.md 镜像给 codex ⑥ task-board 活起来。

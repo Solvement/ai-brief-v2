@@ -1,0 +1,89 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
+# 不编造，未知标「数据不足」，自报数字标「自报/受控」。源：content/papers/2308.00352-metagpt-multi-agent-sop/{paper,career}.mdx + metadata.json
+schema: v2
+node_id: content/metagpt
+slug: metagpt
+kind: paper
+title: "MetaGPT — 把人类软件公司的 SOP 注入多 agent 团队"
+source: "arxiv:2308.00352 (ICLR 2024) + content/papers/2308.00352-metagpt-multi-agent-sop + repo github.com/FoundationAgents/MetaGPT (MIT, 68.5k★)"
+
+facets:
+  problem_solved: >    # Y：一句犀利
+    把多个 LLM 天真串联做复杂任务（如一句话造软件），幻觉会一层层级联放大、前错后跟着错，agent 间还充斥无效闲聊烧 token——
+    缺的是把成熟的人类协作流程注入进去，让中间产物可被有领域常识的角色检查、从源头压住级联错误。
+
+  method: >            # X：大白话 + 类比
+    像把一群 LLM 从「自由群聊」改成「按 SOP 跑的软件公司流水线」：产品经理→架构师→项目经理→工程师→QA 五个角色专精，
+    每个工位只产出带固定格式的交付物（PRD/接口设计/任务单/代码/测试），不传大白话对话。
+    协作不是一对一传话（那是 O(N²) 乱拓扑），而是丢进一个共享消息池、每个角色按自己画像的兴趣去订阅（架构师只盯 PRD、不被 QA 反馈淹没），
+    且「前置依赖全到齐才触发动作」顺手管了次序。工程师写完真跑代码、按报错对照 PRD/设计/历史改、最多 3 轮自纠。口号 Code = SOP(Team)（README 概括，非论文公式）。
+
+  result: >            # Z：真实数字，标自报/受控
+    [自报·论文表格] 代码基准 pass@1：HumanEval 85.9% / MBPP 87.7%。SoftwareDev（7 任务，对比 ChatDev）：
+    可执行性 3.75 vs ChatDev 2.25，人工修订成本降到 0.83 vs 2.5，任务完成率 100%，生产率 124.3 tokens/行（越低越好，ChatDev 248.9）——
+    代价是 token 更贵（31,255 vs 19,292，质量换成本）。消融：加角色让可执行性 1.0→4.0、修订 10→2.5；
+    可执行反馈让 HumanEval +4.2% / MBPP +5.4%、修订 2.25→0.83。
+
+  innovation: >        # 创新：同赛道对比
+    相对 ChatDev 等「让 agent 自由对话」的多 agent 范式：① 用 SOP + 结构化产物代替闲聊，下游被上游 schema 锁住，可验收、降歧义、降级联幻觉；
+    ② 共享消息池 + 按角色画像订阅，胜过 O(N²) 一对一全连接；③ 可执行反馈闭环用「运行结果」这个客观真相纠错，而非靠 LLM 互评。
+    关键澄清：全程无 RL / 无 REINFORCE（把 REINFORCE 归给它是张冠李戴，那是 GPTSwarm）——它的「自改进」只是每个项目前回看反馈改约束提示的 meta-prompt 适配。
+
+  weakness: >          # 缺点/适用边界/坑
+    上下文窗口限制可见信息、幻觉仍在（结构化只是缓解非根除，作者自承）；依赖足够清楚的需求 + 初始需人工定义角色画像与通信 schema；
+    协议偏僵——当前优化只改「角色约束提示」、没改结构化通信接口本身，动态协议演化列为未来工作（附录 A.1）。
+    适用边界：SoftwareDev 是 7 个相对小型、明确的编程任务，别外推成「能造任意复杂软件」；token 更贵，上线要算质量/成本账。
+
+  transfer: >          # 指向本站自进化用途
+    AI-Brief 的深读作者→冷审→补差本身就是一支微型 agent 团队，与 MetaGPT 同源。可直接迁移四件现成零件：
+    ① 结构化产物代替对话（深读/冷审产物用固定 schema 而非自由文本）；② 共享消息池 + 按角色订阅；
+    ③ 可执行反馈式纠错（把「运行/校验结果」当客观真相，封顶重试）；④ SOP-as-config（流程/角色/schema 抽成可配置，换栏目只改配置）。
+    它是「多步多角色 AI 工作流怎么不互相带偏」的奠基工程参考，正对应本站的质量门与 PIPE-1 状态图设计。
+
+  architecture: |      # Mermaid（从 paper.mdx 精简改写）
+    ```mermaid
+    flowchart TD
+      REQ([一句话需求]) --> PM[产品经理<br/>PRD]
+      PM --> ARCH[架构师<br/>文件清单/接口/时序图]
+      ARCH --> PJM[项目经理<br/>任务拆分]
+      PJM --> ENG[工程师<br/>写代码]
+      ENG --> QA[QA<br/>单测/验收]
+      PM -. 发布 .-> POOL[(共享消息池<br/>结构化产物)]
+      ARCH -. 发布 .-> POOL
+      PJM -. 发布 .-> POOL
+      POOL -. 按角色订阅 .-> ENG
+      ENG -->|跑测试报错| FB[可执行反馈<br/>对照 PRD/设计改, 最多 3 轮]
+      FB --> ENG
+      QA --> OUT[[完整仓库 文档+代码+测试]]
+    ```
+
+self_evo_use: >        # 客观判断
+  能用（成熟可落地的工程范式，68.5k★ MIT，一句话需求即跑）。它是「多 agent 怎么协作不带偏」的可复现答案，
+  四个设计（SOP/结构化产物/消息池订阅/可执行反馈）可直接做成本站自进化管线的标准件。
+  但其「递归自改进」只是改约束提示的 prompt 级适配、不是真策略学习——属可被自进化系统借用的编排骨架，不是自进化算法本身。
+
+core_concepts:
+  - name: SOP（标准作业流程）
+    role: primary
+    evidence: "MetaGPT encodes Standardized Operating Procedures (SOPs) into prompt sequences……Code = SOP(Team)"
+  - name: 结构化产物代替对话
+    role: primary
+    evidence: "agents in MetaGPT communicate through documents and diagrams (structured outputs) rather than dialogue……下游角色被上游产物的 schema 锁住"
+  - name: 共享消息池 + 发布订阅
+    role: primary
+    evidence: "a shared message pool……agents utilize role-specific interests to extract relevant information……依赖到齐才触发动作"
+  - name: 可执行反馈（executable feedback）
+    role: primary
+    evidence: "工程师写完代码真去运行，报错就对照 PRD/设计/历史消息改，最多重试 3 次……HumanEval +4.2%、MBPP +5.4%"
+  - name: 角色专精（role specialization）
+    role: supporting
+    evidence: "给每个 agent 一个明确职责 + 该产出的工件，像真公司里的产品经理/架构师/工程师；消融：加角色让可执行性 1.0→4.0"
+
+discovery_trace: 数据不足
+# 理由：paper.mdx 是描述性方法论文，给的是 SOP/消息池/可执行反馈的最终设计与消融证据，
+# 没有「先试了 X 方案、为何失败、怎么走到最终方案」的解法发现叙事（消融是事后验证各组件贡献，非作者探索失败链的记录）。
+# 按 §3.1 铁律：禁止从 abstract/动机反推动机链，故标数据不足。
+
+edges: []
+
+status: extracted

@@ -69,6 +69,8 @@ interface GNode {
   designIdea?: string;
   selfEvoUse?: string;
   facets?: Record<string, string>;
+  coreConcepts?: { name: string; role: string; evidence?: string }[];
+  discoveryTrace?: { hypothesis?: string; failed_attempts?: string; source_span?: string };
   arxivId?: string;
   href?: string;
   deg: number; // edge degree (computed)
@@ -176,6 +178,8 @@ function normalizeGraph(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
       designIdea: typeof n.design_idea === "string" ? n.design_idea : undefined,
       selfEvoUse: typeof n.self_evo_use === "string" ? n.self_evo_use : undefined,
       facets: n.facets && typeof n.facets === "object" ? (n.facets as Record<string, string>) : undefined,
+      coreConcepts: Array.isArray(n.core_concepts) ? (n.core_concepts as GNode["coreConcepts"]) : undefined,
+      discoveryTrace: n.discovery_trace && typeof n.discovery_trace === "object" ? (n.discovery_trace as GNode["discoveryTrace"]) : undefined,
       arxivId,
       href,
       deg: 0,
@@ -831,6 +835,49 @@ function NodeDetail({
       )}
 
       {node.facets && <FacetSpine facets={node.facets} />}
+
+      {node.coreConcepts && node.coreConcepts.length > 0 && (
+        <div className="kg-judge" style={{ display: "grid", gap: 6 }}>
+          <div className="kg-judge-h">承重概念（连边的锚，primary=拿掉它就不成立）</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {node.coreConcepts.map((c) => (
+              <span
+                key={c.name}
+                title={c.evidence || ""}
+                style={{
+                  fontSize: 12, lineHeight: 1.4, padding: "3px 9px", borderRadius: 999,
+                  border: c.role === "primary" ? "1px solid #4338ca" : "1px solid #cbd5e1",
+                  background: c.role === "primary" ? "#eef2ff" : "#f8fafc",
+                  color: c.role === "primary" ? "#3730a3" : "#475569",
+                  fontWeight: c.role === "primary" ? 700 : 500,
+                }}
+              >
+                {c.name}
+                <span style={{ marginLeft: 5, fontSize: 10, opacity: 0.75 }}>{c.role}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {node.discoveryTrace && (node.discoveryTrace.hypothesis || node.discoveryTrace.failed_attempts) && (
+        <div className="kg-judge" style={{ display: "grid", gap: 6 }}>
+          <div className="kg-judge-h">解法是怎么找到的（原文真实叙事，非反推）</div>
+          {node.discoveryTrace.hypothesis && (
+            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "#334155" }}>
+              <strong style={{ color: "#4338ca" }}>先试：</strong>{node.discoveryTrace.hypothesis}
+            </p>
+          )}
+          {node.discoveryTrace.failed_attempts && (
+            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "#334155", whiteSpace: "pre-wrap" }}>
+              <strong style={{ color: "#4338ca" }}>失败→转向：</strong>{node.discoveryTrace.failed_attempts}
+            </p>
+          )}
+          {node.discoveryTrace.source_span && (
+            <p style={{ margin: 0, fontSize: 11, color: "#94a3b8" }}>源：{node.discoveryTrace.source_span}</p>
+          )}
+        </div>
+      )}
 
       {node.designIdea && (
         <div className="kg-judge kg-judge-design">

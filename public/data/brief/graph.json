@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-09T14:40:54.206Z",
+  "generatedAt": "2026-06-10T01:29:10.783Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -58,8 +58,31 @@
         "transfer": "最值得借的不是 RL 代码，是「可训练记忆接口」设计：把 AI-Brief/自进化 agent 的记忆写入/更新/删除做成 typed action（先学接口、后学算法）， 短期不上 GRPO，先把 backend 设计成「未来可训练的 memory controller」。直接喂本站 BriefMem 的 typed memory 设计。\n",
         "architecture": "```mermaid\nflowchart TD\n  T[任务规格 T] --> P{AgeMem Policy}\n  C[短期上下文 C_t] --> P\n  M[(长期记忆 M_t)] --> P\n  P -->|LTM 动作| L[Add / Update / Delete]\n  P -->|STM 动作| S[Retrieve / Summary / Filter]\n  P -->|文本| A[回答/推理]\n  L --> M\n  S --> C\n  A --> R[奖励: 任务完成 + 上下文管理 + 记忆质量<br/>惩罚: 上下文溢出/轮数过多]\n  R -.->|step-wise GRPO: 终局优势广播回每一步| P\n```\n"
       },
+      "core_concepts": [
+        {
+          "name": "可学习的记忆操作",
+          "role": "primary",
+          "evidence": "深读 reasoning_trace.central_contribution 逐字『让记忆操作成为一等 policy action，用 step-wise GRPO 端到端学何时存取改删』+ 问题拆解节逐字『Add/Update/Delete 变成 policy action』『Retrieve/Summary/Filter 变成 policy action』——拿掉它这篇就只剩普通 RL（规范名统一为『可学习的记忆操作』=与 memoryagentbench 同名的跨文件锚）。"
+        },
+        {
+          "name": "step-wise GRPO",
+          "role": "primary",
+          "evidence": "深读机制图逐字『step-wise GRPO —— 终局优势广播到每一步，给跨阶段记忆动作延迟监督』+ 消融节逐字『AgeMem-noRL 均分只有 33.43 / 45.59；加上 RL 才到 41.96 / 54.31（+8.53 / +8.72pp）』——承重的是这套训练而非接口本身。"
+        },
+        {
+          "name": "三阶段课程",
+          "role": "supporting",
+          "evidence": "深读机制图 Training 逐字『Stage 1: 从上下文构建长期记忆 / Stage 2: 在干扰信息下管理短期上下文 / Stage 3: 检索已存记忆并完成最终任务』。"
+        },
+        {
+          "name": "记忆质量奖励",
+          "role": "supporting",
+          "evidence": "深读消融节逐字『All-Returns vs Answer-Only：MQ 0.533 vs 0.479、Judge 0.544 vs 0.509 → memory-aware reward 真的改善了记忆质量，而非顺带产物』（规范名『记忆质量奖励』，源文原词『memory-aware reward / All-Returns』）。"
+        }
+      ],
       "facet_slug": "agemem",
-      "facet_status": "gold"
+      "facet_status": "gold",
+      "href": "/papers/agemem"
     },
     {
       "id": "content/agent-reach",
@@ -120,6 +143,33 @@
         "transfer": "最值得抄的是「agentic best-first tree search loop + experiment manager」这套可回溯探索骨架——任何需要逐步试错、动态调方向的任务 （超参搜索、自进化 agent 的策略探索）都能套。对自进化 agent：树节点的「实验代码+结果+评分」三元组天然是一条可学习的轨迹。 但它的代码执行接口不可直接搬到生产，必须先补严格沙箱。\n",
         "architecture": "```mermaid\nflowchart TD\n  TOPIC[主题描述 .md] --> IDEA[Ideation Agent<br/>生成+反思 → 结构化想法]\n  IDEA --> ROOT[根节点: JSON 研究想法]\n  ROOT --> EM{Experiment Manager<br/>planner + critic}\n  EM -->|best-first 选最有希望叶子| EXP[扩展: LLM 生成代码变体 → 跑实验]\n  EXP --> NODE[新节点: 代码 + 结果 + 评分]\n  NODE --> EM\n  EM -->|达到 steps 上限/预算耗尽| WRITE[Writeup → 论文草稿]\n  WRITE --> REVIEW[自我评审]\n  LIT[(Semantic Scholar 文献)] -.新颖性检查/引用.-> EM\n  NODE -. 持久化到实验日志树 .-> STATE[(搜索树状态)]\n```\n"
       },
+      "core_concepts": [
+        {
+          "name": "实验树搜索",
+          "role": "primary",
+          "evidence": "深读 reasoning_trace.central_contribution 逐字『通过 agentic best-first tree search 实现了从话题到 workshop 论文的端到端自主科研』；技术拆解 Agent Loop 逐字『核心循环是最优优先树搜索：根据 JSON 格式的研究想法创建根节点 → 实验管理器 agent 评估当前所有叶子节点，选择最有希望的节点进行扩展（best-first）→ 对选中节点生成代码变体并运行实验 → 达到 steps 上限停止』。"
+        },
+        {
+          "name": "实验管理器 agent",
+          "role": "primary",
+          "evidence": "深读 Planner 节逐字『Experiment Manager：在树搜索中扮演 planner + critic 角色，决定扩展哪个节点、如何修改代码、何时停止并进入写稿阶段』；系统概览逐字『一个 experiment manager agent 决定搜索方向』。"
+        },
+        {
+          "name": "想法生成 agent",
+          "role": "supporting",
+          "evidence": "深读 Planner 节逐字『Ideation Agent：根据用户提供的主题描述 Markdown，通过反复生成与反思（reflection）产生结构化研究想法列表』——是树搜索根节点的供给者（规范名取『想法生成 agent』，源文原词 Ideation Agent）。"
+        },
+        {
+          "name": "代码执行沙箱",
+          "role": "supporting",
+          "evidence": "深读 Tool Interface 逐字『代码执行工具：在本地 GPU 环境中运行由 LLM 生成的 Python 实验代码』+ Sandbox 节逐字『This codebase will execute LLM-written code，推荐在 Docker 容器等受控环境中运行。系统本身未内建沙盒机制，依赖外部隔离』——规范名『代码执行沙箱』指代源文的『代码执行工具 + Sandbox』这一对。"
+        },
+        {
+          "name": "文献新颖性检查",
+          "role": "mentioned",
+          "evidence": "深读 Tool Interface 逐字『文献搜索工具：通过 Semantic Scholar API 进行新颖性检查和引用收集，依赖 S2_API_KEY』——规范名『文献新颖性检查』取自源文原词『文献搜索工具…新颖性检查』。"
+        }
+      ],
       "facet_slug": "ai-scientist-v2",
       "facet_status": "extracted"
     },
@@ -516,8 +566,31 @@
         "transfer": "几乎为 AI-Brief/BriefMem 量身定做的体检表：AR=写 deep-dive 时能否准确取回旧论文/方法卡不漏不串；TTL=新论文推翻旧结论时能否即时纳入并改后续选择； LRU=跨多篇形成专题综述/赛道判断；CR=检测矛盾结论，正对应图谱里的 contradicts 边。 路线建议：①先立 contradicts/supports 边（已做）→②用\"增量多轮+四维\"做 BriefMem 自测集→③把\"多跳冲突消解\"当红线指标盯死。 复用它的\"四维+增量协议\"当验收尺，别复刻它的合成数据集。\n",
         "architecture": "```mermaid\nflowchart TD\n  subgraph S1[\"供给（增量，非一次性）\"]\n    C1[\"c1 请记住\"] --> C2[\"c2 请记住\"] --> Cn[\"cn 请记住\"]\n  end\n  Cn --> MEM[(被测记忆系统<br/>长上下文 / RAG / 结构RAG / agentic)]\n  Q[q1..qm 提问<br/>原文已收走] --> MEM\n  MEM --> EVAL{四维正交评测}\n  EVAL --> AR[AR 精确检索<br/>SubEM/Recall]\n  EVAL --> TTL[TTL 测试时学习<br/>Acc/Recall@5]\n  EVAL --> LRU[LRU 长程理解<br/>GPT-4o judge F1]\n  EVAL --> CR[CR 冲突消解<br/>SubEM 单跳/多跳]\n  CR -.->|多跳全体≤6% 系统性盲区| GAP[暴露范式短板而非排名]\n```\n"
       },
+      "core_concepts": [
+        {
+          "name": "增量多轮评测协议",
+          "role": "primary",
+          "evidence": "深读大白话带读逐字『论文里管这叫 incremental multi-turn evaluation（增量多轮评测）』+ 评测协议节逐字『chunks c_1…c_n（每块附「请记忆」指令，顺序喂入）；queries q_1…q_m（读完后提问）』——是这套 benchmark 取代『一次性长上下文』的承重件，拿掉它整篇命题不成立。"
+        },
+        {
+          "name": "四维能力(AR/TTL/LRU/CR)",
+          "role": "primary",
+          "evidence": "深读创新节逐字『把记忆能力从单一事实 recall 拆成四个正交维度（AR/TTL/LRU/CR）』+ 能力地图表逐字『AR 精确检索 / TTL 测试时学习 / LRU 长程理解 / CR 冲突消解』——证明『不存在最佳记忆系统』的核心框架（规范名取源文原词『四维能力(AR/TTL/LRU/CR)』）。"
+        },
+        {
+          "name": "冲突消解",
+          "role": "supporting",
+          "evidence": "深读能力地图逐字『CR 冲突消解：检测并消解矛盾，使 agent 与最新事实对齐』+ 失效模式逐字『多跳+冲突是系统性盲区…全体≤6%（多跳）』——是四维之一，对应图谱 contradicts 边（规范名统一为『冲突消解』=跨文件锚，与 supermemory 同名）。"
+        },
+        {
+          "name": "可学习的记忆操作",
+          "role": "mentioned",
+          "evidence": "深读为什么值得看逐字『它还跟我们已收的 AgeMem 是一对：AgeMem 提『可学习的记忆方法』，这篇负责『考这些方法到底行不行』（连 Mem0 都是两篇共同的对象）』——本文不提该方法，仅作为受测/对照对象提及（规范名统一为『可学习的记忆操作』=与 agemem 同名的跨文件锚，源文原词『可学习的记忆方法』）。"
+        }
+      ],
       "facet_slug": "memoryagentbench",
-      "facet_status": "extracted"
+      "facet_status": "extracted",
+      "href": "/papers/memoryagentbench"
     },
     {
       "id": "content/mempalace",
@@ -1017,6 +1090,33 @@
         "transfer": "值得借的是设计模式而非实现（实现依赖其内部托管推理管线，要完全掌控须评估自托管可行性）： ① \"事实抽取→画像构建→混合搜索（RAG+记忆）→连接器\"的记忆引擎分层；② containerTag 多租户/多项目隔离，可直接用于 BriefMem 组织多项目记忆； ③ \"静态画像+动态活动\"的上下文注入；④ 自动遗忘/矛盾消解逻辑可作 BriefMem 处理过时知识的参考机制。\n",
         "architecture": "```mermaid\nflowchart TD\n  IN[对话/文档/URL/连接器<br/>Drive·Gmail·Notion webhook] --> EX[LLM 事实抽取]\n  EX --> RES{冲突消解}\n  RES -->|覆盖旧事实| KG[(有状态事实知识图谱)]\n  RES -->|临时事实到点过期| FORGET[自动遗忘]\n  KG --> PROF[用户画像<br/>静态偏好 + 动态活动]\n  Q[查询] --> HS[混合搜索<br/>个人记忆 + 知识库 RAG]\n  KG --> HS\n  PROF -->|/context 注入| AGENT[Agent / 应用]\n  HS --> AGENT\n  subgraph 对外\n    MCP[MCP: memory/recall/context]; SDK[SDK: add/profile/search]\n  end\n  CT[containerTag 多项目隔离] -.-> KG\n```\n"
       },
+      "core_concepts": [
+        {
+          "name": "事实图谱记忆",
+          "role": "primary",
+          "evidence": "深读技术拆解逐字『Supermemory 将记忆定义为随时间和对话更新的事实知识图谱，而非简单的文档分块。它从对话中提取原子事实，并维护一个动态更新的用户画像』——拿掉它整个『记忆≠RAG』范式不成立（规范名『事实图谱记忆』，源文原词『事实知识图谱』）。"
+        },
+        {
+          "name": "冲突消解",
+          "role": "primary",
+          "evidence": "深读事实提取与更新节逐字『当新信息与旧事实冲突时（如我搬到了 SF vs 我住在 NYC），自动消解矛盾，旧事实被覆盖』——有状态记忆区别于无状态 RAG 的承重件（规范名统一为『冲突消解』=跨文件锚，源文原词『消解矛盾』）。"
+        },
+        {
+          "name": "自动遗忘",
+          "role": "supporting",
+          "evidence": "深读自动遗忘节逐字『临时事实（如我明天有考试）在时间点后自动过期；矛盾和新信息会触发旧记忆的降权或删除』。"
+        },
+        {
+          "name": "混合搜索",
+          "role": "supporting",
+          "evidence": "深读 API 节逐字『client.search.memories()：混合搜索（Hybrid Search），同时检索个人记忆和知识库文档，解决通用知识和个人上下文结合的问题』。"
+        },
+        {
+          "name": "containerTag 多租户隔离",
+          "role": "supporting",
+          "evidence": "深读状态与存储设计节逐字『隔离机制：通过 containerTag（项目标签）实现多租户/多项目隔离，每个标签下的记忆和画像独立演化，可用于区分不同用户或不同项目』。"
+        }
+      ],
       "facet_slug": "supermemory",
       "facet_status": "extracted"
     },
@@ -5943,7 +6043,46 @@
       "file": "content/papers/2308.00352-metagpt-multi-agent-sop/metadata.json",
       "arxiv_id": "2308.00352",
       "topic": "agent",
-      "self_evo_use": "可复用:把 SOP(标准作业流程)写成提示序列 + 结构化产物(PRD/接口/任务单)+ 共享消息池/发布订阅,是多 agent 不互相带偏的可靠角色分工骨架,研究 agent 的『分工 + 结构化交接』可直接抄。可执行反馈闭环(写完真跑、按报错改、限 3 轮)= 自改的最小验证回路。短板(对自进化致命):SOP 是人写死的、流程不变,agent 不会改自己的工作流——这恰是 AgentDisCo/DGM 在补的差;它是『编排』不是『进化』。怎么接:当 L2/L3 的角色分工模板,把跑出的好流程交给 OpenSpace/AgentDisCo 的 policy bank 去让它能进化;消息池可当记忆库的会话级 episodic 写入源。"
+      "self_evo_use": "能用（成熟可落地的工程范式，68.5k★ MIT，一句话需求即跑）。它是「多 agent 怎么协作不带偏」的可复现答案， 四个设计（SOP/结构化产物/消息池订阅/可执行反馈）可直接做成本站自进化管线的标准件。 但其「递归自改进」只是改约束提示的 prompt 级适配、不是真策略学习——属可被自进化系统借用的编排骨架，不是自进化算法本身。\n",
+      "facets": {
+        "problem_solved": "把多个 LLM 天真串联做复杂任务（如一句话造软件），幻觉会一层层级联放大、前错后跟着错，agent 间还充斥无效闲聊烧 token—— 缺的是把成熟的人类协作流程注入进去，让中间产物可被有领域常识的角色检查、从源头压住级联错误。\n",
+        "method": "像把一群 LLM 从「自由群聊」改成「按 SOP 跑的软件公司流水线」：产品经理→架构师→项目经理→工程师→QA 五个角色专精， 每个工位只产出带固定格式的交付物（PRD/接口设计/任务单/代码/测试），不传大白话对话。 协作不是一对一传话（那是 O(N²) 乱拓扑），而是丢进一个共享消息池、每个角色按自己画像的兴趣去订阅（架构师只盯 PRD、不被 QA 反馈淹没）， 且「前置依赖全到齐才触发动作」顺手管了次序。工程师写完真跑代码、按报错对照 PRD/设计/历史改、最多 3 轮自纠。口号 Code = SOP(Team)（README 概括，非论文公式）。\n",
+        "result": "[自报·论文表格] 代码基准 pass@1：HumanEval 85.9% / MBPP 87.7%。SoftwareDev（7 任务，对比 ChatDev）： 可执行性 3.75 vs ChatDev 2.25，人工修订成本降到 0.83 vs 2.5，任务完成率 100%，生产率 124.3 tokens/行（越低越好，ChatDev 248.9）—— 代价是 token 更贵（31,255 vs 19,292，质量换成本）。消融：加角色让可执行性 1.0→4.0、修订 10→2.5； 可执行反馈让 HumanEval +4.2% / MBPP +5.4%、修订 2.25→0.83。\n",
+        "innovation": "相对 ChatDev 等「让 agent 自由对话」的多 agent 范式：① 用 SOP + 结构化产物代替闲聊，下游被上游 schema 锁住，可验收、降歧义、降级联幻觉； ② 共享消息池 + 按角色画像订阅，胜过 O(N²) 一对一全连接；③ 可执行反馈闭环用「运行结果」这个客观真相纠错，而非靠 LLM 互评。 关键澄清：全程无 RL / 无 REINFORCE（把 REINFORCE 归给它是张冠李戴，那是 GPTSwarm）——它的「自改进」只是每个项目前回看反馈改约束提示的 meta-prompt 适配。\n",
+        "weakness": "上下文窗口限制可见信息、幻觉仍在（结构化只是缓解非根除，作者自承）；依赖足够清楚的需求 + 初始需人工定义角色画像与通信 schema； 协议偏僵——当前优化只改「角色约束提示」、没改结构化通信接口本身，动态协议演化列为未来工作（附录 A.1）。 适用边界：SoftwareDev 是 7 个相对小型、明确的编程任务，别外推成「能造任意复杂软件」；token 更贵，上线要算质量/成本账。\n",
+        "transfer": "AI-Brief 的深读作者→冷审→补差本身就是一支微型 agent 团队，与 MetaGPT 同源。可直接迁移四件现成零件： ① 结构化产物代替对话（深读/冷审产物用固定 schema 而非自由文本）；② 共享消息池 + 按角色订阅； ③ 可执行反馈式纠错（把「运行/校验结果」当客观真相，封顶重试）；④ SOP-as-config（流程/角色/schema 抽成可配置，换栏目只改配置）。 它是「多步多角色 AI 工作流怎么不互相带偏」的奠基工程参考，正对应本站的质量门与 PIPE-1 状态图设计。\n",
+        "architecture": "```mermaid\nflowchart TD\n  REQ([一句话需求]) --> PM[产品经理<br/>PRD]\n  PM --> ARCH[架构师<br/>文件清单/接口/时序图]\n  ARCH --> PJM[项目经理<br/>任务拆分]\n  PJM --> ENG[工程师<br/>写代码]\n  ENG --> QA[QA<br/>单测/验收]\n  PM -. 发布 .-> POOL[(共享消息池<br/>结构化产物)]\n  ARCH -. 发布 .-> POOL\n  PJM -. 发布 .-> POOL\n  POOL -. 按角色订阅 .-> ENG\n  ENG -->|跑测试报错| FB[可执行反馈<br/>对照 PRD/设计改, 最多 3 轮]\n  FB --> ENG\n  QA --> OUT[[完整仓库 文档+代码+测试]]\n```\n"
+      },
+      "core_concepts": [
+        {
+          "name": "SOP（标准作业流程）",
+          "role": "primary",
+          "evidence": "MetaGPT encodes Standardized Operating Procedures (SOPs) into prompt sequences……Code = SOP(Team)"
+        },
+        {
+          "name": "结构化产物代替对话",
+          "role": "primary",
+          "evidence": "agents in MetaGPT communicate through documents and diagrams (structured outputs) rather than dialogue……下游角色被上游产物的 schema 锁住"
+        },
+        {
+          "name": "共享消息池 + 发布订阅",
+          "role": "primary",
+          "evidence": "a shared message pool……agents utilize role-specific interests to extract relevant information……依赖到齐才触发动作"
+        },
+        {
+          "name": "可执行反馈（executable feedback）",
+          "role": "primary",
+          "evidence": "工程师写完代码真去运行，报错就对照 PRD/设计/历史消息改，最多重试 3 次……HumanEval +4.2%、MBPP +5.4%"
+        },
+        {
+          "name": "角色专精（role specialization）",
+          "role": "supporting",
+          "evidence": "给每个 agent 一个明确职责 + 该产出的工件，像真公司里的产品经理/架构师/工程师；消融：加角色让可执行性 1.0→4.0"
+        }
+      ],
+      "facet_slug": "metagpt",
+      "facet_status": "extracted",
+      "href": "/papers/2308.00352-metagpt-multi-agent-sop"
     },
     {
       "id": "paper:2402.16823",
@@ -6004,7 +6143,46 @@
       "file": "content/papers/2507.21046-self-evolving-agents-survey/metadata.json",
       "arxiv_id": "2507.21046",
       "topic": "agent",
-      "self_evo_use": "与上一篇互补的坐标系。可复用:What/When/How/Where 四轴 + 把 agent 形式化成 Π=(架构Γ, 模型ψ, 上下文C, 工具W)、自进化=Π→Π′,给本站一个清晰的『进化什么(改记忆?改提示?改工具?改架构?)』决策树,能落成记忆库自进化动作空间的枚举。短板:目录式、无优先级、无实现。怎么接:用 Π 四元组当本站 agent 状态的 schema,用 What/When/How/Where 给每个 ghost 节点(EvolveMem 改记忆、Alita 改工具、DGM 改架构)归位,辅助选下一步进化哪个部件。"
+      "self_evo_use": "能用（最高复用价值，但属「地图/语料源」而非可跑系统）。它是本站 L1/L2/L3 的设计参照系——四轴决策树 + Π/f 形式化 + 评估五维 + 安全红线 可直接当自进化系统的设计语言与验收尺。注意它本身不进 L3 方法论池的「具体方法」槽（综述不证方法），而是当归类骨架与脉络索引用。\n",
+      "facets": {
+        "problem_solved": "静态 LLM 部署后不会变，但真实环境开放、交互、会变；大量「让 agent 自己变强」的工作散、没统一坐标系，难比较难复用—— 综述要给「自进化 agent」建一张全景地图与统一语言，让人能定位「该动哪个部件、什么时候动、用什么方法动」。\n",
+        "method": "像给一整片乱糟糟的领域画一张「四问坐标系 + 零件目录」：先把 agent 系统形式化成 Π=(Γ架构, ψ模型, C上下文, W工具)， 把自进化定义成一个把 Π 升级成更好 Π′ 的变换 f(Π,τ,r)=Π′（拿轨迹 τ 和反馈 r 升级，环境建成 POMDP）； 再用四个轴把所有方法归位——What 进化什么（模型/上下文/工具/架构）、When 何时（任务内 intra vs 任务间 inter）、 How 怎么（奖励式/模仿示范/群体进化，on/off-policy，online/offline）、Where 在哪（通用域 + 编程/GUI/金融/医疗/教育）。 它不提新方法，只给地图：先按「要进化哪个部件」定位章节、再顺代表方法往下挖。\n",
+        "result": "[综述·非实验论文，不证明任何单一方法最好] 产出是分类框架本身 + 自进化定义（三条门槛：经验依赖 / 持久且改变策略 / 自主探索） + 形式化 Π=(Γ,ψ,C,W) 与 f(Π,τ,r)=Π′ + 评估五维（适应/保持/泛化/效率/安全）与三范式（静态/短程/长程终身）+ 安全风险清单。 归档的代表工作：Reflexion/Expel（文本反馈）、Voyager（终身 skill 库）、Promptbreeder/TextGrad/DSPy（提示管线自优化）、 Mem0（记忆进化）、ADAS/AFlow/SICA/Alita（架构自动设计）、ToolGen（工具进化）、STaR/RAGEN/WebRL/ReMA（自训/课程 RL）。\n",
+        "innovation": "相对其它自进化综述（如姊妹综述 arXiv:2508.07407 的「四组件优化回路」视角），本篇的坐标系是 What/When/How/Where 四问轴 + Π=(Γ,ψ,C,W)/f(Π,τ,r)=Π′ 的统一形式化，并把自进化 agent 明确定位成「静态 LLM → ASI」之间的中间形态。 价值是把散落的可复用模式一次性归档成决策树，而非提出新算法。\n",
+        "weakness": "[是综述非方法] 只给坐标系与目录，不证明任何单一方法最优，具体效果要回原论文看（当地图用、别当性能背书）。 自承安全是真难题且未解：价值漂移、灾难性遗忘（stability-plasticity 权衡）、奖励错配驱动有害进化、多 agent 协同进化的涌现行为。 评估尚不成熟——长程终身学习评估仍在早期，现有基准（TRACE 连续学习、PDDL/Gym）覆盖有限。 「通往 ASI」是愿景叙事而非已达成结论。\n",
+        "transfer": "这几乎是本站北极星 L1 自进化 / L2 导师 / L3 研究的「零件目录与决策树」：四轴 = 造自己学习 agent 时「该动哪个部件、何时动、用什么方法动」的设计图。 直接用法：① 用 What 轴定位 AI-Brief 该先进化哪个部件（上下文/记忆是最近的落点，对应 Mem0/记忆进化章）； ② 用 When 轴决定增量入图是任务内还是任务间进化；③ 用评估五维 + 安全风险清单当自进化系统的验收尺与红线（尤其灾难性遗忘、价值漂移）。 它是本站 agent-only 栏的脉络源 + 跨篇综合时的归类骨架。\n",
+        "architecture": "```mermaid\nflowchart TD\n  SE([自进化 agent<br/>Pi=·Gamma,psi,C,W·<br/>f·Pi,tau,r·=Pi prime]) --> W1[What 进化什么<br/>模型·上下文·工具·架构]\n  SE --> W2[When 何时<br/>任务内 intra / 任务间 inter]\n  SE --> W3[How 怎么<br/>奖励·模仿·群体进化·on/off-policy]\n  SE --> W4[Where 在哪<br/>通用域 + 编程/GUI/金融/医疗/教育]\n  SE --> EV[评估<br/>适应·保持·泛化·效率·安全]\n  SE --> SF[安全<br/>价值漂移·灾难性遗忘·奖励错配]\n```\n"
+      },
+      "core_concepts": [
+        {
+          "name": "What/When/How/Where 四轴",
+          "role": "primary",
+          "evidence": "用四个问题把整片领域钉清楚：进化什么(What)、何时进化(When)、怎么进化(How)、在哪进化(Where)"
+        },
+        {
+          "name": "自进化 agent 形式化 Π=(Γ,ψ,C,W) / f(Π,τ,r)=Π′",
+          "role": "primary",
+          "evidence": "把'agent 系统'形式化成 Π=(架构 Γ, 大模型 ψ, 上下文 C, 工具 W)……自进化 = 一个变换 f(Π,τ,r)=Π′"
+        },
+        {
+          "name": "自进化 agent（定义三门槛）",
+          "role": "primary",
+          "evidence": "三条门槛：① 更新依赖经验 ② 更新有持久、改变策略的效果 ③ 有自主探索机制"
+        },
+        {
+          "name": "stability-plasticity（稳定-可塑权衡）",
+          "role": "supporting",
+          "evidence": "学新东西又不忘旧东西的矛盾；学太狠会'灾难性遗忘'……综述自己点名价值漂移、灾难性遗忘"
+        },
+        {
+          "name": "intra- vs inter-test-time",
+          "role": "supporting",
+          "evidence": "进化发生在'一次任务内'(in-context/SFT/RL 即时调)还是'任务之间'(跨任务积累)"
+        }
+      ],
+      "facet_slug": "self-evolving-agents-survey",
+      "facet_status": "extracted",
+      "href": "/papers/2507.21046-self-evolving-agents-survey"
     },
     {
       "id": "paper:2508.07407",
@@ -6184,7 +6362,52 @@
       ],
       "file": "content/papers/2606.01249-tropd-trust-region-distillation/metadata.json",
       "arxiv_id": "2606.01249",
-      "topic": "training"
+      "topic": "training",
+      "facets": {
+        "problem_solved": "在策略蒸馏（学生自己写推理轨迹、老师逐 token 给分）里，省显存的 K1 reverse-KL 估计器遇到师生分布错位时， 会对老师几乎不给概率的离群 token 产生趋于 -∞ 的梯度——少数坏 token 就能把训练带崩。真问题不是「监督太少」，是「少数不可信监督太强」。\n",
+        "method": "把学生写出的每个 token 当成「过海关的旅客」逐个查信任度：用投机解码的接受率 P_trust=min(π_T/π_S,1) 判定—— 老师也愿意给高概率的 token 进信任区，照常用 K1 reverse KL 学；老师明显不认可的离群 token 不去围着这个坏词罚（那会爆梯度）， 改看老师 top-k 最可能写的词、用 forward KL 给一个温和的正面方向。再加冷启动「扶上马」：训练初期老师写一段前缀、学生续写（off-policy guidance）， 前缀长度随 cosine 退火到 0，最后完全回到学生自己的分布。一句话：可靠区照学、不可靠区降级回退、起步先给脚手架。\n",
+        "result": "[自报·arXiv v2 表格，未本机复训] 同一统一训练设定（200 steps / lr 5e-6 / top-k=64 / β=0.001 / batch 128 / 4 rollouts / 8096 tokens）下： 数学域 Table 1 TrOPD Avg. 49.85 > FKL Outlier 49.00 > Mask 47.72 / Clip 47.86 > OPD 46.79，而「全局 FKL」只有 1.40（几乎训不动）—— 证明不是 FKL 神奇，是「只把它放到不可靠区」才有效。DeepSeek-1.5B 学生单域 TrOPD 40.63 vs OPD 37.11 vs REOPOLD 38.79（老师 58.48）； Qwen3-SFT-1.7B 多域 TrOPD 51.73 vs OPD 48.29，分项较 OPD 提升 GPQA +6.18 / IFBench +5.11 / LCB +4.00 / AIME25 +3.34； 与并发 AOPD 正交可叠（40.63 → 41.67）。\n",
+        "innovation": "同赛道处理离群 token 的两条老路——REOPOLD 用 reward clipping、EOPD/Entropy 用高熵 token 筛选——本文证明它们要么不稳、要么把有用监督一起裁掉。 TrOPD 的新点：① 用 min(π_T/π_S,1) 自适应划信任区，省掉固定阈值 τ；② 离群区不丢弃而用老师 top-k FKL「温和回退」，比 mask/clip 多保留可用监督（消融里最高）； ③ 先把 OPD/EOPD/REOPOLD/FKL/JSD/Entropy 放进同一统一基准，才定位出真病灶是 K1 reverse KL 在分布错位下不可靠。\n",
+        "weakness": "[代码未发布] 仓库 HEAD b4bee6f 只有 README/LICENSE/imgs，训练/评测代码与模型均未释放——结果可读不可复跑，README 自称含训练代码但 ToDo 未勾。 作者自承缺真实部署/应用研究、只做 OPD 后训练（未含 pre/mid-training，SRM 性能上限受限）。 信任尺子 π_T/π_S 依赖老师本身可信、且师生 tokenizer/能力可比，老师不可靠时这把尺子失真，原文未充分展开此失败模式。 提升是 +3~6 点级别（非数量级跃迁），且目标是稳定逼近老师不是超过老师。超参（k=64/β=0.001/退火日程）跨任务敏感性无系统表。\n",
+        "transfer": "最值得搬的不是蒸馏代码，是「强监督先过可靠度门再进训练/自进化闭环」的系统心法： AI-Brief 的深读作者→冷审→补差、agent self-improvement、critic 给步骤打分，都不能默认「强模型每一步分数同样可信」。 可直接迁移成「分区可靠度门」——高信任步骤进训练样本/正常学，低信任步骤只给温和建议或老师示范，而非统一加权或一刀切裁剪。 与 AgeMem 的「可训练记忆接口」互补：那条管接口设计，这条管接口里的监督信号该不该信。\n",
+        "architecture": "```mermaid\nflowchart TD\n  P([训练 prompt]) --> S[学生生成 SoG x~pi_S]\n  S --> A{逐 token 信任度<br/>P_trust=min·pi_T/pi_S,1·}\n  A -->|trust region| RKL[K1 reverse KL<br/>Memory O·n·]\n  A -->|outlier| FKL[老师 top-k forward KL<br/>Memory O·nk·]\n  P --> T[老师写前缀 x·:l·] --> C[学生续写<br/>off-policy guidance<br/>beta=0.001, 前缀 cosine 退火到 0]\n  RKL --> L[TrOPD 统一目标]\n  FKL --> L\n  C --> L\n  L --> U[更新学生模型]\n```\n"
+      },
+      "self_evo_use": "能用（属方法论原语，非可跑系统）。它给自进化的训练/反馈回路提供一条承重原则：逐步监督必须分区——信得过的正常回灌、低信任的降级或示范。 但代码未发布、只验证于 OPD 后训练，本站可借的是「可靠度门 + 温和回退 + 冷启动退火」三件设计模式，不是直接抄一套蒸馏栈。\n",
+      "core_concepts": [
+        {
+          "name": "trust region（信任区）",
+          "role": "primary",
+          "evidence": "P_trust(x)=min(π_T(x)/π_S(x),1) 自适应划 reliable token，进正常 OPD 区用 K1 reverse KL"
+        },
+        {
+          "name": "K1 estimator（K1 估计器）",
+          "role": "primary",
+          "evidence": "不在整个词表上算 KL，只用学生采样到的 token 估计……遇到师生分布错位时更容易出现离群梯度"
+        },
+        {
+          "name": "policy-gradient outlier（策略梯度离群点）",
+          "role": "primary",
+          "evidence": "当老师给学生某个 token 的概率接近 0，梯度形如 (1/π_S(x))·log(π_T(x)/π_S(x)) -> -∞，少数 token 就可能主导训练"
+        },
+        {
+          "name": "outlier top-k forward KL（离群区 top-k 正向 KL）",
+          "role": "primary",
+          "evidence": "outlier token 不再用爆炸 reverse-KL 信号，改从老师 top-k 分布给正面示范……消融里最高"
+        },
+        {
+          "name": "off-policy guidance（老师前缀退火）",
+          "role": "supporting",
+          "evidence": "老师先写一段前缀 x[:l]，学生从 x[l:] 继续写……cosine schedule 退火到 0……β=0.001"
+        }
+      ],
+      "discovery_trace": {
+        "hypothesis": "离群 token 不可信，那就直接屏蔽/裁剪掉它（Mask Outlier / Clip Outlier）应该能稳住训练。",
+        "failed_attempts": "论文先试了 Mask Outlier 和 Clip Outlier。两者确实比 vanilla OPD 稳（Mask 维持更高 policy entropy、较低 gradient norm）， 但「只屏蔽」会把离群区里仍然有用的老师信号一起丢掉。另一条极端「全局 top-k FKL」几乎训不动（Avg. 仅 1.40）。 由此走到最终方案：离群 token 本身不可靠，但老师 top-k 分布仍可当正面示范——用 FKL Outlier 保住这部分信号，而非丢弃（消融里 FKL Outlier 49.00 > Mask 47.72 / Clip 47.86）。\n",
+        "source_span": "paper.mdx 核心方法节 > [!key] 补丁:为什么不是\"直接丢掉离群点\"——「论文先试了 Mask Outlier 和 Clip Outlier……只屏蔽会丢掉离群区里仍然有用的老师信号」；并见 Table 1/Table 5 Full FKL 1.40 vs FKL Outlier 49.00 反差"
+      },
+      "facet_slug": "tropd",
+      "facet_status": "extracted",
+      "href": "/papers/2606.01249-tropd-trust-region-distillation"
     },
     {
       "id": "paper:2606.02060",
@@ -30543,7 +30766,7 @@
     "associativeEdges": 24,
     "crossDocEdges": 36,
     "ghosts": 21,
-    "assessed": 35,
-    "facetedNodes": 9
+    "assessed": 36,
+    "facetedNodes": 12
   }
 }

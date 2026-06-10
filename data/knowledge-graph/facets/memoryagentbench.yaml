@@ -1,5 +1,6 @@
 # Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
 # 不编造，未知标「数据不足」，自报数字标「自报/受控」。源：brief-wiki/deep-dives/memoryagentbench-deep-dive.md
+schema: v2
 node_id: content/memoryagentbench
 slug: memoryagentbench
 kind: paper
@@ -54,6 +55,19 @@ facets:
       CR -.->|多跳全体≤6% 系统性盲区| GAP[暴露范式短板而非排名]
     ```
 
+core_concepts:
+  - name: 增量多轮评测协议
+    role: primary
+    evidence: "深读大白话带读逐字『论文里管这叫 incremental multi-turn evaluation（增量多轮评测）』+ 评测协议节逐字『chunks c_1…c_n（每块附「请记忆」指令，顺序喂入）；queries q_1…q_m（读完后提问）』——是这套 benchmark 取代『一次性长上下文』的承重件，拿掉它整篇命题不成立。"
+  - name: 四维能力(AR/TTL/LRU/CR)
+    role: primary
+    evidence: "深读创新节逐字『把记忆能力从单一事实 recall 拆成四个正交维度（AR/TTL/LRU/CR）』+ 能力地图表逐字『AR 精确检索 / TTL 测试时学习 / LRU 长程理解 / CR 冲突消解』——证明『不存在最佳记忆系统』的核心框架（规范名取源文原词『四维能力(AR/TTL/LRU/CR)』）。"
+  - name: 冲突消解
+    role: supporting
+    evidence: "深读能力地图逐字『CR 冲突消解：检测并消解矛盾，使 agent 与最新事实对齐』+ 失效模式逐字『多跳+冲突是系统性盲区…全体≤6%（多跳）』——是四维之一，对应图谱 contradicts 边（规范名统一为『冲突消解』=跨文件锚，与 supermemory 同名）。"
+  - name: 可学习的记忆操作
+    role: mentioned
+    evidence: "深读为什么值得看逐字『它还跟我们已收的 AgeMem 是一对：AgeMem 提『可学习的记忆方法』，这篇负责『考这些方法到底行不行』（连 Mem0 都是两篇共同的对象）』——本文不提该方法，仅作为受测/对照对象提及（规范名统一为『可学习的记忆操作』=与 agemem 同名的跨文件锚，源文原词『可学习的记忆方法』）。"
 self_evo_use: >
   高价值但是"尺子"不是"引擎"——它本身不构建记忆，无法直接当自进化 agent 的记忆模块。
   但它对自进化极关键：自进化的定义是"系统从反馈把自己改得越来越懂用户"，而 TTL（即时学新行为）+ CR（消解过时/矛盾事实）正是衡量"有没有真在进化"的核心维度。
