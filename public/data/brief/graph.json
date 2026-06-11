@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T20:39:21.458Z",
+  "generatedAt": "2026-06-11T23:51:06.778Z",
   "note": "Unified Mind Palace graph. Primary layer is typed relation edges; mechanical references/same_track edges are hidden secondary plumbing.",
   "nodes": [
     {
@@ -19378,6 +19378,60 @@
       "use": "Use the newer endpoint when its stated improvement axis matters."
     },
     {
+      "from": "paper:2606.03458",
+      "to": "content/tropd",
+      "type": "complements",
+      "confidence": "medium",
+      "evidence": "与 TrOPD [[tropd]] 形成互补对：TrOPD 管训练/反馈信号可信度（哪些 token 的梯度不可信）， KVarN 补充「分区处理离群问题」的广义工程模式——高信任/正常区全力处理，极端异常区换代价小的保守方案。",
+      "use": "把 TrOPD 用作监督可信度门，把 KVarN 的离群分区处理用作异常样本/证据处理策略；质量门先判信号是否可信，再对极端异常走保守路径。",
+      "dominance": "mixed",
+      "kg_relation_engine": true,
+      "kg_relation_llm": true,
+      "cross_doc": true,
+      "from_field": "method",
+      "to_field": "method",
+      "candidate_score": 794,
+      "candidate_shared_core_concepts": [],
+      "from_slug": "kvarn",
+      "to_slug": "tropd"
+    },
+    {
+      "from": "paper:2605.31584",
+      "to": "content/tropd",
+      "type": "complements",
+      "confidence": "medium",
+      "evidence": "与 [[tropd]] 的「监督信号先过可靠度门」互补：那条管该不该信老师，这条管过程分该不该发。",
+      "use": "构建训练或审计 reward 时组合两道门：先用 TrOPD 思路判断监督/老师信号是否可信，再用 LongTraceRL 的 positive-only 思路决定过程分是否发放。",
+      "dominance": "mixed",
+      "kg_relation_engine": true,
+      "kg_relation_llm": true,
+      "cross_doc": true,
+      "from_field": "method",
+      "to_field": "method",
+      "candidate_score": 784,
+      "candidate_shared_core_concepts": [],
+      "from_slug": "longtracerl",
+      "to_slug": "tropd"
+    },
+    {
+      "from": "content/ai-scientist-v2",
+      "to": "content/agemem",
+      "type": "complements",
+      "confidence": "medium",
+      "evidence": "记忆：不提供——短期记忆只活在树搜索内部，不会把经验沉淀成可复用技能/记忆（那部分要靠 hermes-agent 的 skills 或 agemem 的可训练记忆补）。",
+      "use": "把 AI-Scientist-v2 的实验树搜索产生的经验交给 AgeMem 式可训练记忆操作沉淀，避免探索只停留在单次搜索内部。",
+      "dominance": "mixed",
+      "kg_relation_engine": true,
+      "kg_relation_llm": true,
+      "cross_doc": true,
+      "from_field": "method",
+      "to_field": "method",
+      "candidate_score": 666,
+      "candidate_shared_core_concepts": [],
+      "from_slug": "ai-scientist-v2",
+      "to_slug": "agemem"
+    },
+    {
       "from": "content/agemem",
       "to": "paper:2605.29307",
       "type": "same_track",
@@ -38570,7 +38624,7 @@
   ],
   "summary": {
     "nodes": 616,
-    "edges": 1489,
+    "edges": 1492,
     "nodeByType": {
       "content": 64,
       "source-pack": 70,
@@ -38589,7 +38643,7 @@
       "references": 1395,
       "builds_on": 2,
       "shares_method": 6,
-      "complements": 3,
+      "complements": 6,
       "implements": 1,
       "composes_with": 9,
       "same_track": 68,
@@ -38612,10 +38666,23 @@
     ],
     "ghostCandidates": 12,
     "references": 1395,
-    "associativeEdges": 26,
-    "crossDocEdges": 71,
+    "associativeEdges": 29,
+    "crossDocEdges": 74,
     "ghosts": 32,
     "assessed": 42,
     "facetedNodes": 19
+  },
+  "relationEngineLlm": {
+    "enabled": true,
+    "model": "file:relation-decisions.json",
+    "candidates": 66,
+    "judged": 66,
+    "accepted": 6,
+    "noEdge": 60,
+    "failed": 0,
+    "rejected": 0,
+    "topK": 5,
+    "maxCandidates": 80,
+    "added": 6
   }
 }

@@ -10,7 +10,8 @@ import { readFile, writeFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
-import { buildDeterministicFacetRelationEdges, normalizeGraphRelations } from "./relation-engine.mjs";
+import { buildDeterministicFacetRelationEdges, extractEdgesLLM, normalizeGraphRelations } from "./relation-engine.mjs";
+import { loadFileJudge } from "./relation-llm-io.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const GRAPH = path.join(ROOT, "public", "data", "brief", "graph.json");
@@ -156,6 +157,7 @@ const facets = await loadFacets();
 let facetedNodes = 0;
 let facetEdgesAdded = 0;
 let relationEngineEdgesAdded = 0;
+let relationEngineLlmEdgesAdded = 0;
 for (const facet of facets) {
   const node = await ensurePaperFacetNode(facet);
   if (!node) {
@@ -256,6 +258,58 @@ for (const edge of relationEngineEdges) {
   relationEngineEdgesAdded += 1;
 }
 
+// (3d) KG-3 opt-in LLM relation extraction. This is intentionally not the
+// default build path: CI/dry-run remains deterministic, while local enrichment
+// can be run with KG_RELATION_LLM=1 npm run kg:build.
+if (process.env.KG_RELATION_LLM === "1") {
+  const llmModel = process.env.KG_RELATION_MODEL || "claude-sonnet-4-6";
+  const llmProvider = process.env.KG_RELATION_PROVIDER || undefined;
+  const llmTopK = Number(process.env.KG_RELATION_TOPK) || 5;
+  const llmMaxCandidates = Number(process.env.KG_RELATION_MAX_CANDIDATES) || 80;
+  const llmTimeoutMs = Number(process.env.KG_RELATION_TIMEOUT_MS) || undefined;
+  // Preferred path: replay precomputed decisions from a strong model (codex
+  // gpt-5.5, separate quota) via a file judge — zero model calls at build time,
+  // no 5h-window contention. Falls back to the live runRelationJudge only if no
+  // decisions file is provided.
+  const decisionsFile = process.env.KG_RELATION_DECISIONS_FILE || undefined;
+  let fileJudge;
+  if (decisionsFile) {
+    try {
+      fileJudge = await loadFileJudge(decisionsFile);
+    } catch (error) {
+      console.warn(`[integrate-kg] WARN relation decisions file unreadable (${decisionsFile}): ${error.message}`);
+    }
+  }
+  try {
+    const { edges: llmEdges, stats } = await extractEdgesLLM(facets, {
+      model: fileJudge ? `file:${path.basename(decisionsFile)}` : llmModel,
+      ...(fileJudge ? { judge: fileJudge } : {}),
+      ...(!fileJudge && llmProvider ? { provider: llmProvider } : {}),
+      topK: llmTopK,
+      maxCandidates: llmMaxCandidates,
+      ...(llmTimeoutMs ? { timeoutMs: llmTimeoutMs } : {}),
+    });
+    for (const edge of llmEdges) {
+      const key = `${edge.from}|${edge.to}|${edge.type}`;
+      if (existingRelationKeys.has(key)) continue;
+      graph.edges.push(edge);
+      existingRelationKeys.add(key);
+      relationEngineLlmEdgesAdded += 1;
+    }
+    graph.relationEngineLlm = {
+      enabled: true,
+      ...stats,
+      added: relationEngineLlmEdgesAdded,
+    };
+    console.log(`[integrate-kg] relation-engine LLM source=${fileJudge ? `file:${path.basename(decisionsFile)}` : `live:${llmProvider || "auto"}/${llmModel}`} candidates=${stats.candidates} judged=${stats.judged} accepted=${stats.accepted} added=${relationEngineLlmEdgesAdded} failed=${stats.failed} rejected=${stats.rejected}`);
+  } catch (error) {
+    graph.relationEngineLlm = { enabled: true, model: llmModel, error: error.message };
+    console.warn(`[integrate-kg] WARN relation-engine LLM skipped: ${error.message}`);
+  }
+} else {
+  delete graph.relationEngineLlm;
+}
+
 // (4) D1 FIX (cold-review): REAL cross-document associative edges. The base graph is ~98% intra-doc
 // plumbing (a deep-read referencing its OWN claim/evidence sub-nodes) — useless for 联想/recall.
 // These connect DISTINCT papers/projects, which is what associative recall actually needs.
@@ -336,7 +390,13 @@ for (const edge of graph.edges) {
 // Final dedup: keep ALL references, but at most ONE associative edge per doc-pair — the most
 // meaningful type (judgment > typed > concept > same_track). Removes reverse-direction duplicates
 // the base builder emits.
-const PRIORITY = { improves_on: 6, composes_with: 6, complements: 6, contradicts: 6, builds_on: 5, shares_method: 5, same_use_case: 5, implements: 5, shares_concept: 3, same_track: 2 };
+const PRIORITY = {
+  composes_with: 7, layers_with: 7, complements: 7, supersedes: 7, replaces: 7, cheaper_alt: 7,
+  compares_with: 7, contradicts: 7, tension_with: 7, precedes: 7, lineage_anchor: 7,
+  validates: 7, isomorphic_with: 7, evaluates: 7,
+  improves_on: 6, extends: 6, implements: 6, applies: 6, tool_for: 6, shares_method: 6, builds_on: 6,
+  same_use_case: 5, shares_concept: 3, same_track: 2,
+};
 const bestByPair = new Map();
 const keptRefs = [];
 for (const e of graph.edges) {
@@ -357,5 +417,5 @@ graph.summary = { ...(graph.summary || {}), nodes: nodes.length, edges: graph.ed
   edgeByType, ghosts: nodes.filter((n) => n.ghost).length, assessed: nodes.filter((n) => n.self_evo_use).length,
   facetedNodes: nodes.filter((n) => n.facets).length };
 await writeFile(GRAPH, `${JSON.stringify(graph, null, 2)}\n`, "utf8");
-console.log(`[integrate-kg] assessments:${merged} | facets:${facetedNodes} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | facet-edges:${facetEdgesAdded} | relation-engine:${relationEngineEdgesAdded} | cross-doc:${crossDoc}`);
+console.log(`[integrate-kg] assessments:${merged} | facets:${facetedNodes} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | facet-edges:${facetEdgesAdded} | relation-engine:${relationEngineEdgesAdded} | relation-llm:${relationEngineLlmEdgesAdded} | cross-doc:${crossDoc}`);
 console.log(`[integrate-kg] nodes ${nodes.length} | edges ${graph.edges.length} (references ${references} plumbing + ASSOCIATIVE ${associativeEdges}, weak same_track excluded) | ghosts ${graph.summary.ghosts} | assessed ${graph.summary.assessed} | faceted ${graph.summary.facetedNodes}`);

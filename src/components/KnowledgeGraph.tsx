@@ -923,6 +923,7 @@ function NodeDetail({
                   {e.confidence ? ` · ${e.confidence}` : ""}
                 </span>
                 <span className="kg-conn-title">{other ? shortTitle(other.title, 30) : e[dir === "out" ? "target" : "source"]}</span>
+                {e.use && <span className="kg-conn-use">↳ 怎么利用：{e.use}</span>}
                 {e.evidence && <span className="kg-conn-what">{e.evidence}</span>}
               </button>
             );

@@ -3,9 +3,12 @@ import test from "node:test";
 
 import {
   buildDeterministicFacetRelationEdges,
+  extractEdgesLLM,
+  facetRelationProse,
   generateFacetCandidates,
   isMechanicalRelation,
   isTypedRelation,
+  limitFacetCandidates,
   normalizeGraphRelations,
   normalizeRelationType,
 } from "./relation-engine.mjs";
@@ -90,4 +93,94 @@ test("buildDeterministicFacetRelationEdges promotes explicit facet evidence only
   assert.equal(edges[0].use, "Use together as adjacent pipeline stages.");
   assert.equal(edges[0].evidence, "AgeMem supplies the method; MemoryAgentBench tests it.");
   assert.equal(edges[0].kg_relation_engine, true);
+});
+
+test("facetRelationProse includes prose fields and core concept evidence for LLM judging", () => {
+  const prose = facetRelationProse({
+    title: "Codegraph",
+    facets: { innovation: "staleness banner prevents stale answers" },
+    self_evo_use: "Use as index infrastructure.",
+    core_concepts: [{ name: "freshness gate", evidence: "pending files require direct Read fallback" }],
+  });
+  assert.match(prose, /innovation: staleness banner/);
+  assert.match(prose, /self_evo_use: Use as index infrastructure/);
+  assert.match(prose, /core_concept:freshness gate: pending files/);
+});
+
+test("limitFacetCandidates caps LLM work to topK<=5 and maxCandidates<=80", () => {
+  const facets = Array.from({ length: 20 }, (_, index) => ({
+    slug: `facet-${index}`,
+    node_id: `content/facet-${index}`,
+    title: `Facet ${index}`,
+    facets: { method: `shared memory controller ${index}` },
+    core_concepts: [{ name: "shared relation candidate" }],
+  }));
+  const candidates = limitFacetCandidates(facets, { topK: 99, maxCandidates: 999 });
+  assert.ok(candidates.length <= 80);
+});
+
+test("extractEdgesLLM accepts mock taxonomy edge with verbatim evidence and use", async () => {
+  const evidence = "A provides the low-level index and B provides the visual navigation layer.";
+  const facets = [
+    {
+      slug: "a",
+      node_id: "content/a",
+      title: "A",
+      facets: { method: evidence, innovation: "shared graph infrastructure" },
+      core_concepts: [{ name: "graph interface" }],
+    },
+    {
+      slug: "b",
+      node_id: "content/b",
+      title: "B",
+      facets: { method: "visual graph navigation for users", innovation: "shared graph infrastructure" },
+      core_concepts: [{ name: "graph interface" }],
+    },
+  ];
+  const { edges, stats } = await extractEdgesLLM(facets, {
+    judge: async () => ({
+      decision: "EDGE",
+      direction: "A_TO_B",
+      type: "layers_with",
+      evidence,
+      use: "Layer A below B as the substrate for navigation.",
+    }),
+  });
+  assert.equal(stats.accepted, 1);
+  assert.equal(edges.length, 1);
+  assert.equal(edges[0].from, "content/a");
+  assert.equal(edges[0].to, "content/b");
+  assert.equal(edges[0].type, "layers_with");
+  assert.equal(edges[0].kg_relation_llm, true);
+  assert.equal(edges[0].use, "Layer A below B as the substrate for navigation.");
+});
+
+test("extractEdgesLLM rejects mock edge when evidence is not in facet prose", async () => {
+  const facets = [
+    {
+      slug: "a",
+      node_id: "content/a",
+      title: "A",
+      facets: { method: "memory policy controller" },
+      core_concepts: [{ name: "memory policy" }],
+    },
+    {
+      slug: "b",
+      node_id: "content/b",
+      title: "B",
+      facets: { method: "memory evaluation suite" },
+      core_concepts: [{ name: "memory policy" }],
+    },
+  ];
+  const { edges, stats } = await extractEdgesLLM(facets, {
+    judge: async () => ({
+      decision: "EDGE",
+      direction: "A_TO_B",
+      type: "complements",
+      evidence: "This sentence was never present in either endpoint.",
+      use: "Combine the method and evaluator.",
+    }),
+  });
+  assert.equal(edges.length, 0);
+  assert.equal(stats.rejected, 1);
 });
