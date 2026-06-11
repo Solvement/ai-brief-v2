@@ -81,6 +81,7 @@ interface GEdge {
   type: string; // normalized edge type
   rawType: string;
   evidence?: string;
+  use?: string; // 怎么利用 (action this relation enables) — external-brain annotation
   confidence?: string;
 }
 interface SimNode extends GNode {
@@ -189,6 +190,9 @@ function normalizeGraph(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
   const rawEdges = Array.isArray(raw.edges) ? raw.edges : [];
   const edges: GEdge[] = [];
   for (const e of rawEdges) {
+    // Hide mechanical plumbing (references/same_track) so the graph isn't a hairball (Kevin
+    // 2026-06-11): the relation engine marks them layer:"mechanical"/hidden — render typed edges only.
+    if ((e as { layer?: string }).layer === "mechanical" || (e as { hidden?: boolean }).hidden === true) continue;
     const src = (e.source || e.from || "") as string;
     const tgt = (e.target || e.to || "") as string;
     if (!src || !tgt || src === tgt) continue;
@@ -199,6 +203,7 @@ function normalizeGraph(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
       type: normEdgeType(e.type),
       rawType: (e.type || "").toString(),
       evidence: e.evidence,
+      use: (e as { use?: string }).use,
       confidence: e.confidence != null ? String(e.confidence) : undefined,
     });
   }
