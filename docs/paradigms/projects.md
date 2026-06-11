@@ -42,10 +42,14 @@
 - **self_evo_use 三段**（必须显式覆盖 记忆／理解／自进化 三个关键词）：这个项目对**我们自己这个系统**的用处——记忆：哪些事实/模式值得入图长存；理解：它纠正或加深了我们对哪个问题域的认识；自进化：它的哪个做法可以直接改进 AI-Brief 自身结构（接 Kevin 的 L1 自进化授权书：判定适用→应用→verify 全绿）。
 - **core_concepts**：3-5 个**承重**概念 `{name, role: primary|supporting|mentioned, evidence}`，每个必须出现在 README/代码（不是营销词）——喂 Mind Palace 核心概念门，paper↔project 判边的项目侧锚（KG-2）。
 
-【按 project_type 选择性抽取（既有决策，2026-06-04）】
-- 教学/skill/课程/awesome 类：最高 light，**不产 mind_palace、不入图**——它们没有可学的设计决策。
+【按 project_type 选择性抽取（既有决策，2026-06-04；2026-06-11 v2 加 agent_skill 双轴）】
+- 纯教学/课程/awesome/资源类：最高 light，**不产 mind_palace、不入图**——它们没有可学的设计决策。
+- **agent_skill（2026-06-11 新品类：skill/plugin/prompt 合集/meta-skill/.claude 技能目录）= 双轴**：
+  - 默认 light（给 Kevin 读，他刷 GitHub 自己也能看）；
+  - 但若 `informs_our_structure`（命中 harness/记忆/taste/eval/agent 编排等"能改进我们自己系统"的信号）→ 升 deep + 标 `self_evo_eligible=true`，进自进化队列（给"我"学：照镜子改我们自己的 harness/写作门/记忆，见 `docs/plans/2026-06-11-projects-coverage-self-evo.md` Loop C）。skills 对**我们**不是垃圾——meta-skill/memory/taste 正是 L1 自进化的一手材料。
 - 工具/library_sdk：standard 档，mind_palace 重点在 method 与横向对比。
 - 架构型（agent_framework / model_infra / 复杂 ai_app）：deep 档首选，mind_palace 重点抽**底层架构**——状态管理、调度、记忆、评测这些可迁移的结构件。
+- **informs_our_structure 轴（v2 通用）**：任何 project_type 命中"能改进我们自己系统"信号都可加权进 deep + self_evo_eligible，不止 agent_skill。
 
 【硬性规则】
 - 禁止当「GitHub 翻译机」直接搬描述。Tier2/3 价值只在两样用户自己刷 GitHub 拿不到的：**成熟度判断 + 横向对比**。没有这两样的 Tier2/3 视为不合格。
