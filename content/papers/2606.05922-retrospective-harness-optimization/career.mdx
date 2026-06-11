@@ -1,0 +1,86 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+RHO 最值得学的一点是：它没有把“agent 自进化”说成训练一个神秘大模型，而是落在你今天就能控制的层面：**文件、脚本、技能、工作流、日志、diff、门禁**。这很适合 FDE / AI-app builder，因为真实项目里你通常没有权重训练权限，也没有大规模标签；你有的是一堆失败会话、项目规则、工具脚本和上线前的验收门。
+
+> [!key] 和 AI-Brief 自己的方向同源
+> AI-Brief 正在做的“内容生成 → 冷审 → 返工 → 记忆入图 → 下一轮更聪明”，本质就是一个 harness 自进化系统。RHO 给你的启发是：不要只把失败经验写成一段 memory；要把它变成**可执行工具、可复用 skill、可审计 diff、可回滚更新**，并且用“候选新 harness 是否真的优于旧 harness”做门，而不是凭感觉上线。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| Harness 物化 | 把 agent 能力拆成 `AGENTS.md` / `skills/*.md` / `tools/*.py` / workflow，而不是一坨 prompt | 给你自己的 agent 建一个最小 harness 目录，所有规则和工具都能 git diff |
+| 轨迹挖矿 | 从历史会话里抽任务、摩擦点、失败模式、是否可重放 | 写脚本扫本地 session JSONL，产出 `taskSummary / difficulty / fingerprint / replayable` |
+| DPP / coreset 选样 | 从大量日志里挑“难且多样”的代表任务 | 用 embedding cosine + greedy DPP 选 10 条失败轨迹，对比随机/只挑难 |
+| Self-validation | 让 agent 审自己的单条轨迹：是否完成、哪里假设错、哪里提前停 | 设计固定 JSON schema：`successful / quality_analysis / issues / severity` |
+| Self-consistency | 让 agent 比较同任务多次尝试：计划、工具、答案哪里冲突 | 同一任务跑 3 次，写一个 cross-trajectory disagreement report |
+| Best-of-N 门控 | 并行生成多版 harness，用 pairwise preference 择优，`S<=0` 不改 | 给自动改 prompt/skill 的流程加 “candidate vs baseline” 评估闸 |
+| 可观测自进化 | 每轮保存 prompt、trajectory、diagnosis、candidate、diff、score、backup | 做一个 run folder viewer；没有持久化，就不要叫自进化系统 |
+
+## 系统设计心法
+
+**改外壳，别急着训模型。** 很多 agent 失败来自流程缺口：没有查证、没有清理生成文件、不会分页、不会确认边界。先把这些写进工具和 skill，比幻想微调更便宜、更可控。
+
+**经验要变成机制，不是变成笔记。** “下次注意清理缓存”只是 memory；`repair-verify` 这种会自动扫描 cache / diff hygiene 的脚本才是机制。RHO 的强点正是把失败经验落成可执行 harness。
+
+**无标签不等于无门禁。** 如果没有标准答案，就用同任务多次重做、自校验、自一致性、自偏好来制造弱信号；但这些信号必须保守使用，`S_j > 0` 才采纳，敏感改动还要人工门。
+
+**自进化的基本单位是 diff。** 你要能回答：这轮从哪些旧轨迹学到了什么？改了哪个文件？为什么改？新轨迹比旧轨迹好在哪？能不能回滚？回答不了，就只是 agent 写了一段新提示词。
+
+**成本要明算。** RHO 的 SWE-Bench Pro 优化期是 103 次 agent invocation，端到端约 3.2 小时并发墙钟；它不是“免费变聪明”，而是用算力换标注。
+
+## 作品集角度(Portfolio angle)
+
+可以做一个很硬的作品：**Self-Evolving Agent Harness for Real Project Workflows**。它不用声称训练了模型，只要把“历史会话 → 诊断 → 候选 harness → 自偏好门 → 应用/回滚”的工程闭环跑通，就已经比大多数 agent demo 更接近生产。
+
+作品集要展示三件事：
+
+- 旧 harness 和新 harness 的 diff：新增了什么 skill、工具、规则。
+- 评估证据：新旧 harness 在同一批 replayable tasks 上的 pairwise preference / pass rate。
+- 安全边界：不可逆任务不自动重放，敏感文件不自动改，候选得分不正则拒绝。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Mini-RHO for Codex | 扫 `~/.codex/sessions`，选 coreset，诊断失败，生成 `AGENTS.md`/skills 候选，`--no-apply` 默认 | 1-2 周 | 直接复刻论文到你自己的开发 agent；可做作品集主项目 |
+| Cold-Audit Skill Evolver | 从 AI-Brief 冷审 HOLD 案例里抽失败模式，自动建议新增/修改深读作者 skill | 3-5 天 | 把内容质量门变成会学习的系统，和本站 north star 强相关 |
+| Harness Diff Viewer | 展示每轮诊断、候选、分数、diff、backup、是否采纳 | 2-4 天 | 自进化系统如果不可视、不可回滚，就很难被信任 |
+| DPP Failure Sampler | 输入一批失败日志，输出“难度×多样性”核心集和 t-SNE/embedding 可视化 | 2-3 天 | 可复用于 eval、冷审、错误分析、客户项目复盘 |
+| Self-Preference Gate API | 标准化 `candidate trajectory vs baseline trajectory` 的 pairwise judge schema | 2-3 天 | 给任何自动改 prompt/tool 的系统加上线前安全闸 |
+
+## 简历 / 面试故事
+
+诚实简历句：
+
+- *"Built a self-supervised harness evolution loop for CLI agents: mined unlabeled past trajectories, selected a difficulty-diverse coreset, generated self-validation/self-consistency diagnoses, proposed Best-of-N harness edits, and accepted updates only when pairwise self-preference beat the baseline."*
+- *"Implemented a DPP-based failure sampler and a diff-backed harness store for agent workflows, making skills, tools, prompts, and rollback metadata auditable across evolution rounds."*
+- *"Designed a no-label evaluation gate for agent harness updates, separating replayable tasks from irreversible tasks and preserving full audit logs for every accepted or rejected candidate."*
+
+> [!key] 面试可讲
+> 面试官问“没有标注数据，怎么让 agent 越用越强？”你可以答：先承认不能凭感觉自改；然后讲 RHO 式流程：从历史轨迹选难且多样的任务，同任务多次重放，抽 self-validation 和 self-consistency 信号，并行生成候选 harness，用 pairwise self-preference 与原 harness 对比，正收益才上线。最后补边界：可重置环境才适用，自评不能替代真实 verifier，高风险改动要人工批准。
+
+## 学习清单
+
+**必学**
+
+- RHO 三阶段：coreset selection → group rollout → Best-of-N harness proposal。
+- harness-as-files：Markdown skills、instructions、scripts、diff、backup。
+- `S_j > 0` 接受闸：自进化系统默认应该保守。
+- self-validation / self-consistency 的 JSON schema 设计。
+
+**有用**
+
+- DPP / greedy MAP 选样，理解 difficulty-diversity tradeoff。
+- Pairwise judge 的位置偏差、解析失败、零分保守策略。
+- run artifact 设计：prompts、events、workspace diff、candidate diff、scores。
+
+**可选**
+
+- Meta-Harness / GEPA / ADAS：了解 validation-feedback 路线。
+- ReasoningBank / Sleep-time Compute：了解“只改记忆/上下文”的轻量路线。
+- SkillOS / SkillRevise / Socratic-SWE：作为后续选稿线索，补齐 trace-derived skills 赛道。

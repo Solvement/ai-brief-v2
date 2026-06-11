@@ -1,0 +1,77 @@
+{
+  "paper_id": "2606.05922",
+  "arxiv_id": "2606.05922",
+  "title": "Evolving Agents in the Dark: Retrospective Harness Optimization via Self-Preference",
+  "alternate_title": "Retrospective Harness Optimization: Improving LLM Agents via Self-Preference over Trajectory Rollouts",
+  "authors": [
+    "Wenbo Pan",
+    "Shujie Liu",
+    "Chin-Yew Lin",
+    "Jingying Zeng",
+    "Xianfeng Tang",
+    "Xiangyang Zhou",
+    "Yan Lu",
+    "Xiaohua Jia"
+  ],
+  "date": "2026-06-04",
+  "last_revised_date": "2026-06-10",
+  "huggingface_url": "https://huggingface.co/papers/2606.05922",
+  "paper_url": "https://arxiv.org/abs/2606.05922",
+  "code_url": "https://github.com/wbopan/retro-harness",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "project_url": "https://paper-rho.wenbo.io/",
+  "organization": "City University of Hong Kong; Microsoft Research Asia",
+  "source_rankings": [
+    "daily",
+    "weekly",
+    "monthly"
+  ],
+  "hf_upvotes_verified_at": "2026-06-11",
+  "hf_upvotes": 51,
+  "hf_daily_rank": 3,
+  "github_stars_verified_at": "2026-06-11",
+  "github_stars": 16,
+  "github_forks": 1,
+  "github_head": "a20659544506e863c60ee961265683235847be52",
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.05922.yaml",
+  "first_seen_date": "2026-06-10",
+  "must_read": true,
+  "track": "hf",
+  "topic": "agent-self-improvement",
+  "agent_relevant": true,
+  "tags": [
+    "agent-harness",
+    "self-evolving-agent",
+    "retrospective-optimization",
+    "self-preference",
+    "trajectory-rollout",
+    "dpp-coreset",
+    "self-validation",
+    "self-consistency",
+    "best-of-n",
+    "agent-eval",
+    "codex",
+    "harness-as-files"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 9,
+    "career_value": 9,
+    "autosci_reuse_value": 9,
+    "buildability": 8,
+    "evaluation_value": 8,
+    "breadth_value": 7,
+    "evidence_quality": 7
+  },
+  "one_sentence_judgment": "RHO 把“agent 从部署经验里自进化”压成一个可工程化闭环：无标签历史轨迹 → 难度×多样性 DPP 核心集 → G=3 平行重做 → self-validation/self-consistency 诊断 → N=3 候选 harness → pairwise self-preference 严格正分才采纳；论文自报 SWE-Bench Pro 0.59→0.78、Terminal-Bench 2 0.71→0.76、GAIA-2 0.29→0.37，仓库实读确认 RHO loop/DPP/diagnose/evaluate/Codex retrospection 已公开，但全部主结果仍是作者体系自报，且方法依赖可重置任务、同模型自评和大量 agent 调用。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

@@ -1,0 +1,98 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用议题局部化评估器+单轴扰动解决 LLM 调解评测尺乱晃问题，展现 topic-localized evaluator 与专家一致性 r=0.823/0.801（自报），最强 mediator Consensus Gain 仅 34.4（自报）；坑=全仿真无真人、代码未发布。
+# 不编造，未知标「数据不足」，自报数字标「自报」。源：content/papers/2606.05563-socrates-mediation-eval/paper.mdx
+schema: v2
+node_id: paper:2606.05563
+slug: socrates
+kind: paper
+title: "SoCRATES — 用议题局部化评估器+反事实基线给 LLM 调解员造一把不乱晃的评测尺"
+source: "arxiv:2606.05563 + content/papers/2606.05563-socrates-mediation-eval/paper.mdx；project page https://disl-lab.github.io/SoCRATES/（代码/数据 Coming soon，截至 2026-06-10）"
+
+facets:
+  problem_solved: >
+    LLM 调解员评测没有可靠的「尺」：场景靠专家手写覆盖不了多元冲突域，per-turn judge 每回合对所有议题全打分把无关噪声一路累积进去，而且没有「如果没有调解员会怎样」的反事实基线——结果评出来的优劣反映的是评测设计缺陷，不是调解能力的真实差距。
+
+  method: >
+    把整个评测流水线拆成五道互相对症的工序。
+    ①「出题工厂」：Searcher agent（o4-mini-deep-research）从 8 个真实冲突域抓种子，Scenario Writer（GPT-5.4）改写成结构化场景（背景/参与方/议题/偏好权重），绕开少量专家手写的覆盖窄。
+    ②「难题筛选门」：每个候选无调解员跑 3 次，三次都陷入僵局才留下，保证 Consensus Gain 的反事实基线真的有缺口。
+    ③「单轴压力测试」：沿 5 根社会认知轴（战略姿态/参与方数量/历史长度/情绪反应/文化身份）每次只改一根，拆成 15 个条件，能读出能力 profile 而不只是一个平均分。
+    ④「议题局部化评估器」：读完整对话后，对每个议题只找它真正被讨论或立场变化的回合打 1-5 分，不相关回合直接沿用上次分数——「谈房价的 5 分钟才打房价分，不顺手改交房时间分」。
+    ⑤「三指标拆分」：Timeliness（多早插话）/ Effectiveness（插话后 5 轮共识提升 / 剩余 headroom 归一化）/ Consensus Gain（终局相对反事实基线关闭了多少缺口）各自独立，避免把刷存在感误当推动共识。
+
+  result: >
+    [自报·arXiv 2606.05563，代码/数据 Coming soon，未本机复现]
+    Evaluator 质量：topic-localized evaluator 与专家的 trajectory-level Pearson r = 0.823、outcome-level r = 0.801，显著高于 non-expert baseline（0.331 / 0.527）和 ProMediate per-turn（0.372 / 0.432）；换 Qwen3-235B 做 evaluator backbone 仍有 0.785 / 0.721。Persona simulator：7 个 backbone，1,120 comparisons，alpha = 0.75，DeepSeek-V3.2 fidelity accuracy 87.2%，被选为主 party simulator。
+    Leaderboard（8 mediators × 600 runs，4,800 total）：最强 GPT-5.4-mini Consensus Gain 34.4，也只关掉约三分之一缺口；Timeliness 最高的 Solar-Pro-3（84.6）和 Qwen3-30B（84.6）Consensus Gain 分别仅 19.9 / 15.7（后两名），Intervention Frequency 约为头部的两倍（32.3% / 31.1%）——频繁早插话反而压低共识增益。
+    Domain 效应：all-mediator avg. Consensus Gain 从 Transactional 41.3 跌到 Intra-organizational 16.6；Competing 战略姿态造成 18.9–64.1 的 Consensus Gain drop。
+    Benchmark 稳定性：multi-run Kendall's W = 0.929，6/8 mediator half-range ≤ ±3 points；Timeliness 换 backbone 后 Spearman rho 仅 0.406（vs Effectiveness 0.862），及时性指标稳定性弱。
+
+  innovation: >
+    同赛道 ProMediate 用 per-turn judge（r ≈ 0.37/0.43），每回合全议题打分把 off-topic noise 直接累积进结果。SoCRATES 新点有四：
+    ① 难题筛选门给 Consensus Gain 提供真正的反事实基线，不只是报最终共识分；
+    ② 5 根社会认知轴各自独立扰动，能读出单轴崩溃，不会被平均分掩盖；
+    ③ 议题局部化评估器从根本上切断 off-topic noise，expert correlation 跳升 2× 以上（0.37 → 0.823）；
+    ④ Agentic scenario curation 让 8 个冲突域都有足量难题，不只集中在 transactional bargaining——论文证明只测该域会高估 mediator 能力约 2.5×（Transactional 41.3 vs Intra-organizational 16.6）。
+
+  weakness: >
+    [代码/数据未发布] GitHub Code 与 HF SoCRATES 数据截至 2026-06-10 均为 Coming soon，论文结果可读不可复跑。
+    全仿真闭环：disputants、mediator、evaluator 三方全是 LLM，真实人的策略、信任、法律风险、情绪创伤没有进入任何验证路径——这不是调解能力在真人场景的证据。
+    Consensus 目标偏窄：party satisfaction、procedural fairness、emotional repair 作者明确留作未来工作。
+    文化轴有语言限制：对话全为英语，文化身份通过 Hofstede profile 注入，不测 multilingual mediation 或翻译歧义。
+    主实验大量同时使用 DeepSeek-V3.2 做 party simulator 和 evaluator，虽有替换 Qwen3-235B 的鲁棒性检查，但不是全量重跑所有模型组合。
+    Timeliness 换 backbone 后 Spearman rho 仅 0.406，「相关回合选择」对及时性读数影响大，这项指标跨评估者稳定性弱于其余两项。
+
+  transfer: >
+    最值得搬的不是调解代码，而是评测工程的三条方法论原则。
+    ① 反事实基线门：AI-Brief 深读质量门、agent 自进化闭环任何「有 agent / 无 agent 对比」，都应先跑一组「无干预基线」确认任务真的有缺口再算增益；否则 "+X%" 可能是本来就会到那里。
+    ② 单轴扰动读能力 profile：评测 AI-Brief 各分析模块时，不要只看平均分——把上下文长度、domain 类型、信息密度分别独立变化、只改一根轴，才能定位是哪条轴触发退化。
+    ③ 局部化评分（噪声隔离）：AI-Brief 冷审打分不要对不相关段落顺手更新分数；评测研究路线判断时，当前段落无关联的维度（如代码质量 vs 推理质量）应分开独立打，不要串联累积——这正是 per-turn judge vs topic-localized 差距 2× 的根因。
+
+  architecture: |
+    ```mermaid
+    flowchart TD
+      A[真实公开冲突域<br/>8 domains] --> B[Searcher agent<br/>o4-mini-deep-research]
+      B --> C[Scenario Writer<br/>GPT-5.4 recast 结构化场景]
+      C --> D[无 mediator 模拟 ×3<br/>DeepSeek-V3.2 party agents]
+      D -->|3 次全 impasse| E[40 hard scenarios<br/>每域 5 个·难题筛选门]
+      E --> F[15 conditions per scenario<br/>general + 5 轴单轴扰动]
+      F --> G[8 个 LLM mediators<br/>每个 600 runs · 共 4800]
+      G --> H[Topic-localized evaluator<br/>DeepSeek-V3.2 backbone<br/>只在相关回合更新议题分]
+      H --> I[Timeliness / Effectiveness<br/>Consensus Gain]
+      I --> J[Domain profile + Axis profile<br/>+ Timing profile 诊断视图]
+    ```
+
+self_evo_use: >
+  记忆：基本不相关——SoCRATES 是 benchmark/evaluation framework，不涉及记忆写入、检索、更新或遗忘机制。它测的是多轮对话里的调解行为，不是 agent 的状态持久化架构。
+
+  理解：能用（评测闭环 + 失败归因原语）——论文最核心的贡献是「怎么让评测尺本身不乱晃」：反事实基线 + 单轴扰动 + 局部化评分三件套，是构建任何开放式多轮 agent 评测的方法论模板。Timeliness vs Effectiveness 的错位（频繁早插话 Consensus Gain 垫底）是「勤快 ≠ 有效」的量化反例，可迁移为「深读频率 vs 深读质量」或「agent 干预次数 vs 干预增益」的归因框架。
+
+  自进化：方法论可用，系统本身不可用（代码未发布，domain 无关联）。不应把 LLM 调解仿真接进 AI-Brief 管线。应搬的是三条工程原则：①任何 agent 改进要先跑「无 agent 反事实基线」确认增益是真实的；②评测模块的分数只更新「确实相关」的维度，不把不相关段落顺手拉进来；③能力测试要单轴扰动、分轴出 profile，而不是用综合分掩盖单轴崩溃。这三条是 AI-Brief 质量门和 cold-audit 设计可以直接落地的工程原则，不依赖 SoCRATES 代码发布。
+
+core_concepts:
+  - name: 议题局部化评估器（topic-localized evaluator）
+    role: primary
+    evidence: "对每个议题只找它真正被讨论或立场变化的回合打分……topic 未被触及时 score carry forward；主 evaluator 与专家 trajectory-level Pearson r = 0.823、outcome-level r = 0.801"
+  - name: 难题筛选门（hard-task gate）
+    role: primary
+    evidence: "每个候选场景先无 mediator 跑 3 次，只有 3 次都陷入 impasse（僵局）才留下……给 Consensus Gain 提供反事实基线，减少「本来就会和解」的假增益"
+  - name: 社会认知轴（socio-cognitive axes）
+    role: primary
+    evidence: "五种压力测试：战略姿态、参与方数量、历史长度、情绪反应、文化身份……每次只改一根轴，避免最后发现模型坏了却不知道是情绪、文化还是多人状态导致的"
+  - name: Consensus Gain（反事实共识增益）
+    role: primary
+    evidence: "终局 Consensus Gain = (S_med - S_unmed) / (1 - S_unmed) * 100……看 mediator 关闭了多少「剩余共识缺口」；负数代表比不调解更糟"
+  - name: agentic 场景策展（agentic scenario curation）
+    role: supporting
+    evidence: "Searcher agent 用 o4-mini-deep-research 在 8 个冲突域里找公开真实纠纷，Scenario Writer 用 GPT-5.4 把报告式材料改写成可模拟的结构化场景"
+
+discovery_trace: 数据不足
+
+# 语义近邻 NO_EDGE 判断：
+# MemoryAgentBench（四维能力 AR/TTL/LRU/CR）：同为 agent 评测 benchmark，但测记忆操作能力，与调解/多轮社交冲突无任何共享概念或架构 → NO_EDGE
+# AI-Scientist-v2（实验管理器 agent）：都用 agentic pipeline 生成场景/实验，但 AI-Scientist 是科研自动化，SoCRATES 是调解评测框架，领域与方法论均不重叠 → NO_EDGE
+# AgeMem（三阶段课程 + step-wise GRPO）：都有多轮对话轨迹，但 AgeMem 测记忆操作训练，SoCRATES 测调解行为评估，task-type 与方法论均不共享 → NO_EDGE
+# LongTraceRL（轨迹分级干扰）：都有长上下文多轮轨迹，但 LongTraceRL 是训练方法，SoCRATES 是评测框架，问题定义无交叉 → NO_EDGE
+# TrOPD（trust region + off-policy guidance）：都涉及「评估某个 token/回合是否可信」的逻辑，但 TrOPD 是训练时监督信号可靠度，SoCRATES 是推理时评测噪声隔离，层次和机制完全不同 → NO_EDGE
+edges: []
+
+status: extracted

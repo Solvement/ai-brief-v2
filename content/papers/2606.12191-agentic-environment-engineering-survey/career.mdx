@@ -1,0 +1,86 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+你做 agent 产品时，真正难的往往不是“再包一层 LLM”，而是**让 agent 在一个可靠、可复现、会反馈、能逐步变难的环境里学和测**。这篇给你的价值，是把环境从“临时脚本 / benchmark / sandbox”升级成一套工程语言：环境有什么属性、怎么合成、怎么评质量、怎么推动 agent 和环境一起进化。
+
+> [!key] 对自进化 agent 的直接价值
+> 之前我们常把自进化理解成 agent 自己改记忆、改 workflow、改 prompt、改策略。本文提醒你：**环境也要进化**。如果训练场永远固定，agent 很快会过拟合；如果训练场只会随机变，agent 又拿不到稳定信号。真正有价值的是可控地扩难度、扩场景、扩反馈，并且用 correctness / diversity / complexity / fidelity 四维把环境质量管住。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 环境属性建模 | 用 8 组属性描述一个 agent 环境，而不是只说“网页/代码/工具环境” | 给你现有一个 agent 测试台填卡：online/offline、closed/open loop、single/multi-agent、symbolic/neural 等 |
+| 可执行环境封装 | 把静态任务包装成 reset / step / observe / reward / verify 的闭环 | 把一个代码修复任务或工具调用任务封成最小 Gym-style 环境 |
+| 符号合成取舍 | 用代码、规则、DB、unit test、sandbox 造可验证环境 | 从 20 个静态任务生成可执行任务，要求每个任务有 verifier |
+| 神经环境判断 | 识别何时需要 world model，何时它只是不可控幻觉源 | 用 LLM 模拟网页状态转移，并记录它在哪些状态上不一致 |
+| 四维质量评估 | correctness / diversity / complexity / fidelity 分开量 | 设计一张环境质检表：能跑、够多样、难度可区分、像真实流程 |
+| 课程式难度控制 | 让环境难度随 agent 能力调整，而不是一次性固定 | 用成功率或错误类型作为信号，把任务升难或降难 |
+| EaaS 接口思维 | 把环境实现和 agent 开发解耦 | 给不同环境统一 `reset/step/score/artifact` 接口，隐藏浏览器/容器/模拟器细节 |
+
+## 系统设计心法
+
+- **环境 > 数据集**：数据集是静态题库，环境是会反馈的训练场。agent 产品上线前，环境质量往往决定你能不能发现真实失败模式。
+- **闭环 > 开环**：开环任务只看一次输出；闭环环境让 agent 承担动作后果。多步工具调用、浏览器操作、代码执行都应该优先做闭环评测。
+- **符号可靠，神经可扩；混合才像工程答案**：代码规则和 verifier 给你可控性，world model 给你覆盖面。生产系统通常不能只选一边。
+- **评环境不能只测能不能跑**：correctness 是地板，diversity / complexity / fidelity 才决定它能不能训练出泛化。
+- **agent 进化和环境进化要分账**：agent 的记忆、workflow、轨迹、RL 是一条账；环境的 neural / difficulty / scaling evolution 是另一条账。混在一起会导致你不知道进步来自哪里。
+
+## 作品集角度(Portfolio angle)
+
+这篇能支撑一个很有区分度的作品集方向：**Agent Environment Lab**。不是再做一个聊天机器人，而是做一个“会自动合成任务、验证任务、调难度、记录环境质量”的小型环境工程平台。
+
+一个好作品不需要很大，可以这样讲：
+
+1. 我把一个真实 agent 工作流封装成统一环境接口。
+2. 我用符号规则合成任务，并用 verifier 保证 correctness。
+3. 我用 embedding / 结构覆盖 / 人类或强模型表现衡量 diversity 和 complexity。
+4. 我根据 agent 成功率做 difficulty-driven curriculum。
+5. 我用报告展示固定环境 vs 自适应环境下 agent 错误类型和学习速度的差异。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | ---: | --- |
+| Mini EaaS 环境接口 | 给 2-3 个小环境统一 `reset/step/observe/reward/verify` | 2-4 天 | 把“环境即服务”从概念变成可展示工程 |
+| Tool-use 环境合成器 | 从 API schema 生成多步任务、初始状态、golden tool sequence、verifier | 5-7 天 | 直接练符号合成 + correctness 验证 |
+| 环境四维质检仪表盘 | 对一个合成任务集输出 correctness/diversity/complexity/fidelity 报告 | 3-5 天 | 很少有人系统评“环境质量”，面试好讲 |
+| 难度自适应课程 | 根据 agent 成功率、错误类型、调用步数自动调任务难度 | 4-6 天 | 落地 difficulty-driven environment evolution |
+| Neural vs Symbolic 对照实验 | 同一任务分别用规则环境和 LLM 模拟环境生成反馈，比较一致性和覆盖面 | 3-5 天 | 能讲清神经-符号权衡，不只背术语 |
+| Multi-agent 小环境 | 做一个合作/竞争工具任务，让多个 agent 的联合动作决定状态 | 1-2 周 | 对应论文点名的 multi-agent environment 空白 |
+
+## 简历 / 面试故事
+
+诚实写法：
+
+- *"Built a mini Environment-as-a-Service layer for LLM agents, exposing heterogeneous tool and code tasks through a unified reset/step/observe/reward/verify interface."*
+- *"Designed a quality-control pipeline for synthesized agent environments, measuring correctness, diversity, complexity, and fidelity instead of relying only on final task success."*
+- *"Implemented a difficulty-driven curriculum for an LLM agent environment: task complexity adapts to recent success rate and error types to keep training near the agent's capability frontier."*
+
+> [!key] 面试可讲
+> “你怎么让一个 agent 持续变强？”不要只答“加记忆、加工具、跑 RL”。更强的回答是：**agent 侧和环境侧一起设计**。agent 侧有记忆、workflow、轨迹和探索；环境侧要能合成、验证、调难度、扩分布。然后补一句生产判断：如果没有 correctness verifier 和 fidelity 检查，自动合成环境可能只是规模化制造错误反馈。
+
+## 学习清单
+
+**必学**
+
+- POMDP 视角：状态、动作、转移、奖励、观察、历史。
+- 8 组环境属性：特别是 symbolic/neural、open/closed loop、online/offline、single/multi-agent。
+- 环境合成两大范式：symbolic synthesis 与 neural synthesis。
+- 环境质量四维：correctness、diversity、complexity、fidelity。
+
+**有用**
+
+- Gym-style / browser / terminal / container 环境接口设计。
+- Verifier 设计：unit test、execution check、state comparison、human/LLM judge agreement。
+- Curriculum learning：success rate、regret、curiosity、student feedback 等难度信号。
+- World model 基础：pixel / word / latent 三种模拟环境方式。
+
+**可选**
+
+- 多智能体环境的 credit assignment 和 non-stationarity。
+- Neural-symbolic environment 的混合架构。
+- Environment scaling law：环境数量、多样性、交互长度、复杂度如何影响 agent 能力。

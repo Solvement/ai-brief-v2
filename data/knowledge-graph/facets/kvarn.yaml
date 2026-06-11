@@ -1,0 +1,126 @@
+# Mind Palace facet — 内化层（AI-only）。spine：用 Hadamard 旋转 + 双轴方差归一化解决自回归解码下 KV-Cache 量化误差逐步累积，2.3 bit/元素下接近 FP16 精度。
+# 不编造，未知标「数据不足」，自报数字标「自报」。源：content/papers/2606.03458-kvarn-kv-cache-quantization/paper.mdx
+schema: v2
+node_id: paper:2606.03458
+slug: kvarn
+kind: paper
+title: "KVarN — 双轴方差归一化把自回归解码下 KV-Cache 量化误差累积摁死在 2.3 bit"
+source: "arxiv:2606.03458 + content/papers/2606.03458-kvarn-kv-cache-quantization/paper.mdx + repo github.com/huawei-csl/KVarN（vLLM 实现，342★·自报快照）"
+
+facets:
+  problem_solved: >
+    test-time scaling 让模型推理越来越长，KV-Cache 线性膨胀吃满显存；既有量化方法（KIVI、QuaRot 等）
+    全在 prefill 静态场景评测——把固定长文本一次性压完。真实自回归解码不是这样：
+    新 token 一个个产出就压回缓存，每一步的量化误差叠在上一步的"已压坏缓存"上，越长越歪。
+    而罪魁不是「方向偏」，是「token 幅度（scale）被压坏」在时间步间传播放大。
+    整个领域的评测设定对不上这个真实负载，是更深的问题。
+
+  method: >
+    把每一块新生成的 K/V 矩阵过两道关：
+    第一道 Hadamard 旋转——沿通道轴做正交变换，把少数通道的极端离群值摊薄成近似高斯（治「通道方向离群」，
+    O(N log N)，可在线做，不需校准数据）；
+    第二道双轴方差归一化（VarN）——攒够一块（G=128 token）后，沿通道轴和 token 轴各放一组缩放因子，
+    迭代 8 次把行列方差都拉均匀，再用普通四舍五入量化（RTN）——这一步专门把「个头被压歪的 token 幅度」按回去。
+    两招互补（Appendix B Fig.8 实测）：Hadamard 擅长压主体分布，但对极端大/小 token 反而更差；
+    VarN 恰恰最擅长治这两个极端。合起来才锁住幅度、切断误差累积链。
+    全程免校准——每块从自身 K/V 在线算，换模型/领域不重调。
+
+  result: >
+    [自报·论文表格，未独立复现，Avg@3] 同档 2.3 bit/元素（含 scale/zeropoint 辅助存储）：
+    Qwen3-4B：AIME24 FP16 61.1 / KIVI 55.5 / QuaRot 56.7 / KVarN 60.0；
+               MATH500 FP16 82.6 / KIVI 77.8 / QuaRot 78.9 / KVarN 79.2。
+    Phi-4-14B：AIME24 FP16 62.2 / KIVI 57.8 / KVarN 61.7；
+               MATH500 FP16 84.9 / KIVI 74.4 / KVarN 84.8（几乎无损）。
+    HumanEval：Phi-4-14B FP16 88.9 / KIVI 74.6 / KVarN 88.2。
+    Line-Retrieval 600 行：Llama-3.1-8B FP16 92% / KIVI 83% / KVarN 89%。
+    在线开销：Qwen3-4B vLLM 生成 128 token 1050 ms，VarN 全程额外 1.9 ms，实测 0.18%。
+    关键反直觉：top 5% 最大误差换回高精度，端到端 KL 改善多于其余 95%——
+    MSE 最优 ≠ 端到端最优，离群点主导质量。
+
+  innovation: >
+    同赛道三条老路：① KIVI 按通道 RTN，不处理幅度；② QuaRot 只做 Hadamard，管不住 token 幅度极端值；
+    ③ TurboQuant 随机旋转 + JL 残差（更高 bit 档，3/3 bit，Table 1 同档对照不公平）。
+    KVarN 的真新点：
+    ① 指出「prefill 评测 ≠ 自回归真实负载」的领域盲点，提出便宜的伪解码协议（pseudo-decode）
+      对齐真实误差累积——这是给整个领域的一把新尺子；
+    ② 几何拆分误差为 E_M（幅度）vs E_D（方向），实证大误差几乎全是幅度被压坏，
+      把优化目标从「降总 MSE」改为「先救离群幅度」；
+    ③ Hadamard 来自 QuaRot、VarN 来自 SINQ，但在 KV-Cache 里 VarN 有效的原因
+      是「直接降重建误差」，与它在权重量化里「近似校准数据」的原因完全不同——
+      作者明确辨析，防止张冠李戴。
+
+  weakness: >
+    适用边界与坑：
+    1. 对无 KV-Cache 架构（Mamba/SSM）完全用不上。
+    2. MLA（DeepSeek 多头潜在注意力，训练期压缩 KV-Cache）兼容性未知——作者明确承认。
+    3. 2-bit KV-Cache 暂无公开服务框架（vLLM）支持，端到端部署收益是推算，未在生产栈验证。
+    4. 方法是已有组件的组合（Hadamard from QuaRot + VarN from SINQ），贡献在「诊断 + 组合 + 评测协议」，不是全新算子。
+    5. 天花板是 FP16，个别格略高于 FP16 属采样方差，不代表「压缩更准」。
+    6. 超参（G=128, S=128, R=128, 迭代 8 次）跨任务敏感性无系统表；IFEval 需 S=32 特例，说明最优超参随任务变化。
+
+  transfer: >
+    最值得搬的是两条工程判断原语，可直接迁移进 AI-Brief 质量门与 agent 设计：
+    ① 「评测设定要对齐真实负载」：pseudo-decode 协议的核心思路——用近似模拟真实工作流下的误差积累，
+      而不是在静态场景下一次性评测。AI-Brief 深读质量门、审计 agent 的评分机制应在「agent 连续读完做决策」
+      的真实使用场景下设计评测，不能只在单篇静态对照下验证。
+    ② 「盯离群点比盯平均更值钱」：top 5% 误差主导端到端 KL 的发现直接映射到——
+      质量审计 agent 应优先暴露最大错误/幻觉，不应只汇报平均覆盖率；
+      几条极差证据往往比整体平均分更能预测最终深读质量。
+    与 TrOPD [[tropd]] 形成互补对：TrOPD 管训练/反馈信号可信度（哪些 token 的梯度不可信），
+    KVarN 补充「分区处理离群问题」的广义工程模式——高信任/正常区全力处理，极端异常区换代价小的保守方案。
+
+  architecture: |
+    ```mermaid
+    flowchart TD
+      TOK([新生成一块 token\nK 和 V 矩阵 16-bit]) --> HAD[Hadamard 旋转\n通道轴 O·N log N·\n摊平通道离群值]
+      HAD --> VARN[双轴方差归一化 VarN\n通道轴 + token 轴迭代 8 次\n拉平行列方差\n改自 SINQ log 域 dual-scale balancing]
+      VARN --> RTN[RTN 四舍五入量化 2-bit\n辅助 FP8 scale×2 + FP16 zeropoint\n有效 2.3 bit/元素]
+      RTN --> CACHE[(三区 KV-Cache\nS=128 sink FP16\n中间 2-bit 体 G=128\nR=128 trailing FP16)]
+      CACHE -->|下一块读已量化缓存\nVarN 锁住幅度误差不再累积| ATT[注意力计算]
+      ATT --> TOK
+    ```
+
+self_evo_use: >
+  记忆：基本不相关。KVarN 压缩的是推理时 Transformer 内部的运行时张量（KV-Cache），
+  不是 AI-Brief 意义上可写入/可检索/可更新/可压缩遗忘的持久记忆。
+  AI-Brief 的记忆层是知识图谱 + 语料库，结构完全不同；这篇论文不提供记忆机制原语。
+
+  理解：能用（评测闭环 + 失败归因两条原语）。
+  ① pseudo-decode 协议 = 「用对齐真实负载的便宜尺子量误差」的评测闭环设计样板：
+    直接映射到深读质量门应在「agent 连续读完做决策」场景下量，不是在静态单次对照下量。
+  ② top 5% 离群误差主导 KL = 失败归因的样板：
+    最大的几个问题往往比整体平均分更能预测最终质量，
+    直接映射到冷审 agent 应先找最大错误/幻觉，不应只汇报平均覆盖率。
+
+  自进化：方法论可借鉴，系统本身不适合直接用。
+  AI-Brief 是订阅 CLI 不跑裸推理栈，无法部署 2-bit KV-Cache 量化。
+  但「分区处理离群问题」的广义模式——高信任区正常处理、极端异常区换代价小的保守方案——
+  是自进化反馈回路的通用工程原则。与 TrOPD [[tropd]] 形成互补对，
+  可作为 AI-Brief 质量门 + 自进化闭环设计的方法论参照，不是直接可运行的组件。
+
+core_concepts:
+  - name: 双轴方差归一化（dual-axis VarN）
+    role: primary
+    evidence: "沿 K/V 矩阵的两个轴（通道 + token）各放一组缩放因子，迭代地把行、列方差都拉平……前人量化只缩一个轴"
+  - name: 幅度误差 vs 方向误差拆分（E_M / E_D decomposition）
+    role: primary
+    evidence: "把量化误差干净地拆成「幅度误差 E_M」和「方向误差 E_D」两块……那些最离谱的大误差，几乎全是「个头被压歪了」（幅度错），不是「指错方向」"
+  - name: 量化误差累积（quantization error accumulation）
+    role: primary
+    evidence: "量化误差会跨时间步累积……越长的序列，误差滚得越大……前人在 prefill 设定下根本看不到这个累积效应"
+  - name: 伪解码评测协议（pseudo-decode）
+    role: supporting
+    evidence: "把长序列切成块，每过一块就量化一次缓存，后续 token 都读「已量化」的缓存——以此模拟真实解码里的误差累积"
+  - name: Hadamard 旋转（incoherence processing）
+    role: supporting
+    evidence: "用一个固定的正交变换把矩阵「转个方向」，让原本几个通道上的极端离群值被摊薄成接近高斯的分布……O(N log N) 很快，可在线做"
+
+discovery_trace: 数据不足
+
+# 潜在语义近邻 NO_EDGE 判断：
+# tropd（TrOPD / 训练时离群点可靠度门）：同为「分区处理离群」思路，但 TrOPD 管训练信号可信度（K1 估计器梯度爆炸），KVarN 管推理时量化误差幅度；领域不同（training vs inference-time compression），无共享 concept node，无法形成可机器验证的语义边 → NO_EDGE
+# scaling（记忆扩展三轴）：同涉及运行时效率，但 scaling 管 LoRA/adapter 生命周期治理，KVarN 管 KV-Cache 量化精度；机制与目标均不重叠 → NO_EDGE
+# self-evolving-agents-survey：无直接方法论接触 → NO_EDGE
+edges: []
+
+status: extracted

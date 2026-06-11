@@ -1,0 +1,57 @@
+{
+  "paper_id": "2606.07591",
+  "arxiv_id": "2606.07591",
+  "title": "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research",
+  "authors": [
+    "Wanghan Xu",
+    "Shuo Li",
+    "Tianlin Ye",
+    "Qinglong Cao",
+    "Yixin Chen",
+    "Hengjian Gao"
+  ],
+  "date": "2026-05-28",
+  "first_seen_date": "2026-06-11",
+  "huggingface_url": "https://huggingface.co/papers/2606.07591",
+  "paper_url": "https://arxiv.org/abs/2606.07591",
+  "code_url": "https://github.com/InternScience/ResearchClawBench",
+  "project_page": "https://internscience.github.io/ResearchClawBench-Home/",
+  "dataset_url": "https://huggingface.co/datasets/InternScience/ResearchClawBench",
+  "model_url": "",
+  "space_url": "",
+  "organization": "Shanghai AI Laboratory · Shanghai Jiao Tong University · Fudan University",
+  "hf_upvotes": 85,
+  "source_rankings": [
+    "daily"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.07591.yaml",
+  "track": "hf",
+  "tags": [
+    "benchmark",
+    "autonomous-research",
+    "scientific-discovery",
+    "rubric-evaluation",
+    "llm-as-judge",
+    "re-discovery",
+    "research-agent"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 7,
+    "system_design_value": 8,
+    "transferability_to_autosci": 8,
+    "breadth_value": 7,
+    "ai_engineering_value": 6,
+    "buildability": 8,
+    "evaluation_value": 9,
+    "evidence_quality": 8
+  },
+  "one_sentence_judgment": "用'隐藏目标论文+专家加权 rubric+50 分=复现线'把端到端自主科研拆成可判分的考卷（40 任务/10 领域），冷峻量化出最强 agent（Claude Code）仅 21.5/100、瓶颈在科学严谨（协议/证据/缺内核）而非工程——是 L3 研究 agent 的现实校准器与可复用评测范式；但只测干实验室、评终点不评过程、judge 单模型偏置仅缓解未消除、全自报。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

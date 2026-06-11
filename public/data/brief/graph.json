@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T13:06:38.933Z",
+  "generatedAt": "2026-06-11T14:13:05.539Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -6892,7 +6892,47 @@
       ],
       "file": "content/papers/2606.03458-kvarn-kv-cache-quantization/metadata.json",
       "arxiv_id": "2606.03458",
-      "topic": "inference"
+      "topic": "inference",
+      "facets": {
+        "problem_solved": "test-time scaling 让模型推理越来越长，KV-Cache 线性膨胀吃满显存；既有量化方法（KIVI、QuaRot 等） 全在 prefill 静态场景评测——把固定长文本一次性压完。真实自回归解码不是这样： 新 token 一个个产出就压回缓存，每一步的量化误差叠在上一步的\"已压坏缓存\"上，越长越歪。 而罪魁不是「方向偏」，是「token 幅度（scale）被压坏」在时间步间传播放大。 整个领域的评测设定对不上这个真实负载，是更深的问题。\n",
+        "method": "把每一块新生成的 K/V 矩阵过两道关： 第一道 Hadamard 旋转——沿通道轴做正交变换，把少数通道的极端离群值摊薄成近似高斯（治「通道方向离群」， O(N log N)，可在线做，不需校准数据）； 第二道双轴方差归一化（VarN）——攒够一块（G=128 token）后，沿通道轴和 token 轴各放一组缩放因子， 迭代 8 次把行列方差都拉均匀，再用普通四舍五入量化（RTN）——这一步专门把「个头被压歪的 token 幅度」按回去。 两招互补（Appendix B Fig.8 实测）：Hadamard 擅长压主体分布，但对极端大/小 token 反而更差； VarN 恰恰最擅长治这两个极端。合起来才锁住幅度、切断误差累积链。 全程免校准——每块从自身 K/V 在线算，换模型/领域不重调。\n",
+        "result": "[自报·论文表格，未独立复现，Avg@3] 同档 2.3 bit/元素（含 scale/zeropoint 辅助存储）： Qwen3-4B：AIME24 FP16 61.1 / KIVI 55.5 / QuaRot 56.7 / KVarN 60.0；\n           MATH500 FP16 82.6 / KIVI 77.8 / QuaRot 78.9 / KVarN 79.2。\nPhi-4-14B：AIME24 FP16 62.2 / KIVI 57.8 / KVarN 61.7；\n           MATH500 FP16 84.9 / KIVI 74.4 / KVarN 84.8（几乎无损）。\nHumanEval：Phi-4-14B FP16 88.9 / KIVI 74.6 / KVarN 88.2。 Line-Retrieval 600 行：Llama-3.1-8B FP16 92% / KIVI 83% / KVarN 89%。 在线开销：Qwen3-4B vLLM 生成 128 token 1050 ms，VarN 全程额外 1.9 ms，实测 0.18%。 关键反直觉：top 5% 最大误差换回高精度，端到端 KL 改善多于其余 95%—— MSE 最优 ≠ 端到端最优，离群点主导质量。\n",
+        "innovation": "同赛道三条老路：① KIVI 按通道 RTN，不处理幅度；② QuaRot 只做 Hadamard，管不住 token 幅度极端值； ③ TurboQuant 随机旋转 + JL 残差（更高 bit 档，3/3 bit，Table 1 同档对照不公平）。 KVarN 的真新点： ① 指出「prefill 评测 ≠ 自回归真实负载」的领域盲点，提出便宜的伪解码协议（pseudo-decode）\n  对齐真实误差累积——这是给整个领域的一把新尺子；\n② 几何拆分误差为 E_M（幅度）vs E_D（方向），实证大误差几乎全是幅度被压坏，\n  把优化目标从「降总 MSE」改为「先救离群幅度」；\n③ Hadamard 来自 QuaRot、VarN 来自 SINQ，但在 KV-Cache 里 VarN 有效的原因\n  是「直接降重建误差」，与它在权重量化里「近似校准数据」的原因完全不同——\n  作者明确辨析，防止张冠李戴。\n",
+        "weakness": "适用边界与坑： 1. 对无 KV-Cache 架构（Mamba/SSM）完全用不上。 2. MLA（DeepSeek 多头潜在注意力，训练期压缩 KV-Cache）兼容性未知——作者明确承认。 3. 2-bit KV-Cache 暂无公开服务框架（vLLM）支持，端到端部署收益是推算，未在生产栈验证。 4. 方法是已有组件的组合（Hadamard from QuaRot + VarN from SINQ），贡献在「诊断 + 组合 + 评测协议」，不是全新算子。 5. 天花板是 FP16，个别格略高于 FP16 属采样方差，不代表「压缩更准」。 6. 超参（G=128, S=128, R=128, 迭代 8 次）跨任务敏感性无系统表；IFEval 需 S=32 特例，说明最优超参随任务变化。\n",
+        "transfer": "最值得搬的是两条工程判断原语，可直接迁移进 AI-Brief 质量门与 agent 设计： ① 「评测设定要对齐真实负载」：pseudo-decode 协议的核心思路——用近似模拟真实工作流下的误差积累，\n  而不是在静态场景下一次性评测。AI-Brief 深读质量门、审计 agent 的评分机制应在「agent 连续读完做决策」\n  的真实使用场景下设计评测，不能只在单篇静态对照下验证。\n② 「盯离群点比盯平均更值钱」：top 5% 误差主导端到端 KL 的发现直接映射到——\n  质量审计 agent 应优先暴露最大错误/幻觉，不应只汇报平均覆盖率；\n  几条极差证据往往比整体平均分更能预测最终深读质量。\n与 TrOPD [[tropd]] 形成互补对：TrOPD 管训练/反馈信号可信度（哪些 token 的梯度不可信）， KVarN 补充「分区处理离群问题」的广义工程模式——高信任/正常区全力处理，极端异常区换代价小的保守方案。\n",
+        "architecture": "```mermaid\nflowchart TD\n  TOK([新生成一块 token\\nK 和 V 矩阵 16-bit]) --> HAD[Hadamard 旋转\\n通道轴 O·N log N·\\n摊平通道离群值]\n  HAD --> VARN[双轴方差归一化 VarN\\n通道轴 + token 轴迭代 8 次\\n拉平行列方差\\n改自 SINQ log 域 dual-scale balancing]\n  VARN --> RTN[RTN 四舍五入量化 2-bit\\n辅助 FP8 scale×2 + FP16 zeropoint\\n有效 2.3 bit/元素]\n  RTN --> CACHE[(三区 KV-Cache\\nS=128 sink FP16\\n中间 2-bit 体 G=128\\nR=128 trailing FP16)]\n  CACHE -->|下一块读已量化缓存\\nVarN 锁住幅度误差不再累积| ATT[注意力计算]\n  ATT --> TOK\n```\n"
+      },
+      "self_evo_use": "记忆：基本不相关。KVarN 压缩的是推理时 Transformer 内部的运行时张量（KV-Cache）， 不是 AI-Brief 意义上可写入/可检索/可更新/可压缩遗忘的持久记忆。 AI-Brief 的记忆层是知识图谱 + 语料库，结构完全不同；这篇论文不提供记忆机制原语。\n理解：能用（评测闭环 + 失败归因两条原语）。 ① pseudo-decode 协议 = 「用对齐真实负载的便宜尺子量误差」的评测闭环设计样板：\n  直接映射到深读质量门应在「agent 连续读完做决策」场景下量，不是在静态单次对照下量。\n② top 5% 离群误差主导 KL = 失败归因的样板：\n  最大的几个问题往往比整体平均分更能预测最终质量，\n  直接映射到冷审 agent 应先找最大错误/幻觉，不应只汇报平均覆盖率。\n\n自进化：方法论可借鉴，系统本身不适合直接用。 AI-Brief 是订阅 CLI 不跑裸推理栈，无法部署 2-bit KV-Cache 量化。 但「分区处理离群问题」的广义模式——高信任区正常处理、极端异常区换代价小的保守方案—— 是自进化反馈回路的通用工程原则。与 TrOPD [[tropd]] 形成互补对， 可作为 AI-Brief 质量门 + 自进化闭环设计的方法论参照，不是直接可运行的组件。\n",
+      "core_concepts": [
+        {
+          "name": "双轴方差归一化（dual-axis VarN）",
+          "role": "primary",
+          "evidence": "沿 K/V 矩阵的两个轴（通道 + token）各放一组缩放因子，迭代地把行、列方差都拉平……前人量化只缩一个轴"
+        },
+        {
+          "name": "幅度误差 vs 方向误差拆分（E_M / E_D decomposition）",
+          "role": "primary",
+          "evidence": "把量化误差干净地拆成「幅度误差 E_M」和「方向误差 E_D」两块……那些最离谱的大误差，几乎全是「个头被压歪了」（幅度错），不是「指错方向」"
+        },
+        {
+          "name": "量化误差累积（quantization error accumulation）",
+          "role": "primary",
+          "evidence": "量化误差会跨时间步累积……越长的序列，误差滚得越大……前人在 prefill 设定下根本看不到这个累积效应"
+        },
+        {
+          "name": "伪解码评测协议（pseudo-decode）",
+          "role": "supporting",
+          "evidence": "把长序列切成块，每过一块就量化一次缓存，后续 token 都读「已量化」的缓存——以此模拟真实解码里的误差累积"
+        },
+        {
+          "name": "Hadamard 旋转（incoherence processing）",
+          "role": "supporting",
+          "evidence": "用一个固定的正交变换把矩阵「转个方向」，让原本几个通道上的极端离群值被摊薄成接近高斯的分布……O(N log N) 很快，可在线做"
+        }
+      ],
+      "facet_slug": "kvarn",
+      "facet_status": "extracted",
+      "href": "/papers/2606.03458-kvarn-kv-cache-quantization"
     },
     {
       "id": "paper:2606.05259",
@@ -6938,7 +6978,47 @@
       ],
       "file": "content/papers/2606.05563-socrates-mediation-eval/metadata.json",
       "arxiv_id": "2606.05563",
-      "topic": "eval"
+      "topic": "eval",
+      "facets": {
+        "problem_solved": "LLM 调解员评测没有可靠的「尺」：场景靠专家手写覆盖不了多元冲突域，per-turn judge 每回合对所有议题全打分把无关噪声一路累积进去，而且没有「如果没有调解员会怎样」的反事实基线——结果评出来的优劣反映的是评测设计缺陷，不是调解能力的真实差距。\n",
+        "method": "把整个评测流水线拆成五道互相对症的工序。 ①「出题工厂」：Searcher agent（o4-mini-deep-research）从 8 个真实冲突域抓种子，Scenario Writer（GPT-5.4）改写成结构化场景（背景/参与方/议题/偏好权重），绕开少量专家手写的覆盖窄。 ②「难题筛选门」：每个候选无调解员跑 3 次，三次都陷入僵局才留下，保证 Consensus Gain 的反事实基线真的有缺口。 ③「单轴压力测试」：沿 5 根社会认知轴（战略姿态/参与方数量/历史长度/情绪反应/文化身份）每次只改一根，拆成 15 个条件，能读出能力 profile 而不只是一个平均分。 ④「议题局部化评估器」：读完整对话后，对每个议题只找它真正被讨论或立场变化的回合打 1-5 分，不相关回合直接沿用上次分数——「谈房价的 5 分钟才打房价分，不顺手改交房时间分」。 ⑤「三指标拆分」：Timeliness（多早插话）/ Effectiveness（插话后 5 轮共识提升 / 剩余 headroom 归一化）/ Consensus Gain（终局相对反事实基线关闭了多少缺口）各自独立，避免把刷存在感误当推动共识。\n",
+        "result": "[自报·arXiv 2606.05563，代码/数据 Coming soon，未本机复现] Evaluator 质量：topic-localized evaluator 与专家的 trajectory-level Pearson r = 0.823、outcome-level r = 0.801，显著高于 non-expert baseline（0.331 / 0.527）和 ProMediate per-turn（0.372 / 0.432）；换 Qwen3-235B 做 evaluator backbone 仍有 0.785 / 0.721。Persona simulator：7 个 backbone，1,120 comparisons，alpha = 0.75，DeepSeek-V3.2 fidelity accuracy 87.2%，被选为主 party simulator。 Leaderboard（8 mediators × 600 runs，4,800 total）：最强 GPT-5.4-mini Consensus Gain 34.4，也只关掉约三分之一缺口；Timeliness 最高的 Solar-Pro-3（84.6）和 Qwen3-30B（84.6）Consensus Gain 分别仅 19.9 / 15.7（后两名），Intervention Frequency 约为头部的两倍（32.3% / 31.1%）——频繁早插话反而压低共识增益。 Domain 效应：all-mediator avg. Consensus Gain 从 Transactional 41.3 跌到 Intra-organizational 16.6；Competing 战略姿态造成 18.9–64.1 的 Consensus Gain drop。 Benchmark 稳定性：multi-run Kendall's W = 0.929，6/8 mediator half-range ≤ ±3 points；Timeliness 换 backbone 后 Spearman rho 仅 0.406（vs Effectiveness 0.862），及时性指标稳定性弱。\n",
+        "innovation": "同赛道 ProMediate 用 per-turn judge（r ≈ 0.37/0.43），每回合全议题打分把 off-topic noise 直接累积进结果。SoCRATES 新点有四： ① 难题筛选门给 Consensus Gain 提供真正的反事实基线，不只是报最终共识分； ② 5 根社会认知轴各自独立扰动，能读出单轴崩溃，不会被平均分掩盖； ③ 议题局部化评估器从根本上切断 off-topic noise，expert correlation 跳升 2× 以上（0.37 → 0.823）； ④ Agentic scenario curation 让 8 个冲突域都有足量难题，不只集中在 transactional bargaining——论文证明只测该域会高估 mediator 能力约 2.5×（Transactional 41.3 vs Intra-organizational 16.6）。\n",
+        "weakness": "[代码/数据未发布] GitHub Code 与 HF SoCRATES 数据截至 2026-06-10 均为 Coming soon，论文结果可读不可复跑。 全仿真闭环：disputants、mediator、evaluator 三方全是 LLM，真实人的策略、信任、法律风险、情绪创伤没有进入任何验证路径——这不是调解能力在真人场景的证据。 Consensus 目标偏窄：party satisfaction、procedural fairness、emotional repair 作者明确留作未来工作。 文化轴有语言限制：对话全为英语，文化身份通过 Hofstede profile 注入，不测 multilingual mediation 或翻译歧义。 主实验大量同时使用 DeepSeek-V3.2 做 party simulator 和 evaluator，虽有替换 Qwen3-235B 的鲁棒性检查，但不是全量重跑所有模型组合。 Timeliness 换 backbone 后 Spearman rho 仅 0.406，「相关回合选择」对及时性读数影响大，这项指标跨评估者稳定性弱于其余两项。\n",
+        "transfer": "最值得搬的不是调解代码，而是评测工程的三条方法论原则。 ① 反事实基线门：AI-Brief 深读质量门、agent 自进化闭环任何「有 agent / 无 agent 对比」，都应先跑一组「无干预基线」确认任务真的有缺口再算增益；否则 \"+X%\" 可能是本来就会到那里。 ② 单轴扰动读能力 profile：评测 AI-Brief 各分析模块时，不要只看平均分——把上下文长度、domain 类型、信息密度分别独立变化、只改一根轴，才能定位是哪条轴触发退化。 ③ 局部化评分（噪声隔离）：AI-Brief 冷审打分不要对不相关段落顺手更新分数；评测研究路线判断时，当前段落无关联的维度（如代码质量 vs 推理质量）应分开独立打，不要串联累积——这正是 per-turn judge vs topic-localized 差距 2× 的根因。\n",
+        "architecture": "```mermaid\nflowchart TD\n  A[真实公开冲突域<br/>8 domains] --> B[Searcher agent<br/>o4-mini-deep-research]\n  B --> C[Scenario Writer<br/>GPT-5.4 recast 结构化场景]\n  C --> D[无 mediator 模拟 ×3<br/>DeepSeek-V3.2 party agents]\n  D -->|3 次全 impasse| E[40 hard scenarios<br/>每域 5 个·难题筛选门]\n  E --> F[15 conditions per scenario<br/>general + 5 轴单轴扰动]\n  F --> G[8 个 LLM mediators<br/>每个 600 runs · 共 4800]\n  G --> H[Topic-localized evaluator<br/>DeepSeek-V3.2 backbone<br/>只在相关回合更新议题分]\n  H --> I[Timeliness / Effectiveness<br/>Consensus Gain]\n  I --> J[Domain profile + Axis profile<br/>+ Timing profile 诊断视图]\n```\n"
+      },
+      "self_evo_use": "记忆：基本不相关——SoCRATES 是 benchmark/evaluation framework，不涉及记忆写入、检索、更新或遗忘机制。它测的是多轮对话里的调解行为，不是 agent 的状态持久化架构。\n理解：能用（评测闭环 + 失败归因原语）——论文最核心的贡献是「怎么让评测尺本身不乱晃」：反事实基线 + 单轴扰动 + 局部化评分三件套，是构建任何开放式多轮 agent 评测的方法论模板。Timeliness vs Effectiveness 的错位（频繁早插话 Consensus Gain 垫底）是「勤快 ≠ 有效」的量化反例，可迁移为「深读频率 vs 深读质量」或「agent 干预次数 vs 干预增益」的归因框架。\n自进化：方法论可用，系统本身不可用（代码未发布，domain 无关联）。不应把 LLM 调解仿真接进 AI-Brief 管线。应搬的是三条工程原则：①任何 agent 改进要先跑「无 agent 反事实基线」确认增益是真实的；②评测模块的分数只更新「确实相关」的维度，不把不相关段落顺手拉进来；③能力测试要单轴扰动、分轴出 profile，而不是用综合分掩盖单轴崩溃。这三条是 AI-Brief 质量门和 cold-audit 设计可以直接落地的工程原则，不依赖 SoCRATES 代码发布。\n",
+      "core_concepts": [
+        {
+          "name": "议题局部化评估器（topic-localized evaluator）",
+          "role": "primary",
+          "evidence": "对每个议题只找它真正被讨论或立场变化的回合打分……topic 未被触及时 score carry forward；主 evaluator 与专家 trajectory-level Pearson r = 0.823、outcome-level r = 0.801"
+        },
+        {
+          "name": "难题筛选门（hard-task gate）",
+          "role": "primary",
+          "evidence": "每个候选场景先无 mediator 跑 3 次，只有 3 次都陷入 impasse（僵局）才留下……给 Consensus Gain 提供反事实基线，减少「本来就会和解」的假增益"
+        },
+        {
+          "name": "社会认知轴（socio-cognitive axes）",
+          "role": "primary",
+          "evidence": "五种压力测试：战略姿态、参与方数量、历史长度、情绪反应、文化身份……每次只改一根轴，避免最后发现模型坏了却不知道是情绪、文化还是多人状态导致的"
+        },
+        {
+          "name": "Consensus Gain（反事实共识增益）",
+          "role": "primary",
+          "evidence": "终局 Consensus Gain = (S_med - S_unmed) / (1 - S_unmed) * 100……看 mediator 关闭了多少「剩余共识缺口」；负数代表比不调解更糟"
+        },
+        {
+          "name": "agentic 场景策展（agentic scenario curation）",
+          "role": "supporting",
+          "evidence": "Searcher agent 用 o4-mini-deep-research 在 8 个冲突域里找公开真实纠纷，Scenario Writer 用 GPT-5.4 把报告式材料改写成可模拟的结构化场景"
+        }
+      ],
+      "facet_slug": "socrates",
+      "facet_status": "extracted",
+      "href": "/papers/2606.05563-socrates-mediation-eval"
     },
     {
       "id": "paper:2606.05622",
@@ -15844,16 +15924,6 @@
       "evidence": "MemoryAgentBench 评测智能体长期记忆系统、PEFT 论文用 LoRA 承载个性化持久状态,都围绕「给智能体一份可持续累积的记忆」这一用途,前者是后者一类方法的潜在评测台。"
     },
     {
-      "from": "content/memoryagentbench",
-      "to": "content/agemem",
-      "type": "composes_with",
-      "confidence": "high",
-      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
-      "kg_integrated": true,
-      "cross_doc": true,
-      "verified_from_facet": true
-    },
-    {
       "from": "concept/agentic-memory",
       "to": "content/agemem",
       "type": "same_track",
@@ -16042,6 +16112,16 @@
       "type": "composes_with",
       "confidence": "high",
       "evidence": "两者都用 Tree-sitter 把代码库抽成知识图谱给 agent 用；codegraph 强在低层索引基础设施（SQLite schema+MCP工具+staleness），understand-anything 强在上层多agent语义导览+可视化仪表盘——一个做底座一个做表现层，互补而非重复。",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "verified_from_facet": true
+    },
+    {
+      "from": "content/memoryagentbench",
+      "to": "content/agemem",
+      "type": "composes_with",
+      "confidence": "high",
+      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
       "kg_integrated": true,
       "cross_doc": true,
       "verified_from_facet": true
@@ -32161,9 +32241,9 @@
       "builds_on": 2,
       "shares_method": 6,
       "same_use_case": 3,
-      "composes_with": 9,
       "same_track": 51,
       "improves_on": 2,
+      "composes_with": 9,
       "contradicts": 2
     },
     "wikilinks": {
@@ -32185,7 +32265,7 @@
     "associativeEdges": 24,
     "crossDocEdges": 54,
     "ghosts": 19,
-    "assessed": 40,
-    "facetedNodes": 17
+    "assessed": 42,
+    "facetedNodes": 19
   }
 }

@@ -1,0 +1,189 @@
+# Paper · 论文本身
+
+## 一句话总结
+
+RHO（Retrospective Harness Optimization，回溯式 harness 优化）要解决的是一个很现实的问题：agent 跑久了会留下大量**没有标准答案的历史轨迹**，能不能只靠这些旧轨迹，把它的 persistent harness（持久外壳：技能、工具、指令、工作流）改得更好？作者的做法是：挑出难且多样的旧任务，让同一个 agent 重做多遍，用 self-validation（自己查单条轨迹有没有错）和 self-consistency（比较多条轨迹哪里互相打架）生成改进方向，再并行写出几版 harness，用 agent 自己的 pairwise self-preference（两两偏好判断）选一版；SWE-Bench Pro 自报从 0.59 提到 0.78。[^arxiv]
+
+## 问题(Problem)
+
+- 一个 LLM agent 真正上线后，能力不只来自模型权重，还来自外面那圈 **harness**：项目说明、技能文档、工具脚本、工作流、记忆文件。很多失败不是“模型不会”，而是“外壳没教它怎么查、怎么验、怎么收尾”。[^setting]
+- 现有 harness / prompt / agent 搜索方法通常需要 validation set（带标准答案或可自动判分的验证集）来评估每版改动。生产环境里这件事很尴尬：未来任务分布会变，人工标注贵，很多真实任务甚至没有可复用的 grader。[^related]
+- 但 agent 每天都在产生历史轨迹：它读了什么、调用了什么工具、哪里绕路、哪里错判、最后怎么收尾。RHO 的核心问题是：**只看这些无标签轨迹，能不能提炼出让未来任务变好的 harness 改动？**[^intro]
+
+> [!key] 立场
+> 这篇值得读，不是因为 “0.59→0.78” 这个 headline 数字本身，而是因为它把“自进化 agent”从一个口号压成了可工程化的闭环：**历史轨迹 → 难例采样 → 多次重做 → 自诊断 → 候选 harness diff → 自偏好门控 → 持久化更新**。它不训练权重、不要求人工标签，正好适配 Codex / Claude Code 这类订阅式 CLI agent 的真实限制。保留意见也很明确：它省的是标签，不省算力；它依赖模型自评，不等于真实世界 verifier；它要求任务可重复重跑，一次性外部动作不适合直接套。
+
+## 关键术语(Key terms)
+
+| 术语 | 大白话解释 |
+| --- | --- |
+| **harness（持久外壳）** | 固定模型外面那圈能改的东西：tools、prompts、skills、workflows。论文实验里它被物化成一个目录，里面有 Markdown 指令/技能和可执行脚本。[^pipeline] |
+| **trajectory（轨迹）** | agent 解一道题的全过程记录：任务、思考/动作、工具调用、观察、最终输出、workspace diff。RHO 把旧轨迹当“经验矿”。[^setting] |
+| **latent utility（隐含效用）** | 真实想最大化的是未来任务表现，但这个效用函数看不见、没有标签。RHO 用 self-preference 排序来近似它。[^setting] |
+| **self-preference（自偏好）** | 同一个 agent 比较两条或多条轨迹，判断哪条更好并给理由。它不是标准答案，只是一个无标签代理信号。[^method] |
+| **self-validation（自校验）** | 对一条轨迹内部做复盘：有没有错用工具、错误假设、漏证据、提前停止。像让 agent 写自己的事故复盘。[^diagnose] |
+| **self-consistency（自一致性）** | 对同一任务的多条平行轨迹做横向比较：计划、工具顺序、最终答案是否冲突。分歧越大，越说明 harness 没把做法稳定下来。[^diagnose] |
+| **DPP coreset（行列式点过程核心集）** | 从大量旧任务里挑“难且不重样”的小样本。DPP 像一个会防重复的选题器：既看任务难度，也看失败模式是否相似。[^dpp] |
+| **Best-of-N harness proposal** | 并行生成 N 版候选 harness，让每版都重做核心集任务，再用自偏好打分；只有平均分严格大于 0 才替换原 harness。[^method] |
+
+## 核心方法(Core method)
+
+可以把 RHO 想成一次没有老师批改的团队复盘会。团队手里没有标准答案，只有过去做项目留下的会议纪要和提交记录；它先挑最值得复盘的案子，再让团队重做几遍，看哪些做法稳定、哪些做法互相矛盾，最后把复盘结论写进团队手册和工具箱。
+
+**第一步：挑难且多样的旧任务。** 对每条历史轨迹，RHO 让同一个 backbone agent 做 difficulty judge：给任务/轨迹打难度分 `r_i`，并写一个 task-agnostic fingerprint（抽象失败描述）。这些 fingerprint 被嵌入成向量，用 DPP 在“高难度”和“低重复”之间选出 `k=10` 个核心任务。[^dpp]
+
+**第二步：同一道题平行重做。** 对核心集中的每道任务，用原始 harness `h_0` 平行跑 `G=3` 次。然后诊断器做两类分析：self-validation 查每条轨迹内部是否完成任务、是否有错误假设；self-consistency 查三条轨迹之间是否有关键分歧。输出不是散文，而是结构化 JSON：每条 trajectory analysis、failure mode、inconsistency、harness improvement direction、severity。[^diagnose]
+
+**第三步：并行改 harness，再自偏好择优。** 优化器看到原 harness 目录和按 severity 排序的诊断，直接在 filesystem 里新增/修改/删除 Markdown skill、instruction、script。它生成 `N=3` 个候选 harness。每个候选再去重做核心集任务，并与原 harness 的固定 baseline trajectory 进行 pairwise rank。候选 `j` 的分数是 `S_j = (1/k) Σ rank(t, τ_t^(j), τ_t^(0))`；只在最高 `S_j > 0` 时采纳，否则保持原样。[^method]
+
+## 架构 / 流程
+
+```mermaid
+flowchart TD
+  A([无标签历史轨迹 D<br/>past tasks + solve trajectories]) --> B[Difficulty judge<br/>难度分 r_i + failure fingerprint]
+  B --> C[DPP coreset selection<br/>K = diag(r) S diag(r)<br/>难度 x 多样性]
+  C --> D[[核心任务集 D_core<br/>k = 10]]
+  D --> E[Group rollout<br/>每题用 h0 平行重做 G=3 次]
+  E --> F[self-validation<br/>单条轨迹查错]
+  E --> G[self-consistency<br/>跨轨迹找关键分歧]
+  F --> H[结构化诊断 I_t<br/>severity + improvement direction]
+  G --> H
+  H --> I[Best-of-N optimize<br/>并行生成 N=3 个候选 harness]
+  I --> J[候选 harness 重做核心集任务]
+  J --> K[pairwise self-preference<br/>候选轨迹 vs 原轨迹]
+  K --> L{max S_j > 0?}
+  L -->|yes| M[[采纳 winning harness]]
+  L -->|no| N[[保持原 harness h0]]
+```
+
+## 创新点(Innovation points)
+
+| 创新 | 新在哪 | 为什么重要 |
+| --- | --- | --- |
+| 从无标签历史轨迹优化 harness | 不用 validation labels，也不用外部 grader；只用过去轨迹和 agent 自偏好 | 贴近真实部署：日志多、标签少，未来任务分布还会漂 |
+| 编辑 full harness | 不只追加记忆或 prompt，而是允许改 instruction、skill、executable tool | 很多 agent 失败是流程/工具缺口；可执行脚本比“记住一句话”更能改变行为 |
+| DPP 难度×多样性选样 | 不是只挑最难，也不是随机；用失败 fingerprint 做覆盖 | 只复盘同一类难题会过拟合，复盘样本必须覆盖多个 failure modes |
+| 双信号诊断 | self-validation 找“这条自己做错了什么”，self-consistency 找“三次为什么不一致” | 消融显示两者都贡献明显；直接把原始轨迹丢给 optimizer 不够 |
+| Best-of-N + 正分采纳闸 | 多版候选并行生成，用 pairwise self-preference 过滤，并且 `S_j <= 0` 不上线 | 自进化系统最怕越改越差；这个闸把“无改动”当合法结果 |
+
+## 实验 / 证据(Experiments / evidence)
+
+以下数字均为论文/项目页/README **作者自报**，我没有本机复跑完整 benchmark；仓库实读确认代码释放了 RHO loop、DPP selector、diagnose/optimize/rank、SWE-Bench Pro / Terminal-Bench 2 / GAIA-2 loader、ReasoningBank / Meta-Harness baseline、tests、Claude/Codex retrospection variants，但不是第三方复现。[^repo]
+
+**实验设置。** 底座为 Codex agent + `gpt-5.5`，high reasoning effort；`k=10`、`G=3`、`N=3`、DPP `θ=0.7`、score floor `ε=0.1`，fingerprint embedding 为本地 `BAAI/bge-large-en-v1.5`。三类任务：SWE-Bench Pro（软件工程）、Terminal-Bench 2（命令行技术任务）、GAIA-2（动态异步知识工作）。[^hparams]
+
+**主结果：held-out pass rate（Table 1，自报）。**
+
+| 方法 | Harness surface | SWE-Bench Pro | Terminal-Bench 2 | GAIA-2 |
+| --- | --- | ---: | ---: | ---: |
+| Vanilla Codex | None | 0.59 | 0.71 | 0.29 |
+| Dynamic Cheatsheet | Skills | 0.62 (+0.03) | 0.73 (+0.02) | 0.30 (+0.01) |
+| ReasoningBank | Memory | 0.61 (+0.02) | 0.73 (+0.02) | 0.28 (-0.01) |
+| Sleep-time Compute | Memory | 0.64 (+0.05) | 0.73 (+0.02) | 0.32 (+0.03) |
+| **RHO** | **Skills + Tools** | **0.78 (+0.19)** | **0.76 (+0.05)** | **0.37 (+0.08)** |
+
+读法要克制：SWE-Bench Pro 的 +19 个百分点最醒目，但 Terminal-Bench 2 和 GAIA-2 分别只有 +5、+8 个百分点；不能把 +19 外推成所有 agent 任务的普遍收益。[^main]
+
+**对照有标签 optimizer：Meta-Harness（Table 2，自报）。**
+
+| 方法 | 需要验证标签 | 优化期 agent calls | SWE-Bench Pro |
+| --- | --- | ---: | ---: |
+| RHO | none | 103 (1.0x) | 0.78 |
+| Meta-Harness (1 round) | required | 41 (0.4x) | 0.62 |
+| Meta-Harness (10 rounds) | required | 320 (3.1x) | 0.80 |
+
+这组结果的重点不是“RHO 永远比 Meta-Harness 好”，而是：在没有标签时，RHO 单轮已经接近 Meta-Harness 十轮的结果；但 Meta-Harness 十轮仍略高（0.80 vs 0.78），说明 ground-truth feedback 仍有上限优势。[^meta]
+
+**诊断消融：self-validation / self-consistency 不可随手删（Table 4，自报）。**
+
+| 变体 | SWE Pro | TB 2 | GAIA-2 |
+| --- | ---: | ---: | ---: |
+| Full diagnosis | 0.78 | 0.76 | 0.37 |
+| - self-consistency | 0.56 | 0.75 | 0.27 |
+| - self-validation | 0.70 | 0.73 | 0.30 |
+| Raw trajectory | 0.60 | 0.75 | 0.29 |
+
+最有信息量的是 SWE-Bench Pro：去掉 self-consistency 后从 0.78 掉到 0.56，比 baseline 0.59 还低；说明“多条轨迹之间怎么分歧”不是装饰，而是关键诊断信号。[^diagnosis]
+
+**Best-of-N 选择不是 oracle。** 三个候选的 held-out 表现显示，RHO 的自偏好选择能避免最差，但不保证选到真实最好：SWE-Bench Pro 三候选均值 0.79、chosen 0.78、lowest 0.73；Terminal-Bench 2 均值 0.74、chosen 0.76、lowest 0.71；GAIA-2 均值 0.34、chosen 0.37、lowest 0.32。[^bestofn]
+
+**行为变化。** 论文 Figure 4 报告，收益主要来自 long-horizon tasks；SWE-Bench Pro 上优化后 agent 更常做 verification，Terminal-Bench 2 和 GAIA-2 上则更主动使用新工具。Figure 3 / Appendix H 展示了实际写出的 harness：SWE-Bench Pro 的 `README.md`、`checklists/contract-verification.md`、`bin/repair-verify`；Terminal-Bench 2 的 playbook 与 Python/package/mask helpers；GAIA-2 的 notes 与 `are_helper.py`。这些不是“摘要记忆”，而是可执行/可 diff 的文件资产。[^artifacts]
+
+**成本账。** RHO 在 SWE-Bench Pro 的优化流程含 30 次 rollout、10 次 diagnose、3 次 optimize、30 次 after、30 次 rank，再加 100 次 held-out test，总计 203 次 Codex agent invocation；如果只算优化期是 103 次。墙钟成本自报：RHO 在 SWE-Bench Pro `Σ_codex=23.1h / end-to-end=3.2h`，Terminal-Bench 2 为 `15.5h / 2.5h`，GAIA-2 为 `9.2h / 1.4h`。它省标签，不省调用。[^cost]
+
+> [!warn] 别被带偏
+> 1. **“无标签”不是“无评估”。** RHO 仍大量调用同一个模型做 judge / diagnose / optimize / rank；只是不用 ground-truth label。
+> 2. **“自偏好”不是客观真值。** 如果模型偏好错误做法，RHO 可能把错误流程固化进 harness。
+> 3. **“full harness”也有前提。** 必须存在可编辑的技能/工具/指令 surface；如果任务主要卡在模型权重能力，改 harness 不一定有用。
+> 4. **仓库可读但完整复现实验仍重。** 代码公开，README 也给了 `rho evolve`、Claude workflow、Codex retrospection 一键入口；但主实验依赖 Codex/GPT-5.5、Docker benchmark、数据集与大量调用，本轮未复跑。
+
+## 限制与风险(Limitations and risks)
+
+- **可重置环境假设。** Group rollout 要同一道任务重跑多次；一次性或不可逆动作（真实下单、发邮件、删生产数据）不能直接用原算法。[^limits]
+- **轨迹污染会被蒸馏。** 原文明确说开放环境中的 past trajectories 可能含 adversarial content；如果拿被污染轨迹优化，可能把攻击行为写进持久 harness。[^limits]
+- **敏感改动需要人工门。** 伦理节要求完整 audit logs、敏感 harness edits 人工批准、面向高影响任务时用领域安全检查。[^ethics]
+- **GAIA-2 数据完整性有提示级边界。** 论文承认 Terminal-Bench 2 的“不读 test / solution / verifier log”是 prompt-level convention，不是 sandbox 强隔离；GAIA-2 也有环境改动（如 `send_message_to_user` 每 turn 上限从 1 提到 4）。[^datasets]
+- **同一模型多角色会放大共识幻觉。** 作者为了避免 confound，让同一个 `gpt-5.5` 同时做 solver、judge、optimizer、ranker；这保证可比性，但也意味着 judge 的盲点可能和 solver 同源。[^hparams]
+
+## 先读什么(What to read first)
+
+1. **Abstract + Figure 1**：先看它如何把 validation-feedback optimization 和 retrospective optimization 对开。
+2. **§3 Problem Setting**：看清 `U(t, τ)` 是 latent，RHO 用 self-preference estimator 替代。
+3. **Algorithm 1 + §4.1-§4.3**：完整理解 DPP coreset、group rollout、Best-of-N proposal。
+4. **Table 1 / Table 2 / Table 4**：主结果、Meta-Harness 对照、诊断消融都在这里。
+5. **Appendix B / C / F**：超参、实现细节、成本账。这里能看出它不是免费自进化。
+6. **GitHub 仓库**：读 `src/rho/loop.py`、`selection/dpp_selector.py`、`orchestrators/diagnose.py`、`orchestrators/evaluate.py`、`codex/retrospection.py`，确认论文 pipeline 怎样落成代码。[^repo]
+
+## 技术细节(选读)
+
+**1. DPP 选样不是“挑最高分”。**
+
+大白话：如果只挑最难，十个任务可能全是同一种坑；如果只挑最多样，会混进很多太容易、没优化价值的任务。DPP 像“难度加权的防撞选题器”，让被选样本既难又互相不太像。
+
+精确机制：difficulty judge 给每条轨迹分数 `r_i ∈ [0,10]` 和 fingerprint；fingerprint embedding 的 cosine similarity 形成 `S`；核矩阵 `K = diag(r̃) S diag(r̃)`，`r̃_i = (max(r_i, ε) / max_j max(r_j, ε))^α`，`α = θ / (2(1-θ))`，论文取 `θ=0.7`、`ε=0.1`。仓库 `src/rho/selection/dpp_selector.py` 实现了 fast greedy MAP；当 `θ=1.0` 时源码专门切到对角矩阵，避免指数下溢。[^dpp][^repo]
+
+**2. 诊断 prompt 明确拆成五步。**
+
+大白话：RHO 不让模型“随便总结一下三条轨迹”，而是强迫它先逐条验收，再分析失败模式，再比较分歧，再提出一个 task-agnostic 改进方向，最后给 severity。
+
+精确机制：`orchestrators/diagnose.py` 的 `DIAGNOSE_INSTRUCTIONS` 输出固定 JSON：`severity`、`trajectory_analyses`、`failure_mode_analysis`、`inconsistency_analysis`、`harness_improvement_direction`。消融版本会移除 self-validation 或 self-consistency 对应字段，但保留外层脚手架。[^diagnose][^repo]
+
+**3. pairwise rank 有位置偏差处理，但仍保守。**
+
+大白话：让模型比较 A/B 时，先后顺序会影响偏好。源码把 candidate trajectory 放在 A，baseline 放在 B，然后在解析后取负号，试图抵消“后项偏好”；解析失败或执行失败给 0 分，避免错误把候选推上线。
+
+精确机制：`orchestrators/evaluate.py` 的 prompt 要求输出 `{"value": <integer in [-10,10]>, "rationale": ...}`；失败时返回 `Score(value=0)`。`loop.py` 按 task 聚合平均分，最高候选只有 `mean_score > 0` 才 `accepted=true`。[^pipeline][^repo]
+
+**4. 防张冠李戴：RHO 不是 RL，也不是微调。**
+
+论文说 Group Rollout 受“组内相对优势作为 reward signal”的 RL 工作启发，但 RHO 本身**不更新模型权重**、不做 GRPO、不训练 skill curator。它改的是 filesystem harness。把 RHO 写成 RLHF / reinforcement learning / PEFT 方法都是错的；它更接近“无标签轨迹复盘 + 文件级 harness diff”。[^method]
+
+## 后续演化 · 这方法后来怎样了
+
+本文 arXiv v2 是 2026-06-10，距离当前 2026-06-11 太近，我没有找到可可靠核实的“后续引用改进 RHO”的前向工作；下面只列原文/ HF 推荐中可定位的相邻脉络，不当作 RHO 的后继成果。
+
+- **Meta-Harness**（arXiv:2603.28052）是最直接对照：同样改 full harness，但用 validation feedback 搜索，多轮成本高，10 轮 SWE-Bench Pro 到 0.80。_[置信度:高]_
+- **ReasoningBank**（arXiv:2509.25140）和 **Sleep-time Compute** 是 RHO 的 feedback-free baselines：前者存 reusable reasoning patterns，后者离线压缩 past traces 成 context/memory；RHO 的差异是能改 tools + skills。_[置信度:高]_
+- **SkillOS**（HF librarian-bot 推荐为 2026 相关工作）路线是训练 skill curator；RHO 原文定位表明确说 SkillOS 仍需 labeled training corpus、separate judge model、weight updates。_[置信度:中；相关但非本文后继]_
+- **Socratic-SWE / SkillRevise / SkillOpt / CODESKILL** 等 HF 页面推荐同属“从 trace 改 skill/harness”的相邻赛道；本轮未逐篇读全文，不能断言它们改进了 RHO。_[置信度:低；仅作后续选稿线索]_[^hf]
+
+[^arxiv]: arXiv abs/PDF/TeX v2：*Evolving Agents in the Dark: Retrospective Harness Optimization via Self-Preference*, arXiv:2606.05922，submitted 2026-06-04，last revised 2026-06-10。https://arxiv.org/abs/2606.05922
+[^intro]: arXiv v2 §1 Introduction：validation-feedback optimizer 依赖 labeled validation set；RHO 从 past trajectories 单趟优化。
+[^setting]: arXiv v2 §3 Problem Setting：`h`、`τ = solve(h,t)`、`D={τ_i}`、latent utility `U(t,τ)` 与 self-preference ranking。
+[^related]: arXiv v2 §2 Related Work 与 Appendix G：OPRO/DSPy/TextGrad/GEPA/ADAS/Meta-Harness 等 validation-feedback 家族。
+[^method]: arXiv v2 §4 Retrospective Harness Optimization / Algorithm 1：coreset selection、group rollout、best-of-N proposal、`S_j>0` 接受条件。
+[^dpp]: arXiv v2 §4.1 与 Appendix B；源码实读 `src/rho/selection/dpp_selector.py`，repo HEAD `a20659544506e863c60ee961265683235847be52`。
+[^diagnose]: arXiv v2 §4.2、Appendix A diagnosis prompt；源码实读 `src/rho/orchestrators/diagnose.py` 与 `src/rho/strategies/diagnose.py`。
+[^pipeline]: arXiv v2 Appendix C Pipeline Implementation Details；源码实读 `src/rho/loop.py`、`src/rho/protocols.py`、`src/rho/stores/harness.py`。
+[^main]: arXiv v2 Table 1；项目页 Results 同列该表。https://paper-rho.wenbo.io/
+[^meta]: arXiv v2 Table 2 与 Appendix F.4：Meta-Harness 单轮/十轮调用数与 SWE-Bench Pro 结果。
+[^bestofn]: arXiv v2 Table 3：Best-of-N 候选 mean/chosen/std/lowest。
+[^diagnosis]: arXiv v2 Table 4：diagnosis step 消融。
+[^artifacts]: arXiv v2 Figure 3 / Appendix H；源码仓库 README 也列 `src/rho/`、`.claude/workflows/retrospection.js`、`codex/retrospection.py`、webui/tests 等布局。
+[^hparams]: arXiv v2 Appendix B Hyperparameters and Infrastructure。
+[^datasets]: arXiv v2 Appendix D Dataset Specifications：SWE-Bench Pro split、Terminal-Bench 2 split/data integrity、GAIA-2 mini split/environment modifications。
+[^cost]: arXiv v2 Appendix F Optimization-Phase Compute Cost，Table 7/8。
+[^limits]: arXiv v2 Limitations。
+[^ethics]: arXiv v2 Ethics Statement。
+[^repo]: GitHub `wbopan/retro-harness` 实读，HEAD `a20659544506e863c60ee961265683235847be52`；README 自称 MIT、Python 3.11+、7 commits、无 releases（GitHub 页面 2026-06-11 显示 16 stars / 1 fork）。https://github.com/wbopan/retro-harness
+[^hf]: Hugging Face paper page 2026-06-11：#3 Paper of the day、Upvote 51、GitHub linked；librarian-bot 推荐 SkillRevise/SkillOpt/CODESKILL/Socratic-SWE 等相邻论文。https://huggingface.co/papers/2606.05922
