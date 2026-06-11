@@ -32,16 +32,16 @@ outputs:
   - executable_search_traces
   - byte_equivalent_tool_observations
 core_concepts:
-  - name: "直接语料交互（DCI）"
+  - name: "Direct Corpus Interaction（直接语料交互 DCI）"
     role: primary
     evidence: "treats the corpus itself as the search environment"
-  - name: "答案屏蔽倒推轨迹合成"
+  - name: "答案感知倒推 + 答案盲顺写（冷启动轨迹合成）"
     role: primary
     evidence: "answer-aware Tutor and answer-blind Planner"
-  - name: "格式门奖励"
+  - name: "格式门 × token-F1 奖励"
     role: supporting
     evidence: "binary format indicator"
-  - name: "语义保持分片并行"
+  - name: "语义保持分片并行执行（semantics-preserving sharded-parallel）"
     role: primary
     evidence: "preserving byte-exact equivalence with sequential execution"
   - name: "混合搜索"

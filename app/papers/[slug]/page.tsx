@@ -4,11 +4,28 @@ import { notFound } from "next/navigation";
 import { PaperDeepDive } from "@/components/PaperDeepDive";
 
 const CONTENT_DIR = path.join(process.cwd(), "content", "papers");
+const PUBLISHABLE_COLD_AUDIT = new Set(["grandfathered", "ready_to_publish"]);
+
+function isPublishableDeepRead(meta: { status?: string; cold_audit?: { status?: string } } | null) {
+  if (!meta || meta.status !== "deep_read") return false;
+  const state = meta.cold_audit?.status;
+  return !state || PUBLISHABLE_COLD_AUDIT.has(state);
+}
 
 export async function generateStaticParams() {
   try {
     const entries = await fs.readdir(CONTENT_DIR, { withFileTypes: true });
-    return entries.filter((e) => e.isDirectory()).map((e) => ({ slug: e.name }));
+    const params = [];
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      try {
+        const raw = await fs.readFile(path.join(CONTENT_DIR, entry.name, "metadata.json"), "utf8");
+        if (isPublishableDeepRead(JSON.parse(raw))) params.push({ slug: entry.name });
+      } catch {
+        // Invalid or missing metadata cannot be safely published.
+      }
+    }
+    return params;
   } catch {
     return [];
   }
@@ -31,6 +48,6 @@ async function readDeepDive(slug: string) {
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const data = await readDeepDive(slug);
-  if (!data) notFound();
+  if (!data || !isPublishableDeepRead(data.meta)) notFound();
   return <PaperDeepDive meta={data.meta} paper={data.paper} career={data.career} />;
 }

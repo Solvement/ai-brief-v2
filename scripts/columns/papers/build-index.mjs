@@ -59,6 +59,9 @@ export async function collectDeepReads(deps = {}) {
       title: meta.title || d.name,
       date: meta.date || meta.first_seen_date || "",
       first_seen_date: meta.first_seen_date || meta.date || "",
+      // 精读发布日（前端按这一天分组,Kevin 打开就能看到"今天有新精读"):
+      // 过冷审门的用 audited_at 那天;grandfathered/legacy 没有审计日,回退 first_seen。
+      deep_read_date: (meta.cold_audit?.audited_at || "").slice(0, 10) || meta.deep_read_date || meta.first_seen_date || meta.date || "",
       must_read: Boolean(meta.must_read),
       foundational: Boolean(meta.foundational),
       track: meta.track === "conference" ? "conference" : "hf",

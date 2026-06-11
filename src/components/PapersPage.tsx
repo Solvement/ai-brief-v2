@@ -123,7 +123,9 @@ export function PapersPage() {
       // reads" — keep them out of the daily date tabs and behind their own 奠基 tab so the date
       // tabs reflect genuine daily curation.
       if (d.foundational) { foundational.push(d); continue; }
-      const k = dateKey(d.first_seen_date || d.date) || "未知";
+      // 按精读发布日分组(deep_read_date=过冷审那天),不是论文策展日——否则当天新精读会被
+      // 归档进老日期标签,打开像"没更新"(2026-06-10 Kevin 实际踩到)。老索引无此字段时回退。
+      const k = dateKey(d.deep_read_date || d.first_seen_date || d.date) || "未知";
       (map.get(k) || map.set(k, []).get(k)!).push(d);
     }
     const dated = [...map.entries()]

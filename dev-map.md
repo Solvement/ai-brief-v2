@@ -59,6 +59,7 @@ KG-2 / Mind Palace 入口（2026-06-10）：`npm run kg:build` = brief graph →
 - 项目栏内容/排序 → `ingest.mjs` + `lib/project-*`
 - 模型栏 → `public/data/models.json`（当前手工策展）
 - 文章/学术 → `papers-radar.mjs` + `columns/papers/`。papers-radar 是单一学术引擎；Articles surface 由 papers column publish 产出 `public/data/articles.json`；`refresh`-`articles` 已退役。
+- 论文详情页发布门 → `app/papers/[slug]/page.tsx`。页面级路由也必须遵守 `cold_audit.status`：仅 legacy/`grandfathered`/`ready_to_publish` 可渲染，`needs_human`/`hold`/`audit_error` 不能靠直达 URL 上线。
 - 任何视觉 → `styles.css`（:root + 末尾 B 覆盖块）+ 对应 page
 
 ## 旧 harness 去哪了

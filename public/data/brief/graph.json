@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T23:18:51.218Z",
+  "generatedAt": "2026-06-11T00:41:02.336Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -6393,7 +6393,9 @@
         "reinforcement-learning",
         "sharded-parallel-execution",
         "lexical-vs-dense",
-        "qwen3.5-9b"
+        "qwen3.5-9b",
+        "retrieval-agent",
+        "hybrid-retrieval"
       ],
       "file": "content/papers/2605.29307-grepseek-dci-search-agent/metadata.json",
       "arxiv_id": "2605.29307",
@@ -6787,6 +6789,28 @@
       "topic": "data"
     },
     {
+      "id": "paper:2606.05563",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.05563-socrates-mediation-eval",
+      "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
+      "tags": [
+        "benchmark",
+        "llm-as-judge",
+        "judge-calibration",
+        "topic-localized-evaluation",
+        "counterfactual-baseline",
+        "hard-task-filtering",
+        "proactive-agents",
+        "mediation",
+        "social-cognition",
+        "multi-agent-simulation"
+      ],
+      "file": "content/papers/2606.05563-socrates-mediation-eval/metadata.json",
+      "arxiv_id": "2606.05563",
+      "topic": "eval"
+    },
+    {
       "id": "paper:2606.05622",
       "type": "paper",
       "family": "paper",
@@ -6799,9 +6823,11 @@
         "progressive-disclosure",
         "interactive-evaluation",
         "user-simulator",
+        "constraint-tracking",
         "llm-judge-calibration",
         "replanning",
-        "early-stopping"
+        "early-stopping",
+        "agent-eval"
       ],
       "file": "content/papers/2606.05622-adaplanbench-dual-constraint-planning/metadata.json",
       "arxiv_id": "2606.05622",
@@ -6815,14 +6841,14 @@
       "title": "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
       "tags": [
         "agent-skills",
-        "lora",
+        "latent-skill",
+        "lora-adapter",
         "hypernetwork",
-        "weight-space",
-        "context-compression",
+        "weight-space-memory",
         "skill-composition",
-        "prompt-injection-robustness",
-        "modular-adapters",
-        "qwen3-8b"
+        "parameter-efficient-adaptation",
+        "self-evolving-agent",
+        "agent-efficiency"
       ],
       "file": "content/papers/2606.06087-latentskill-weight-space-skills/metadata.json",
       "arxiv_id": "2606.06087",
@@ -6898,6 +6924,50 @@
       "topic": "code"
     },
     {
+      "id": "paper:2606.09079",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.09079-flashmemory-lookahead-sparse-attention",
+      "title": "FlashMemory-DeepSeek-V4: Lightning Index Ultra-Long Context via Lookahead Sparse Attention",
+      "tags": [
+        "long-context",
+        "kv-cache",
+        "sparse-attention",
+        "predictive-prefetch",
+        "dual-encoder",
+        "decoupled-training",
+        "memory-management",
+        "deepseek-v4",
+        "negative-results"
+      ],
+      "file": "content/papers/2606.09079-flashmemory-lookahead-sparse-attention/metadata.json",
+      "arxiv_id": "2606.09079",
+      "topic": "inference"
+    },
+    {
+      "id": "paper:2606.09669",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.09669-spatialworld-interactive-spatial-benchmark",
+      "title": "SpatialWorld: Benchmarking Interactive Spatial Reasoning of Multimodal Agents in Real-World Tasks",
+      "tags": [
+        "multimodal-agent",
+        "interactive-spatial-reasoning",
+        "embodied-agent",
+        "agent-eval",
+        "benchmark",
+        "terminal-state-verification",
+        "unified-action-interface",
+        "partial-observability",
+        "step-efficiency",
+        "simulator-suite",
+        "self-improving-agent"
+      ],
+      "file": "content/papers/2606.09669-spatialworld-interactive-spatial-benchmark/metadata.json",
+      "arxiv_id": "2606.09669",
+      "topic": "agent-evaluation"
+    },
+    {
       "id": "radar:chopratejas/headroom",
       "type": "project",
       "family": "project",
@@ -6922,30 +6992,6 @@
       "radar": true
     },
     {
-      "id": "radar:can1357/oh-my-pi",
-      "type": "project",
-      "family": "project",
-      "slug": "oh-my-pi",
-      "title": "can1357/oh-my-pi",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/can1357/oh-my-pi",
-      "ghost": true,
-      "radar": true
-    },
-    {
-      "id": "radar:yikart/AiToEarn",
-      "type": "project",
-      "family": "project",
-      "slug": "aitoearn",
-      "title": "yikart/AiToEarn",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/yikart/AiToEarn",
-      "ghost": true,
-      "radar": true
-    },
-    {
       "id": "radar:colbymchenry/codegraph",
       "type": "project",
       "family": "project",
@@ -6958,26 +7004,14 @@
       "radar": true
     },
     {
-      "id": "radar:rohitg00/agentmemory",
+      "id": "radar:CloakHQ/CloakBrowser",
       "type": "project",
       "family": "project",
-      "slug": "agentmemory",
-      "title": "rohitg00/agentmemory",
+      "slug": "cloakbrowser",
+      "title": "CloakHQ/CloakBrowser",
       "tags": [],
       "file": "public/data/trending.json",
-      "url": "https://github.com/rohitg00/agentmemory",
-      "ghost": true,
-      "radar": true
-    },
-    {
-      "id": "radar:fathah/hermes-desktop",
-      "type": "project",
-      "family": "project",
-      "slug": "hermes-desktop",
-      "title": "fathah/hermes-desktop",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/fathah/hermes-desktop",
+      "url": "https://github.com/CloakHQ/CloakBrowser",
       "ghost": true,
       "radar": true
     },
@@ -7002,6 +7036,18 @@
       "tags": [],
       "file": "public/data/trending.json",
       "url": "https://github.com/refactoringhq/tolaria",
+      "ghost": true,
+      "radar": true
+    },
+    {
+      "id": "radar:roboflow/supervision",
+      "type": "project",
+      "family": "project",
+      "slug": "supervision",
+      "title": "roboflow/supervision",
+      "tags": [],
+      "file": "public/data/trending.json",
+      "url": "https://github.com/roboflow/supervision",
       "ghost": true,
       "radar": true
     },
@@ -15542,6 +15588,16 @@
       "evidence": "MemoryAgentBench 评测智能体长期记忆系统、PEFT 论文用 LoRA 承载个性化持久状态,都围绕「给智能体一份可持续累积的记忆」这一用途,前者是后者一类方法的潜在评测台。"
     },
     {
+      "from": "content/memoryagentbench",
+      "to": "content/agemem",
+      "type": "composes_with",
+      "confidence": "high",
+      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "verified_from_facet": true
+    },
+    {
       "from": "concept/agentic-memory",
       "to": "content/agemem",
       "type": "same_track",
@@ -15628,15 +15684,6 @@
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签 search-agent、reinforcement-learning",
-      "weight": 2,
-      "weak": true
-    },
-    {
-      "from": "paper:2606.06087",
-      "to": "paper:2606.06492",
-      "type": "same_track",
-      "confidence": "medium",
-      "evidence": "共享标签 lora、hypernetwork",
       "weight": 2,
       "weak": true
     },
@@ -15745,16 +15792,6 @@
     },
     {
       "from": "content/memoryagentbench",
-      "to": "content/agemem",
-      "type": "composes_with",
-      "confidence": "high",
-      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
-      "kg_integrated": true,
-      "cross_doc": true,
-      "verified_from_facet": true
-    },
-    {
-      "from": "content/memoryagentbench",
       "to": "content/mempalace",
       "type": "composes_with",
       "confidence": "medium",
@@ -15856,6 +15893,16 @@
     {
       "from": "content/memoryagentbench",
       "to": "paper:2606.02060",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "content/memoryagentbench",
+      "to": "paper:2606.05563",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:benchmark",
@@ -15974,6 +16021,36 @@
       "weak": true
     },
     {
+      "from": "paper:2507.21046",
+      "to": "paper:2606.06087",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2508.07407",
+      "to": "paper:2606.06087",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2605.28556",
+      "to": "paper:2606.05563",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:llm-as-judge",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
       "from": "paper:2605.31264",
       "to": "paper:2606.01249",
       "type": "same_track",
@@ -16014,6 +16091,16 @@
       "weak": true
     },
     {
+      "from": "paper:2605.31584",
+      "to": "paper:2606.09669",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-improving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
       "from": "paper:2606.00408",
       "to": "paper:2606.03458",
       "type": "same_track",
@@ -16024,21 +16111,21 @@
       "weak": true
     },
     {
-      "from": "paper:2606.02060",
-      "to": "paper:2606.05622",
+      "from": "paper:2606.00408",
+      "to": "paper:2606.09079",
       "type": "same_track",
       "confidence": "medium",
-      "evidence": "共享标签:benchmark",
+      "evidence": "共享标签:long-context",
       "kg_integrated": true,
       "cross_doc": true,
       "weak": true
     },
     {
-      "from": "paper:2606.02437",
-      "to": "paper:2606.06087",
+      "from": "paper:2606.02060",
+      "to": "paper:2606.09669",
       "type": "same_track",
       "confidence": "medium",
-      "evidence": "共享标签:lora",
+      "evidence": "共享标签:self-improving-agent、benchmark",
       "kg_integrated": true,
       "cross_doc": true,
       "weak": true
@@ -16049,6 +16136,86 @@
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:lora",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.03458",
+      "to": "paper:2606.09079",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:long-context",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05563",
+      "to": "paper:2606.02060",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05563",
+      "to": "paper:2606.05622",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05563",
+      "to": "paper:2606.09669",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05622",
+      "to": "paper:2606.09669",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark、agent-eval",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05622",
+      "to": "paper:2606.02060",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.06087",
+      "to": "paper:2606.06492",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:hypernetwork",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.09669",
+      "to": "content/memoryagentbench",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
       "kg_integrated": true,
       "cross_doc": true,
       "weak": true
@@ -31473,19 +31640,6 @@
     },
     {
       "type": "same_track",
-      "source": "paper:2606.06087",
-      "target": "paper:2606.06492",
-      "edge": {
-        "from": "paper:2606.06087",
-        "to": "paper:2606.06492",
-        "type": "same_track",
-        "confidence": "medium",
-        "evidence": "共享标签 lora、hypernetwork",
-        "weight": 2
-      }
-    },
-    {
-      "type": "same_track",
       "source": "ghost:hkuds-openspace",
       "target": "ghost:voyager-skill-library",
       "edge": {
@@ -31499,8 +31653,8 @@
     }
   ],
   "summary": {
-    "nodes": 588,
-    "edges": 1437,
+    "nodes": 589,
+    "edges": 1449,
     "nodeByType": {
       "content": 63,
       "source-pack": 69,
@@ -31512,17 +31666,17 @@
       "evidence": 3,
       "artifact": 69,
       "taste": 1,
-      "paper": 31,
-      "project": 13
+      "paper": 34,
+      "project": 11
     },
     "edgeByType": {
       "references": 1374,
       "builds_on": 2,
       "shares_method": 6,
       "same_use_case": 3,
-      "same_track": 39,
-      "improves_on": 2,
       "composes_with": 9,
+      "same_track": 51,
+      "improves_on": 2,
       "contradicts": 2
     },
     "wikilinks": {
@@ -31542,8 +31696,8 @@
     "ghostCandidates": 12,
     "references": 1374,
     "associativeEdges": 24,
-    "crossDocEdges": 41,
-    "ghosts": 21,
+    "crossDocEdges": 54,
+    "ghosts": 19,
     "assessed": 40,
     "facetedNodes": 16
   }

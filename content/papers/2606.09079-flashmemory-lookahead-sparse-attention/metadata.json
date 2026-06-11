@@ -68,5 +68,9 @@
     "breadth_value": 7,
     "evidence_quality": 7
   },
-  "one_sentence_judgment": "把「该留哪些 KV」改写成标准双塔检索问题:每 64 步预测未来要用的历史 CSA 块、阈值召回(≥0.5 全取,允许空手)从 CPU 冷池预取;Table 1 Avg 行实值为物理 KV cache 0.42 vs 3.90 GB、精度 77.5 vs 76.9(+0.6),LongBench-v2-L 为 0.74 vs 7.52 GB(约 9.8%),另有 13.5% 是原文 §3.2 逐基准占比平均而非 Avg 行直接相除;精度反升的机制解释=LSA 当 attention denoiser 滤掉无关历史块(作者解释)——最值钱的是两个方法论:解耦训练(冻结骨干、只训 <0.1% 查询塔,单个 H20 GPU-hour 收敛,8×H20 一周 500 次配置扫描)和罕见诚实的失败剖析(O(1) 假设被 No-Context 对抗测试推翻、MRCR 76→48 经 oracle 诊断归因为任务本质需要密集全局记忆、长度泛化止于训练长度 2 倍);保留:项目中途叫停 τ/阈值无消融、RULER 128K/256K 实为掉分、对照是 DS-V4-Flash 而非 dense full attention、无任何延迟/吞吐数据、开源仓库截至 2026-06-10 只有 retriever/toy loop 无生产 KV swap 且无第三方复现。"
+  "one_sentence_judgment": "把「该留哪些 KV」改写成标准双塔检索问题:每 64 步预测未来要用的历史 CSA 块、阈值召回(≥0.5 全取,允许空手)从 CPU 冷池预取;v2 Table 1 Avg 行实值为物理 KV cache 0.10 vs 0.93 GB、精度 77.5 vs 76.9(+0.6),LongBench-v2-L 为 0.18 vs 1.80 GB(10.0%),另有 13.5% 是原文 §3.2 逐基准占比平均而非 Avg 行直接相除;精度反升的机制解释=LSA 当 attention denoiser 滤掉无关历史块(作者解释)——最值钱的是两个方法论:解耦训练(冻结骨干、只训 <0.1% 查询塔,单个 H20 GPU-hour 收敛,8×H20 一周 500 次配置扫描)和罕见诚实的失败剖析(O(1) 假设被 No-Context 对抗测试推翻、MRCR 76→48 经 oracle 诊断归因为任务本质需要密集全局记忆、长度泛化止于训练长度 2 倍);保留:项目中途叫停 τ/阈值无消融、RULER 128K/256K 实为掉分、对照是 DS-V4-Flash 而非 dense full attention、无任何延迟/吞吐数据、开源仓库截至 2026-06-10 只有 retriever/toy loop 无生产 KV swap 且无第三方复现。",
+  "cold_audit": {
+    "status": "needs_human",
+    "note": "integrity re-audit queued 2026-06-10 evening (audited-version != published-version / revised after false hold); do not publish until the gate flips this."
+  }
 }

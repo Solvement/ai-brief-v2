@@ -163,7 +163,7 @@ flowchart TD
 - **第三方复现实测**：截至本次写作（2026-06-10）未找到可信第三方复现实验报告能独立验证 GrepSeek 表格数字；本文指标仍应标为论文自报。_[置信度:中]_。
 
 [^arxiv]: 论文 *GrepSeek: Training Search Agents for Direct Corpus Interaction*, arXiv:2605.29307, submitted 2026-05-28。https://arxiv.org/abs/2605.29307
-[^hf]: Hugging Face paper page, arxiv:2605.29307, upvote 104, models citing this paper: `alireza7/GrepSeek-Qwen3.5-9B-GRPO` 与 `alireza7/GrepSeek-Qwen3.5-9B-SFT`; dataset citing this paper: `alireza7/GrepSeek-ColdStart-SFT-10k`。https://huggingface.co/papers/2605.29307
+[^hf]: Hugging Face paper page, arxiv:2605.29307；本次抓取页面显示作者发布的 `alireza7/GrepSeek-Qwen3.5-9B-GRPO`、`alireza7/GrepSeek-Qwen3.5-9B-SFT` 与 `alireza7/GrepSeek-ColdStart-SFT-10k` 关联资产。HF upvote 是动态页面指标，本文不把它作为论文结论。https://huggingface.co/papers/2605.29307
 [^intro]: 同上，Introduction：检索器 top-k index interface、DCI 作为 agent 直接操作 corpus 的替代接口；Figure 1 对比 retrieval-augmented agentic search 与 direct corpus interaction。
 [^method]: 同上，§2 开头：同期 DCI 工作主要作为 inference-time prompting strategy，依赖 Claude 等强模型，可能计算昂贵、操作低效；GrepSeek 聚焦训练小模型与高效执行。
 [^coldstart]: 同上，§2.1 / Algorithm 1 / §2.1.1：直接 RL 不稳定；answer-aware Tutor、answer-blind Planner、target masking、backward verification、forward assembly、coherence judge。

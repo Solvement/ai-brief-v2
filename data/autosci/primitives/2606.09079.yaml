@@ -61,6 +61,7 @@ risks:
   - host_specific_labels      # 标签学的是"这个宿主习惯看哪",换宿主须重抽重训
   - immature_no_ablation      # 项目中途叫停:τ=64/阈值 0.5 无消融,无第三方复现
   - release_not_production_stack # 开源 release 只有 retriever/toy loop;真实 KV swap、sglang+DS-V4 CSA 集成、fallback/routing 未放出
+  - versioned_source_drift    # arXiv HTML/PDF/TeX 版本可能不同步;关键表格数字必须以最新 PDF/TeX 源核对
 core_concepts:                              # KG-2 §3.1 受控命名,evidence 为源文逐字短语
   - name: "前瞻稀疏注意力（lookahead sparse attention）"
     role: primary

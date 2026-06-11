@@ -62,5 +62,8 @@
     "breadth_value": 8,
     "evidence_quality": 7
   },
-  "one_sentence_judgment": "AdaPlanBench 把“约束不会一次性说清”做成了可复用的 agent eval 协议：307 个家务任务、隐藏 world/user 双约束、违规才披露、连续 2 轮无新约束 early stop，并用 VPR/Acc/AWRV/AURV/ATWC/ATUC 拆出失败指纹；最有价值的结论不是 GPT-5 最高 67.75%，而是 VPR>90% 仍可 Acc<45%、显式贴回已披露约束只救合规不救效果、rubric 反馈会修新坏旧；主要保留是 GPT-5.4 裁判与 GPT-5 赢家同家族、纯文本家务域、无真实执行和人类 baseline。"
+  "one_sentence_judgment": "AdaPlanBench 把“约束不会一次性说清”做成了可复用的 agent eval 协议：307 个家务任务、隐藏 world/user 双约束、违规才披露、连续 2 轮无新约束 early stop，并用 VPR/Acc/AWRV/AURV/ATWC/ATUC 拆出失败指纹；最有价值的结论不是 GPT-5 最高 67.75%，而是 VPR>90% 仍可 Acc<45%、显式贴回已披露约束只救合规不救效果、rubric 反馈会修新坏旧；主要保留是 GPT-5.4 裁判与 GPT-5 赢家同家族、纯文本家务域、无真实执行和人类 baseline。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
 }

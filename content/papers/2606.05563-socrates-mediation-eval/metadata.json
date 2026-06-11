@@ -56,5 +56,9 @@
     "breadth_value": 8,
     "evidence_quality": 7
   },
-  "one_sentence_judgment": "SoCRATES 的核心价值不是证明某个 LLM 会不会调解，而是给开放式多轮干预任务提供一套可迁移的评测工序：agentic 场景策展 + 无调解模拟筛硬题 + 5 根社会认知轴独立扰动 + topic-localized evaluator + 反事实 consensus gain；最硬证据是裁判与专家 trajectory-level Pearson r=0.823，显著高于 ProMediate per-turn judge 的 0.372，并在 4,800 个 mediator runs 上显示最强 GPT-5.4-mini 也只达到 34.4 consensus gain。限制也明确：代码/数据 Coming soon、全 LLM 仿真非真人田野、DeepSeek-V3.2 同时做 party simulator/evaluator/被测 mediator、被测闭源模型是 mini/Flash-Lite 档，且全部对话为英语。"
+  "one_sentence_judgment": "SoCRATES 的核心价值不是证明 LLM 已能真实调解人类冲突，而是给开放式多轮 agent 评测提供一套可迁移的工程尺：agentic 场景策展、无 mediator hard-task gate、5 根社会认知轴独立扰动、topic-localized evaluator、配对反事实 Consensus Gain；最硬证据是 evaluator 与专家 trajectory-level Pearson r=0.823，高于 ProMediate per-turn judge 的 0.372，并在 4,800 个 mediator runs 上显示最强 GPT-5.4-mini 也只达到 34.4 Consensus Gain。限制同样明确：全 LLM 仿真、代码/数据 Coming soon、全部对话为英语、共识之外的满意度/公平/信任修复未纳入主指标。",
+  "cold_audit": {
+    "status": "needs_human",
+    "note": "Generator draft only; independent cold audit required before publication."
+  }
 }

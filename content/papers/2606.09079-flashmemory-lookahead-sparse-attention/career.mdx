@@ -18,7 +18,7 @@
 | 从模型内部蒸馏标签 | 离线跑冻结模型、抽中间表示当训练数据、跨源投票去噪 | 复刻 mini 版金标签管线:拿任一开源模型多层注意力分数,做 Softmax→Top-p→跨层投票,看标签量怎么从爆炸压到可用 |
 | 便宜实验设计 | 怎么把一个贵问题切出"可独立训练的小件",换来实验吞吐 | 找你手头一个慢管线,识别可预计算冻结的部分,把迭代周期从小时压到分钟 |
 | oracle 诊断法 | 组件背锅还是任务本身难?把真值直接喂给下游,隔离根因 | 给你的 RAG 系统做一次 oracle 实验:检索器换成"直接给金文档",看端到端还差多少 |
-| 开源成熟度判断 | README 自称、论文自报、可跑代码、生产集成缺口要分开 | 拿本仓库做例子:能跑 retriever scorer/toy loop,但真实 KV swap、sglang 集成和 threshold fallback 未开源 |
+| 开源成熟度判断 | README 自称、论文自报、可跑代码、生产集成缺口要分开;表格数字还要交叉核对 HTML / PDF / TeX 版本 | 拿本仓库做例子:能跑 retriever scorer/toy loop,但真实 KV swap、sglang 集成和 threshold fallback 未开源;再把 arXiv v2 Table 1 与 HTML 渲染差异单独记账 |
 
 ## 系统设计心法
 

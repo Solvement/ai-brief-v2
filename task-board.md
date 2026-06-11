@@ -15,54 +15,55 @@
 ## 进行中
 
 ### DAILY-0610 · 2026-06-10 每日链 + 冷审硬化 + KG-2 增量入图（本日态势汇总）
-- **发布**：GrepSeek 2605.29307 冷审 1 轮 PASS 已发布；LatentSkill 2606.06087 晚间批次 1 轮 PASS（待批次收尾 build-index 发布）。
-- **质量门实战**：FlashMemory 2606.09079 三轮 **HOLD**（显存数字与原文 Table 1 矛盾 + 反直觉头条缺机制解释）——门真拦了坏深读，未发布已告警；待路由 codex 按 diagnosis 修订后重审。
-- **两个管线 bug 根治**（含回归测试，52/52 绿）：① 批次内一篇 crash 不再杀全批（audit_error 隔离，545e422）；② audit_error 不再被收尾错写成终态 hold 埋掉论文（5817d3d，已修复被埋的 05563/05622，dry-run 确认重新进候选）。
-- **配额实证**：claude -p 与交互会话共享订阅 5h 时段窗（429 session limit）→ 重批量任务排交互不活跃时段（boot 09:00 合适）；memory 已记。
-- **KG-2 增量**：grepseek + latentskill facet v2 入图（14 facets，validator OK，recall@3=1.0，判边 NO_EDGE×10 全记录在 facet 注释）。
-- **待办**：SpatialWorld 2606.09669 批次审理中；05563/05622 明日 09:00 自动重审；FlashMemory 修订路由；main 推送待 Kevin。
+- **发布现状（2026-06-11 接手复核）**：GrepSeek 2605.29307 冷审 1 轮 PASS，已进入 `public/data/papers-index.json`（精读日期 2026-06-11，待 push/生产可见）。LatentSkill / FlashMemory / SoCRATES / AdaPlanBench / SpatialWorld 的全量重审均因 Claude CLI 429 在 Stage A 中断，metadata 仍为 `needs_human`，不得发布。
+- **发布完整性漏洞已根治**：1553d22 修复冷审只读“批次开始快照”的问题；Stage A/Stage B 每轮审前重新读盘，审计版本=发布版本，回归测试覆盖 `runDaily` 读取作者轮落盘后的 artifact。
+- **审稿幻觉/错杀修复已落地但待独立重审**：FlashMemory 显存数字恢复为原文正确的 0.42/3.90 GB，并补 §3.2 去噪机制解释；冷审 prompt 增加“指控数字造假必须附原文逐字引文”纪律。当前尚未过独立重审，仍不发布。
+- **批处理可靠性**：545e422/5817d3d 已修 audit_error 隔离与“audit_error 被收尾错写成终态 hold”问题；本次 5 篇 429 被正确隔离为 `audit_error`，没有污染 metadata 终态。
+- **配额实证**：claude -p 继续返回 `You've hit your session limit · resets 11pm (America/New_York)`，重审必须等额度恢复后再跑；当前不伪造 PASS。
+- **KG-2 / Mind Palace 增量**：Mind Palace 自动入图 stage 已上线并实跑，d4rt + longtracerl 两篇积压 facet 入图，`validate-mind-palace` 当前为 facets:16 / vectors:16。后续 2606.02437、2606.03458 入图尝试因 Claude 429 失败，被隔离记录在 `logs/kg-ingest/2026-06-11.json`。
+- **待办**：Claude quota 恢复后重跑 5 篇冷审；过审后 build-index + kg ingest；当前可先提交/推送 GrepSeek + 发布门硬化 + Mind Palace stage 更新，但不能宣称 6 篇全量重审完成。
 
 ### PAPER-2606.09669 · SpatialWorld 深读从头重写（plan `docs/plans/2026-06-10-spatialworld-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 SpatialWorld 写成可进入 AI-Brief 知识库的深读资产，重点沉淀“统一 I/O 瓶颈 + 终态 verifier + TSR/SE 双指标 + 任务三件套”对 multimodal agent / 自进化 agent eval 的价值。
 - **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + 项目页 + clone `Hongcheng-Gao/SpatialWorld` 源码/数据；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09669.yaml`；区分论文自报、项目页/HF/GitHub 动态核验、仓库实读。
-- **阶段**：开发完成，机器门禁待跑。
-- **阻塞**：无机器阻塞；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
-- **交付结论**：四个目标文件已从全文/源码重写，下一步跑 `build-index`、`validate-papers-deepread`、`npm run verify` 后回填。
+- **阶段**：✅ 第 1 轮作者稿复核完成 + 机器门禁通过。
+- **阻塞**：独立冷审重跑在 Stage A 遇 Claude 429，`logs/papers-cold-audit/2606.09669/status.json` 为 `audit_error`；metadata 保持 `cold_audit.status="needs_human"`，按冷审门不自动发布。
+- **交付结论**：作者稿已按 arXiv HTML/PDF 全文、HF 页面、项目页、GitHub 仓库 HEAD `55d8d47` 复核并落盘四个目标文件；机器门可过，但独立冷审未完成。
 
 ### PAPER-2606.09079 · FlashMemory-DeepSeek-V4 深读第 1 轮（plan `docs/plans/2026-06-10-flashmemory-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 FlashMemory-DeepSeek-V4 写成 AI-Brief 可收录的深读资产，重点沉淀 Lookahead Sparse Attention、KV cache 预测式预取、解耦训练与 oracle 诊断对 agent 记忆/长上下文工程的迁移价值。
 - **小方向**：读 arXiv HTML/PDF/TeX 全文 + HF paper/model 页面 + clone `libertywing/FlashMemory-Deepseek-V4` 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09079.yaml`；修正原表内存数字、15 位作者列表、仓库 release 范围，区分论文自报 / HF&GitHub 动态核验 / 仓库实读。
 - **阶段**：✅ 开发完成 + 机器门禁通过。
-- **阻塞**：无机器阻塞；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
-- **交付结论**：已写入四个目标文件；`node scripts/columns/papers/build-index.mjs`、`node scripts/validate-papers-deepread.mjs`、`npm run verify` 全绿。验证仅余既有 lint/build warning 与人工冷审待执行，不自审、不自动发布。
+- **阻塞**：作者稿已修正错误 HOLD 带来的数字回退，并补 §3.2 去噪机制解释；独立重审在 Stage A 遇 Claude 429，metadata 保持 `cold_audit.status="needs_human"`。
+- **交付结论**：已恢复原文正确显存数字 0.42/3.90 GB，并在内容中补充审稿指出的真实机制缺口；机器门可过，但未过独立冷审，不自动发布。
 
 ### PAPER-2606.06087 · LatentSkill 深读从头写（plan `docs/plans/2026-06-10-latentskill-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 LatentSkill 写成 AI-Brief 可收录的深读资产，重点沉淀“agent textual skill 从 prompt/context 搬到 LoRA weight space”的工程价值与限制。
 - **小方向**：读 arXiv HTML/PDF/TeX 全文 + HF 页面 + clone `yuaofan0-oss/LatentSkill`；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.06087.yaml`；区分论文自报、HF 页面、仓库实读。
-- **阶段**：✅ 开发完成 + 机器门禁通过。
-- **阻塞**：无机器阻塞；官方 GitHub 当前仅 README + 图片，Code/Data/Checkpoints 仍 Coming soon，已在内容中诚实标注；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
-- **交付结论**：已写入 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.06087.yaml`；`node scripts/columns/papers/build-index.mjs`、`node scripts/validate-papers-deepread.mjs`、`npm run verify` 全绿。验证仅余既有 lint/build warning 与人工冷审待执行，不自审、不自动发布。
+- **阶段**：✅ 作者稿完成 + 机器门禁通过；重审未完成。
+- **阻塞**：官方 GitHub 当前仅 README + 图片，Code/Data/Checkpoints 仍 Coming soon，已在内容中诚实标注；完整性重审在 Stage A 遇 Claude 429，metadata 回到 `cold_audit.status="needs_human"`。
+- **交付结论**：已写入 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.06087.yaml`；但发布版尚未被独立冷审重新确认，不自动发布。
 
 ### PAPER-2606.05622 · AdaPlanBench 深读从头重写（plan `docs/plans/2026-06-10-adaplanbench-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 AdaPlanBench 写成可进入 AI-Brief 知识库的深读资产，重点沉淀 hidden world/user constraints、progressive disclosure、adaptive replanning eval 对 agent 产品与自进化验收的价值。
 - **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + clone `JiayuJeff/AdaPlanBench` 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05622.yaml`；数字集中在实验节并区分论文自报/仓库实读/原文未披露。
-- **阶段**：✅ 开发完成 + 机器门禁通过。
-- **阻塞**：无；独立冷审不在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
-- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.05622.yaml`；`build-index`、`validate-papers-deepread`、`npm run verify` 全绿。验证仅余既有 lint/build warning 与人工冷审待执行，不自审、不自动发布。
+- **阶段**：✅ 作者稿完成 + 机器门禁通过；重审未完成。
+- **阻塞**：独立冷审重跑在 Stage A 遇 Claude 429，`logs/papers-cold-audit/2606.05622/status.json` 为 `audit_error`；metadata 保持 `needs_human`。
+- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.05622.yaml`；未过冷审，不自动发布。
 
 ### PAPER-2606.05563 · SoCRATES 深读从头重写（plan `docs/plans/2026-06-10-socrates-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 SoCRATES 写成可进入 AI-Brief 知识库的深读资产，重点沉淀 topic-localized LLM judge、hard-task gate、counterfactual baseline 对 agent eval / 冷审门的可迁移价值。
 - **小方向**：读 arXiv HTML/PDF/HF/项目页全文与附录；确认代码/数据项目页仍为 Coming soon；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05563.yaml`；数字集中在实验节并标论文自报。
-- **阶段**：✅ 开发完成 + 机器门禁通过。
-- **阻塞**：无；独立冷审未在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`。
-- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.05563.yaml`；`build-index`、`validate-papers-deepread`、`npm run verify` 全绿。验证过程遇到 OneDrive `.next` 缓存 EPERM，清理构建缓存后通过；冷审仍为 `needs_human`，不自动发布。
+- **阶段**：✅ 作者稿完成 + 机器门禁通过；重审未完成。
+- **阻塞**：独立冷审重跑在 Stage A 遇 Claude 429，`logs/papers-cold-audit/2606.05563/status.json` 为 `audit_error`；metadata 保持 `needs_human`。
+- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2606.05563.yaml`；未过冷审，不自动发布。
 
 ### PAPER-2605.29307 · GrepSeek 深读从头重写（plan `docs/plans/2026-06-10-grepseek-deepread.md`）
 - **大方向**：按 canonical 论文范式把 GrepSeek 写成可进入 AI-Brief 知识库的深读资产，重点沉淀 Direct Corpus Interaction 对 agent/RAG 工程的可迁移价值。
 - **小方向**：读 arXiv HTML/PDF/TeX 全文 + HF 页面 + clone 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2605.29307.yaml`；数字集中在实验节并区分论文自报/源码实读。
-- **阶段**：✅ 开发完成 + 机器门禁通过。
-- **阻塞**：无机器阻塞；独立冷审未在当前 Codex 会话执行，metadata 保持 `cold_audit.status="needs_human"`，不自动发布。
-- **交付结论**：已重写 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2605.29307.yaml`；`build-index`、`validate-papers-deepread`、`npm run verify` 全绿。验证过程中发现既有 `public/data/models.json` 连续问号编码风险，已做最小占位修复后通过。
+- **阶段**：✅ 作者稿复核完成 + 冷审 1 轮 PASS。
+- **阻塞**：无；metadata 已标 `cold_audit.status="ready_to_publish"`。
+- **交付结论**：已按全文/源码复核并落盘 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2605.29307.yaml`；修正 HF 动态 upvote 表述、career 自报标注、AutoSci core_concepts 受控词表命名；已进入文章索引，待 push/部署生产可见。
 
 ### KG-2 · 知识关联层全语料化 + 自进化反哺 + 综合栏（plan `docs/plans/KG-2-association-layer.md`）
 - **大方向**：北极星 L1/L3——关联层覆盖全语料且**被机器真用**（gap-map 反哺选稿=自进化；跨记忆综合产 derived 节点=auto-research 种子）。Kevin 2026-06-09 loop 7 格确认（回填部分+增量、paper↔project 词表+核心概念门、竞赛+批判 agent、综合=单独栏、增量入图长在 PIPE-1、授权批判性改现有结构/范式）。
@@ -70,6 +71,7 @@
 - **阶段**：✅ Phase 0 完成（codex+Claude 两路对抗审独立收敛：solution_path→可空 discovery_trace+source_span 硬门 / same_problem KILL / core_concepts 升对象数组 role 化使核心概念门机器可判 / 判边默认 NO_EDGE+双端 evidence+negative rationale / eval 重标基线防假绿 / Phase B 指标去 self_evo_use 循环论证。schema v2 定稿 plan §3.1；范式增量已落 papers.md#14「解法是怎么找到的(选读)」+ projects.md Tier3 core_concepts+claim_ledger）。→ 🔄 pilot 切片 2 跑中（TrOPD/MetaGPT/survey 三论文 facet v2 + 项目侧 core_concepts 升级 + codex validator v2，并行）。
 - **进度续 (2026-06-10)**：✅ codex pilot 后端门完成（plan `docs/plans/KG-2-pilot-backend-gate.md`）：`validate-mind-palace` 落 v2 字段门 + bad fixture 三类 reject 实测；`concept-vocab.json` 生成；`kg:build` 链接入 vocab；TrOPD/MetaGPT/self-evolving survey 三个 paper facet 已合并到 paper 节点，`facetedNodes:12`、vectors:12。
 - **✅ pilot 切片 2 完成 (2026-06-10)**：① 独立判边（opus，generator≠judge）8 候选**全 NO_EDGE**（含 TrOPD 阴性对照；MAB 受测清单实证不含 AgeMem/supermemory，"类目级配对"被证据门挡住）→ 补 `evaluates` 边型 + `evidence_kind` 机器门；② 跨模型冷审：3 新 facet PASS（discovery_trace"数据不足"判定确认正当），4 升级文件概念命名 FAIL → 裁定**两层命名制**（name=跨文件统一规范名 / evidence=源文逐字短语）→ 修复 agent 改完、共用锚（冲突消解/可学习的记忆操作）保住、validator+vocab(31 概念)全绿；③ 前端节点面板新增**承重概念 chips + 解法发现链块**；④ kg:build + npm build 全绿 → 部署。**产品可见**：/mind-palace 点 TrOPD 看 discovery_trace、点任意 12 faceted 节点看承重概念。
+- **进度续 (2026-06-10 夜)**：✅ Mind Palace 自动入图 stage 上线并实跑：d4rt、longtracerl 两篇积压自动蒸馏入图；`public/data/brief/graph.json` 与 `data/knowledge-graph/concept-vocab.json` 均含两者，`validate-mind-palace` 当前统计 facets:16 / vectors:16。2606.02437、2606.03458 后续入图因 Claude 429 失败并隔离，待额度恢复。
 - **切片**：① 审计+schema v2 定稿 ② pilot 3 节点入图(产品可见停点) ③ 存量批量回填 ④ gap-map 反哺字段进选稿 ⑤ 综合栏第一篇(🔴 新栏目 Kevin 自审)。
 - **阻塞**：无。
 
@@ -124,6 +126,8 @@
 - 今晨 09:15 boot **挂在新闻第一步**：根因=PS5.1 `$EAP=Stop` + `native 2>&1|Tee` 把子进程 stderr 的瞬时重试日志（openai RSS retry 1/3）误判为致命错误 → 整管线死、无 marker。**根因已修**（boot-daily.ps1: EAP=Continue + git pull/npm daily/push 显式 `$LASTEXITCODE` 检查——真失败仍停，stderr 噪声不再炸）。此事故=PIPE-1(LangGraph) 论据 +1。
 - 21:5x 修复后重跑中（后台）。跑完接 **KG-2 增量入图首跑**：今日新深读 → facet 蒸馏 → 判边 → 冷审 → mind palace。
 - Loop Contract Gate（loop-engineering 协议 v2 机器硬门）今晚已实装并实弹验证（armed 时 npm 被拒/契约齐开闸/管线 LOOP_GATE=off 旁路）。
+- **收尾复核 (2026-06-11)**：6/9 的 boot-daily 事故修复已进入后续提交；Loop Contract Gate 已在 Codex 会话中再次实弹验证。KG-2 增量入图已由 6/10 夜间 stage 接管，结果记录在 DAILY-0610 / KG-2。
 
 ## 阻塞 / 等人
 - codex 额度：2026-06-08 晚耗尽，深读/管线改用 opus 子 agent 顶（见 memory feedback-subagent-fallback-and-durable）。
+- Claude CLI 额度：2026-06-11 当前仍返回 429 session limit；5 篇独立冷审与 2 篇后续 KG ingest 需要额度恢复后继续，不能由 Codex 自审替代。
