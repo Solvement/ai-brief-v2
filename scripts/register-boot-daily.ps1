@@ -42,8 +42,13 @@ $wdScript = Join-Path $proj "scripts\watchdog-daily.ps1"
 $wdAction = New-ScheduledTaskAction -Execute "powershell.exe" `
   -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$wdScript`"" `
   -WorkingDirectory $proj
-$wdTrigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).Date.AddHours(9)) `
+# BUGFIX 2026-06-11: -Once trigger's 12h repetition only covered the REGISTRATION day —
+# watchdog silently died after day 1 (NextRunTime empty; 6-11 boot ^C went unrevived).
+# Daily trigger + repetition pattern = revives every day 09:00-21:00.
+$wdTrigger = New-ScheduledTaskTrigger -Daily -At 9:00am
+$wdRep = New-ScheduledTaskTrigger -Once -At 9:00am `
   -RepetitionInterval (New-TimeSpan -Minutes 30) -RepetitionDuration (New-TimeSpan -Hours 12)
+$wdTrigger.Repetition = $wdRep.Repetition
 $wdSettings = New-ScheduledTaskSettingsSet -StartWhenAvailable `
   -ExecutionTimeLimit (New-TimeSpan -Minutes 5) -MultipleInstances IgnoreNew
 Register-ScheduledTask -TaskName "AI-Brief Daily Watchdog" `
