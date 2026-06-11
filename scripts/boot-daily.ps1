@@ -25,6 +25,23 @@ function Log($m) { $line = "$(Get-Date -Format HH:mm:ss) $m"; Write-Output $line
 
 Log "=== AI-Brief daily boot (deterministic) $today ==="
 try {
+  # Branch pin (2026-06-11): a concurrent session can leave the shared working dir on another branch
+  # (e.g. a UI-redesign branch). The nightly pipeline must always run on the deploy branch, else it
+  # runs/commits on the wrong branch (or this very script is absent on that branch). Stash any
+  # other-session WIP into a NAMED, recoverable stash (never discard) then checkout the deploy branch.
+  $deployBranch = "feat/nextjs-migration"
+  $curBranch = (git rev-parse --abbrev-ref HEAD 2>$null)
+  if ($curBranch) { $curBranch = $curBranch.Trim() }
+  if ($curBranch -ne $deployBranch) {
+    Log "branch pin: on '$curBranch', switching to '$deployBranch'"
+    if (git status --porcelain) {
+      git stash push -u -m "boot-pin-autostash-$today" 2>&1 | Tee-Object -FilePath $log -Append
+      Log "branch pin: stashed other-session WIP (recover via: git stash list | git stash pop)"
+    }
+    git checkout $deployBranch 2>&1 | Tee-Object -FilePath $log -Append
+    if ($LASTEXITCODE -ne 0) { throw "branch pin: checkout $deployBranch failed (exit $LASTEXITCODE)" }
+  }
+
   Log "git pull..."; git pull --rebase --autostash 2>&1 | Tee-Object -FilePath $log -Append
   if ($LASTEXITCODE -ne 0) { throw "git pull failed (exit $LASTEXITCODE)" }
 

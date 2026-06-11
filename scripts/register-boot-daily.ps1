@@ -12,8 +12,18 @@ $script = Join-Path $proj "scripts\boot-daily.ps1"
 # Hidden (2026-06-10): Minimized still creates a closable console window in the user's session —
 # three runs died with 0xC000013A (console CTRL_C/close) on 6-09/6-10, killing the whole pipeline
 # including in-flight codex audits. Hidden = no window to close; pipeline output lives in the log.
+# Branch checkout in the ACTION (2026-06-11): a concurrent session can leave the shared working dir on
+# a branch where boot-daily.ps1 does not even exist (e.g. an old UI branch) — then -File would fail to
+# find the script and the whole pipeline silently no-ops. So the action -Command first checks out the
+# deploy branch (stashing any other-session WIP into a recoverable named stash), THEN runs the script.
+$deployBranch = "feat/nextjs-migration"
+$bootCmd = "Set-Location '$proj'; " +
+  "if ((git rev-parse --abbrev-ref HEAD).Trim() -ne '$deployBranch') { " +
+  "if (git status --porcelain) { git stash push -u -m 'boot-task-autostash' | Out-Null }; " +
+  "git checkout $deployBranch | Out-Null }; " +
+  "& '$script'"
 $action = New-ScheduledTaskAction -Execute "powershell.exe" `
-  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`"" `
+  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$bootCmd`"" `
   -WorkingDirectory $proj
 
 # Two triggers: at logon (delayed 5 min) + daily wall-clock 09:00.
