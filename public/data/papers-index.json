@@ -1,12 +1,60 @@
 {
-  "generatedAt": "2026-06-11T14:03:19.416Z",
+  "generatedAt": "2026-06-11T15:36:18.351Z",
   "date": "2026-06-11",
   "counts": {
-    "deepReads": 26,
+    "deepReads": 27,
     "radar": 10,
     "deepCandidates": 3
   },
   "deepReads": [
+    {
+      "slug": "2606.12191-agentic-environment-engineering-survey",
+      "arxiv_id": "2606.12191",
+      "title": "Agentic Environment Engineering for Large Language Models: A Survey of Environment Modeling, Synthesis, Evaluation, and Application",
+      "date": "2026-06-10",
+      "first_seen_date": "2026-06-11",
+      "deep_read_date": "2026-06-11",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Jiachun Li",
+        "Zhuoran Jin",
+        "Tianyi Men",
+        "Yupu Hao",
+        "Kejian Zhu",
+        "Lingshuai Wang"
+      ],
+      "tags": [
+        "survey",
+        "agentic-environment",
+        "environment-engineering",
+        "environment-synthesis",
+        "environment-evaluation",
+        "agent-environment-coevolution",
+        "world-model",
+        "curriculum-learning",
+        "environment-as-a-service",
+        "self-evolving-agent"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 8,
+        "breadth_value": 10,
+        "evidence_quality": 6
+      },
+      "source_rankings": [
+        "daily",
+        "hf_paper_of_the_day_3"
+      ],
+      "one_sentence_judgment": "一篇地图型综述，把'给 LLM agent 造环境'系统化为环境工程生命周期：POMDP 建模、8 组属性、8 个任务领域、符号/神经两类合成、correctness/diversity/complexity/fidelity 四维评估、agent evolution 4 路径与 environment evolution 3 范式；对自进化 agent 的价值很高，因为它补上环境侧设计语言，但证据主要是文献归纳和作者定性判断，没有自做 benchmark 或配套代码仓库。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12191.png"
+    },
     {
       "slug": "2606.09079-flashmemory-lookahead-sparse-attention",
       "arxiv_id": "2606.09079",
@@ -1215,70 +1263,78 @@
   ],
   "deepCandidates": [
     {
-      "arxiv_id": "2606.05922",
-      "title": "Retrospective Harness Optimization: Improving LLM Agents via Self-Preference over Trajectory Rollouts",
-      "final_score": 8.05,
+      "arxiv_id": "2606.09730",
+      "title": "SearchSwarm: Towards Delegation Intelligence in Agentic LLMs for Long-Horizon Deep Research",
+      "final_score": 7.65,
       "category": "agent",
       "autosci_relevance": "direct",
       "scores": {
         "idea_novelty": 8,
-        "system_design_value": 9,
-        "transferability_to_autosci": 8,
+        "system_design_value": 8,
+        "transferability_to_autosci": 9,
         "breadth_value": 7,
-        "ai_engineering_value": 9,
-        "buildability": 8,
-        "evaluation_value": 7,
-        "evidence_quality": 7
+        "ai_engineering_value": 8,
+        "buildability": 7,
+        "evaluation_value": 6,
+        "evidence_quality": 5
       },
-      "one_line": "利用过去轨迹自监督优化agent工具和工作流，无需标注数据。",
+      "one_line": "委托智能范式：主代理分解任务并派发给子代理，节省上下文预算，可迁移至AutoSci的自主研究工作流。",
       "deep_slug": null
     },
     {
-      "arxiv_id": "2606.07591",
-      "title": "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research",
-      "final_score": 7.5,
+      "arxiv_id": "2606.05405",
+      "title": "Agents' Last Exam",
+      "final_score": 7.4,
       "category": "eval",
       "autosci_relevance": "direct",
       "scores": {
         "idea_novelty": 7,
         "system_design_value": 8,
         "transferability_to_autosci": 8,
-        "breadth_value": 7,
-        "ai_engineering_value": 6,
-        "buildability": 8,
+        "breadth_value": 6,
+        "ai_engineering_value": 8,
+        "buildability": 7,
         "evaluation_value": 9,
-        "evidence_quality": 8
+        "evidence_quality": 7
       },
-      "one_line": "提供了一个评估端到端自主科学研究的基准，包含多学科任务和专家设计的评分标准，可迁移用于评测Agent的科研能力。",
+      "one_line": "构建经济学价值的长期任务基准的方法",
       "deep_slug": null
     },
     {
-      "arxiv_id": "2606.12191",
-      "title": "Agentic Environment Engineering for Large Language Models: A Survey of Environment Modeling, Synthesis, Evaluation, and Application",
+      "arxiv_id": "2606.07297",
+      "title": "SWE-Explore: Benchmarking How Coding Agents Explore Repositories",
       "final_score": 7.4,
-      "category": "systems",
+      "category": "agent",
       "autosci_relevance": "direct",
       "scores": {
-        "idea_novelty": 6,
-        "system_design_value": 8,
+        "idea_novelty": 8,
+        "system_design_value": 7,
         "transferability_to_autosci": 8,
-        "breadth_value": 9,
+        "breadth_value": 6,
         "ai_engineering_value": 7,
-        "buildability": 7,
-        "evaluation_value": 7,
-        "evidence_quality": 6
+        "buildability": 8,
+        "evaluation_value": 9,
+        "evidence_quality": 7
       },
-      "one_line": "代理环境工程的系统综述，教环境建模、合成、评估和应用的通用模式。",
+      "one_line": "教了如何通过细粒度基准评估智能体的仓库探索能力",
       "deep_slug": null
     }
   ],
   "radar": [
     {
-      "arxiv_id": "2606.10917",
-      "title": "Role-Agent: Bootstrapping LLM Agents via Dual-Role Evolution",
+      "arxiv_id": "2606.09076",
+      "title": "Beyond Scalar Rewards by Internalizing Reasoning into Score Distributions",
+      "final_score": 7.4,
+      "category": "training",
+      "one_line": "用分数分布替代标量奖励的教师-学生框架，降低推理成本，可迁移至训练优化。",
+      "deep_slug": null
+    },
+    {
+      "arxiv_id": "2606.10651",
+      "title": "Kwai Keye-VL-2.0 Technical Report",
       "final_score": 7.35,
-      "category": "agent",
-      "one_line": "让LLM同时扮演Agent和环境实现自举式共进化，可迁移用于自我进化的Agent系统设计。",
+      "category": "multimodal",
+      "one_line": "将稀疏注意力适配到多模态模型以处理长视频的技术",
       "deep_slug": null
     },
     {
@@ -1286,15 +1342,15 @@
       "title": "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement",
       "final_score": 7.3,
       "category": "agent",
-      "one_line": "用假设树精炼框架实现自主科研的持续学习循环。",
+      "one_line": "提出了假设树精炼框架，实现自主研究的长期循环与洞察提炼",
       "deep_slug": null
     },
     {
-      "arxiv_id": "2606.09076",
-      "title": "Beyond Scalar Rewards by Internalizing Reasoning into Score Distributions",
-      "final_score": 7.25,
-      "category": "training",
-      "one_line": "解耦推理与部署的奖励建模框架，可迁移至主观偏好优化。",
+      "arxiv_id": "2606.03988",
+      "title": "Imaginative Perception Tokens Enhance Spatial Reasoning in Multimodal Language Models",
+      "final_score": 7.1,
+      "category": "multimodal",
+      "one_line": "通过中间感知标记增强模型空间推理的方法",
       "deep_slug": null
     },
     {
@@ -1302,55 +1358,47 @@
       "title": "TIDE: Proactive Multi-Problem Discovery via Template-Guided Iteration",
       "final_score": 7.1,
       "category": "agent",
-      "one_line": "模板引导迭代框架可迁移用于自主发现多问题。",
+      "one_line": "模板引导迭代发现隐藏问题，教会主动探查多问题的工作流模式。",
       "deep_slug": null
     },
     {
       "arxiv_id": "2606.04525",
       "title": "GENEB: Why Genomic Models Are Hard to Compare",
-      "final_score": 7,
+      "final_score": 7.05,
       "category": "eval",
-      "one_line": "基因组模型统一评估基准，可迁移至跨领域模型比较方法论。",
+      "one_line": "统一基准评估基因组模型的可比性，强调标准化评测协议的可迁移模式。",
       "deep_slug": null
     },
     {
-      "arxiv_id": "2606.10651",
-      "title": "Kwai Keye-VL-2.0 Technical Report",
-      "final_score": 6.85,
-      "category": "training",
-      "one_line": "开源MoE多模态模型，采用稀疏注意力实现长视频理解，优化训练效率。",
+      "arxiv_id": "2606.00683",
+      "title": "OCC-RAG: Optimal Cognitive Core for Faithful Question Answering",
+      "final_score": 6.95,
+      "category": "rag",
+      "one_line": "教了用小模型+检索实现忠实问答的推理优化方法",
       "deep_slug": null
     },
     {
-      "arxiv_id": "2606.09730",
-      "title": "SearchSwarm: Towards Delegation Intelligence in Agentic LLMs for Long-Horizon Deep Research",
-      "final_score": 6.85,
-      "category": "agent",
-      "one_line": "训练模型学会在长时任务中智能委派子任务以节省上下文预算。",
-      "deep_slug": null
-    },
-    {
-      "arxiv_id": "2606.12344",
-      "title": "Claw-SWE-Bench: A Benchmark for Evaluating OpenClaw-style Agent Harnesses on Coding Tasks",
-      "final_score": 6.8,
-      "category": "eval",
-      "one_line": "为异构agent harness提供标准化编码基准适配协议。",
+      "arxiv_id": "2605.31039",
+      "title": "GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration",
+      "final_score": 6.9,
+      "category": "data",
+      "one_line": "用生成模型创建真实训练数据，数据生产范式可迁移至其他修复任务。",
       "deep_slug": null
     },
     {
       "arxiv_id": "2606.07229",
       "title": "MMAE: A Massive Multitask Audio Editing Benchmark",
       "final_score": 6.7,
-      "category": "eval",
-      "one_line": "大规模多任务音频编辑基准的设计方法可迁移用于其他领域评估。",
+      "category": "multimodal",
+      "one_line": "首个通用音频编辑基准，提供评测方法论可迁移至其他多模态。",
       "deep_slug": null
     },
     {
-      "arxiv_id": "2606.05553",
-      "title": "ArcANE: Do Role-Playing Language Agents Stay in Character at the Right Time?",
-      "final_score": 6.6,
-      "category": "eval",
-      "one_line": "评估角色一致性随时间演化的基准，可迁移至动态人格建模。",
+      "arxiv_id": "2606.10917",
+      "title": "Role-Agent: Bootstrapping LLM Agents via Dual-Role Evolution",
+      "final_score": 6.65,
+      "category": "agent",
+      "one_line": "让单个LLM同时作为智能体和环境，实现自举共同进化。",
       "deep_slug": null
     }
   ],
@@ -1360,7 +1408,7 @@
       {
         "arxiv_id": "2606.12397",
         "title": "Redesign Mixture-of-Experts Routers with Manifold Power Iteration",
-        "upvotes": 70,
+        "upvotes": 73,
         "num_comments": 2,
         "authors": [
           "Songhao Wu",
@@ -1375,7 +1423,7 @@
       {
         "arxiv_id": "2606.11926",
         "title": "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement",
-        "upvotes": 57,
+        "upvotes": 61,
         "num_comments": 3,
         "authors": [
           "Jiajie Jin",
@@ -1400,12 +1448,12 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12191.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.12191",
         "paper_url": "https://arxiv.org/abs/2606.12191",
-        "already_done": false
+        "already_done": true
       },
       {
         "arxiv_id": "2606.12344",
         "title": "Claw-SWE-Bench: A Benchmark for Evaluating OpenClaw-style Agent Harnesses on Coding Tasks",
-        "upvotes": 50,
+        "upvotes": 55,
         "num_comments": 1,
         "authors": [
           "Mengyu Zheng",
@@ -1420,7 +1468,7 @@
       {
         "arxiv_id": "2606.09076",
         "title": "Beyond Scalar Rewards by Internalizing Reasoning into Score Distributions",
-        "upvotes": 46,
+        "upvotes": 47,
         "num_comments": 1,
         "authors": [
           "Xin Jin",
@@ -1435,7 +1483,7 @@
       {
         "arxiv_id": "2606.09323",
         "title": "TRL-Bench: Standardizing Cross-Paradigm Representation-Level Evaluation of Tabular Encoders",
-        "upvotes": 38,
+        "upvotes": 42,
         "num_comments": 2,
         "authors": [
           "Wei Pang",
@@ -1465,7 +1513,7 @@
       {
         "arxiv_id": "2606.11683",
         "title": "Reason, Then Re-reason: Cross-view Revisiting Improves Spatial Reasoning",
-        "upvotes": 25,
+        "upvotes": 26,
         "num_comments": 1,
         "authors": [
           "Chaofan Ma",
@@ -1480,7 +1528,7 @@
       {
         "arxiv_id": "2606.12403",
         "title": "World Pilot: Steering Vision-Language-Action Models with World-Action Priors",
-        "upvotes": 21,
+        "upvotes": 22,
         "num_comments": 1,
         "authors": [
           "Zefu Lin",
@@ -1495,7 +1543,7 @@
       {
         "arxiv_id": "2606.12364",
         "title": "On Subquadratic Architectures: From Applications to Principles",
-        "upvotes": 18,
+        "upvotes": 20,
         "num_comments": 2,
         "authors": [
           "Anamaria-Roberta Hartl",
@@ -1540,7 +1588,7 @@
       {
         "arxiv_id": "2606.12195",
         "title": "InternVideo3: Agentify Foundation Models with Multimodal Contextual Reasoning",
-        "upvotes": 14,
+        "upvotes": 15,
         "num_comments": 1,
         "authors": [
           "Ziang Yan",
@@ -1555,7 +1603,7 @@
       {
         "arxiv_id": "2606.12370",
         "title": "Breaking Entropy Bounds: Accelerating RL Training via MTP with Rejection Sampling",
-        "upvotes": 14,
+        "upvotes": 15,
         "num_comments": 2,
         "authors": [
           "Yucheng Li",
@@ -1565,6 +1613,21 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12370.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.12370",
         "paper_url": "https://arxiv.org/abs/2606.12370",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.11119",
+        "title": "TRACE: A Unified Rollout Budget Allocation Framework for Efficient Agentic Reinforcement Learning",
+        "upvotes": 14,
+        "num_comments": 1,
+        "authors": [
+          "Heming Zou",
+          "Qi Wang",
+          "Yun Qu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11119.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.11119",
+        "paper_url": "https://arxiv.org/abs/2606.11119",
         "already_done": false
       },
       {
@@ -1579,21 +1642,6 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11722.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.11722",
         "paper_url": "https://arxiv.org/abs/2606.11722",
-        "already_done": false
-      },
-      {
-        "arxiv_id": "2606.11119",
-        "title": "TRACE: A Unified Rollout Budget Allocation Framework for Efficient Agentic Reinforcement Learning",
-        "upvotes": 13,
-        "num_comments": 1,
-        "authors": [
-          "Heming Zou",
-          "Qi Wang",
-          "Yun Qu"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11119.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.11119",
-        "paper_url": "https://arxiv.org/abs/2606.11119",
         "already_done": false
       },
       {
@@ -1627,6 +1675,21 @@
         "already_done": false
       },
       {
+        "arxiv_id": "2606.12412",
+        "title": "Reroute, Don't Remove: Recoverable Visual Token Routing for Vision-Language Models",
+        "upvotes": 5,
+        "num_comments": 1,
+        "authors": [
+          "Cheng-Yu Yang",
+          "Shao-Yuan Lo",
+          "Yu-Lun Liu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12412.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.12412",
+        "paper_url": "https://arxiv.org/abs/2606.12412",
+        "already_done": false
+      },
+      {
         "arxiv_id": "2606.12373",
         "title": "Verifiable Environments Are LEGO Bricks: Recursive Composition for Reasoning Generalization",
         "upvotes": 5,
@@ -1657,6 +1720,21 @@
         "already_done": false
       },
       {
+        "arxiv_id": "2606.07881",
+        "title": "Breaking the Bubble: Asynchronous Pipeline Parallel Training with Bounded Weight Inconsistency",
+        "upvotes": 4,
+        "num_comments": 1,
+        "authors": [
+          "Itay Elam",
+          "Eliron Rahimi",
+          "Avi Mendelson"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.07881.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.07881",
+        "paper_url": "https://arxiv.org/abs/2606.07881",
+        "already_done": false
+      },
+      {
         "arxiv_id": "2606.07943",
         "title": "POISE: Position-Aware Undetectable Skill Injection on LLM Agents",
         "upvotes": 3,
@@ -1672,18 +1750,33 @@
         "already_done": false
       },
       {
-        "arxiv_id": "2606.07881",
-        "title": "Breaking the Bubble: Asynchronous Pipeline Parallel Training with Bounded Weight Inconsistency",
-        "upvotes": 3,
+        "arxiv_id": "2606.11854",
+        "title": "Fine-tuning Multi-modal LLMs with ART: Art-based Reinforcement Training",
+        "upvotes": 2,
         "num_comments": 1,
         "authors": [
-          "Itay Elam",
-          "Eliron Rahimi",
-          "Avi Mendelson"
+          "Michal Chudoba",
+          "Sergey Alyaev",
+          "Petra Galuscakova"
         ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.07881.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.07881",
-        "paper_url": "https://arxiv.org/abs/2606.07881",
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11854.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.11854",
+        "paper_url": "https://arxiv.org/abs/2606.11854",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.11990",
+        "title": "Time-Series Foundation Model Embeddings for Remaining Useful Life Estimation",
+        "upvotes": 2,
+        "num_comments": 1,
+        "authors": [
+          "Amir El-Ghoussani",
+          "Michele De Vita",
+          "Ronald Naumann"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11990.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.11990",
+        "paper_url": "https://arxiv.org/abs/2606.11990",
         "already_done": false
       },
       {
@@ -1717,33 +1810,18 @@
         "already_done": false
       },
       {
-        "arxiv_id": "2606.11854",
-        "title": "Fine-tuning Multi-modal LLMs with ART: Art-based Reinforcement Training",
+        "arxiv_id": "2606.12203",
+        "title": "Adaptive Multi-Resolution Procedural Knowledge Compression for Large Language Models",
         "upvotes": 1,
         "num_comments": 1,
         "authors": [
-          "Michal Chudoba",
-          "Sergey Alyaev",
-          "Petra Galuscakova"
+          "Changyue Wang",
+          "Weihang Su",
+          "Qingyao Ai"
         ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11854.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.11854",
-        "paper_url": "https://arxiv.org/abs/2606.11854",
-        "already_done": false
-      },
-      {
-        "arxiv_id": "2606.11990",
-        "title": "Time-Series Foundation Model Embeddings for Remaining Useful Life Estimation",
-        "upvotes": 1,
-        "num_comments": 1,
-        "authors": [
-          "Amir El-Ghoussani",
-          "Michele De Vita",
-          "Ronald Naumann"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11990.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.11990",
-        "paper_url": "https://arxiv.org/abs/2606.11990",
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12203.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.12203",
+        "paper_url": "https://arxiv.org/abs/2606.12203",
         "already_done": false
       },
       {
@@ -1774,43 +1852,13 @@
         "hf_paper_url": "https://huggingface.co/papers/2606.10156",
         "paper_url": "https://arxiv.org/abs/2606.10156",
         "already_done": false
-      },
-      {
-        "arxiv_id": "2601.05212",
-        "title": "FlowLet: Conditional 3D Brain MRI Synthesis using Wavelet Flow Matching",
-        "upvotes": 0,
-        "num_comments": 1,
-        "authors": [
-          "Danilo Danese",
-          "Angela Lombardi",
-          "Matteo Attimonelli"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2601.05212.png",
-        "hf_paper_url": "https://huggingface.co/papers/2601.05212",
-        "paper_url": "https://arxiv.org/abs/2601.05212",
-        "already_done": false
-      },
-      {
-        "arxiv_id": "2605.30861",
-        "title": "Distilling LLM Feedback for Lean Theorem Proving",
-        "upvotes": 0,
-        "num_comments": 1,
-        "authors": [
-          "Gaetan Narozniak",
-          "Gérard Biau",
-          "Rémi Munos"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.30861.png",
-        "hf_paper_url": "https://huggingface.co/papers/2605.30861",
-        "paper_url": "https://arxiv.org/abs/2605.30861",
-        "already_done": false
       }
     ],
     "weekly": [
       {
         "arxiv_id": "2606.05405",
         "title": "Agents' Last Exam",
-        "upvotes": 233,
+        "upvotes": 241,
         "num_comments": 2,
         "authors": [
           "Yiyou Sun",
@@ -1910,7 +1958,7 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.07591.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.07591",
         "paper_url": "https://arxiv.org/abs/2606.07591",
-        "already_done": false
+        "already_done": true
       },
       {
         "arxiv_id": "2606.10917",
@@ -1930,7 +1978,7 @@
       {
         "arxiv_id": "2606.12397",
         "title": "Redesign Mixture-of-Experts Routers with Manifold Power Iteration",
-        "upvotes": 70,
+        "upvotes": 73,
         "num_comments": 2,
         "authors": [
           "Songhao Wu",
@@ -1955,6 +2003,21 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.07082.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.07082",
         "paper_url": "https://arxiv.org/abs/2606.07082",
+        "already_done": false
+      },
+      {
+        "arxiv_id": "2606.11926",
+        "title": "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement",
+        "upvotes": 61,
+        "num_comments": 3,
+        "authors": [
+          "Jiajie Jin",
+          "Yuyang Hu",
+          "Kai Qiu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11926.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.11926",
+        "paper_url": "https://arxiv.org/abs/2606.11926",
         "already_done": false
       },
       {
@@ -1988,21 +2051,6 @@
         "already_done": true
       },
       {
-        "arxiv_id": "2606.11926",
-        "title": "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement",
-        "upvotes": 57,
-        "num_comments": 3,
-        "authors": [
-          "Jiajie Jin",
-          "Yuyang Hu",
-          "Kai Qiu"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11926.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.11926",
-        "paper_url": "https://arxiv.org/abs/2606.11926",
-        "already_done": false
-      },
-      {
         "arxiv_id": "2606.09079",
         "title": "FlashMemory-DeepSeek-V4: Lightning Index Ultra-Long Context via Lookahead Sparse Attention",
         "upvotes": 56,
@@ -2030,6 +2078,21 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12191.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.12191",
         "paper_url": "https://arxiv.org/abs/2606.12191",
+        "already_done": true
+      },
+      {
+        "arxiv_id": "2606.12344",
+        "title": "Claw-SWE-Bench: A Benchmark for Evaluating OpenClaw-style Agent Harnesses on Coding Tasks",
+        "upvotes": 55,
+        "num_comments": 1,
+        "authors": [
+          "Mengyu Zheng",
+          "Kai Han",
+          "Boxun Li"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12344.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.12344",
+        "paper_url": "https://arxiv.org/abs/2606.12344",
         "already_done": false
       },
       {
@@ -2045,22 +2108,7 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05922.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.05922",
         "paper_url": "https://arxiv.org/abs/2606.05922",
-        "already_done": false
-      },
-      {
-        "arxiv_id": "2606.12344",
-        "title": "Claw-SWE-Bench: A Benchmark for Evaluating OpenClaw-style Agent Harnesses on Coding Tasks",
-        "upvotes": 50,
-        "num_comments": 1,
-        "authors": [
-          "Mengyu Zheng",
-          "Kai Han",
-          "Boxun Li"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.12344.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.12344",
-        "paper_url": "https://arxiv.org/abs/2606.12344",
-        "already_done": false
+        "already_done": true
       },
       {
         "arxiv_id": "2606.09730",
@@ -2093,6 +2141,21 @@
         "already_done": true
       },
       {
+        "arxiv_id": "2606.09076",
+        "title": "Beyond Scalar Rewards by Internalizing Reasoning into Score Distributions",
+        "upvotes": 47,
+        "num_comments": 1,
+        "authors": [
+          "Xin Jin",
+          "Huanqia Cai",
+          "Zhen Li"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.09076.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.09076",
+        "paper_url": "https://arxiv.org/abs/2606.09076",
+        "already_done": false
+      },
+      {
         "arxiv_id": "2606.08415",
         "title": "CoVEBench: Can Video Editing Models Handle Complex Instructions?",
         "upvotes": 47,
@@ -2105,21 +2168,6 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.08415.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.08415",
         "paper_url": "https://arxiv.org/abs/2606.08415",
-        "already_done": false
-      },
-      {
-        "arxiv_id": "2606.09076",
-        "title": "Beyond Scalar Rewards by Internalizing Reasoning into Score Distributions",
-        "upvotes": 46,
-        "num_comments": 1,
-        "authors": [
-          "Xin Jin",
-          "Huanqia Cai",
-          "Zhen Li"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.09076.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.09076",
-        "paper_url": "https://arxiv.org/abs/2606.09076",
         "already_done": false
       },
       {
@@ -2153,6 +2201,21 @@
         "already_done": false
       },
       {
+        "arxiv_id": "2606.09323",
+        "title": "TRL-Bench: Standardizing Cross-Paradigm Representation-Level Evaluation of Tabular Encoders",
+        "upvotes": 42,
+        "num_comments": 2,
+        "authors": [
+          "Wei Pang",
+          "Xiangru Jian",
+          "Hehan Li"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.09323.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.09323",
+        "paper_url": "https://arxiv.org/abs/2606.09323",
+        "already_done": false
+      },
+      {
         "arxiv_id": "2606.09669",
         "title": "SpatialWorld: Benchmarking Interactive Spatial Reasoning of Multimodal Agents in Real-World Tasks",
         "upvotes": 41,
@@ -2166,21 +2229,6 @@
         "hf_paper_url": "https://huggingface.co/papers/2606.09669",
         "paper_url": "https://arxiv.org/abs/2606.09669",
         "already_done": true
-      },
-      {
-        "arxiv_id": "2606.09323",
-        "title": "TRL-Bench: Standardizing Cross-Paradigm Representation-Level Evaluation of Tabular Encoders",
-        "upvotes": 38,
-        "num_comments": 2,
-        "authors": [
-          "Wei Pang",
-          "Xiangru Jian",
-          "Hehan Li"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.09323.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.09323",
-        "paper_url": "https://arxiv.org/abs/2606.09323",
-        "already_done": false
       },
       {
         "arxiv_id": "2606.07512",
@@ -2230,7 +2278,7 @@
       {
         "arxiv_id": "2509.10078",
         "title": "Human Psychometric Questionnaires Mischaracterize LLM Behavior",
-        "upvotes": 32,
+        "upvotes": 33,
         "num_comments": 2,
         "authors": [
           "Woojung Song",
@@ -2262,7 +2310,7 @@
       {
         "arxiv_id": "2606.05405",
         "title": "Agents' Last Exam",
-        "upvotes": 233,
+        "upvotes": 241,
         "num_comments": 2,
         "authors": [
           "Yiyou Sun",
@@ -2367,7 +2415,7 @@
       {
         "arxiv_id": "2606.02800",
         "title": "Cosmos 3: Omnimodal World Models for Physical AI",
-        "upvotes": 113,
+        "upvotes": 114,
         "num_comments": 1,
         "authors": [
           "Aditi",
@@ -2482,7 +2530,7 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.07591.png",
         "hf_paper_url": "https://huggingface.co/papers/2606.07591",
         "paper_url": "https://arxiv.org/abs/2606.07591",
-        "already_done": false
+        "already_done": true
       },
       {
         "arxiv_id": "2606.06492",
@@ -2517,7 +2565,7 @@
       {
         "arxiv_id": "2606.12397",
         "title": "Redesign Mixture-of-Experts Routers with Manifold Power Iteration",
-        "upvotes": 70,
+        "upvotes": 73,
         "num_comments": 2,
         "authors": [
           "Songhao Wu",
@@ -2590,6 +2638,21 @@
         "already_done": true
       },
       {
+        "arxiv_id": "2606.11926",
+        "title": "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement",
+        "upvotes": 61,
+        "num_comments": 3,
+        "authors": [
+          "Jiajie Jin",
+          "Yuyang Hu",
+          "Kai Qiu"
+        ],
+        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11926.png",
+        "hf_paper_url": "https://huggingface.co/papers/2606.11926",
+        "paper_url": "https://arxiv.org/abs/2606.11926",
+        "already_done": false
+      },
+      {
         "arxiv_id": "2606.09828",
         "title": "Latent Spatial Memory for Video World Models",
         "upvotes": 61,
@@ -2647,21 +2710,6 @@
         "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.31604.png",
         "hf_paper_url": "https://huggingface.co/papers/2605.31604",
         "paper_url": "https://arxiv.org/abs/2605.31604",
-        "already_done": false
-      },
-      {
-        "arxiv_id": "2606.11926",
-        "title": "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement",
-        "upvotes": 57,
-        "num_comments": 3,
-        "authors": [
-          "Jiajie Jin",
-          "Yuyang Hu",
-          "Kai Qiu"
-        ],
-        "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.11926.png",
-        "hf_paper_url": "https://huggingface.co/papers/2606.11926",
-        "paper_url": "https://arxiv.org/abs/2606.11926",
         "already_done": false
       },
       {

@@ -1,0 +1,75 @@
+primitive_id: delegation-intelligence-harness-to-sft
+source_paper: "2606.09730"
+title: "SearchSwarm: Towards Delegation Intelligence in Agentic LLMs for Long-Horizon Deep Research"
+relevance_level: direct                     # AutoSci 子 agent 编排 + 长程上下文管理的直接蓝本
+audience: ai_only
+core_pattern: >
+  把"主派发-子执行"的委托做成可训练能力：一套四原则 harness（鼓励委托 / 全交接 brief /
+  主代理保留方向判断 / 子代理报告引用落地）在推理时逼出高质量委托轨迹 → 过滤（只留答对主轨迹、
+  去重复调用与假引用）→ environment-masking SFT 蒸进权重。关键 reframe：委托 = 单模型的
+  内容感知上下文管理（子代理是同一模型的 fresh context，brief/report 替代固定规则截断）。
+  关键教训：委托行为不会从 harness 自发涌现，必须显式训练/硬约束固化。
+problem_class: train-delegation-intelligence-for-long-horizon-context-management
+core_concepts:
+  - name: "委托智能（delegation intelligence）"
+    role: primary
+    evidence: "the ability to decompose complex tasks, determine when and what to delegate, and integrate returned results into the ongoing workflow"
+  - name: "委托即上下文管理（delegation as context management）"
+    role: primary
+    evidence: "single-agent context management ... the model manages its own context more intelligently, using the model-generated brief and report as a content-aware compression in place of fixed-rule truncation or summarization"
+  - name: "harness 引导轨迹蒸馏（harness-guided trajectory to SFT）"
+    role: primary
+    evidence: "The harness-guided trajectories naturally encode correct delegation decisions, which we use as supervised fine-tuning data to internalize delegation intelligence into model weights"
+  - name: "全交接简报（comprehensive briefing）"
+    role: supporting
+    evidence: "write each brief as if addressing a new collaborator joining the investigation ... why this subtask matters ... what has been established so far, what remains uncertain, and which directions have been tried or ruled out"
+  - name: "带环境屏蔽的监督微调（SFT with environment masking）"
+    role: supporting
+    evidence: "The loss is computed only over model outputs a_t; all environment returns o_t are masked"
+  - name: "委托行为需训练而非涌现（delegation does not emerge from harness alone）"
+    role: supporting
+    evidence: "this model never invokes the call_sub_agent tool ... delegation behavior does not emerge from the harness alone and requires explicit training"
+discovery_trace:
+  hypothesis: "一套足够好的 harness（四原则系统提示词）应能在推理时直接激发委托行为，可能无需训练"
+  failed_attempts: "把完整 harness 套在未微调的 Tongyi DeepResearch（Tongyi DR Swarm）上，模型从不调用 call_sub_agent，行为退化成普通 Tongyi DR——委托未自发涌现；harness 消融显示只加委托工具仅 +2.3，需四原则把轨迹质量拉高且训练固化才稳定"
+  source_span: "原文 §3.2 末尾 'We additionally report Tongyi DR Swarm ...' + §3.3 harness 消融（47.7→50.0→57.7）"
+components:
+  - main_agent_orchestrator   # 规划/派发/核验/综合，保留方向判断
+  - sub_agent_executor        # 独立 context 执行搜集，只回交带引用的 report
+  - delegation_harness        # 工具集(search/visit/python/call_sub_agent)+四原则系统提示词
+  - trajectory_filter         # 只留答对主轨迹、去重复调用/假引用/工具误用
+  - env_masking_sft           # 只对模型输出算 loss，mask 工具返回
+autosci_modules:
+  - self_evolve_controller    # 委托型 harness = AutoSci 子 agent 编排的可抄蓝本
+  - typed_memory              # brief/report 作为内容感知压缩的结构化上下文
+  - cold_critic               # 主代理保留核心判断 = 不无条件信子代理结论
+  - self_skill_distiller      # harness 逼轨迹→过滤→蒸权重的数据合成链
+inputs:
+  - long_horizon_query        # 深研类长程任务
+  - delegation_harness        # 四原则提示词 + 工具集
+outputs:
+  - delegation_trajectories   # 可过滤为 SFT 料的委托轨迹
+  - context_budget_savings    # 主代理 context 占用下降（总算力不一定省）
+implementation_idea: >
+  Mini 版：给一个多步检索 agent 加 call_sub_agent 工具 + 抄 Appendix B 主/子提示词；主代理只收
+  子代理的摘要 report、强制 inline 引用；录成功轨迹→写过滤器去重复调用/假引用。100-300 行可跑通。
+  本项目可直接拿四原则审计现有 AutoSci 子 agent 派发，量化 brief 字段缺漏与 context 占用。
+small_experiment: >
+  同一组深研问题，对照"委托 harness vs 单代理 baseline"的答对率与主代理 token 占用；再做 harness 消融：
+  只加委托工具 vs 加四原则，看委托调用频率与质量差。1-7 天（订阅 CLI 不微调时只验 harness 端，不验 SFT 端）。
+risks:
+  - self_report_only          # 全是作者自测、无第三方复测 → 复用须自建评测
+  - preliminary_exploration   # 作者自定位初步探索 → 结论可能随底座/数据规模变
+  - no_total_compute_saving   # 只省主代理 context，子代理把成本付在自己 context，总 token 可能更多
+  - single_level_only         # 委托限单层，多层编排协调复杂度未解
+  - needs_verifiable_answer   # 数据过滤强依赖可验证对错信号，软任务难照搬
+design_principles:
+  - name: "主动委托 > 被动截断"
+    statement: "长程任务提前把 token 贵、认知浅的体力活外包给独立 context 子代理，只回收带引用的压缩报告；不要等 context 溢出再截断/摘要。"
+  - name: "brief 质量 = 子代理能力上限"
+    statement: "把每个交接简报当'给新同事的入职文档'写（为什么重要/已确认/待定/已排除），下游有用度直接由 brief 完整度决定。"
+  - name: "主代理永远保留方向判断"
+    statement: "子代理只搜证据、测假设；追哪个假设/何时收尾/矛盾怎么裁必须主代理独立定，否则错误累积传播。"
+  - name: "行为靠训练或硬约束固化，不靠涌现"
+    statement: "好 harness 是必要不充分；能微调就 SFT 蒸进权重，不能微调就把约束写得更硬——别指望模型自觉学会复杂委托。"
+status: extracted

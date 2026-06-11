@@ -86,5 +86,5 @@ test("resource/tutorial projects are capped at light even with heat", () => {
 
   assert.equal(decision.depth_band, "light");
   assert.equal(decision.final_depth, "light");
-  assert.ok(decision.rejection_reasons.includes("depth_gate:teaching_skill_or_resource_max_light"));
+  assert.ok(decision.rejection_reasons.includes("depth_gate:teaching_resource_or_template_max_light"));
 });

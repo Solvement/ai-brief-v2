@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T14:13:05.539Z",
+  "generatedAt": "2026-06-11T14:38:22.237Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -7044,6 +7044,30 @@
       "topic": "eval"
     },
     {
+      "id": "paper:2606.05922",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.05922-retrospective-harness-optimization",
+      "title": "Evolving Agents in the Dark: Retrospective Harness Optimization via Self-Preference",
+      "tags": [
+        "agent-harness",
+        "self-evolving-agent",
+        "retrospective-optimization",
+        "self-preference",
+        "trajectory-rollout",
+        "dpp-coreset",
+        "self-validation",
+        "self-consistency",
+        "best-of-n",
+        "agent-eval",
+        "codex",
+        "harness-as-files"
+      ],
+      "file": "content/papers/2606.05922-retrospective-harness-optimization/metadata.json",
+      "arxiv_id": "2606.05922",
+      "topic": "agent-self-improvement"
+    },
+    {
       "id": "paper:2606.06087",
       "type": "paper",
       "family": "paper",
@@ -7134,6 +7158,24 @@
       "topic": "code"
     },
     {
+      "id": "paper:2606.07591",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.07591-researchclawbench-autonomous-research",
+      "title": "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research",
+      "tags": [
+        "benchmark",
+        "autonomous-research",
+        "scientific-discovery",
+        "rubric-evaluation",
+        "llm-as-judge",
+        "re-discovery",
+        "research-agent"
+      ],
+      "file": "content/papers/2606.07591-researchclawbench-autonomous-research/metadata.json",
+      "arxiv_id": "2606.07591"
+    },
+    {
       "id": "paper:2606.09079",
       "type": "paper",
       "family": "paper",
@@ -7178,86 +7220,36 @@
       "topic": "agent-evaluation"
     },
     {
-      "id": "radar:chopratejas/headroom",
-      "type": "project",
-      "family": "project",
-      "slug": "headroom",
-      "title": "chopratejas/headroom",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/chopratejas/headroom",
-      "ghost": true,
-      "radar": true
+      "id": "paper:2606.12191",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.12191-agentic-environment-engineering-survey",
+      "title": "Agentic Environment Engineering for Large Language Models: A Survey of Environment Modeling, Synthesis, Evaluation, and Application",
+      "tags": [
+        "survey",
+        "agentic-environment",
+        "environment-engineering",
+        "environment-synthesis",
+        "environment-evaluation",
+        "agent-environment-coevolution",
+        "world-model",
+        "curriculum-learning",
+        "environment-as-a-service",
+        "self-evolving-agent"
+      ],
+      "file": "content/papers/2606.12191-agentic-environment-engineering-survey/metadata.json",
+      "arxiv_id": "2606.12191",
+      "topic": "agent"
     },
     {
-      "id": "radar:mvanhorn/last30days-skill",
+      "id": "radar:CopilotKit/CopilotKit",
       "type": "project",
       "family": "project",
-      "slug": "last30days-skill",
-      "title": "mvanhorn/last30days-skill",
+      "slug": "copilotkit",
+      "title": "CopilotKit/CopilotKit",
       "tags": [],
       "file": "public/data/trending.json",
-      "url": "https://github.com/mvanhorn/last30days-skill",
-      "ghost": true,
-      "radar": true
-    },
-    {
-      "id": "radar:colbymchenry/codegraph",
-      "type": "project",
-      "family": "project",
-      "slug": "codegraph",
-      "title": "colbymchenry/codegraph",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/colbymchenry/codegraph",
-      "ghost": true,
-      "radar": true
-    },
-    {
-      "id": "radar:CloakHQ/CloakBrowser",
-      "type": "project",
-      "family": "project",
-      "slug": "cloakbrowser",
-      "title": "CloakHQ/CloakBrowser",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/CloakHQ/CloakBrowser",
-      "ghost": true,
-      "radar": true
-    },
-    {
-      "id": "radar:microsoft/markitdown",
-      "type": "project",
-      "family": "project",
-      "slug": "markitdown",
-      "title": "microsoft/markitdown",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/microsoft/markitdown",
-      "ghost": true,
-      "radar": true
-    },
-    {
-      "id": "radar:refactoringhq/tolaria",
-      "type": "project",
-      "family": "project",
-      "slug": "tolaria",
-      "title": "refactoringhq/tolaria",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/refactoringhq/tolaria",
-      "ghost": true,
-      "radar": true
-    },
-    {
-      "id": "radar:roboflow/supervision",
-      "type": "project",
-      "family": "project",
-      "slug": "supervision",
-      "title": "roboflow/supervision",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/roboflow/supervision",
+      "url": "https://github.com/CopilotKit/CopilotKit",
       "ghost": true,
       "radar": true
     },
@@ -15924,6 +15916,23 @@
       "evidence": "MemoryAgentBench 评测智能体长期记忆系统、PEFT 论文用 LoRA 承载个性化持久状态,都围绕「给智能体一份可持续累积的记忆」这一用途,前者是后者一类方法的潜在评测台。"
     },
     {
+      "from": "content/ecc",
+      "to": "paper:2606.05922",
+      "type": "implements",
+      "confidence": "medium",
+      "evidence": "项目与论文标题强匹配:harness、optimization"
+    },
+    {
+      "from": "content/memoryagentbench",
+      "to": "content/agemem",
+      "type": "composes_with",
+      "confidence": "high",
+      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "verified_from_facet": true
+    },
+    {
       "from": "concept/agentic-memory",
       "to": "content/agemem",
       "type": "same_track",
@@ -15938,6 +15947,15 @@
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签 scientific-discovery、tree-search",
+      "weight": 2,
+      "weak": true
+    },
+    {
+      "from": "content/ai-scientist-v2",
+      "to": "paper:2606.07591",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签 scientific-discovery、autonomous-research",
       "weight": 2,
       "weak": true
     },
@@ -16112,16 +16130,6 @@
       "type": "composes_with",
       "confidence": "high",
       "evidence": "两者都用 Tree-sitter 把代码库抽成知识图谱给 agent 用；codegraph 强在低层索引基础设施（SQLite schema+MCP工具+staleness），understand-anything 强在上层多agent语义导览+可视化仪表盘——一个做底座一个做表现层，互补而非重复。",
-      "kg_integrated": true,
-      "cross_doc": true,
-      "verified_from_facet": true
-    },
-    {
-      "from": "content/memoryagentbench",
-      "to": "content/agemem",
-      "type": "composes_with",
-      "confidence": "high",
-      "evidence": "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）",
       "kg_integrated": true,
       "cross_doc": true,
       "verified_from_facet": true
@@ -16358,7 +16366,7 @@
     },
     {
       "from": "paper:2507.21046",
-      "to": "paper:2606.06087",
+      "to": "paper:2606.05922",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:self-evolving-agent",
@@ -16368,7 +16376,7 @@
     },
     {
       "from": "paper:2508.07407",
-      "to": "paper:2606.06087",
+      "to": "paper:2606.05922",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:self-evolving-agent",
@@ -16379,6 +16387,16 @@
     {
       "from": "paper:2605.28556",
       "to": "paper:2606.05563",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:llm-as-judge",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2605.28556",
+      "to": "paper:2606.07591",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:llm-as-judge",
@@ -16477,11 +16495,31 @@
       "weak": true
     },
     {
+      "from": "paper:2606.02800",
+      "to": "paper:2606.12191",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:world-model",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
       "from": "paper:2606.03458",
       "to": "paper:2606.09079",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:long-context",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05563",
+      "to": "paper:2606.07591",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark、llm-as-judge",
       "kg_integrated": true,
       "cross_doc": true,
       "weak": true
@@ -16499,16 +16537,6 @@
     {
       "from": "paper:2606.05563",
       "to": "paper:2606.05622",
-      "type": "same_track",
-      "confidence": "medium",
-      "evidence": "共享标签:benchmark",
-      "kg_integrated": true,
-      "cross_doc": true,
-      "weak": true
-    },
-    {
-      "from": "paper:2606.05563",
-      "to": "paper:2606.09669",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:benchmark",
@@ -16537,6 +16565,56 @@
       "weak": true
     },
     {
+      "from": "paper:2606.05622",
+      "to": "paper:2606.05922",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-eval",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05922",
+      "to": "paper:2606.06087",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.05922",
+      "to": "paper:2606.09669",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-eval",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.06087",
+      "to": "paper:2507.21046",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.06087",
+      "to": "paper:2508.07407",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
       "from": "paper:2606.06087",
       "to": "paper:2606.06492",
       "type": "same_track",
@@ -16547,11 +16625,81 @@
       "weak": true
     },
     {
+      "from": "paper:2606.07591",
+      "to": "content/memoryagentbench",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.07591",
+      "to": "paper:2606.02060",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
       "from": "paper:2606.09669",
       "to": "content/memoryagentbench",
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.09669",
+      "to": "paper:2606.05563",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.12191",
+      "to": "paper:2507.21046",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.12191",
+      "to": "paper:2508.07407",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.12191",
+      "to": "paper:2606.05922",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.12191",
+      "to": "paper:2606.06087",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:self-evolving-agent",
       "kg_integrated": true,
       "cross_doc": true,
       "weak": true
@@ -16676,6 +16824,18 @@
         "type": "same_use_case",
         "confidence": "low",
         "evidence": "MemoryAgentBench 评测智能体长期记忆系统、PEFT 论文用 LoRA 承载个性化持久状态,都围绕「给智能体一份可持续累积的记忆」这一用途,前者是后者一类方法的潜在评测台。"
+      }
+    },
+    {
+      "type": "implements",
+      "source": "content/ecc",
+      "target": "paper:2606.05922",
+      "edge": {
+        "from": "content/ecc",
+        "to": "paper:2606.05922",
+        "type": "implements",
+        "confidence": "medium",
+        "evidence": "项目与论文标题强匹配:harness、optimization"
       }
     },
     {
@@ -32064,6 +32224,19 @@
     },
     {
       "type": "same_track",
+      "source": "content/ai-scientist-v2",
+      "target": "paper:2606.07591",
+      "edge": {
+        "from": "content/ai-scientist-v2",
+        "to": "paper:2606.07591",
+        "type": "same_track",
+        "confidence": "medium",
+        "evidence": "共享标签 scientific-discovery、autonomous-research",
+        "weight": 2
+      }
+    },
+    {
+      "type": "same_track",
       "source": "concept/agentic-memory",
       "target": "content/memoryagentbench",
       "edge": {
@@ -32220,8 +32393,8 @@
     }
   ],
   "summary": {
-    "nodes": 597,
-    "edges": 1470,
+    "nodes": 594,
+    "edges": 1486,
     "nodeByType": {
       "content": 64,
       "source-pack": 70,
@@ -32233,17 +32406,18 @@
       "evidence": 3,
       "artifact": 70,
       "taste": 1,
-      "paper": 34,
-      "project": 11
+      "paper": 37,
+      "project": 5
     },
     "edgeByType": {
       "references": 1395,
       "builds_on": 2,
       "shares_method": 6,
       "same_use_case": 3,
-      "same_track": 51,
-      "improves_on": 2,
+      "implements": 1,
       "composes_with": 9,
+      "same_track": 66,
+      "improves_on": 2,
       "contradicts": 2
     },
     "wikilinks": {
@@ -32262,9 +32436,9 @@
     ],
     "ghostCandidates": 12,
     "references": 1395,
-    "associativeEdges": 24,
-    "crossDocEdges": 54,
-    "ghosts": 19,
+    "associativeEdges": 25,
+    "crossDocEdges": 68,
+    "ghosts": 13,
     "assessed": 42,
     "facetedNodes": 19
   }

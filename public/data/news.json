@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T12:57:42.222Z",
+  "generatedAt": "2026-06-11T14:30:05.278Z",
   "column": "news",
   "mode": "aggregate-only",
   "llmEnabled": false,
@@ -103,7 +103,7 @@
       "source": "Hacker News",
       "sourceType": "community",
       "ok": true,
-      "count": 28,
+      "count": 29,
       "error": ""
     },
     {
@@ -111,7 +111,7 @@
       "source": "r/LocalLLaMA",
       "sourceType": "reddit",
       "ok": true,
-      "count": 10,
+      "count": 12,
       "error": ""
     },
     {
@@ -121,6 +121,34 @@
       "ok": true,
       "count": 6,
       "error": ""
+    },
+    {
+      "id": "last30days",
+      "source": "last30days",
+      "sourceType": "community",
+      "ok": true,
+      "count": 24,
+      "error": "",
+      "topics": [
+        {
+          "topic": "AI agents",
+          "ok": true,
+          "parsed": 8,
+          "added": 8
+        },
+        {
+          "topic": "open source LLM",
+          "ok": true,
+          "parsed": 8,
+          "added": 8
+        },
+        {
+          "topic": "AI coding",
+          "ok": true,
+          "parsed": 8,
+          "added": 8
+        }
+      ]
     }
   ],
   "enrichment": {
@@ -128,11 +156,18 @@
     "model": "",
     "imageCandidateLimit": 0
   },
-  "totalDiscovered": 165,
-  "totalAfterDedupe": 240,
-  "totalPublished": 217,
-  "totalPublishedForGeneratedDay": 19,
+  "totalDiscovered": 192,
+  "totalAfterDedupe": 254,
+  "totalPublished": 219,
+  "totalPublishedForGeneratedDay": 20,
   "items": [
+    {
+      "title": "Jun 11, 2026 Announcements Introducing Claude Corps",
+      "source": "Anthropic",
+      "sourceType": "official",
+      "url": "https://www.anthropic.com/news/claude-corps",
+      "publishedAt": "2026-06-11T04:00:00.000Z"
+    },
     {
       "title": "OpenAI mulls slashing prices as it competes with Anthropic for users",
       "source": "Hacker News",
@@ -142,12 +177,20 @@
       "points": 69
     },
     {
+      "title": "Workers are spending over 6 hours a week botsitting AI, fueling job frustration",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://www.businessinsider.com/botsitting-ai-hidden-human-labor-at-work-2026-6",
+      "publishedAt": "2026-06-11T13:26:59.000Z",
+      "points": 68
+    },
+    {
       "title": "Anthropic Walks Back Policy That Could Have 'Sabotaged' Researchers Using Claude",
       "source": "Hacker News",
       "sourceType": "community",
       "url": "https://www.wired.com/story/anthropic-responds-to-backlash-on-claudes-secret-sabotage-on-ai-research/",
       "publishedAt": "2026-06-11T03:41:06.000Z",
-      "points": 51
+      "points": 57
     },
     {
       "title": "Antirez on X: I believe what Anthropic is doing is *deeply* wrong",
@@ -155,7 +198,23 @@
       "sourceType": "community",
       "url": "https://twitter.com/antirez/status/2064766429887352971",
       "publishedAt": "2026-06-11T00:13:06.000Z",
-      "points": 42
+      "points": 43
+    },
+    {
+      "title": "More AI-generated code doesn't make your team faster. It might slow you",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://twitter.com/awscloud/status/2064449711155589396",
+      "publishedAt": "2026-06-11T13:06:08.000Z",
+      "points": 32
+    },
+    {
+      "title": "Open Reproduction of DeepSeek-R1",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://github.com/huggingface/open-r1",
+      "publishedAt": "2026-06-11T13:14:31.000Z",
+      "points": 28
     },
     {
       "title": "It blocked us at 'hello ' Anthropic Fable 5 refusing innocuous prompts",
@@ -163,7 +222,15 @@
       "sourceType": "community",
       "url": "https://www.theregister.com/ai-and-ml/2026/06/10/anthropic-claude-fable-5-refuses-innocuous-prompts/5253754",
       "publishedAt": "2026-06-11T04:54:52.000Z",
-      "points": 27
+      "points": 28
+    },
+    {
+      "title": "The AI Agent in the Billing Department of Verizon Is a Mentally Handicapped Thug",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://samhenrycliff.medium.com/the-ai-agent-in-the-billing-department-of-verizon-wireless-is-a-mentally-handicapped-thug-99890a389ff5",
+      "publishedAt": "2026-06-11T12:19:17.000Z",
+      "points": 21
     },
     {
       "title": "Tell HN: Anthropic's Fable model is too expensive",
@@ -190,12 +257,49 @@
       "points": 9
     },
     {
+      "title": "Nobody needs AI to search the Internet, court says in ruling against Google",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://arstechnica.com/tech-policy/2026/06/nobody-needs-ai-to-search-the-internet-court-says-in-ruling-against-google/",
+      "publishedAt": "2026-06-11T13:56:24.000Z",
+      "points": 8
+    },
+    {
       "title": "We Used Agentic AI to Fix Kong Gateway's Flakiest Tests",
       "source": "Hacker News",
       "sourceType": "community",
       "url": "https://konghq.com/blog/engineering/how-we-used-agentic-ai-to-fix-kong-gateways-flakiest-tests",
       "publishedAt": "2026-06-11T02:07:56.000Z",
       "points": 8
+    },
+    {
+      "title": "DoorDash&#8217;s new AI chatbot lets you order with prompts and photos",
+      "source": "TechCrunch AI",
+      "sourceType": "press",
+      "url": "https://techcrunch.com/2026/06/11/doordashs-new-ai-chatbot-lets-you-order-with-prompts-and-photos/",
+      "publishedAt": "2026-06-11T14:23:43.000Z",
+      "summary": "The new chatbot, called Ask DoorDash, allows users to search the app for what they're looking for in their own words instead of having to scroll through restaurants and stores to build a cart."
+    },
+    {
+      "title": "DiffusionGemma under real workloads feels very different from benchmark demos",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u30dhr/diffusiongemma_under_real_workloads_feels_very/",
+      "publishedAt": "2026-06-11T14:18:24.000Z"
+    },
+    {
+      "title": "As we know Minimax M3 is just going to be open sourced in few days and because of that I was surfing on internet searching for its scores and I found out pretty interesting results. Is Minimax M3 really that good in agentic stuff and in coding? Is it better than older gpt models?",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u2zfqs/as_we_know_minimax_m3_is_just_going_to_be_open/",
+      "publishedAt": "2026-06-11T13:41:47.000Z"
+    },
+    {
+      "title": "Can't seem to enable reasoning in llama.cpp",
+      "source": "r/LocalLLaMA",
+      "sourceType": "reddit",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u2yufo/cant_seem_to_enable_reasoning_in_llamacpp/",
+      "publishedAt": "2026-06-11T13:17:46.000Z"
     },
     {
       "title": "Anthropic apologizes for invisible Claude Fable guardrails",
@@ -213,72 +317,6 @@
       "publishedAt": "2026-06-11T11:37:40.000Z"
     },
     {
-      "title": "How do i prevent llama.cpp from offloading on Swap?",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u2w9hg/how_do_i_prevent_llamacpp_from_offloading_on_swap/",
-      "publishedAt": "2026-06-11T11:22:08.000Z"
-    },
-    {
-      "title": "\"How NVIDIA Built Nemotron 3 Open Model\" by \"Caleb Writes Code\" x \"Joey Conway\"",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u2tm4h/how_nvidia_built_nemotron_3_open_model_by_caleb/",
-      "publishedAt": "2026-06-11T08:54:54.000Z"
-    },
-    {
-      "title": "Anthropic walks back policy on silent nerfing for AI/ML, will notify users [N]",
-      "source": "r/MachineLearning",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/MachineLearning/comments/1u2tk0i/anthropic_walks_back_policy_on_silent_nerfing_for/",
-      "publishedAt": "2026-06-11T08:51:10.000Z"
-    },
-    {
-      "title": "Deezer launches an AI music detector for other streaming services",
-      "source": "The Verge AI",
-      "sourceType": "press",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/948153/deezer-ai-music-detector-spotify-apple",
-      "publishedAt": "2026-06-11T08:00:00.000Z",
-      "summary": "Deezer will now scan your playlists on other streaming platforms to detect AI-generated music. Deezer was the first of the big streaming services to start labeling AI-generated music. It even offered its tech to other pl"
-    },
-    {
-      "title": "Opendoor&#8217;s India exit is fueling a bigger conversation about AI and outsourcing",
-      "source": "TechCrunch AI",
-      "sourceType": "press",
-      "url": "https://techcrunch.com/2026/06/10/opendoors-india-exit-is-fueling-a-bigger-conversation-about-ai-and-outsourcing/",
-      "publishedAt": "2026-06-11T04:02:19.000Z",
-      "summary": "The decision comes as India emerges as the world’s largest GCC market."
-    },
-    {
-      "title": "Anthropic&#8217;s Dario Amodei has just one direct report",
-      "source": "TechCrunch AI",
-      "sourceType": "press",
-      "url": "https://techcrunch.com/2026/06/10/anthropics-dario-amodei-has-just-one-direct-report/",
-      "publishedAt": "2026-06-11T03:53:06.000Z",
-      "summary": "If you doubted his genius, doubt no more."
-    },
-    {
-      "title": "nvidia/diffusiongemma-26B-A4B-it-NVFP4 · Hugging Face",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u2np0a/nvidiadiffusiongemma26ba4bitnvfp4_hugging_face/",
-      "publishedAt": "2026-06-11T03:28:47.000Z"
-    },
-    {
-      "title": "How can Deepseek v4 top the coding leaderboards and still sit 8 months behind the frontier?",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u2nn2f/how_can_deepseek_v4_top_the_coding_leaderboards/",
-      "publishedAt": "2026-06-11T03:25:59.000Z"
-    },
-    {
-      "title": "I wired a fully offline voice loop to Ollama + LM Studio — 100% CPU, no GPU, nothing leaves your machine (Silero VAD + Parakeet STT + Supertonic TTS 3)",
-      "source": "r/LocalLLaMA",
-      "sourceType": "reddit",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u2mu9i/i_wired_a_fully_offline_voice_loop_to_ollama_lm/",
-      "publishedAt": "2026-06-11T02:47:21.000Z"
-    },
-    {
       "title": "Claude Desktop spawns 1.8 GB Hyper-V VM on every launch, even for chat-only use",
       "source": "Hacker News",
       "sourceType": "community",
@@ -292,7 +330,15 @@
       "sourceType": "community",
       "url": "https://samwilkinson.io/posts/2026-06-09-anthropics-model-naming-extrapolated",
       "publishedAt": "2026-06-10T18:45:20.000Z",
-      "points": 311
+      "points": 312
+    },
+    {
+      "title": "Apache Burr: Build reliable AI agents and applications",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://burr.apache.org/",
+      "publishedAt": "2026-06-10T00:00:00.000Z",
+      "points": 233
     },
     {
       "title": "AWS Bedrock to require sharing data with Anthropic for Mythos and future models",
@@ -310,7 +356,7 @@
       "sourceType": "community",
       "url": "https://news.ycombinator.com/item?id=48476474",
       "publishedAt": "2026-06-10T14:03:40.000Z",
-      "points": 185
+      "points": 190
     },
     {
       "title": "Show HN: macOS menu bar gauges for your Claude Code quota",
@@ -324,6 +370,14 @@
       "imageUrl": "https://opengraph.githubassets.com/270b28ccca6dbe26f00b122beec5bcac030d3761d1c4248cda75dcce77ec45a6/grzegorz-raczek-unit8/claude-quota"
     },
     {
+      "title": "PRC-linked influence operations are targeting AI debates in the US",
+      "source": "Hacker News",
+      "sourceType": "community",
+      "url": "https://openai.com/index/prc-linked-influence-operations-ai-debates/",
+      "publishedAt": "2026-06-10T20:17:37.000Z",
+      "points": 19
+    },
+    {
       "title": "Initial impressions of Claude Fable 5",
       "source": "Hacker News",
       "sourceType": "community",
@@ -333,14 +387,6 @@
       "titleZh": "对 Claude Fable 5 的初步印象",
       "summaryZh": "对 Claude Fable 5 的初步印象",
       "imageUrl": "https://static.simonwillison.net/static/2026/fable-max.jpg"
-    },
-    {
-      "title": "PRC-linked influence operations are targeting AI debates in the US",
-      "source": "Hacker News",
-      "sourceType": "community",
-      "url": "https://openai.com/index/prc-linked-influence-operations-ai-debates/",
-      "publishedAt": "2026-06-10T20:17:37.000Z",
-      "points": 17
     },
     {
       "title": "Google Gemini Is Down",
@@ -442,14 +488,6 @@
       "publishedAt": "2026-06-10T18:09:02.000Z"
     },
     {
-      "title": "Microsoft, like, totally gets why students are booing AI-pilled graduation speakers",
-      "source": "The Verge AI",
-      "sourceType": "press",
-      "url": "https://www.theverge.com/news/947831/college-speakers-booed-ai-microsoft",
-      "publishedAt": "2026-06-10T17:45:11.000Z",
-      "summary": "New college graduates around the country have been booing and heckling commencement speakers who hype up AI. Microsoft would like everyone to talk it out. In a blog post running more than 3,100 words, Microsoft vice chai"
-    },
-    {
       "title": "Claude Fable 5 and Claude Mythos 5 Announcements Jun 9, 2026 Our next generation of intelligence for the hardest knowledge work and coding problems.",
       "source": "Anthropic",
       "sourceType": "official",
@@ -462,9 +500,7 @@
       "sourceType": "community",
       "url": "https://techcrunch.com/2026/06/08/microsofts-open-source-tools-were-hacked-to-steal-passwords-of-ai-developers/",
       "publishedAt": "2026-06-09T00:00:00.000Z",
-      "points": 545,
-      "titleZh": "微软的开源工具被黑客用于窃取AI开发者的密码",
-      "summaryZh": "微软的开源工具被黑客用于窃取AI开发者的密码"
+      "points": 558
     },
     {
       "title": "If Claude Fable stops helping you, you'll never know",
@@ -661,9 +697,7 @@
       "sourceType": "community",
       "url": "https://www.cc.dev/",
       "publishedAt": "2026-06-08T00:00:00.000Z",
-      "points": 64,
-      "titleZh": "Show HN：Command Center，为关注质量的用户打造的AI编码环境",
-      "summaryZh": "Show HN：Command Center，为关注质量的用户打造的AI编码环境"
+      "points": 66
     },
     {
       "title": "Do agents.md files help coding agents?",
@@ -913,9 +947,7 @@
       "sourceType": "community",
       "url": "https://octavio.substack.com/p/the-roi-of-ai-coding-looks-completely",
       "publishedAt": "2026-06-07T00:00:00.000Z",
-      "points": 8,
-      "titleZh": "当你是一名自力更生的创始人时，AI编码的投资回报率看起来不同",
-      "summaryZh": "当你是一名自力更生的创始人时，AI编码的投资回报率看起来不同"
+      "points": 8
     },
     {
       "title": "Agentic AI solved coding and exposed every other problem in SE",
@@ -933,9 +965,7 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/machinelearningnews/comments/1tz4jb2/what_is_your_current_local_llm_setup/",
       "publishedAt": "2026-06-07T00:00:00.000Z",
-      "points": 20,
-      "titleZh": "你当前使用的本地LLM设置是什么？",
-      "summaryZh": "你当前使用的本地LLM设置是什么？"
+      "points": 21
     },
     {
       "title": "Is this the dawn of the Tokenpocalypse?",
@@ -1083,8 +1113,7 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/LocalLLM/comments/1tyl3ov/whats_a_open_source_llm_for_software_development/",
       "publishedAt": "2026-06-06T00:00:00.000Z",
-      "points": 16,
-      "titleZh": "软件开发用开源大语言模型推荐？"
+      "points": 16
     },
     {
       "title": "dvlt.cu: inference engine written from scratch in CUDA/C++ for NVIDIA's DVLT 3D transformer model",
@@ -1465,9 +1494,7 @@
       "sourceType": "community",
       "url": "https://github.com/anthropics/defending-code-reference-harness",
       "publishedAt": "2026-06-04T00:00:00.000Z",
-      "points": 538,
-      "titleZh": "Anthropic用于人工智能漏洞发现的开源框架",
-      "summaryZh": "Anthropic用于人工智能漏洞发现的开源框架"
+      "points": 538
     },
     {
       "title": "When AI Builds Itself: Our progress toward recursive self-improvement",
@@ -1754,9 +1781,7 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/webdev/comments/1tvsfgj/im_calling_it_now_the_adoption_of_ai_agents_into/",
       "publishedAt": "2026-06-03T00:00:00.000Z",
-      "points": 3989,
-      "titleZh": "乔治·霍兹：我预言，将 AI 智能体引入软件开发将是该领域历史上代价最高的错误之一",
-      "summaryZh": "乔治·霍兹：我预言，将 AI 智能体引入软件开发将是该领域历史上代价最高的错误之一"
+      "points": 3991
     },
     {
       "title": "I turned an Android phone into a Vulkan-accelerated local LLM node (GGUF + LiteLLM + Tailscale)",
@@ -1828,9 +1853,7 @@
       "sourceType": "community",
       "url": "https://julienreszka.com/blog/rss-is-back-ai-agents-are-reading-it/",
       "publishedAt": "2026-06-02T00:00:00.000Z",
-      "points": 85,
-      "titleZh": "现在AI代理需要RSS的功能",
-      "summaryZh": "现在AI代理需要RSS的功能"
+      "points": 85
     },
     {
       "title": "What’s the coolest thing you’ve automated with AI Agents so far in 2026?",
@@ -1838,9 +1861,7 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/AI_Agents/comments/1tugo0h/whats_the_coolest_thing_youve_automated_with_ai/",
       "publishedAt": "2026-06-02T00:00:00.000Z",
-      "points": 132,
-      "titleZh": "迄今为止，你在2026年用AI代理自动化了哪些最酷的事情？",
-      "summaryZh": "迄今为止，你在2026年用AI代理自动化了哪些最酷的事情？"
+      "points": 132
     },
     {
       "title": "Uber caps employee AI spending after blowing through budget in 4 months",
@@ -1987,9 +2008,7 @@
       "source": "Reddit",
       "sourceType": "community",
       "url": "https://www.reddit.com/r/technology/comments/1turcd2/resistance_is_futile_says_qualcomm_ceo_ai_agents/",
-      "publishedAt": "2026-06-02T00:00:00.000Z",
-      "titleZh": "高通CEO表示“抵抗是徒劳的”，AI代理将变得无形、无处不在，并跨设备跟随你",
-      "summaryZh": "高通CEO表示“抵抗是徒劳的”，AI代理将变得无形、无处不在，并跨设备跟随你"
+      "publishedAt": "2026-06-02T00:00:00.000Z"
     },
     {
       "title": "Jun 1, 2026 Announcements Anthropic confidentially submits draft S-1 to the SEC",
@@ -2051,6 +2070,14 @@
       "summaryZh": "作为初学者，如何从零开始构建一个AI代理？"
     },
     {
+      "title": "What is the best AI Coding plan now? (best value for price)",
+      "source": "Reddit",
+      "sourceType": "community",
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1tu7dj6/what_is_the_best_ai_coding_plan_now_best_value/",
+      "publishedAt": "2026-06-01T00:00:00.000Z",
+      "points": 18
+    },
+    {
       "title": "Finetuning a Reasoning LLM with Supervised or Reinforcement Learning? [D]",
       "source": "r/MachineLearning",
       "sourceType": "reddit",
@@ -2074,9 +2101,7 @@
       "sourceType": "community",
       "url": "https://cate.cero-ai.com/blog/ui-problem-ai-coding-agents",
       "publishedAt": "2026-05-31T00:00:00.000Z",
-      "points": 9,
-      "titleZh": "AI编程代理的UI问题",
-      "summaryZh": "AI编程代理的UI问题"
+      "points": 9
     },
     {
       "title": "Robinhood now lets your AI agents trade stocks",
@@ -2084,9 +2109,7 @@
       "sourceType": "community",
       "url": "https://techcrunch.com/2026/05/27/robinhood-now-lets-your-ai-agents-trade-stocks/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
-      "points": 112,
-      "titleZh": "Robinhood现在允许你的AI代理交易股票",
-      "summaryZh": "Robinhood现在允许你的AI代理交易股票"
+      "points": 112
     },
     {
       "title": "CAPTCHAs can still detect AI agents",
@@ -2094,9 +2117,7 @@
       "sourceType": "community",
       "url": "https://research.roundtable.ai/captchas-detect-ai/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
-      "points": 84,
-      "titleZh": "CAPTCHA仍然可以检测到AI代理",
-      "summaryZh": "CAPTCHA仍然可以检测到AI代理"
+      "points": 84
     },
     {
       "title": "Undisclosed addition in jqwik instructed AI coding agents to delete app output",
@@ -2104,9 +2125,7 @@
       "sourceType": "community",
       "url": "https://arstechnica.com/security/2026/05/fed-up-with-vibe-coders-dev-sneaks-data-nuking-prompt-injection-into-their-code/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
-      "points": 67,
-      "titleZh": "jqwik中未公开的添加内容指示AI编程代理删除应用输出",
-      "summaryZh": "jqwik中未公开的添加内容指示AI编程代理删除应用输出"
+      "points": 67
     },
     {
       "title": "Claude Opus 4.8 distilled Alibaba Qwen models",
@@ -2160,9 +2179,7 @@
       "sourceType": "community",
       "url": "https://www.reddit.com/r/vibecoding/comments/1tqwxxb/ai_coding_is_getting_expensive_and_cannot_afford/",
       "publishedAt": "2026-05-29T00:00:00.000Z",
-      "points": 149,
-      "titleZh": "AI 编程越来越贵，现在连 100 美元都付不起 😔。2026 年每月 20 美元以下的最佳编程设置是什么？",
-      "summaryZh": "AI 编程越来越贵，现在连 100 美元都付不起 😔。2026 年每月 20 美元以下的最佳编程设置是什么？"
+      "points": 149
     }
   ]
 }

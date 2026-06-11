@@ -44,6 +44,7 @@ export interface DeepDive {
 export type ProjectDepth = "list_only" | "light" | "analysis" | "deep" | "needs_enrichment";
 export type ProjectDepthBand = "list_only" | "light" | "standard" | "deep" | "needs_enrichment";
 export type ProjectTier = 0 | 1 | 2 | 3;
+export type ProjectType = "ai_app" | "agent_framework" | "agent_skill" | "devtool_cli" | "model_infra" | "frontend_ui" | "dataset_benchmark" | "library_sdk" | "template_boilerplate" | "non_ai_eng";
 
 /** Per-tier structured fields from the project-radar tier paradigm (2026-06-03). */
 export interface ProjectTierTemplate {
@@ -99,6 +100,9 @@ export interface AnalyzedRepo extends RepoSummary {
   max_allowed_depth?: ProjectDepth;
   recommended_action?: string;
   needs_enrichment?: boolean;
+  project_type?: ProjectType;
+  informs_our_structure?: boolean;
+  self_evo_eligible?: boolean;
   ranking_reasons?: string[];
   rejection_reasons?: string[];
   review_verdict?: string;

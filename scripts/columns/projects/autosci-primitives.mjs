@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
 const OUT_DIR = path.join(ROOT, "data", "autosci", "primitives");
 const AUTOSCI_PROJECT_TYPES = new Set(["agent_framework", "devtool_cli", "model_infra", "dataset_benchmark", "library_sdk", "ai_app"]);
-const NON_AUTOSCI_PROJECT_TYPES = new Set(["frontend_ui", "template_boilerplate", "non_ai_eng"]);
+const NON_AUTOSCI_PROJECT_TYPES = new Set(["agent_skill", "frontend_ui", "template_boilerplate", "non_ai_eng"]);
 const TEACHING_INTENTS = new Set(["teaching", "learning", "education", "course", "tutorial", "resource"]);
 const TEACHING_IDENTITY_RE = /\b(awesome|course|courses|tutorial|tutorials|teaching|curriculum|lesson|lessons|book|books|roadmap|cheatsheet|from[-\s]?scratch|starter|template|boilerplate|workshop|playbook)\b/i;
 const SKILL_PACK_RE = /\b(skill|skills|workflow pack|prompt pack)\b/i;
@@ -375,6 +375,15 @@ function normalizeProjectType(value) {
   return {
     app: "ai_app",
     ai_application: "ai_app",
+    agent_skill: "agent_skill",
+    agent_skills: "agent_skill",
+    skill: "agent_skill",
+    skills: "agent_skill",
+    plugin: "agent_skill",
+    plugins: "agent_skill",
+    prompt_collection: "agent_skill",
+    prompt_collections: "agent_skill",
+    meta_skill: "agent_skill",
     agent: "agent_framework",
     agent_build: "agent_framework",
     agent_runtime: "agent_framework",

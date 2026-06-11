@@ -1,0 +1,69 @@
+primitive_id: hidden-target-rubric-research-eval
+source_paper: "2606.07591"
+title: "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research"
+relevance_level: direct                     # L3 研究 agent 的评测尺 + 开放式产出自动判质的可复用范式
+audience: ai_only
+core_pattern: >
+  评测端到端自主科研：每题锚定一篇真论文但对系统隐藏（hidden target），给问题/文献/原始数据，
+  让系统从零走完"文献→处理数据→设计执行实验→出图→写报告"全流程；
+  用专家拆解的加权 rubric（围绕目标论文关键科学产物的、可验证子项+技术关键词）逐项判分；
+  钉 50 分=复现线、>50=真发现，把"复刻"与"超越"放进同一刻度。配极简 ReAct 壳（ResearchHarness）让裸 LLM 同台可比。
+problem_class: evaluate-open-ended-end-to-end-autonomous-research-without-exact-match
+
+core_concepts:
+  - name: 隐藏目标论文再发现（hidden-target re-discovery）
+    role: primary
+    evidence: "we keep the target paper hidden on the evaluation side ... enabling evaluation of target-paper-level re-discovery while leaving room for new discovery (Abstract/§3.2)"
+  - name: 加权可验证 rubric 拆解（expert-curated weighted rubric）
+    role: primary
+    evidence: "Expert-curated multimodal rubrics decompose the target scientific artifacts into weighted criteria ... specific criteria ... technical keywords that the judge needs to verify, and a weight (§3.4)"
+  - name: 50=复现 / >50=发现 评分刻度（re-discovery-to-discovery scale）
+    role: primary
+    evidence: "we set 50 rather than 100 as the re-discovery boundary ... 50 means the model recovered the target result, and scores above 50 indicate discoveries (§3.4)"
+  - name: 失败集中于科学严谨（protocol/evidence/scientific-core mismatch）
+    role: supporting
+    evidence: "failures concentrate in experimental protocol mismatch, evidence mismatch, and missing scientific core (Abstract/§4.5, 280 runs)"
+  - name: ResearchHarness 极简 ReAct 评测壳
+    role: supporting
+    evidence: "a lightweight tool-using harness ... a concise ReAct-style loop ... automatic context compaction ... default compaction trigger is 128k tokens (§3.3)"
+  - name: 自进化 agent
+    role: mentioned
+    evidence: "AI coding agents are increasingly used for scientific work, but their end-to-end autonomous research capability remains difficult to verify (Abstract)"
+
+discovery_trace: 数据不足   # benchmark 论文，无解法发现叙事（没有"先试 X 失败→改 Y"的方法探索过程），按范式不反推。
+
+components:
+  - expert_task_builder     # 专家选真论文→可执行任务描述→配文献/原始数据→拆加权 rubric→交叉核对
+  - hidden_target_packager  # 把目标论文 p* 对系统隐藏，只暴露 q/L/D
+  - research_gym            # 可执行科研环境，系统产出 y=(π,o,r) 代码/中间结果/报告
+  - research_harness        # 裸 LLM 的极简 ReAct 壳（Web Serper+Jina / 文件 MinerU / 执行 shell）+128k 自动压缩
+  - rubric_judge            # GPT-5.1 逐项对照加权 rubric（文本类/图像类）打分
+  - error_taxonomy          # 6 类错误归因（协议/证据/科学内核/目标/可靠性/执行）
+autosci_modules:
+  - cold_critic             # rubric judge = 独立评委判分；可直接强化深读冷审门（隐藏答案+加权子项）
+  - eval_harness            # 开放式产出自动判质的范式（复现线锚点+关键词核对去偏）
+  - self_evolve_controller  # 错误归因→定位真瓶颈→指导后续 agent 改进方向（科学严谨而非工程）
+inputs:
+  - target_papers           # 真实已发表论文（高质量、问题清晰、数据可得）
+  - raw_data_and_literature # 原始数据 + 相关文献
+outputs:
+  - weighted_rubric         # 围绕目标论文关键产物的加权可验证子项
+  - capability_frontier     # 各系统×各领域分数 + 错误分布（行业现状校准）
+design_principles:
+  - "开放式产出判质：隐藏标准答案 + 拆成围绕真目标的加权可验证子项 > 让 judge 整体打分（防泄漏、降偏置）。"
+  - "钉一条'复现线'锚点（达到已知正确答案=50）> 只设满分线：既测真实差距、又给超越留测量空间。"
+  - "评质量把权重压在可验证的科学/事实子项：报告专业性/排版是表面分（常 >70 但与 rubric 弱相关）。"
+  - "测能力要分离'脚手架红利'与'模型本事'：给裸 LLM 统一极简壳同台比。"
+  - "任务在能力边界之外时多花算力是浪费：成本/耗时与分数仅弱正相关；先确认在边界内再 scale。"
+small_experiment: >
+  在 AI-Brief 冷审门上试：选 3 篇已深读论文，把每篇拆成 5-7 项加权 rubric（隐藏原 paper.mdx），
+  让 judge 对"新生成深读 vs grandfathered 金样"逐项打分；对比"整体打分 vs 逐项打分"的方差，
+  验证逐项+关键词核对是否更稳、更能区分。再对失败深读做 6 类错误归因。3-7 天。
+risks:
+  - dry_lab_only            # 只评干实验室（已有数据/代码/文献），湿实验无法测
+  - scores_final_not_process # 评最终报告而非细粒度研究步骤；过程对错被掩盖
+  - single_judge_bias       # 判官单一模型（GPT-5.1），偏置仅靠拆细+关键词核对缓解、未消除
+  - rubric_caps_at_known    # rubric 锚定已有论文，评"真新结论"缺更可靠方法（作者自承）
+  - small_scale             # 40 任务/10 领域，单领域样本稀薄
+  - all_self_reported        # 全自报，无第三方复现
+status: extracted

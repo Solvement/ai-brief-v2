@@ -14,6 +14,22 @@
 
 ## 进行中
 
+### PAPER-2606.05405 · Agents' Last Exam 深读第 1 轮（plan `docs/plans/2026-06-11-agents-last-exam-deepread-round1.md`）
+- **大方向**：按 canonical 论文范式把 ALE 写成可进入 AI-Brief 的深读资产，重点沉淀“真实经济工作流 → task/env/agent 解耦 → hidden reference → deterministic-first gate-and-score”的 agent benchmark 工程范式。
+- **小方向**：读 arXiv v1 HTML/PDF/TeX 全文 + HF 页面 + 项目官网 + clone `rdi-berkeley/agents-last-exam` 源码；从头核写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05405.yaml`；区分论文自报、README/官网自称、源码实读和动态页面核验。
+- **Mind Palace 召回**：Recall 命中 SoCRATES / MemoryAgentBench / GrepSeek / MetaGPT 等；Contest 结论是 ALE 补“真实经济工作流评测”坐标，不替代过程级错误定位、记忆评测或代码检索；Synthesis 采用“可验证 workflow + public smoke/private holdout + deterministic-first gate”；Evolution action 是给 AutoSci 增加 Mini-ALE benchmark_builder/eval_harness 原语。
+- **阶段**：✅ 第 1 轮作者稿完成 + 机器门禁通过。
+- **阻塞**：独立冷审未跑，metadata 保持 `cold_audit.status="needs_human"`。
+- **交付结论**：已按 arXiv v1 HTML/PDF/TeX 全文、HF 页面（#1 Paper of the day, 241 upvotes）、项目官网、GitHub 仓库 HEAD `8583037e52fec4ff100a12833ca330721a05575e` 重写/核补四个目标文件；区分论文自报、README/官网自称、源码实读与动态页面核验，并补充专家人数、Last-Exam 任务数、timeout 统计的口径差异；`node scripts/columns/papers/build-index.mjs` 通过（deepReads=27），`node scripts/validate-papers-deepread.mjs` 通过，`npm run verify` 通过（291 tests + validate + build 全绿，仅既有 warning），`npm run ops:baseline:diff` 通过且无新增 validator 失败；冷审未跑，`cold_audit.status="needs_human"` 保持不发布。
+
+### PAPER-2606.07297 · SWE-Explore 深读第 1 轮（plan `docs/plans/2026-06-11-swe-explore-deepread-round1.md`）
+- **大方向**：按 canonical 论文范式把 SWE-Explore 写成可进入 AI-Brief 的深读资产，重点沉淀“代码 agent 的仓库探索能力要被单独评估，而不是被 issue resolved 二值结果掩盖”的评测范式。
+- **小方向**：读 arXiv v1 HTML/PDF 全文 + HF 页面 + clone `Qiushao-E/SWE-Explore-Bench` 源码；从头核验并重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.07297.yaml`；区分论文自报、HF/GitHub 动态核验、仓库实读。
+- **Mind Palace 召回**：Recall 命中 SoCRATES / codegraph / GrepSeek / MemoryAgentBench 等；Contest 结论是本文补“仓库探索评测”坐标，不替代代码索引或通用 agent 记忆；Synthesis 采用“行级探索靶 + 轨迹接地 ground truth + 下游修复反验”；Evolution action 是给 AutoSci/codex 子 agent 增加 repository-exploration scorer / context budget optimizer 的可造方向。
+- **阶段**：✅ 作者稿完成 + 机器门禁通过；独立冷审未跑。
+- **阻塞**：独立冷审未跑，metadata 保持 `cold_audit.status="needs_human"`，不自动发布。
+- **交付结论**：已按 arXiv v1 PDF/TeX 全文（PDF 已下载，TeX 全节/全表实读）、HF 页面（#2 Paper of the day, 107 upvotes；dataset 848/127/6）、GitHub 仓库 HEAD `3c12dc5`（13 stars/0 forks/1 commit）复核并写入四个目标文件；本轮修正了 restricted-context patcher 的正文/表注口径差异标注，并把 AutoSci `core_concepts` 收回到 KG-2 要求的 3–5 个；`node scripts/columns/papers/build-index.mjs` 通过（deepReads=27），`node scripts/validate-papers-deepread.mjs` 通过，`npm run verify` 通过（291 tests + validate + build，全绿，仅既有 warning）。
+
 ### PAPER-2606.12191 · Agentic Environment Engineering 深读第 1 轮（plan `docs/plans/2026-06-11-agentic-environment-engineering-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 Agentic Environment Engineering 写成可进入 AI-Brief 的深读资产，重点沉淀“环境工程 = 自进化 agent 的环境侧基础设施”。
 - **小方向**：读 arXiv v1 PDF/TeX 全文 + HF 页面；核实无官方代码仓库披露；从头重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.12191.yaml`；区分综述自报分类、HF/arXiv 动态核验、作者定性判断与实测缺失。
@@ -32,9 +48,9 @@
 ### PAPER-2606.05922 · Retrospective Harness Optimization 深读第 1 轮（plan `docs/plans/2026-06-11-retro-harness-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 RHO 写成可进入 AI-Brief 的深读资产，重点沉淀“无标签历史轨迹 → 自诊断 → 候选 harness → 自偏好门控”的 agent 自进化工程模式。
 - **小方向**：读 arXiv PDF/TeX 全文 + HF/项目页 + clone `wbopan/retro-harness` 源码；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05922.yaml`；区分论文自报、README/项目页自称、源码实读。
-- **阶段**：✅ 作者稿完成；机器校验待本轮收尾。
+- **阶段**：✅ 作者稿完成 + 机器门通过。
 - **阻塞**：独立冷审未跑，metadata 保持 `cold_audit.status="needs_human"`，不自动发布。
-- **交付结论**：已按 arXiv v2 PDF/TeX、HF 页面、项目页、GitHub 仓库 HEAD `a206595` 重写四个目标文件；待 validate/verify 结果回填。
+- **交付结论**：已按 arXiv v2 PDF/TeX、HF 页面、项目页、GitHub 仓库 HEAD `a206595` 重写四个目标文件；HF/GitHub 动态事实回核为 52 upvotes、16 stars、2 forks；Mind Palace 召回用于背景定位（self-evolving-agents-survey 等），未当作本文事实来源；`node scripts/columns/papers/build-index.mjs` 通过，`node scripts/validate-papers-deepread.mjs` 通过，`npm run verify` 通过（291 tests，validate/build 全绿，仅既有 warning）；冷审未跑，`cold_audit.status="needs_human"` 保持不发布。
 
 ### HARNESS-CMU-GAPS · 补全 CMU 四块拼图缺口（plan `docs/plans/2026-06-11-cmu-harness-gaps.md`）
 - **大方向**：让"完成"从模型叙述变脚本判定——补 CMU 反馈块（基线对比/遥测）+ 约束·进化块（流程完整性/可判定 Rule 下沉/closeout 证据）。

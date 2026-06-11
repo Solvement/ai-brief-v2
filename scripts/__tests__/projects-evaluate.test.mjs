@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classifyProjectIntent, evaluate, normalizeLightResult } from "../columns/projects/evaluate.mjs";
+import { classifyProjectIntent, classifyProjectType, evaluate, normalizeLightResult } from "../columns/projects/evaluate.mjs";
 
 function candidate(overrides = {}) {
   return {
@@ -201,4 +201,34 @@ test("project intent classification separates understanding teaching and tool re
     description: "CLI for running coding agents",
     readme: "Install with npm, configure your API key, run commands, and integrate the SDK.",
   }), "tool");
+});
+
+test("project type classifier separates agent skills from agent frameworks", () => {
+  assert.equal(classifyProjectType({
+    repo: {
+      name: "agent-skills",
+      fullName: "author/agent-skills",
+      description: "Production-grade engineering skills for AI coding agents.",
+      language: "Shell",
+    },
+  }), "agent_skill");
+
+  assert.equal(classifyProjectType({
+    repo: {
+      name: "agent-runtime",
+      description: "Multi-agent autonomous framework with LLM tool calling and MCP memory.",
+      language: "Python",
+    },
+  }), "agent_framework");
+});
+
+test("project type classifier keeps support agents and non-AI infra out of AI buckets", () => {
+  for (const repo of [
+    { name: "chatwoot", description: "Open-source live-chat, email support, omni-channel desk. Alternative to Intercom and Zendesk." },
+    { name: "maigret", description: "Collect a dossier on a person by username from 3000+ sites." },
+    { name: "MasterDnsVPN", description: "Advanced DNS tunneling VPN for censorship bypass." },
+    { name: "container", description: "Create and run Linux containers using lightweight virtual machines on a Mac." },
+  ]) {
+    assert.equal(classifyProjectType({ repo }), "non_ai_eng", repo.name);
+  }
 });

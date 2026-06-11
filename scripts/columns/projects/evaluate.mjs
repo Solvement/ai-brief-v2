@@ -9,8 +9,11 @@ import {
 } from "./project-ranking.mjs";
 
 const INTENTS = new Set(["understanding", "teaching", "tool"]);
-const PROJECT_TYPES = new Set(["ai_app", "agent_framework", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
-const AI_RE = /\b(ai|agent|agents|rag|retrieval|mcp|a2a|memory|llm|multimodal|model|eval|benchmark|embedding|vector|prompt|tool use|function calling|coding agent|generative)\b/i;
+const PROJECT_TYPES = new Set(["ai_app", "agent_framework", "agent_skill", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
+const AI_RE = /\b(ai|agent|agents|agentic|rag|retrieval|mcp|a2a|memory|llm|lm|multimodal|model|eval|benchmark|embedding|vector|prompt|tool use|function calling|coding agent|generative|claude|openai|anthropic|gemini|tts|onnx|world model|notebook lm)\b/i;
+const NON_AI_ENGINEERING_RE = /\b(osint|dossier|username|vpn|tunnel(?:ing)?|dns tunnel(?:ing)?|backup|container(?:s)?|kubernetes|sbom|vulnerabilit(?:y|ies)|misconfigurations?|secrets?|textbook|pdf教材|教材|live[-\s]?chat|live chat|customer support|helpdesk|omni[-\s]?channel|collaboration platform|secure collaboration|chromium|bot detection|fingerprint)\b/i;
+const AGENT_AI_CONTEXT_RE = /\b(ai agent|agentic|llm|large language model|autonomous|tool[-\s]?calling|tool use|function calling|multi[-\s]?agent|mcp|model context protocol|coding agent|computer use|planner|agent runtime|agent framework|agent infrastructure|memory framework|rag|retrieval)\b/i;
+const AGENT_SKILL_RE = /\b(agent[-\s]?skill|agentic skills?|skills? marketplace|meta[-\s]?skill|prompt collection|prompt collections|prompt library|system prompts?|\.claude|skill modes?|skill file|skills? for (?:ai|claude|coding agents?|real engineers)|commands? and plugins|knowledge[-\s]?work plugins?|plugins? primarily intended|specialized agents?|proven deliverables|taste[-\s]?skill)\b/i;
 const TOOL_RE = /\b(cli|sdk|api|server|plugin|app|framework|library|package|install|usage|quickstart|deploy|docker|npm|pip|run|command|configure|integration|workflow)\b/i;
 const TEACHING_RE = /\b(course|lesson|tutorial|workshop|curriculum|exercise|notebook|learn|learning|roadmap|class|chapter|hands-on|awesome|resource list)\b/i;
 const UNDERSTANDING_RE = /\b(understand|understanding|explain|explaining|visual|graph|map|architecture|concept|internals|deep dive|guide|notes|analysis|codebase)\b/i;
@@ -166,6 +169,8 @@ export function radarCardPayload(evaluation = {}) {
     project_tier_label: `Tier ${tier}`,
     project_bucket: bucket,
     bucket,
+    informs_our_structure: Boolean(decision.informs_our_structure || evaluation.informs_our_structure),
+    self_evo_eligible: Boolean(decision.self_evo_eligible || evaluation.self_evo_eligible),
     model_tier: decision.model_tier || evaluation.model_tier || modelForProjectTier(tier),
     requires_manual_confirmation: Boolean(decision.requires_manual_confirmation || evaluation.requires_manual_confirmation || tier === 3),
     tier_tag: `[Tier ${tier}｜${bucket}]`,
@@ -205,6 +210,8 @@ export function normalizeLightResult(input = {}, repo = {}, evidence = {}, triag
     project_tier_label: `Tier ${tier}`,
     project_bucket: bucket,
     bucket,
+    informs_our_structure: Boolean(triage?.informs_our_structure || triage?.depth_decision?.informs_our_structure),
+    self_evo_eligible: Boolean(triage?.self_evo_eligible || triage?.depth_decision?.self_evo_eligible),
     model_tier: triage?.model_tier || triage?.depth_decision?.model_tier || modelForProjectTier(tier),
     requires_manual_confirmation: Boolean(triage?.requires_manual_confirmation || triage?.depth_decision?.requires_manual_confirmation || tier === 3),
     tier_tag: `[Tier ${tier}｜${bucket}]`,
@@ -286,11 +293,16 @@ export function classifyProjectType(input = {}) {
     ...(Array.isArray(input.tags) ? input.tags : []),
   ].filter(Boolean).join("\n");
 
+  if (isNonAiEngineeringText(text)) return "non_ai_eng";
+  if (isAgentSkillText(text)) return "agent_skill";
   if (!AI_RE.test(text)) return "non_ai_eng";
+  const agentTermsOnly = /\bagents?\b/i.test(text) && !AGENT_AI_CONTEXT_RE.test(text);
+  if (agentTermsOnly) return "non_ai_eng";
   if (/\b(coding agent|devtool|developer tool|cli|command line|terminal|shell|codemod|code assistant)\b/i.test(text)) return "devtool_cli";
-  if (/\b(dataset|benchmark|eval|evaluation|leaderboard|arena|test set|harness)\b/i.test(text)) return "dataset_benchmark";
   if (/\b(agent framework|agent runtime|agent infrastructure|agent toolkit|multi-agent|orchestration|planner|tool calling|workflow engine|memory framework|mcp)\b/i.test(text)) return "agent_framework";
-  if (/\b(model infra|serving|inference|fine-tun|finetun|training|checkpoint|quantization|vllm|lora|embedding service)\b/i.test(text)) return "model_infra";
+  if (/\b(open source,? extensible AI agent|self[-\s]?improving ai framework|autonomously improve .* ai agent|ai agent .* (install|execute|edit|test))\b/i.test(text)) return "agent_framework";
+  if (/\b(model infra|world models?|physical ai|serving|inference|fine-tun|finetun|training|checkpoint|quantization|vllm|lora|embedding service|tts|text[-\s]?to[-\s]?speech|onnx)\b/i.test(text)) return "model_infra";
+  if (/\b(dataset|benchmark|eval|evaluation|leaderboard|arena|test set|harness)\b/i.test(text)) return "dataset_benchmark";
   if (/\b(frontend|ui|react|vue|svelte|dashboard|component|chat ui|web app)\b/i.test(text)) return "frontend_ui";
   if (/\b(sdk|library|package|api client|framework|client library)\b/i.test(text)) return "library_sdk";
   if (/\b(template|boilerplate|starter|scaffold|example app)\b/i.test(text)) return "template_boilerplate";
@@ -315,6 +327,15 @@ export function normalizeProjectType(value, fallback = "non_ai_eng") {
   const mapped = {
     ai_app: "ai_app",
     app: "ai_app",
+    agent_skill: "agent_skill",
+    agent_skills: "agent_skill",
+    skill: "agent_skill",
+    skills: "agent_skill",
+    plugin: "agent_skill",
+    plugins: "agent_skill",
+    prompt_collection: "agent_skill",
+    prompt_collections: "agent_skill",
+    meta_skill: "agent_skill",
     agent_framework: "agent_framework",
     agent_runtime: "agent_framework",
     framework: "agent_framework",
@@ -400,6 +421,8 @@ function evaluationFromDecision({ candidate, repo, evidence_signals, ranking, de
     light,
     intent,
     project_type,
+    informs_our_structure: Boolean(depth_decision.informs_our_structure),
+    self_evo_eligible: Boolean(depth_decision.self_evo_eligible),
     verdict: legacyVerdictForDepth(depth_decision.final_depth),
     ratings: ratingsFromRanking(ranking),
     project_tier: depth_decision.project_tier,
@@ -597,8 +620,12 @@ function intentFromSignals(signals = {}) {
 
 function projectTypeFromSignals(signals = {}) {
   const text = `${signals.raw_readme || ""}\n${signals.description || ""}\n${(signals.topics || []).join(" ")}`;
+  if (isNonAiEngineeringText(text)) return "non_ai_eng";
+  if (isAgentSkillText(text) || (signals.has_skills && !signals.has_agents && !signals.has_mcp && !signals.has_models)) return "agent_skill";
   if (!AI_RE.test(text) && !signals.has_agents && !signals.has_mcp && !signals.has_models) return "non_ai_eng";
-  if (signals.has_agents || signals.has_mcp || signals.has_skills) return "agent_framework";
+  const agentTermsOnly = /\bagents?\b/i.test(text) && !AGENT_AI_CONTEXT_RE.test(text) && !signals.has_mcp && !signals.has_models;
+  if (agentTermsOnly) return "non_ai_eng";
+  if (signals.has_agents || signals.has_mcp) return "agent_framework";
   if (signals.has_cli) return "devtool_cli";
   if (/\b(eval|benchmark|dataset|leaderboard)\b/i.test(text)) return "dataset_benchmark";
   if (signals.has_models) return "model_infra";
@@ -654,6 +681,9 @@ function publicDepthDecision(decision = {}) {
     project_tier_label: decision.project_tier_label || `Tier ${projectTierForDepth(decision.final_depth)}`,
     project_bucket: decision.project_bucket || decision.bucket || "无关类",
     bucket: decision.project_bucket || decision.bucket || "无关类",
+    project_type: decision.project_type || "non_ai_eng",
+    informs_our_structure: Boolean(decision.informs_our_structure),
+    self_evo_eligible: Boolean(decision.self_evo_eligible),
     model_tier: decision.model_tier || modelForProjectTier(projectTierForDepth(decision.final_depth)),
     requires_manual_confirmation: Boolean(decision.requires_manual_confirmation || projectTierForDepth(decision.final_depth) === 3),
     ranking_reasons: decision.ranking_reasons || [],
@@ -864,6 +894,14 @@ function normalizeScore(value = {}) {
 function scoreRegex(text, regex) {
   const matches = String(text || "").match(new RegExp(regex.source, "gi"));
   return matches ? matches.length : 0;
+}
+
+function isNonAiEngineeringText(text) {
+  return NON_AI_ENGINEERING_RE.test(text) && !AGENT_AI_CONTEXT_RE.test(text);
+}
+
+function isAgentSkillText(text) {
+  return AGENT_SKILL_RE.test(text);
 }
 
 function normalizeTags(value) {

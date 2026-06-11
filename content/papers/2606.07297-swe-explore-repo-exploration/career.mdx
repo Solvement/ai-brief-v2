@@ -1,0 +1,66 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+> [!key] 你每天都在用 coding agent，这篇告诉你它弱在哪
+> 你（和你的 codex/Claude 子 agent）天天在仓库里"找相关代码再改"。SWE-Explore 用实测把一个反直觉但极有用的结论砸明白：**现在的 coding agent 文件级定位已经很强，真瓶颈是行级 recall——能翻到对的文件，却漏掉该读的那些具体行**。这直接影响你怎么用 agent：当 agent 改错或改漏，多半不是"没找到文件"，是"没把相关上下文读够"。对策不是换更强的模型，是**给它更好的探索机制（如 CoSIL 的迭代代码图搜索）或主动把关键上下文喂全**。
+
+三点价值：
+1. **上下文工程的实证依据**：CtxEff 与修复率 r=0.950——"上下文既要相关又要紧凑"不再是口号，是可量的。这给你"喂多少上下文给 agent"提供了量化直觉。
+2. **缺上下文 > 冗余上下文**：现代 patcher 能容忍多余代码，但缺核心证据会卡死（阈值式）。所以**宁可多给点也别漏**——召回优先于过度过滤。
+3. **轨迹接地的评测方法**可迁移：用"多条成功轨迹的共识"替代人工标注，是你给任何 agent 能力建评测时省力又靠谱的招。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 仓库探索/上下文选择 | 把"找相关代码"做成可量的排序行级选择任务，而非端到端黑箱 | 给一个 issue，让 agent 只输出 K=5 区域，对照成功轨迹打分 |
+| 轨迹接地的 ground truth | 用≥2 条成功轨迹取交集 + LLM 精炼 + 人工审造标准答案 | 录几条成功 agent 轨迹，抽 read 动作取交集，建一个迷你靶 |
+| 行预算指标设计 | nDCG@B（行预算非 rank 截断）、FUH、context efficiency | 实现这三个指标，对比它们对下游成败的区分力 |
+| 指标→下游反向验证 | 用受限上下文协议量"该信哪个指标" | 把候选指标和下游修复率算相关性，留预测力强的 |
+| 上下文预算决策 | 缺 > 冗余的非对称性，召回优先于过滤 | 做缺/冗余消融：藏掉 α% 核心 vs 填等量噪声，看下游差 |
+
+## 系统设计心法
+
+- **文件级到位 ≠ 上下文够**：agent 翻到对的文件只是到了"街区"，关键是有没有把承重的那些**行**读全；评估 agent 检索别只看文件命中。
+- **召回优先于过滤**：高覆盖区里，缺核心证据比多塞无关代码致命得多——喂上下文时宁全勿漏，先保召回再谈紧凑。
+- **探索机制 > 换大模型**：行 recall 的天花板靠更好的探索机制（迭代代码图搜索）突破，换更强 patcher 不解决探索瓶颈。
+- **用行为共识替代人工标注**：要给某能力建 ground truth，先想"有没有多条成功轨迹的交集可用"，比雇人标既省又稳。
+- **指标要被下游验证**：别凭直觉选评测指标；拿真正关心的下游结果当裁判，留下预测力强的，必要时报一组混合指标。
+
+## 作品集角度(Portfolio angle)
+
+这能撑起一个**"coding agent 上下文质量诊断"**方向的作品：做一个小工具，输入 (issue, repo)，跑几个 explorer（BM25 / 一个 agent / 代码图搜索），按行级覆盖+排序+效率打分，可视化"文件级强但行级漏"的差距。亮点是**你能把一个模糊的'agent 检索好不好'变成可量的诊断**，并复现"召回是瓶颈"这一结论——比"我会调 RAG"具体得多。给这个 13★ 新基准提一个 explorer 适配器 PR 也是硬简历点。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| 仓库探索打分器 | 输入 K=5 区域清单，算行级 precision/recall/HitFile/nDCG@B/CtxEff | 3-5 天 | 吃透行级评测，产出能复现"召回瓶颈"的 repo |
+| 轨迹接地靶构造器 | 从成功 agent 轨迹抽 read 动作 → 行级取交集 → 出迷你 ground truth | 1 周 | 把"行为共识替代人工标注"这条方法跑通 |
+| 上下文预算消融器 | 对一个 patcher 做缺/冗余上下文 sweep，画修复率曲线 | 2-3 天 | 量出"召回优先"的非对称性，指导喂上下文策略 |
+
+## 简历 / 面试故事
+
+诚实写法：
+- *"Built a line-level repository-exploration scorer that grounds ground truth in the consensus of multiple successful agent trajectories, and reproduced the finding that modern coding agents are file-level strong but line-level recall-limited."*
+- *"Ran a missing-vs-redundant context ablation showing patchers tolerate redundancy but fail on missing core evidence, motivating recall-first context selection."*
+
+> [!key] 面试可讲
+> "coding agent 改错代码，你怎么定位是哪一环出了问题？" —— 用本文拆：把端到端 pass/fail 拆成**探索 / 定位 / 补丁合成**；先量探索（行级覆盖），多数情况会发现 agent**文件找对了、行读漏了**（recall 瓶颈）。对策是上更好的探索机制或主动补全上下文，而非换模型。这体现你不止会用 agent，还会**诊断 agent 的失败结构**。
+
+## 学习清单
+
+**必学**
+- 行级仓库探索评测（覆盖 / 排序 / 效率三维）
+- 轨迹接地的 ground truth 构造（成功轨迹取交集 + 精炼 + 审）
+- 缺 vs 冗余上下文的非对称性（召回优先）
+
+**有用**
+- 行预算下的 nDCG、FUH、context efficiency 实现
+- 指标用下游结果反向验证的方法学
+
+**可选**
+- 各 explorer 家族（BM25/稠密检索/AutoCodeRover/LocAgent/CoSIL）的机制差异——做检索方向时再深挖

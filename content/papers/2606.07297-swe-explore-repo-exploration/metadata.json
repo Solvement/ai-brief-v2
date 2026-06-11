@@ -1,0 +1,71 @@
+{
+  "paper_id": "2606.07297",
+  "arxiv_id": "2606.07297",
+  "title": "SWE-Explore: Benchmarking How Coding Agents Explore Repositories",
+  "authors": [
+    "Shaoqiu Zhang",
+    "Yuhang Wang",
+    "Jialiang Liang",
+    "Yuling Shi",
+    "Wenhao Zeng",
+    "Maoquan Wang",
+    "Shilin He",
+    "Ningyuan Xu",
+    "Siyu Ye",
+    "Kai Cai",
+    "Xiaodong Gu"
+  ],
+  "affiliations": [
+    "Shanghai Jiao Tong University",
+    "Xinjiang University",
+    "University of Illinois Urbana-Champaign",
+    "Independent Researcher",
+    "The Chinese University of Hong Kong"
+  ],
+  "date": "2026-06-05",
+  "huggingface_url": "https://huggingface.co/papers/2606.07297",
+  "paper_url": "https://arxiv.org/abs/2606.07297",
+  "code_url": "https://github.com/Qiushao-E/SWE-Explore-Bench",
+  "dataset_url": "https://huggingface.co/datasets/SWE-Explore-Bench/SWE-Explore-Bench",
+  "model_url": "",
+  "space_url": "",
+  "hf_upvotes": 107,
+  "github_stars": 13,
+  "source_rankings": [
+    "daily",
+    "hf_paper_of_the_day_2"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.07297.yaml",
+  "first_seen_date": "2026-06-09",
+  "topic": "agent",
+  "agent_relevant": true,
+  "tags": [
+    "repository-exploration",
+    "coding-agent-benchmark",
+    "context-selection",
+    "trajectory-grounded-gt",
+    "line-level-localization",
+    "context-efficiency",
+    "swe-bench"
+  ],
+  "status": "deep_read",
+  "track": "hf",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 7,
+    "transferability_to_autosci": 8,
+    "breadth_value": 6,
+    "ai_engineering_value": 7,
+    "buildability": 8,
+    "evaluation_value": 9,
+    "evidence_quality": 7
+  },
+  "one_sentence_judgment": "把 SWE-bench 的二值黑箱拆开、单拎'仓库探索'做行级可比评测:用≥2 条成功修复轨迹读过的行取交集(+LLM 精炼+人工审)当 ground truth,沿覆盖/排序/效率三维打分并用下游修复反验指标;核心实测结论=现在 coding agent 文件级强但行级 recall 是瓶颈、缺上下文比冗余更致命;轨迹接地与上下文预算方法可直接迁移,但分数自报、GT 偏'已被强模型解出的 issue'、带 LLM 精炼主观性。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

@@ -1,0 +1,101 @@
+primitive_id: agentic-environment-engineering-lifecycle
+source_paper: "2606.12191"
+title: "Agentic Environment Engineering for Large Language Models: A Survey of Environment Modeling, Synthesis, Evaluation, and Application"
+relevance_level: direct
+audience: ai_only
+core_pattern: >
+  把 LLM agent 的“环境”从临时 benchmark / sandbox / world model 升级为可建模、可合成、可评估、
+  可演化的工程对象：先用 POMDP 定义状态、动作、转移、奖励和观察；再用 8 组属性与 8 个任务领域定位环境；
+  合成侧分 symbolic synthesis 与 neural synthesis；质量门分 correctness、diversity、complexity、fidelity；
+  应用侧分 agent evolution 4 路径与 environment evolution 3 范式。对 AutoSci 的直接启发是：
+  自进化不能只改 agent 自身，也要把“训练场/评测场”做成会验证、会调难度、会扩分布的环境层。
+problem_class: model-synthesize-evaluate-and-evolve-agentic-environments-for-self-improving-agents
+
+core_concepts:
+  - name: 环境工程生命周期（modeling-synthesis-evaluation-application）
+    role: primary
+    evidence: "modeling, synthesis, evaluation and application"
+  - name: 符号合成 vs 神经合成（symbolic vs neural environment synthesis）
+    role: primary
+    evidence: "Symbolic Synthesis ... Neural Synthesis"
+  - name: 环境质量四维评估（correctness/diversity/complexity/fidelity）
+    role: primary
+    evidence: "correctness, diversity, complexity, and fidelity"
+  - name: agent↔环境协同进化（agent-environment co-evolution）
+    role: primary
+    evidence: "agent-environment co-evolution"
+  - name: Environment-as-a-Service（EaaS）
+    role: supporting
+    evidence: "Environment-as-a-Service (EaaS)"
+  - name: 自进化 agent
+    role: mentioned
+    evidence: "continual evolution of model capabilities"
+
+discovery_trace: 数据不足
+
+components:
+  - pomdp_environment_model
+  - eight_attribute_taxonomy
+  - eight_domain_map
+  - symbolic_environment_synthesizer
+  - neural_world_model_synthesizer
+  - four_dim_environment_quality_gate
+  - agent_evolution_pathways
+  - environment_evolution_pathways
+  - eaas_interface_layer
+
+autosci_modules:
+  - environment_builder
+  - eval_harness
+  - self_evolve_controller
+  - memory_system
+  - trajectory_synthesizer
+  - curriculum_scheduler
+  - cold_critic
+
+inputs:
+  - task_domains
+  - environment_attributes
+  - static_tasks_or_real_world_traces
+  - verifier_or_reward_spec
+  - agent_performance_feedback
+
+outputs:
+  - typed_environment_card
+  - synthesized_environment_pool
+  - environment_quality_report
+  - adaptive_curriculum_policy
+  - agent_environment_coevolution_log
+
+design_principles:
+  - "把环境当一等工程对象：数据集只给样本，环境给动作后果、状态变化和奖励。"
+  - "先做 correctness，再谈规模：自动合成环境如果没有 verifier，只是在规模化制造错误反馈。"
+  - "diversity、complexity、fidelity 要和 correctness 分开量，否则环境可能能跑但训不出泛化。"
+  - "agent 进化和环境进化分账：记忆/编排/轨迹/RL 是 agent 侧；神经/难度/规模是环境侧。"
+  - "符号环境提供可控和可复现，神经环境提供覆盖和模拟；生产级系统优先考虑神经-符号混合。"
+  - "EaaS 接口应隐藏浏览器、容器、模拟器、设备依赖，让 agent 只看到统一交互协议。"
+
+small_experiment: >
+  选一个现有 AutoSci 任务族（如论文深读冷审、代码修复或工具调用），做一个 Mini Environment Lab：
+  1) 用 8 组属性填写 environment card；2) 封装 reset/step/observe/reward/verify；
+  3) 用规则或代码合成 30-100 个任务并跑 verifier；4) 输出 correctness/diversity/complexity/fidelity 报告；
+  5) 用最近 N 次成功率或错误类型做 difficulty-driven curriculum，对照固定环境 vs 自适应环境下的错误率和学习速度。
+  预计 3-10 天可做出最小闭环。
+
+risks:
+  - survey_not_method
+  - no_new_benchmark
+  - no_official_code_repo
+  - taxonomy_subjective
+  - qualitative_gap_claims
+  - fast_staleness
+  - verifier_overtrust
+  - synthetic_environment_bias
+
+source_notes:
+  arxiv: "https://arxiv.org/abs/2606.12191"
+  hf: "https://huggingface.co/papers/2606.12191"
+  code_repo: "无 / 未披露"
+  evidence_boundary: "综述归纳；没有作者自做实验或 benchmark；空白点多为定性判断。"
+
+status: extracted

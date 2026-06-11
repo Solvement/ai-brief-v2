@@ -1,0 +1,88 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+> [!key] 这篇给你的不是榜单，是“怎么把专业工作变成 agent 可验收任务”的方法
+> FDE 的价值经常卡在一句话：客户说“让 AI 帮我做这个工作流”，但真正难的是把“这个工作流”拆成输入、环境、软件、交付物、验收门。ALE 正好把这件事工程化了：真实项目进题库，agent 自由工作，最后用隐藏 reference 和 `evaluate()` 判卷。你学它，学到的是把模糊专业需求变成可运行 eval 的能力。
+
+对应用型工程师来说，它有三层价值：
+
+1. **评测设计能力**：别只 demo agent 会聊天，要能证明它在真实工作流里交付了什么。
+2. **系统验收能力**：把“看起来对”改成 `gate-and-score`：先硬门，再质量分。
+3. **垂直落地判断**：ALE 的失败画像说明，当前 agent 很多时候不是不会执行，而是不懂领域、选错方法。FDE 的护城河就在这里。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 可验证任务设计 | 把一个业务流程改写成“输入文件 + 目标软件 + 交付物 + 评分规格” | 选一个你熟悉的工作流，写出 5 要素，然后让别人只看这 5 要素能否复现验收 |
+| `evaluate()` 思维 | 每个 agent 产物都要有一个可执行评分函数，而不是靠主观感觉 | 给一个项目写最小 grader：读取 `output/`，对照 reference，返回 0..1 |
+| gate-and-score | 先判硬条件（能打开、能解析、无关键缺项），再算质量分 | 给报告/表格/代码产物设计“硬门 + 连续分”两层 rubric |
+| 沙箱与目录契约 | 用 `input/ software/ output/ reference/` 隔离资料、软件、产物和隐藏答案 | 搭一个本地 mini sandbox：agent 只写 `output/`，grader 才能读 `reference/` |
+| GCUA 能力体检 | 按 Brain/Eyes/Body/Hands/Feet 检查 agent 缺哪层 | 拿 Claude Code、Codex、一个 GUI agent 做对照表，标出谁缺视觉、谁缺运行时、谁缺长程编排 |
+| 失败归因 | 不只记 pass/fail，要分 Understanding / Approach / Execution / Infrastructure | 跑 10 个失败 case，给每个失败打主因标签，再决定该补知识、改规划还是修工具 |
+| 反污染评测运维 | 公开题让大家学习，私有题保持测量面，定期轮换 | 给自己的 benchmark 设计 public smoke set + private holdout set |
+
+## 系统设计心法
+
+- **可验证 > 炫技**：一个 agent demo 再漂亮，如果交付物没有自动验收门，就不能稳定进入生产。
+- **任务、agent、环境分开**：任务规格不要写死某个 agent；agent 不该假设某个任务；环境只提供统一接口。分开以后才能横向比较。
+- **先硬门，后评分**：解析失败、文件缺失、关键安全约束没过，直接 0；不要让“做了一点点”稀释底线。
+- **隐藏答案是评测尊严**：reference 不能在 agent 工作阶段出现。否则你测的是 agent 会不会找答案，不是会不会做任务。
+- **领域知识是短期护城河**：如果失败主因是 Understanding/Approach，继续堆 GUI 工具或 shell 权限未必有用；要把专家知识、示例、检查清单、领域软件流程灌进系统。
+- **benchmark 是产品的一部分**：垂直 agent 不是写完功能再补测试，而是先定义“什么叫做真的完成这份专业工作”。
+
+## 作品集角度(Portfolio angle)
+
+这篇最适合做一个**垂直领域 mini-ALE**作品集：挑一个你熟悉的行业或软件场景，做 5-10 个真实小工作流，每题有输入、reference、`evaluate()`、失败分析，然后跑 2-3 个 agent 对比。
+
+这个作品比“我做了一个 chatbot”硬很多，因为它证明三件事：
+
+- 你会把业务工作拆成机器可判任务。
+- 你会设计 agent 环境和评分器。
+- 你会用失败归因指导下一轮产品改进。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| Mini-ALE for FDE | 选一个垂直场景，做 5-10 个任务、四目录结构、`evaluate()` grader、简单 leaderboard | 1-2 周 | 最能体现“懂业务 + 懂 eval + 懂 agent”的作品 |
+| Agent 验收门模板 | 一个 TypeScript/Python 模板：`input/ output/ reference/ evaluate()` + JSON report | 2-4 天 | 可复用于任何 AI app 的交付验收 |
+| GCUA 能力体检表 | Brain/Eyes/Body/Hands/Feet 五层 checklist，评估不同 agent 产品缺口 | 1-2 天 | 面试和方案评审时很好讲，能避免“GUI agent = 全能 agent”的误判 |
+| Failure Taxonomy Logger | 对失败 run 自动生成 analysis card，再分类为 Understanding/Approach/Execution/Infrastructure | 3-7 天 | 把失败从“感觉不行”变成可优化 backlog |
+| Deterministic-first Judge Refactor | 把一个现有 LLM-as-judge 评测改成可执行硬门 + 少量窄 probe | 3-5 天 | 直击生产 eval 稳定性，适合写技术文章 |
+| Private Holdout Runner | public smoke set + private holdout set + 滚动轮换脚本 | 4-7 天 | 体现你理解污染、过拟合和长期运维 |
+
+## 简历 / 面试故事
+
+诚实写法：
+
+- *"Built a verifiable agent evaluation harness for a vertical workflow: decoupled task specification, agent runner, and sandbox environment, with hidden-reference grading and gate-and-score metrics."*
+- *"Designed deterministic-first evaluation for AI-generated deliverables, replacing broad LLM-as-judge prompts with executable checks, hard gates, and narrow evidence-anchored probes."*
+- *"Analyzed agent failures with a two-level taxonomy (Understanding, Approach, Execution, Infrastructure), showing which issues required domain knowledge versus tool/runtime fixes."*
+
+> [!key] 面试可讲
+> 如果面试官问“你怎么判断一个 agent 真的能做专业工作，而不是 demo 里看起来能做？”可以这样讲：我会先把工作流写成可验证任务规格，分离 task / agent / environment；让 agent 只接触 `input/` 和 `software/`，只写 `output/`；评分阶段再注入 `reference/`；`evaluate()` 先跑硬门，再算质量分；失败后不只看 pass/fail，而是归因到理解、方法、执行或基础设施。这个回答比“我会 prompt engineering”更像工程负责人。
+
+## 学习清单
+
+**必学**
+
+- `load()` / `start()` / `evaluate()` 这种任务生命周期抽象
+- `input/ software/ output/ reference/` 四目录契约
+- gate-and-score 与 deterministic-first verification
+- GCUA 五层：Brain / Eyes / Body / Hands / Feet
+
+**有用**
+
+- O*NET / SOC 这类分类法如何帮助你做覆盖设计
+- 公开/私有题池如何抗污染
+- 失败 taxonomy 如何转成产品 backlog
+
+**可选**
+
+- 远程 VM / GCS / baked image / encrypted reference 的运维细节
+- VLM/LLM judge 的窄 probe 设计
+- 成本、时间、token 与 pass rate 的多目标评估图

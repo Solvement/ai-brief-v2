@@ -435,7 +435,7 @@ Offline mode sets noLlm/offline and writes the deterministic offline stub shape 
 
 function normalizeProjectType(value) {
   const raw = String(value || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
-  const allowed = new Set(["ai_app", "agent_framework", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
+  const allowed = new Set(["ai_app", "agent_framework", "agent_skill", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
   return allowed.has(raw) ? raw : "non_ai_eng";
 }
 

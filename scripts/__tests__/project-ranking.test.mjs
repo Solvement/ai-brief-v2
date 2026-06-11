@@ -83,6 +83,117 @@ test("daily depth target helper does not cap deep candidates", () => {
   assert.equal(assigned.filter((item) => item.eval.rejection_reasons.some((reason) => reason.startsWith("daily_"))).length, 0);
 });
 
+test("daily depth target helper caps deep candidates at two per window by default", () => {
+  const deepItems = projectRadarRegressionFixtures.slice(0, 3).map((fixture, index) => {
+    const decision = decisionFor(fixture);
+    decision.final_depth = "deep";
+    decision.depth_band = "deep";
+    return {
+      candidate: {
+        id: `deep-${index}`,
+        raw: { fullName: `owner/deep-${index}`, ranksByWindow: { daily: index + 1 }, windows: ["daily"] },
+      },
+      eval: {
+        score: 90 - index,
+        ranking_score: 90 - index,
+        final_depth: "deep",
+        depth_decision: decision,
+      },
+    };
+  });
+
+  const assigned = applyDailyDepthTargets(deepItems, {});
+
+  assert.equal(assigned.filter((item) => item.eval.final_depth === "deep").length, 2);
+  assert.equal(assigned.filter((item) => item.eval.final_depth === "analysis").length, 1);
+  assert.ok(assigned.some((item) => item.eval.rejection_reasons.includes("deep_window_soft_cap")));
+});
+
+test("AI relevant projects bottom out at light instead of list_only", () => {
+  const aiSignals = {
+    repo: "small-ai-notebook",
+    description: "Notebook LM style AI app for summarizing local notes.",
+    raw_readme: "Notebook LM style AI app with a short README and minimal setup notes.",
+    readme_found: true,
+    readme_length: 320,
+    stars: 20,
+    stars_in_period: 2,
+    language: "TypeScript",
+    trend_sources: ["github-trending:daily"],
+    key_files: ["README.md"],
+    has_docs: false,
+    has_examples: false,
+    has_tests: false,
+    has_install: false,
+    package_files: { package_json: true },
+  };
+
+  const decision = decideProjectDepth({ ranking: scoreProject(aiSignals), evidence_signals: aiSignals });
+
+  assert.notEqual(decision.project_type, "non_ai_eng");
+  assert.equal(decision.final_depth, "light");
+  assert.ok(depthAtLeast(decision.final_depth, "light"));
+});
+
+test("agent_skill defaults to light unless it informs our structure", () => {
+  const skillSignals = {
+    repo: "agent-skills",
+    description: "Production-grade engineering skills for AI coding agents.",
+    raw_readme: "Agent skill pack with installation notes, examples, docs, and tests. ".repeat(30),
+    readme_found: true,
+    readme_length: 1800,
+    stars: 2000,
+    stars_in_period: 120,
+    language: "Shell",
+    trend_sources: ["github-trending:daily"],
+    top_level_dirs: ["skills", "docs", "tests"],
+    key_files: ["README.md"],
+    has_docs: true,
+    has_examples: true,
+    has_tests: true,
+    has_install: true,
+    has_skills: true,
+    package_files: {},
+  };
+
+  const decision = decideProjectDepth({ ranking: scoreProject(skillSignals), evidence_signals: skillSignals });
+
+  assert.equal(decision.project_type, "agent_skill");
+  assert.equal(decision.final_depth, "light");
+  assert.equal(decision.informs_our_structure, false);
+  assert.equal(decision.self_evo_eligible, false);
+});
+
+test("structure-informing agent_skill upgrades to deep and self-evo eligible", () => {
+  const skillSignals = {
+    repo: "agent-harness-skills",
+    description: "Agent skill pack for memory, taste, eval harness, MCP commands, and workflow orchestration.",
+    raw_readme: "Agent skill pack with memory eval harness MCP commands workflow orchestration installation examples tests docs. ".repeat(30),
+    readme_found: true,
+    readme_length: 3000,
+    stars: 2400,
+    stars_in_period: 140,
+    language: "Shell",
+    trend_sources: ["github-trending:daily", "github-trending:weekly"],
+    appears_in_tabs: ["daily", "weekly"],
+    top_level_dirs: ["skills", "docs", "tests"],
+    key_files: ["README.md"],
+    has_docs: true,
+    has_examples: true,
+    has_tests: true,
+    has_install: true,
+    has_skills: true,
+    package_files: {},
+  };
+
+  const decision = decideProjectDepth({ ranking: scoreProject(skillSignals), evidence_signals: skillSignals });
+
+  assert.equal(decision.project_type, "agent_skill");
+  assert.equal(decision.final_depth, "deep");
+  assert.equal(decision.informs_our_structure, true);
+  assert.equal(decision.self_evo_eligible, true);
+});
+
 test("ordinary AI projects need a strong signal before Tier 3", () => {
   const ordinary = {
     owner: "indie-dev",

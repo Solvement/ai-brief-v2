@@ -1,0 +1,66 @@
+# Career & Learning · 求职与成长
+
+> 假设你已读完 Paper 栏。这里只谈它对**应用型 AI 工程师 / FDE / AI-app 开发者**的你有什么用。
+
+## 为什么这对我重要
+
+> [!key] 和你正在做的东西直接撞上
+> 你这个项目（AI-Brief + AutoSci）本身就是个"主代理拆任务、派发给子代理（Claude sub-agent / codex）、回收结果"的系统，CLAUDE.md 里的 harness 治理、dynamic workflow、"子 agent 四件套"全是这套委托范式的工程化。SearchSwarm 给你的不是"又一个 deep research 模型"，而是**一份把委托做对的可抄清单**——它的四条 harness 原则几乎可以逐条对照你现在的子 agent 调度。
+
+具体三点价值：
+1. **委托设计的"标准答案"**：brief 要写全（为什么重要/已确认/待定/已排除）、主代理保留方向判断、子代理报告必须带引用——这正是你手搓子 agent 编排时最容易偷懒的地方。
+2. **"harness 不训练就失效"是个反直觉但重要的工程教训**：好提示词≠会涌现复杂行为。对订阅制 CLI（不能微调）的你，反过来读这条 = **必须把行为用更硬的 harness 约束死，不能指望模型自觉**。
+3. **委托=主动上下文管理**这个 reframe，能直接改善你任何长程 agent 的 context 预算策略：与其等爆了再压缩，不如提前把"体力活"派出去、只回收摘要。
+
+## 该学的 AI 工程技能
+
+| 技能 | 学什么 | 怎么练 |
+| --- | --- | --- |
+| 委托型 harness 设计 | 把"何时委托/怎么写 brief/主代理保留什么判断/报告怎么落引用"写成系统提示词 | 抄 Appendix B 的主/子提示词，套到自己的 deep-research 小工具上 |
+| 上下文预算工程 | 把"主代理只收摘要、子代理独立 context"做成显式策略，而非等溢出再截断 | 给一个多步检索 agent 加 call_sub_agent，量主代理 token 占用前后差 |
+| 轨迹→训练数据合成 | 用 harness 逼出好轨迹 → 过滤（只留答对的、去坏习惯）→ 当 SFT 料 | 录 50 条自己 agent 的成功轨迹，写过滤器（去重复调用/假引用） |
+| environment masking | 微调时只对模型输出算 loss、mask 工具返回 | 读懂式 5，在任意 SFT 脚本里实现 loss mask |
+| 引用落地与可追溯 | 子代理每条结论挂 inline 源、主代理传播引用做端到端可追溯 | 给你的检索 agent 输出强制 [n] + References，校验 URL 真实性 |
+
+## 系统设计心法
+
+- **主动委托 > 被动截断**：长程任务别等 context 爆了再压缩，提前把"token 贵、认知浅"的体力活外包，主代理注意力留给规划/核验/综合。
+- **brief 质量 = 子代理上限**：交接说明写多全，下游就多有用；把每个 brief 当"给新同事的入职文档"写。
+- **主代理永远保留方向判断**：子代理可以搜证据、测假设，但"追哪个假设/何时收尾/矛盾怎么裁"必须主代理独立定——否则错误累积传播。
+- **行为要训练/约束固化，不能指望涌现**：好 harness 是必要不充分；能微调就训进权重，不能微调（订阅 CLI）就把约束写得更硬。
+- **单模型也能"多代理"**：所谓子代理只是同一模型的 fresh context + 内容感知压缩——别被"多代理"光环唬住，先问"是不是其实是一次聪明的上下文管理"。
+
+## 作品集角度(Portfolio angle)
+
+这能撑起一个**"委托型深度研究 agent"**方向的作品：不是又一个 RAG 问答，而是一套"主代理派发-子代理执行-引用落地"的可演示 harness。亮点是**可量化**：主代理 context 占用下降多少、答对率 vs 单代理 baseline 提升多少。再加一条狠的——**把它接进你自己的 AutoSci 子 agent 编排**，用本文四原则改造现有调度并量出差异，这比 demo 更能讲。
+
+## 可造(Build ideas)
+
+| 造什么 | 范围 | 时间 | 为什么有用 |
+| --- | --- | --- | --- |
+| 委托型 deep-research mini harness | 主/子两套提示词 + call_sub_agent 工具 + 引用校验 | 3-5 天 | 吃透四原则，产出能量化 context 节省的 repo |
+| 子 agent 编排审计器 | 对照四原则给自己现有的子 agent 调度打分、找漏写的 brief 字段 | 2-3 天 | 直接改善 AutoSci/本项目的派发质量 |
+| 轨迹过滤 + SFT 料工厂 | 录成功轨迹→去重复/去假引用→导出 SFT 格式 | 1 周 | 把"harness 逼轨迹→蒸权重"这条链跑通一遍 |
+
+## 简历 / 面试故事
+
+诚实写法：
+- *"Built a delegation harness for a deep-research agent (main-distributes/sub-executes) that offloads multi-step retrieval to independent-context sub-agents and reduces the main agent's context usage, with citation-grounded reporting for end-to-end traceability."*
+- *"Re-framed a 'multi-agent' workflow as single-model content-aware context management, and measured answer-accuracy gains over a single-agent baseline."*
+
+> [!key] 面试可讲
+> "你怎么让一个长程 agent 不被 context 撑爆？" —— 用本文论证：**主动委托**（提前外包体力活、只回收带引用的摘要）比**被动截断/摘要**更可控；并补一句反直觉教训——**好 harness 不会自动让模型学会委托，行为得训练或硬约束固化**（Tongyi DR Swarm 从不调用子代理那条负面证据）。这同时体现系统思维 + 对"提示词工程极限"的清醒。
+
+## 学习清单
+
+**必学**
+- 委托型 harness 四原则（鼓励委托 / 全交接 brief / 主代理保留判断 / 引用落地）
+- 主动上下文管理 vs 被动截断的取舍
+- 轨迹过滤 → SFT（含 environment masking）
+
+**有用**
+- ReAct 循环里把 call_sub_agent 当工具的形式化（§2.1）
+- 两配置数据采集（强主+弱子逼出更严控主线的轨迹）
+
+**可选**
+- 具体 deep-research benchmark（BrowseComp/GAIA/xbench）的评测协议——领域特定，迁移性一般

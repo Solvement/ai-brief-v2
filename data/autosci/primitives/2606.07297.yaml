@@ -1,0 +1,69 @@
+primitive_id: trajectory-grounded-exploration-eval
+source_paper: "2606.07297"
+title: "SWE-Explore: Benchmarking How Coding Agents Explore Repositories"
+relevance_level: direct                     # AutoSci 检索/上下文选择能力评测 + 轨迹接地标注的直接蓝本
+audience: ai_only
+core_pattern: >
+  把端到端 pass/fail 拆开，单拎"仓库探索"做行级可比评测：ground truth 不靠人工标，而从≥2 条成功修复
+  轨迹的 read 动作取行级交集（+ LLM 精炼 + 人工审）得核心区域；explorer 只交 K=5 排序区域清单，
+  沿覆盖（precision/recall/HitFile/HitRegion）×排序（行预算 nDCG@B、FUH）×效率（context efficiency、
+  noise）三维打分；再用受限上下文协议（只露选中区域喂固定 patcher）量上游指标对下游修复率的相关性，
+  以此挑该信的指标。核心实测：coding agent 文件级强、行级 recall 是瓶颈；缺上下文比冗余更致命。
+problem_class: isolate-and-measure-repository-exploration-with-trajectory-grounded-line-level-gt
+core_concepts:
+  - name: "轨迹接地的标准答案（trajectory-grounded ground truth）"
+    role: primary
+    evidence: "derive line-level ground truth from independent agent trajectories that successfully solved the same issue ... regions repeatedly surfaced across independent successful trajectories as a behavioral signal for core context"
+  - name: "仓库探索作为独立评测靶（repository exploration as isolated target）"
+    role: primary
+    evidence: "isolates the evaluation of repository exploration ... formalize it as a ranked, line-level context selection task"
+  - name: "行级 recall 瓶颈（file-level strong, line-level recall-limited）"
+    role: primary
+    evidence: "file-level localization is already strong for modern methods, line-level coverage and efficient ranking remain the key axes ... their Rec ℓ remains only around 0.14-0.19"
+  - name: "上下文效率（context efficiency）"
+    role: supporting
+    evidence: "Context Efficiency has the highest Pearson correlation (r=0.950), suggesting that useful context must be both relevant and compact"
+  - name: "缺上下文比冗余更致命（missing context dominates redundancy）"
+    role: supporting
+    evidence: "missing core evidence matters more than moderate precision loss, so recall-oriented improvements are more valuable than small filtering gains"
+discovery_trace: 数据不足   # benchmark 论文，没有"先试 X 失败→改 Y"的解法发现叙事；按 canonical 不从结果反推方法发现链。
+components:
+  - successful_trajectory_pool   # ≥2 条强模型成功修复轨迹
+  - read_action_extractor        # 抽编辑器查看/cat·head·sed -n/grep -n 为行级区域
+  - intersection_refine_audit    # 行级取交集 → LLM 精炼承重可选读 → 人工审
+  - ranked_region_scorer         # 覆盖×排序×效率三维指标
+  - restricted_context_validator # 只露选中区域喂固定 patcher 验下游修复
+  - released_eval_harness      # 官方仓库含 eval.py / quality/bench_metrics.py / eval_runner.py，可复用为 scorer 骨架
+autosci_modules:
+  - cold_critic                  # 探索质量评分 = AutoSci 检索/上下文选择能力的独立评判
+  - typed_memory                 # 行级区域作为结构化可验证上下文记录
+  - self_evolve_controller       # 缺>冗余的非对称性指导 AutoSci 喂上下文策略(召回优先)
+  - benchmark_builder            # 轨迹接地法给任意 agent 能力造低成本 ground truth
+inputs:
+  - issue_and_repo_snapshot      # (问题, 仓库快照)
+  - successful_trajectories      # 用于接地 ground truth 的成功轨迹
+outputs:
+  - ranked_region_list           # K=5 行级排序区域
+  - exploration_scores           # 三维指标 + 下游修复相关性
+implementation_idea: >
+  Mini 版：录几条成功 agent 轨迹，抽 read 动作（编辑器查看/cat/sed -n/grep -n）取行级交集做迷你靶；
+  让 explorer 交 K=5 区域，算 precision/recall/HitFile/nDCG@B/CtxEff；做缺/冗余上下文消融看下游差。
+  本项目可用此法评 AutoSci/codex 子 agent 的"找相关代码"质量，并落实"召回优先于过滤"的喂料策略。100-400 行起步。
+small_experiment: >
+  对一个 coding agent，量 HitFile vs Rec ℓ 的差（验证文件强/行弱）；再做缺/冗余上下文 sweep
+  （藏 α% 核心 vs 填等量噪声），画修复率曲线验"缺>冗余"。3-10 天。
+risks:
+  - self_report_only             # 全自报、无第三方复测
+  - solved_issue_bias            # GT 仅取"已被强模型解出"的 issue，难题被排除→探索难度被低估
+  - refine_subjectivity          # LLM 精炼 + 人工审引入主观性，偏保守核心、漏非主流有效路径
+  - hyperparam_sensitivity       # K=5、行预算 B 等超参影响排名，换设定结论未必稳
+design_principles:
+  - name: "文件级到位 ≠ 上下文够"
+    statement: "评 agent 检索别只看文件命中；翻到对的文件只是到街区，关键是承重的那些行有没有读全（行级 recall）。"
+  - name: "召回优先于过滤"
+    statement: "高覆盖区里缺核心证据比多塞无关代码致命得多；喂上下文宁全勿漏，先保召回再谈紧凑。"
+  - name: "探索机制 > 换大模型"
+    statement: "行 recall 天花板靠更好的探索机制（迭代代码图搜索如 CoSIL）突破，换更强 patcher 不解决探索瓶颈。"
+  - name: "用行为共识替代人工标注"
+    statement: "给某能力造 ground truth，先找'多条成功轨迹的交集'，比雇人标既省又稳，且天然接地于成功行为。"
+status: extracted

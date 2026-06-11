@@ -1,8 +1,120 @@
 {
   "schemaVersion": 1,
   "surface": "projects",
-  "updatedAt": "2026-06-11T13:06:38.955Z",
+  "updatedAt": "2026-06-11T14:38:22.261Z",
   "runs": [
+    {
+      "id": "projects-2026-06-11-1781188702264",
+      "surface": "projects",
+      "date": "2026-06-11",
+      "generatedAt": "2026-06-11T14:38:22.261Z",
+      "sourceFiles": {
+        "public": "public/data/trending.json",
+        "db": "data/ai-brief.db",
+        "briefWiki": "brief-wiki",
+        "briefMirror": "public/data/brief"
+      },
+      "agentFlow": [
+        {
+          "stage": "discover",
+          "role": "Discoverer",
+          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
+          "signal": "47 repos from GitHub Trending plus topic/search supplements"
+        },
+        {
+          "stage": "evidence",
+          "role": "Evidence Collector",
+          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
+          "signal": "47 README + artifactAudit + evidence_signals records in SQLite"
+        },
+        {
+          "stage": "rank",
+          "role": "Ranker",
+          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
+          "signal": "canonical Tier 0/1/2/3 rank; Tier 3 has no count cap and is scarce only because the bar is high"
+        },
+        {
+          "stage": "review",
+          "role": "Teacher Reviewer",
+          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
+          "signal": "0 brief-wiki project analysis/deep briefs with separate reviewer pass, 0 radar cards"
+        },
+        {
+          "stage": "verify",
+          "role": "Verifier",
+          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
+          "signal": "Reviewer LLM pass per analysis/deep brief; BriefGuard layer-A brief:lint after generation"
+        },
+        {
+          "stage": "publish",
+          "role": "Publisher",
+          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
+          "signal": "brief:build public/data/brief/*.json + public/data/trending.json"
+        },
+        {
+          "stage": "archive",
+          "role": "Archivist",
+          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
+          "signal": "brief-wiki status:deep_dived + SQLite runs + data/agent-memory/projects.json"
+        }
+      ],
+      "qualityGate": {
+        "schemaVersion": 1,
+        "surface": "projects",
+        "status": "warning",
+        "checkedAt": "2026-06-11T14:38:20.289Z",
+        "checks": [
+          {
+            "id": "boards-present",
+            "label": "daily / weekly / monthly boards exist",
+            "status": "pass",
+            "details": "windows=daily,weekly,monthly"
+          },
+          {
+            "id": "cards-have-tldr",
+            "label": "every project card has a TL;DR",
+            "status": "pass",
+            "details": "0 repos checked"
+          },
+          {
+            "id": "worth-scores",
+            "label": "every project has a numeric worthDeepDive score",
+            "status": "pass",
+            "details": "0 repos checked"
+          },
+          {
+            "id": "depth-fields",
+            "label": "every project card has final_depth and ranking_score",
+            "status": "pass",
+            "details": "0 repos checked"
+          },
+          {
+            "id": "daily-radar-target",
+            "label": "radar carries the daily target count",
+            "status": "warning",
+            "details": "0 radar repos"
+          },
+          {
+            "id": "deep-quality-gate",
+            "label": "deep count is quality-gate only, not quota-limited",
+            "status": "pass",
+            "details": "0 deep candidates"
+          }
+        ]
+      },
+      "trace": null,
+      "reflection": null,
+      "selectedItems": [],
+      "archivedItems": [],
+      "highlights": [
+        "Projects refreshed 0 radar repo cards.",
+        "0 repos generated analysis/deep brief-wiki output."
+      ],
+      "nextActions": [
+        "Run npm run brief:lint before treating the brief mirror as clean.",
+        "Point project deep cards to the brief-wiki mirror in the frontend."
+      ]
+    },
     {
       "id": "projects-2026-06-11-1781183198956",
       "surface": "projects",
@@ -5358,191 +5470,6 @@
         "Run npm run brief:lint before treating the brief mirror as clean.",
         "Point project deep cards to the brief-wiki mirror in the frontend."
       ]
-    },
-    {
-      "id": "projects-2026-06-04-1780601156710",
-      "surface": "projects",
-      "date": "2026-06-04",
-      "generatedAt": "2026-06-04T19:25:56.709Z",
-      "sourceFiles": {
-        "public": "public/data/trending.json",
-        "db": "data/ai-brief.db",
-        "briefWiki": "brief-wiki",
-        "briefMirror": "public/data/brief"
-      },
-      "agentFlow": [
-        {
-          "stage": "discover",
-          "role": "Discoverer",
-          "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-          "signal": "45 repos from GitHub Trending plus topic/search supplements"
-        },
-        {
-          "stage": "evidence",
-          "role": "Evidence Collector",
-          "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-          "signal": "45 README + artifactAudit + evidence_signals records in SQLite"
-        },
-        {
-          "stage": "rank",
-          "role": "Ranker",
-          "responsibility": "按岗位相关性、架构价值、实践价值、评估质量、可迁移性和新鲜度排序。",
-          "signal": "canonical Tier 0/1/2/3 rank; Tier 3 has no count cap and is scarce only because the bar is high"
-        },
-        {
-          "stage": "review",
-          "role": "Teacher Reviewer",
-          "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-          "signal": "0 brief-wiki project analysis/deep briefs with separate reviewer pass, 30 radar cards"
-        },
-        {
-          "stage": "verify",
-          "role": "Verifier",
-          "responsibility": "运行结构校验、编码校验和质量门槛，失败时不静默发布。",
-          "signal": "Reviewer LLM pass per analysis/deep brief; BriefGuard layer-A brief:lint after generation"
-        },
-        {
-          "stage": "publish",
-          "role": "Publisher",
-          "responsibility": "把通过质量门槛的小批量内容写入前端可读 JSON，保持每日 feed 决策清晰。",
-          "signal": "brief:build public/data/brief/*.json + public/data/trending.json"
-        },
-        {
-          "stage": "archive",
-          "role": "Archivist",
-          "responsibility": "把未入选但有复用价值的内容和历史运行记录保存下来，后续用于架构思路和选题复盘。",
-          "signal": "brief-wiki status:deep_dived + SQLite runs + data/agent-memory/projects.json"
-        }
-      ],
-      "qualityGate": {
-        "schemaVersion": 1,
-        "surface": "projects",
-        "status": "pass",
-        "checkedAt": "2026-06-04T19:25:56.003Z",
-        "checks": [
-          {
-            "id": "boards-present",
-            "label": "daily / weekly / monthly boards exist",
-            "status": "pass",
-            "details": "windows=daily,weekly,monthly"
-          },
-          {
-            "id": "cards-have-tldr",
-            "label": "every project card has a TL;DR",
-            "status": "pass",
-            "details": "30 repos checked"
-          },
-          {
-            "id": "worth-scores",
-            "label": "every project has a numeric worthDeepDive score",
-            "status": "pass",
-            "details": "30 repos checked"
-          },
-          {
-            "id": "depth-fields",
-            "label": "every project card has final_depth and ranking_score",
-            "status": "pass",
-            "details": "30 repos checked"
-          },
-          {
-            "id": "daily-radar-target",
-            "label": "radar carries the daily target count",
-            "status": "pass",
-            "details": "30 radar repos"
-          },
-          {
-            "id": "deep-quality-gate",
-            "label": "deep count is quality-gate only, not quota-limited",
-            "status": "pass",
-            "details": "19 deep candidates"
-          }
-        ]
-      },
-      "trace": null,
-      "reflection": null,
-      "selectedItems": [],
-      "archivedItems": [
-        {
-          "id": "OpenMOSS/MOSS-TTS",
-          "title": "OpenMOSS/MOSS-TTS",
-          "score": 95,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "bytedance/UI-TARS-desktop",
-          "title": "bytedance/UI-TARS-desktop",
-          "score": 95,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "chopratejas/headroom",
-          "title": "chopratejas/headroom",
-          "score": 93,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "affaan-m/ECC",
-          "title": "affaan-m/ECC",
-          "score": 89,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "Lum1104/Understand-Anything",
-          "title": "Lum1104/Understand-Anything",
-          "score": 89,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "can1357/oh-my-pi",
-          "title": "can1357/oh-my-pi",
-          "score": 89,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "colbymchenry/codegraph",
-          "title": "colbymchenry/codegraph",
-          "score": 89,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "OpenBMB/VoxCPM",
-          "title": "OpenBMB/VoxCPM",
-          "score": 85,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "revfactory/harness",
-          "title": "revfactory/harness",
-          "score": 83,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "EveryInc/compound-engineering-plugin",
-          "title": "EveryInc/compound-engineering-plugin",
-          "score": 83,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "Leonxlnx/taste-skill",
-          "title": "Leonxlnx/taste-skill",
-          "score": 83,
-          "reason": "light read or below deep-dive threshold"
-        },
-        {
-          "id": "cursor/plugins",
-          "title": "cursor/plugins",
-          "score": 83,
-          "reason": "light read or below deep-dive threshold"
-        }
-      ],
-      "highlights": [
-        "Projects refreshed 30 radar repo cards.",
-        "0 repos generated analysis/deep brief-wiki output."
-      ],
-      "nextActions": [
-        "Run npm run brief:lint before treating the brief mirror as clean.",
-        "Point project deep cards to the brief-wiki mirror in the frontend."
-      ]
     }
   ],
   "reusablePatterns": [
@@ -5550,235 +5477,235 @@
       "text": "CopilotKit/CopilotKit: brief-wiki/copilotkit-copilotkit",
       "source": "projects",
       "firstSeenAt": "2026-06-11T13:06:38.955Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "roboflow/supervision: brief-wiki/roboflow-supervision",
       "source": "projects",
       "firstSeenAt": "2026-06-10T13:58:49.692Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "Leonxlnx/taste-skill: brief-wiki/leonxlnx-taste-skill",
       "source": "projects",
       "firstSeenAt": "2026-06-09T13:13:31.651Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "refactoringhq/tolaria: brief-wiki/tolaria",
       "source": "projects",
       "firstSeenAt": "2026-06-07T14:12:42.717Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "Lum1104/Understand-Anything: brief-wiki/understand-anything",
       "source": "projects",
       "firstSeenAt": "2026-06-05T15:27:43.873Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "Panniantong/Agent-Reach: brief-wiki/agent-reach",
       "source": "projects",
       "firstSeenAt": "2026-06-05T15:27:43.873Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "MemPalace/mempalace: brief-wiki/mempalace",
       "source": "projects",
       "firstSeenAt": "2026-06-05T15:27:43.873Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "NVlabs/LongLive: 这是一个并行基础设施，用于长视频生成的训练和推理，特别在支持NVFP4低精度量化、序列并行和多镜头功能。",
       "source": "projects",
       "firstSeenAt": "2026-06-04T20:01:08.247Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "presenton/presenton: 这是一个自托管的AI演示文稿生成器，支持多模型和MCP协议，重点在于数据隐私和完全控制。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "ChromeDevTools/chrome-devtools-mcp: 这是一个 MCP 服务器，让 AI 编码代理能够控制 Chrome 浏览器并进行深度调试与性能分析，特别在于集成了完整的 Chrome DevTools 工具集。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "OpenMOSS/MOSS-TTS: OpenMOSS/MOSS-TTS：MOSS-TTS 开源语音和声音生成模型家族，覆盖长语音、多说话人对话、声音设计、环境音效和实时流式 TTS。",
       "source": "projects",
       "firstSeenAt": "2026-06-04T20:01:08.247Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "bytedance/UI-TARS-desktop: bytedance/UI-TARS-desktop：开源多模态 AI Agent 技术栈，用于连接前沿 AI 模型和 Agent 基础设施。",
       "source": "projects",
       "firstSeenAt": "2026-06-04T20:01:08.247Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "NousResearch/hermes-agent: brief-wiki/hermes-agent",
       "source": "projects",
       "firstSeenAt": "2026-06-04T03:47:52.137Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "opendataloader-project/opendataloader-pdf: brief-wiki/opendataloader-pdf",
       "source": "projects",
       "firstSeenAt": "2026-06-04T03:47:52.137Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "lyogavin/airllm: brief-wiki/airllm",
       "source": "projects",
       "firstSeenAt": "2026-06-04T00:42:41.678Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "HKUDS/Vibe-Trading: brief-wiki/vibe-trading",
       "source": "projects",
       "firstSeenAt": "2026-06-04T03:47:52.137Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "HKUDS/ViMax: brief-wiki/vimax",
       "source": "projects",
       "firstSeenAt": "2026-06-04T00:42:41.678Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "fathah/hermes-desktop: brief-wiki/hermes-desktop",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "modelscope/FunASR: brief-wiki/funasr",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "mukul975/Anthropic-Cybersecurity-Skills: brief-wiki/anthropic-cybersecurity-skills",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "nesquena/hermes-webui: brief-wiki/hermes-webui",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "Open-LLM-VTuber/Open-LLM-VTuber: brief-wiki/open-llm-vtuber",
       "source": "projects",
       "firstSeenAt": "2026-06-03T16:09:43.816Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "chopratejas/headroom: brief-wiki/headroom",
       "source": "projects",
       "firstSeenAt": "2026-06-02T14:08:28.835Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "microsoft/markitdown: 微软开源的轻量级文件转Markdown工具，专为LLM数据预处理设计，支持多格式和插件扩展。",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "nesquena/hermes-webui: Hermes WebUI提供Hermes Agent的全功能浏览器界面，支持持久记忆、调度和消息平台，无需构建步骤。",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "supermemoryai/supermemory: 开源记忆引擎，提供RAG、用户画像和MCP集成，AI代理无需自建记忆系统",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "harry0703/MoneyPrinterTurbo: 一键AI短视频生成工具，支持自动文案、素材、字幕、音乐合成",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "D4Vinci/Scrapling: 自适应网页抓取框架，智能元素定位，内置反爬绕过，支持MCP与AI Agent集成。",
       "source": "projects",
       "firstSeenAt": "2026-06-01T14:52:53.411Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "harry0703/MoneyPrinterTurbo: 一键AI短视频生成工具，集成多种LLM，自动文案、字幕、配音，提供Web界面和API。",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "microsoft/markitdown: 轻量级 Python 工具，将多种文件转换为 Markdown，便于 LLM 处理",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "D4Vinci/Scrapling: 自适应Web抓取框架，支持反爬虫绕过、动态元素追踪、Spider爬虫和MCP集成。",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "nesquena/hermes-webui: Hermes 自治代理的轻量级 Web 界面，支持持久记忆、调度和多平台访问。",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "EveryInc/compound-engineering-plugin: AI coding assistant plugin implementing compound engineering workflow: plan, review, compound knowledge.",
       "source": "projects",
       "firstSeenAt": "2026-05-31T13:50:09.713Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "Lum1104/Understand-Anything: 这是一个多代理代码理解工具，用于将任意代码库转换为可搜索、可对话的知识图谱，特别在结合静态解析与LLM语义分析，并支持增量更新和多平台集成。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "colbymchenry/codegraph: 这是一个MCP工具，用来为AI编程代理提供预索引代码知识图谱，特别在显著降低token消耗和工具调用次数。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "rohitg00/ai-engineering-from-scratch: 这是一个系统性AI工程课程仓库，用来从零构建完整AI系统，特别在每个课程产出可复用的agent、MCP server等实用工具。",
       "source": "projects",
       "firstSeenAt": "2026-05-24T02:40:44.598Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "colbymchenry/codegraph: 这是一个MCP服务器工具，用来为AI编码助手构建预索引代码知识图谱，特别通过语义查询减少工具调用和加速代码探索。",
       "source": "projects",
       "firstSeenAt": "2026-05-21T00:50:08.792Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "tinyhumansai/openhuman: 这是一个开源的桌面AI代理系统，用来打造个人超级智能助手，特别在自动上下文获取和记忆树技术。",
       "source": "projects",
       "firstSeenAt": "2026-05-21T00:50:08.792Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     },
     {
       "text": "rohitg00/agentmemory: 这是一个持久化记忆引擎，为AI编码代理提供跨会话的上下文记忆，无需外部数据库，基于真实基准实现95.2%召回率。",
       "source": "projects",
       "firstSeenAt": "2026-05-21T00:50:08.792Z",
-      "lastSeenAt": "2026-06-11T13:06:38.955Z"
+      "lastSeenAt": "2026-06-11T14:38:22.261Z"
     }
   ]
 }

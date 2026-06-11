@@ -1,0 +1,66 @@
+{
+  "paper_id": "2606.09730",
+  "arxiv_id": "2606.09730",
+  "title": "SearchSwarm: Towards Delegation Intelligence in Agentic LLMs for Long-Horizon Deep Research",
+  "authors": [
+    "Pu Ning",
+    "Quan Chen",
+    "Kun Tao",
+    "Xinyu Tang",
+    "Tianshu Wang",
+    "Qianggang Cao",
+    "Xinyu Kong",
+    "Zujie Wen",
+    "Zhiqiang Zhang",
+    "Jun Zhou"
+  ],
+  "affiliations": [
+    "Tsinghua University",
+    "Peking University",
+    "Ant Group",
+    "Renmin University of China"
+  ],
+  "date": "2026-06-08",
+  "huggingface_url": "https://huggingface.co/papers/2606.09730",
+  "paper_url": "https://arxiv.org/abs/2606.09730",
+  "code_url": "https://github.com/Search-Swarm/SearchSwarm",
+  "dataset_url": "",
+  "model_url": "",
+  "space_url": "",
+  "hf_upvotes": 49,
+  "github_stars": 60,
+  "source_rankings": [
+    "daily"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.09730.yaml",
+  "first_seen_date": "2026-06-11",
+  "tags": [
+    "delegation-intelligence",
+    "deep-research",
+    "context-management",
+    "agent-harness",
+    "trajectory-to-sft",
+    "sub-agent",
+    "long-horizon"
+  ],
+  "status": "deep_read",
+  "track": "hf",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 8,
+    "transferability_to_autosci": 9,
+    "breadth_value": 7,
+    "ai_engineering_value": 8,
+    "buildability": 7,
+    "evaluation_value": 6,
+    "evidence_quality": 5
+  },
+  "one_sentence_judgment": "把'主派发-子执行'的委托打法用一套四原则 harness 在推理时逼出好轨迹、再 SFT 蒸进 30B 小模型权重的完整开源配方——核心 reframe 是'委托=单模型内容感知上下文管理'(子代理只是同一模型的 fresh context),且证明委托行为不会从 harness 自发涌现、必须训练固化;是 AutoSci 子 agent 编排的直接可抄蓝本,但全是自报分数、初步探索、只验证于 deep research。",
+  "cold_audit": {
+    "status": "needs_human"
+  }
+}

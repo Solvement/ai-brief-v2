@@ -1,0 +1,67 @@
+{
+  "paper_id": "2606.05405",
+  "arxiv_id": "2606.05405",
+  "title": "Agents' Last Exam",
+  "authors": [
+    "Yiyou Sun",
+    "Xinyang Han",
+    "Weichen Zhang",
+    "Yuanbo Pang",
+    "Tianyu Wang",
+    "Yuhan Cao",
+    "Yixiao Huang",
+    "Chris Duroiu",
+    "Haoyun Zhang",
+    "Jeffrey Lin",
+    "Dawn Song",
+    "et al."
+  ],
+  "date": "2026-06-03",
+  "huggingface_url": "https://huggingface.co/papers/2606.05405",
+  "paper_url": "https://arxiv.org/abs/2606.05405",
+  "code_url": "https://github.com/rdi-berkeley/agents-last-exam",
+  "project_url": "https://agents-last-exam.org/",
+  "dataset_url": "https://huggingface.co/agents-last-exam",
+  "model_url": "",
+  "space_url": "",
+  "source_rankings": [
+    "daily",
+    "hf_paper_of_the_day"
+  ],
+  "human_tabs": [
+    "paper",
+    "career"
+  ],
+  "autosci_primitive": "data/autosci/primitives/2606.05405.yaml",
+  "first_seen_date": "2026-06-09",
+  "topic": "agent",
+  "agent_relevant": true,
+  "tags": [
+    "agent-benchmark",
+    "computer-use-agent",
+    "real-world-workflow",
+    "verifiable-evaluation",
+    "deterministic-grading",
+    "gate-and-score",
+    "economic-impact",
+    "gcua",
+    "long-horizon-agent",
+    "evaluation-harness"
+  ],
+  "status": "deep_read",
+  "scores": {
+    "idea_novelty": 8,
+    "system_design_value": 9,
+    "career_value": 9,
+    "autosci_reuse_value": 9,
+    "buildability": 8,
+    "evaluation_value": 10,
+    "breadth_value": 9,
+    "evidence_quality": 8
+  },
+  "one_sentence_judgment": "ALE 的价值不在又报一个低分榜，而在把真实专业工作流评测工程化：专家真实项目进题库，task spec / agent / environment 三组件解耦，hidden reference + deterministic-first gate-and-score 判卷；它给应用型工程师最可迁移的是“把模糊业务流程变成可运行验收门”的方法，但所有 benchmark 数字仍应按作者自报处理，且公开仓库只覆盖框架与公开子集，不等于完整私有任务池可复现。",
+  "cold_audit": {
+    "status": "needs_human",
+    "note": "Round-1 author draft by Codex; requires independent cold audit before publication."
+  }
+}

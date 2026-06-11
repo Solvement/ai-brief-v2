@@ -179,6 +179,7 @@ ${depthContract}
 project_type 分诊表:
 - ai_app: wrapper vs real workflow/state/deploy/error handling。
 - agent_framework: agent loop/tool interface/state/memory/planner/sandbox/safety。
+- agent_skill: skill/plugin/prompt pack scope, transferability, and whether it changes our harness/memory/taste/eval structure.
 - devtool_cli: 嵌入开发流位置/命令/配置/插件/错误处理。
 - model_infra: 性能/成本/部署/benchmark/可观测。
 - frontend_ui: 交互/组件/状态/可迁移。

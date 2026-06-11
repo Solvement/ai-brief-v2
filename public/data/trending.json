@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-11T13:06:37.198Z",
+  "generatedAt": "2026-06-11T14:38:20.289Z",
   "analysisModels": {
     "projectLight": "deepseek-v4-flash",
     "projectDeep": "Tier 3: codex:gpt-5.5;model_reasoning_effort=high",
     "projectReview": "deepseek-v4-pro"
   },
   "pipelineRun": {
-    "id": "projects-2026-06-11-1781183198956",
+    "id": "projects-2026-06-11-1781188702264",
     "memoryFile": "data/agent-memory/projects.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -115,13 +115,13 @@
       "stage": "discover",
       "role": "Discoverer",
       "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-      "signal": "46 repos from GitHub Trending plus topic/search supplements"
+      "signal": "47 repos from GitHub Trending plus topic/search supplements"
     },
     {
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "46 README + artifactAudit + evidence_signals records in SQLite"
+      "signal": "47 README + artifactAudit + evidence_signals records in SQLite"
     },
     {
       "stage": "rank",
@@ -133,7 +133,7 @@
       "stage": "review",
       "role": "Teacher Reviewer",
       "responsibility": "用教授视角解释该学什么、好在哪里、弱在哪里、如何迁移到自己的工作。",
-      "signal": "1 brief-wiki project analysis/deep briefs with separate reviewer pass, 1 radar cards"
+      "signal": "0 brief-wiki project analysis/deep briefs with separate reviewer pass, 0 radar cards"
     },
     {
       "stage": "verify",
@@ -158,7 +158,7 @@
     "schemaVersion": 1,
     "surface": "projects",
     "status": "warning",
-    "checkedAt": "2026-06-11T13:06:37.198Z",
+    "checkedAt": "2026-06-11T14:38:20.289Z",
     "checks": [
       {
         "id": "boards-present",
@@ -170,25 +170,25 @@
         "id": "cards-have-tldr",
         "label": "every project card has a TL;DR",
         "status": "pass",
-        "details": "1 repos checked"
+        "details": "0 repos checked"
       },
       {
         "id": "worth-scores",
         "label": "every project has a numeric worthDeepDive score",
         "status": "pass",
-        "details": "1 repos checked"
+        "details": "0 repos checked"
       },
       {
         "id": "depth-fields",
         "label": "every project card has final_depth and ranking_score",
         "status": "pass",
-        "details": "1 repos checked"
+        "details": "0 repos checked"
       },
       {
         "id": "daily-radar-target",
         "label": "radar carries the daily target count",
         "status": "warning",
-        "details": "1 radar repos"
+        "details": "0 radar repos"
       },
       {
         "id": "deep-quality-gate",
@@ -200,382 +200,14 @@
   },
   "radar": {
     "window": "radar",
-    "generatedAt": "2026-06-11T13:06:37.197Z",
+    "generatedAt": "2026-06-11T14:38:20.289Z",
     "target": 30,
-    "repos": [
-      {
-        "fullName": "CopilotKit/CopilotKit",
-        "owner": "CopilotKit",
-        "name": "CopilotKit",
-        "url": "https://github.com/CopilotKit/CopilotKit",
-        "ownerAvatarUrl": "https://github.com/CopilotKit.png?size=80",
-        "description": "The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol",
-        "language": "TypeScript",
-        "languageColor": "#3178c6",
-        "stars": 34669,
-        "forks": 4334,
-        "starsGained": 2686,
-        "starsGainedByWindow": {
-          "weekly": 2686
-        },
-        "rank": 1,
-        "tldr": "CopilotKit/CopilotKit：GitHub 描述为“The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol”。",
-        "tags": [
-          "Tier 2",
-          "真·新项目",
-          "agents",
-          "mcp",
-          "skills"
-        ],
-        "light": "CopilotKit/CopilotKit 得分 63，信号是 project_type:agent_framework, signal_score:63。按确定性深度门控进入 analysis，建议 analyze。",
-        "worthDeepDive": 63,
-        "ranking_score": 63,
-        "max_allowed_depth": "deep",
-        "final_depth": "analysis",
-        "depth_band": "standard",
-        "analysis_depth": "standard",
-        "project_tier": 2,
-        "project_tier_label": "Tier 2",
-        "project_bucket": "真·新项目",
-        "bucket": "真·新项目",
-        "tier_tag": "[Tier 2｜真·新项目]",
-        "model_tier": "deepseek-or-light-codex",
-        "requires_manual_confirmation": false,
-        "tier_template": {
-          "tier": 2,
-          "bucket": "真·新项目",
-          "tag": "[Tier 2｜真·新项目]",
-          "one_sentence_positioning": "CopilotKit/CopilotKit：GitHub 描述为“The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol”。",
-          "what_it_does": "The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol",
-          "metadata": {
-            "language": "TypeScript",
-            "total_stars": 34669,
-            "stars_in_period": 2686,
-            "author": "CopilotKit"
-          },
-          "labels": [
-            "agents",
-            "mcp",
-            "skills"
-          ],
-          "prose_body": "CopilotKit/CopilotKit 得分 63，信号是 project_type:agent_framework, signal_score:63。按确定性深度门控进入 analysis，建议 analyze。",
-          "pain_point": "之前为不同前端框架重复实现 Agent 交互层，需要处理状态同步、UI 协调和平台差异，CopilotKit 通过 AG-UI 协议统一了后端 Agent 到多前端的连接，用一套代码覆盖 Web、移动和聊天平台。",
-          "core_capabilities": [
-            "agent 工作流",
-            "MCP 连接",
-            "CLI 入口"
-          ],
-          "how_to_run": {
-            "install_command": "见 README 安装说明",
-            "minimal_example": "见 README/examples 最小示例"
-          },
-          "maturity_signals": {
-            "star_velocity": "2686 period stars / 34669 total stars",
-            "recent_commit": "2026-06-11T12:54:02Z",
-            "releases": "数据不足",
-            "issue_activity": "数据不足"
-          },
-          "comparison": "数据不足",
-          "trajectory_note": "数据不足",
-          "practitioner_meaning": "AG-UI 协议尚未成为行业标准，自学习功能早期且缺少测试。"
-        },
-        "recommended_action": "analyze",
-        "needs_enrichment": false,
-        "ranking_reasons": [
-          "project_type:agent_framework",
-          "signal_score:63",
-          "depth_gate:standard_threshold",
-          "bucket:真·新项目",
-          "novelty:ai_builder_shape",
-          "novelty:substantive_artifact",
-          "heat:stars_in_period=2686",
-          "deep_gate:stars_gained_below_3000",
-          "signal:star_velocity:2686",
-          "signal:total_stars:34669",
-          "signal:cross_source:1",
-          "signal:topic_fit:agent,memory,mcp",
-          "signal:maturity:ci",
-          "signal:maturity:docs",
-          "signal:maturity:examples",
-          "signal:maturity:install",
-          "agent/workflow evidence",
-          "MCP evidence",
-          "skills/hooks evidence",
-          "model/RAG evidence",
-          "AI terms found in README/tree/topics",
-          "substantial README",
-          "repo tree available"
-        ],
-        "rejection_reasons": [],
-        "review_verdict": "pass",
-        "review_issues": [],
-        "evidence_summary": {
-          "readme_found": true,
-          "readme_fetch_failed": false,
-          "readme_empty": false,
-          "readme_length": 11302,
-          "top_level_dirs": [
-            ".changeset",
-            ".claude-plugin",
-            ".claude",
-            ".cursor",
-            ".github",
-            ".superset",
-            "assets",
-            "codemods",
-            "community",
-            "dev-docs",
-            "docs",
-            "examples"
-          ],
-          "key_files": [
-            "README.md",
-            "package.json",
-            "pnpm-workspace.yaml"
-          ],
-          "has_docs": true,
-          "has_examples": true,
-          "has_tests": false,
-          "has_install": true,
-          "has_docker": false,
-          "has_ci": true,
-          "has_cli": true,
-          "has_agents": true,
-          "has_mcp": true,
-          "has_skills": true,
-          "has_models": true,
-          "has_demo": true,
-          "package_files": {
-            "package_json": true,
-            "pyproject_toml": false,
-            "cargo_toml": false,
-            "requirements_txt": false,
-            "docker_compose_yml": false,
-            "dockerfile": false
-          },
-          "stars_gained_by_window": {
-            "weekly": 2686
-          },
-          "source_count": 1,
-          "signal_subscores": {
-            "star_velocity": 28,
-            "cross_source": 4,
-            "topic_fit": 18,
-            "maturity": 13,
-            "blacklist_penalty": 0
-          }
-        },
-        "depth_decision": {
-          "ranking_score": 63,
-          "max_allowed_depth": "deep",
-          "final_depth": "analysis",
-          "depth_band": "standard",
-          "analysis_depth": "standard",
-          "ranking_reasons": [
-            "project_type:agent_framework",
-            "signal_score:63",
-            "depth_gate:standard_threshold",
-            "bucket:真·新项目",
-            "novelty:ai_builder_shape",
-            "novelty:substantive_artifact",
-            "heat:stars_in_period=2686",
-            "deep_gate:stars_gained_below_3000",
-            "signal:star_velocity:2686",
-            "signal:total_stars:34669",
-            "signal:cross_source:1",
-            "signal:topic_fit:agent,memory,mcp",
-            "signal:maturity:ci",
-            "signal:maturity:docs",
-            "signal:maturity:examples",
-            "signal:maturity:install",
-            "agent/workflow evidence",
-            "MCP evidence",
-            "skills/hooks evidence",
-            "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available"
-          ],
-          "rejection_reasons": [],
-          "recommended_action": "analyze",
-          "needs_enrichment": false,
-          "review_verdict": "pass",
-          "review_issues": [],
-          "evidence_summary": {
-            "readme_found": true,
-            "readme_fetch_failed": false,
-            "readme_empty": false,
-            "readme_length": 11302,
-            "top_level_dirs": [
-              ".changeset",
-              ".claude-plugin",
-              ".claude",
-              ".cursor",
-              ".github",
-              ".superset",
-              "assets",
-              "codemods",
-              "community",
-              "dev-docs",
-              "docs",
-              "examples"
-            ],
-            "key_files": [
-              "README.md",
-              "package.json",
-              "pnpm-workspace.yaml"
-            ],
-            "has_docs": true,
-            "has_examples": true,
-            "has_tests": false,
-            "has_install": true,
-            "has_docker": false,
-            "has_ci": true,
-            "has_cli": true,
-            "has_agents": true,
-            "has_mcp": true,
-            "has_skills": true,
-            "has_models": true,
-            "has_demo": true,
-            "package_files": {
-              "package_json": true,
-              "pyproject_toml": false,
-              "cargo_toml": false,
-              "requirements_txt": false,
-              "docker_compose_yml": false,
-              "dockerfile": false
-            },
-            "stars_gained_by_window": {
-              "weekly": 2686
-            },
-            "source_count": 1,
-            "signal_subscores": {
-              "star_velocity": 28,
-              "cross_source": 4,
-              "topic_fit": 18,
-              "maturity": 13,
-              "blacklist_penalty": 0
-            }
-          }
-        },
-        "communityValidation": {
-          "hackerNews": {
-            "title": "Show HN: CopilotKit- Build in-app AI chatbots and AI-powered textareas",
-            "url": "https://github.com/CopilotKit/CopilotKit",
-            "points": 197,
-            "objectID": "38545207",
-            "createdAt": "2023-12-06T15:35:41Z"
-          },
-          "ossInsight": false
-        },
-        "eliteSelection": {
-          "selected": true,
-          "thresholds": {
-            "limit": 12,
-            "minStars": 3000,
-            "minMonthlyStars": 1500,
-            "minSourceCount": 2,
-            "hnMinPoints": 50
-          },
-          "sourceCount": 2,
-          "sourceSignals": [
-            "github_trending",
-            "hacker_news"
-          ],
-          "stars": 34669,
-          "monthlyStarsGained": 2686,
-          "reasons": [
-            "heat_gate:pass",
-            "source_count:2",
-            "github_trending",
-            "hacker_news"
-          ]
-        },
-        "mind_palace": {
-          "problem_solved": "为 Agent 开发者提供一套代码即可覆盖 React、Angular、Vue、React Native、Slack 等前端，避免重复开发 UI 交互层。",
-          "discovery_trace": "数据不足",
-          "method": "用户输入 → CopilotKit 前端 (useAgent) → AG-UI 协议 → Agent 后端 → 工具调用 / 状态更新 → AG-UI 协议回传 → UI 动态渲染 / 请求用户输入。循环直到任务完成。 ```mermaid sequenceDiagram User->>CopilotKit Frontend: 输入 CopilotKit Frontend->>AG-UI Protocol: 传递消息 AG-UI Protocol->>Agent Backend: 转发 Agent Backend->>Agent Backend: 处理/调用工具 Agent Backend->>AG-UI Protocol: 返回 UI 描述或请求输入 AG-UI Protocol->>CopilotKit Frontend: 流式更新状态/UI CopilotKit Frontend->>User: 渲染组件或请求确认 ```",
-          "self_evo_use": "记忆：通过 Shared State 和线程持久化记录完整交互历史（包括生成式 UI 和人机协同），使 Agent 能跨会话回忆上下文。 理解：利用生成式 UI 描述动态呈现信息，Agent 能够根据当前理解产出不同的界面元素。 自进化：通过 CLHF (Continuous Learning from Human Feedback) 在上下文中进行强化学习，根据用户反馈自动优化提示词和行为，无需微调模型。",
-          "core_concepts": [
-            {
-              "name": "AG-UI Protocol",
-              "role": "primary",
-              "evidence": "\"Makers of the AG-UI Protocol\" (README header), \"adopted by Google, LangChain, AWS, Microsoft, Mastra, PydanticAI, and more!\" (README)"
-            },
-            {
-              "name": "Generative UI",
-              "role": "primary",
-              "evidence": "\"Generative UI is a core CopilotKit pattern that allows agents to dynamically render UI\" (README)"
-            },
-            {
-              "name": "Shared State",
-              "role": "primary",
-              "evidence": "\"A synchronized state layer that both agents and UI components can read from and write to in real time.\" (README)"
-            },
-            {
-              "name": "Human-in-the-Loop",
-              "role": "primary",
-              "evidence": "\"Lets agents pause execution to request user input, confirmation, or edits before continuing.\" (README)"
-            },
-            {
-              "name": "useAgent Hook",
-              "role": "supporting",
-              "evidence": "\"The `useAgent` hook sits directly on AG-UI, giving you full programmatic control over the agent connection.\" (README)"
-            }
-          ]
-        },
-        "project_type": "agent_framework",
-        "verdict": "deep_dive",
-        "ratings": {
-          "relevance_to_ai_engineer": 5,
-          "engineering_depth": 5,
-          "reuse_value": 5,
-          "maturity": 5
-        },
-        "rankingReason": {
-          "decision": "deterministic",
-          "rawScore": 63,
-          "finalScore": 63,
-          "matchedBoostTerms": [
-            "project_type:agent_framework",
-            "signal_score:63",
-            "depth_gate:standard_threshold",
-            "bucket:真·新项目",
-            "novelty:ai_builder_shape",
-            "novelty:substantive_artifact",
-            "heat:stars_in_period=2686",
-            "deep_gate:stars_gained_below_3000",
-            "signal:star_velocity:2686",
-            "signal:total_stars:34669",
-            "signal:cross_source:1",
-            "signal:topic_fit:agent,memory,mcp",
-            "signal:maturity:ci",
-            "signal:maturity:docs",
-            "signal:maturity:examples",
-            "signal:maturity:install",
-            "agent/workflow evidence",
-            "MCP evidence",
-            "skills/hooks evidence",
-            "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available"
-          ],
-          "matchedCapTerms": [],
-          "explanation": "score=63; max=deep; final=analysis"
-        },
-        "briefSlug": "copilotkit-copilotkit",
-        "brief_slug": "copilotkit-copilotkit",
-        "deep_status": "available"
-      }
-    ],
-    "depthCounts": {
-      "analysis": 1
-    }
+    "repos": [],
+    "depthCounts": {}
   },
   "daily": {
     "window": "daily",
-    "generatedAt": "2026-06-11T13:06:37.181Z",
+    "generatedAt": "2026-06-11T14:38:20.277Z",
     "target": 6,
     "repos": [
       {
@@ -587,8 +219,8 @@
         "description": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon.",
         "language": "Swift",
         "languageColor": "#F05138",
-        "stars": 30948,
-        "forks": 865,
+        "stars": 31240,
+        "forks": 875,
         "starsGained": 2775,
         "starsGainedByWindow": {
           "daily": 2419,
@@ -598,12 +230,12 @@
         "tldr": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac.",
         "tags": [
           "容器",
+          "虚拟机",
           "macOS",
           "Swift",
-          "虚拟化",
-          "Apple Silicon"
+          "OCI"
         ],
-        "light": "苹果官方开源的容器工具，使用Swift编写，专为Apple Silicon优化，可在macOS 26上通过轻量级虚拟机运行Linux容器，支持OCI标准镜像。项目因GitHub Trending日榜第一、周榜第九进入雷达。README提供了完整安装流程、文档链接和示例，但仍在早期开发阶段（未达1.0），API和工具稳定性仅保证patch版本内。目前缺乏与AI直接相关的使用案例或集成文档，适用于作为AI开发环境的底层基础设施。推荐monitor，等待成熟后再深入评估。",
+        "light": "Apple 开源的 container 工具，利用 macOS 26 虚拟化特性在 Mac 上以轻量级 VM 方式运行 Linux 容器，支持 OCI 标准镜像的拉取、推送和运行。项目处于早期开发阶段（0.x），仅保证补丁版本内稳定性，仅支持 Apple Silicon 和 macOS 26。有完整文档、示例和测试。与 AI 生态无直接关联，但展示了系统级虚拟化实现轻量级容器的工程实践。推荐关注其容器化技术和 Swift 实现，深度分析需等待更成熟版本。",
         "worthDeepDive": 50,
         "ranking_score": 50,
         "max_allowed_depth": "deep",
@@ -621,16 +253,16 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "macOS平台Linux容器运行工具，面向需要本地容器环境的开发者",
-          "what_it_does": "在Apple Silicon Mac上创建、运行和管理Linux容器；从OCI注册表拉取/推送镜像，支持标准容器工作流。",
+          "one_sentence_positioning": "Apple 开源的 Mac 原生容器工具，面向 macOS 26+ 的 Apple Silicon 用户",
+          "what_it_does": "通过轻量级虚拟机在 Mac 上创建和运行 OCI 兼容的 Linux 容器，支持镜像拉取、构建和推送",
           "metadata": {
             "language": "Swift",
-            "total_stars": 30948,
+            "total_stars": 31240,
             "stars_in_period": 2775,
             "author": "apple"
           },
           "labels": [
-            "infra"
+            "工具"
           ],
           "prose_body": "apple/container 得分 50，信号是 project_type:agent_framework, signal_score:50。按确定性深度门控进入 light，建议 monitor。"
         },
@@ -648,7 +280,7 @@
           "gate:real_new_project",
           "deep_gate:stars_gained_below_3000",
           "signal:star_velocity:2775",
-          "signal:total_stars:30948",
+          "signal:total_stars:31240",
           "signal:cross_source:1",
           "signal:maturity:tests",
           "signal:maturity:ci",
@@ -734,7 +366,7 @@
             "gate:real_new_project",
             "deep_gate:stars_gained_below_3000",
             "signal:star_velocity:2775",
-            "signal:total_stars:30948",
+            "signal:total_stars:31240",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
@@ -809,7 +441,7 @@
           "hackerNews": {
             "title": "macOS Container Machines",
             "url": "https://github.com/apple/container/blob/main/docs/container-machine.md",
-            "points": 1225,
+            "points": 1228,
             "objectID": "48469658",
             "createdAt": "2026-06-10T00:29:01Z"
           },
@@ -831,7 +463,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 30948,
+          "stars": 31240,
           "monthlyStarsGained": 2775,
           "reasons": [
             "heat_gate:pass",
@@ -842,7 +474,7 @@
             "ossinsight_trending"
           ]
         },
-        "project_type": "devtool_cli",
+        "project_type": "non_ai_eng",
         "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 1,
@@ -866,7 +498,7 @@
             "gate:real_new_project",
             "deep_gate:stars_gained_below_3000",
             "signal:star_velocity:2775",
-            "signal:total_stars:30948",
+            "signal:total_stars:31240",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
@@ -893,8 +525,8 @@
         "description": "Production-grade engineering skills for AI coding agents.",
         "language": "Shell",
         "languageColor": "#89e051",
-        "stars": 53603,
-        "forks": 5857,
+        "stars": 53826,
+        "forks": 5867,
         "starsGained": 3275,
         "starsGainedByWindow": {
           "daily": 3275
@@ -902,13 +534,13 @@
         "rank": 2,
         "tldr": "addyosmani/agent-skills：GitHub 描述为“Production-grade engineering skills for AI coding agents”。",
         "tags": [
-          "agent技能",
-          "工程实践",
-          "编码代理",
-          "工作流",
-          "开发效率"
+          "AI代理",
+          "编码技能",
+          "开发工作流",
+          "工程最佳实践",
+          "插件"
         ],
-        "light": "该项目由Google工程师Addy Osmani创建，将资深工程师的开发流程、质量门禁和最佳实践封装为24个技能，每个技能对应一个SKILL.md文件，遵循统一格式（概述、触发条件、步骤、验证门等）。项目支持Claude Code、Cursor、Gemini CLI、Antigravity、Windsurf、OpenCode、GitHub Copilot等主流AI编码工具，提供7个斜杠命令映射开发生命周期（/spec, /plan, /build, /test, /review, /code-simplify, /ship）。README包含多平台安装指南，有docs目录和CI配置，但缺少examples、tests和演示demo，也无实际项目使用案例。虽热度极高（5.3万星，日增3275），但受限于教学资源深度，仅适合作为agent编排的参考清单，不宜深入分析架构。建议监控其技能模板的更新和社区采纳情况。",
+        "light": "该项目由 Addy Osmani 创建，旨在将资深工程师的工作流、质量门禁和最佳实践封装成 AI 代理可一致遵循的技能。仓库包含完整的技能定义、安装指南和文档，支持 Claude Code、Cursor、Antigravity、Gemini CLI 等多个平台。已获 5.38 万星，日增 3275，属于新热项目。已知事实：有 24 个技能、7 个命令、4 个 agent 角色和多个参考清单。缺失证据：无示例代码、无测试、无演示，技能具体执行效果和实际工程验证尚不可知。推荐操作：由于深度限制为 light，建议监控后续社区反馈和实际案例，无需深入代码审查。",
         "worthDeepDive": 45,
         "ranking_score": 45,
         "max_allowed_depth": "deep",
@@ -926,17 +558,19 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "Agent Skills 是一套供AI编码代理使用的生产级工程技能集合，面向想要提升代理代码生成质量的开发者。",
-          "what_it_does": "将资深工程师的工作流、质量门禁和最佳实践打包成24个Markdown技能，通过斜杠命令或自动触发让AI代理遵循这些规范进行开发。",
+          "one_sentence_positioning": "为 AI 编码代理提供标准化开发工作流的技能集，适用于使用 Claude Code、Cursor 等 AI IDE 的开发者。",
+          "what_it_does": "它提供了一系列 Markdown 格式的技能，代理可以按步骤执行，涵盖从定义、计划、构建、验证、审查到发布的全流程工程实践。",
           "metadata": {
             "language": "Shell",
-            "total_stars": 53603,
+            "total_stars": 53826,
             "stars_in_period": 3275,
             "author": "addyosmani"
           },
           "labels": [
             "agent",
-            "工具"
+            "工具",
+            "推理",
+            "infra"
           ],
           "prose_body": "addyosmani/agent-skills 得分 45，信号是 project_type:agent_framework, signal_score:45；暂不深挖，因为 depth_gate:teaching_skill_or_resource_max_light。建议 monitor。"
         },
@@ -954,7 +588,7 @@
           "gate:real_new_project",
           "deep_gate:excluded_resource_teaching_list",
           "signal:star_velocity:3275",
-          "signal:total_stars:53603",
+          "signal:total_stars:53826",
           "signal:cross_source:1",
           "signal:topic_fit:agent,memory,mcp",
           "signal:maturity:ci",
@@ -1043,7 +677,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3275",
-            "signal:total_stars:53603",
+            "signal:total_stars:53826",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,mcp",
             "signal:maturity:ci",
@@ -1135,7 +769,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 53603,
+          "stars": 53826,
           "monthlyStarsGained": 3275,
           "reasons": [
             "heat_gate:pass",
@@ -1144,7 +778,7 @@
             "ossinsight_trending"
           ]
         },
-        "project_type": "agent_framework",
+        "project_type": "agent_skill",
         "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -1168,7 +802,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3275",
-            "signal:total_stars:53603",
+            "signal:total_stars:53826",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,mcp",
             "signal:maturity:ci",
@@ -1196,8 +830,8 @@
         "description": "🕵️‍♂️ Collect a dossier on a person by username from 3000+ sites",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 32375,
-        "forks": 2377,
+        "stars": 32417,
+        "forks": 2381,
         "starsGained": 665,
         "starsGainedByWindow": {
           "daily": 665
@@ -1233,7 +867,7 @@
           "what_it_does": "🕵️‍♂️ Collect a dossier on a person by username from 3000+ sites",
           "metadata": {
             "language": "Python",
-            "total_stars": 32375,
+            "total_stars": 32417,
             "stars_in_period": 665,
             "author": "soxoj"
           },
@@ -1265,7 +899,7 @@
           "heat:daily_only_flash_penalty",
           "gate:not_real_new_project",
           "signal:star_velocity:665",
-          "signal:total_stars:32375",
+          "signal:total_stars:32417",
           "signal:cross_source:1",
           "signal:topic_fit:agent,rag",
           "signal:maturity:tests",
@@ -1354,7 +988,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:665",
-            "signal:total_stars:32375",
+            "signal:total_stars:32417",
             "signal:cross_source:1",
             "signal:topic_fit:agent,rag",
             "signal:maturity:tests",
@@ -1453,7 +1087,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 32375,
+          "stars": 32417,
           "monthlyStarsGained": 665,
           "reasons": [
             "heat_gate:pass",
@@ -1462,7 +1096,7 @@
             "hacker_news"
           ]
         },
-        "project_type": "agent_framework",
+        "project_type": "non_ai_eng",
         "verdict": "skip",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -1485,7 +1119,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:665",
-            "signal:total_stars:32375",
+            "signal:total_stars:32417",
             "signal:cross_source:1",
             "signal:topic_fit:agent,rag",
             "signal:maturity:tests",
@@ -1515,8 +1149,8 @@
         "description": "Advanced DNS tunneling VPN for censorship bypass, optimized beyond DNSTT and SlipStream with low-overhead ARQ, resolver load balancing, high packet-loss stability and speed.",
         "language": "Go",
         "languageColor": "#00ADD8",
-        "stars": 5489,
-        "forks": 509,
+        "stars": 5530,
+        "forks": 513,
         "starsGained": 510,
         "starsGainedByWindow": {
           "daily": 510
@@ -1551,7 +1185,7 @@
           "what_it_does": "Advanced DNS tunneling VPN for censorship bypass, optimized beyond DNSTT and SlipStream with low-overhead ARQ, resolver load balancing, high packet-loss stability and speed.",
           "metadata": {
             "language": "Go",
-            "total_stars": 5489,
+            "total_stars": 5530,
             "stars_in_period": 510,
             "author": "masterking32"
           },
@@ -1584,7 +1218,7 @@
           "heat:daily_only_flash_penalty",
           "gate:irrelevant_to_ai",
           "signal:star_velocity:510",
-          "signal:total_stars:5489",
+          "signal:total_stars:5530",
           "signal:cross_source:1",
           "signal:maturity:ci",
           "signal:maturity:install",
@@ -1668,7 +1302,7 @@
             "heat:daily_only_flash_penalty",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:510",
-            "signal:total_stars:5489",
+            "signal:total_stars:5530",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:install",
@@ -1757,7 +1391,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 5489,
+          "stars": 5530,
           "monthlyStarsGained": 510,
           "reasons": [
             "heat_gate:pass",
@@ -1788,7 +1422,7 @@
             "heat:daily_only_flash_penalty",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:510",
-            "signal:total_stars:5489",
+            "signal:total_stars:5530",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:install",
@@ -1819,8 +1453,8 @@
         "description": "Open-source live-chat, email support, omni-channel desk. An alternative to Intercom, Zendesk, Salesforce Service Cloud etc. 🔥💬",
         "language": "Ruby",
         "languageColor": "#701516",
-        "stars": 30147,
-        "forks": 7491,
+        "stars": 30199,
+        "forks": 7494,
         "starsGained": 31,
         "starsGainedByWindow": {
           "daily": 31
@@ -1856,7 +1490,7 @@
           "what_it_does": "Open-source live-chat, email support, omni-channel desk. An alternative to Intercom, Zendesk, Salesforce Service Cloud etc. 🔥💬",
           "metadata": {
             "language": "Ruby",
-            "total_stars": 30147,
+            "total_stars": 30199,
             "stars_in_period": 31,
             "author": "chatwoot"
           },
@@ -1888,7 +1522,7 @@
           "heat:daily_only_flash_penalty",
           "gate:not_real_new_project",
           "signal:star_velocity:31",
-          "signal:total_stars:30147",
+          "signal:total_stars:30199",
           "signal:cross_source:1",
           "signal:topic_fit:agent",
           "signal:maturity:tests",
@@ -1982,7 +1616,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:31",
-            "signal:total_stars:30147",
+            "signal:total_stars:30199",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:tests",
@@ -2086,7 +1720,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 30147,
+          "stars": 30199,
           "monthlyStarsGained": 31,
           "reasons": [
             "heat_gate:pass",
@@ -2095,7 +1729,7 @@
             "hacker_news"
           ]
         },
-        "project_type": "agent_framework",
+        "project_type": "non_ai_eng",
         "verdict": "skip",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -2118,7 +1752,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:31",
-            "signal:total_stars:30147",
+            "signal:total_stars:30199",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:tests",
@@ -2148,8 +1782,8 @@
         "description": "Mattermost is an open source platform for secure collaboration across the entire software development lifecycle..",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 37128,
-        "forks": 8688,
+        "stars": 37169,
+        "forks": 8690,
         "starsGained": 26,
         "starsGainedByWindow": {
           "daily": 26
@@ -2157,13 +1791,13 @@
         "rank": 6,
         "tldr": "mattermost/mattermost：GitHub 描述为“Mattermost is an open source platform for secure collaboration across the entire softwa",
         "tags": [
-          "协作平台",
-          "开源",
-          "AI集成",
-          "企业通讯",
-          "工作流自动化"
+          "collaboration",
+          "self-hosted",
+          "chat",
+          "AI integration",
+          "workflow automation"
         ],
-        "light": "Mattermost是一个成熟的企业级协作平台，核心功能包括即时通讯、工作流自动化、语音/视频通话及AI助手集成。代码仓库展示完整的服务端（Go）和Web端（React）实现，支持Docker、Kubernetes等多种部署方式。项目已稳定发展多年（37k+ stars），本次因日榜活跃而进入雷达，但README中缺乏AI集成架构、使用示例等具体证据，建议查阅官方文档以获取AI功能详细说明。",
+        "light": "Mattermost 是一个开源自托管的协作平台，核心功能包括即时消息、工作流自动化、语音/视频通话和 AI 集成。仓库为 monorepo，主要语言为 Go 和 React，依赖 PostgreSQL。进入雷达原因：每日 26 颗新增星标，GitHub 日榜第 18 位；支持 AI 集成和工作流自动化，适合 AI 工程师了解协作平台与 AI 的结合。已知事实：README 提供详细的部署指南（Docker、Ubuntu、Kubernetes 等），提及 AI 集成，但仓库中不包含 examples、tests 或 demo。缺失证据：无架构文档、无示例代码、无测试用例。推荐行动：监控，无需深入分析。",
         "worthDeepDive": 9,
         "ranking_score": 9,
         "max_allowed_depth": "light",
@@ -2181,11 +1815,11 @@
           "tier": 1,
           "bucket": "老回潮",
           "tag": "[Tier 1｜老回潮]",
-          "one_sentence_positioning": "面向企业团队的协作平台，集成了AI能力的即时通讯与工作流工具。",
-          "what_it_does": "提供安全的消息传递、渠道管理、文件分享、语音/视频会议及可自定义的工作流自动化，并支持AI助手集成。",
+          "one_sentence_positioning": "Mattermost 是一个开源自托管的协作平台，用于开发团队的安全沟通和自动化工作流，集成 AI 能力。",
+          "what_it_does": "提供即时聊天、语音/视频通话、屏幕共享、工作流自动化以及 AI 集成（如聊天机器人、模型调用）。支持自部署，使用 Go 和 React 构建，后端依赖 PostgreSQL。",
           "metadata": {
-            "language": "TypeScript, Go, React",
-            "total_stars": 37128,
+            "language": "TypeScript",
+            "total_stars": 37169,
             "stars_in_period": 26,
             "author": "mattermost"
           },
@@ -2208,7 +1842,7 @@
           "heat:daily_only_flash_penalty",
           "gate:not_real_new_project",
           "signal:star_velocity:26",
-          "signal:total_stars:37128",
+          "signal:total_stars:37169",
           "signal:cross_source:1",
           "signal:topic_fit:agent",
           "signal:maturity:ci",
@@ -2294,7 +1928,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:26",
-            "signal:total_stars:37128",
+            "signal:total_stars:37169",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:ci",
@@ -2391,7 +2025,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 37128,
+          "stars": 37169,
           "monthlyStarsGained": 26,
           "reasons": [
             "heat_gate:pass",
@@ -2400,7 +2034,7 @@
             "hacker_news"
           ]
         },
-        "project_type": "ai_app",
+        "project_type": "non_ai_eng",
         "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -2422,7 +2056,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:26",
-            "signal:total_stars:37128",
+            "signal:total_stars:37169",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:ci",
@@ -2449,8 +2083,8 @@
   },
   "weekly": {
     "window": "weekly",
-    "generatedAt": "2026-06-11T13:06:37.182Z",
-    "target": 4,
+    "generatedAt": "2026-06-11T14:38:20.278Z",
+    "target": 3,
     "repos": [
       {
         "fullName": "apple/container",
@@ -2461,8 +2095,8 @@
         "description": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon.",
         "language": "Swift",
         "languageColor": "#F05138",
-        "stars": 30948,
-        "forks": 865,
+        "stars": 31240,
+        "forks": 875,
         "starsGained": 2775,
         "starsGainedByWindow": {
           "daily": 2419,
@@ -2472,12 +2106,12 @@
         "tldr": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac.",
         "tags": [
           "容器",
+          "虚拟机",
           "macOS",
           "Swift",
-          "虚拟化",
-          "Apple Silicon"
+          "OCI"
         ],
-        "light": "苹果官方开源的容器工具，使用Swift编写，专为Apple Silicon优化，可在macOS 26上通过轻量级虚拟机运行Linux容器，支持OCI标准镜像。项目因GitHub Trending日榜第一、周榜第九进入雷达。README提供了完整安装流程、文档链接和示例，但仍在早期开发阶段（未达1.0），API和工具稳定性仅保证patch版本内。目前缺乏与AI直接相关的使用案例或集成文档，适用于作为AI开发环境的底层基础设施。推荐monitor，等待成熟后再深入评估。",
+        "light": "Apple 开源的 container 工具，利用 macOS 26 虚拟化特性在 Mac 上以轻量级 VM 方式运行 Linux 容器，支持 OCI 标准镜像的拉取、推送和运行。项目处于早期开发阶段（0.x），仅保证补丁版本内稳定性，仅支持 Apple Silicon 和 macOS 26。有完整文档、示例和测试。与 AI 生态无直接关联，但展示了系统级虚拟化实现轻量级容器的工程实践。推荐关注其容器化技术和 Swift 实现，深度分析需等待更成熟版本。",
         "worthDeepDive": 50,
         "ranking_score": 50,
         "max_allowed_depth": "deep",
@@ -2495,16 +2129,16 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "macOS平台Linux容器运行工具，面向需要本地容器环境的开发者",
-          "what_it_does": "在Apple Silicon Mac上创建、运行和管理Linux容器；从OCI注册表拉取/推送镜像，支持标准容器工作流。",
+          "one_sentence_positioning": "Apple 开源的 Mac 原生容器工具，面向 macOS 26+ 的 Apple Silicon 用户",
+          "what_it_does": "通过轻量级虚拟机在 Mac 上创建和运行 OCI 兼容的 Linux 容器，支持镜像拉取、构建和推送",
           "metadata": {
             "language": "Swift",
-            "total_stars": 30948,
+            "total_stars": 31240,
             "stars_in_period": 2775,
             "author": "apple"
           },
           "labels": [
-            "infra"
+            "工具"
           ],
           "prose_body": "apple/container 得分 50，信号是 project_type:agent_framework, signal_score:50。按确定性深度门控进入 light，建议 monitor。"
         },
@@ -2522,7 +2156,7 @@
           "gate:real_new_project",
           "deep_gate:stars_gained_below_3000",
           "signal:star_velocity:2775",
-          "signal:total_stars:30948",
+          "signal:total_stars:31240",
           "signal:cross_source:1",
           "signal:maturity:tests",
           "signal:maturity:ci",
@@ -2608,7 +2242,7 @@
             "gate:real_new_project",
             "deep_gate:stars_gained_below_3000",
             "signal:star_velocity:2775",
-            "signal:total_stars:30948",
+            "signal:total_stars:31240",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
@@ -2683,7 +2317,7 @@
           "hackerNews": {
             "title": "macOS Container Machines",
             "url": "https://github.com/apple/container/blob/main/docs/container-machine.md",
-            "points": 1225,
+            "points": 1228,
             "objectID": "48469658",
             "createdAt": "2026-06-10T00:29:01Z"
           },
@@ -2705,7 +2339,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 30948,
+          "stars": 31240,
           "monthlyStarsGained": 2775,
           "reasons": [
             "heat_gate:pass",
@@ -2716,7 +2350,7 @@
             "ossinsight_trending"
           ]
         },
-        "project_type": "devtool_cli",
+        "project_type": "non_ai_eng",
         "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 1,
@@ -2740,7 +2374,7 @@
             "gate:real_new_project",
             "deep_gate:stars_gained_below_3000",
             "signal:star_velocity:2775",
-            "signal:total_stars:30948",
+            "signal:total_stars:31240",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
@@ -2759,371 +2393,6 @@
         "deep_status": "not_applicable"
       },
       {
-        "fullName": "CopilotKit/CopilotKit",
-        "owner": "CopilotKit",
-        "name": "CopilotKit",
-        "url": "https://github.com/CopilotKit/CopilotKit",
-        "ownerAvatarUrl": "https://github.com/CopilotKit.png?size=80",
-        "description": "The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol",
-        "language": "TypeScript",
-        "languageColor": "#3178c6",
-        "stars": 34669,
-        "forks": 4334,
-        "starsGained": 2686,
-        "starsGainedByWindow": {
-          "weekly": 2686
-        },
-        "rank": 2,
-        "tldr": "CopilotKit/CopilotKit：GitHub 描述为“The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol”。",
-        "tags": [
-          "Tier 2",
-          "真·新项目",
-          "agents",
-          "mcp",
-          "skills"
-        ],
-        "light": "CopilotKit/CopilotKit 得分 63，信号是 project_type:agent_framework, signal_score:63。按确定性深度门控进入 analysis，建议 analyze。",
-        "worthDeepDive": 63,
-        "ranking_score": 63,
-        "max_allowed_depth": "deep",
-        "final_depth": "analysis",
-        "depth_band": "standard",
-        "analysis_depth": "standard",
-        "project_tier": 2,
-        "project_tier_label": "Tier 2",
-        "project_bucket": "真·新项目",
-        "bucket": "真·新项目",
-        "tier_tag": "[Tier 2｜真·新项目]",
-        "model_tier": "deepseek-or-light-codex",
-        "requires_manual_confirmation": false,
-        "tier_template": {
-          "tier": 2,
-          "bucket": "真·新项目",
-          "tag": "[Tier 2｜真·新项目]",
-          "one_sentence_positioning": "CopilotKit/CopilotKit：GitHub 描述为“The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol”。",
-          "what_it_does": "The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol",
-          "metadata": {
-            "language": "TypeScript",
-            "total_stars": 34669,
-            "stars_in_period": 2686,
-            "author": "CopilotKit"
-          },
-          "labels": [
-            "agents",
-            "mcp",
-            "skills"
-          ],
-          "prose_body": "CopilotKit/CopilotKit 得分 63，信号是 project_type:agent_framework, signal_score:63。按确定性深度门控进入 analysis，建议 analyze。",
-          "pain_point": "之前为不同前端框架重复实现 Agent 交互层，需要处理状态同步、UI 协调和平台差异，CopilotKit 通过 AG-UI 协议统一了后端 Agent 到多前端的连接，用一套代码覆盖 Web、移动和聊天平台。",
-          "core_capabilities": [
-            "agent 工作流",
-            "MCP 连接",
-            "CLI 入口"
-          ],
-          "how_to_run": {
-            "install_command": "见 README 安装说明",
-            "minimal_example": "见 README/examples 最小示例"
-          },
-          "maturity_signals": {
-            "star_velocity": "2686 period stars / 34669 total stars",
-            "recent_commit": "2026-06-11T12:54:02Z",
-            "releases": "数据不足",
-            "issue_activity": "数据不足"
-          },
-          "comparison": "数据不足",
-          "trajectory_note": "数据不足",
-          "practitioner_meaning": "AG-UI 协议尚未成为行业标准，自学习功能早期且缺少测试。"
-        },
-        "recommended_action": "analyze",
-        "needs_enrichment": false,
-        "ranking_reasons": [
-          "project_type:agent_framework",
-          "signal_score:63",
-          "depth_gate:standard_threshold",
-          "bucket:真·新项目",
-          "novelty:ai_builder_shape",
-          "novelty:substantive_artifact",
-          "heat:stars_in_period=2686",
-          "deep_gate:stars_gained_below_3000",
-          "signal:star_velocity:2686",
-          "signal:total_stars:34669",
-          "signal:cross_source:1",
-          "signal:topic_fit:agent,memory,mcp",
-          "signal:maturity:ci",
-          "signal:maturity:docs",
-          "signal:maturity:examples",
-          "signal:maturity:install",
-          "agent/workflow evidence",
-          "MCP evidence",
-          "skills/hooks evidence",
-          "model/RAG evidence",
-          "AI terms found in README/tree/topics",
-          "substantial README",
-          "repo tree available"
-        ],
-        "rejection_reasons": [],
-        "review_verdict": "pass",
-        "review_issues": [],
-        "evidence_summary": {
-          "readme_found": true,
-          "readme_fetch_failed": false,
-          "readme_empty": false,
-          "readme_length": 11302,
-          "top_level_dirs": [
-            ".changeset",
-            ".claude-plugin",
-            ".claude",
-            ".cursor",
-            ".github",
-            ".superset",
-            "assets",
-            "codemods",
-            "community",
-            "dev-docs",
-            "docs",
-            "examples"
-          ],
-          "key_files": [
-            "README.md",
-            "package.json",
-            "pnpm-workspace.yaml"
-          ],
-          "has_docs": true,
-          "has_examples": true,
-          "has_tests": false,
-          "has_install": true,
-          "has_docker": false,
-          "has_ci": true,
-          "has_cli": true,
-          "has_agents": true,
-          "has_mcp": true,
-          "has_skills": true,
-          "has_models": true,
-          "has_demo": true,
-          "package_files": {
-            "package_json": true,
-            "pyproject_toml": false,
-            "cargo_toml": false,
-            "requirements_txt": false,
-            "docker_compose_yml": false,
-            "dockerfile": false
-          },
-          "stars_gained_by_window": {
-            "weekly": 2686
-          },
-          "source_count": 1,
-          "signal_subscores": {
-            "star_velocity": 28,
-            "cross_source": 4,
-            "topic_fit": 18,
-            "maturity": 13,
-            "blacklist_penalty": 0
-          }
-        },
-        "depth_decision": {
-          "ranking_score": 63,
-          "max_allowed_depth": "deep",
-          "final_depth": "analysis",
-          "depth_band": "standard",
-          "analysis_depth": "standard",
-          "ranking_reasons": [
-            "project_type:agent_framework",
-            "signal_score:63",
-            "depth_gate:standard_threshold",
-            "bucket:真·新项目",
-            "novelty:ai_builder_shape",
-            "novelty:substantive_artifact",
-            "heat:stars_in_period=2686",
-            "deep_gate:stars_gained_below_3000",
-            "signal:star_velocity:2686",
-            "signal:total_stars:34669",
-            "signal:cross_source:1",
-            "signal:topic_fit:agent,memory,mcp",
-            "signal:maturity:ci",
-            "signal:maturity:docs",
-            "signal:maturity:examples",
-            "signal:maturity:install",
-            "agent/workflow evidence",
-            "MCP evidence",
-            "skills/hooks evidence",
-            "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available"
-          ],
-          "rejection_reasons": [],
-          "recommended_action": "analyze",
-          "needs_enrichment": false,
-          "review_verdict": "pass",
-          "review_issues": [],
-          "evidence_summary": {
-            "readme_found": true,
-            "readme_fetch_failed": false,
-            "readme_empty": false,
-            "readme_length": 11302,
-            "top_level_dirs": [
-              ".changeset",
-              ".claude-plugin",
-              ".claude",
-              ".cursor",
-              ".github",
-              ".superset",
-              "assets",
-              "codemods",
-              "community",
-              "dev-docs",
-              "docs",
-              "examples"
-            ],
-            "key_files": [
-              "README.md",
-              "package.json",
-              "pnpm-workspace.yaml"
-            ],
-            "has_docs": true,
-            "has_examples": true,
-            "has_tests": false,
-            "has_install": true,
-            "has_docker": false,
-            "has_ci": true,
-            "has_cli": true,
-            "has_agents": true,
-            "has_mcp": true,
-            "has_skills": true,
-            "has_models": true,
-            "has_demo": true,
-            "package_files": {
-              "package_json": true,
-              "pyproject_toml": false,
-              "cargo_toml": false,
-              "requirements_txt": false,
-              "docker_compose_yml": false,
-              "dockerfile": false
-            },
-            "stars_gained_by_window": {
-              "weekly": 2686
-            },
-            "source_count": 1,
-            "signal_subscores": {
-              "star_velocity": 28,
-              "cross_source": 4,
-              "topic_fit": 18,
-              "maturity": 13,
-              "blacklist_penalty": 0
-            }
-          }
-        },
-        "communityValidation": {
-          "hackerNews": {
-            "title": "Show HN: CopilotKit- Build in-app AI chatbots and AI-powered textareas",
-            "url": "https://github.com/CopilotKit/CopilotKit",
-            "points": 197,
-            "objectID": "38545207",
-            "createdAt": "2023-12-06T15:35:41Z"
-          },
-          "ossInsight": false
-        },
-        "eliteSelection": {
-          "selected": true,
-          "thresholds": {
-            "limit": 12,
-            "minStars": 3000,
-            "minMonthlyStars": 1500,
-            "minSourceCount": 2,
-            "hnMinPoints": 50
-          },
-          "sourceCount": 2,
-          "sourceSignals": [
-            "github_trending",
-            "hacker_news"
-          ],
-          "stars": 34669,
-          "monthlyStarsGained": 2686,
-          "reasons": [
-            "heat_gate:pass",
-            "source_count:2",
-            "github_trending",
-            "hacker_news"
-          ]
-        },
-        "mind_palace": {
-          "problem_solved": "为 Agent 开发者提供一套代码即可覆盖 React、Angular、Vue、React Native、Slack 等前端，避免重复开发 UI 交互层。",
-          "discovery_trace": "数据不足",
-          "method": "用户输入 → CopilotKit 前端 (useAgent) → AG-UI 协议 → Agent 后端 → 工具调用 / 状态更新 → AG-UI 协议回传 → UI 动态渲染 / 请求用户输入。循环直到任务完成。 ```mermaid sequenceDiagram User->>CopilotKit Frontend: 输入 CopilotKit Frontend->>AG-UI Protocol: 传递消息 AG-UI Protocol->>Agent Backend: 转发 Agent Backend->>Agent Backend: 处理/调用工具 Agent Backend->>AG-UI Protocol: 返回 UI 描述或请求输入 AG-UI Protocol->>CopilotKit Frontend: 流式更新状态/UI CopilotKit Frontend->>User: 渲染组件或请求确认 ```",
-          "self_evo_use": "记忆：通过 Shared State 和线程持久化记录完整交互历史（包括生成式 UI 和人机协同），使 Agent 能跨会话回忆上下文。 理解：利用生成式 UI 描述动态呈现信息，Agent 能够根据当前理解产出不同的界面元素。 自进化：通过 CLHF (Continuous Learning from Human Feedback) 在上下文中进行强化学习，根据用户反馈自动优化提示词和行为，无需微调模型。",
-          "core_concepts": [
-            {
-              "name": "AG-UI Protocol",
-              "role": "primary",
-              "evidence": "\"Makers of the AG-UI Protocol\" (README header), \"adopted by Google, LangChain, AWS, Microsoft, Mastra, PydanticAI, and more!\" (README)"
-            },
-            {
-              "name": "Generative UI",
-              "role": "primary",
-              "evidence": "\"Generative UI is a core CopilotKit pattern that allows agents to dynamically render UI\" (README)"
-            },
-            {
-              "name": "Shared State",
-              "role": "primary",
-              "evidence": "\"A synchronized state layer that both agents and UI components can read from and write to in real time.\" (README)"
-            },
-            {
-              "name": "Human-in-the-Loop",
-              "role": "primary",
-              "evidence": "\"Lets agents pause execution to request user input, confirmation, or edits before continuing.\" (README)"
-            },
-            {
-              "name": "useAgent Hook",
-              "role": "supporting",
-              "evidence": "\"The `useAgent` hook sits directly on AG-UI, giving you full programmatic control over the agent connection.\" (README)"
-            }
-          ]
-        },
-        "project_type": "agent_framework",
-        "verdict": "deep_dive",
-        "ratings": {
-          "relevance_to_ai_engineer": 5,
-          "engineering_depth": 5,
-          "reuse_value": 5,
-          "maturity": 5
-        },
-        "rankingReason": {
-          "decision": "deterministic",
-          "rawScore": 63,
-          "finalScore": 63,
-          "matchedBoostTerms": [
-            "project_type:agent_framework",
-            "signal_score:63",
-            "depth_gate:standard_threshold",
-            "bucket:真·新项目",
-            "novelty:ai_builder_shape",
-            "novelty:substantive_artifact",
-            "heat:stars_in_period=2686",
-            "deep_gate:stars_gained_below_3000",
-            "signal:star_velocity:2686",
-            "signal:total_stars:34669",
-            "signal:cross_source:1",
-            "signal:topic_fit:agent,memory,mcp",
-            "signal:maturity:ci",
-            "signal:maturity:docs",
-            "signal:maturity:examples",
-            "signal:maturity:install",
-            "agent/workflow evidence",
-            "MCP evidence",
-            "skills/hooks evidence",
-            "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available"
-          ],
-          "matchedCapTerms": [],
-          "explanation": "score=63; max=deep; final=analysis"
-        },
-        "briefSlug": "copilotkit-copilotkit",
-        "brief_slug": "copilotkit-copilotkit",
-        "deep_status": "available"
-      },
-      {
         "fullName": "aquasecurity/trivy",
         "owner": "aquasecurity",
         "name": "trivy",
@@ -3132,13 +2401,13 @@
         "description": "Find vulnerabilities, misconfigurations, secrets, SBOM in containers, Kubernetes, code repositories, clouds and more",
         "language": "Go",
         "languageColor": "#00ADD8",
-        "stars": 36313,
+        "stars": 36312,
         "forks": 467,
         "starsGained": 991,
         "starsGainedByWindow": {
           "weekly": 991
         },
-        "rank": 3,
+        "rank": 2,
         "tldr": "aquasecurity/trivy：GitHub 描述为“Find vulnerabilities, misconfigurations, secrets, SBOM in containers, Kubernetes, code repositories, clouds and more”。",
         "tags": [
           "Tier 0",
@@ -3169,7 +2438,7 @@
           "what_it_does": "Find vulnerabilities, misconfigurations, secrets, SBOM in containers, Kubernetes, code repositories, clouds and more",
           "metadata": {
             "language": "Go",
-            "total_stars": 36313,
+            "total_stars": 36312,
             "stars_in_period": 991,
             "author": "aquasecurity"
           },
@@ -3200,7 +2469,7 @@
           "heat:stars_in_period=991",
           "gate:irrelevant_to_ai",
           "signal:star_velocity:991",
-          "signal:total_stars:36313",
+          "signal:total_stars:36312",
           "signal:cross_source:1",
           "signal:maturity:ci",
           "signal:maturity:docs",
@@ -3293,7 +2562,7 @@
             "heat:stars_in_period=991",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:991",
-            "signal:total_stars:36313",
+            "signal:total_stars:36312",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:docs",
@@ -3398,7 +2667,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 36313,
+          "stars": 36312,
           "monthlyStarsGained": 991,
           "reasons": [
             "heat_gate:pass",
@@ -3428,7 +2697,7 @@
             "heat:stars_in_period=991",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:991",
-            "signal:total_stars:36313",
+            "signal:total_stars:36312",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:docs",
@@ -3461,22 +2730,22 @@
         "description": "AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF generation, batch processing.",
         "language": "JavaScript",
         "languageColor": "#f1e05a",
-        "stars": 52627,
-        "forks": 10554,
+        "stars": 52651,
+        "forks": 10555,
         "starsGained": 3998,
         "starsGainedByWindow": {
           "weekly": 3998
         },
-        "rank": 4,
+        "rank": 3,
         "tldr": "santifer/career-ops：GitHub 描述为“AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF gene",
         "tags": [
-          "job-search",
-          "ai-agent",
-          "claude-code",
-          "resume-generator",
-          "automation"
+          "求职自动化",
+          "Claude Code",
+          "简历生成",
+          "AI Agent",
+          "开源工具"
         ],
-        "light": "Career-Ops是一个利用Claude Code、Gemini等AI编码CLI的求职系统，提供14种技能模式和Go仪表板。它通过粘贴职位URL或描述自动运行评估、生成ATS优化简历、批量处理并扫描45+公司的门户。项目有详细文档、安装指南、Docker支持和示例，但缺乏测试文件，系统稳定性和可维护性证据不足。推荐有兴趣的AI工程师clone试用其求职自动化能力。",
+        "light": "Career-Ops是一个将AI编码CLI（如Claude Code）转变为求职命令中心的系统，由个人开发者创建并用于自身求职成功。它通过14种技能模式（如LLMOps、Agentic）对职位进行A-F评分，自动扫描45+公司的招聘门户，生成ATS优化的PDF简历，并提供Go语言终端仪表盘管理申请。该项目以5.2万星、周增近4000星的速度进入雷达，被WIRED、Business Insider报道。已知事实：提供文档、示例、安装命令（npx）、Docker部署、CI配置，支持Claude Code/Gemini/Codex等多AI提供商。缺失证据：无单元测试，架构细节仅靠README描述，实际效果依赖个人配置。推荐行动：适合想用AI优化求职流程的开发者，建议尝试并投入时间配置个人资料，再评估实际效果。",
         "worthDeepDive": 64,
         "ranking_score": 64,
         "max_allowed_depth": "deep",
@@ -3494,16 +2763,17 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "基于AI编码CLI（如Claude Code）的求职自动化系统，面向求职者",
-          "what_it_does": "自动评估职位匹配度、生成ATS优化简历PDF、扫描多个招聘门户、批量处理求职申请，并通过终端仪表板跟踪进度。",
+          "one_sentence_positioning": "一个基于AI CLI（Claude Code/Gemini等）的求职辅助系统，面向需要批量筛选职位、生成定制简历和跟踪申请进度的求职者。",
+          "what_it_does": "自动评估职位描述与个人简历匹配度，生成ATS优化PDF简历，扫描多个招聘门户，提供终端仪表盘管理申请流程，支持批量处理和多AI提供商。",
           "metadata": {
-            "language": "JavaScript",
-            "total_stars": 52627,
+            "language": "JavaScript, Go",
+            "total_stars": 52651,
             "stars_in_period": 3998,
             "author": "santifer"
           },
           "labels": [
             "agent",
+            "推理",
             "工具"
           ],
           "prose_body": "santifer/career-ops 得分 64，信号是 project_type:agent_framework, signal_score:64；暂不深挖，因为 depth_gate:teaching_skill_or_resource_max_light。建议 try。"
@@ -3521,7 +2791,7 @@
           "gate:real_new_project",
           "deep_gate:excluded_resource_teaching_list",
           "signal:star_velocity:3998",
-          "signal:total_stars:52627",
+          "signal:total_stars:52651",
           "signal:cross_source:2",
           "signal:topic_fit:agent,memory,eval,rag,self_evo",
           "signal:maturity:ci",
@@ -3613,7 +2883,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3998",
-            "signal:total_stars:52627",
+            "signal:total_stars:52651",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,eval,rag,self_evo",
             "signal:maturity:ci",
@@ -3710,7 +2980,7 @@
             "github_search",
             "ossinsight_trending"
           ],
-          "stars": 52627,
+          "stars": 52651,
           "monthlyStarsGained": 3998,
           "reasons": [
             "heat_gate:pass",
@@ -3720,7 +2990,7 @@
             "ossinsight_trending"
           ]
         },
-        "project_type": "agent_framework",
+        "project_type": "agent_skill",
         "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -3743,7 +3013,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3998",
-            "signal:total_stars:52627",
+            "signal:total_stars:52651",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,eval,rag,self_evo",
             "signal:maturity:ci",
@@ -3767,7 +3037,7 @@
   },
   "monthly": {
     "window": "monthly",
-    "generatedAt": "2026-06-11T13:06:37.182Z",
+    "generatedAt": "2026-06-11T14:38:20.278Z",
     "target": 3,
     "repos": [
       {
@@ -3779,7 +3049,7 @@
         "description": "Your Personal AI super intelligence. Private, Simple and extremely powerful.",
         "language": "Rust",
         "languageColor": "#dea584",
-        "stars": 31487,
+        "stars": 31495,
         "forks": 3064,
         "starsGained": 30921,
         "starsGainedByWindow": {
@@ -3816,7 +3086,7 @@
           "what_it_does": "Your Personal AI super intelligence. Private, Simple and extremely powerful.",
           "metadata": {
             "language": "Rust",
-            "total_stars": 31487,
+            "total_stars": 31495,
             "stars_in_period": 30921,
             "author": "tinyhumansai"
           },
@@ -3837,8 +3107,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "30921 period stars / 31487 total stars",
-            "recent_commit": "2026-06-11T12:54:16Z",
+            "star_velocity": "30921 period stars / 31495 total stars",
+            "recent_commit": "2026-06-11T14:35:35Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -3867,7 +3137,7 @@
           "deep_gate:stars_gained=30921",
           "deep_gate:quality_pass",
           "signal:star_velocity:30921",
-          "signal:total_stars:31487",
+          "signal:total_stars:31495",
           "signal:cross_source:1",
           "signal:topic_fit:agent,memory,rag",
           "signal:maturity:tests",
@@ -3960,7 +3230,7 @@
             "deep_gate:stars_gained=30921",
             "deep_gate:quality_pass",
             "signal:star_velocity:30921",
-            "signal:total_stars:31487",
+            "signal:total_stars:31495",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -4053,7 +3323,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 31487,
+          "stars": 31495,
           "monthlyStarsGained": 30921,
           "reasons": [
             "heat_gate:pass",
@@ -4062,7 +3332,7 @@
             "ossinsight_trending"
           ]
         },
-        "project_type": "agent_framework",
+        "project_type": "ai_app",
         "verdict": "clone_and_run",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -4089,7 +3359,7 @@
             "deep_gate:stars_gained=30921",
             "deep_gate:quality_pass",
             "signal:star_velocity:30921",
-            "signal:total_stars:31487",
+            "signal:total_stars:31495",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -4113,8 +3383,8 @@
         "description": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 57057,
-        "forks": 4739,
+        "stars": 57118,
+        "forks": 4742,
         "starsGained": 42791,
         "starsGainedByWindow": {
           "monthly": 42791
@@ -4124,11 +3394,11 @@
         "tags": [
           "知识图谱",
           "代码分析",
-          "Claude Code插件",
-          "多代理",
-          "知识库可视化"
+          "Claude插件",
+          "开发者工具",
+          "AI代理"
         ],
-        "light": "Understand-Anything 是一个面向 AI 编码工具的插件，通过多代理管道（Tree-sitter 解析 + LLM 语义）将代码库或知识库构建为交互式知识图谱，提供搜索、问答、变更影响分析、引导式导览等功能。项目 2026 年 3 月创建，已获 57k+ 星，安装简便（一键脚本），支持 15+ 平台（Claude Code、Cursor、Copilot、Gemini CLI 等）。已知：README 详细说明了功能和用法，有文档、测试、演示链接。缺失：无 formal 示例目录或完整架构文档。推荐行动：尝试安装并体验代码库可视化。",
+        "light": "该项目是一个多平台 AI 编码插件，通过多代理管道（项目扫描、文件分析、架构分析等）结合 Tree-sitter 静态分析与 LLM 语义理解，将代码库转化为可交互的知识图谱，并提供仪表盘、语义搜索、差异影响分析等功能。它因在 GitHub 上短期内获得 4.2 万星而进入雷达。已知事实包括支持多种平台、有测试与 CI、有安装脚本和在线演示。缺失示例目录和架构文档。建议尝试使用以评估其实际效果。",
         "worthDeepDive": 62,
         "ranking_score": 62,
         "max_allowed_depth": "deep",
@@ -4146,11 +3416,11 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "代码库理解的知识图谱插件 / 面向 AI 编码工具用户",
-          "what_it_does": "分析代码库或知识库，构建交互式知识图谱，提供可视化仪表板和搜索问答功能。",
+          "one_sentence_positioning": "面向开发者，将任意代码库转换为交互式知识图谱的 AI 插件/工具，支持多种 AI 编码平台。",
+          "what_it_does": "通过多代理管道和 Tree-sitter + LLM 混合引擎，分析项目结构并生成知识图谱，提供可视化仪表盘、语义搜索、差异分析与引导导览。",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 57057,
+            "total_stars": 57118,
             "stars_in_period": 42791,
             "author": "Egonex-AI"
           },
@@ -4175,7 +3445,7 @@
           "gate:real_new_project",
           "deep_gate:excluded_resource_teaching_list",
           "signal:star_velocity:42791",
-          "signal:total_stars:57057",
+          "signal:total_stars:57118",
           "signal:cross_source:2",
           "signal:topic_fit:agent,memory,rag",
           "signal:maturity:tests",
@@ -4266,7 +3536,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:42791",
-            "signal:total_stars:57057",
+            "signal:total_stars:57118",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -4361,7 +3631,7 @@
             "github_trending",
             "github_search"
           ],
-          "stars": 57057,
+          "stars": 57118,
           "monthlyStarsGained": 42791,
           "reasons": [
             "heat_gate:pass",
@@ -4370,7 +3640,7 @@
             "github_search"
           ]
         },
-        "project_type": "agent_framework",
+        "project_type": "devtool_cli",
         "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -4393,7 +3663,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:42791",
-            "signal:total_stars:57057",
+            "signal:total_stars:57118",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -4422,8 +3692,8 @@
         "description": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 20207,
-        "forks": 2396,
+        "stars": 20227,
+        "forks": 2397,
         "starsGained": 8127,
         "starsGainedByWindow": {
           "monthly": 8127
@@ -4431,13 +3701,13 @@
         "rank": 3,
         "tldr": "anthropics/knowledge-work-plugins：GitHub 描述为“Open source repository of plugins primarily intended for knowledge workers ",
         "tags": [
-          "Claude",
-          "插件",
+          "Claude插件",
           "知识工作",
           "MCP",
-          "企业应用"
+          "工作流自动化",
+          "企业工具"
         ],
-        "light": "这是一个由 Anthropic 开源的插件仓库，为 Claude Cowork（以及兼容的 Claude Code）提供面向不同知识工作角色的即用型插件，包括销售、客服、产品管理、市场、法律、财务、数据、企业搜索、生物研究等11个领域。插件通过 MCP（Model Context Protocol）连接外部工具，以 skills（技能）、commands（斜杠命令）和 connectors（连接器）结构组织，全部为 markdown 和 JSON 文件，无需代码或基础设施。项目在 GitHub 上获20207星，月增8127星，热度极高。但仓库中缺乏独立的文档、示例、测试和 demo，目前仅能通过 README 了解功能概览，无法直接评估插件的实际质量和易用性。建议有兴趣的读者直接通过 Claude Cowork 或 Claude Code 安装试用，或参考其结构自行构建定制插件。",
+        "light": "该项目是Anthropic官方的Claude Cowork插件市场开源版，包含11个面向不同职业角色（如销售、客服、财务等）的预构建插件。每个插件由skills（领域知识markdown）、commands（斜杠命令）和connectors（基于MCP的外部工具连接）组成，全部基于Markdown/JSON文件，无需编码。项目近期在GitHub Trending上获得大量关注，但缺少独立文档、示例和测试用例，建议直接通过Claude Cowork或Claude Code尝试安装使用。",
         "worthDeepDive": 62,
         "ranking_score": 62,
         "max_allowed_depth": "light",
@@ -4455,19 +3725,17 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "为 Claude 知识工作场景提供即用型、可定制的插件集合，面向企业团队和知识工作者。",
-          "what_it_does": "提供11个预构建插件，每个插件包含技能文件、斜杠命令和 MCP 连接器，使 Claude 能像专业角色一样工作；用户可自定义连接器、添加公司上下文、调整工作流。",
+          "one_sentence_positioning": "Anthropic开源的Claude Cowork插件集合，面向知识工作者，用于定制Claude在特定角色下的行为。",
+          "what_it_does": "提供预构建的插件（如销售、支持、法律等），包含领域知识技能、斜杠命令和通过MCP连接的外部工具，用户可直接安装或修改适配自身流程。",
           "metadata": {
             "language": "Python",
-            "total_stars": 20207,
+            "total_stars": 20227,
             "stars_in_period": 8127,
-            "author": "Anthropic (Organization)"
+            "author": "anthropics"
           },
           "labels": [
             "agent",
-            "工具",
-            "数据",
-            "infra"
+            "tools"
           ],
           "prose_body": "anthropics/knowledge-work-plugins 得分 62，信号是 project_type:agent_framework, signal_score:62；暂不深挖，因为 cannot_design_practical_test_plan。建议 try。"
         },
@@ -4483,7 +3751,7 @@
           "heat:stars_in_period=8127",
           "gate:real_new_project",
           "signal:star_velocity:8127",
-          "signal:total_stars:20207",
+          "signal:total_stars:20227",
           "signal:cross_source:1",
           "signal:topic_fit:agent,memory,rag,mcp",
           "signal:maturity:ci",
@@ -4573,7 +3841,7 @@
             "heat:stars_in_period=8127",
             "gate:real_new_project",
             "signal:star_velocity:8127",
-            "signal:total_stars:20207",
+            "signal:total_stars:20227",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag,mcp",
             "signal:maturity:ci",
@@ -4668,7 +3936,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 20207,
+          "stars": 20227,
           "monthlyStarsGained": 8127,
           "reasons": [
             "heat_gate:pass",
@@ -4677,7 +3945,7 @@
             "ossinsight_trending"
           ]
         },
-        "project_type": "agent_framework",
+        "project_type": "agent_skill",
         "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -4699,7 +3967,7 @@
             "heat:stars_in_period=8127",
             "gate:real_new_project",
             "signal:star_velocity:8127",
-            "signal:total_stars:20207",
+            "signal:total_stars:20227",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag,mcp",
             "signal:maturity:ci",

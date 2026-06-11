@@ -1,0 +1,122 @@
+primitive_id: verifiable-economic-workflow-benchmark
+source_paper: "2606.05405"
+title: "Agents' Last Exam"
+relevance_level: direct
+audience: ai_only
+core_pattern: >
+  把真实专业工作流做成可规模化、可复跑、可自动判卷的 agent benchmark：
+  题源来自行业专家已完成项目，经五道 QC 门入库；运行时解耦 task specification、
+  agent harness、environment VM；agent 只能看到 input/software 并写 output，
+  hidden reference 在评分阶段才注入；评分优先使用 deterministic-first checks，
+  常见组合是 gate-and-score（二值前置门失败即 0，通过后再算连续质量分）。
+  这给 AutoSci 的直接启发是：任何自进化 agent 任务都应先变成可验收工作流，
+  再让 agent 在同一 task/env 接口下横向比较和回写失败。
+problem_class: verifiable-long-horizon-agent-evaluation-for-economic-professional-workflows
+
+core_concepts:
+  - name: 可验证经济价值任务（verifiable economically-valuable workflow）
+    role: primary
+    evidence: "long horizon, economically valuable, real world tasks with verifiable outcomes"
+  - name: 门控+打分（gate-and-score）
+    role: primary
+    evidence: "failure on the gate forces the task score to 0"
+  - name: 回避 LLM-as-judge（deterministic-first verification）
+    role: primary
+    evidence: "deliberately avoids LLM-as-judge wherever a deterministic alternative exists"
+  - name: 评测三组件解耦（task-spec / agent / environment）
+    role: primary
+    evidence: "uncoupling of three components (the task specification, the agent, and the environment)"
+  - name: GCUA 五功能层（Brain/Eyes/Body/Hands/Feet）
+    role: supporting
+    evidence: "Brain (LLM reasoning and planning), Eyes (GUI perception via screenshots), Body ... Hands ... Feet"
+  - name: 领域知识瓶颈（domain-knowledge failure dominance）
+    role: supporting
+    evidence: "Understanding and Approach failures together account for roughly three quarters of cases"
+
+discovery_trace: 数据不足
+
+components:
+  - expert_sourced_workflows
+  - five_gate_task_qc
+  - executable_task_spec_load_start_evaluate
+  - decoupled_agent_environment_interface
+  - hidden_reference_staging
+  - deterministic_first_grader
+  - gate_and_score_composition
+  - gcua_capability_layers
+  - public_private_rolling_pool
+  - failure_taxonomy_analysis
+
+autosci_modules:
+  - benchmark_builder
+  - eval_harness
+  - cold_critic
+  - self_evolve_controller
+  - environment_builder
+  - trajectory_logger
+  - typed_memory
+
+inputs:
+  - expert_workflow_description
+  - input_assets
+  - target_software_or_runtime
+  - expected_deliverable
+  - hidden_reference_or_rubric
+  - agent_under_test
+
+outputs:
+  - task_spec_main_py
+  - sandbox_data_contract
+  - deterministic_score
+  - run_trajectory
+  - failure_taxonomy_card
+  - public_or_private_eval_record
+
+implementation_idea: >
+  在 AI-Brief/AutoSci 内部做 Mini-ALE：选 5-10 个已有长程任务（论文深读、代码修复、
+  KG facet 蒸馏、冷审复核），每个任务都写成 input/output/reference/evaluate 四目录契约；
+  evaluate() 先跑硬门（文件存在、JSON/YAML/MDX 可解析、脚注/数字可回溯、验证脚本绿），
+  再算质量分或人工冷审分。保留 public smoke set 给日常回归，private holdout 给模型/agent
+  升级评估。每次失败都标 Understanding / Approach / Execution / Infrastructure，
+  回写到任务设计和记忆层。
+
+small_experiment: >
+  用一个现有深读任务做 3 版评测：A=LLM-as-judge 总体打分；B=deterministic hard gates
+  + LLM 质量评语；C=gate-and-score + hidden reference snippets。比较三者的稳定性、
+  误杀/漏杀、人工复核时间。预期 3-7 天可完成最小闭环。
+
+design_principles:
+  - name: "可验证优先"
+    statement: "先把专业任务设计到能被代码或窄证据 probe 判，再让 agent 去做；判不了就不该进入核心 benchmark。"
+  - name: "三组件解耦"
+    statement: "task specification、agent harness、environment VM 靠接口组合，避免评测被某个 agent 或某台机器写死。"
+  - name: "hidden reference 不进 agent 视野"
+    statement: "reference 只在评分阶段出现；否则 benchmark 会退化成找答案或反向工程。"
+  - name: "门控优先于加权平均"
+    statement: "解析失败、文件缺失、安全/结构硬约束失败应直接归零，再谈连续质量分。"
+  - name: "失败归因驱动自进化"
+    statement: "pass/fail 之后必须标 Understanding/Approach/Execution/Infrastructure，才能决定补领域知识、改规划、修工具还是调环境。"
+  - name: "公开题用于学习，私有题用于测量"
+    statement: "public smoke set 提供透明回归；private holdout 保持长期可测性，防止针对性过拟合。"
+
+risks:
+  - author_self_reported_scores
+  - private_pool_not_fully_reproducible
+  - deterministic_task_selection_bias
+  - model_harness_attribution_confound
+  - public_subset_contamination
+  - high_task_construction_cost
+  - llm_probe_residual_subjectivity
+
+source_notes:
+  arxiv: "https://arxiv.org/abs/2606.05405"
+  hf: "https://huggingface.co/papers/2606.05405"
+  project: "https://agents-last-exam.org/"
+  code_repo: "https://github.com/rdi-berkeley/agents-last-exam"
+  repo_head_read: "8583037e52fec4ff100a12833ca330721a05575e"
+  evidence_boundary: "论文结果为作者自报；仓库实读确认 ale_run 框架、公开任务与 reference harness，未证明完整私有任务池可复现。"
+  mind_palace_use: "Recall 命中 SoCRATES / MemoryAgentBench / GrepSeek 等评测与 agent 工程记忆；仅用于定位 ALE 的可迁移评测范式，不作为本文事实来源。"
+  synthesis: "ALE 应被吸收为 AutoSci 的 benchmark_builder/eval_harness 原语：先把长程任务写成可验证 workflow，再让 agent 在 task/env 接口下横向比较。"
+  evolution_actions: "add: Mini-ALE public smoke + private holdout；optimize: 深读/冷审任务增加 hidden-reference hard gates；replace: 宽泛 LLM-as-judge 总分改为 deterministic-first gate-and-score；delete: 用单次 demo 成功替代可复跑评测的旧假设。"
+
+status: extracted

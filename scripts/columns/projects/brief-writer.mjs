@@ -10,7 +10,7 @@ const NOT_FOUND = "not_found";
 const NOT_EXPLAINED = "未在 README/artifact 说明";
 const LIGHT_SPINE_SCHEMA_VERSION = "project-light-spine/v1";
 
-const PROJECT_TYPES = new Set(["ai_app", "agent_framework", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
+const PROJECT_TYPES = new Set(["ai_app", "agent_framework", "agent_skill", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate", "non_ai_eng"]);
 const PROJECT_VERDICTS = new Set(["skip", "watch", "L1", "deep_dive", "clone_and_run"]);
 const EVIDENCE_STRENGTHS = new Set(["high", "medium", "low", "none"]);
 const CONCEPT_MATURITY = new Set(["stable", "active", "emerging", "deprecated"]);
@@ -23,6 +23,7 @@ const REPRODUCIBILITY_STATUS = new Set(["reproducible", "code_available_but_heav
 export const PROJECT_TYPE_TO_SHAPE = {
   ai_app: "howto-use",
   agent_framework: "agent-build",
+  agent_skill: "roadmap",
   devtool_cli: "howto-use",
   model_infra: "howto-use",
   frontend_ui: "howto-use",
@@ -35,6 +36,7 @@ export const PROJECT_TYPE_TO_SHAPE = {
 export const PROJECT_TYPE_TO_PROJECT_KIND = {
   ai_app: "functional_software",
   agent_framework: "functional_software",
+  agent_skill: "skill",
   devtool_cli: "functional_software",
   model_infra: "functional_software",
   frontend_ui: "functional_software",
@@ -1755,6 +1757,15 @@ function normalizeProjectType(value) {
   const mapped = {
     app: "ai_app",
     ai_app: "ai_app",
+    agent_skill: "agent_skill",
+    agent_skills: "agent_skill",
+    skill: "agent_skill",
+    skills: "agent_skill",
+    plugin: "agent_skill",
+    plugins: "agent_skill",
+    prompt_collection: "agent_skill",
+    prompt_collections: "agent_skill",
+    meta_skill: "agent_skill",
     agent_runtime: "agent_framework",
     agent_framework: "agent_framework",
     devtool: "devtool_cli",

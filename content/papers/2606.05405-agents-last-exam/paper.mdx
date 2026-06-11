@@ -1,0 +1,208 @@
+# Paper · 论文本身
+
+## 一句话总结
+
+Agents' Last Exam（ALE）不是又一张“模型会不会答题”的榜，而是一套**把真实专业工作流改造成可自动判卷考试**的 agent benchmark：题目来自行业专家做过的真实项目，agent 在 Windows/Linux 沙箱里自由用 GUI、CLI、文件、代码和网页，最后只看交付物能不能被隐藏参考答案和确定性 grader 判过。口号式概括：**如果一个 agent 说自己能干活，先让它过一遍接近 GDP 的职业资格考试。**[^arxiv]
+
+## 问题(Problem)
+
+- 过去几年 AI 在数学、编程、知识问答、网页任务上连续刷榜，但这些分数没有等比例变成专业工作里的经济产出。作者把这归因到评测层：现有 benchmark 很少持续测量真实、长程、经济上有价值的工作流。[^intro]
+- 真实工作流难测，是因为它同时要满足三件事：**代表真实专业实践**、足够复杂、还能被客观验证。很多现有 benchmark 只拿到其中一两项：要么范围窄，要么靠人工 judge，要么任务太像拼图而不是工作。
+- ALE 的赌法是：用 O*NET / SOC 2018 这类职业分类做覆盖坐标，用专家真实项目做题源，用 `evaluate()` 和隐藏 reference 做自动判卷，尽量把“能不能完成专业工作”变成可重复跑的数。
+
+> [!key] 立场
+> 这篇最值得看的不是“2.6% 很低”这个新闻点，而是它把 agent eval 从**玩具任务/单软件任务**推到**专业交付物验收**：任务、agent、环境三件套解耦，隐藏 reference 延后注入，评分尽量 deterministic-first。这对 AI 工程师的启发很直接：如果你要做垂直 agent，真正稀缺的不是再包一层聊天界面，而是把专业工作拆成“真实输入 -> 受约束产物 -> 可执行验收门”的能力。ALE 的实测也给了冷水：当前顶配 agent 在最难档仍远未饱和，失败主因更多是理解/方法/领域知识，而不是单纯不会点按钮。[^results]
+
+## 关键术语(Key terms)
+
+| 术语 | 大白话解释 |
+| --- | --- |
+| **ALE（Agents' Last Exam）** | 一个面向 AI agent 的真实专业工作流 benchmark。论文自报覆盖 13 个行业簇、55 个子领域、1,490 个任务实例，其中 150 个公开，剩余主要为私有/待 QC 池；专家人数在 abstract 中写 250+，related work/README 又写 300+，复述时按具体来源标明口径。[^counts] |
+| **GCUA（Generalist Computer-Use Agent，通用计算机使用代理）** | 不是只会 GUI 的 CUA，也不是只会 terminal 的 coding agent，而是同时有 Brain/Eyes/Body/Hands/Feet 五层能力：会想、会看屏幕、会编排长流程、会调工具、会在真实运行时落地。[^gcua] |
+| **task workflow / task instance（任务工作流 / 任务实例）** | workflow 是一类端到端专业流程；instance 是这类流程的一个具体案例。一个 `main.py` 可以共享同一套 `evaluate()`，用不同输入/reference 生成多个实例。[^pipeline] |
+| **task specification（任务规格）** | 仓库里的一个 `main.py`，暴露 `load()`、`start()`、`evaluate()` 三段生命周期：声明任务、布置沙箱、评分产物。[^pipeline] |
+| **hidden reference（隐藏参考答案）** | agent 工作时看不到的标准产物。公开文档说明 reference 会在 agent 完成后才注入；如果数据预烘在镜像中，则用加密 `reference.7z` 到评分阶段再解包。[^repo_tasks] |
+| **gate-and-score（门控+打分）** | 先过硬门，比如文件能解析、没有碰撞、必需字段齐；硬门失败直接 0 分；通过后再算连续质量分，比如几何距离、数值误差、表格字段匹配。[^eval] |
+| **deterministic-first verification（确定性优先验证）** | 能用代码/数值/结构/轨迹判，就不用 LLM 当总裁判；少数视觉/语义题才用窄问题的 VLM/LLM probe，再由代码聚合。[^eval] |
+| **living / rolling benchmark（活基准 / 滚动评测）** | 题池持续扩充，公开题和私有题可以轮换，避免模型或团队只针对固定公开题过拟合。[^counts] |
+
+## 核心方法(Core method)
+
+把 ALE 想成一套**职业资格考试的考务系统**，它不是自己造 agent，而是搭“出题、考场、判卷、留痕”的基础设施。
+
+1. **出题：从真项目进题库**  
+   题目不是让标注工人编，而是让行业专家提交他们过去做过、通常要花几天/几周的项目。每个候选要补齐五要素：自然语言描述、输入文件、目标软件、期望交付物、评测规格。之后经过专家 sourcing、门户提交、一审、工程实现/dry-run、专家委员会终审五道门。[^construction]
+
+2. **考场：任务、agent、环境三组件解耦**  
+   任务规格是 `main.py`；agent 是 harness + 模型；环境是远程 VM。VM 里有四类目录：`input/` 给 agent 看，`software/` 放专业软件，`output/` 是 agent 唯一应写的交付区，`reference/` 在评分阶段才给 grader 用。好处是换 agent 不必改题，换题不必改 agent。[^pipeline]
+
+3. **判卷：交付物说了算**  
+   `evaluate()` 不问 agent “你感觉做完了吗”，而是读 `output/`，对照隐藏 reference / rubric 给 0 到 1 的分数。比较形式可以是哈希/精确值、数值表、几何距离、视觉判断、固定输入下的行为状态、文本 rubric；组合方式常见是 gate-and-score。[^eval]
+
+4. **留痕：每次 run 都可审计**  
+   仓库 `ale_run` 会保存 trajectory、raw logs、eval result、run metadata、output 等；源码中的 `RunWriter` 和 lifecycle runner 负责把 agent 行为、评分和终止原因写到统一 run 目录。[^repo_runner]
+
+## 架构 / 流程(Architecture / pipeline)
+
+```mermaid
+flowchart TD
+  subgraph BUILD[出题与质控]
+    EXP[行业专家提交真实项目<br/>描述/输入/软件/交付物/评测规格] --> R1[一审<br/>major/minor/borderline/accept]
+    R1 --> ENG[工程实现<br/>main.py + 沙箱数据 + scorer]
+    ENG --> DRY[工程 dry-run<br/>发现缺口回专家]
+    DRY --> QC[专家委员会终审<br/>reference 正确性/评分边界/上下文充分]
+    QC --> POOL[(ALE 任务池<br/>公开子集 + 私有/待 QC 池)]
+  end
+
+  subgraph RUN[一次评测 run]
+    TASK[Task spec: main.py<br/>load -> start -> evaluate] --> ENV[远程 VM 环境<br/>input/software/output/reference]
+    AGENT[Agent harness + model<br/>GCUA: GUI + CLI + files + code + web] -->|截图/键鼠/shell/文件/API| ENV
+    ENV -->|agent 写入 output/| OUT[交付物]
+    OUT --> EVAL[evaluate()<br/>隐藏 reference + deterministic-first grader]
+    EVAL --> SCORE[0..1 score<br/>pass/mean score/日志/trajectory]
+  end
+
+  POOL --> TASK
+```
+
+## 创新点(Innovation points)
+
+| 创新 | 新在哪 | 为什么重要 |
+| --- | --- | --- |
+| 用职业分类做覆盖坐标 | 用 O*NET / SOC 2018 映射 13 簇、55 子领域，而不是只按研究者熟悉的任务挑题 | 论文自报 16 个主流 benchmark 的并集仍漏 13/55 子领域；ALE 试图补经济工作流的盲区。[^taxonomy] |
+| 专家真实项目 + 五道 QC | 题来自专业人士完成过的项目，随后工程化为可执行任务 | 避免“看起来像工作”的合成小题，逼 agent 面对真实软件、真实输入、真实产物约束。 |
+| 三组件解耦 | task spec / agent / environment 通过接口组合 | 任何 agent 可跑任何任务，评测框架不被某个 harness 绑死。[^pipeline] |
+| hidden reference + 延后注入 | 标准答案在 agent 工作阶段不可见，评分阶段才进入环境 | 降低答案泄露和投机风险，是可验证 benchmark 的底线。[^repo_tasks] |
+| deterministic-first scoring | 能代码判就代码判，LLM/VLM judge 只做少数窄探针 | 比纯人工或泛化 LLM-as-judge 更可复现，也更适合长期 leaderboard。[^eval] |
+| GCUA 五功能层 | 把 agent 能力拆成 Brain/Eyes/Body/Hands/Feet | 能解释为什么 CLI-agent 缺视觉、GUI-agent 缺运行时，ALE 要测的是两者并集。[^gcua] |
+
+## 实验 / 证据(Experiments / evidence)
+
+> 除“仓库实读”外，下列 benchmark 数字均为**作者自报 / ALE 团队自测**；多数配置为单次运行，只有部分重复运行给了标准差。逐格数值以原文 Table 1 / 附录表为准。[^table]
+
+**规模与发布形态。**
+- 论文宏与图中给出的规模：55 子领域、13 行业簇、960 个 task workflow、1,490 个 task instance。[^counts]
+- 1,490 个实例拆分为 960 个外部提交与 530 个 commissioned tasks；发布状态为 150 public、1,017 private、323 unverified pending QC。[^counts]
+- 仓库实读：`rdi-berkeley/agents-last-exam` 当前 HEAD `8583037`，包含 `ale_run/` 框架、`tasks/` 公开任务、`selected_tasks/` 三档列表和 reference harness。当前 repo 内有 165 个 `task_card.json`，含 demo/smoke 等，不等同论文 Table 1 的 150 个公开评测实例。[^repo]
+
+**主结果：最难档远未饱和。**
+
+| 配置（主流 harness + GUI-as-Tool） | Near-Term pass | Full-Spectrum pass | Last-Exam pass | Overall pass |
+| --- | ---: | ---: | ---: | ---: |
+| Codex + GPT-5.5 | 42.4% | 20.0% | 8.6% | 26.2% |
+| ALE-Claw + GPT-5.5 | 35.6% | 21.8% | 8.6% | 24.2% |
+| Cursor + GPT-5.5 | 36.4% | 20.0% | 2.9% | 22.5% |
+| Claude Code + Opus 4.7 | 23.7% | 12.7% | 0.0% | 14.1% |
+| Claude Code + Sonnet 4.6 | 31.4% | 12.7% | 0.0% | 17.1% |
+
+作者摘要强调：在 hardest tier 上，跨主流 harness 和 backbone 配置的平均 full pass rate 只有 **2.6%**。注意这是最难档口径，不是全体任务整体通过率。[^arxiv]
+
+**ALE-CLI 对 Terminal-Bench 的反差。**
+- 正文说 Codex + GPT-5.5 在 Terminal-Bench 为 **82%**，但在 ALE-CLI 这个 Linux-only 子集上只有 **25.2% overall pass**（Near-Term 41.5%、Full-Spectrum 20.0%、Last-Exam 4.5%）。[^results]
+- Table 1 下方面板的 ALE-CLI 逐格数字与正文比较段存在轻微口径差异（例如表格列出 Codex + GPT-5.5 overall 26.4%）。引用时应以原文表和具体口径为准，不混用。[^table]
+
+**失败画像：缺领域脑子，不只是缺手脚。**
+- Claude Code + Opus 4.7 的失败分析里，classifiable failures 中 **Approach 47%**（wrong strategy 30%、premature abandonment 17%），**Understanding 31%**（domain knowledge gap 25%、hallucination/fabrication 6%），**Execution 22%**（output format 10%、implementation bug 8%、GUI failure 4%）。timeout/resource cases 被作者排除在这个 breakdown 外。[^failure]
+- 主文总结为：Understanding + Approach 合计约四分之三，说明主瓶颈更像模型/agent 的领域知识与方法选择，而不是单纯执行器坏了。[^results]
+
+**GUI 没被充分使用。**
+- 作者报告 34% 公开任务实例把图形软件指定为 primary tool，但多数配置的 GUI tool share 仍小，agent 往往用 Bash/CLI 代替 GUI 工作。[^results]
+
+**模型选择比 harness 选择更能拉开差距，但不要过度归因。**
+- 附录 D.4：固定 OpenClaw 换 12 个模型，overall pass spread 为 18.0 percentage points；固定 GPT-5.5 换 5 个 harness，spread 为 6.0 pp；固定 Opus 4.7 换 3 个 harness，spread 为 5.3 pp。作者概括为模型选择的离散约为 harness 选择的 3 倍。[^harness]
+- 这不等于 harness 不重要。它只说明在“已相对工程化的 harness”之间，基座模型的推理和领域知识更主导；如果 harness 很烂，结论不能外推。
+
+**成本/时间/超时。**
+- 主文说每个 agent-task run 平均花费约 \$3-10，持续几十分钟到数小时；每次 run capped at five hours。[^results]
+- 超时口径有轻微不一致：正文 §4 写 overall timeout rate 为 4.3%；附录 D.2 对 Table 1 export 的统计写 2.9% evaluated runs 触达 5 小时上限。附录还给出 timeout runs 平均 score 20.8，非 timeout runs 平均 27.7；按难度：Near-Term 2.4%、Full-Spectrum 2.5%、Last-Exam 4.4%。引用时应带上“正文口径 / Table 1 export 口径”。[^timeout]
+- 附录 D.5：资源消耗不可靠预测成绩。例如 ALE-Claw + GPT-5.5 总 API cost \$307，overall mean score 48.0%；同 harness + Opus 4.7 花 \$1,141，但低 6.0 pp。[^cost]
+
+**源码实读边界。**
+- README 自称仓库是 open evaluation framework，含 `ale_run` toolkit、150 reference tasks、two reference agent harnesses；实读目录确有 `ale_run/tasks/loader.py`、`driver.py`、`orchestration/lifecycle.py`、`agents/ale_claw/`、多 agent config 与公开任务。[^repo]
+- 文档页说明任务采用 `load()` / `start()` / `evaluate()`，输入先注入，reference 在 agent 完成后注入；如数据预烘在镜像里，reference 使用加密 `reference.7z` 到评分阶段解包。源码 `baked_in_sandbox.py` 也实现了这个 reference 解包逻辑。[^repo_tasks]
+- 私有题池、完整 leaderboard 评测 run logs、所有 reference 数据并未完全在仓库明文公开；外部读者可复现的是公开子集与框架，不是论文全部私有池。
+
+> [!warn] 别被带偏
+> 1. **ALE 是 benchmark，不是自动化率预测器。** 它证明“这些 agent 在这些可验证任务上过不去”，不等于直接推出某行业岗位替代率。
+> 2. **2.6% 是 hardest tier 平均 full pass，不是整体 pass。** 顶配整体 pass 可到 20%+，Near-Term 更高；引用必须带档位。
+> 3. **deterministic-first 会选择性过滤工作。** 能被自动验收的工作更适合 ALE；高度主观、模糊、要人类品味/政治判断的工作流会在设计阶段被排除或弱化。
+> 4. **作者自报与源码可见要分开。** 论文 Table 1 是 ALE 团队自测；仓库公开了框架和公开任务，但私有任务池与全部运行细节不等于第三方已复现。
+
+## 限制与风险(Limitations and risks)
+
+- **代表性边界**：ALE 明确排除核心工作不够数字化的 sector；“55 子领域覆盖”是 non-physical / software-mediated professional work 的覆盖，不是所有职业劳动。
+- **可验证性偏置**：只要把“能自动判”放进准入门槛，就会偏向产物清楚、reference 明确、rubric 可编码的工作流。
+- **单次运行为主**：Table 1 只有部分配置有三次重复估计标准差，多数数字仍是单次/少次 run，方差和重试策略影响未完全展开。
+- **模型/harness 归因混杂**：不同 harness 的工具暴露、上下文管理、retry、并行度、GUI 桥接成熟度不同，不能把所有差异都归因给基座模型。
+- **公开题污染与运维成本**：公开 150 题会被研究者优化；ALE 要保持长期有效，必须持续征题、QC、私有轮换和 leaderboard 运维。
+- **评分可能被反向工程**：deterministic grader 比 LLM judge 稳，但也可能被针对性投机；隐藏 reference 和私有题池只是缓解，不是根治。
+
+## 先读什么(What to read first)
+
+1. **Abstract + §1 Introduction**：先理解 utility problem，以及为什么作者认为“评测错了会带偏研究方向”。[^arxiv]
+2. **§2.1-§2.3**：看三条任务准入原则、O*NET/SOC 分类、五道任务构建门。[^construction]
+3. **§3.1-§3.3**：重点读 task spec / agent / environment 三组件解耦、GCUA 五层、gate-and-score。[^pipeline]
+4. **Table 1 + §4**：只在这里集中看数字，尤其要区分 pass rate、mean score、Near-Term/Full-Spectrum/Last-Exam。[^table]
+5. **Appendix D.3-D.5**：失败 taxonomy、model vs harness、成本/时间/token 分析。[^failure]
+6. **仓库 README + `ale_run/tasks/driver.py` + 一个公开任务的 `main.py`**：把论文里的 `load/start/evaluate` 看成真实代码。[^repo]
+
+## 技术细节(选读)
+
+### 任务规格的三段生命周期
+
+**大白话**：每道题不是一段 prompt，而是一个小程序。`load()` 告诉考务系统“这题是什么、要什么机器”；`start()` 把考场布置好；agent 做完后，`evaluate()` 打分。
+
+**精确机制**：论文 §3.1 规定 task specification 是 `main.py`，含 `load()`、`start()`、`evaluate()`；仓库的公开任务如 `tasks/computing_math/os_log_permission_guard_v1/main.py` 正是这种结构。`evaluate()` 返回 `list[float]` 或 score dict，`TaskDriver.evaluate()` 再将其规范成 run result。[^pipeline]
+
+### 四目录契约与 reference 隐藏
+
+**大白话**：考试时桌上只有题目和资料，没有答案；交卷后监考员才拿标准答案来判。
+
+**精确机制**：论文给出 `input/`、`software/`、`output/`、`reference/` 四目录。项目文档进一步说明：input 在 agent 前注入，reference 在 agent 完成后注入；若使用 baked image，reference 以 encrypted `reference.7z` 存在，到 `stage_reference` 才解包。仓库 `ale_run/environments/task_data/baked_in_sandbox.py` 实现了 `stage_input()` 与 `stage_reference()`。[^repo_tasks]
+
+### gate-and-score 为什么重要
+
+**大白话**：先问“你有没有交一份能打开、能跑、没撞车的作业”，再问“质量有多好”。没过基本门，就别给“局部努力分”。
+
+**精确机制**：原文 §3.3 把评分拆成 comparison form 与 composition 两轴；gate-and-score 是最常见组合。二值 precondition 失败会把总分强制为 0，之后的连续指标才有意义。公开任务的 `task_card.json` 里也能看到这种描述，例如 OS log permission guard 要求输出 JSON、目录存在、文件模式/内容/owner/group 全符合，最后二值评分。[^eval]
+
+### GCUA 不等于 GUI agent
+
+**大白话**：会看屏幕、会点鼠标只是“眼睛”和“手指”；真实专业活还要会写脚本、读文件、跑长流程、管理上下文。
+
+**精确机制**：论文 §3.2 定义 Brain/Eyes/Body/Hands/Feet 五层。CLI-agent 通常缺 Eyes；GUI-agent 只有 Brain/Eyes 比较强，Body/Hands/Feet 浅。ALE 目标是 Generalist CUA-agent，即五层都要覆盖。GUI 接法有 GUI-as-Tool 和 GUI-as-SubAgent；主评测用 GUI-as-Tool，DeepSeek V4 这类无原生视觉输入模型才保留 GUI-as-SubAgent。[^gcua]
+
+### 防张冠李戴
+
+- **ALE-Claw 不是 ALE 本体。** ALE 是 benchmark 与评测框架；ALE-Claw 是作者实现的 in-tree reference harness，用来验证基础 GCUA 组件能追上部分前沿 harness。不要把 ALE-Claw 当论文主贡献的 agent 产品。
+- **deterministic-first 不是完全不用 LLM/VLM judge。** 原文说尽量避免 LLM-as-judge；少数视觉、视频、渲染或自由文本任务仍可用窄的 LLM/VLM probe，再由代码聚合。写成“完全没有模型判官”是错的。
+- **公开任务数、Table 任务数和仓库文件数不是同一口径。** 论文说 150 public instances；`selected_tasks/full/last-exam.txt` 当前是 35 行；宏/附录图又出现 36；仓库含 165 个 `task_card.json`。复述时说“以原文 Table / 具体文件口径为准”，不要混成一个数。
+
+## 后续演化 · 这方法后来怎样了
+
+本文 2026-06-03 提交，离本轮写作日期 2026-06-11 很近；我未找到已独立核实、明确以 ALE 为基础提出改进方法的后续论文。以下只写谱系位置，不写“后来者优化”。
+
+- **GDPval / Remote Labor Index（RLI）**：ALE 把自己定位为同样面向经济价值工作流的后继/并行路线，但用更强的自动验证和更广行业覆盖来降低人工评分依赖。_[置信度:高，原文 §5/Table 2 明示]_[^related]
+- **Terminal-Bench / SWE-bench / OSWorld / GAIA**：ALE 认为这些分别覆盖 CLI、软件工程、GUI 或一般推理的一部分面，ALE 的目标面是“GUI+CLI+真实专业软件+长程交付物”的并集。_[置信度:高，原文 §1/§5 明示]_[^related]
+- **真实前向引用**：Papers with Code 页面截至本轮检索显示 0 citations；社交媒体/媒体讨论不算方法演化。_[置信度:中，外部页面动态可能变化]_[^pwc]
+
+[^arxiv]: 论文 *Agents' Last Exam*, arXiv:2606.05405 v1, submitted 2026-06-03。https://arxiv.org/abs/2606.05405
+[^intro]: 同上，Abstract 与 §1 Introduction。
+[^counts]: 同上，Figure 2、Figure 5、`data/counts.tex` 与 §2.3：55 subdomains / 13 clusters / 960 workflows / 1,490 instances / 150 public / 1,017 private / 323 pending QC。
+[^taxonomy]: 同上，§2.2 与 related-work coverage mapping：使用 SOC 2018 / O*NET，16 个既有 benchmark 并集仍有 13/55 子领域未覆盖。
+[^construction]: 同上，§2.1-§2.3：Representativeness / Complexity / Verifiability；Expert sourcing -> Task submission -> First-pass review -> Task implementation -> Final QC。
+[^pipeline]: 同上，§3.1 与 Appendix C.1/C.2：task specification 三组件解耦、`load/start/evaluate`、四目录契约、task workflow vs task instance。
+[^gcua]: 同上，§3.2 与 Figure 7/8：Brain/Eyes/Body/Hands/Feet；GUI-as-Tool / GUI-as-SubAgent。
+[^eval]: 同上，§3.3 与 Appendix C.3：comparison form、composition、gate-and-score、deterministic-first verification 与有限 LLM/VLM probe。
+[^results]: 同上，§4 Experiment / Analysis：Terminal-Bench 对比、GUI usage、failure bottleneck、model vs harness summary、5-hour cap。
+[^table]: 同上，Table 1 `tables/main_results.tex`：主结果、成本、时间、token、重复运行标准差说明。
+[^failure]: 同上，Appendix D.3：failure taxonomy pipeline 与分布（Approach 47%、Understanding 31%、Execution 22%）。
+[^harness]: 同上，Appendix D.4：fixed OpenClaw model spread 18.0 pp；fixed backbone harness spread 6.0 / 5.3 pp。
+[^timeout]: 同上，Appendix D.2：5-hour cap；2.9% evaluated runs reached cap；timeout by tier/harness。
+[^cost]: 同上，Appendix D.5：cost/time/token efficiency observations。
+[^related]: 同上，§5 Related Work 与 Table 2。
+[^repo]: 代码仓库 `rdi-berkeley/agents-last-exam`，本轮 clone HEAD `8583037e52fec4ff100a12833ca330721a05575e`；README、`ale_run/`、`tasks/`、`selected_tasks/`、`agents/ale_claw/` 已实读。https://github.com/rdi-berkeley/agents-last-exam
+[^repo_runner]: 同上，`ale_run/orchestration/run_writer.py`、`ale_run/orchestration/lifecycle.py`、`ale_run/tasks/driver.py`。
+[^repo_tasks]: 同上，README 与 docs site `pages/tasks.html`、`pages/add-task.html`，以及源码 `ale_run/environments/task_data/baked_in_sandbox.py` / `gsbucket.py`。
+[^hf]: Hugging Face paper page，2026-06-11 浏览：#1 Paper of the day，Upvote 241，Submitted by Han on Jun 9。https://huggingface.co/papers/2606.05405
+[^pwc]: Papers with Code page for arXiv:2606.05405，2026-06-11 浏览显示 0 citations。https://paperswithcode.co/paper/2606.05405

@@ -18,7 +18,7 @@ Return strict JSON:
     "labels": ["agent|推理|工具|数据|infra"]
   },
   "intent": "understanding|teaching|tool",
-  "project_type": "ai_app|agent_framework|devtool_cli|model_infra|frontend_ui|dataset_benchmark|library_sdk|template_boilerplate|non_ai_eng"
+  "project_type": "ai_app|agent_framework|agent_skill|devtool_cli|model_infra|frontend_ui|dataset_benchmark|library_sdk|template_boilerplate|non_ai_eng"
 }
 
 Writing rules:

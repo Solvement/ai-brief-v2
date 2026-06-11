@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-06-11T12:59:28.198Z",
+  "generatedAt": "2026-06-11T14:35:27.816Z",
   "note": "L0 knowledge-graph DAG. forward_lineage = verified 'edge effect' only.",
   "stats": {
-    "nodes": 141,
-    "edges": 112,
+    "nodes": 150,
+    "edges": 118,
     "nodeByType": {
-      "paper": 42,
-      "principle": 99
+      "paper": 45,
+      "principle": 105
     },
     "edgeByType": {
-      "exhibits_principle": 87,
+      "exhibits_principle": 93,
       "shares_tag": 4,
       "forward_lineage": 21
     },
@@ -1044,6 +1044,56 @@
       "primitive_relevance": "direct_pattern_strong"
     },
     {
+      "id": "paper:2606.05922",
+      "type": "paper",
+      "arxiv_id": "2606.05922",
+      "slug": "2606.05922-retrospective-harness-optimization",
+      "title": "Evolving Agents in the Dark: Retrospective Harness Optimization via Self-Preference",
+      "date": "2026-06-04",
+      "authors": [
+        "Wenbo Pan",
+        "Shujie Liu",
+        "Chin-Yew Lin",
+        "Jingying Zeng",
+        "Xianfeng Tang",
+        "Xiangyang Zhou",
+        "Yan Lu",
+        "Xiaohua Jia"
+      ],
+      "tags": [
+        "agent-harness",
+        "self-evolving-agent",
+        "retrospective-optimization",
+        "self-preference",
+        "trajectory-rollout",
+        "dpp-coreset",
+        "self-validation",
+        "self-consistency",
+        "best-of-n",
+        "agent-eval",
+        "codex",
+        "harness-as-files"
+      ],
+      "topic": "agent-self-improvement",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 8,
+        "breadth_value": 7,
+        "evidence_quality": 7
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "retrospective-harness-optimization",
+      "external": false,
+      "primitive_relevance": "direct_pattern_strong"
+    },
+    {
       "id": "paper:2606.06087",
       "type": "paper",
       "arxiv_id": "2606.06087",
@@ -1138,6 +1188,49 @@
       "primitive": "repo-conditioned-versioned-lora-memory",
       "external": false,
       "primitive_relevance": "direct_pattern_strong"
+    },
+    {
+      "id": "paper:2606.07591",
+      "type": "paper",
+      "arxiv_id": "2606.07591",
+      "slug": "2606.07591-researchclawbench-autonomous-research",
+      "title": "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research",
+      "date": "2026-05-28",
+      "authors": [
+        "Wanghan Xu",
+        "Shuo Li",
+        "Tianlin Ye",
+        "Qinglong Cao",
+        "Yixin Chen",
+        "Hengjian Gao"
+      ],
+      "tags": [
+        "benchmark",
+        "autonomous-research",
+        "scientific-discovery",
+        "rubric-evaluation",
+        "llm-as-judge",
+        "re-discovery",
+        "research-agent"
+      ],
+      "topic": "",
+      "agent_relevant": false,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 8,
+        "transferability_to_autosci": 8,
+        "breadth_value": 7,
+        "ai_engineering_value": 6,
+        "buildability": 8,
+        "evaluation_value": 9,
+        "evidence_quality": 8
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "hidden-target-rubric-research-eval",
+      "external": false,
+      "primitive_relevance": "direct"
     },
     {
       "id": "paper:2606.09079",
@@ -1254,6 +1347,61 @@
       "primitive": "unified-interface-terminal-verified-agent-eval",
       "external": false,
       "primitive_relevance": "direct_pattern_strong"
+    },
+    {
+      "id": "paper:2606.12191",
+      "type": "paper",
+      "arxiv_id": "2606.12191",
+      "slug": "2606.12191-agentic-environment-engineering-survey",
+      "title": "Agentic Environment Engineering for Large Language Models: A Survey of Environment Modeling, Synthesis, Evaluation, and Application",
+      "date": "2026-06-10",
+      "authors": [
+        "Jiachun Li",
+        "Zhuoran Jin",
+        "Tianyi Men",
+        "Yupu Hao",
+        "Kejian Zhu",
+        "Lingshuai Wang",
+        "Dongqi Huang",
+        "Longxiang Wang",
+        "Shengjia Hua",
+        "Lu Wang",
+        "Jinshan Gao",
+        "Hongbang Yuan",
+        "Ruilin Xu",
+        "Kang Liu",
+        "Jun Zhao"
+      ],
+      "tags": [
+        "survey",
+        "agentic-environment",
+        "environment-engineering",
+        "environment-synthesis",
+        "environment-evaluation",
+        "agent-environment-coevolution",
+        "world-model",
+        "curriculum-learning",
+        "environment-as-a-service",
+        "self-evolving-agent"
+      ],
+      "topic": "agent",
+      "agent_relevant": true,
+      "status": "deep_read",
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 7,
+        "evaluation_value": 8,
+        "breadth_value": 10,
+        "evidence_quality": 6
+      },
+      "is_lineage_seed": false,
+      "seed_priority": null,
+      "primitive": "agentic-environment-engineering-lifecycle",
+      "external": false,
+      "primitive_relevance": "direct"
     },
     {
       "id": "principle:sop-over-freeform",
@@ -1838,6 +1986,60 @@
       "principle": "连续 N 轮没有新信息增量时停止；这比只设最大轮数更能防止原地打转。",
       "papers": [
         "2606.05622"
+      ]
+    },
+    {
+      "id": "principle:evolve-files-not-vibes",
+      "type": "principle",
+      "key": "evolve-files-not-vibes",
+      "principle": "自进化的更新单位必须是可 diff、可回滚的 harness 文件，而不是模糊的“模型学到了”。",
+      "papers": [
+        "2606.05922"
+      ]
+    },
+    {
+      "id": "principle:labels-are-optional-gates-are-not",
+      "type": "principle",
+      "key": "labels-are-optional-gates-are-not",
+      "principle": "没有标签时可以用自偏好代理效用，但不能跳过门控；S_j<=0 必须拒绝改动。",
+      "papers": [
+        "2606.05922"
+      ]
+    },
+    {
+      "id": "principle:diagnose-before-edit",
+      "type": "principle",
+      "key": "diagnose-before-edit",
+      "principle": "先把失败拆成 self-validation 与 self-consistency 结构化诊断，再让 optimizer 改文件；直接喂原始轨迹效果差。",
+      "papers": [
+        "2606.05922"
+      ]
+    },
+    {
+      "id": "principle:difficulty-diversity-beats-hard-only",
+      "type": "principle",
+      "key": "difficulty-diversity-beats-hard-only",
+      "principle": "优化样本要难且多样；只挑最难会聚类，只看覆盖会稀释信号。",
+      "papers": [
+        "2606.05922"
+      ]
+    },
+    {
+      "id": "principle:executable-tools-beat-text-memory-for-procedural-failures",
+      "type": "principle",
+      "key": "executable-tools-beat-text-memory-for-procedural-failures",
+      "principle": "流程性错误要沉淀成脚本或检查器；只写进记忆容易被忽略。",
+      "papers": [
+        "2606.05922"
+      ]
+    },
+    {
+      "id": "principle:self-preference-is-not-ground-truth",
+      "type": "principle",
+      "key": "self-preference-is-not-ground-truth",
+      "principle": "自偏好只能作为弱代理，敏感 harness edits 仍需独立冷审/人工批准。",
+      "papers": [
+        "2606.05922"
       ]
     },
     {
@@ -2647,6 +2849,36 @@
     {
       "source": "paper:2606.05622",
       "target": "principle:stagnation-early-stop",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05922",
+      "target": "principle:evolve-files-not-vibes",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05922",
+      "target": "principle:labels-are-optional-gates-are-not",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05922",
+      "target": "principle:diagnose-before-edit",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05922",
+      "target": "principle:difficulty-diversity-beats-hard-only",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05922",
+      "target": "principle:executable-tools-beat-text-memory-for-procedural-failures",
+      "type": "exhibits_principle"
+    },
+    {
+      "source": "paper:2606.05922",
+      "target": "principle:self-preference-is-not-ground-truth",
       "type": "exhibits_principle"
     },
     {

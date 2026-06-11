@@ -693,7 +693,7 @@ Return only a JSON object matching this schema shape:
 {
   "schema_version": "${TIER_TEMPLATE_SCHEMA_VERSION}",
   "repo": "owner/name",
-  "project_type": "agent_framework|devtool_cli|ai_app|model_infra|frontend_ui|dataset_benchmark|library_sdk|template_boilerplate|non_ai_eng",
+  "project_type": "agent_framework|agent_skill|devtool_cli|ai_app|model_infra|frontend_ui|dataset_benchmark|library_sdk|template_boilerplate|non_ai_eng",
   "tier_template": {
     "one_sentence": {"summary": "...", "body_md": "..."},
     "why_worth_attention": {"body_md": "...", "bullets": ["..."]},

@@ -21,6 +21,10 @@ const AI_TERMS_RE = /\b(ai|agent|agents|agentic|llm|rag|retrieval|mcp|model cont
 const AGENT_RE = /\b(agent|agents|agentic|multi-agent|planner|tool calling|tool use|function calling|workflow|orchestration|autonomous|coding agent|computer use|browser agent)\b/i;
 const MCP_RE = /\b(mcp|model context protocol)\b/i;
 const SKILLS_RE = /\b(skill|skills|commands?|hooks?|workflow pack|playbook)\b/i;
+const AGENT_SKILL_RE = /\b(agent[-\s]?skill|agentic skills?|skills? marketplace|meta[-\s]?skill|prompt collection|prompt collections|prompt library|system prompts?|\.claude|skill modes?|skill file|skills? for (?:ai|claude|coding agents?|real engineers)|commands? and plugins|knowledge[-\s]?work plugins?|plugins? primarily intended|specialized agents?|proven deliverables)\b/i;
+const NON_AI_ENGINEERING_RE = /\b(osint|dossier|username|vpn|tunnel(?:ing)?|dns tunnel(?:ing)?|backup|container(?:s)?|kubernetes|sbom|vulnerabilit(?:y|ies)|misconfigurations?|secrets?|textbook|pdf教材|教材|live[-\s]?chat|live chat|customer support|helpdesk|omni[-\s]?channel|collaboration platform|secure collaboration|chromium|bot detection|fingerprint)\b/i;
+const AGENT_AI_CONTEXT_RE = /\b(ai agent|agentic|llm|large language model|autonomous|tool[-\s]?calling|tool use|function calling|multi[-\s]?agent|mcp|model context protocol|coding agent|computer use|planner|agent runtime|agent framework|agent infrastructure|memory framework|rag|retrieval)\b/i;
+const STRUCTURE_INFORMING_RE = /\b(harness|memory|recall|context|taste|eval|evaluation|benchmark|scorecard|rubric|agent orchestration|orchestration|workflow|multi[-\s]?agent|mcp|model context protocol|tool[-\s]?calling|hooks?|commands?|skill modes?|meta[-\s]?skill|self[-\s]?(?:evolv|improv)|feedback loop|reflection)\b/i;
 const MODEL_RE = /\b(model|models|llm|embedding|vector|checkpoint|hugging ?face|openai|anthropic|gemini|claude|inference|rag|retrieval)\b/i;
 const EVAL_RE = /\b(eval|evals|evaluation|benchmark|test harness|leaderboard|scorecard)\b/i;
 const INSTALL_RE = /\b(install|installation|quickstart|getting started|setup|npm install|pnpm install|pip install|uv pip|cargo install|docker run|docker compose|clone|run)\b/i;
@@ -45,8 +49,9 @@ const PACKAGE_FILE_KEYS = [
   "docker_compose_yml",
   "dockerfile",
 ];
+const AI_PROJECT_TYPES = new Set(["ai_app", "agent_framework", "agent_skill", "devtool_cli", "model_infra", "frontend_ui", "dataset_benchmark", "library_sdk", "template_boilerplate"]);
 const ARCHITECTURE_IDEA_TYPES = new Set(["agent-infra", "functional", "finance_agent", "research", "devtool"]);
-const DEEP_WINDOW_SOFT_CAP = 12;
+const DEEP_WINDOW_SOFT_CAP = 2;
 const DEEP_MIN_STARS_GAINED = 3000;   // 本月新增 star 速度门(验证信号,必要不充分);旧值 20 太松→24个深扒
 const DEEP_QUALITY_THRESHOLD = 80;    // 质量分门;旧值 75 不区分
 const DEEP_ELITE_SCORE = 90;          // ≥90 精英直通(质量极高则放宽 star 速度要求)
@@ -164,6 +169,8 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
   const canonical = scoreCanonicalProject(evidence_signals);
   const signalScore = Number(scored.signal_score ?? canonical.score ?? scored.total ?? 0);
   const depthGate = depthGateForV2({ signals: evidence_signals, signalScore });
+  const project_type = depthGate.project_type || projectTypeForDepthGate(evidence_signals);
+  const informs_our_structure = informsOurStructure(evidence_signals);
   const rejection_reasons = [];
   let max_allowed_depth = "deep";
   let needs_enrichment = Boolean(evidence_signals.needs_enrichment);
@@ -190,14 +197,13 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
   if (isPlainUiWrapper(evidence_signals)) capToLight("plain_ui_wrapper_without_agent_infra_or_workflow");
   if (!canDesignTestPlan(evidence_signals)) capToLight("cannot_design_practical_test_plan");
 
-  const aiResourceOrTeaching = isAiRelevant(evidence_signals)
-    && (isResourceProject(evidence_signals) || isAwesomeCourseTutorialList(evidence_signals) || isExcludedDeepDiveIdentity(evidence_signals));
-  if (canonical.project_tier === 0 && !aiResourceOrTeaching) {
+  const aiRelevant = isAiRelevant(evidence_signals) || AI_PROJECT_TYPES.has(project_type);
+  if (canonical.project_tier === 0 && !aiRelevant) {
     max_allowed_depth = "list_only";
     rejection_reasons.push(`bucket:${canonical.project_bucket}`);
-  } else if (canonical.project_tier === 0 && aiResourceOrTeaching) {
+  } else if (canonical.project_tier === 0 && aiRelevant) {
     max_allowed_depth = minDepth(max_allowed_depth, "light");
-    rejection_reasons.push(`bucket:${canonical.project_bucket}:max_light`);
+    rejection_reasons.push(`bucket:${canonical.project_bucket}:ai_min_light`);
   }
 
   const tierDepth = depthGate.depth;
@@ -214,6 +220,9 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
     max_allowed_depth,
     final_depth,
     depth_gate_band: depthGate.band,
+    project_type,
+    informs_our_structure,
+    self_evo_eligible: Boolean(project_type === "agent_skill" && informs_our_structure && final_depth === "deep"),
     depth_band: final_depth === "analysis" ? "standard" : final_depth,
     analysis_depth: final_depth === "analysis" ? "standard" : final_depth,
     project_tier: final_project_tier,
@@ -530,29 +539,39 @@ export function scoreDeterministicSignals(inputSignals = {}) {
 function depthGateForV2({ signals, signalScore }) {
   const projectType = projectTypeForDepthGate(signals);
   const monthlyTop10 = Number(signals.ranks_by_window?.monthly) > 0 && Number(signals.ranks_by_window.monthly) <= 10;
-  const teachingOrSkill = isAwesomeCourseTutorialList(signals) || isExcludedDeepDiveIdentity(signals) || projectType === "template_boilerplate";
+  const structureInforming = informsOurStructure(signals);
+  const teachingOrResource = isAwesomeCourseTutorialList(signals) || projectType === "template_boilerplate" || (projectType !== "agent_skill" && isExcludedDeepDiveIdentity(signals));
   const architectureType = ["agent_framework", "model_infra", "ai_app"].includes(projectType);
   const standardType = ["devtool_cli", "library_sdk", "dataset_benchmark"].includes(projectType);
   const maturity = scoreDeterministicSignals(signals).subscores.maturity;
   const reasons = [`project_type:${projectType}`, `signal_score:${signalScore}`];
   const rejections = [];
 
-  if (teachingOrSkill) {
-    rejections.push("depth_gate:teaching_skill_or_resource_max_light");
-    return { band: "light", depth: "light", reasons, rejections };
+  if (teachingOrResource) {
+    rejections.push("depth_gate:teaching_resource_or_template_max_light");
+    return { band: "light", depth: "light", project_type: projectType, informs_our_structure: structureInforming, reasons, rejections };
   }
-  if ((architectureType && signalScore >= 78) || monthlyTop10 || (architectureType && hasArxivEndorsement(signals) && signalScore >= 52)) {
+  if (projectType === "agent_skill") {
+    if (structureInforming) {
+      reasons.push("depth_gate:agent_skill_informs_our_structure_deep");
+      return { band: "deep", depth: "deep", project_type: projectType, informs_our_structure: structureInforming, reasons, rejections };
+    }
+    reasons.push("depth_gate:agent_skill_light_default");
+    return { band: "light", depth: "light", project_type: projectType, informs_our_structure: structureInforming, reasons, rejections };
+  }
+  if ((architectureType && structureInforming && signalScore >= 72) || (architectureType && signalScore >= 78) || monthlyTop10 || (architectureType && hasArxivEndorsement(signals) && signalScore >= 52)) {
     if (monthlyTop10) reasons.push("depth_gate:monthly_top10_default_deep");
+    else if (structureInforming) reasons.push("deep_gate:informs_our_structure");
     else if (hasArxivEndorsement(signals)) reasons.push("deep_gate:arxiv_backed_architecture_signal");
     else reasons.push("deep_gate:architecture_type_signal_deep");
-    return { band: "deep", depth: "deep", reasons, rejections };
+    return { band: "deep", depth: "deep", project_type: projectType, informs_our_structure: structureInforming, reasons, rejections };
   }
   if ((architectureType && signalScore >= 52 && maturity >= 10) || (standardType && signalScore >= 60) || signalScore >= 72) {
     reasons.push("depth_gate:standard_threshold");
-    return { band: "standard", depth: "analysis", reasons, rejections };
+    return { band: "standard", depth: "analysis", project_type: projectType, informs_our_structure: structureInforming, reasons, rejections };
   }
   reasons.push("depth_gate:light_default");
-  return { band: "light", depth: "light", reasons, rejections };
+  return { band: "light", depth: "light", project_type: projectType, informs_our_structure: structureInforming, reasons, rejections };
 }
 
 function starVelocitySubscore(signals, reasons) {
@@ -659,8 +678,10 @@ function effectiveSourceCount(signals) {
 
 function projectTypeForDepthGate(signals) {
   const text = evidenceText(signals);
+  if (isNonAiEngineering(signals)) return "non_ai_eng";
+  if (AGENT_SKILL_RE.test([signals.repo, signals.description, signals.raw_readme, ...(signals.topics || [])].join("\n")) || (signals.has_skills && !signals.has_agents && !signals.has_mcp && !signals.has_models)) return "agent_skill";
   if (!isAiRelevant(signals)) return "non_ai_eng";
-  if (signals.has_agents || signals.has_mcp || signals.has_skills || /\b(agent framework|agent runtime|orchestration|planner|tool calling|workflow engine|memory framework)\b/i.test(text)) return "agent_framework";
+  if (signals.has_agents || signals.has_mcp || /\b(agent framework|agent runtime|orchestration|planner|tool calling|workflow engine|memory framework)\b/i.test(text)) return "agent_framework";
   if (/\b(dataset|benchmark|eval|evaluation|leaderboard|arena|test set|harness)\b/i.test(text)) return "dataset_benchmark";
   if (signals.has_cli || /\b(coding agent|devtool|developer tool|cli|command line|terminal|shell|code assistant)\b/i.test(text)) return "devtool_cli";
   if (signals.has_models || /\b(model infra|serving|inference|fine[-\s]?tun|training|checkpoint|quantization|vllm|lora|embedding service)\b/i.test(text)) return "model_infra";
@@ -761,13 +782,38 @@ function isAiRelevant(signals) {
     ...(signals.topics || []),
     ...(signals.key_files || []),
   ].join("\n");
+  if (isNonAiEngineering(signals)) return false;
   return Boolean(
     signals.has_agents
       || signals.has_mcp
       || signals.has_skills
       || signals.has_models
+      || AGENT_SKILL_RE.test(text)
       || AI_TERMS_RE.test(text),
   );
+}
+
+function isNonAiEngineering(signals) {
+  const text = [
+    signals.repo,
+    signals.description,
+    signals.raw_readme,
+    ...(signals.topics || []),
+    ...(signals.key_files || []),
+  ].join("\n");
+  return NON_AI_ENGINEERING_RE.test(text) && !AGENT_AI_CONTEXT_RE.test(text);
+}
+
+function informsOurStructure(signals) {
+  const text = [
+    signals.repo,
+    signals.description,
+    signals.raw_readme,
+    ...(signals.topics || []),
+    ...(signals.top_level_dirs || []),
+    ...(signals.key_files || []),
+  ].join("\n");
+  return STRUCTURE_INFORMING_RE.test(text) || Boolean(signals.has_mcp || signals.has_agents);
 }
 
 function hasSubstantiveCode(signals) {
