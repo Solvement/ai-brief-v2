@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T03:38:38.393Z",
+  "generatedAt": "2026-06-11T13:06:38.933Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -338,6 +338,23 @@
         "typescript"
       ],
       "file": "brief-wiki/content/compound-engineering-plugin.md"
+    },
+    {
+      "id": "content/copilotkit-copilotkit",
+      "type": "content",
+      "family": "project",
+      "slug": "copilotkit-copilotkit",
+      "title": "CopilotKit — The Frontend Stack for Agents & Generative UI. React,...",
+      "tags": [
+        "tier-2",
+        "project",
+        "agents",
+        "mcp",
+        "skills",
+        "agent-framework",
+        "typescript"
+      ],
+      "file": "brief-wiki/content/copilotkit-copilotkit.md"
     },
     {
       "id": "content/decolua-9router",
@@ -1411,6 +1428,15 @@
       "file": "brief-wiki/source-packs/compound-engineering-plugin-source-pack.md"
     },
     {
+      "id": "source-pack/copilotkit-copilotkit-source-pack",
+      "type": "source-pack",
+      "family": "project",
+      "slug": "copilotkit-copilotkit-source-pack",
+      "title": "CopilotKit — Source Pack",
+      "tags": [],
+      "file": "brief-wiki/source-packs/copilotkit-copilotkit-source-pack.md"
+    },
+    {
       "id": "source-pack/decolua-9router-source-pack",
       "type": "source-pack",
       "family": "project",
@@ -2032,6 +2058,15 @@
       "file": "brief-wiki/evidence-packs/compound-engineering-plugin-evidence-pack.md"
     },
     {
+      "id": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "type": "evidence-pack",
+      "family": "project",
+      "slug": "copilotkit-copilotkit-evidence-pack",
+      "title": "CopilotKit — Evidence Pack",
+      "tags": [],
+      "file": "brief-wiki/evidence-packs/copilotkit-copilotkit-evidence-pack.md"
+    },
+    {
       "id": "evidence-pack/decolua-9router-evidence-pack",
       "type": "evidence-pack",
       "family": "project",
@@ -2644,6 +2679,15 @@
       "file": "brief-wiki/deep-dives/compound-engineering-plugin-deep-dive.md"
     },
     {
+      "id": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "type": "deep-dive",
+      "family": "project",
+      "slug": "copilotkit-copilotkit-deep-dive",
+      "title": "CopilotKit — 深度拆解",
+      "tags": [],
+      "file": "brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+    },
+    {
       "id": "deep-dive/decolua-9router-deep-dive",
       "type": "deep-dive",
       "family": "project",
@@ -3123,6 +3167,18 @@
         "resilience"
       ],
       "file": "brief-wiki/concepts/adaptive-element-relocation.md"
+    },
+    {
+      "id": "concept/ag-ui-protocol",
+      "type": "concept",
+      "family": "project",
+      "slug": "ag-ui-protocol",
+      "title": "Ag Ui Protocol",
+      "tags": [
+        "protocol",
+        "agent-ui"
+      ],
+      "file": "brief-wiki/concepts/ag-ui-protocol.md"
     },
     {
       "id": "concept/agent-awareness-via-output-parsing",
@@ -3681,6 +3737,18 @@
         "ai-engineering"
       ],
       "file": "brief-wiki/concepts/from-scratch-ai-curriculum.md"
+    },
+    {
+      "id": "concept/generative-ui",
+      "type": "concept",
+      "family": "project",
+      "slug": "generative-ui",
+      "title": "Generative Ui",
+      "tags": [
+        "ui",
+        "agent"
+      ],
+      "file": "brief-wiki/concepts/generative-ui.md"
     },
     {
       "id": "concept/graph-investigation-loop",
@@ -5005,6 +5073,15 @@
       "file": "brief-wiki/claims/compound-engineering-plugin-main-claim.md"
     },
     {
+      "id": "claim/copilotkit-copilotkit-main-claim",
+      "type": "claim",
+      "family": "project",
+      "slug": "copilotkit-copilotkit-main-claim",
+      "title": "Copilotkit Copilotkit Main Claim",
+      "tags": [],
+      "file": "brief-wiki/claims/copilotkit-copilotkit-main-claim.md"
+    },
+    {
       "id": "claim/decolua-9router-main-claim",
       "type": "claim",
       "family": "project",
@@ -5624,6 +5701,15 @@
       "title": "Compound Engineering Plugin Repo",
       "tags": [],
       "file": "brief-wiki/artifacts/compound-engineering-plugin-repo.md"
+    },
+    {
+      "id": "artifact/copilotkit-copilotkit-repo",
+      "type": "artifact",
+      "family": "project",
+      "slug": "copilotkit-copilotkit-repo",
+      "title": "Copilotkit Copilotkit Repo",
+      "tags": [],
+      "file": "brief-wiki/artifacts/copilotkit-copilotkit-repo.md"
     },
     {
       "id": "artifact/decolua-9router-repo",
@@ -7948,6 +8034,48 @@
       "evidence": "链接出现在 brief-wiki/content/compound-engineering-plugin.md"
     },
     {
+      "from": "content/copilotkit-copilotkit",
+      "to": "source-pack/copilotkit-copilotkit-source-pack",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+    },
+    {
+      "from": "content/copilotkit-copilotkit",
+      "to": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+    },
+    {
+      "from": "content/copilotkit-copilotkit",
+      "to": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+    },
+    {
+      "from": "content/copilotkit-copilotkit",
+      "to": "concept/ag-ui-protocol",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+    },
+    {
+      "from": "content/copilotkit-copilotkit",
+      "to": "concept/generative-ui",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+    },
+    {
+      "from": "content/copilotkit-copilotkit",
+      "to": "claim/copilotkit-copilotkit-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+    },
+    {
+      "from": "content/copilotkit-copilotkit",
+      "to": "artifact/copilotkit-copilotkit-repo",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+    },
+    {
       "from": "content/decolua-9router",
       "to": "source-pack/decolua-9router-source-pack",
       "type": "references",
@@ -10066,6 +10194,12 @@
       "evidence": "链接出现在 brief-wiki/source-packs/compound-engineering-plugin-source-pack.md"
     },
     {
+      "from": "source-pack/copilotkit-copilotkit-source-pack",
+      "to": "content/copilotkit-copilotkit",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/source-packs/copilotkit-copilotkit-source-pack.md"
+    },
+    {
       "from": "source-pack/decolua-9router-source-pack",
       "to": "content/decolua-9router",
       "type": "references",
@@ -10634,6 +10768,24 @@
       "to": "content/compound-engineering-plugin",
       "type": "references",
       "evidence": "链接出现在 brief-wiki/evidence-packs/compound-engineering-plugin-evidence-pack.md"
+    },
+    {
+      "from": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "to": "claim/copilotkit-copilotkit-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/evidence-packs/copilotkit-copilotkit-evidence-pack.md"
+    },
+    {
+      "from": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "to": "artifact/copilotkit-copilotkit-repo",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/evidence-packs/copilotkit-copilotkit-evidence-pack.md"
+    },
+    {
+      "from": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "to": "content/copilotkit-copilotkit",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/evidence-packs/copilotkit-copilotkit-evidence-pack.md"
     },
     {
       "from": "evidence-pack/decolua-9router-evidence-pack",
@@ -11890,6 +12042,30 @@
       "evidence": "链接出现在 brief-wiki/deep-dives/compound-engineering-plugin-deep-dive.md"
     },
     {
+      "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "to": "concept/ag-ui-protocol",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+    },
+    {
+      "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "to": "concept/generative-ui",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+    },
+    {
+      "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "to": "content/copilotkit-copilotkit",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+    },
+    {
+      "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "to": "claim/copilotkit-copilotkit-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+    },
+    {
       "from": "deep-dive/decolua-9router-deep-dive",
       "to": "concept/openai-compatible-local-gateway",
       "type": "references",
@@ -13138,6 +13314,18 @@
       "evidence": "链接出现在 brief-wiki/concepts/adaptive-element-relocation.md"
     },
     {
+      "from": "concept/ag-ui-protocol",
+      "to": "content/copilotkit-copilotkit",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/ag-ui-protocol.md"
+    },
+    {
+      "from": "concept/ag-ui-protocol",
+      "to": "claim/copilotkit-copilotkit-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/ag-ui-protocol.md"
+    },
+    {
       "from": "concept/agent-awareness-via-output-parsing",
       "to": "content/ogulcancelik-herdr",
       "type": "references",
@@ -13640,6 +13828,18 @@
       "to": "claim/rohitg00-ai-engineering-from-scratch-main-claim",
       "type": "references",
       "evidence": "链接出现在 brief-wiki/concepts/from-scratch-ai-curriculum.md"
+    },
+    {
+      "from": "concept/generative-ui",
+      "to": "content/copilotkit-copilotkit",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/generative-ui.md"
+    },
+    {
+      "from": "concept/generative-ui",
+      "to": "claim/copilotkit-copilotkit-main-claim",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/concepts/generative-ui.md"
     },
     {
       "from": "concept/graph-investigation-loop",
@@ -14800,6 +15000,12 @@
       "evidence": "链接出现在 brief-wiki/claims/compound-engineering-plugin-main-claim.md"
     },
     {
+      "from": "claim/copilotkit-copilotkit-main-claim",
+      "to": "content/copilotkit-copilotkit",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/claims/copilotkit-copilotkit-main-claim.md"
+    },
+    {
       "from": "claim/decolua-9router-main-claim",
       "to": "content/decolua-9router",
       "type": "references",
@@ -15242,6 +15448,12 @@
       "to": "content/compound-engineering-plugin",
       "type": "references",
       "evidence": "链接出现在 brief-wiki/artifacts/compound-engineering-plugin-repo.md"
+    },
+    {
+      "from": "artifact/copilotkit-copilotkit-repo",
+      "to": "content/copilotkit-copilotkit",
+      "type": "references",
+      "evidence": "链接出现在 brief-wiki/artifacts/copilotkit-copilotkit-repo.md"
     },
     {
       "from": "artifact/decolua-9router-repo",
@@ -17539,6 +17751,83 @@
         "to": "artifact/compound-engineering-plugin-repo",
         "type": "references",
         "evidence": "链接出现在 brief-wiki/content/compound-engineering-plugin.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/copilotkit-copilotkit",
+      "target": "source-pack/copilotkit-copilotkit-source-pack",
+      "edge": {
+        "from": "content/copilotkit-copilotkit",
+        "to": "source-pack/copilotkit-copilotkit-source-pack",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/copilotkit-copilotkit",
+      "target": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "edge": {
+        "from": "content/copilotkit-copilotkit",
+        "to": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/copilotkit-copilotkit",
+      "target": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "edge": {
+        "from": "content/copilotkit-copilotkit",
+        "to": "deep-dive/copilotkit-copilotkit-deep-dive",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/copilotkit-copilotkit",
+      "target": "concept/ag-ui-protocol",
+      "edge": {
+        "from": "content/copilotkit-copilotkit",
+        "to": "concept/ag-ui-protocol",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/copilotkit-copilotkit",
+      "target": "concept/generative-ui",
+      "edge": {
+        "from": "content/copilotkit-copilotkit",
+        "to": "concept/generative-ui",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/copilotkit-copilotkit",
+      "target": "claim/copilotkit-copilotkit-main-claim",
+      "edge": {
+        "from": "content/copilotkit-copilotkit",
+        "to": "claim/copilotkit-copilotkit-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "content/copilotkit-copilotkit",
+      "target": "artifact/copilotkit-copilotkit-repo",
+      "edge": {
+        "from": "content/copilotkit-copilotkit",
+        "to": "artifact/copilotkit-copilotkit-repo",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/content/copilotkit-copilotkit.md"
       }
     },
     {
@@ -21426,6 +21715,17 @@
     },
     {
       "type": "references",
+      "source": "source-pack/copilotkit-copilotkit-source-pack",
+      "target": "content/copilotkit-copilotkit",
+      "edge": {
+        "from": "source-pack/copilotkit-copilotkit-source-pack",
+        "to": "content/copilotkit-copilotkit",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/source-packs/copilotkit-copilotkit-source-pack.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "source-pack/decolua-9router-source-pack",
       "target": "content/decolua-9router",
       "edge": {
@@ -22467,6 +22767,39 @@
         "to": "content/compound-engineering-plugin",
         "type": "references",
         "evidence": "链接出现在 brief-wiki/evidence-packs/compound-engineering-plugin-evidence-pack.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "target": "claim/copilotkit-copilotkit-main-claim",
+      "edge": {
+        "from": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+        "to": "claim/copilotkit-copilotkit-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/evidence-packs/copilotkit-copilotkit-evidence-pack.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "target": "artifact/copilotkit-copilotkit-repo",
+      "edge": {
+        "from": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+        "to": "artifact/copilotkit-copilotkit-repo",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/evidence-packs/copilotkit-copilotkit-evidence-pack.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+      "target": "content/copilotkit-copilotkit",
+      "edge": {
+        "from": "evidence-pack/copilotkit-copilotkit-evidence-pack",
+        "to": "content/copilotkit-copilotkit",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/evidence-packs/copilotkit-copilotkit-evidence-pack.md"
       }
     },
     {
@@ -24770,6 +25103,50 @@
     },
     {
       "type": "references",
+      "source": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "target": "concept/ag-ui-protocol",
+      "edge": {
+        "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+        "to": "concept/ag-ui-protocol",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "target": "concept/generative-ui",
+      "edge": {
+        "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+        "to": "concept/generative-ui",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "target": "content/copilotkit-copilotkit",
+      "edge": {
+        "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+        "to": "content/copilotkit-copilotkit",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "deep-dive/copilotkit-copilotkit-deep-dive",
+      "target": "claim/copilotkit-copilotkit-main-claim",
+      "edge": {
+        "from": "deep-dive/copilotkit-copilotkit-deep-dive",
+        "to": "claim/copilotkit-copilotkit-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/deep-dives/copilotkit-copilotkit-deep-dive.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "deep-dive/decolua-9router-deep-dive",
       "target": "concept/openai-compatible-local-gateway",
       "edge": {
@@ -27058,6 +27435,28 @@
     },
     {
       "type": "references",
+      "source": "concept/ag-ui-protocol",
+      "target": "content/copilotkit-copilotkit",
+      "edge": {
+        "from": "concept/ag-ui-protocol",
+        "to": "content/copilotkit-copilotkit",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/ag-ui-protocol.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "concept/ag-ui-protocol",
+      "target": "claim/copilotkit-copilotkit-main-claim",
+      "edge": {
+        "from": "concept/ag-ui-protocol",
+        "to": "claim/copilotkit-copilotkit-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/ag-ui-protocol.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "concept/agent-awareness-via-output-parsing",
       "target": "content/ogulcancelik-herdr",
       "edge": {
@@ -27978,6 +28377,28 @@
         "to": "claim/rohitg00-ai-engineering-from-scratch-main-claim",
         "type": "references",
         "evidence": "链接出现在 brief-wiki/concepts/from-scratch-ai-curriculum.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "concept/generative-ui",
+      "target": "content/copilotkit-copilotkit",
+      "edge": {
+        "from": "concept/generative-ui",
+        "to": "content/copilotkit-copilotkit",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/generative-ui.md"
+      }
+    },
+    {
+      "type": "references",
+      "source": "concept/generative-ui",
+      "target": "claim/copilotkit-copilotkit-main-claim",
+      "edge": {
+        "from": "concept/generative-ui",
+        "to": "claim/copilotkit-copilotkit-main-claim",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/concepts/generative-ui.md"
       }
     },
     {
@@ -30105,6 +30526,17 @@
     },
     {
       "type": "references",
+      "source": "claim/copilotkit-copilotkit-main-claim",
+      "target": "content/copilotkit-copilotkit",
+      "edge": {
+        "from": "claim/copilotkit-copilotkit-main-claim",
+        "to": "content/copilotkit-copilotkit",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/claims/copilotkit-copilotkit-main-claim.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "claim/decolua-9router-main-claim",
       "target": "content/decolua-9router",
       "edge": {
@@ -30919,6 +31351,17 @@
     },
     {
       "type": "references",
+      "source": "artifact/copilotkit-copilotkit-repo",
+      "target": "content/copilotkit-copilotkit",
+      "edge": {
+        "from": "artifact/copilotkit-copilotkit-repo",
+        "to": "content/copilotkit-copilotkit",
+        "type": "references",
+        "evidence": "链接出现在 brief-wiki/artifacts/copilotkit-copilotkit-repo.md"
+      }
+    },
+    {
+      "type": "references",
       "source": "artifact/decolua-9router-repo",
       "target": "content/decolua-9router",
       "edge": {
@@ -31697,24 +32140,24 @@
     }
   ],
   "summary": {
-    "nodes": 589,
-    "edges": 1449,
+    "nodes": 597,
+    "edges": 1470,
     "nodeByType": {
-      "content": 63,
-      "source-pack": 69,
-      "evidence-pack": 69,
-      "deep-dive": 67,
-      "concept": 131,
+      "content": 64,
+      "source-pack": 70,
+      "evidence-pack": 70,
+      "deep-dive": 68,
+      "concept": 133,
       "method": 3,
-      "claim": 69,
+      "claim": 70,
       "evidence": 3,
-      "artifact": 69,
+      "artifact": 70,
       "taste": 1,
       "paper": 34,
       "project": 11
     },
     "edgeByType": {
-      "references": 1374,
+      "references": 1395,
       "builds_on": 2,
       "shares_method": 6,
       "same_use_case": 3,
@@ -31724,7 +32167,7 @@
       "contradicts": 2
     },
     "wikilinks": {
-      "resolved": 1509,
+      "resolved": 1532,
       "unresolved": 0
     },
     "focusTags": [
@@ -31738,7 +32181,7 @@
       "agentic-search"
     ],
     "ghostCandidates": 12,
-    "references": 1374,
+    "references": 1395,
     "associativeEdges": 24,
     "crossDocEdges": 54,
     "ghosts": 19,

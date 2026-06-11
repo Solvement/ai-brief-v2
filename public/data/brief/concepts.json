@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-10T13:58:48.679Z",
+  "generatedAt": "2026-06-11T13:06:37.661Z",
   "entity": "concept",
   "directory": "concepts",
-  "count": 131,
+  "count": 133,
   "items": [
     {
       "id": "concept/adaptive-element-relocation",
@@ -48,6 +48,62 @@
         {
           "target": "claims/scrapling-main-claim",
           "raw": "[[claims/scrapling-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/ag-ui-protocol",
+      "type": "concept",
+      "slug": "ag-ui-protocol",
+      "title": "Ag Ui Protocol",
+      "file": "concepts/ag-ui-protocol.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "AG-UI Protocol",
+        "slug": "ag-ui-protocol",
+        "kind": "concept",
+        "tags": [
+          "protocol",
+          "agent-ui"
+        ],
+        "maturity": "active",
+        "first_seen_in": "copilotkit-copilotkit",
+        "related_content": [
+          "copilotkit-copilotkit"
+        ],
+        "related_concepts": [],
+        "explanation": "一种 Agent-用户交互协议，定义了 Agent 如何向前端发送消息、UI 描述、用户输入请求等。通过标准化协议，不同 Agent 框架可以复用同一套前端组件。",
+        "examples": [
+          "README 提到 Google、LangChain 等采用"
+        ],
+        "common_misunderstandings": [
+          "AG-UI 不是 UI 库本身，而是协议规范，CopilotKit 是其前端实现之一。"
+        ],
+        "open_questions": [
+          "协议的具体规范细节（外部仓库）",
+          "与 OpenAI function calling 或其他协议的异同"
+        ]
+      },
+      "body": "\n## Explanation\n\n一种 Agent-用户交互协议，定义了 Agent 如何向前端发送消息、UI 描述、用户输入请求等。通过标准化协议，不同 Agent 框架可以复用同一套前端组件。 出处:https://github.com/copilotkit/copilotkit。See [[content/copilotkit-copilotkit]]。\n\n## Supported by\n- [[claims/copilotkit-copilotkit-main-claim]]\n",
+      "excerpt": "一种 Agent-用户交互协议，定义了 Agent 如何向前端发送消息、UI 描述、用户输入请求等。通过标准化协议，不同 Agent 框架可以复用同一套前端组件。 出处:https://github.com/copilotkit/copilotkit。See [[content/copilotkit-copilotkit]]。",
+      "links": [
+        {
+          "target": "content/copilotkit-copilotkit",
+          "raw": "[[content/copilotkit-copilotkit]]"
+        },
+        {
+          "target": "claims/copilotkit-copilotkit-main-claim",
+          "raw": "[[claims/copilotkit-copilotkit-main-claim]]"
         }
       ],
       "headings": [
@@ -2499,6 +2555,63 @@
         {
           "target": "claims/rohitg00-ai-engineering-from-scratch-main-claim",
           "raw": "[[claims/rohitg00-ai-engineering-from-scratch-main-claim]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Explanation"
+        },
+        {
+          "depth": 2,
+          "text": "Supported by"
+        }
+      ]
+    },
+    {
+      "id": "concept/generative-ui",
+      "type": "concept",
+      "slug": "generative-ui",
+      "title": "Generative Ui",
+      "file": "concepts/generative-ui.md",
+      "directory": "concepts",
+      "meta": {
+        "name": "Generative UI",
+        "slug": "generative-ui",
+        "kind": "concept",
+        "tags": [
+          "ui",
+          "agent"
+        ],
+        "maturity": "active",
+        "first_seen_in": "copilotkit-copilotkit",
+        "related_content": [
+          "copilotkit-copilotkit"
+        ],
+        "related_concepts": [],
+        "explanation": "Agent 在运行时动态生成和更新 UI 组件的模式，CopilotKit 支持三种方式：静态预定义组件、声明式 JSON、开放 JSON/MCP Apps。",
+        "examples": [
+          "README 中的 generate-ui 示例链接",
+          "三种生成模式对比图"
+        ],
+        "common_misunderstandings": [
+          "生成 UI 不是指生成整个页面，而是组件级别的动态交互。",
+          "静态模式需要预定义组件映射，并非任意 UI。"
+        ],
+        "open_questions": [
+          "A2UI 和 MCP Apps 的具体实现差异和性能对比"
+        ]
+      },
+      "body": "\n## Explanation\n\nAgent 在运行时动态生成和更新 UI 组件的模式，CopilotKit 支持三种方式：静态预定义组件、声明式 JSON、开放 JSON/MCP Apps。 出处:https://github.com/copilotkit/copilotkit。See [[content/copilotkit-copilotkit]]。\n\n## Supported by\n- [[claims/copilotkit-copilotkit-main-claim]]\n",
+      "excerpt": "Agent 在运行时动态生成和更新 UI 组件的模式，CopilotKit 支持三种方式：静态预定义组件、声明式 JSON、开放 JSON/MCP Apps。 出处:https://github.com/copilotkit/copilotkit。See [[content/copilotkit-copilotkit]]。",
+      "links": [
+        {
+          "target": "content/copilotkit-copilotkit",
+          "raw": "[[content/copilotkit-copilotkit]]"
+        },
+        {
+          "target": "claims/copilotkit-copilotkit-main-claim",
+          "raw": "[[claims/copilotkit-copilotkit-main-claim]]"
         }
       ],
       "headings": [

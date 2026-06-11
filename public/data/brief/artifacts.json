@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-10T13:58:48.679Z",
+  "generatedAt": "2026-06-11T13:06:37.661Z",
   "entity": "artifact",
   "directory": "artifacts",
-  "count": 69,
+  "count": 70,
   "items": [
     {
       "id": "artifact/9router-repo",
@@ -616,6 +616,45 @@
         {
           "target": "content/compound-engineering-plugin",
           "raw": "[[content/compound-engineering-plugin]]"
+        }
+      ],
+      "headings": [
+        {
+          "depth": 2,
+          "text": "Artifact audit"
+        }
+      ]
+    },
+    {
+      "id": "artifact/copilotkit-copilotkit-repo",
+      "type": "artifact",
+      "slug": "copilotkit-copilotkit-repo",
+      "title": "Copilotkit Copilotkit Repo",
+      "file": "artifacts/copilotkit-copilotkit-repo.md",
+      "directory": "artifacts",
+      "meta": {
+        "slug": "copilotkit-copilotkit-repo",
+        "kind": "artifact",
+        "content": "copilotkit-copilotkit",
+        "artifact_type": "repo",
+        "url": "https://github.com/CopilotKit/CopilotKit",
+        "official_or_third_party": "official",
+        "status": "available",
+        "license": "MIT",
+        "runnable": "yes",
+        "missing_parts": [
+          "测试代码",
+          "自学习代理的具体实现架构",
+          "AG-UI 协议规范本身（链接至外部仓库）"
+        ],
+        "last_checked": "2026-06-11"
+      },
+      "body": "\n## Artifact audit\n\n仓库包含完整的源码、文档、示例，以及用于多个前端包的 monorepo。提供了创建脚手架和安装编码代理技能的 CLI。缺少测试，自学习部分为早期访问。\n\n出处:https://github.com/copilotkit/copilotkit。See [[content/copilotkit-copilotkit]]。\n",
+      "excerpt": "仓库包含完整的源码、文档、示例，以及用于多个前端包的 monorepo。提供了创建脚手架和安装编码代理技能的 CLI。缺少测试，自学习部分为早期访问。",
+      "links": [
+        {
+          "target": "content/copilotkit-copilotkit",
+          "raw": "[[content/copilotkit-copilotkit]]"
         }
       ],
       "headings": [
