@@ -1,6 +1,7 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizeProjectMindPalace } from "./project-facet.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -271,6 +272,7 @@ function renderDeepDive(ctx) {
     light_spine: deepDive.light_spine,
     authoring: deepDive.authoring,
     reasoning_trace: deepDive.reasoning_trace,
+    mind_palace: deepDive.mind_palace,
     project_verdict: deepDive.project_verdict,
     next_actions: deepDive.next_actions,
     unknowns: deepDive.unknowns,
@@ -773,6 +775,7 @@ function normalizeProjectDeepDive(input = {}, { repo, audit, evidence, triage, c
     risks,
     next_actions: normalizeStringArray(input.next_actions).length ? normalizeStringArray(input.next_actions) : normalizeStringArray(lightSpine?.judgment?.action).length ? normalizeStringArray(lightSpine.judgment.action) : nextActionsFromVerdict(projectVerdict.verdict),
     memory_card: normalizeMemoryCard(input.memory_card, projectType),
+    mind_palace: normalizeProjectMindPalace(input) || undefined,
     reasoning_trace: normalizeReasoningTrace(input.reasoning_trace, { repo, projectType, claimLedger, risks }),
     project_type: projectType,
     project_verdict: projectVerdict,

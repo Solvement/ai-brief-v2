@@ -5,6 +5,11 @@ import { fileURLToPath } from "node:url";
 import { fetchWithRetry } from "../../lib/http.mjs";
 import { BOOST_TERMS } from "../../lib/project-ranking.mjs";
 import { scrapeTrendingBoard } from "../../lib/github-trending.mjs";
+import {
+  filterNewProjectCandidates,
+  readProjectLedger,
+  writeProjectLedger,
+} from "./ledger.mjs";
 
 export { fetchWithRetry, isTransientNetworkError } from "../../lib/http.mjs";
 
@@ -20,6 +25,9 @@ const DEFAULT_ELITE_MIN_MONTHLY_STARS = 1500;
 const DEFAULT_ELITE_MIN_SOURCE_COUNT = 2;
 const DEFAULT_HN_MIN_POINTS = 50;
 const DEFAULT_HN_VALIDATION_LIMIT = 60;
+const DEFAULT_HN_SOURCE_LIMIT = 40;
+const DEFAULT_GITHUB_GROWTH_LIMIT = 4;
+const DEFAULT_HF_SOURCE_LIMIT = 12;
 const SEARCH_TERMS = ["agent", "rag", "mcp", "a2a", "memory", "eval", "ai coding", "coding agent"];
 const DEFAULT_USER_AGENT = "Mozilla/5.0 ai-brief-projects/0.3";
 const GITHUB_API_BASE = "https://api.github.com";
@@ -92,6 +100,7 @@ export async function discover(ctx = {}) {
   const options = ctx.options || {};
   const trendingBoardLimit = numberOption(options.boardLimit, DEFAULT_TRENDING_BOARD_LIMIT);
   const topicLimit = numberOption(options.topicLimit, 0);
+  const growthSearchLimit = numberOption(options.growthSearchLimit, DEFAULT_GITHUB_GROWTH_LIMIT);
   const offline = isOffline(options);
   const discoveredAt = nowIso(options);
   const rows = [];
@@ -100,19 +109,26 @@ export async function discover(ctx = {}) {
     rows.push(...await loadOfflineTrending({ limit: trendingBoardLimit, discoveredAt }));
   } else {
     rows.push(...await discoverTrending({ limit: trendingBoardLimit, discoveredAt, logger: ctx.logger }));
+    rows.push(...await discoverHackerNewsSource({ limit: numberOption(options.hnSourceLimit, DEFAULT_HN_SOURCE_LIMIT), discoveredAt, logger: ctx.logger, options }));
+    if (growthSearchLimit > 0) rows.push(...await discoverGrowthSearch({ topicLimit: growthSearchLimit, discoveredAt, logger: ctx.logger, options }));
     if (topicLimit > 0) rows.push(...await discoverTopicSearch({ topicLimit, discoveredAt, logger: ctx.logger, options }));
+    if (options.hfSource || process.env.PROJECTS_HF_SOURCE === "1") rows.push(...await discoverHuggingFaceLinkedRepos({ limit: numberOption(options.hfSourceLimit, DEFAULT_HF_SOURCE_LIMIT), discoveredAt, logger: ctx.logger, options }));
   }
 
-  const mergedCandidates = mergeCandidates(rows);
-  const eliteCandidates = options.eliteSelection === false
-    ? mergedCandidates
-    : await applyEliteSelection(mergedCandidates, { options, logger: ctx.logger, offline });
   const deepDivedRepos = readBriefWikiDeepDivedProjectRepos(options.briefWikiContentDir || BRIEF_WIKI_CONTENT);
+  const mergedCandidates = mergeCandidates(rows).map((candidate) => annotateKnownDeepDive(candidate, deepDivedRepos));
+  const ledger = await readProjectLedger(options.projectLedgerFile);
+  const { accepted: ledgerCandidates, skipped } = filterNewProjectCandidates(mergedCandidates, ledger, { seenAt: discoveredAt });
+  await writeProjectLedger(ledger, options.projectLedgerFile);
+  const eliteCandidates = options.eliteSelection === false
+    ? ledgerCandidates
+    : await applyEliteSelection(ledgerCandidates, { options, logger: ctx.logger, offline });
   const discoveryCap = options.cap == null ? null : numberOption(options.cap, null);
-  const candidates = eliteCandidates.map((candidate) => annotateKnownDeepDive(candidate, deepDivedRepos)).slice(0, discoveryCap || undefined);
+  const candidates = eliteCandidates.slice(0, discoveryCap || undefined);
   const reused = candidates.filter((candidate) => candidate.raw?.alreadyDeepDived).length;
   const capped = eliteCandidates.length - candidates.length;
   if (reused) ctx.logger?.info?.(`projects discover reused ${reused} already deep-dived repo(s) from brief-wiki`);
+  if (skipped.length) ctx.logger?.info?.(`projects discover ledger skipped ${skipped.length} done repo(s)`);
   if (options.eliteSelection !== false) ctx.logger?.info?.(`projects discover elite selected ${eliteCandidates.length}/${mergedCandidates.length} repo(s)`);
   if (capped) ctx.logger?.info?.(`projects discover capped ${capped} repo(s) by --cap debug limit`);
   if (options.db) {
@@ -617,6 +633,13 @@ export function buildEvidenceSignals(repo = {}, {
     stars_today: Number(repo.starsGained ?? repo.stars_today ?? repo.starsToday) || 0,
     stars_in_period: Number(repo.starsGained ?? repo.stars_today ?? repo.starsToday) || 0,
     stars_gained_by_window: repo.starsGainedByWindow || {},
+    ranks_by_window: repo.ranksByWindow || {},
+    source_provenance: Array.isArray(repo.provenance) ? repo.provenance : [],
+    source_count: sourceFamilyCount(repo.provenance, source),
+    hn_points: maxMetric(repo.provenance, "hn_points"),
+    hn_comments: maxMetric(repo.provenance, "hn_comments"),
+    hf_likes: maxMetric(repo.provenance, "hf_likes"),
+    hf_downloads: maxMetric(repo.provenance, "hf_downloads"),
     language: repo.language || artifactAudit.language || "",
     topics,
     description: repo.description || artifactAudit.description || artifactAudit.repo_description || "",
@@ -633,6 +656,7 @@ export function buildEvidenceSignals(repo = {}, {
     has_docs: hasDocs,
     has_examples: hasExamples,
     has_tests: boolAudit(artifactAudit.has_tests),
+    has_ci: boolAudit(artifactAudit.has_ci),
     has_install: hasInstall,
     has_docker: hasDocker,
     has_cli: hasCli,
@@ -860,8 +884,160 @@ async function discoverTopicSearch({ topicLimit, discoveredAt, logger, options }
   return rows;
 }
 
-async function searchGitHubRepos(term, { limit, options }) {
-  const query = searchQueryForTerm(term);
+async function discoverGrowthSearch({ topicLimit, discoveredAt, logger, options }) {
+  const rows = [];
+  for (const term of SEARCH_TERMS) {
+    try {
+      const repos = await searchGitHubRepos(term, { limit: topicLimit, options, growth: true });
+      repos.forEach((repo, index) => {
+        rows.push(toCandidate(repo, {
+          source: `github-search-growth:${term}`,
+          window: null,
+          rank: 2000 + rows.length + index,
+          discoveredAt,
+          sourceTerm: term,
+          provenanceMetrics: {
+            query: growthSearchQueryForTerm(term, options),
+            search_sort: "stars",
+          },
+        }));
+      });
+    } catch (error) {
+      logger?.warn?.(`GitHub growth search "${term}" failed: ${error.message}`);
+    }
+  }
+  return rows;
+}
+
+async function discoverHackerNewsSource({ limit, discoveredAt, logger, options }) {
+  const rows = [];
+  const queries = [
+    { label: "show-hn", query: "Show HN github.com" },
+    { label: "github", query: "github.com" },
+  ];
+  for (const query of queries) {
+    try {
+      const hits = await searchHackerNewsGithubMentions(query.query, { limit, options });
+      hits.forEach((hit, index) => {
+        for (const fullName of extractGithubRepoFullNames(`${hit.url || ""}\n${hit.title || ""}\n${hit.story_text || ""}`)) {
+          rows.push(toCandidate({
+            fullName,
+            url: `https://github.com/${fullName}`,
+            description: hit.title || null,
+            stars: 0,
+            forks: 0,
+            starsGained: 0,
+          }, {
+            source: `hacker-news:${query.label}`,
+            window: null,
+            rank: 3000 + rows.length + index,
+            discoveredAt,
+            sourceTerm: query.query,
+            provenanceMetrics: {
+              hn_object_id: String(hit.objectID || ""),
+              hn_points: Number(hit.points) || 0,
+              hn_comments: Number(hit.num_comments) || 0,
+              hn_title: String(hit.title || hit.story_title || ""),
+              hn_url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
+            },
+          }));
+        }
+      });
+    } catch (error) {
+      logger?.warn?.(`HN source "${query.label}" failed: ${error.message}`);
+    }
+  }
+  return rows;
+}
+
+async function searchHackerNewsGithubMentions(query, { limit, options }) {
+  const url = new URL("https://hn.algolia.com/api/v1/search_by_date");
+  url.searchParams.set("query", query);
+  url.searchParams.set("tags", "story");
+  url.searchParams.set("hitsPerPage", String(limit));
+  const response = await fetchWithRetry(url, {
+    headers: { accept: "application/json", "user-agent": options.userAgent || DEFAULT_USER_AGENT },
+  }, {
+    logger: options.logger,
+    label: `hn source ${query}`,
+    retries: numberOption(options.externalRetries, 1),
+    timeoutMs: numberOption(options.externalTimeoutMs, 8000),
+    fetchImpl: options.fetchImpl || globalThis.fetch,
+  });
+  if (!response.ok) throw new Error(`HN API ${response.status}`);
+  const data = await response.json();
+  return (data.hits || [])
+    .filter((hit) => Number(hit.points) >= numberOption(options.hnSourceMinPoints, 10) || /^show hn/i.test(String(hit.title || hit.story_title || "")))
+    .slice(0, limit);
+}
+
+async function discoverHuggingFaceLinkedRepos({ limit, discoveredAt, logger, options }) {
+  try {
+    const models = await fetchHuggingFaceTrendingModels({ limit, options });
+    const rows = [];
+    for (const model of models) {
+      const repos = extractGithubRepoFullNames(`${model.cardText || ""}\n${model.github || ""}`).slice(0, 2);
+      for (const fullName of repos) {
+        rows.push(toCandidate({
+          fullName,
+          url: `https://github.com/${fullName}`,
+          description: `Linked from Hugging Face trending model ${model.id}`,
+          stars: 0,
+          forks: 0,
+          starsGained: 0,
+        }, {
+          source: "huggingface-linked-repo",
+          window: null,
+          rank: 4000 + rows.length,
+          discoveredAt,
+          sourceTerm: model.id,
+          provenanceMetrics: {
+            hf_model: model.id,
+            hf_likes: model.likes,
+            hf_downloads: model.downloads,
+          },
+        }));
+      }
+    }
+    return rows;
+  } catch (error) {
+    logger?.warn?.(`HF linked repo source skipped: ${error.message}`);
+    return [];
+  }
+}
+
+async function fetchHuggingFaceTrendingModels({ limit, options }) {
+  const url = new URL("https://huggingface.co/api/models");
+  url.searchParams.set("sort", "trending");
+  url.searchParams.set("direction", "-1");
+  url.searchParams.set("limit", String(limit));
+  const response = await fetchWithRetry(url, {
+    headers: { accept: "application/json", "user-agent": options.userAgent || DEFAULT_USER_AGENT },
+  }, {
+    logger: options.logger,
+    label: "hf trending models",
+    retries: numberOption(options.externalRetries, 1),
+    timeoutMs: numberOption(options.externalTimeoutMs, 10000),
+    fetchImpl: options.fetchImpl || globalThis.fetch,
+  });
+  if (!response.ok) throw new Error(`HF API ${response.status}`);
+  const models = await response.json();
+  return (Array.isArray(models) ? models : []).map((model) => ({
+    id: String(model.id || model.modelId || ""),
+    likes: Number(model.likes) || 0,
+    downloads: Number(model.downloads) || 0,
+    github: model.cardData?.github || "",
+    cardText: [
+      model.cardData?.github,
+      model.cardData?.repository,
+      model.cardData?.repo,
+      ...(Array.isArray(model.tags) ? model.tags : []),
+    ].filter(Boolean).join("\n"),
+  })).filter((model) => model.id);
+}
+
+async function searchGitHubRepos(term, { limit, options, growth = false }) {
+  const query = growth ? growthSearchQueryForTerm(term, options) : searchQueryForTerm(term);
   const url = new URL("https://api.github.com/search/repositories");
   url.searchParams.set("q", query);
   url.searchParams.set("sort", "stars");
@@ -897,6 +1073,19 @@ function searchQueryForTerm(term) {
   const normalized = term.toLowerCase();
   if (/^[a-z0-9-]+$/.test(normalized)) return `topic:${normalized} stars:>50`;
   return `"${term}" in:name,description,readme stars:>50`;
+}
+
+function growthSearchQueryForTerm(term, options = {}) {
+  const createdAfter = isoDateDaysAgo(numberOption(options.growthSearchDays, 90));
+  const minStars = numberOption(options.growthSearchMinStars, 300);
+  const normalized = term.toLowerCase();
+  const focus = /^[a-z0-9-]+$/.test(normalized) ? `topic:${normalized}` : `"${term}" in:name,description,readme`;
+  return `${focus} created:>${createdAfter} stars:>${minStars}`;
+}
+
+function isoDateDaysAgo(days) {
+  const date = new Date(Date.now() - Math.max(1, days) * 86400000);
+  return date.toISOString().slice(0, 10);
 }
 
 async function loadOfflineTrending({ limit, discoveredAt }) {
@@ -936,11 +1125,24 @@ function fallbackRows(discoveredAt) {
   ];
 }
 
-function toCandidate(repo, { source, window, rank, discoveredAt, sourceTerm = null }) {
+function toCandidate(repo, { source, window, rank, discoveredAt, sourceTerm = null, provenanceMetrics = {} }) {
   const fullName = String(repo.fullName || repo.full_name || "").trim();
   const [ownerFromName, nameFromFull] = fullName.split("/");
   const owner = repo.owner || ownerFromName;
   const name = repo.name || nameFromFull;
+  const provenance = [{
+    source,
+    seen_at: discoveredAt,
+    ...(window ? { window } : {}),
+    ...(rank ? { rank } : {}),
+    ...(sourceTerm ? { query: sourceTerm } : {}),
+    metrics: {
+      stars: Number(repo.stars) || 0,
+      forks: Number(repo.forks) || 0,
+      stars_gained: Number(repo.starsGained) || 0,
+      ...provenanceMetrics,
+    },
+  }];
   const raw = normalizeRepo({
     ...repo,
     fullName,
@@ -955,6 +1157,7 @@ function toCandidate(repo, { source, window, rank, discoveredAt, sourceTerm = nu
     currentRanksByWindow: window ? { [window]: rank } : {},
     currentStarsGainedByWindow: window ? { [window]: Number(repo.starsGained) || 0 } : {},
     sourceTerms: sourceTerm ? [sourceTerm] : [],
+    provenance,
     boostTerms: BOOST_TERMS,
   });
 
@@ -995,6 +1198,7 @@ function mergeRepoRaw(left, right) {
     currentWindows: unique([...(left.currentWindows || []), ...(right.currentWindows || [])]),
     currentRanksByWindow: { ...(left.currentRanksByWindow || {}), ...(right.currentRanksByWindow || {}) },
     currentStarsGainedByWindow: { ...(left.currentStarsGainedByWindow || {}), ...(right.currentStarsGainedByWindow || {}) },
+    provenance: mergeProvenance(left.provenance, right.provenance),
     stars: Math.max(Number(left.stars) || 0, Number(right.stars) || 0),
     forks: Math.max(Number(left.forks) || 0, Number(right.forks) || 0),
     starsGained: Math.max(Number(left.starsGained) || 0, Number(right.starsGained) || 0),
@@ -1032,6 +1236,7 @@ function normalizeRepo(repo) {
     currentRanksByWindow: repo.currentRanksByWindow || {},
     currentStarsGainedByWindow: repo.currentStarsGainedByWindow || {},
     sourceTerms: repo.sourceTerms || [],
+    provenance: Array.isArray(repo.provenance) ? repo.provenance : [],
     communityValidation: repo.communityValidation || null,
     eliteSelection: repo.eliteSelection || null,
   };
@@ -1039,6 +1244,48 @@ function normalizeRepo(repo) {
 
 function mergeSource(left, right) {
   return unique(String(left || "").split("+").concat(String(right || "").split("+")).filter(Boolean)).join("+");
+}
+
+function mergeProvenance(left = [], right = []) {
+  const byKey = new Map();
+  for (const item of [...arrayValue(left), ...arrayValue(right)]) {
+    if (!item || typeof item !== "object") continue;
+    const source = String(item.source || "").trim();
+    if (!source) continue;
+    const key = `${source}|${item.window || ""}|${item.query || ""}|${item.rank || ""}`;
+    byKey.set(key, { ...byKey.get(key), ...item, source });
+  }
+  return [...byKey.values()];
+}
+
+function extractGithubRepoFullNames(text) {
+  const out = new Set();
+  const re = /github\.com[/:]([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)(?:\.git)?/gi;
+  let match;
+  while ((match = re.exec(String(text || "")))) {
+    const owner = match[1];
+    const repo = match[2].replace(/[).,\]'"}]+$/g, "");
+    const fullName = normalizeRepoFullName(`${owner}/${repo}`);
+    if (fullName && !/^(topics|trending|marketplace|features|collections|settings|login|signup)$/i.test(repo)) out.add(fullName);
+  }
+  return [...out];
+}
+
+function sourceFamilyCount(provenance = [], fallbackSource = "") {
+  const families = new Set();
+  for (const source of [...arrayValue(provenance).map((item) => item?.source), fallbackSource]) {
+    const value = String(source || "");
+    if (value.startsWith("github-trending")) families.add("github-trending");
+    else if (value.startsWith("hacker-news")) families.add("hacker-news");
+    else if (value.startsWith("github-search")) families.add("github-search");
+    else if (value.startsWith("huggingface")) families.add("huggingface");
+    else if (value) families.add(value.split(":")[0]);
+  }
+  return families.size;
+}
+
+function maxMetric(provenance = [], key) {
+  return Math.max(0, ...arrayValue(provenance).map((item) => Number(item?.metrics?.[key]) || 0));
 }
 
 function parseFrontmatter(text) {

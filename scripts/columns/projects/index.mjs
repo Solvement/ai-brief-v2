@@ -223,6 +223,8 @@ export async function analyze(item, evidence, ctx = {}) {
     paths: generated.paths,
     entitySlugs: generated.entitySlugs,
     autosciPrimitive: generated.autosciPrimitive || null,
+    mind_palace: generated.mind_palace || null,
+    kgIngestQueue: generated.kgIngestQueue || null,
     offline: generated.offline,
     model: generated.model,
     triage: summarizeTriage(triage),
@@ -465,6 +467,7 @@ export function enrichFromDb(db, candidate) {
       bucket: briefWiki?.depth_decision?.project_bucket || briefWiki?.depth_decision?.bucket || mergedLight.project_bucket || mergedLight.bucket,
       model_tier: briefWiki?.depth_decision?.model_tier || mergedLight.model_tier || modelForProjectTier(briefTier),
       requires_manual_confirmation: Boolean(briefWiki?.depth_decision?.requires_manual_confirmation || mergedLight.requires_manual_confirmation || briefTier === 3),
+      mind_palace: briefWiki?.mind_palace || mergedLight.mind_palace || null,
     };
     mergedLight.depth_decision = {
       ...(mergedLight.depth_decision || {}),
@@ -680,6 +683,8 @@ function repoForBoard(item, window, rank, options = {}) {
     ranking_score: rankingScore,
     max_allowed_depth: light.max_allowed_depth || depthDecision.max_allowed_depth || "list_only",
     final_depth: finalDepth,
+    depth_band: light.depth_band || depthDecision.depth_band || (finalDepth === "analysis" ? "standard" : finalDepth),
+    analysis_depth: light.analysis_depth || depthDecision.analysis_depth || (finalDepth === "analysis" ? "standard" : finalDepth),
     project_tier: Number(light.project_tier ?? depthDecision.project_tier ?? projectTierForDepth(finalDepth)),
     project_tier_label: light.project_tier_label || depthDecision.project_tier_label || `Tier ${projectTierForDepth(finalDepth)}`,
     project_bucket: light.project_bucket || light.bucket || depthDecision.project_bucket || depthDecision.bucket || "无关类",
@@ -699,6 +704,7 @@ function repoForBoard(item, window, rank, options = {}) {
     communityValidation: repo.communityValidation || null,
     eliteSelection: repo.eliteSelection || null,
   };
+  if (light.mind_palace) out.mind_palace = light.mind_palace;
   if (light.project_type) out.project_type = light.project_type;
   if (light.verdict) out.verdict = light.verdict;
   if (light.ratings) out.ratings = light.ratings;
@@ -789,6 +795,8 @@ function recordBriefWikiBookkeeping({ db, ctx = {}, candidate = {}, evidence = {
     review: generated.review || null,
     paths: generated.paths,
     entitySlugs: generated.entitySlugs,
+    mind_palace: generated.mind_palace || null,
+    kgIngestQueue: generated.kgIngestQueue || null,
     offline: generated.offline,
     triage: summarizeTriage(triage),
     artifactAudit: evidence?.artifactAudit || evidence?.metadata?.artifactAudit || null,
@@ -866,6 +874,8 @@ function publicDepthDecision(light = {}) {
     ranking_score: Number(light.ranking_score ?? decision.ranking_score ?? light.worthDeepDive ?? 0),
     max_allowed_depth: light.max_allowed_depth || decision.max_allowed_depth || "list_only",
     final_depth: light.final_depth || decision.final_depth || "list_only",
+    depth_band: light.depth_band || decision.depth_band || ((light.final_depth || decision.final_depth) === "analysis" ? "standard" : light.final_depth || decision.final_depth || "light"),
+    analysis_depth: light.analysis_depth || decision.analysis_depth || ((light.final_depth || decision.final_depth) === "analysis" ? "standard" : light.final_depth || decision.final_depth || "light"),
     ranking_reasons: Array.isArray(light.ranking_reasons) ? light.ranking_reasons : decision.ranking_reasons || [],
     rejection_reasons: Array.isArray(light.rejection_reasons) ? light.rejection_reasons : decision.rejection_reasons || [],
     recommended_action: light.recommended_action || decision.recommended_action || "monitor",

@@ -42,6 +42,7 @@ export interface DeepDive {
 }
 
 export type ProjectDepth = "list_only" | "light" | "analysis" | "deep" | "needs_enrichment";
+export type ProjectDepthBand = "list_only" | "light" | "standard" | "deep" | "needs_enrichment";
 export type ProjectTier = 0 | 1 | 2 | 3;
 
 /** Per-tier structured fields from the project-radar tier paradigm (2026-06-03). */
@@ -92,6 +93,8 @@ export interface AnalyzedRepo extends RepoSummary {
   deep?: DeepDive;
   // ---- 2026-06-03 deterministic radar fields (project-radar-paradigm) ----
   final_depth?: ProjectDepth;
+  depth_band?: ProjectDepthBand;
+  analysis_depth?: ProjectDepthBand;
   ranking_score?: number;
   max_allowed_depth?: ProjectDepth;
   recommended_action?: string;
@@ -102,6 +105,7 @@ export interface AnalyzedRepo extends RepoSummary {
   review_issues?: string[];
   evidence_summary?: string | Record<string, unknown>;
   depth_decision?: Record<string, unknown>;
+  mind_palace?: ProjectMindPalaceFacet;
   briefSlug?: string;
   brief_slug?: string;
   // ---- 2026-06-03 tier paradigm (replaces light_spine) ----
@@ -112,6 +116,22 @@ export interface AnalyzedRepo extends RepoSummary {
   tier_tag?: string;
   requires_manual_confirmation?: boolean;
   tier_template?: ProjectTierTemplate;
+}
+
+export interface ProjectMindPalaceFacet {
+  problem_solved: string;
+  discovery_trace?: "数据不足" | {
+    hypothesis?: string;
+    failed_attempts?: string[];
+    source_span: string;
+  };
+  method: string;
+  self_evo_use: string;
+  core_concepts: Array<{
+    name: string;
+    role: "primary" | "supporting" | "mentioned";
+    evidence: string;
+  }>;
 }
 
 export interface Board {

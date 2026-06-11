@@ -9,6 +9,7 @@ import { parseJson } from "../../lib/llm.mjs";
 import { publishBriefMirror, isBriefWikiAnalysisCompleted, isProjectAlreadyDeepDived } from "./brief-pipeline.mjs";
 import { writeProjectBriefWikiEntities } from "./brief-writer.mjs";
 import { emitProjectAutoSciPrimitive } from "./autosci-primitives.mjs";
+import { enqueueProjectKgIngest, normalizeProjectMindPalace } from "./project-facet.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -321,6 +322,17 @@ export async function authorOneDeepDive(record, options = {}) {
   console.log(`codex deep-dive AutoSci primitives ${repoLabel}: 本次抽取 ${autosciPrimitiveCount} 条原语`);
 
   const generatedAt = nowIso(options);
+  const projectMindPalace = normalizeProjectMindPalace(payload);
+  const kgIngestQueue = projectMindPalace
+    ? await enqueueProjectKgIngest({
+        repo,
+        slug: written.slug,
+        mindPalace: projectMindPalace,
+        sourceFile: written.paths?.deepDive || "",
+        generatedAt,
+        queueFile: options.projectKgQueueFile,
+      })
+    : null;
   const dbPayload = {
     repo: repoLabel,
     slug: written.slug,
@@ -331,6 +343,8 @@ export async function authorOneDeepDive(record, options = {}) {
     triage: summarizeTriage(triage),
     artifactAudit: record.evidence?.artifactAudit || record.evidence?.metadata?.artifactAudit || null,
     authoring: payload.authoring,
+    mind_palace: projectMindPalace,
+    kgIngestQueue,
     rawPayload: relativeToRoot(rawJsonPath),
     autosciPrimitive,
     autosciPrimitiveCount,
@@ -388,6 +402,7 @@ function normalizeCodexPayload(input = {}, { repo, invocation, responsePath, pro
   return {
     ...input,
     tier_template: normalizeAuthorTierTemplate(input.tier_template || input.tierTemplate),
+    mind_palace: normalizeProjectMindPalace(input),
     schema_version: input.schema_version || TIER_TEMPLATE_SCHEMA_VERSION,
     project_type: input.project_type || input.projectType,
     authoring: {
@@ -698,6 +713,15 @@ Return only a JSON object matching this schema shape:
     ],
     "judgment": {"action": "skip|watch|read-docs|clone-and-run|extract-pattern", "ratings": {"相关度": 1, "工程深度": 1, "复用价值": 1, "成熟度": 1}, "body_md": "..."}
   },
+  "mind_palace": {
+    "problem_solved": "这个项目解决的真实问题; 不知道写 数据不足",
+    "discovery_trace": "数据不足 或 {\"hypothesis\":\"设计动机\", \"failed_attempts\":[\"被否定的替代方案\"], \"source_span\":\"README/docs/issue/PR/blog 的具体锚点\"}",
+    "method": "机制链 + 一个 Mermaid 图; 只写源码/README/docs 支撑的内容",
+    "self_evo_use": "三段都必须出现: 记忆: ... 理解: ... 自进化: ...",
+    "core_concepts": [
+      {"name": "规范概念名", "role": "primary|supporting|mentioned", "evidence": "逐字短语 + 文件/章节锚"}
+    ]
+  },
   "concepts": [
     {"slug": "lowercase-hyphen", "name": "...", "explanation": "...", "tags": ["..."], "maturity": "stable|active|emerging|deprecated", "examples": ["..."], "common_misunderstandings": ["..."], "open_questions": ["..."]}
   ],
@@ -710,6 +734,7 @@ Concreteness contract:
 - "comparison" is required for Tier 3 horizontal judgment. Name at least 2 concrete alternatives, predecessors, or common practices, not vague labels like "similar systems". For each, state a real difference dimension (retrieval mechanism, integration path, self-hosting, license, maturity, workflow fit, or equivalent) and the tradeoff for building AI applications: when to pick this project, and when to pick the alternative. If a competitor capability is only vendor/project claimed or not independently verified, mark it as self-claimed/unverified. If you cannot find a directly comparable alternative, write "未找到直接可比同类" and describe the searched scope; do not invent competitors or numbers.
 - "key_claims_evidence.items" must make each claim concrete: state the literal mechanism, number, config, path, command, or example that supports it. Do not write abstract claims like "provides governance capabilities" unless you also quote what it literally does and where.
 - "tier_template.core_concepts" is a required Tier 3 standard piece (KG-2 paradigm): emit 3-5 LOAD-BEARING concepts, each {name, role: primary|supporting, evidence}. A concept is load-bearing only if removing it makes the project's core paradigm collapse; marketing words, generic buzzwords (e.g. "AI", "fast", "easy"), and undocumented features are NOT concepts. Each concept MUST appear in the actual README/source/docs (not invented) and its evidence MUST quote the source wording verbatim plus a file/section anchor (来源：...). Use a stable canonical name (中文优先) so the same concept matches across files — these feed the Mind Palace core-concept gate and are the project-side anchor for paper↔project edge judging. If you cannot find 3 genuinely load-bearing documented concepts, emit fewer rather than padding.
+- "mind_palace" is the project facet hook for KG ingest. It must include problem_solved / discovery_trace / method / self_evo_use / core_concepts. self_evo_use must explicitly cover 记忆、理解、自进化. discovery_trace must be 数据不足 unless the repo/docs/issues/PRs/blogs really show the design motivation path; non-empty discovery_trace requires source_span. core_concepts must be 3-5 objects with role primary|supporting|mentioned and evidence anchored in real source text.
 - Actively pull real snippets, config keys, commands, numbers, module names, and file paths from README plus source/docs/examples/config/tests. The result should read like someone inspected the code, not someone skimmed the README.
 - Standard: "more useful than a full translation." Preserve the concrete details a raw translation would carry, then organize and judge them. Any section that contains only a framework/category with no concrete example, number, snippet, command, or path is a failure.
 - If a section fails that concreteness standard, add a top-level "render_warnings" array explaining which section is too abstract and why.
@@ -738,11 +763,16 @@ function codexOutputSchema() {
   return {
     type: "object",
     additionalProperties: true,
-    required: ["schema_version", "repo", "tier_template"],
+    required: ["schema_version", "repo", "tier_template", "mind_palace"],
     properties: {
       schema_version: { type: "string" },
       repo: { type: "string" },
       project_type: { type: "string" },
+      mind_palace: {
+        type: "object",
+        additionalProperties: true,
+        required: ["problem_solved", "method", "self_evo_use", "core_concepts"],
+      },
       tier_template: {
         type: "object",
         additionalProperties: true,

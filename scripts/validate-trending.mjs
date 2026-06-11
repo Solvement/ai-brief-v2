@@ -6,6 +6,7 @@ let errors = [];
 const DATA_INSUFFICIENT = "数据不足";
 const CLAIM_ATTRIBUTIONS = new Set(["自报", "已核实", "不适用"]);
 const SELF_REPORTED_SOURCE_RE = /README|artifact|官网|self|自述|自称/i;
+const SELF_EVO_KEYWORDS = ["记忆", "理解", "自进化"];
 
 function fail(path, message) {
   errors.push(`${path}: ${message}`);
@@ -116,6 +117,13 @@ function validateRepo(repo, path) {
     }
   }
 
+  if (repo.depth_band !== undefined && !["deep", "standard", "light", "list_only", "needs_enrichment"].includes(repo.depth_band)) {
+    fail(`${path}.depth_band`, "must be deep, standard, light, list_only, or needs_enrichment");
+  }
+  if (repo.analysis_depth !== undefined && !["deep", "standard", "light", "list_only", "needs_enrichment"].includes(repo.analysis_depth)) {
+    fail(`${path}.analysis_depth`, "must be deep, standard, light, list_only, or needs_enrichment");
+  }
+
   if (repo.deep) {
     const deep = repo.deep;
     for (const key of ["atGlance", "howItWorks", "novelty", "ecosystem"]) {
@@ -137,6 +145,47 @@ function validateRepo(repo, path) {
 
   validateTierTemplateComparison(repo, path);
   validateClaimLedgerAttribution(repo, path);
+  validateMindPalace(repo.mind_palace, `${path}.mind_palace`);
+}
+
+function validateMindPalace(facet, path) {
+  if (facet === undefined || facet === null) return;
+  if (!facet || typeof facet !== "object" || Array.isArray(facet)) {
+    fail(path, "must be an object when present");
+    return;
+  }
+  for (const key of ["problem_solved", "method", "self_evo_use"]) {
+    if (!isNonEmptyString(facet[key])) fail(`${path}.${key}`, "must be a non-empty string");
+  }
+  if (isNonEmptyString(facet.self_evo_use)) {
+    for (const keyword of SELF_EVO_KEYWORDS) {
+      if (!facet.self_evo_use.includes(keyword)) fail(`${path}.self_evo_use`, `must explicitly cover ${SELF_EVO_KEYWORDS.join("/")}`);
+    }
+  }
+  const cc = facet.core_concepts;
+  if (!Array.isArray(cc) || cc.length < 3 || cc.length > 5) {
+    fail(`${path}.core_concepts`, "must contain 3-5 items");
+  } else {
+    cc.forEach((concept, index) => {
+      const conceptPath = `${path}.core_concepts[${index}]`;
+      if (!concept || typeof concept !== "object" || Array.isArray(concept)) {
+        fail(conceptPath, "must be an object");
+        return;
+      }
+      if (!isNonEmptyString(concept.name)) fail(`${conceptPath}.name`, "must be a non-empty string");
+      if (!["primary", "supporting", "mentioned"].includes(concept.role)) fail(`${conceptPath}.role`, "must be primary, supporting, or mentioned");
+      if (!isNonEmptyString(concept.evidence)) fail(`${conceptPath}.evidence`, "must be a non-empty string");
+    });
+  }
+  const trace = facet.discovery_trace;
+  const traceEmpty = trace === undefined || trace === null || (typeof trace === "string" && (!trace.trim() || trace.trim() === DATA_INSUFFICIENT));
+  if (!traceEmpty) {
+    if (!trace || typeof trace !== "object" || Array.isArray(trace)) {
+      fail(`${path}.discovery_trace`, `must be an object or ${DATA_INSUFFICIENT}`);
+    } else if (!isNonEmptyString(trace.source_span)) {
+      fail(`${path}.discovery_trace.source_span`, "must be non-empty when discovery_trace is not 数据不足");
+    }
+  }
 }
 
 function validateAgentFlow(flow, path) {

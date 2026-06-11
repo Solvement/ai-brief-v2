@@ -58,6 +58,15 @@ export const PROJECT_DEEP_DIVE_OUTPUT_SCHEMA = {
     risk_pattern: "risk pattern",
     similar_projects: "similar projects, or 未在 README/artifact 说明",
   },
+  mind_palace: {
+    problem_solved: "项目解决的真实问题; 不知道写 数据不足",
+    discovery_trace: "数据不足 或 {hypothesis, failed_attempts, source_span}; 非空必须有 source_span",
+    method: "机制链 + Mermaid; 只写 README/artifact/source 支撑的内容",
+    self_evo_use: "必须显式分三段: 记忆 / 理解 / 自进化",
+    core_concepts: [
+      { name: "规范概念名", role: "primary|supporting|mentioned", evidence: "逐字短语 + 来源锚" },
+    ],
+  },
   reasoning_trace: {
     paper_type_decision: "why this project_type/shape",
     central_contribution: "central contribution as a string, not an object",
@@ -163,6 +172,7 @@ ${depthContract}
 - If a section fails that concreteness standard, add a top-level render_warnings array explaining which section is too abstract and why.
 - Concreteness must not reintroduce fabrication. Every concrete specific must be sourced inline and attributed. If a concrete detail cannot be found, write unknown / not explained by README/docs/tree; do not invent.
 - Canonical Projects paradigm: every output must include tier_template. Tier2/3 are invalid unless they include maturity judgment + horizontal comparison. Tier2/3 must emit tier_template.comparison_table: 1-2 named alternatives, each with real difference, maturity_vs, and tradeoff; similar projects that are only named without differences do not count as horizontal comparison and are invalid. If no comparable evidence exists, set comparison_table=[] and comparison="数据不足"; do not invent.
+- Mind Palace hook: Tier2/3 outputs must include mind_palace.problem_solved / discovery_trace / method / self_evo_use / core_concepts. self_evo_use must explicitly cover 记忆、理解、自进化. discovery_trace must be 数据不足 unless repo/docs/issues/PR/blogs really expose design motivation; non-empty discovery_trace requires source_span. core_concepts must be 3-5 source-grounded concepts with role primary|supporting|mentioned.
 
 技术拆解必须按 project_type 分诊。本项目 project_type=${projectType || "unknown"};本次重点:${focus}
 

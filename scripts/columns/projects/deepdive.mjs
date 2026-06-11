@@ -8,6 +8,7 @@ import { evaluate } from "./evaluate.mjs";
 import { projectDeepDiveSystemPrompt, projectDeepDiveUser } from "./deepdive-prompts.mjs";
 import { writeProjectBriefWikiEntities } from "./brief-writer.mjs";
 import { emitProjectAutoSciPrimitive } from "./autosci-primitives.mjs";
+import { enqueueProjectKgIngest, normalizeProjectMindPalace } from "./project-facet.mjs";
 import { depthAtLeast, isBriefDepth } from "./project-ranking.mjs";
 import {
   applyReviewToDepthDecision,
@@ -180,6 +181,17 @@ export async function generateProjectDeepDive({
   });
   const autosciPrimitiveCount = autosciPrimitive ? 1 : 0;
   logger?.info?.(`projects AutoSci primitives ${repo.fullName || repo.name || candidate?.id || ""}: 本次抽取 ${autosciPrimitiveCount} 条原语`);
+  const projectMindPalace = normalizeProjectMindPalace(payload);
+  const kgIngestQueue = projectMindPalace
+    ? await enqueueProjectKgIngest({
+        repo,
+        slug: written.slug,
+        mindPalace: projectMindPalace,
+        sourceFile: written.paths?.deepDive || "",
+        generatedAt: nowIso(options),
+        queueFile: options.projectKgQueueFile,
+      })
+    : null;
 
   return {
     ...written,
@@ -188,6 +200,8 @@ export async function generateProjectDeepDive({
     repo: repo.fullName || repo.name || "",
     final_depth: finalDepth,
     depth_decision: depthDecision,
+    mind_palace: projectMindPalace,
+    kgIngestQueue,
     review,
     offline,
     model: offline ? "offline-project-deepdive-stub" : model,
@@ -210,6 +224,10 @@ function legacyVerdictForDepth(depth) {
   if (depth === "analysis") return "deep_dive";
   if (depth === "light") return "L1";
   return "skip";
+}
+
+function nowIso(options = {}) {
+  return options.now?.() || new Date().toISOString();
 }
 
 export function buildOfflineProjectDeepDiveStub({ candidate, evidence, triage, options = {} } = {}) {

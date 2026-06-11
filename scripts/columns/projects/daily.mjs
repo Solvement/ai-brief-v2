@@ -54,6 +54,8 @@ export function parseArgs(argv = []) {
     limit: 30,
     radarLimit: 30,
     topicLimit: 0,
+    growthSearchLimit: 4,
+    hfSource: false,
     worthThreshold: 60,
     readmeMaxChars: 14000,
     lightMaxTokens: Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200,
@@ -104,6 +106,14 @@ export function parseArgs(argv = []) {
       options.topicLimit = numberOption(nextValue(), options.topicLimit);
     } else if (arg.startsWith("--topic-limit=")) {
       options.topicLimit = numberOption(valueAfterEquals(arg), options.topicLimit);
+    } else if (arg === "--growth-search-limit") {
+      options.growthSearchLimit = numberOption(nextValue(), options.growthSearchLimit);
+    } else if (arg.startsWith("--growth-search-limit=")) {
+      options.growthSearchLimit = numberOption(valueAfterEquals(arg), options.growthSearchLimit);
+    } else if (arg === "--no-growth-search") {
+      options.growthSearchLimit = 0;
+    } else if (arg === "--hf-source") {
+      options.hfSource = true;
     } else if (arg === "--readme-max-chars") {
       options.readmeMaxChars = numberOption(nextValue(), options.readmeMaxChars);
     } else if (arg.startsWith("--readme-max-chars=")) {
@@ -183,6 +193,9 @@ Flags:
   --cap N          Debug candidate cap before ranking. Default: no cap
   --radar-limit N  Max merged radar cards. Default: 30
   --board-limit N  Optional safety cap per daily / weekly / monthly board. Default: real scraped window size
+  --growth-search-limit N  GitHub Search growth blind-spot candidates per query. Default: 4
+  --no-growth-search Disable GitHub Search growth blind-spot source
+  --hf-source       Enable optional Hugging Face linked-repo source. Default: off
   --offline        No LLM calls; deterministic radar plus offline stub brief shape where selected
   --dry-run        Offline/no-LLM path for cheap shape verification
   --skip-brief-authoring  Publish boards without generating analysis/deep brief-wiki files

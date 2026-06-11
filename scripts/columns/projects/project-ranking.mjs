@@ -54,6 +54,7 @@ const DEEP_ELITE_SCORE = 90;          // ≥90 精英直通(质量极高则放�
 export function scoreProject(evidenceSignals = {}) {
   const signals = normalizeEvidenceSignals(evidenceSignals);
   const canonical = scoreCanonicalProject(signals);
+  const signal = scoreDeterministicSignals(signals);
   const text = evidenceText(signals);
   const reasons = [];
 
@@ -142,6 +143,9 @@ export function scoreProject(evidenceSignals = {}) {
     ...subscores,
     total,
     tier,
+    signal_score: signal.total,
+    signal_subscores: signal.subscores,
+    signal_reasons: signal.reasons,
     project_tier: canonical.project_tier,
     project_bucket: canonical.project_bucket,
     bucket: canonical.project_bucket,
@@ -150,7 +154,7 @@ export function scoreProject(evidenceSignals = {}) {
     canonical_reasons: canonical.reasons,
     requires_manual_confirmation: canonical.requires_manual_confirmation,
     model_tier: canonical.model_tier,
-    ranking_reasons: unique([...canonical.reasons, ...reasons]).slice(0, 16),
+    ranking_reasons: unique([...signal.reasons, ...canonical.reasons, ...reasons]).slice(0, 20),
   };
 }
 
@@ -158,6 +162,8 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
   const evidence_signals = normalizeEvidenceSignals(inputSignals);
   const scored = ranking || scoreProject(evidence_signals);
   const canonical = scoreCanonicalProject(evidence_signals);
+  const signalScore = Number(scored.signal_score ?? canonical.score ?? scored.total ?? 0);
+  const depthGate = depthGateForV2({ signals: evidence_signals, signalScore });
   const rejection_reasons = [];
   let max_allowed_depth = "deep";
   let needs_enrichment = Boolean(evidence_signals.needs_enrichment);
@@ -184,23 +190,32 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
   if (isPlainUiWrapper(evidence_signals)) capToLight("plain_ui_wrapper_without_agent_infra_or_workflow");
   if (!canDesignTestPlan(evidence_signals)) capToLight("cannot_design_practical_test_plan");
 
-  if (canonical.project_tier === 0) {
+  const aiResourceOrTeaching = isAiRelevant(evidence_signals)
+    && (isResourceProject(evidence_signals) || isAwesomeCourseTutorialList(evidence_signals) || isExcludedDeepDiveIdentity(evidence_signals));
+  if (canonical.project_tier === 0 && !aiResourceOrTeaching) {
     max_allowed_depth = "list_only";
     rejection_reasons.push(`bucket:${canonical.project_bucket}`);
+  } else if (canonical.project_tier === 0 && aiResourceOrTeaching) {
+    max_allowed_depth = minDepth(max_allowed_depth, "light");
+    rejection_reasons.push(`bucket:${canonical.project_bucket}:max_light`);
   }
 
-  const tierDepth = depthForProjectTier(canonical.project_tier);
+  const tierDepth = depthGate.depth;
   const final_depth = needs_enrichment && evidence_signals.readme_fetch_failed
     ? "needs_enrichment"
     : minDepth(tierDepth, max_allowed_depth);
   const final_project_tier = projectTierForDepthName(final_depth);
   const final_model_tier = modelForProjectTier(final_project_tier);
+  const manualReasons = final_project_tier === 3 ? ["manual_confirmation_required"] : [];
 
   return {
-    ranking_score: canonical.score,
-    ranking: { ...scored, ...canonical, total: canonical.score },
+    ranking_score: signalScore,
+    ranking: { ...scored, ...canonical, total: signalScore },
     max_allowed_depth,
     final_depth,
+    depth_gate_band: depthGate.band,
+    depth_band: final_depth === "analysis" ? "standard" : final_depth,
+    analysis_depth: final_depth === "analysis" ? "standard" : final_depth,
     project_tier: final_project_tier,
     project_tier_label: `Tier ${final_project_tier}`,
     scored_project_tier: canonical.project_tier,
@@ -208,8 +223,8 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
     bucket: canonical.project_bucket,
     model_tier: final_model_tier,
     requires_manual_confirmation: final_project_tier === 3,
-    ranking_reasons: unique([...(canonical.reasons || []), ...(scored.ranking_reasons || [])]),
-    rejection_reasons: unique(rejection_reasons),
+    ranking_reasons: unique([...(depthGate.reasons || []), ...manualReasons, ...(canonical.reasons || []), ...(scored.ranking_reasons || [])]),
+    rejection_reasons: unique([...rejection_reasons, ...(depthGate.rejections || [])]),
     evidence_signals,
     recommended_action: recommendedAction(final_depth, scored.total, needs_enrichment),
     needs_enrichment,
@@ -243,6 +258,8 @@ export function applyDailyDepthTargets(items = [], options = {}) {
     const decision = cloneDecision(evalResult.depth_decision || evalResult);
     const finalDepth = originalDepth === "deep" && !acceptedDeep.has(itemKey(item)) ? "analysis" : originalDepth;
     decision.final_depth = finalDepth;
+    decision.depth_band = finalDepth === "analysis" ? "standard" : finalDepth;
+    decision.analysis_depth = finalDepth === "analysis" ? "standard" : finalDepth;
     if (originalDepth === "deep" && finalDepth !== "deep") {
       decision.rejection_reasons = unique([...asArray(decision.rejection_reasons), "deep_window_soft_cap"]);
       decision.ranking_reasons = unique([...asArray(decision.ranking_reasons), `deep_window_soft_cap:${softCap}`]);
@@ -253,6 +270,8 @@ export function applyDailyDepthTargets(items = [], options = {}) {
     decision.requires_manual_confirmation = decision.project_tier === 3;
     decision.recommended_action = recommendedAction(finalDepth, Number(decision.ranking_score ?? evalResult.score ?? 0), decision.needs_enrichment);
     evalResult.final_depth = finalDepth;
+    evalResult.depth_band = decision.depth_band;
+    evalResult.analysis_depth = decision.analysis_depth;
     evalResult.project_tier = decision.project_tier;
     evalResult.project_tier_label = decision.project_tier_label;
     evalResult.model_tier = decision.model_tier;
@@ -327,6 +346,13 @@ export function normalizeEvidenceSignals(input = {}) {
     stars_today: Number(input.stars_today ?? input.starsToday ?? input.starsGained ?? input.stars_in_period ?? input.starsInPeriod) || 0,
     stars_in_period: Number(input.stars_in_period ?? input.starsInPeriod ?? input.stars_today ?? input.starsToday ?? input.starsGained) || 0,
     stars_gained_by_window: normalizeStarsGainedByWindow(input.stars_gained_by_window || input.starsGainedByWindow),
+    ranks_by_window: normalizeRanksByWindow(input.ranks_by_window || input.ranksByWindow || input.current_ranks_by_window || input.currentRanksByWindow),
+    source_provenance: asArray(input.source_provenance || input.sourceProvenance || input.provenance),
+    source_count: Number(input.source_count ?? input.sourceCount) || 0,
+    hn_points: Number(input.hn_points ?? input.hnPoints) || 0,
+    hn_comments: Number(input.hn_comments ?? input.hnComments) || 0,
+    hf_likes: Number(input.hf_likes ?? input.hfLikes) || 0,
+    hf_downloads: Number(input.hf_downloads ?? input.hfDownloads) || 0,
     language: clean(input.language),
     topics: asArray(input.topics).map(clean).filter(Boolean),
     description: clean(input.description),
@@ -347,6 +373,7 @@ export function normalizeEvidenceSignals(input = {}) {
     has_docs: Boolean(input.has_docs ?? input.hasDocs),
     has_examples: Boolean(input.has_examples ?? input.hasExamples),
     has_tests: Boolean(input.has_tests ?? input.hasTests),
+    has_ci: Boolean(input.has_ci ?? input.hasCi),
     has_install: Boolean(input.has_install ?? input.hasInstall),
     has_docker: Boolean((input.has_docker ?? input.hasDocker) || packageFiles.dockerfile || packageFiles.docker_compose_yml),
     has_cli: Boolean(input.has_cli ?? input.hasCli),
@@ -375,6 +402,7 @@ export function evidenceSummary(evidenceSignals = {}) {
     has_tests: signals.has_tests,
     has_install: signals.has_install,
     has_docker: signals.has_docker,
+    has_ci: signals.has_ci,
     has_cli: signals.has_cli,
     has_agents: signals.has_agents,
     has_mcp: signals.has_mcp,
@@ -383,6 +411,8 @@ export function evidenceSummary(evidenceSignals = {}) {
     has_demo: signals.has_demo,
     package_files: signals.package_files,
     stars_gained_by_window: signals.stars_gained_by_window,
+    source_count: effectiveSourceCount(signals),
+    signal_subscores: scoreDeterministicSignals(signals).subscores,
     project_tier: signals.project_tier,
     project_bucket: signals.project_bucket,
   };
@@ -480,6 +510,164 @@ export function deepDiveEligibility(inputSignals = {}, options = {}) {
     threshold,
     reasons,
   };
+}
+
+export function scoreDeterministicSignals(inputSignals = {}) {
+  const signals = normalizeEvidenceSignals(inputSignals);
+  const reasons = [];
+  const subscores = {
+    star_velocity: starVelocitySubscore(signals, reasons),
+    cross_source: crossSourceSubscore(signals, reasons),
+    topic_fit: topicFitSubscore(signals, reasons),
+    maturity: maturitySubscore(signals, reasons),
+    blacklist_penalty: blacklistPenalty(signals, reasons),
+  };
+  const positive = subscores.star_velocity + subscores.cross_source + subscores.topic_fit + subscores.maturity;
+  const total = clampScore(positive - subscores.blacklist_penalty, 0, 100);
+  return { total, subscores, reasons: unique(reasons) };
+}
+
+function depthGateForV2({ signals, signalScore }) {
+  const projectType = projectTypeForDepthGate(signals);
+  const monthlyTop10 = Number(signals.ranks_by_window?.monthly) > 0 && Number(signals.ranks_by_window.monthly) <= 10;
+  const teachingOrSkill = isAwesomeCourseTutorialList(signals) || isExcludedDeepDiveIdentity(signals) || projectType === "template_boilerplate";
+  const architectureType = ["agent_framework", "model_infra", "ai_app"].includes(projectType);
+  const standardType = ["devtool_cli", "library_sdk", "dataset_benchmark"].includes(projectType);
+  const maturity = scoreDeterministicSignals(signals).subscores.maturity;
+  const reasons = [`project_type:${projectType}`, `signal_score:${signalScore}`];
+  const rejections = [];
+
+  if (teachingOrSkill) {
+    rejections.push("depth_gate:teaching_skill_or_resource_max_light");
+    return { band: "light", depth: "light", reasons, rejections };
+  }
+  if ((architectureType && signalScore >= 78) || monthlyTop10 || (architectureType && hasArxivEndorsement(signals) && signalScore >= 52)) {
+    if (monthlyTop10) reasons.push("depth_gate:monthly_top10_default_deep");
+    else if (hasArxivEndorsement(signals)) reasons.push("deep_gate:arxiv_backed_architecture_signal");
+    else reasons.push("deep_gate:architecture_type_signal_deep");
+    return { band: "deep", depth: "deep", reasons, rejections };
+  }
+  if ((architectureType && signalScore >= 52 && maturity >= 10) || (standardType && signalScore >= 60) || signalScore >= 72) {
+    reasons.push("depth_gate:standard_threshold");
+    return { band: "standard", depth: "analysis", reasons, rejections };
+  }
+  reasons.push("depth_gate:light_default");
+  return { band: "light", depth: "light", reasons, rejections };
+}
+
+function starVelocitySubscore(signals, reasons) {
+  const monthly = Math.max(
+    Number(signals.stars_gained_by_window?.monthly) || 0,
+    Number(signals.stars_in_period) || 0,
+    Number(signals.stars_today) || 0,
+  );
+  const totalStars = Number(signals.total_stars || signals.stars) || 0;
+  const velocity = Math.min(24, Math.round((Math.log10(monthly + 1) / Math.log10(5001)) * 24));
+  const total = totalStars >= 20000 ? 6 : totalStars >= 5000 ? 4 : totalStars >= 1000 ? 2 : totalStars >= 300 ? 1 : 0;
+  if (monthly > 0) reasons.push(`signal:star_velocity:${monthly}`);
+  if (total > 0) reasons.push(`signal:total_stars:${totalStars}`);
+  return Math.min(30, velocity + total);
+}
+
+function crossSourceSubscore(signals, reasons) {
+  const count = effectiveSourceCount(signals);
+  let score = 0;
+  if (count >= 4) score = 20;
+  else if (count === 3) score = 16;
+  else if (count === 2) score = 12;
+  else if (count === 1) score = 4;
+  if (score) reasons.push(`signal:cross_source:${count}`);
+  if (signals.hn_points > 0) {
+    score += Math.min(6, Math.floor(Number(signals.hn_points) / 50) + Math.floor(Number(signals.hn_comments) / 40));
+    reasons.push(`signal:hn:${signals.hn_points}pts/${signals.hn_comments}comments`);
+  }
+  if (signals.hf_likes > 0 || signals.hf_downloads > 0) {
+    score += Math.min(4, Math.floor(Number(signals.hf_likes) / 25) + Math.floor(Number(signals.hf_downloads) / 10000));
+    reasons.push("signal:huggingface_linked");
+  }
+  return Math.min(24, score);
+}
+
+function topicFitSubscore(signals, reasons) {
+  const text = evidenceText(signals);
+  let score = 0;
+  const matches = [];
+  for (const [label, regex, points] of [
+    ["agent", AGENT_RE, 8],
+    ["memory", /\b(memory|context|long[-\s]?term|recall|episodic)\b/i, 6],
+    ["eval", EVAL_RE, 5],
+    ["rag", /\b(rag|retrieval|embedding|vector|search)\b/i, 4],
+    ["self_evo", /\b(self[-\s]?(improv|evolv)|auto[-\s]?improv|reflection|feedback loop)\b/i, 5],
+    ["mcp", MCP_RE, 4],
+  ]) {
+    if (regex.test(text)) {
+      score += points;
+      matches.push(label);
+    }
+  }
+  if (matches.length) reasons.push(`signal:topic_fit:${matches.join(",")}`);
+  return Math.min(26, score);
+}
+
+function maturitySubscore(signals, reasons) {
+  let score = 0;
+  if (signals.has_tests) { score += 5; reasons.push("signal:maturity:tests"); }
+  if (signals.has_ci) { score += 4; reasons.push("signal:maturity:ci"); }
+  if (signals.has_docs) { score += 4; reasons.push("signal:maturity:docs"); }
+  if (signals.has_examples || signals.has_demo) { score += 3; reasons.push("signal:maturity:examples"); }
+  if (signals.has_install) { score += 2; reasons.push("signal:maturity:install"); }
+  if (Number(signals.releases) > 0) { score += 2; reasons.push("signal:maturity:release"); }
+  return Math.min(20, score);
+}
+
+function blacklistPenalty(signals, reasons) {
+  let penalty = 0;
+  if (isResourceProject(signals) || isAwesomeCourseTutorialList(signals)) {
+    penalty += 28;
+    reasons.push("signal:penalty:resource_or_course");
+  }
+  if (isExcludedDeepDiveIdentity(signals)) {
+    penalty += 16;
+    reasons.push("signal:penalty:excluded_deep_identity");
+  }
+  if (!isAiRelevant(signals)) {
+    penalty += 35;
+    reasons.push("signal:penalty:non_ai_eng");
+  }
+  if (isPlainUiWrapper(signals)) {
+    penalty += 18;
+    reasons.push("signal:penalty:plain_ui_wrapper");
+  }
+  return Math.min(50, penalty);
+}
+
+function effectiveSourceCount(signals) {
+  const families = new Set();
+  for (const source of [
+    ...(signals.trend_sources || []),
+    ...(signals.source_provenance || []).map((item) => item?.source),
+  ]) {
+    const raw = String(source || "");
+    if (raw.startsWith("github-trending")) families.add("github-trending");
+    else if (raw.startsWith("hacker-news")) families.add("hacker-news");
+    else if (raw.startsWith("github-search")) families.add("github-search");
+    else if (raw.startsWith("huggingface")) families.add("huggingface");
+    else if (raw) families.add(raw.split(":")[0]);
+  }
+  return Math.max(Number(signals.source_count) || 0, families.size);
+}
+
+function projectTypeForDepthGate(signals) {
+  const text = evidenceText(signals);
+  if (!isAiRelevant(signals)) return "non_ai_eng";
+  if (signals.has_agents || signals.has_mcp || signals.has_skills || /\b(agent framework|agent runtime|orchestration|planner|tool calling|workflow engine|memory framework)\b/i.test(text)) return "agent_framework";
+  if (/\b(dataset|benchmark|eval|evaluation|leaderboard|arena|test set|harness)\b/i.test(text)) return "dataset_benchmark";
+  if (signals.has_cli || /\b(coding agent|devtool|developer tool|cli|command line|terminal|shell|code assistant)\b/i.test(text)) return "devtool_cli";
+  if (signals.has_models || /\b(model infra|serving|inference|fine[-\s]?tun|training|checkpoint|quantization|vllm|lora|embedding service)\b/i.test(text)) return "model_infra";
+  if (/\b(frontend|ui|react|vue|svelte|dashboard|component|chat ui|web app)\b/i.test(text)) return "frontend_ui";
+  if (/\b(template|boilerplate|starter|scaffold|example app)\b/i.test(text)) return "template_boilerplate";
+  if (hasAnyPackageFile(signals)) return "library_sdk";
+  return "ai_app";
 }
 
 function readmeEvidencePoints(signals, reasons) {
@@ -943,6 +1131,17 @@ function normalizeStarsGainedByWindow(input = {}) {
   return out;
 }
 
+function normalizeRanksByWindow(input = {}) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return {};
+  const out = {};
+  for (const [key, value] of Object.entries(input)) {
+    const tab = normalizeTab(key);
+    const rank = Number(value);
+    if (tab && Number.isFinite(rank)) out[tab] = rank;
+  }
+  return out;
+}
+
 function boolPoints(condition, points, reasons, reason) {
   if (!condition) return 0;
   reasons.push(reason);
@@ -954,6 +1153,8 @@ function cloneDecision(value = {}) {
     ranking_score: Number(value.ranking_score ?? value.score ?? 0),
     max_allowed_depth: value.max_allowed_depth || "deep",
     final_depth: normalizeDepth(value.final_depth),
+    depth_band: value.depth_band || value.depthBand || "",
+    analysis_depth: value.analysis_depth || value.analysisDepth || "",
     ranking_reasons: asArray(value.ranking_reasons),
     rejection_reasons: asArray(value.rejection_reasons),
     evidence_signals: value.evidence_signals,
