@@ -10,6 +10,7 @@ import { readFile, writeFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
+import { buildDeterministicFacetRelationEdges, normalizeGraphRelations } from "./relation-engine.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const GRAPH = path.join(ROOT, "public", "data", "brief", "graph.json");
@@ -154,6 +155,7 @@ for (const a of assess.assessments || []) {
 const facets = await loadFacets();
 let facetedNodes = 0;
 let facetEdgesAdded = 0;
+let relationEngineEdgesAdded = 0;
 for (const facet of facets) {
   const node = await ensurePaperFacetNode(facet);
   if (!node) {
@@ -241,6 +243,19 @@ for (const facet of facets) {
   }
 }
 
+// (3c) KG-3 deterministic relation engine. CI/dry-run path: no model call,
+// only promotes evidence that already exists in facets and passes candidate
+// generation (hybrid-like lexical + shared core_concept top-K).
+const relationEngineEdges = buildDeterministicFacetRelationEdges({ facets, nodes, topK: 6 });
+const existingRelationKeys = new Set((graph.edges || []).map((e) => `${e.from}|${e.to}|${e.type}`));
+for (const edge of relationEngineEdges) {
+  const key = `${edge.from}|${edge.to}|${edge.type}`;
+  if (existingRelationKeys.has(key)) continue;
+  graph.edges.push(edge);
+  existingRelationKeys.add(key);
+  relationEngineEdgesAdded += 1;
+}
+
 // (4) D1 FIX (cold-review): REAL cross-document associative edges. The base graph is ~98% intra-doc
 // plumbing (a deep-read referencing its OWN claim/evidence sub-nodes) — useless for 联想/recall.
 // These connect DISTINCT papers/projects, which is what associative recall actually needs.
@@ -321,7 +336,7 @@ for (const edge of graph.edges) {
 // Final dedup: keep ALL references, but at most ONE associative edge per doc-pair — the most
 // meaningful type (judgment > typed > concept > same_track). Removes reverse-direction duplicates
 // the base builder emits.
-const PRIORITY = { improves_on: 6, composes_with: 6, builds_on: 5, shares_method: 5, same_use_case: 5, implements: 5, shares_concept: 3, same_track: 2 };
+const PRIORITY = { improves_on: 6, composes_with: 6, complements: 6, contradicts: 6, builds_on: 5, shares_method: 5, same_use_case: 5, implements: 5, shares_concept: 3, same_track: 2 };
 const bestByPair = new Map();
 const keptRefs = [];
 for (const e of graph.edges) {
@@ -331,6 +346,7 @@ for (const e of graph.edges) {
   if (!prev || (PRIORITY[e.type] || 1) > (PRIORITY[prev.type] || 1)) bestByPair.set(k, e);
 }
 graph.edges = [...keptRefs, ...bestByPair.values()];
+graph.edges = normalizeGraphRelations(graph.edges);
 
 const references = graph.edges.filter((e) => e.type === "references").length;
 const associativeEdges = graph.edges.filter((e) => e.type !== "references" && !(e.type === "same_track" && e.weak)).length;
@@ -341,5 +357,5 @@ graph.summary = { ...(graph.summary || {}), nodes: nodes.length, edges: graph.ed
   edgeByType, ghosts: nodes.filter((n) => n.ghost).length, assessed: nodes.filter((n) => n.self_evo_use).length,
   facetedNodes: nodes.filter((n) => n.facets).length };
 await writeFile(GRAPH, `${JSON.stringify(graph, null, 2)}\n`, "utf8");
-console.log(`[integrate-kg] assessments:${merged} | facets:${facetedNodes} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | facet-edges:${facetEdgesAdded} | cross-doc:${crossDoc}`);
+console.log(`[integrate-kg] assessments:${merged} | facets:${facetedNodes} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | facet-edges:${facetEdgesAdded} | relation-engine:${relationEngineEdgesAdded} | cross-doc:${crossDoc}`);
 console.log(`[integrate-kg] nodes ${nodes.length} | edges ${graph.edges.length} (references ${references} plumbing + ASSOCIATIVE ${associativeEdges}, weak same_track excluded) | ghosts ${graph.summary.ghosts} | assessed ${graph.summary.assessed} | faceted ${graph.summary.facetedNodes}`);

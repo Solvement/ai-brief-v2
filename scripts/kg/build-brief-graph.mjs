@@ -31,6 +31,7 @@ import {
   buildImplementsEdges,
 } from './brief-edges.mjs';
 import { FOCUS_TYPED_EDGES, FOCUS_TAGS } from './focus-edges.mjs';
+import { normalizeGraphRelations } from './relation-engine.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const WIKI_DIR = join(ROOT, 'brief-wiki');
@@ -280,7 +281,7 @@ export function buildBriefGraph() {
   });
 
   // ---- assemble edges (dedupe by from|to|type) ----
-  const edges = [];
+  let edges = [];
   const seen = new Set();
   const pushAll = (list) => {
     for (const e of list) {
@@ -295,6 +296,7 @@ export function buildBriefGraph() {
   pushAll(wiki.edges);
   pushAll(sameTrack.edges);
   pushAll(ghosts.edges);
+  edges = normalizeGraphRelations(edges);
 
   // ---- adjacency + summary (shape parallel to brief/build.mjs buildGraph) ----
   const adjacency = edges.map((e) => ({ type: e.type, source: e.from, target: e.to, edge: e }));
@@ -305,7 +307,7 @@ export function buildBriefGraph() {
 
   const out = {
     generatedAt: new Date().toISOString(),
-    note: 'Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).',
+    note: 'Unified Mind Palace graph. Primary layer is typed relation edges; mechanical references/same_track edges are hidden secondary plumbing.',
     nodes: allNodes.map((n) => ({
       id: n.id,
       type: n.type,

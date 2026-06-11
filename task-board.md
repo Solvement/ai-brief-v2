@@ -14,6 +14,13 @@
 
 ## 进行中
 
+### KG-3-RELATION-ENGINE · Mind Palace typed 关系引擎 Loop B+C（plan `docs/plans/2026-06-11-mind-palace-relation-engine.md`）
+- **大方向**：Mind Palace 主图从 references/same_track 毛球切到 typed relation reasoning；机械边保留为 secondary plumbing，不再占主边层。
+- **小方向**：新增 `scripts/kg/relation-engine.mjs` 确定性 CI 路径（facet 明示证据 + lexical/shared-core candidate top-K，不调模型）；`same_use_case` 并入 `complements`；typed 边补 `use`；`build-brief-graph` / `integrate-kg` 统一 normalize。
+- **阶段**：✅ Codex 实现完成，待独立冷审。
+- **阻塞**：独立冷审未跑（generator≠critic 红线）；前端 Loop D 非本任务范围。
+- **交付结论**：`node scripts/eval-relation-engine.mjs` 已绿（primary=26，typed-primary=26，mechanical-in-primary=0，typed=100%）；`npm run kg:build` 已重建图/词表/embedding；`node scripts/kg/bench-retrieval.mjs hybrid` recall@3=8/8、precision=13/15；`node scripts/kg/recall-eval.mjs` recall@3=1.000；`npm run verify` 通过（298 tests + validate + build，全绿，仅既有 warning）；`npm run ops:baseline:diff` 无新增 validator 失败。报告 `.agent/codex-relation-engine-report.md` 已写。
+
 ### PROJECTS-BOARD-REUSE-HIGHLIGHT · 项目板块展示解耦去重 + 亮点轻卡（plan `docs/plans/2026-06-11-projects-board-display-reuse-highlight.md`）
 - **大方向**：ledger 去重只防重复分析，不防当前 trending 展示；月/周/日榜要反映真实窗口态势，已分析项目复用缓存并继续展示。
 - **小方向**：`filterNewProjectCandidates` 返回 `accepted+reuse`；`reuse` 标 `alreadyAnalyzed:true` 并跳过 analyze LLM；light 输出新增必填亮点 `highlight`；board/validate/types/tests 同步。
