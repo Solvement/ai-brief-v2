@@ -25,6 +25,8 @@
     "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs && node scripts/validate-papers-deepread.mjs && node scripts/validate-news-health.mjs && node scripts/validate-daily-digest.mjs && node scripts/validate-mind-palace.mjs && node scripts/ops/check-harness.mjs",
     "ops:harness": "node scripts/ops/check-harness.mjs",
     "ops:tokens": "node scripts/ops/token-usage-by-model.mjs",
+    "ops:progress": "node scripts/ops/progress.mjs",
+    "ops:watch": "node scripts/ops/progress.mjs --watch",
     "ops:baseline": "node scripts/ops/verify-baseline.mjs snapshot",
     "ops:baseline:diff": "node scripts/ops/verify-baseline.mjs diff",
     "digest:daily": "node --env-file-if-exists=.env.local --no-warnings scripts/columns/digest/daily.mjs",
