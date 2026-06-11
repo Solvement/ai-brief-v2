@@ -63,11 +63,12 @@ facets:
       CORPUS --> OBS[截断 tool_response] --> AGENT
     ```
 
-self_evo_use: >        # 客观判断
-  能用（方法论原语 + 可跑资产双重）。方法论层：「行为初始化先于自由探索」「检索接口可重新设计」「答案感知造数据/答案盲保因果」
-  三条都能直接进本站 agent/语料管线设计。资产层：官方放出 SFT/GRPO 模型与 10k 冷启动数据集（HF alireza7/GrepSeek-*），
-  源码含可独立复用的 parallel_search 引擎（带 byte-equivalence 测试）。但本站语料仅 ~百篇级 markdown，分片并行引擎本身用不上，
-  借的是「语义保持才能给工具提速」的工程纪律。
+self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
+  记忆：部分相关——它不建持久记忆，走的是「语料库当可执行环境」的检索式替代（DCI 直查原始语料省掉抽取式记忆层），给「逐字 vs 抽取」之争提供工具侧证据。
+
+  理解：部分能用——「答案感知造数据/答案盲保因果」是因果干净轨迹合成的方法论，可迁移到本站轨迹/评测数据构造；「语义保持才能给工具提速」（byte-equivalence 测试）是可借的工程纪律。
+
+  自进化：能用（方法论原语 + 可跑资产双重）。「行为初始化先于自由探索」「检索接口可重新设计」可直接进本站 agent/语料管线设计；资产层官方放出 SFT/GRPO 模型与 10k 冷启动数据集（HF alireza7/GrepSeek-*），源码含可独立复用的 parallel_search 引擎。但本站语料仅 ~百篇级 markdown，分片并行引擎本身用不上。
 
 core_concepts:
   - name: Direct Corpus Interaction（直接语料交互 DCI）

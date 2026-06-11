@@ -14,6 +14,7 @@ const KILLED_EDGE_TYPES = new Set(["same_problem", "same_use_case"]);
 const CORE_CONCEPT_ROLES = new Set(["primary", "supporting", "mentioned"]);
 const CROSS_TYPE_EDGE_TYPES = new Set(["implements", "applies", "tool_for"]);
 const ROLE_RANK = { mentioned: 0, supporting: 1, primary: 2 };
+const SELF_EVO_KEYWORDS = ["记忆", "理解", "自进化"];
 const LEGACY_EDGE_GRANDFATHER = new Map([
   ["agemem.yaml", new Set(["improves_on|rohitg00-agentmemory|AgeMem 用 RL 学习记忆策略，取长补短 agentmemory 的写死 hook（学习式 > 固定式）"])],
   ["ai-scientist-v2.yaml", new Set(["composes_with|nousresearch-hermes-agent|ai-scientist-v2 给的是任务级探索引擎（树搜索+实验manager），hermes-agent 给的是长期运行时（skills记忆+终端后端+审批）——前者当 hermes 的一个 execute_code 任务跑，后者补它缺的经验沉淀与安全沙箱。"])],
@@ -120,6 +121,18 @@ function validateDiscoveryTrace(facet, where) {
   if (!hasText(facet.discovery_trace.source_span)) {
     fail(where, "discovery_trace.source_span must be non-empty when discovery_trace is not 数据不足");
   }
+}
+
+function validateSelfEvoUse(facet, where) {
+  if (!hasText(facet.self_evo_use)) {
+    warn(where, "self_evo_use should explain how this facet affects agent memory, understanding, and self-evolution");
+    return;
+  }
+  const missing = SELF_EVO_KEYWORDS.filter((keyword) => !String(facet.self_evo_use).includes(keyword));
+  if (!missing.length) return;
+  // Existing v2 facets predate the operating contract; warn to avoid a one-shot rewrite.
+  // New auto-ingested facets are hard-gated earlier by scripts/kg/ingest-daily.mjs precheckFacet.
+  warn(where, `self_evo_use should explicitly cover ${missing.join("/")}`);
 }
 
 function validateCrossTypeConcept(edge, edgePath, fromFacet, toFacet) {
@@ -267,6 +280,7 @@ for (const { facet, file, where } of parsedFacets) {
 
   validateCoreConcepts(facet, where);
   validateDiscoveryTrace(facet, where);
+  validateSelfEvoUse(facet, where);
 
   if (!isObject(facet.facets)) {
     fail(where, "facets must be an object");

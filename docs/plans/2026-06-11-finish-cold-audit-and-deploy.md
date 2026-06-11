@@ -2,6 +2,8 @@
 
 > 触发：用户要求接手 Claude Code 未完成任务；涉及批量冷审、发布索引、Mind Palace 入图、任务态势与上线，超过 100 行且触及发布链，按 RULES #11 先写 plan。
 
+> 2026-06-10 supplement: Kevin confirmed Claude Code and Codex quotas are not fully shared. If one side has no quota, the other side may replace it through a completely independent subagent. For cold-audit gating this means the main Codex controller may orchestrate read-only `codex exec` subprocesses as independent auditors; the controller must not author the verdict itself.
+
 ## 1. 大方向 / 小方向（验收标的）
 - **大方向**：把 6/9-6/10 的每日链补成一个可发布、可审计、可回滚的版本，保证「中午打开=最新+精读+Mind Palace」这条北极星路径在生产可见。
 - **小方向**：

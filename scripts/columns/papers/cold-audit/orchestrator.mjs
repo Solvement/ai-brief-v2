@@ -574,7 +574,10 @@ export function makeClaudeAuditFn(config = {}) {
   // on Windows. `--output-format json` wraps the result for reliable parsing; we unwrap both layers.
   const callClaude = runClaude || (async function callClaude(prompt, label, ctx) {
     // -p with no positional prompt = headless print mode reading the prompt from stdin.
-    const args = ["-p", "--output-format", "json"];
+    // 模型显式钉死 (2026-06-10 Kevin): 不传 --model 会用 CLI 默认(已升 Fable, 每日管线禁用)。
+    // 冷审是发布门的判断工作 -> opus 前代档; env 可覆盖。
+    const auditModel = process.env.COLD_AUDIT_CLAUDE_MODEL || "claude-opus-4-8";
+    const args = ["-p", "--output-format", "json", "--model", auditModel];
     // PARSE-RETRY (2026-06-10): the auditor hand-writes JSON; dense numeric notes occasionally break
     // it (unescaped quotes/truncation). 2026-06-10 chain run: one malformed stageB response threw
     // here and killed the WHOLE daily batch (0/3 audited). A malformed sample is usually transient —

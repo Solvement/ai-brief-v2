@@ -60,9 +60,12 @@ core_concepts:
   - name: 记忆质量奖励
     role: supporting
     evidence: "深读消融节逐字『All-Returns vs Answer-Only：MQ 0.533 vs 0.479、Judge 0.544 vs 0.509 → memory-aware reward 真的改善了记忆质量，而非顺带产物』（规范名『记忆质量奖励』，源文原词『memory-aware reward / All-Returns』）。"
-self_evo_use: >        # 客观：能否用于研究/自进化（向量召回 + 推理共用）
-  能用。它是"记忆即动作"的可落地范式——自进化 agent 的记忆控制器可直接抄这套 typed action 接口 + 用冷审/反馈当 reward 的训练回路。
-  属真自进化（系统从反馈改自己的记忆策略），不是固定流程。
+self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
+  记忆：能用——"记忆即动作"的可落地范式：六个记忆操作（长期 Add/Update/Delete + 短期 Retrieve/Summary/Filter）成为一等策略动作，自进化 agent 的记忆控制器可直接抄这套 typed action 接口。
+
+  理解：部分——三阶段课程 + 面向记忆的奖励显示「记忆质量可以被教出来」；它不建世界模型，理解层贡献在于把"什么时候记/忘"变成可归因的策略决策。
+
+  自进化：能用，属真自进化（系统从反馈改自己的记忆策略，不是固定流程）——「用冷审/反馈当 reward 的训练回路」可直接借给本站记忆控制器设计。
 
 # typed 边（走冷审门核验后入图；非自动 tag 噪声）
 edges:

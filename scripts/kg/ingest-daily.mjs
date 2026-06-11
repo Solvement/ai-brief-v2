@@ -120,6 +120,13 @@ export function buildFacetPrompt({ nodeId, slug, dirName, paperMdx, vocabJson, e
     "   innovation 同赛道对比；weakness 含适用边界和坑；transfer 指向 AI-Brief（个人 AI 情报站+自进化 agent 语料库）自身可搬的方法论；",
     "   self_evo_use 客观判断能不能用、能搬什么。",
     "",
+    "Mind Palace 目标（必须落到字段里，不能只做摘要）：",
+    "A. 后续检索要能找回「核心架构 + 方法论」：method 写成可执行机制链；architecture 若有就用 Mermaid；core_concepts 选能作为检索锚点的架构/方法词，不要选泛词。",
+    "B. self_evo_use 必须显式分三段回答：",
+    "   - 记忆：这个论文/项目能否帮助 AI 实现可写入、可检索、可更新、可压缩/遗忘的记忆？能/不能/部分，为什么。",
+    "   - 理解：它能否帮助 AI 形成可迁移的理解（抽象、因果、世界模型、评测闭环、失败归因之一）？能/不能/部分，为什么。",
+    "   - 自进化：AI-Brief/个人 agent 是否应该直接用这个项目本身、复用其方法论，还是只作为反例/参照？写清可落地用法和边界。",
+    "",
     "=== 结构样例（tropd.yaml，学结构和密度，不抄内容）===",
     exampleYaml,
     "",
@@ -168,6 +175,13 @@ export function precheckFacet(facet, { nodeId, slug }) {
   if (!dtEmpty && (typeof dt !== "object" || !hasText(dt.source_span))) errors.push("non-empty discovery_trace requires source_span");
   if (Array.isArray(facet.edges) && facet.edges.length > 0) errors.push("edges must be [] in auto-ingest (NO_EDGE default)");
   if (facet.edges !== undefined && !Array.isArray(facet.edges)) errors.push("edges must be an array");
+  if (!hasText(facet.self_evo_use)) errors.push("self_evo_use empty");
+  if (hasText(facet.self_evo_use)) {
+    const text = String(facet.self_evo_use);
+    for (const keyword of ["记忆", "理解", "自进化"]) {
+      if (!text.includes(keyword)) errors.push(`self_evo_use missing ${keyword}`);
+    }
+  }
   return errors;
 }
 
@@ -202,8 +216,11 @@ function spawnWithInput(command, args, input, { cwd, timeoutMs }) {
 
 async function callClaude(prompt, logger = console) {
   // claude -p（订阅）：prompt 走 stdin（Windows 大 prompt 可靠）；输出走 --output-format json 信封。
-  logger.log(`[kg-ingest] claude -p (prompt ${Math.round(prompt.length / 1024)}KB on stdin, timeout ${CLAUDE_TIMEOUT_MS / 60000}min)`);
-  const result = await spawnWithInput("claude", ["-p", "--output-format", "json"], prompt, { cwd: ROOT, timeoutMs: CLAUDE_TIMEOUT_MS });
+  // 模型必须显式钉死: 不传 --model 会用 CLI 默认(已升 Fable, 每日管线禁用——Kevin 2026-06-10)。
+  // facet 蒸馏是固定 prompt 的普通任务 -> sonnet 档。
+  const model = process.env.KG_INGEST_CLAUDE_MODEL || "claude-sonnet-4-6";
+  logger.log(`[kg-ingest] claude -p --model ${model} (prompt ${Math.round(prompt.length / 1024)}KB on stdin, timeout ${CLAUDE_TIMEOUT_MS / 60000}min)`);
+  const result = await spawnWithInput("claude", ["-p", "--output-format", "json", "--model", model], prompt, { cwd: ROOT, timeoutMs: CLAUDE_TIMEOUT_MS });
   if (result.code !== 0) throw new Error(`claude exited ${result.code}: ${String(result.stderr || result.stdout).slice(-400)}`);
   try {
     const envelope = JSON.parse(String(result.stdout).trim());

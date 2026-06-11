@@ -89,6 +89,7 @@ test("precheckFacet: catches the gate-relevant violations", () => {
       { name: "c", role: "primary", evidence: "e3" },
     ],
     discovery_trace: "数据不足",
+    self_evo_use: "记忆：能帮助写入/检索。理解：能帮助形成机制抽象。自进化：能作为可回滚改进材料。",
     edges: [],
   };
   assert.deepEqual(precheckFacet(good, { nodeId: "paper:2402.16823", slug: "gptswarm" }), []);
@@ -97,10 +98,12 @@ test("precheckFacet: catches the gate-relevant violations", () => {
   bad.discovery_trace = { hypothesis: "h", failed_attempts: "f" }; // missing source_span
   bad.edges = [{ type: "extends", to: "x" }]; // auto-ingest must not propose edges
   bad.core_concepts = good.core_concepts.slice(0, 2); // too few
+  bad.self_evo_use = "能用但没有三段用途";
   const errors = precheckFacet(bad, { nodeId: "paper:2402.16823", slug: "gptswarm" });
   assert.ok(errors.some((e) => e.includes("source_span")));
   assert.ok(errors.some((e) => e.includes("NO_EDGE")));
   assert.ok(errors.some((e) => e.includes("3-5")));
+  assert.ok(errors.some((e) => e.includes("self_evo_use missing")));
 });
 
 test("buildFacetPrompt embeds hard rules, vocab, example, and the paper", () => {

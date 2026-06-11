@@ -1,12 +1,255 @@
 {
-  "generatedAt": "2026-06-11T00:41:00.477Z",
+  "generatedAt": "2026-06-11T03:46:48.718Z",
   "date": "2026-06-10",
   "counts": {
-    "deepReads": 21,
+    "deepReads": 26,
     "radar": 10,
     "deepCandidates": 3
   },
   "deepReads": [
+    {
+      "slug": "2606.09079-flashmemory-lookahead-sparse-attention",
+      "arxiv_id": "2606.09079",
+      "title": "FlashMemory-DeepSeek-V4: Lightning Index Ultra-Long Context via Lookahead Sparse Attention",
+      "date": "2026-06-09",
+      "first_seen_date": "2026-06-09",
+      "deep_read_date": "2026-06-11",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Yan Wang",
+        "Qifan Zhang",
+        "Jiachen Yu",
+        "Tian Liang",
+        "Dongyang Ma",
+        "Xiang Hu"
+      ],
+      "tags": [
+        "long-context",
+        "kv-cache",
+        "sparse-attention",
+        "predictive-prefetch",
+        "dual-encoder",
+        "decoupled-training",
+        "memory-management",
+        "deepseek-v4",
+        "negative-results"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 9,
+        "autosci_reuse_value": 8,
+        "buildability": 7,
+        "evaluation_value": 6,
+        "breadth_value": 7,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "把「该留哪些 KV」改写成标准双塔检索问题:每 64 步预测未来要用的历史 CSA 块、阈值召回(≥0.5 全取,允许空手)从 CPU 冷池预取;v2 Table 1 Avg 行实值为物理 KV cache 0.10 vs 0.93 GB、精度 77.5 vs 76.9(+0.6),LongBench-v2-L 为 0.18 vs 1.80 GB(10.0%),另有 13.5% 是原文 §3.2 逐基准占比平均而非 Avg 行直接相除;精度反升的机制解释=LSA 当 attention denoiser 滤掉无关历史块(作者解释)——最值钱的是两个方法论:解耦训练(冻结骨干、只训 <0.1% 查询塔,单个 H20 GPU-hour 收敛,8×H20 一周 500 次配置扫描)和罕见诚实的失败剖析(O(1) 假设被 No-Context 对抗测试推翻、MRCR 76→48 经 oracle 诊断归因为任务本质需要密集全局记忆、长度泛化止于训练长度 2 倍);保留:项目中途叫停 τ/阈值无消融、RULER 128K/256K 实为掉分、对照是 DS-V4-Flash 而非 dense full attention、无任何延迟/吞吐数据、开源仓库截至 2026-06-10 只有 retriever/toy loop 无生产 KV swap 且无第三方复现。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.09079.png"
+    },
+    {
+      "slug": "2606.09669-spatialworld-interactive-spatial-benchmark",
+      "arxiv_id": "2606.09669",
+      "title": "SpatialWorld: Benchmarking Interactive Spatial Reasoning of Multimodal Agents in Real-World Tasks",
+      "date": "2026-06-08",
+      "first_seen_date": "2026-06-09",
+      "deep_read_date": "2026-06-11",
+      "must_read": true,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Hongcheng Gao",
+        "Hailong Qu",
+        "Jingyi Tang",
+        "Jiahao Wang",
+        "Zihao Huang",
+        "Hengkang Qiao"
+      ],
+      "tags": [
+        "multimodal-agent",
+        "interactive-spatial-reasoning",
+        "embodied-agent",
+        "agent-eval",
+        "benchmark",
+        "terminal-state-verification",
+        "unified-action-interface",
+        "partial-observability",
+        "step-efficiency",
+        "simulator-suite",
+        "self-improving-agent"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 10,
+        "breadth_value": 8,
+        "evidence_quality": 8
+      },
+      "source_rankings": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "SpatialWorld 的价值不是又报一个 MLLM 排名，而是把跨异构 3D 后端的空间 agent 评测做成可归因协议：8 个 simulator、760 题、vision-only partial observability、统一文本动作、终态 verifier、TSR+SE 双指标和任务三件套；论文自报当前最强 GPT-5 全 benchmark 平均 TSR 17.4%、Physical Overall 14.4%，Qwen-3.5-397B-A17B Physical Overall 12.2%，并暴露 Navigation-Interaction 复合任务 mean TSR 仅 4.2%、Multi-ProcTHOR 最好仅 5.9%、GPT-5.4 大量 premature termination；保留意见是它仍是模拟器 benchmark、高层动作屏蔽低层控制、760 题切细后格子偏薄、人工一致率未披露，且模型结果全部是论文自报而非第三方实测。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.09669.png"
+    },
+    {
+      "slug": "2606.05563-socrates-mediation-eval",
+      "arxiv_id": "2606.05563",
+      "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
+      "date": "2026-06-04",
+      "first_seen_date": "2026-06-08",
+      "deep_read_date": "2026-06-11",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Taewon Yun",
+        "Hyeonseong Park",
+        "Jeonghwan Choi",
+        "Hayoon Park",
+        "Yeeun Choi",
+        "Hwanjun Song"
+      ],
+      "tags": [
+        "benchmark",
+        "llm-as-judge",
+        "judge-calibration",
+        "topic-localized-evaluation",
+        "counterfactual-baseline",
+        "hard-task-filtering",
+        "proactive-agents",
+        "mediation",
+        "social-cognition",
+        "multi-agent-simulation"
+      ],
+      "scores": {
+        "idea_novelty": 7,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 8,
+        "buildability": 7,
+        "evaluation_value": 9,
+        "breadth_value": 8,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "SoCRATES 的核心价值不是证明 LLM 已能真实调解人类冲突，而是给开放式多轮 agent 评测提供一套可迁移的工程尺：agentic 场景策展、无 mediator hard-task gate、5 根社会认知轴独立扰动、topic-localized evaluator、配对反事实 Consensus Gain；最硬证据是 evaluator 与专家 trajectory-level Pearson r=0.823，高于 ProMediate per-turn judge 的 0.372，并在 4,800 个 mediator runs 上显示最强 GPT-5.4-mini 也只达到 34.4 Consensus Gain。限制同样明确：全 LLM 仿真、代码/数据 Coming soon、全部对话为英语、共识之外的满意度/公平/信任修复未纳入主指标。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05563.png"
+    },
+    {
+      "slug": "2606.05622-adaplanbench-dual-constraint-planning",
+      "arxiv_id": "2606.05622",
+      "title": "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model Agents under World and User Constraints",
+      "date": "2026-06-04",
+      "first_seen_date": "2026-06-05",
+      "deep_read_date": "2026-06-11",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Jiayu Liu",
+        "Cheng Qian",
+        "Zhenhailong Wang",
+        "Bingxuan Li",
+        "Jiateng Liu",
+        "Heng Wang"
+      ],
+      "tags": [
+        "benchmark",
+        "adaptive-planning",
+        "dual-constraints",
+        "progressive-disclosure",
+        "interactive-evaluation",
+        "user-simulator",
+        "constraint-tracking",
+        "llm-judge-calibration",
+        "replanning",
+        "early-stopping",
+        "agent-eval"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 8,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 8,
+        "evaluation_value": 9,
+        "breadth_value": 8,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "one_sentence_judgment": "AdaPlanBench 把“约束不会一次性说清”做成了可复用的 agent eval 协议：307 个家务任务、隐藏 world/user 双约束、违规才披露、连续 2 轮无新约束 early stop，并用 VPR/Acc/AWRV/AURV/ATWC/ATUC 拆出失败指纹；最有价值的结论不是 GPT-5 最高 67.75%，而是 VPR>90% 仍可 Acc<45%、显式贴回已披露约束只救合规不救效果、rubric 反馈会修新坏旧；主要保留是 GPT-5.4 裁判与 GPT-5 赢家同家族、纯文本家务域、无真实执行和人类 baseline。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.05622.png"
+    },
+    {
+      "slug": "2606.06087-latentskill-weight-space-skills",
+      "arxiv_id": "2606.06087",
+      "title": "LatentSkill: From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
+      "date": "2026-06-04",
+      "first_seen_date": "2026-06-09",
+      "deep_read_date": "2026-06-11",
+      "must_read": false,
+      "foundational": false,
+      "track": "hf",
+      "venue": "",
+      "authors": [
+        "Aofan Yu",
+        "Chenyu Zhou",
+        "Tianyi Xu",
+        "Zihan Guo",
+        "Rong Shan",
+        "Zhihui Fu"
+      ],
+      "tags": [
+        "agent-skills",
+        "latent-skill",
+        "lora-adapter",
+        "hypernetwork",
+        "weight-space-memory",
+        "skill-composition",
+        "parameter-efficient-adaptation",
+        "self-evolving-agent",
+        "agent-efficiency"
+      ],
+      "scores": {
+        "idea_novelty": 8,
+        "system_design_value": 9,
+        "career_value": 8,
+        "autosci_reuse_value": 9,
+        "buildability": 5,
+        "evaluation_value": 7,
+        "breadth_value": 7,
+        "evidence_quality": 7
+      },
+      "source_rankings": [
+        "daily"
+      ],
+      "one_sentence_judgment": "LatentSkill 把 agent textual skill 从每步 prompt 注入改成 hypernetwork 生成的可插拔 LoRA 权重技能，在 ALFWorld/Search-QA 上自报同时提升平均表现并降低 skill-token overhead，还展示了 α 控制和组件级组合；它对 AI-Brief 的价值是提供“长期技能可编译为参数模块”的系统设计原语，但当前官方仓库仍是 README+图片、Code/Data/Checkpoints 未开放，结论应按论文自报而非第三方复现实测处理。",
+      "thumbnail_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2606.06087.png"
+    },
     {
       "slug": "2606.06492-code2lora-hypernetwork-repo-adapters",
       "arxiv_id": "2606.06492",
@@ -988,7 +1231,7 @@
         "evidence_quality": 7
       },
       "one_line": "提出Lookahead Sparse Attention通过预测未来上下文需求减少GPU内存占用，实现超长上下文推理",
-      "deep_slug": null
+      "deep_slug": "2606.09079-flashmemory-lookahead-sparse-attention"
     },
     {
       "arxiv_id": "2606.09669",
@@ -1007,7 +1250,7 @@
         "evidence_quality": 7
       },
       "one_line": "多模态agent交互空间推理基准，可迁移至自主agent评测框架设计。",
-      "deep_slug": null
+      "deep_slug": "2606.09669-spatialworld-interactive-spatial-benchmark"
     },
     {
       "arxiv_id": "2606.05563",
@@ -1026,7 +1269,7 @@
         "evidence_quality": 6
       },
       "one_line": "构建多领域多社会认知轴基准，通过agentic pipeline生成真实冲突场景评估LLM调解员",
-      "deep_slug": null
+      "deep_slug": "2606.05563-socrates-mediation-eval"
     }
   ],
   "radar": [

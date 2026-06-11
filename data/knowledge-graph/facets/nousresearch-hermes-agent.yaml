@@ -45,9 +45,12 @@ facets:
       CRON[cron jobs.json + prompt scanner] -.无人值守.-> LLM
       HOOKS[observer hooks 只读 / middleware 改写] -.遥测+改写.-> DISP
     ```
-self_evo_use: >
-  能用，且是 4 个节点里最接近「自进化运行时」的一个。SKILL.md 程序性记忆（从经验造技能、用时改进）就是 L1 自进化的工程落地；
-  cross-session SQLite 检索 + 用户建模 = 记忆层。局限：它的「learning loop」是 README 自称、无对照证明，且没有 agemem 那种「用 RL/反馈真正训练记忆策略」的回路——它的自进化是「生成并编辑技能文件」这种规则式改写，而非策略学习。当工程参考样本极好，当「已证明的自进化」要打折。
+self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
+  记忆：能用——cross-session SQLite 检索 + 用户建模是现成的记忆层；SKILL.md 是程序性记忆（从经验造技能、用时改进）。
+
+  理解：部分——execute_code RPC 把中间结果留在 RPC 层不进 LLM 上下文，是对「上下文=稀缺资源」的工程级理解；但无显式世界模型或归因机制。
+
+  自进化：4 个节点里最接近「自进化运行时」的一个——SKILL.md 程序性记忆就是 L1 自进化的工程落地。局限：「learning loop」是 README 自称、无对照证明，且其自进化是「生成并编辑技能文件」的规则式改写、而非策略学习（对照 agemem 的 RL 路线）。当工程参考样本极好，当「已证明的自进化」要打折。
 edges:
   - to: agemem
     type: contradicts

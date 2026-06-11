@@ -78,7 +78,20 @@
   },
   "one_sentence_judgment": "SpatialWorld 的价值不是又报一个 MLLM 排名，而是把跨异构 3D 后端的空间 agent 评测做成可归因协议：8 个 simulator、760 题、vision-only partial observability、统一文本动作、终态 verifier、TSR+SE 双指标和任务三件套；论文自报当前最强 GPT-5 全 benchmark 平均 TSR 17.4%、Physical Overall 14.4%，Qwen-3.5-397B-A17B Physical Overall 12.2%，并暴露 Navigation-Interaction 复合任务 mean TSR 仅 4.2%、Multi-ProcTHOR 最好仅 5.9%、GPT-5.4 大量 premature termination；保留意见是它仍是模拟器 benchmark、高层动作屏蔽低层控制、760 题切细后格子偏薄、人工一致率未披露，且模型结果全部是论文自报而非第三方实测。",
   "cold_audit": {
-    "status": "needs_human",
-    "note": "Round-1 deep read authored from arXiv HTML/PDF and SpatialWorld repo HEAD 55d8d47 on 2026-06-10; hold from publication until independent cold audit flips this gate."
+    "status": "ready_to_publish",
+    "rounds": 1,
+    "audited_at": "2026-06-11T01:05:24.411Z",
+    "auditor": "codex-independent-cold-audit",
+    "author": "codex-gpt-5.5-high",
+    "replacement_for": "claude-cold-audit-quota-unavailable",
+    "final_verdict": "pass",
+    "major_gaps": [],
+    "arxiv_citation_audit": {
+      "checkedCount": 0,
+      "checked": [],
+      "unresolved": [],
+      "downgradeLabel": "推断/待核"
+    },
+    "unresolved_arxiv_references": []
   }
 }

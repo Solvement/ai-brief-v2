@@ -58,7 +58,20 @@
   },
   "one_sentence_judgment": "SoCRATES 的核心价值不是证明 LLM 已能真实调解人类冲突，而是给开放式多轮 agent 评测提供一套可迁移的工程尺：agentic 场景策展、无 mediator hard-task gate、5 根社会认知轴独立扰动、topic-localized evaluator、配对反事实 Consensus Gain；最硬证据是 evaluator 与专家 trajectory-level Pearson r=0.823，高于 ProMediate per-turn judge 的 0.372，并在 4,800 个 mediator runs 上显示最强 GPT-5.4-mini 也只达到 34.4 Consensus Gain。限制同样明确：全 LLM 仿真、代码/数据 Coming soon、全部对话为英语、共识之外的满意度/公平/信任修复未纳入主指标。",
   "cold_audit": {
-    "status": "needs_human",
-    "note": "Generator draft only; independent cold audit required before publication."
+    "status": "ready_to_publish",
+    "rounds": 1,
+    "audited_at": "2026-06-11T00:58:47.322Z",
+    "auditor": "codex-independent-cold-audit",
+    "author": "codex-gpt-5.5-high",
+    "replacement_for": "claude-cold-audit-quota-unavailable",
+    "final_verdict": "pass",
+    "major_gaps": [],
+    "arxiv_citation_audit": {
+      "checkedCount": 0,
+      "checked": [],
+      "unresolved": [],
+      "downgradeLabel": "推断/待核"
+    },
+    "unresolved_arxiv_references": []
   }
 }

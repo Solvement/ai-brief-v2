@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T00:41:02.336Z",
+  "generatedAt": "2026-06-11T03:38:38.393Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -48,7 +48,7 @@
         "reinforcement-learning"
       ],
       "file": "brief-wiki/content/agemem.md",
-      "self_evo_use": "能用。它是\"记忆即动作\"的可落地范式——自进化 agent 的记忆控制器可直接抄这套 typed action 接口 + 用冷审/反馈当 reward 的训练回路。 属真自进化（系统从反馈改自己的记忆策略），不是固定流程。\n",
+      "self_evo_use": "记忆：能用——\"记忆即动作\"的可落地范式：六个记忆操作（长期 Add/Update/Delete + 短期 Retrieve/Summary/Filter）成为一等策略动作，自进化 agent 的记忆控制器可直接抄这套 typed action 接口。\n理解：部分——三阶段课程 + 面向记忆的奖励显示「记忆质量可以被教出来」；它不建世界模型，理解层贡献在于把\"什么时候记/忘\"变成可归因的策略决策。\n自进化：能用，属真自进化（系统从反馈改自己的记忆策略，不是固定流程）——「用冷审/反馈当 reward 的训练回路」可直接借给本站记忆控制器设计。\n",
       "facets": {
         "problem_solved": "记忆生命周期（写入/检索/更新/删除/压缩/过滤）缺乏端到端监督——固定规则的记忆管理是死的，跟不上任务变化。\n",
         "method": "把六个记忆操作（长期记忆 Add/Update/Delete + 短期上下文 Retrieve/Summary/Filter）变成 agent 能像调工具一样随时调用的「一等策略动作」， 再用三阶段课程（先学记、再学在干扰下管上下文、最后学用记忆答题）+ step-wise GRPO（把\"最后答对\"的奖励回传给前面每一步） 强化学习教它「什么时候按哪个按钮」。核心：记忆不是旁边的管家，是大脑的一部分，边想边记。\n",
@@ -133,7 +133,7 @@
         "project"
       ],
       "file": "brief-wiki/content/ai-scientist-v2.md",
-      "self_evo_use": "能用，作为「探索引擎」原语。它示范了自进化 agent 怎么把试错过程结构化成一棵可回溯的树、用一个 manager 节点做选择与停止判断—— 这正是自进化所需的「提出假设→实验→评分→改方向」闭环骨架。局限：它的「学习」是搜索内的方向调整，不会把经验沉淀成可复用技能/记忆（那部分要靠 hermes-agent 的 skills 或 agemem 的可训练记忆补）。\n",
+      "self_evo_use": "记忆：不提供——短期记忆只活在树搜索内部，不会把经验沉淀成可复用技能/记忆（那部分要靠 hermes-agent 的 skills 或 agemem 的可训练记忆补）。\n理解：部分——experiment manager 的评分与方向选择是「提出假设→实验→评分→改方向」的理解闭环骨架，可作为本站研究 loop 的结构参照。\n自进化：能用，作为「探索引擎」原语——示范了怎么把试错过程结构化成一棵可回溯的树、用 manager 节点做选择与停止判断。局限：它的「学习」是搜索内的方向调整，非持久自进化。\n",
       "facets": {
         "problem_solved": "自动科研要么靠人先写死实验模板（v1 的做法，换个领域就失效），要么一锤子让 LLM 跑一次实验、不会回头改方向—— 缺一个能自己「试一条路、不行就退回去换条路」的探索机制。\n",
         "method": "把「从想法到论文」整个过程做成一棵会长大的实验树：每个节点 = 一次独立实验（一段 LLM 写的代码 + 跑出来的结果 + 打分）。 一个 experiment manager（既当规划者又当评委）每轮看所有叶子，挑最有希望的那个往下扩展（best-first，类似下棋只深算最有戏的几步）， 跑出新结果再打分，直到步数耗尽。前面有 ideation agent 反复生成+反思憋出研究想法，后面接 writeup + 自评审。 短期记忆 = 把当前节点这一路的历史塞进 prompt；外部知识 = Semantic Scholar 查文献做新颖性检查。\n",
@@ -309,7 +309,7 @@
         "typescript"
       ],
       "file": "brief-wiki/content/colbymchenry-codegraph.md",
-      "self_evo_use": "能用，但定位是「记忆/索引基础设施」原语，不是自进化大脑本身。它示范了自进化 agent 的记忆层该怎么落地： 结构化关系图（不是纯 embedding RAG）+ 增量同步 + 显式 freshness 信号 + 输出预算控制。 本站的关联知识图谱可直接借它的 schema 与 staleness 设计；但它本身是确定性索引、没有「从反馈改自己」的回路，那一层要外面补。\n",
+      "self_evo_use": "记忆：能用——结构化关系图（不是纯 embedding RAG）+ 增量同步 + 显式 freshness 信号 + 输出预算控制，是「记忆/索引基础设施」原语；本站关联知识图谱可直接借它的 schema 与 staleness 设计。\n理解：能用（结构理解层）——把代码库抽成符号/调用关系图，给 agent 一张确定性的结构理解地图；但理解止于结构事实，语义与因果要上层补。\n自进化：不能——它本身是确定性索引、没有「从反馈改自己」的回路，那一层要外面补（如可学习的记忆控制器）。定位是地基，不是自进化大脑本身。\n",
       "facets": {
         "problem_solved": "编程 agent 每次要理解代码库都临时 grep+读一堆文件，反复重新发现路径和调用链，烧 token 又慢； 而它最怕的是「安静地给你旧答案」——你刚改完文件、索引还没跟上，它却不告诉你。\n",
         "method": "先把整个代码库用 Tree-sitter（把源码转成语法树的解析器）预解析成一张本地 SQLite 关系图： 节点=函数/类/方法/路由这些符号，边=calls/contains/extends/imports 这些关系，外加 FTS5 全文索引。 跨文件引用先丢进 unresolved_refs 暂存表、再批量解析成边（解耦了「抽取」和「跨文件接线」）。 然后通过 MCP（agent 用 stdio 调工具的协议）把它暴露成 codegraph_explore/search/callers/impact 等 8 个工具， agent 不读数据库、只调工具拿结构化上下文。文件改动有 2000ms debounce 的 watcher，落后期间若回答引用到 pending 文件，就在顶部贴 staleness banner 让 agent 改去直接 Read 那几个文件。\n",
@@ -556,7 +556,7 @@
         "llm-agents"
       ],
       "file": "brief-wiki/content/memoryagentbench.md",
-      "self_evo_use": "高价值但是\"尺子\"不是\"引擎\"——它本身不构建记忆，无法直接当自进化 agent 的记忆模块。 但它对自进化极关键：自进化的定义是\"系统从反馈把自己改得越来越懂用户\"，而 TTL（即时学新行为）+ CR（消解过时/矛盾事实）正是衡量\"有没有真在进化\"的核心维度。 可直接拿它的四维协议当 AI-Brief 记忆系统的回归测试门，把\"多跳冲突消解\"列为自进化记忆的红线指标。\n",
+      "self_evo_use": "记忆：是\"尺子\"不是\"引擎\"——本身不构建记忆，无法直接当记忆模块；但 AR/TTL/LRU/CR 四维协议可直接当 AI-Brief 记忆系统的回归测试门。\n理解：能用（评测视角的理解框架）——四维正交拆解 + 增量多轮协议把「记忆系统好不好」变成可检查的问题；「多跳冲突消解全体 ≤6%」是对整个领域失败模式的系统性归因。\n自进化：对自进化极关键——自进化的定义是\"系统从反馈把自己改得越来越懂用户\"，TTL（即时学新行为）+ CR（消解过时/矛盾事实）正是衡量\"有没有真在进化\"的核心维度；把\"多跳冲突消解\"列为自进化记忆的红线指标。\n",
       "facets": {
         "problem_solved": "现有\"记忆评测\"是把整本书一次性塞给模型再提问——测的是\"会不会在长文里翻到答案\"，不是\"记不记得住\"。 真实 agent 是边读边记、原文收走后只能看自己的笔记答题，旧评测测不出这种增量记忆，导致记忆能力被严重误判。\n",
         "method": "像把一次性开卷考改成\"每天发几页、让你自己记笔记，几天后收走原文只准看笔记答题，中途还通知你某条信息作废了要记新忘旧\"—— 论文叫 incremental multi-turn evaluation（增量多轮评测）：把语料拆成块 c1…cn 顺序喂入、每块附\"请记住\"，读完再用 q1…qm 提问。 考试拆成四门正交的课：AR 精确检索、TTL 测试时学习、LRU 长程理解、CR 冲突消解； 再自建两套定向难题（EventQA 超长书籍事件链 / FactConsolidation 反事实编辑对）专戳薄弱维度。它不提新记忆方法，只造\"怎样才算公平地测记忆\"。\n",
@@ -608,7 +608,7 @@
         "python"
       ],
       "file": "brief-wiki/content/mempalace.md",
-      "self_evo_use": "可用、且对研究底座友好。逐字保留原始对话 + 本地零 API + 可插拔后端，使它适合当自进化 agent 的\"原始事实档案层\"—— 当上层策略需要回溯\"当初到底说了什么\"时，未压缩的逐字记忆不可逆地优于抽取式。 但它本身只是存储+检索基础设施、不含可学习的记忆策略（不会自己进化什么时候记/忘），属\"地基\"非\"自进化引擎\"，要做真自进化需在其上加可训练的记忆控制器。\n",
+      "self_evo_use": "记忆：能用——逐字保留原始对话 + 本地零 API + 可插拔后端，适合当自进化 agent 的\"原始事实档案层\"；上层策略要回溯\"当初到底说了什么\"时，未压缩的逐字记忆不可逆地优于抽取式。\n理解：基本不提供——不抽取、不摘要、不建因果结构，理解工作全留给上层（这是它的设计选择，不是缺陷）。\n自进化：不能——它本身只是存储+检索基础设施、不含可学习的记忆策略（不会自己进化什么时候记/忘），属\"地基\"非\"自进化引擎\"；要做真自进化需在其上加可训练的记忆控制器。\n",
       "facets": {
         "problem_solved": "AI 记忆系统普遍靠 LLM 把对话压成事实条目（会丢信息、会幻觉、还得调 API 花钱）； 想要一个完全本地、不摘要不提取、原文一字不改还能高召回检索的记忆层。\n",
         "method": "像一座\"记忆宫殿\"：不改写你说过的话，把对话历史逐字（verbatim）存下来，靠嵌入模型（embeddinggemma-300m 或 all-MiniLM-L6-v2）做纯语义搜索。 再加三层逻辑命名空间索引——wings（人/项目）、rooms（主题）、drawers（原始内容），让检索可以按结构范围缩小，而不是在一个扁平大语料库里捞。 后端可插拔（默认 ChromaDB，抽象接口在 mempalace/backends/base.py），全部数据留在本地、零 API 调用。 检索分级：纯语义搜索 → 混合提升 → 可选 LLM 重排序。装一行 uv tool install mempalace，mine 一下 ~/.claude/projects 就能 search/wake-up。\n",
@@ -747,7 +747,7 @@
         "transfer": "对自进化 agent 极高价值，按模块抄：① SKILL.md 程序性记忆——「从经验生成技能、用时改进」正是 L1 自进化的可落地形态，本站可直接借这套 skill 文件结构当 agent 的可复用流程记忆； ② execute_code RPC——多步工具链不污染上下文，适合长链任务；③ observer/middleware 契约——做 agent 可观测性/质量门的钩子层；④ cron scanner——无人值守管线的注入防护模板。建议抽模式、不整库当生产底座。\n",
         "architecture": "```mermaid\nflowchart TD\n  ENTRY[hermes CLI / gateway 消息平台 / mcp serve] --> LLM[模型层<br/>20+ provider 可配]\n  LLM -->|tool call| DISP{agent_runtime_helpers 分派}\n  DISP -->|delegate_task| SUB[子 agent: 独立上下文/受限工具<br/>父只见总结]\n  DISP -->|普通工具| MW[run_tool_execution_middleware<br/>插件可包裹]\n  DISP -->|execute_code| GUARD[check_execute_code_guard 审批]\n  GUARD --> RPC[生成 hermes_tools.py RPC stub<br/>脚本调父进程工具, 中间结果不进上下文]\n  RPC --> TERM[terminal backend<br/>local/ssh/docker/modal/daytona...]\n  SKILL[(SKILL.md 程序性记忆<br/>skill_view 渐进加载)] -.注入流程.-> LLM\n  MEM[(跨会话 SQLite + FTS5 检索)] -.过去会话.-> LLM\n  CRON[cron jobs.json + prompt scanner] -.无人值守.-> LLM\n  HOOKS[observer hooks 只读 / middleware 改写] -.遥测+改写.-> DISP\n```\n"
       },
-      "self_evo_use": "能用，且是 4 个节点里最接近「自进化运行时」的一个。SKILL.md 程序性记忆（从经验造技能、用时改进）就是 L1 自进化的工程落地； cross-session SQLite 检索 + 用户建模 = 记忆层。局限：它的「learning loop」是 README 自称、无对照证明，且没有 agemem 那种「用 RL/反馈真正训练记忆策略」的回路——它的自进化是「生成并编辑技能文件」这种规则式改写，而非策略学习。当工程参考样本极好，当「已证明的自进化」要打折。\n",
+      "self_evo_use": "记忆：能用——cross-session SQLite 检索 + 用户建模是现成的记忆层；SKILL.md 是程序性记忆（从经验造技能、用时改进）。\n理解：部分——execute_code RPC 把中间结果留在 RPC 层不进 LLM 上下文，是对「上下文=稀缺资源」的工程级理解；但无显式世界模型或归因机制。\n自进化：4 个节点里最接近「自进化运行时」的一个——SKILL.md 程序性记忆就是 L1 自进化的工程落地。局限：「learning loop」是 README 自称、无对照证明，且其自进化是「生成并编辑技能文件」的规则式改写、而非策略学习（对照 agemem 的 RL 路线）。当工程参考样本极好，当「已证明的自进化」要打折。\n",
       "facet_slug": "nousresearch-hermes-agent",
       "facet_status": "extracted"
     },
@@ -1097,7 +1097,7 @@
         "typescript"
       ],
       "file": "brief-wiki/content/supermemory.md",
-      "self_evo_use": "有限可用、且要打折。它的\"自动遗忘 + 矛盾消解 + 画像随对话演进\"确实是自进化记忆需要的能力，可当设计参考； 但记忆处理是黑箱托管 API、无自托管、无开放评测，无法当可掌控的自进化记忆引擎核心，更适合当\"它是怎么把记忆当有状态图谱来做的\"概念参照，不适合直接做研究底座。\n",
+      "self_evo_use": "记忆：有限可用、且要打折——\"自动遗忘 + 矛盾消解 + 画像随对话演进\"确实是自进化记忆需要的能力，可当设计参考；但记忆处理是黑箱托管 API、无自托管、无开放评测。\n理解：部分——「把记忆当有状态图谱来做」（LLM 抽取事实知识图谱）是理解式/抽取式记忆路线的概念参照，与 mempalace 的逐字路线正相反，两边对照着看才完整。\n自进化：不能当核心——黑箱不可改不可测，无法当可掌控的自进化记忆引擎，更适合当概念参照，不适合直接做研究底座。\n",
       "facets": {
         "problem_solved": "AI 应用对话即忘，逼用户反复澄清、破坏个性化；自己搭记忆栈又要配向量库、嵌入管线、分块策略、用户画像系统一大堆底层。\n",
         "method": "把记忆当成一张\"随时间更新的事实知识图谱\"，而不是文档分块。像一个会自己整理的私人助理： 用 LLM 从对话里抽出原子事实存进去；当新信息和旧事实冲突（\"我搬到 SF\" vs \"我住 NYC\"）自动消解、覆盖旧的； 临时事实（\"我明天有考试\"）到点自动过期遗忘。用户画像分静态（长期偏好/身份）+ 动态（近期活动/项目），一次调用即取（自报延迟约 50ms）。 对外用单一 API/MCP 暴露：client.add() 存任意内容自动抽取索引、client.profile() 取画像、search.memories() 做混合搜索（个人记忆 + 知识库 RAG 同时检索）； 用 containerTag 做多项目/多租户隔离。开发者不用碰向量库、嵌入、分块。\n",
@@ -1196,7 +1196,7 @@
         "transfer": "可借的是架构模式而非实现：① 「确定性解析做结构事实 + LLM 只补语义」的混合管道——任何要建可解释知识库、又怕 LLM 乱接关系的场景都该这么分层（本站论文/项目知识图谱抽取同理）； ② 增量指纹 + importMap 预计算省重复分析；③ 知识图谱 JSON 进 Git 当「文档即代码」共享。多智能体协调细节不可见，无法照抄。\n",
         "architecture": "```mermaid\nflowchart TD\n  REPO[代码库] --> TS[Tree-sitter 确定性解析<br/>文件/函数/类/依赖 = 结构事实]\n  TS --> PIPE{多智能体流水线}\n  PIPE --> SCAN[项目扫描]\n  PIPE --> FILE[文件分析 LLM 语义]\n  PIPE --> ARCH[架构层识别]\n  PIPE --> TOUR[导览构建]\n  PIPE --> REVIEW[图谱审查]\n  SCAN & FILE & ARCH & TOUR & REVIEW --> GRAPH[(知识图谱 JSON)]\n  FP[指纹 + importMap 预计算] -.增量更新.-> PIPE\n  GRAPH --> GIT[提交进 Git 团队共享]\n  GRAPH --> DASH[可视化仪表盘<br/>分层着色/语义搜索/差异影响]\n  PLUGIN[15 平台插件接入: Claude Code/Cursor...] -.调用 /understand.-> PIPE\n```\n"
       },
-      "self_evo_use": "价值在「方法原语」而非「可复用系统」：它把「确定性结构 + LLM 语义」的混合抽取范式坐实了，自进化 agent 建自己的代码/知识地图时该照此分层，避免幻觉破坏关系。 但作为系统不能直接复用——多智能体通信/调度是黑盒、无策略学习回路、内部不开放。它是「怎么抽一张可信知识图谱」的参考，不是自进化大脑。\n",
+      "self_evo_use": "记忆：部分——产出的代码知识图谱可作为 agent 的外部结构记忆（图谱进 Git 即持久化），但无写入策略与生命周期管理。\n理解：能用（核心价值）——把「确定性结构 + LLM 语义」的混合抽取范式坐实了：结构事实用 Tree-sitter 确定性解析、LLM 只补语义防幻觉；自进化 agent 建自己的代码/知识地图时该照此分层。\n自进化：不能直接复用——多智能体通信/调度是黑盒、无策略学习回路、内部不开放。它是「怎么抽一张可信知识图谱」的方法参考，不是自进化大脑。\n",
       "facet_slug": "understand-anything",
       "facet_status": "extracted"
     },
@@ -6131,7 +6131,7 @@
       "file": "content/papers/2308.00352-metagpt-multi-agent-sop/metadata.json",
       "arxiv_id": "2308.00352",
       "topic": "agent",
-      "self_evo_use": "能用（成熟可落地的工程范式，68.5k★ MIT，一句话需求即跑）。它是「多 agent 怎么协作不带偏」的可复现答案， 四个设计（SOP/结构化产物/消息池订阅/可执行反馈）可直接做成本站自进化管线的标准件。 但其「递归自改进」只是改约束提示的 prompt 级适配、不是真策略学习——属可被自进化系统借用的编排骨架，不是自进化算法本身。\n",
+      "self_evo_use": "记忆：部分相关——共享消息池+发布订阅是会话内的工作记忆/通信结构，没有跨会话持久记忆层。\n理解：能用——「结构化产物代替对话」（上下游被 schema 锁住的 PRD/设计/任务单）是把理解显式化成可检查交付物的范式，可直接用于本站多 agent 接力（plan/spec/审计单同构）。\n自进化：能用但要分清两层——四个设计（SOP/结构化产物/消息池订阅/可执行反馈）是成熟可落地的编排骨架（68.5k★ MIT，一句话需求即跑），可直接做成本站自进化管线的标准件；但其「递归自改进」只是改约束提示的 prompt 级适配、不是真策略学习——属可被自进化系统借用的骨架，不是自进化算法本身。\n",
       "facets": {
         "problem_solved": "把多个 LLM 天真串联做复杂任务（如一句话造软件），幻觉会一层层级联放大、前错后跟着错，agent 间还充斥无效闲聊烧 token—— 缺的是把成熟的人类协作流程注入进去，让中间产物可被有领域常识的角色检查、从源头压住级联错误。\n",
         "method": "像把一群 LLM 从「自由群聊」改成「按 SOP 跑的软件公司流水线」：产品经理→架构师→项目经理→工程师→QA 五个角色专精， 每个工位只产出带固定格式的交付物（PRD/接口设计/任务单/代码/测试），不传大白话对话。 协作不是一对一传话（那是 O(N²) 乱拓扑），而是丢进一个共享消息池、每个角色按自己画像的兴趣去订阅（架构师只盯 PRD、不被 QA 反馈淹没）， 且「前置依赖全到齐才触发动作」顺手管了次序。工程师写完真跑代码、按报错对照 PRD/设计/历史改、最多 3 轮自纠。口号 Code = SOP(Team)（README 概括，非论文公式）。\n",
@@ -6231,7 +6231,7 @@
       "file": "content/papers/2507.21046-self-evolving-agents-survey/metadata.json",
       "arxiv_id": "2507.21046",
       "topic": "agent",
-      "self_evo_use": "能用（最高复用价值，但属「地图/语料源」而非可跑系统）。它是本站 L1/L2/L3 的设计参照系——四轴决策树 + Π/f 形式化 + 评估五维 + 安全红线 可直接当自进化系统的设计语言与验收尺。注意它本身不进 L3 方法论池的「具体方法」槽（综述不证方法），而是当归类骨架与脉络索引用。\n",
+      "self_evo_use": "记忆：部分——综述把记忆列为进化对象之一（What 轴），提供记忆方法的归类骨架，但本身不给具体记忆机制。\n理解：能用（最高复用价值的设计语言）——四轴决策树 + Π=(Γ,ψ,C,W) / f(Π,τ,r)=Π′ 形式化 + 评估五维 + 安全红线，可直接当自进化系统的设计参照系与验收尺；stability-plasticity 权衡是理解自进化风险的核心框架。\n自进化：能用（属「地图/语料源」而非可跑系统）——它是本站 L1/L2/L3 的设计参照系。注意它本身不进 L3 方法论池的「具体方法」槽（综述不证方法），而是当归类骨架与脉络索引用。\n",
       "facets": {
         "problem_solved": "静态 LLM 部署后不会变，但真实环境开放、交互、会变；大量「让 agent 自己变强」的工作散、没统一坐标系，难比较难复用—— 综述要给「自进化 agent」建一张全景地图与统一语言，让人能定位「该动哪个部件、什么时候动、用什么方法动」。\n",
         "method": "像给一整片乱糟糟的领域画一张「四问坐标系 + 零件目录」：先把 agent 系统形式化成 Π=(Γ架构, ψ模型, C上下文, W工具)， 把自进化定义成一个把 Π 升级成更好 Π′ 的变换 f(Π,τ,r)=Π′（拿轨迹 τ 和反馈 r 升级，环境建成 POMDP）； 再用四个轴把所有方法归位——What 进化什么（模型/上下文/工具/架构）、When 何时（任务内 intra vs 任务间 inter）、 How 怎么（奖励式/模仿示范/群体进化，on/off-policy，online/offline）、Where 在哪（通用域 + 编程/GUI/金融/医疗/教育）。 它不提新方法，只给地图：先按「要进化哪个部件」定位章节、再顺代表方法往下挖。\n",
@@ -6322,7 +6322,7 @@
         "transfer": "可搬的是接口设计心法，不是模型。① 「重编码一次 + 轻查询多次」：把昂贵的理解压成一块统一表示，下游一切产物都是对它的廉价查询—— 对应 AI-Brief 的 KG/Mind Palace：语料一次性蒸馏成 facet+嵌入后，列表/召回/判边/gap-map 都应是「换一种问法」查同一索引， 而不是每个功能再起一条专用管线（D4RT 用一个接口干掉多专用头，正是反「每栏目一套散装脚本」）。 ② 「稀疏训练、按需稠密」：质量门可以只抽样冷审、部署后按需全量核查，不必为最坏情况付全量成本。 ③ 占用网格的去重思想与 ledger 的 arxiv_id 去重同构：已处理项显式标记，确定性防重复计算。 ④ 消融纪律值得学：每个看似不起眼的零件（9×9 patch、查询独立）都有数字背书——本站范式改动也该小样消融再全量。\n",
         "architecture": "```mermaid\nflowchart TD\n  VID[\"输入视频 T×H×W×3<br/>统一缩放 256×256\"] --> ENC[\"编码器 ViT-g 40 层<br/>时空 patch 2×16×16\"]\n  ENC --> F[\"全局场景表示 F<br/>一块可寻址的时空记忆\"]\n  Q[\"查询 q = u v t_src t_tgt t_cam<br/>+ 9×9 局部 RGB patch\"] --> DEC[\"解码器 8 层 cross-attn<br/>查询完全独立 无查询间 self-attn\"]\n  F --> DEC\n  DEC --> P[\"P = 该点的 3D 位置\"]\n  P --> T1[\"点轨迹: 固定 u v t_src 扫 t_tgt\"]\n  P --> T2[\"深度/点云: 扫 u v\"]\n  P --> T3[\"相机位姿: 网格点 + Umeyama/针孔\"]\n  P -.-> OCC[\"全像素跟踪: 占用网格去重<br/>5-15x 加速\"]\n```\n"
       },
-      "self_evo_use": "不能直接用（CV 感知底座，非 agent/记忆/训练原语，且代码权重未确认公开、训练门槛 64 TPU 级）。 能搬的是三条结构心法：统一查询接口替代多专用管线（对 KG 查询层的架构启示）、稀疏训练稠密推理的成本策略（对质量门抽审的启示）、 显式去重表防重复计算（与 ledger 同构，互证设计正确）。另作为「快到能实时的 4D 感知」里程碑， 是未来具身/视频类 agent 选稿的谱系锚点——后续改进/替代工作出现时以本节点为前作参照。\n",
+      "self_evo_use": "记忆：基本不相关——「全局场景表示 F」是单次推理内的时空工作记忆，不提供跨会话可写入/检索的记忆机制。\n理解：部分能用——按需查询解码接口示范了「统一查询接口替代多专用管线」的结构心法（对本站 KG 查询层的架构启示）；但它是 CV 感知底座，不产出可迁移的因果/世界模型方法论。\n自进化：不能直接用（非 agent/记忆/训练原语，且代码权重未确认公开、训练门槛 64 TPU 级）。能搬三条结构心法：统一查询接口、稀疏训练稠密推理的成本策略（对质量门抽审的启示）、显式去重表防重复计算（与 ledger 同构，互证设计正确）。另作为「快到能实时的 4D 感知」里程碑，是未来具身/视频类 agent 选稿的谱系锚点——后续改进/替代工作出现时以本节点为前作参照。\n",
       "core_concepts": [
         {
           "name": "按需查询解码接口（query-based decoding）",
@@ -6409,7 +6409,7 @@
         "transfer": "对 AI-Brief 最值得搬的是两层判断：① 检索接口也是 agent 能力的一部分——本站语料是 markdown 文件，Mind Palace 召回不必只走 embedding top-k，「rg 直查 + 向量召回」hybrid 正是我们 AM Wave 1 竞赛胜出法的同构验证（精确实体/代号用 grep，语义近邻用向量）； ② 自由工具使用必须先行为初始化再 RL/优化——映射到本站 agent 设计：给 agent 新工具（如 shell 查语料）时先用范例轨迹立规矩 （窄命令、限量取回），否则它会学会一把捞爆 context。冷启动数据的「答案感知倒推+答案盲顺写」也是造高质量 agent 训练/评测轨迹的通用配方。\n",
         "architecture": "```mermaid\nflowchart TD\n  Q[QA 样本 question+gold] --> TUTOR[答案感知 Tutor<br/>倒推证据链+target masking]\n  TUTOR --> PLANNER[答案盲 Planner<br/>只看可观测历史顺写]\n  PLANNER --> GATE[质量门 F1>0 + coherence judge]\n  GATE --> SFT[SFT 初始化 Qwen3.5-9B]\n  SFT --> GRPO[GRPO 200 steps<br/>reward = 格式门 x token-F1]\n  GRPO --> AGENT[9B DCI search agent]\n  AGENT --> CMD[生成 shell pipeline rg/grep/head...]\n  CMD --> CLS{pipeline 分类器<br/>byte-exact 可证?}\n  CLS -->|安全| PAR[分片并行 CONCAT/HEAD/COUNT/SORTHEAD]\n  CLS -->|不可证| SEQ[顺序回退]\n  PAR --> CORPUS[(wiki-18 21M 段 ~14GB)]\n  SEQ --> CORPUS\n  CORPUS --> OBS[截断 tool_response] --> AGENT\n```\n"
       },
-      "self_evo_use": "能用（方法论原语 + 可跑资产双重）。方法论层：「行为初始化先于自由探索」「检索接口可重新设计」「答案感知造数据/答案盲保因果」 三条都能直接进本站 agent/语料管线设计。资产层：官方放出 SFT/GRPO 模型与 10k 冷启动数据集（HF alireza7/GrepSeek-*）， 源码含可独立复用的 parallel_search 引擎（带 byte-equivalence 测试）。但本站语料仅 ~百篇级 markdown，分片并行引擎本身用不上， 借的是「语义保持才能给工具提速」的工程纪律。\n",
+      "self_evo_use": "记忆：部分相关——它不建持久记忆，走的是「语料库当可执行环境」的检索式替代（DCI 直查原始语料省掉抽取式记忆层），给「逐字 vs 抽取」之争提供工具侧证据。\n理解：部分能用——「答案感知造数据/答案盲保因果」是因果干净轨迹合成的方法论，可迁移到本站轨迹/评测数据构造；「语义保持才能给工具提速」（byte-equivalence 测试）是可借的工程纪律。\n自进化：能用（方法论原语 + 可跑资产双重）。「行为初始化先于自由探索」「检索接口可重新设计」可直接进本站 agent/语料管线设计；资产层官方放出 SFT/GRPO 模型与 10k 冷启动数据集（HF alireza7/GrepSeek-*），源码含可独立复用的 parallel_search 引擎。但本站语料仅 ~百篇级 markdown，分片并行引擎本身用不上。\n",
       "core_concepts": [
         {
           "name": "Direct Corpus Interaction（直接语料交互 DCI）",
@@ -6528,7 +6528,7 @@
         "transfer": "最值得搬的是两条工程心法。① 「难负例不该随机造，该从真实处理轨迹的副产物里捞」：AI-Brief 的判边 NO_EDGE 候选、 冷审 borderline 稿、选稿淘汰项，正是自家 agent「读了却没采纳」的高混淆样本——拿它们当质量门/判边器的对抗测试集， 比随机抽负例难得多，且难度可用类似「含黄金要素比例」量化。② positive-only 心法：过程分（rubric 评分、结构检查分） 只对结果过门的产出发放，防止深读/facet 被「堆关键词、堆实体名」刷过程分——这正是冷审 rubric 设计该有的防作弊开关。 与 [[tropd]] 的「监督信号先过可靠度门」互补：那条管该不该信老师，这条管过程分该不该发。\n",
         "architecture": "```mermaid\nflowchart TD\n  KG([KILT Wikipedia 超链接图]) --> WALK[随机游走 8 跳得实体路径]\n  WALK --> QGEN[强模型合成八跳问题<br/>+ 吐出每跳黄金实体]\n  QGEN --> AGENT[搜索 agent 真去答题<br/>search/open/cite, 每题 5 条留答对]\n  AGENT --> TIER[分级干扰: Tier-1 读了没引<br/>Tier-2 搜到没点开]\n  TIER --> ASM[traj-tiered 装配到 128K<br/>先 Tier-1 后 Tier-2 再打乱]\n  ASM --> RL[GRPO 训练 G=8]\n  QGEN -. 黄金实体 .-> RUB[rubric 奖励: 实体召回率<br/>组内归一]\n  RL --> GATE{结果奖励 r_oc>0 ?}\n  GATE -->|是| COMB[组合奖励 1-a 结果 + a 过程, a=0.3]\n  GATE -->|否| ZERO[奖励=0 positive-only]\n  RUB --> COMB\n```\n"
       },
-      "self_evo_use": "能用（方法论原语，非可跑系统——本站没有 RL 训练栈，不是抄它的 GRPO 管线）。可直接搬两件设计模式： 「高混淆负样本工厂」（用自家 agent 真实轨迹里读了没采纳的产物当难例，难度可量化）用于把判边/冷审的 benchmark 做强（正合 RULES#18「先把 benchmark 做强」）； 「positive-only 过程分门」用于任何 rubric 式评分——过程分只发给结果过门者，防堆关键词刷分。 代码/模型已开源（4B/8B/30B），但 32×H800 的训练本站不可复现，借的是设计不是栈。\n",
+      "self_evo_use": "记忆：部分相关——处理的是长轨迹内的信息利用（读了没采纳的产物当难例），不提供持久记忆机制。\n理解：能用（失败归因方法论）——「高混淆负样本工厂」用自家 agent 真实轨迹造难度可量化的难例，正是把判边/冷审 benchmark 做强的路子（正合 RULES#18「先把 benchmark 做强」）。\n自进化：能用（方法论原语，非可跑系统——本站没有 RL 训练栈，不是抄它的 GRPO 管线）。「positive-only 过程分门」可用于任何 rubric 式评分——过程分只发给结果过门者，防堆关键词刷分。代码/模型已开源（4B/8B/30B），但 32×H800 的训练本站不可复现，借的是设计不是栈。\n",
       "core_concepts": [
         {
           "name": "rubric reward（实体级评分细则奖励）",
@@ -6614,7 +6614,7 @@
         "transfer": "最值得搬的不是蒸馏代码，是「强监督先过可靠度门再进训练/自进化闭环」的系统心法： AI-Brief 的深读作者→冷审→补差、agent self-improvement、critic 给步骤打分，都不能默认「强模型每一步分数同样可信」。 可直接迁移成「分区可靠度门」——高信任步骤进训练样本/正常学，低信任步骤只给温和建议或老师示范，而非统一加权或一刀切裁剪。 与 AgeMem 的「可训练记忆接口」互补：那条管接口设计，这条管接口里的监督信号该不该信。\n",
         "architecture": "```mermaid\nflowchart TD\n  P([训练 prompt]) --> S[学生生成 SoG x~pi_S]\n  S --> A{逐 token 信任度<br/>P_trust=min·pi_T/pi_S,1·}\n  A -->|trust region| RKL[K1 reverse KL<br/>Memory O·n·]\n  A -->|outlier| FKL[老师 top-k forward KL<br/>Memory O·nk·]\n  P --> T[老师写前缀 x·:l·] --> C[学生续写<br/>off-policy guidance<br/>beta=0.001, 前缀 cosine 退火到 0]\n  RKL --> L[TrOPD 统一目标]\n  FKL --> L\n  C --> L\n  L --> U[更新学生模型]\n```\n"
       },
-      "self_evo_use": "能用（属方法论原语，非可跑系统）。它给自进化的训练/反馈回路提供一条承重原则：逐步监督必须分区——信得过的正常回灌、低信任的降级或示范。 但代码未发布、只验证于 OPD 后训练，本站可借的是「可靠度门 + 温和回退 + 冷启动退火」三件设计模式，不是直接抄一套蒸馏栈。\n",
+      "self_evo_use": "记忆：基本不相关——这是蒸馏训练方法论，不涉及记忆机制。\n理解：能用（失败归因原语）——policy-gradient outlier 的成因分析（K1 估计器在师生分布错位时离群梯度发散）是「训练失败怎么归因到 token 级」的样板。\n自进化：能用（属方法论原语，非可跑系统）。给自进化的训练/反馈回路一条承重原则：逐步监督必须分区——信得过的正常回灌、低信任的降级或示范。本站可借「可靠度门 + 温和回退 + 冷启动退火」三件设计模式；代码未发布、只验证于 OPD 后训练，不是直接抄一套蒸馏栈。\n",
       "core_concepts": [
         {
           "name": "trust region（信任区）",
@@ -6719,7 +6719,51 @@
       "file": "content/papers/2606.02437-scaling-peft-million-personal-models/metadata.json",
       "arxiv_id": "2606.02437",
       "topic": "training",
-      "self_evo_use": "高可用,提供自进化的『权重级持久状态』那一档(比 prompt/skill 进化更深)。可复用:把 LoRA/PEFT 重解释为『长在共享强基座上的持久个人状态』——少数大基座 + 百万级小 adapter 承载某 agent 的偏好/技能/记忆式更新,且 Scale Out 轴明确要求 adapter 可共存/服务/评测/回滚/聚合。这正是自进化记忆库的权重层落点:把跨任务沉淀固化成可回滚的 adapter,而非只存文本记忆。短板:架构蓝图 + 自有实验,代码未披露、关键数字体系内自报,不是可直接复现的方法;训练 adapter 成本高于改 prompt。怎么接:作为 L1 的『深层进化』选项——文本记忆(agentmemory)管短期,稳定下来的行为周期性蒸馏进 LoRA adapter(可回滚)管长期,本图记录 adapter 血缘。"
+      "self_evo_use": "记忆：部分能用。它不能替代外部事实库、文档库、日历、数据库，因为原文明确把 adapter 定位成“局部可写状态”的载体而不是完整记忆系统；但它能帮助 AI 实现可写入、可检索、可更新、可压缩/遗忘的一部分记忆，即把反复经验造成的行为后果压进 LoRA/PEFT adapter，并通过 MinT-style lifecycle 做身份、版本、provenance、评测、服务驻留、回滚。边界是 LoRA-as-memory 有容量律，超过约 10^-2 memory tokens / trainable parameter 后 collapse toward zero，所以事实记忆必须继续分层放外部 memory/tools。\n理解：部分能用。它不是世界模型论文，也没有证明因果理解自动涌现；但它给“可迁移理解”提供了工程闭环：Scale Up 说明强先验让 RL 能采到更好的 reasoning/tool-use 轨迹，Scale Down 用 rank sweep、OLoRA-tail、rank/alpha/lr 联动暴露失败归因，Scale Out 用 majority vote / routing / distillation 把多样 adapter 的行为差异变成可测资源。对 AI-Brief 来说，它能帮助建立“哪些经验该抽象成策略、哪些事实只该保留为检索项、哪些失败来自训练-推理不一致或低秩不稳定”的理解框架。\n自进化：应该复用方法论和架构约束，不应直接把该项目当可落地依赖。原因是代码仓库未披露、关键实验闭源或自报、论文是纲领/position+synthesis。AI-Brief 可落地采用的是三件事：一是 Context Learning 写策略，先用上下文/工具/验证拿到高质量反馈，再只固化重复有用的行为改进；二是 adapter 生命周期治理，把每次策略更新当 revision，必须可评测、可回滚、可追 provenance；三是 population 思维，让多个个性化/任务化策略通过冷审、投票、路由、蒸馏聚合，而不是追求一个永久自改的单体 agent。\n",
+      "facets": {
+        "problem_solved": "个人 AI 的真问题不是“怎么给每个用户便宜微调一次”，而是一个共享强基座能不能承载百万级持久、可训练、可回滚、可服务的个人行为状态；prompt、长上下文、RAG 管当前轮，full checkpoint 又贵到不可治理，中间缺一层可写入的本地适应状态。\n",
+        "method": "论文把 PEFT/LoRA 从“省钱补丁”重解释成“长在共享大脑上的个人神经接口”：少数 trillion-scale base model 负责通用先验，用户/agent 的偏好、技能、工具习惯、失败恢复轨迹先经上下文系统和工具验证，再由 Context Learning 判断哪些反复有用的行为后果值得写进 LoRA/PEFT adapter。整个机制链分三轴推进：Scale Up 先把强 base 带进 RL/适配循环，因为 RL 只能强化当前 policy 采得到的好轨迹；Scale Down 把 adapter 压到低秩但稳定的操作区间，用 rank sweep、OLoRA-tail、rank/alpha/lr 联动降低不可靠种子和 KL 崩溃；Scale Out 再把许多 adapter 当作可命名、可版本化、可缓存、可评测、可回滚的 population 管起来，并通过投票、路由、蒸馏、模拟把多样性变成系统资源。类比一句话：base 是共享发动机，adapter 是每个人可换可审计的驾驶习惯芯片，MinT 是芯片仓库和调度系统。\n",
+        "result": "[自报·作者体系实验，未外部复现] Scale Up motivating table 中，DS-Distill-Qwen-1.5B full RL 用 1.5B trainable parameters 得到 AIME 2025 normalized gain 8.33%、GPQA Diamond 25.00%；DS-Distill-Qwen-7B LoRA r=64 用 0.16B 得到 11.31% / 27.23%；DS-Distill-Qwen-32B LoRA r=8 用 0.07B 得到 20.61% / 33.02%，但作者承认 model size 和 training method 同时变化，不能隔离因果。Kimi K2 case 在 1.04T total parameters / 32.6B activated parameters MoE 上做 LoRA RL，compute/communication footprint 约 conventional full-parameter RL 的 10%；R3 run 在 step 46 的 PPO KL divergence 为 0.000026。Scale Down 中，Qwen3-8B PPO sweep 覆盖 216 runs = 9 ranks × 4 batch sizes × 6 seeds，每个配置 500-step PPO，结论是 rank 16/32 当前最稳，rank 1-4 best seed 可接近但 mean 和 seed reliability 不稳，rank 64/128/256 成本涨而 best-run frontier 没明显抬高。OLoRA 在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO 上约 step 100 collapse，reward 到 -1.0、KL 到 ~8；OLoRA-tail 500 steps 内稳定，并在 DAPO-Math-17k、constant LR 1×10^-5、batch 32、r=16、α=32 下六个数学 benchmark 平均 58.3% vs LoRA 56.3%。δ-Mem 在 Qwen3-4B-Instruct 上把平均分 46.79 提到 51.66，MemoryAgentBench Avg 29.54 到 38.85，HotpotQA EM/F1 42.35/56.00 到 49.41/63.66；TSW/SSW 只引入 4.87M trainable parameters(约 0.12%)，MSW 19.47M(约 0.48%)。LoRA-as-memory 的 DishNameBenchmark 共 263 runs：低于约 10^-3 memory tokens / trainable parameter 时 accuracy 接近 1，10^-3 到 10^-2 transition，超过约 10^-2 后 collapse toward zero，模块效率 MLP > Attention ≈ All >> Unembed。Qwen3-235B rank-32 LoRA 在 ALFWorld validation average 0.646 到 0.845。Scale Out majority vote 中，collaboration accuracy 从 0.3644(k=1) 到 0.4267(k=10)、0.4633(k=100)、最佳 0.4867(k=198)，final baseline 0.3727，拟合 accuracy ≈ 0.386 + 0.0172 ln(k)，R² ≈ 0.888。MinT 数字显示 Qwen3-4B rank-32 LoRA 252 MiB vs merged full 8.061 GB，Qwen3-30B rank-16 LoRA 1.692 GB vs full 61.084 GB；built/audited 10^6-entry packed adapter catalog；CPU cache 369 loaded adapters at 512 hotset、550 at 2048 weak-locality pressure；same-batch window 64 distinct adapters；cold loading 16 cache misses 为 1.375-23.267 s load staircase；packed MoE LoRA tensor objects 37,248 → 672，live loading 8.5-8.7× faster；old warm TTFT p95 9.63 s，ready request load p95 0.00 s，prewarm 409.04 s。\n",
+        "innovation": "同赛道很多 PEFT 论文只证明“微调更省”，这篇的创新是把 PEFT 放进个人 AI/长期 agent 的状态架构里：adapter 不是一次性 task patch，而是 persistent local adaptive state；三轴 Scale Up / Down / Out 不是分类表，而是依赖链，强先验给低秩更新杠杆，稳定低秩让每个个人状态可训练，生命周期基础设施让百万 adapter 可寻址和可治理。它还把 LoRA-as-memory 的容量边界、低秩 RL 的 seed reliability、OLoRA-tail 初始化、rank/alpha/lr 联动、adapter majority vote、MinT-style lifecycle 放到同一张系统蓝图里，强调“个人模型”不是复制大模型，而是共享 base + 轻量 adapter population。\n",
+        "weakness": "[代码未披露] HF paper page 没有 linked model / dataset / space，arXiv 也未给 official GitHub；关键证据来自作者体系内实验，Kimi K2、GLM5、MinT、OASIS、ALFWorld、majority vote 细节缺独立复现。论文是 position+synthesis paper，不是单一端到端 benchmark；多个变量未隔离，尤其 prior comparison 同时改变模型大小和训练方式。许多关键证据以曲线呈现，逐点值以原文图为准。适用边界也清楚：adapter 适合存偏好、技能、工具习惯、策略和部分记忆式更新，不适合把所有事实塞进参数；一旦 prompt injection、错误权限边界或坏工具习惯被固化进 adapter，清理难度会高于一次性上下文错误。Scale Out 的百万是 addressability 和 lifecycle，不是百万 adapter 同时进 GPU；冷启动、缓存局部性、评测回滚和安全治理仍是硬工程约束。\n",
+        "transfer": "AI-Brief 最该搬的是“记忆分层 + 写入策略 + 生命周期治理”这套方法论，而不是等待一个可 clone 的训练栈。个人 AI 情报站可以把原始论文、事实、链接、日期留在外部 memory / tools，把反复稳定的阅读偏好、摘要风格、边界判断、失败归因模式写进可版本化的本地策略层；每次写入前先经 Context Learning 式判断：这是一条一次性事实，还是可复用行为后果。自进化 agent 语料库也可以借 Scale Up/Down/Out 三轴做治理：强模型先产出高质量轨迹，小型可回滚状态只固化低风险稳定改进，多个 agent/adapters 的差异通过投票、路由、冷审和蒸馏聚合，而不是把所有反馈直接灌进同一个不可解释状态。\n",
+        "architecture": "```mermaid\nflowchart TD\n  BASE([共享强 base model<br/>dense / MoE / trillion-scale prior])\n  EXP[用户/agent 反复交互<br/>工具结果·偏好·失败恢复·技能轨迹]\n  EXT[外部 memory / tools<br/>文档·事实·日历·数据库]\n  CTX[Context system<br/>检索/工具/验证提供当前轮证据]\n  WRITE[Context Learning 写策略<br/>决定什么值得固化]\n  ADAPT[LoRA / PEFT adapter<br/>小型持久本地行为状态]\n  MINT[MinT-style lifecycle<br/>policy record·revision·provenance·eval·residency]\n  POP[adapter population<br/>许多个人模型实例]\n  AGG[投票/路由/蒸馏/模拟<br/>把多样性变成系统资源]\n\n  BASE --> ADAPT\n  EXP --> CTX\n  EXT --> CTX\n  CTX --> WRITE\n  WRITE --> ADAPT\n  ADAPT --> MINT\n  MINT --> POP\n  POP --> AGG\n  AGG --> BASE\n```\n"
+      },
+      "core_concepts": [
+        {
+          "name": "Scale Up / Scale Down / Scale Out（三轴扩展）",
+          "role": "primary",
+          "evidence": "Scale Up / Down / Out"
+        },
+        {
+          "name": "LoRA-as-memory（参数化记忆）",
+          "role": "primary",
+          "evidence": "LoRA-as-memory 有容量上限，不是无限仓库"
+        },
+        {
+          "name": "Context Learning（上下文写入策略）",
+          "role": "primary",
+          "evidence": "Context Learning as write policy"
+        },
+        {
+          "name": "MinT adapter 生命周期治理",
+          "role": "primary",
+          "evidence": "policy record / revision / residency 分离"
+        },
+        {
+          "name": "PEFT/LoRA 本地适应状态（local adaptive state）",
+          "role": "primary",
+          "evidence": "persistent personal model instance 的 local adaptive state"
+        }
+      ],
+      "discovery_trace": {
+        "hypothesis": "把标准 SVD-based 初始化从 SFT 迁移到 RL，应该能给低秩 LoRA 更好的几何起点。",
+        "failed_attempts": "论文中的 OLoRA 尝试显示这条路会在 RL 中过猛：在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO 上约 step 100 collapse，reward 掉到 -1.0、KL 爆到 ~8。作者因此走向 OLoRA-tail：仍用 pretrained weight 的 minor singular vectors 初始化 B0 = U_-r, A0 = V_-r^T，但去掉 MiLoRA 的 singular-value scaling，让初始化有几何方向但不放大扰动；随后在 500 steps 内稳定，并在相同 DAPO-Math-17k、constant LR 1×10^-5、effective batch size 32、r=16、α=32 设置下得到 58.3% vs LoRA 56.3%。\n",
+        "source_span": "paper.mdx 实验 / 证据 > 5. OLoRA-tail：低秩 RL 初始化要“有几何，但别太猛”——「标准 SVD-based 初始化从 SFT 搬到 RL 会出问题……OLoRA 在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO 上约 step 100 collapse……OLoRA-tail 在 500 steps 内稳定」"
+      },
+      "facet_slug": "scaling",
+      "facet_status": "extracted",
+      "href": "/papers/2606.02437-scaling-peft-million-personal-models"
     },
     {
       "id": "paper:2606.02800",
@@ -6862,7 +6906,7 @@
         "transfer": "对 AI-Brief 北极星（L1 自进化）的关键启发：长期复用的知识不一定永远以文本形式检索进 context——高频技能可以 「编译」而非「检索」。本站对应物：深读范式、判边 rubric、冷审 prompt 这些每天重复进 context 的「技能文本」， 在未来有自有模型/可训练层时是编译候选。眼下可借的设计模式：① 技能强度应该是连续旋钮不是开关（α 思路适用于 prompt 权重/指令优先级）；② 组合可复用单元时先拆语义组件再合并，整块叠加会重复放大共享部分——这条对我们 拼接多个范式 prompt 时同样成立（共享的 house rules 不要在多个范式里重复注入）。\n",
         "architecture": "```mermaid\nflowchart TD\n  S[技能文档 s<br/>策略·工具模式·恢复规则] --> G[Skill compiler G_phi<br/>hypernetwork]\n  subgraph Train[两阶段训练]\n    P[文档预训练<br/>重建/补全 171K GitHub docs] --> F[轨迹 SFT<br/>skill+teacher trajectory 整条挂载]\n  end\n  Train --> G\n  G --> L[生成 LoRA 补丁 Delta_s]\n  L --> C[Adapter cache<br/>编译一次反复用]\n  C --> M[Frozen backbone<br/>theta + alpha*Delta_s]\n  H[任务历史 h_t 不含技能原文] --> M\n  M --> Y[agent 动作/答案]\n  C --> A[alpha 强度旋钮<br/>倒U曲线 峰值~0.5-0.6]\n  C --> K[组件级组合<br/>拆 general/task/mistakes 再相加]\n```\n"
       },
-      "self_evo_use": "方法论能用，系统不能用（源码未放）。给自进化的承重原则：「技能的承载介质是设计变量」——context 检索、权重编译、 不可逆内化是一条光谱，按复用频率和更新需求选位置。本站当下全在 context 端（范式 prompt/skills 文件），这是对的 （无自有可训练模型），但 facet/语料设计应保持「可编译性」：结构化、组件化（general vs task-specific 分开）， 未来介质迁移时不用重写。α 倒 U 和组件级组合是两条今天就能用的工程直觉。\n",
+      "self_evo_use": "记忆：部分相关——「技能的承载介质是设计变量」（context 检索、权重编译、不可逆内化一条光谱）本质上是\"知识放哪一层\"的记忆架构问题，与参数化记忆同题。\n理解：部分能用——α 倒 U 和组件级组合（general vs task-specific 分开）是两条今天就能用的工程直觉；对「什么时候该把知识从文本搬进权重」给出判断框架。\n自进化：方法论能用，系统不能用（源码未放）。本站当下全在 context 端（范式 prompt/skills 文件），这是对的（无自有可训练模型），但 facet/语料设计应保持「可编译性」：结构化、组件化，未来介质迁移时不用重写。\n",
       "core_concepts": [
         {
           "name": "技能编译器（skill compiler / hypernetwork 生成 LoRA）",
@@ -31699,6 +31743,6 @@
     "crossDocEdges": 54,
     "ghosts": 19,
     "assessed": 40,
-    "facetedNodes": 16
+    "facetedNodes": 17
   }
 }

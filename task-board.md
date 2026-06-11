@@ -15,13 +15,20 @@
 ## 进行中
 
 ### DAILY-0610 · 2026-06-10 每日链 + 冷审硬化 + KG-2 增量入图（本日态势汇总）
-- **发布现状（2026-06-11 接手复核）**：GrepSeek 2605.29307 冷审 1 轮 PASS，已进入 `public/data/papers-index.json`（精读日期 2026-06-11，待 push/生产可见）。LatentSkill / FlashMemory / SoCRATES / AdaPlanBench / SpatialWorld 的全量重审均因 Claude CLI 429 在 Stage A 中断，metadata 仍为 `needs_human`，不得发布。
+- **发布现状（2026-06-11 续跑）**：Kevin 确认 Claude Code 与 Codex 额度不完全共享，Claude 429 时可用完全独立 Codex 子 agent 替代。GrepSeek 2605.29307 已由 Claude 冷审 PASS；LatentSkill / FlashMemory / SoCRATES / AdaPlanBench / SpatialWorld 已由独立 `codex exec` 冷审子进程完成 Stage A/B，两段式 JSON 审稿结果均为 `ready_to_publish`、`majorGaps=[]`，metadata 已写 `auditor:"codex-independent-cold-audit"`。`public/data/papers-index.json` 当前 deepReads=26。
 - **发布完整性漏洞已根治**：1553d22 修复冷审只读“批次开始快照”的问题；Stage A/Stage B 每轮审前重新读盘，审计版本=发布版本，回归测试覆盖 `runDaily` 读取作者轮落盘后的 artifact。
 - **审稿幻觉/错杀修复已落地但待独立重审**：FlashMemory 显存数字恢复为原文正确的 0.42/3.90 GB，并补 §3.2 去噪机制解释；冷审 prompt 增加“指控数字造假必须附原文逐字引文”纪律。当前尚未过独立重审，仍不发布。
 - **批处理可靠性**：545e422/5817d3d 已修 audit_error 隔离与“audit_error 被收尾错写成终态 hold”问题；本次 5 篇 429 被正确隔离为 `audit_error`，没有污染 metadata 终态。
-- **配额实证**：claude -p 继续返回 `You've hit your session limit · resets 11pm (America/New_York)`，重审必须等额度恢复后再跑；当前不伪造 PASS。
-- **KG-2 / Mind Palace 增量**：Mind Palace 自动入图 stage 已上线并实跑，d4rt + longtracerl 两篇积压 facet 入图，`validate-mind-palace` 当前为 facets:16 / vectors:16。后续 2606.02437、2606.03458 入图尝试因 Claude 429 失败，被隔离记录在 `logs/kg-ingest/2026-06-11.json`。
-- **待办**：Claude quota 恢复后重跑 5 篇冷审；过审后 build-index + kg ingest；当前可先提交/推送 GrepSeek + 发布门硬化 + Mind Palace stage 更新，但不能宣称 6 篇全量重审完成。
+- **配额实证**：Claude CLI 429 仍是事实，但本次冷审用完全独立 Codex 子进程替代，主控只编排和落盘，不自审判稿。
+- **KG-2 / Mind Palace 增量**：Mind Palace 自动入图 stage 已上线并实跑；d4rt + longtracerl 已入图。2606.02437 scaling facet 已用 Codex KG 子进程重蒸馏并入图，明确 `self_evo_use` 三段（记忆/理解/自进化）；`kg:build` 当前 facets:17 / vectors:17。其余待入图论文仍按队列继续。
+- **待办**：继续处理剩余 KG ingest 队列（flashmemory/spatialworld facet 待蒸馏）。verify/提交/部署 → 已由 SESSION-0610-EVE 完成（见下）。
+
+### SESSION-0610-EVE · loop-hook v3 + Mind Palace 冷批审 + 模型钉死 + 部署（Claude 主控）
+- **Loop 协议 v3（Kevin 改语义）**：7 格展示+断层提问 → 不等"对"自主推进到可运行交付（红线🔴仍停）。hook 合并为单一 `loop_contract_gate.py`（UserPromptSubmit/PreToolUse/Stop 三事件）：句级分类修假阳/假阴、契约库 `.agent/contracts/` 免重填、180s 冷却修一天 22 份归档 churn、Stop 闭环+陈旧拆防。机器验收 `loop_gate_test.py` 29/29。协议文档/memory 已同步 v3。
+- **Mind Palace 冷批审（codex 改动）**：方向对，三处修正——① research-loop.mjs 把战略七层架构 stamp 到任何查询（例子≠范围违例）→ 重构为 Recall/Contest/RoleCoverage/Gaps 机械层 + Synthesis/Evolution 由 agent 产出，加 13 case 测试；② codex 放宽锁定 bench 的红 case（metric gaming）→ 已恢复 precision 硬门并收紧新 case accept；③ 14+2 个旧 facet self_evo_use 补三段（记忆/理解/自进化），validator 0 WARN。回填后 bench precision 12/15→**13/15**、recall@3 8/8（涨分靠语料不靠放宽）。新增 scaling 容量 precision case 红着留（rank4，指向嵌入文本缺 self_evo_use/core_concepts 的改进方向）。
+- **每日管线模型钉死（Kevin 红线：禁 Fable）**：3 处裸 `claude -p` 已显式 --model——papers:deepread=opus-4-8、cold-audit=opus-4-8（COLD_AUDIT_CLAUDE_MODEL 可覆盖）、kg:ingest=sonnet-4-6（KG_INGEST_CLAUDE_MODEL 可覆盖）；claude-author 原本就 opus-4-8 ✓；codex-deepdive 默认 gpt-5.5 ✓。
+- **6.9/6.10 栏目核查**：papers 5 篇深读已沉淀+过审但未上线 → 本次提交部署；trending/models/pipeline 6-10 新鲜 ✓；**新闻栏 articles.json 停 6-04（断 6 天，静默失败）→ codex B 修根因**；深读积压 3 篇（Mellum2/TIDE/Humanoid-GPT）→ 文末跑 papers:deepread 清。
+- **codex 并行派单**：A=项目栏 v2（plan `docs/plans/2026-06-10-projects-column-v2.md`，gpt-5.5 high）；B=新闻栏断档根因（gpt-5.5 medium）。任务书在 `.agent/codex-task-*.md`，产出报告待 Claude review。
 
 ### PAPER-2606.09669 · SpatialWorld 深读从头重写（plan `docs/plans/2026-06-10-spatialworld-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 SpatialWorld 写成可进入 AI-Brief 知识库的深读资产，重点沉淀“统一 I/O 瓶颈 + 终态 verifier + TSR/SE 双指标 + 任务三件套”对 multimodal agent / 自进化 agent eval 的价值。
@@ -72,6 +79,7 @@
 - **进度续 (2026-06-10)**：✅ codex pilot 后端门完成（plan `docs/plans/KG-2-pilot-backend-gate.md`）：`validate-mind-palace` 落 v2 字段门 + bad fixture 三类 reject 实测；`concept-vocab.json` 生成；`kg:build` 链接入 vocab；TrOPD/MetaGPT/self-evolving survey 三个 paper facet 已合并到 paper 节点，`facetedNodes:12`、vectors:12。
 - **✅ pilot 切片 2 完成 (2026-06-10)**：① 独立判边（opus，generator≠judge）8 候选**全 NO_EDGE**（含 TrOPD 阴性对照；MAB 受测清单实证不含 AgeMem/supermemory，"类目级配对"被证据门挡住）→ 补 `evaluates` 边型 + `evidence_kind` 机器门；② 跨模型冷审：3 新 facet PASS（discovery_trace"数据不足"判定确认正当），4 升级文件概念命名 FAIL → 裁定**两层命名制**（name=跨文件统一规范名 / evidence=源文逐字短语）→ 修复 agent 改完、共用锚（冲突消解/可学习的记忆操作）保住、validator+vocab(31 概念)全绿；③ 前端节点面板新增**承重概念 chips + 解法发现链块**；④ kg:build + npm build 全绿 → 部署。**产品可见**：/mind-palace 点 TrOPD 看 discovery_trace、点任意 12 faceted 节点看承重概念。
 - **进度续 (2026-06-10 夜)**：✅ Mind Palace 自动入图 stage 上线并实跑：d4rt、longtracerl 两篇积压自动蒸馏入图；`public/data/brief/graph.json` 与 `data/knowledge-graph/concept-vocab.json` 均含两者，`validate-mind-palace` 当前统计 facets:16 / vectors:16。2606.02437、2606.03458 后续入图因 Claude 429 失败并隔离，待额度恢复。
+- **进度续 (2026-06-11 第二大脑 contract)**：✅ `docs/workflow/mind-palace-operating-contract.md` 落地：复杂 agent/记忆/预测/自进化/架构任务前必须 Recall → Contest → Synthesis → Evolution actions。✅ `scripts/kg/research-loop.mjs` + `npm run kg:research` 落地：hybrid(vector+BM25+RRF) 召回 Mind Palace，输出候选方法竞赛表、推荐架构和 delete/replace/optimize/add 自进化动作。✅ 新入图 prompt/precheck 要求 `self_evo_use` 显式覆盖“记忆/理解/自进化”；全量 validator 对旧 facet 缺口 warning，避免一次性重写全库。
 - **切片**：① 审计+schema v2 定稿 ② pilot 3 节点入图(产品可见停点) ③ 存量批量回填 ④ gap-map 反哺字段进选稿 ⑤ 综合栏第一篇(🔴 新栏目 Kevin 自审)。
 - **阻塞**：无。
 

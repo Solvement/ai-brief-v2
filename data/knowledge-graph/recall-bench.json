@@ -22,6 +22,9 @@
     {"q": "agent 每开新会话就失忆，怎么给它装跨会话的持久记忆", "expect": "rohitg00-agentmemory", "mode": "recall", "accept": ["rohitg00-agentmemory", "supermemory", "mempalace", "agemem"], "type": "改写"},
     {"q": "新人面对一个巨大陌生代码库、没有地图，怎么快速理解它的结构", "expect": "understand-anything", "mode": "recall", "accept": ["understand-anything", "colbymchenry-codegraph"], "type": "改写"},
     {"q": "记忆系统在多跳冲突消解上普遍很差，谁系统性指出了这个盲区", "expect": "memoryagentbench", "mode": "precision", "type": "改写"},
-    {"q": "把记忆当成大脑的一部分边想边记，而不是旁边一个写死规则的管家", "expect": "agemem", "mode": "precision", "type": "改写"}
+    {"q": "把记忆当成大脑的一部分边想边记，而不是旁边一个写死规则的管家", "expect": "agemem", "mode": "precision", "type": "改写"},
+    {"q": "我要做一个战略 agent + 预测 agent，需要先检索哪些记忆、评测和自进化方法来设计架构", "expect": "memoryagentbench", "mode": "recall", "accept": ["agemem", "memoryagentbench", "self-evolving-agents-survey", "ai-scientist-v2"], "type": "第二大脑"},
+    {"q": "Mind Palace 不是给人看的图，而是让 agent 比较论文项目、取长补短、删减替换优化自身架构", "expect": "scaling", "mode": "recall", "accept": ["scaling", "agemem", "self-evolving-agents-survey"], "type": "第二大脑"},
+    {"q": "把稳定下来的行为蒸馏进可回滚的 LoRA adapter 当长期记忆，参数化记忆的容量边界在哪", "expect": "scaling", "mode": "precision", "type": "簇内消歧"}
   ]
 }

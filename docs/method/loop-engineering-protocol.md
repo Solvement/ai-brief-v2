@@ -1,6 +1,7 @@
 # Loop-Engineering 协议 — 做事前先把 Kevin 的意图整理成"loop 设计"
 
 > Kevin 2026-06-09 定，强制（UserPromptSubmit hook 每次注入提醒）。
+> **v3（2026-06-10 Kevin 改）**：硬门从"等 Kevin 说对"改为"**展示 7 格 + 断层提问引发他思考补全 → 不等确认，自主推进到可运行交付**"。红线 🔴（schema/删除/密钥/上线策略/产品方向）仍停。大 loop/goal = 这 7 步；小 loop 怎么写由 Claude 自主决定。契约仍必填（机器可验的 loop 设计），由 Claude 自填，填齐即开闸——门拦"没设计就动手"，不再拦"Kevin 没批"。
 > **深层目的（不是安全/对齐，是训练）**：这是 **Kevin 练 loop engineering 的脚手架**——他要锻炼"表述系统设计 + 写出完整可循环 loop"的能力；逼我把他的话整理成 loop 设计、在断层处让他补，他就在练把 loop 写完整；写完整了，**细节我去做**。hook 训练的是**设计者**，不是执行者。
 > 背景：loop engineering = 不再逐轮 prompt agent，而是设计那个"发现工作→分派(子)agent→验证→持久化状态→决定下一步"的循环系统（承接 Prompt→Context→Harness→**Loop**）。
 
@@ -17,8 +18,8 @@
    5. **状态 / 持久化** — 中间状态记哪（task-board / memory / research-state）
    6. **停止 / 交付** — 何时停、交付什么
    7. **断层** — 上面哪格他没说清 → 列出来问他
-2. **断层处问 Kevin 补**，直到 loop 完整。
-3. **等他明确"对 / 补充"**（硬门）——补完说"对"，才执行细节。**不准没确认就动手。**
+2. **断层处提问引发 Kevin 思考补全**（训练目的不变——他练 loop 表述）。
+3. **v3：不等确认，自主推进到可运行交付**。先自填契约（机器可验 loop 设计）→ 开闸 → 连续执行小 loop 直到验收门全绿。只在红线 🔴 处停下问。汇报时把结果放回 7 格 + 6 问。
 
 ## 内化（这才是重点）
 - 每次走完，把他**反复出现的目的 + 逻辑模式**沉进 `[[kevin-purposes-and-loops]]`（auto-memory，自动进上下文）。
@@ -28,6 +29,15 @@
 - **无停止条件会死循环** → 硬门 = 他说"对"才停提问、才动手。
 - **反思不持久则改进是临时的** → 沉进 memory。
 - **会幻觉他的意图** → 7 格里不确定的标"断层"问他，不替他脑补。
+
+## v3 升级：单一分类源 + 句级分类 + 契约库 + Stop 闭环（2026-06-10，Kevin 授权"按推荐改进"）
+
+- **合并**：loop-protocol.mjs 已删，`loop_contract_gate.py` 是唯一 hook（UserPromptSubmit/PreToolUse/Stop 三事件）。未布防的真实用户消息发 1 行轻提醒；布防时发完整 v3 文案。
+- **句级分类**：按句切分，实施词（EN 词边界正则 + ZH 扩词表含 改进/优化/重写/升级/补全/实施/落地/更改）只在**非疑问句**内才布防；疑问句 = 句尾 ?/？/吗/呢 或句内 是否/是不是/要不要/怎么/如何/为什么/哪些 等。保守偏向假阴（不布防的代价 < 误拦）。
+- **契约库** `.agent/contracts/<type>.md`：契约新增 `Loop type:` / `Reuse triggers:` 字段；布防时触发词命中 → 复用库契约（换 hash）→ 首个工具调用验证即开闸，免重填。跑稳的 loop 类型由 Claude 在闭环时手动晋升入库（"skills compound, prompts burn"）。
+- **冷却 180s**：state 创建 3 分钟内的新实施 prompt 不重布防（修 0610 一天 22 份契约归档 churn）。
+- **Stop 闭环**：① armed 未实施 → 自动拆防（修陈旧 state 拦无关写入的事故类）；② 开闸过且未闭环 → block 一次提醒（6 问汇报 + memory 更新 + 契约晋升评估），置 closed 后放行，保证不死循环；payload.stop_hook_active 直接放行。
+- **机器验收**：`python .claude/hooks/loop_gate_test.py`（29 case 全过 = 门行为正确）。plan：`docs/plans/2026-06-10-loop-hook-v3.md`。
 
 ## v2 升级：Loop Contract Gate（2026-06-09，Kevin 定）
 

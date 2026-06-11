@@ -1,0 +1,87 @@
+schema: v2
+node_id: paper:2606.02437
+slug: scaling
+kind: paper
+title: "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters"
+source: "arxiv:2606.02437v2 + content/papers/2606.02437-scaling-peft-million-personal-models/paper.mdx（深读冷审稿；代码仓库未披露）"
+
+facets:
+  problem_solved: >
+    个人 AI 的真问题不是“怎么给每个用户便宜微调一次”，而是一个共享强基座能不能承载百万级持久、可训练、可回滚、可服务的个人行为状态；prompt、长上下文、RAG 管当前轮，full checkpoint 又贵到不可治理，中间缺一层可写入的本地适应状态。
+
+  method: >
+    论文把 PEFT/LoRA 从“省钱补丁”重解释成“长在共享大脑上的个人神经接口”：少数 trillion-scale base model 负责通用先验，用户/agent 的偏好、技能、工具习惯、失败恢复轨迹先经上下文系统和工具验证，再由 Context Learning 判断哪些反复有用的行为后果值得写进 LoRA/PEFT adapter。整个机制链分三轴推进：Scale Up 先把强 base 带进 RL/适配循环，因为 RL 只能强化当前 policy 采得到的好轨迹；Scale Down 把 adapter 压到低秩但稳定的操作区间，用 rank sweep、OLoRA-tail、rank/alpha/lr 联动降低不可靠种子和 KL 崩溃；Scale Out 再把许多 adapter 当作可命名、可版本化、可缓存、可评测、可回滚的 population 管起来，并通过投票、路由、蒸馏、模拟把多样性变成系统资源。类比一句话：base 是共享发动机，adapter 是每个人可换可审计的驾驶习惯芯片，MinT 是芯片仓库和调度系统。
+
+  result: >
+    [自报·作者体系实验，未外部复现] Scale Up motivating table 中，DS-Distill-Qwen-1.5B full RL 用 1.5B trainable parameters 得到 AIME 2025 normalized gain 8.33%、GPQA Diamond 25.00%；DS-Distill-Qwen-7B LoRA r=64 用 0.16B 得到 11.31% / 27.23%；DS-Distill-Qwen-32B LoRA r=8 用 0.07B 得到 20.61% / 33.02%，但作者承认 model size 和 training method 同时变化，不能隔离因果。Kimi K2 case 在 1.04T total parameters / 32.6B activated parameters MoE 上做 LoRA RL，compute/communication footprint 约 conventional full-parameter RL 的 10%；R3 run 在 step 46 的 PPO KL divergence 为 0.000026。Scale Down 中，Qwen3-8B PPO sweep 覆盖 216 runs = 9 ranks × 4 batch sizes × 6 seeds，每个配置 500-step PPO，结论是 rank 16/32 当前最稳，rank 1-4 best seed 可接近但 mean 和 seed reliability 不稳，rank 64/128/256 成本涨而 best-run frontier 没明显抬高。OLoRA 在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO 上约 step 100 collapse，reward 到 -1.0、KL 到 ~8；OLoRA-tail 500 steps 内稳定，并在 DAPO-Math-17k、constant LR 1×10^-5、batch 32、r=16、α=32 下六个数学 benchmark 平均 58.3% vs LoRA 56.3%。δ-Mem 在 Qwen3-4B-Instruct 上把平均分 46.79 提到 51.66，MemoryAgentBench Avg 29.54 到 38.85，HotpotQA EM/F1 42.35/56.00 到 49.41/63.66；TSW/SSW 只引入 4.87M trainable parameters(约 0.12%)，MSW 19.47M(约 0.48%)。LoRA-as-memory 的 DishNameBenchmark 共 263 runs：低于约 10^-3 memory tokens / trainable parameter 时 accuracy 接近 1，10^-3 到 10^-2 transition，超过约 10^-2 后 collapse toward zero，模块效率 MLP > Attention ≈ All >> Unembed。Qwen3-235B rank-32 LoRA 在 ALFWorld validation average 0.646 到 0.845。Scale Out majority vote 中，collaboration accuracy 从 0.3644(k=1) 到 0.4267(k=10)、0.4633(k=100)、最佳 0.4867(k=198)，final baseline 0.3727，拟合 accuracy ≈ 0.386 + 0.0172 ln(k)，R² ≈ 0.888。MinT 数字显示 Qwen3-4B rank-32 LoRA 252 MiB vs merged full 8.061 GB，Qwen3-30B rank-16 LoRA 1.692 GB vs full 61.084 GB；built/audited 10^6-entry packed adapter catalog；CPU cache 369 loaded adapters at 512 hotset、550 at 2048 weak-locality pressure；same-batch window 64 distinct adapters；cold loading 16 cache misses 为 1.375-23.267 s load staircase；packed MoE LoRA tensor objects 37,248 → 672，live loading 8.5-8.7× faster；old warm TTFT p95 9.63 s，ready request load p95 0.00 s，prewarm 409.04 s。
+
+  innovation: >
+    同赛道很多 PEFT 论文只证明“微调更省”，这篇的创新是把 PEFT 放进个人 AI/长期 agent 的状态架构里：adapter 不是一次性 task patch，而是 persistent local adaptive state；三轴 Scale Up / Down / Out 不是分类表，而是依赖链，强先验给低秩更新杠杆，稳定低秩让每个个人状态可训练，生命周期基础设施让百万 adapter 可寻址和可治理。它还把 LoRA-as-memory 的容量边界、低秩 RL 的 seed reliability、OLoRA-tail 初始化、rank/alpha/lr 联动、adapter majority vote、MinT-style lifecycle 放到同一张系统蓝图里，强调“个人模型”不是复制大模型，而是共享 base + 轻量 adapter population。
+
+  weakness: >
+    [代码未披露] HF paper page 没有 linked model / dataset / space，arXiv 也未给 official GitHub；关键证据来自作者体系内实验，Kimi K2、GLM5、MinT、OASIS、ALFWorld、majority vote 细节缺独立复现。论文是 position+synthesis paper，不是单一端到端 benchmark；多个变量未隔离，尤其 prior comparison 同时改变模型大小和训练方式。许多关键证据以曲线呈现，逐点值以原文图为准。适用边界也清楚：adapter 适合存偏好、技能、工具习惯、策略和部分记忆式更新，不适合把所有事实塞进参数；一旦 prompt injection、错误权限边界或坏工具习惯被固化进 adapter，清理难度会高于一次性上下文错误。Scale Out 的百万是 addressability 和 lifecycle，不是百万 adapter 同时进 GPU；冷启动、缓存局部性、评测回滚和安全治理仍是硬工程约束。
+
+  transfer: >
+    AI-Brief 最该搬的是“记忆分层 + 写入策略 + 生命周期治理”这套方法论，而不是等待一个可 clone 的训练栈。个人 AI 情报站可以把原始论文、事实、链接、日期留在外部 memory / tools，把反复稳定的阅读偏好、摘要风格、边界判断、失败归因模式写进可版本化的本地策略层；每次写入前先经 Context Learning 式判断：这是一条一次性事实，还是可复用行为后果。自进化 agent 语料库也可以借 Scale Up/Down/Out 三轴做治理：强模型先产出高质量轨迹，小型可回滚状态只固化低风险稳定改进，多个 agent/adapters 的差异通过投票、路由、冷审和蒸馏聚合，而不是把所有反馈直接灌进同一个不可解释状态。
+
+  architecture: |
+    ```mermaid
+    flowchart TD
+      BASE([共享强 base model<br/>dense / MoE / trillion-scale prior])
+      EXP[用户/agent 反复交互<br/>工具结果·偏好·失败恢复·技能轨迹]
+      EXT[外部 memory / tools<br/>文档·事实·日历·数据库]
+      CTX[Context system<br/>检索/工具/验证提供当前轮证据]
+      WRITE[Context Learning 写策略<br/>决定什么值得固化]
+      ADAPT[LoRA / PEFT adapter<br/>小型持久本地行为状态]
+      MINT[MinT-style lifecycle<br/>policy record·revision·provenance·eval·residency]
+      POP[adapter population<br/>许多个人模型实例]
+      AGG[投票/路由/蒸馏/模拟<br/>把多样性变成系统资源]
+
+      BASE --> ADAPT
+      EXP --> CTX
+      EXT --> CTX
+      CTX --> WRITE
+      WRITE --> ADAPT
+      ADAPT --> MINT
+      MINT --> POP
+      POP --> AGG
+      AGG --> BASE
+    ```
+
+self_evo_use: >
+  记忆：部分能用。它不能替代外部事实库、文档库、日历、数据库，因为原文明确把 adapter 定位成“局部可写状态”的载体而不是完整记忆系统；但它能帮助 AI 实现可写入、可检索、可更新、可压缩/遗忘的一部分记忆，即把反复经验造成的行为后果压进 LoRA/PEFT adapter，并通过 MinT-style lifecycle 做身份、版本、provenance、评测、服务驻留、回滚。边界是 LoRA-as-memory 有容量律，超过约 10^-2 memory tokens / trainable parameter 后 collapse toward zero，所以事实记忆必须继续分层放外部 memory/tools。
+
+  理解：部分能用。它不是世界模型论文，也没有证明因果理解自动涌现；但它给“可迁移理解”提供了工程闭环：Scale Up 说明强先验让 RL 能采到更好的 reasoning/tool-use 轨迹，Scale Down 用 rank sweep、OLoRA-tail、rank/alpha/lr 联动暴露失败归因，Scale Out 用 majority vote / routing / distillation 把多样 adapter 的行为差异变成可测资源。对 AI-Brief 来说，它能帮助建立“哪些经验该抽象成策略、哪些事实只该保留为检索项、哪些失败来自训练-推理不一致或低秩不稳定”的理解框架。
+
+  自进化：应该复用方法论和架构约束，不应直接把该项目当可落地依赖。原因是代码仓库未披露、关键实验闭源或自报、论文是纲领/position+synthesis。AI-Brief 可落地采用的是三件事：一是 Context Learning 写策略，先用上下文/工具/验证拿到高质量反馈，再只固化重复有用的行为改进；二是 adapter 生命周期治理，把每次策略更新当 revision，必须可评测、可回滚、可追 provenance；三是 population 思维，让多个个性化/任务化策略通过冷审、投票、路由、蒸馏聚合，而不是追求一个永久自改的单体 agent。
+
+core_concepts:
+  - name: "Scale Up / Scale Down / Scale Out（三轴扩展）"
+    role: primary
+    evidence: "Scale Up / Down / Out"
+  - name: "LoRA-as-memory（参数化记忆）"
+    role: primary
+    evidence: "LoRA-as-memory 有容量上限，不是无限仓库"
+  - name: "Context Learning（上下文写入策略）"
+    role: primary
+    evidence: "Context Learning as write policy"
+  - name: "MinT adapter 生命周期治理"
+    role: primary
+    evidence: "policy record / revision / residency 分离"
+  - name: "PEFT/LoRA 本地适应状态（local adaptive state）"
+    role: primary
+    evidence: "persistent personal model instance 的 local adaptive state"
+
+discovery_trace:
+  hypothesis: "把标准 SVD-based 初始化从 SFT 迁移到 RL，应该能给低秩 LoRA 更好的几何起点。"
+  failed_attempts: >
+    论文中的 OLoRA 尝试显示这条路会在 RL 中过猛：在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO 上约 step 100 collapse，reward 掉到 -1.0、KL 爆到 ~8。作者因此走向 OLoRA-tail：仍用 pretrained weight 的 minor singular vectors 初始化 B0 = U_-r, A0 = V_-r^T，但去掉 MiLoRA 的 singular-value scaling，让初始化有几何方向但不放大扰动；随后在 500 steps 内稳定，并在相同 DAPO-Math-17k、constant LR 1×10^-5、effective batch size 32、r=16、α=32 设置下得到 58.3% vs LoRA 56.3%。
+  source_span: "paper.mdx 实验 / 证据 > 5. OLoRA-tail：低秩 RL 初始化要“有几何，但别太猛”——「标准 SVD-based 初始化从 SFT 搬到 RL 会出问题……OLoRA 在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO 上约 step 100 collapse……OLoRA-tail 在 500 steps 内稳定」"
+
+# agemem(记忆接口相关但训练范式不同)：本文是 PEFT adapter 生命周期与容量律，不是 step-wise GRPO 记忆操作训练 → NO_EDGE
+# supermemory(外部记忆系统相关但存储层不同)：本文明确 raw facts/documents 应留在 external memory/tools，adapter 存行为状态 → NO_EDGE
+# latentskill(参数空间技能相关但机制不同)：二者都把能力写入参数小块，但本文核心是 LoRA/PEFT personal state 与 lifecycle，不是 hypernetwork 生成 LoRA → NO_EDGE
+# self-evolving-agents-survey(自进化框架相关但粒度不同)：本文可作为自进化状态层方法论，不是自进化 agent 形式化综述 → NO_EDGE
+edges: []
+
+status: extracted

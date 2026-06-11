@@ -58,9 +58,12 @@ core_concepts:
   - name: 文献新颖性检查
     role: mentioned
     evidence: "深读 Tool Interface 逐字『文献搜索工具：通过 Semantic Scholar API 进行新颖性检查和引用收集，依赖 S2_API_KEY』——规范名『文献新颖性检查』取自源文原词『文献搜索工具…新颖性检查』。"
-self_evo_use: >
-  能用，作为「探索引擎」原语。它示范了自进化 agent 怎么把试错过程结构化成一棵可回溯的树、用一个 manager 节点做选择与停止判断——
-  这正是自进化所需的「提出假设→实验→评分→改方向」闭环骨架。局限：它的「学习」是搜索内的方向调整，不会把经验沉淀成可复用技能/记忆（那部分要靠 hermes-agent 的 skills 或 agemem 的可训练记忆补）。
+self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
+  记忆：不提供——短期记忆只活在树搜索内部，不会把经验沉淀成可复用技能/记忆（那部分要靠 hermes-agent 的 skills 或 agemem 的可训练记忆补）。
+
+  理解：部分——experiment manager 的评分与方向选择是「提出假设→实验→评分→改方向」的理解闭环骨架，可作为本站研究 loop 的结构参照。
+
+  自进化：能用，作为「探索引擎」原语——示范了怎么把试错过程结构化成一棵可回溯的树、用 manager 节点做选择与停止判断。局限：它的「学习」是搜索内的方向调整，非持久自进化。
 edges:
   - to: nousresearch-hermes-agent
     type: composes_with
