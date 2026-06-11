@@ -26,3 +26,6 @@
 17. **编排分两层**（研究 CMU+腾讯 / LangGraph / CrewAI / AutoGen 后定，2026-06-09，详见 docs/agents/README.md §编排决策）：① **开发期**多 agent（建造/审计/研究）= Claude sub-agent + dynamic workflow + codex，**采纳模式不引运行时库**（我们的 agent 是订阅 CLI 非 API model-client）；② **每日管线 = LangGraph (Python)**——管线=带条件门+有界循环的状态图，要 checkpoint/断点续跑/可观测/HITL。**不引 AutoGen/CrewAI 运行时。**
 
 18. **找问题/优化结构用 research-loop（科研不照抄）**，详见 [docs/method/research-loop.md](./docs/method/research-loop.md)：读论文/项目**当镜子照自己**（不只找有用，问"我们结构有没有它治的病/适不适合我们"）；**自审找不出问题** → 真跑真测(对抗) + **跨模型对抗审(codex⇄claude 升到架构层)**；同一问题**多法竞赛、指标当裁判**，选最适合我们的（**不照抄** papers 的栈）；**先把 benchmark 做强**再比方法（弱测试给假绿）。
+
+19. **closeout 必须引用验证证据（CMU 第 8 章验收清单）。** task-board 的 `交付结论：` 不许只写"做完了"——要带 verify/冷审/commit/门 等可追溯证据，否则只是完成幻觉。空/待办用 `交付结论：—` 或 `待…` 显式标注。`npm run ops:harness`（已接进 `validate`）机器检查此条 + workflow.yaml stage 完整性 + 跨文件引用不悬空 = 可判定 Rule 下沉成脚本（CMU「能判定就不要停在自然语言 Rule」）。
+20. **责任靠前后报告对比，不靠叙述（CMU 六轮补稳 #5）。** 大改动前 `npm run ops:baseline`（存 validate 套件基线），改完 `npm run ops:baseline:diff` 自证哪些 validator 是本次新引入失败的——"这不是我引入的"必须用 diff 证明，不能口头。

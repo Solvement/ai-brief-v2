@@ -14,6 +14,13 @@
 
 ## 进行中
 
+### HARNESS-CMU-GAPS · 补全 CMU 四块拼图缺口（plan `docs/plans/2026-06-11-cmu-harness-gaps.md`）
+- **大方向**：让"完成"从模型叙述变脚本判定——补 CMU 反馈块（基线对比/遥测）+ 约束·进化块（流程完整性/可判定 Rule 下沉/closeout 证据）。
+- **小方向**：① `verify-baseline.mjs`（snapshot/diff，自证新增失败）② `check-harness.mjs`（workflow stage 完整性+引用不悬空+closeout 证据门，接进 validate）③ `token-usage-by-model.mjs`（遥测，比模型/定位烧点）④ npm ops:* ⑤ RULES #19/#20 + dev-map。
+- **阶段**：✅ 完成。三脚本 + npm ops:* + validate 接入 + RULES #19/#20 + dev-map。
+- **阻塞**：无。
+- **交付结论**：独立冷审（opus）抓出两 bug 已修——① closeout 正则对 `**交付结论**：` 失配导致证据门变死检查（改 `\*{0,2}` 容粗体，已用合成 case 验证活检查）；② token 脚本按 content-block 重复计数（同 requestId 多行重复 usage），已按 requestId 去重（Opus 调用数 17,143→6,701）。修后 eslint/test/build 全绿，check-harness 接进 validate 实跑 0 硬错误。已快进 origin/main。
+
 ### DAILY-0610 · 2026-06-10 每日链 + 冷审硬化 + KG-2 增量入图（本日态势汇总）
 - **发布现状（2026-06-11 续跑）**：Kevin 确认 Claude Code 与 Codex 额度不完全共享，Claude 429 时可用完全独立 Codex 子 agent 替代。GrepSeek 2605.29307 已由 Claude 冷审 PASS；LatentSkill / FlashMemory / SoCRATES / AdaPlanBench / SpatialWorld 已由独立 `codex exec` 冷审子进程完成 Stage A/B，两段式 JSON 审稿结果均为 `ready_to_publish`、`majorGaps=[]`，metadata 已写 `auditor:"codex-independent-cold-audit"`。`public/data/papers-index.json` 当前 deepReads=26。
 - **发布完整性漏洞已根治**：1553d22 修复冷审只读“批次开始快照”的问题；Stage A/Stage B 每轮审前重新读盘，审计版本=发布版本，回归测试覆盖 `runDaily` 读取作者轮落盘后的 artifact。
