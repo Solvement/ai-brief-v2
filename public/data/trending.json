@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-11T14:38:20.289Z",
+  "generatedAt": "2026-06-11T17:35:01.430Z",
   "analysisModels": {
     "projectLight": "deepseek-v4-flash",
     "projectDeep": "Tier 3: codex:gpt-5.5;model_reasoning_effort=high",
     "projectReview": "deepseek-v4-pro"
   },
   "pipelineRun": {
-    "id": "projects-2026-06-11-1781188702264",
+    "id": "projects-2026-06-11-1781199303797",
     "memoryFile": "data/agent-memory/projects.json",
     "statusFile": "public/data/pipeline-status.json"
   },
@@ -115,13 +115,13 @@
       "stage": "discover",
       "role": "Discoverer",
       "responsibility": "发现候选内容，保留来源、主题、时间和热度信号，避免只靠标题判断。",
-      "signal": "47 repos from GitHub Trending plus topic/search supplements"
+      "signal": "12 repos from GitHub Trending plus topic/search supplements"
     },
     {
       "stage": "evidence",
       "role": "Evidence Collector",
       "responsibility": "收集 README、abstract、sourceUrl、paperUrl、benchmark、版本号等证据，让分析有依据。",
-      "signal": "47 README + artifactAudit + evidence_signals records in SQLite"
+      "signal": "12 README + artifactAudit + evidence_signals records in SQLite"
     },
     {
       "stage": "rank",
@@ -158,7 +158,7 @@
     "schemaVersion": 1,
     "surface": "projects",
     "status": "warning",
-    "checkedAt": "2026-06-11T14:38:20.289Z",
+    "checkedAt": "2026-06-11T17:35:01.430Z",
     "checks": [
       {
         "id": "boards-present",
@@ -200,14 +200,14 @@
   },
   "radar": {
     "window": "radar",
-    "generatedAt": "2026-06-11T14:38:20.289Z",
+    "generatedAt": "2026-06-11T17:35:01.430Z",
     "target": 30,
     "repos": [],
     "depthCounts": {}
   },
   "daily": {
     "window": "daily",
-    "generatedAt": "2026-06-11T14:38:20.277Z",
+    "generatedAt": "2026-06-11T17:35:01.425Z",
     "target": 6,
     "repos": [
       {
@@ -219,81 +219,95 @@
         "description": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon.",
         "language": "Swift",
         "languageColor": "#F05138",
-        "stars": 31240,
-        "forks": 875,
+        "stars": 31672,
+        "forks": 886,
         "starsGained": 2775,
         "starsGainedByWindow": {
           "daily": 2419,
           "weekly": 2775
         },
         "rank": 1,
-        "tldr": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac.",
+        "tldr": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon”。",
         "tags": [
-          "容器",
-          "虚拟机",
-          "macOS",
-          "Swift",
-          "OCI"
+          "Tier 0",
+          "无关类",
+          "skills",
+          "cli",
+          "docs"
         ],
-        "light": "Apple 开源的 container 工具，利用 macOS 26 虚拟化特性在 Mac 上以轻量级 VM 方式运行 Linux 容器，支持 OCI 标准镜像的拉取、推送和运行。项目处于早期开发阶段（0.x），仅保证补丁版本内稳定性，仅支持 Apple Silicon 和 macOS 26。有完整文档、示例和测试。与 AI 生态无直接关联，但展示了系统级虚拟化实现轻量级容器的工程实践。推荐关注其容器化技术和 Swift 实现，深度分析需等待更成熟版本。",
-        "worthDeepDive": 50,
-        "ranking_score": 50,
-        "max_allowed_depth": "deep",
-        "final_depth": "light",
-        "depth_band": "light",
-        "analysis_depth": "light",
-        "project_tier": 1,
-        "project_tier_label": "Tier 1",
-        "project_bucket": "真·新项目",
-        "bucket": "真·新项目",
-        "tier_tag": "[Tier 1｜真·新项目]",
-        "model_tier": "cheap-extraction",
+        "light": "apple/container 得分 15，信号是 project_type:non_ai_eng, signal_score:15；暂不深挖，因为 bucket:无关类。建议 monitor。",
+        "worthDeepDive": 15,
+        "ranking_score": 15,
+        "max_allowed_depth": "list_only",
+        "final_depth": "list_only",
+        "depth_band": "list_only",
+        "analysis_depth": "list_only",
+        "project_tier": 0,
+        "project_tier_label": "Tier 0",
+        "project_bucket": "无关类",
+        "bucket": "无关类",
+        "tier_tag": "[Tier 0｜无关类]",
+        "model_tier": "none",
         "requires_manual_confirmation": false,
         "tier_template": {
-          "tier": 1,
-          "bucket": "真·新项目",
-          "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "Apple 开源的 Mac 原生容器工具，面向 macOS 26+ 的 Apple Silicon 用户",
-          "what_it_does": "通过轻量级虚拟机在 Mac 上创建和运行 OCI 兼容的 Linux 容器，支持镜像拉取、构建和推送",
+          "tier": 0,
+          "bucket": "无关类",
+          "tag": "[Tier 0｜无关类]",
+          "one_sentence_positioning": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon”。",
+          "what_it_does": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon.",
           "metadata": {
             "language": "Swift",
-            "total_stars": 31240,
+            "total_stars": 31672,
             "stars_in_period": 2775,
             "author": "apple"
           },
           "labels": [
-            "工具"
+            "skills",
+            "cli",
+            "docs"
           ],
-          "prose_body": "apple/container 得分 50，信号是 project_type:agent_framework, signal_score:50。按确定性深度门控进入 light，建议 monitor。"
+          "prose_body": "apple/container 得分 15，信号是 project_type:non_ai_eng, signal_score:15；暂不深挖，因为 bucket:无关类。建议 monitor。",
+          "index_only": {
+            "name": "apple/container",
+            "url": "https://github.com/apple/container",
+            "automatic_tags": [
+              "无关类",
+              "bucket:无关类"
+            ]
+          }
         },
-        "recommended_action": "monitor",
+        "recommended_action": "ignore",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": false,
         "ranking_reasons": [
-          "project_type:agent_framework",
-          "signal_score:50",
+          "project_type:non_ai_eng",
+          "signal_score:15",
           "depth_gate:light_default",
-          "bucket:真·新项目",
+          "bucket:无关类",
           "novelty:new_repo",
           "novelty:substantive_artifact",
           "heat:stars_in_period=2775",
           "heat:multi_tab_coverage",
-          "gate:real_new_project",
-          "deep_gate:stars_gained_below_3000",
+          "gate:irrelevant_to_ai",
           "signal:star_velocity:2775",
-          "signal:total_stars:31240",
+          "signal:total_stars:31672",
           "signal:cross_source:1",
           "signal:maturity:tests",
           "signal:maturity:ci",
           "signal:maturity:docs",
           "signal:maturity:examples",
           "signal:maturity:install",
+          "signal:penalty:non_ai_eng",
           "skills/hooks evidence",
           "substantial README",
           "repo tree available",
           "key files available",
           "docs signal"
         ],
-        "rejection_reasons": [],
+        "rejection_reasons": [
+          "bucket:无关类"
+        ],
         "review_verdict": "not_applicable",
         "review_issues": [],
         "evidence_summary": {
@@ -345,43 +359,47 @@
             "cross_source": 4,
             "topic_fit": 0,
             "maturity": 18,
-            "blacklist_penalty": 0
+            "blacklist_penalty": 35
           }
         },
         "depth_decision": {
-          "ranking_score": 50,
-          "max_allowed_depth": "deep",
-          "final_depth": "light",
-          "depth_band": "light",
-          "analysis_depth": "light",
+          "ranking_score": 15,
+          "max_allowed_depth": "list_only",
+          "final_depth": "list_only",
+          "depth_band": "list_only",
+          "analysis_depth": "list_only",
           "ranking_reasons": [
-            "project_type:agent_framework",
-            "signal_score:50",
+            "project_type:non_ai_eng",
+            "signal_score:15",
             "depth_gate:light_default",
-            "bucket:真·新项目",
+            "bucket:无关类",
             "novelty:new_repo",
             "novelty:substantive_artifact",
             "heat:stars_in_period=2775",
             "heat:multi_tab_coverage",
-            "gate:real_new_project",
-            "deep_gate:stars_gained_below_3000",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:2775",
-            "signal:total_stars:31240",
+            "signal:total_stars:31672",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
             "signal:maturity:docs",
             "signal:maturity:examples",
             "signal:maturity:install",
+            "signal:penalty:non_ai_eng",
             "skills/hooks evidence",
             "substantial README",
             "repo tree available",
             "key files available",
             "docs signal"
           ],
-          "rejection_reasons": [],
-          "recommended_action": "monitor",
+          "rejection_reasons": [
+            "bucket:无关类"
+          ],
+          "recommended_action": "ignore",
           "needs_enrichment": false,
+          "informs_our_structure": true,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -433,7 +451,7 @@
               "cross_source": 4,
               "topic_fit": 0,
               "maturity": 18,
-              "blacklist_penalty": 0
+              "blacklist_penalty": 35
             }
           }
         },
@@ -441,7 +459,7 @@
           "hackerNews": {
             "title": "macOS Container Machines",
             "url": "https://github.com/apple/container/blob/main/docs/container-machine.md",
-            "points": 1228,
+            "points": 1233,
             "objectID": "48469658",
             "createdAt": "2026-06-10T00:29:01Z"
           },
@@ -463,7 +481,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 31240,
+          "stars": 31672,
           "monthlyStarsGained": 2775,
           "reasons": [
             "heat_gate:pass",
@@ -475,7 +493,7 @@
           ]
         },
         "project_type": "non_ai_eng",
-        "verdict": "L1",
+        "verdict": "skip",
         "ratings": {
           "relevance_to_ai_engineer": 1,
           "engineering_depth": 2,
@@ -483,36 +501,38 @@
           "maturity": 5
         },
         "rankingReason": {
-          "decision": "deterministic",
-          "rawScore": 50,
-          "finalScore": 50,
+          "decision": "gated",
+          "rawScore": 15,
+          "finalScore": 15,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
-            "signal_score:50",
+            "project_type:non_ai_eng",
+            "signal_score:15",
             "depth_gate:light_default",
-            "bucket:真·新项目",
+            "bucket:无关类",
             "novelty:new_repo",
             "novelty:substantive_artifact",
             "heat:stars_in_period=2775",
             "heat:multi_tab_coverage",
-            "gate:real_new_project",
-            "deep_gate:stars_gained_below_3000",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:2775",
-            "signal:total_stars:31240",
+            "signal:total_stars:31672",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
             "signal:maturity:docs",
             "signal:maturity:examples",
             "signal:maturity:install",
+            "signal:penalty:non_ai_eng",
             "skills/hooks evidence",
             "substantial README",
             "repo tree available",
             "key files available",
             "docs signal"
           ],
-          "matchedCapTerms": [],
-          "explanation": "score=50; max=deep; final=light"
+          "matchedCapTerms": [
+            "bucket:无关类"
+          ],
+          "explanation": "score=15; max=list_only; final=list_only"
         },
         "deep_status": "not_applicable"
       },
@@ -525,8 +545,8 @@
         "description": "Production-grade engineering skills for AI coding agents.",
         "language": "Shell",
         "languageColor": "#89e051",
-        "stars": 53826,
-        "forks": 5867,
+        "stars": 54163,
+        "forks": 5893,
         "starsGained": 3275,
         "starsGainedByWindow": {
           "daily": 3275
@@ -534,51 +554,77 @@
         "rank": 2,
         "tldr": "addyosmani/agent-skills：GitHub 描述为“Production-grade engineering skills for AI coding agents”。",
         "tags": [
-          "AI代理",
-          "编码技能",
-          "开发工作流",
-          "工程最佳实践",
-          "插件"
+          "Tier 3",
+          "真·新项目",
+          "agents",
+          "mcp",
+          "skills"
         ],
-        "light": "该项目由 Addy Osmani 创建，旨在将资深工程师的工作流、质量门禁和最佳实践封装成 AI 代理可一致遵循的技能。仓库包含完整的技能定义、安装指南和文档，支持 Claude Code、Cursor、Antigravity、Gemini CLI 等多个平台。已获 5.38 万星，日增 3275，属于新热项目。已知事实：有 24 个技能、7 个命令、4 个 agent 角色和多个参考清单。缺失证据：无示例代码、无测试、无演示，技能具体执行效果和实际工程验证尚不可知。推荐操作：由于深度限制为 light，建议监控后续社区反馈和实际案例，无需深入代码审查。",
+        "light": "addyosmani/agent-skills 得分 45，信号是 project_type:agent_skill, signal_score:45。按确定性深度门控进入 deep，建议 deep_dive。",
         "worthDeepDive": 45,
         "ranking_score": 45,
         "max_allowed_depth": "deep",
-        "final_depth": "light",
-        "depth_band": "light",
-        "analysis_depth": "light",
-        "project_tier": 1,
-        "project_tier_label": "Tier 1",
+        "final_depth": "deep",
+        "depth_band": "deep",
+        "analysis_depth": "deep",
+        "project_tier": 3,
+        "project_tier_label": "Tier 3",
         "project_bucket": "真·新项目",
         "bucket": "真·新项目",
-        "tier_tag": "[Tier 1｜真·新项目]",
-        "model_tier": "cheap-extraction",
-        "requires_manual_confirmation": false,
+        "tier_tag": "[Tier 3｜真·新项目]",
+        "model_tier": "codex:gpt-5.5;model_reasoning_effort=high",
+        "requires_manual_confirmation": true,
         "tier_template": {
-          "tier": 1,
+          "tier": 3,
           "bucket": "真·新项目",
-          "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "为 AI 编码代理提供标准化开发工作流的技能集，适用于使用 Claude Code、Cursor 等 AI IDE 的开发者。",
-          "what_it_does": "它提供了一系列 Markdown 格式的技能，代理可以按步骤执行，涵盖从定义、计划、构建、验证、审查到发布的全流程工程实践。",
+          "tag": "[Tier 3｜真·新项目]",
+          "one_sentence_positioning": "addyosmani/agent-skills：GitHub 描述为“Production-grade engineering skills for AI coding agents”。",
+          "what_it_does": "Production-grade engineering skills for AI coding agents.",
           "metadata": {
             "language": "Shell",
-            "total_stars": 53826,
+            "total_stars": 54163,
             "stars_in_period": 3275,
             "author": "addyosmani"
           },
           "labels": [
-            "agent",
-            "工具",
-            "推理",
-            "infra"
+            "agents",
+            "mcp",
+            "skills"
           ],
-          "prose_body": "addyosmani/agent-skills 得分 45，信号是 project_type:agent_framework, signal_score:45；暂不深挖，因为 depth_gate:teaching_skill_or_resource_max_light。建议 monitor。"
+          "prose_body": "addyosmani/agent-skills 得分 45，信号是 project_type:agent_skill, signal_score:45。按确定性深度门控进入 deep，建议 deep_dive。",
+          "pain_point": "数据不足",
+          "core_capabilities": [
+            "agent 工作流",
+            "MCP 连接",
+            "CLI 入口"
+          ],
+          "how_to_run": {
+            "install_command": "见 README 安装说明",
+            "minimal_example": "数据不足"
+          },
+          "maturity_signals": {
+            "star_velocity": "3275 period stars / 54163 total stars",
+            "recent_commit": "2026-06-11T17:33:33Z",
+            "releases": "数据不足",
+            "issue_activity": "数据不足"
+          },
+          "comparison": "数据不足",
+          "trajectory_note": "仅日榜=昙花存疑",
+          "manual_confirmation": true,
+          "how_it_works_with_analogy": "数据不足",
+          "essential_design_difference": "数据不足",
+          "practitioner_meaning": "数据不足",
+          "cross_links": []
         },
-        "recommended_action": "monitor",
+        "recommended_action": "deep_dive",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": true,
         "ranking_reasons": [
-          "project_type:agent_framework",
+          "project_type:agent_skill",
           "signal_score:45",
+          "depth_gate:agent_skill_informs_our_structure_deep",
+          "manual_confirmation_required",
           "bucket:真·新项目",
           "novelty:new_repo",
           "novelty:ai_builder_shape",
@@ -588,7 +634,7 @@
           "gate:real_new_project",
           "deep_gate:excluded_resource_teaching_list",
           "signal:star_velocity:3275",
-          "signal:total_stars:53826",
+          "signal:total_stars:54163",
           "signal:cross_source:1",
           "signal:topic_fit:agent,memory,mcp",
           "signal:maturity:ci",
@@ -600,10 +646,8 @@
           "skills/hooks evidence",
           "model/RAG evidence"
         ],
-        "rejection_reasons": [
-          "depth_gate:teaching_skill_or_resource_max_light"
-        ],
-        "review_verdict": "not_applicable",
+        "rejection_reasons": [],
+        "review_verdict": "pending",
         "review_issues": [],
         "evidence_summary": {
           "readme_found": true,
@@ -662,12 +706,14 @@
         "depth_decision": {
           "ranking_score": 45,
           "max_allowed_depth": "deep",
-          "final_depth": "light",
-          "depth_band": "light",
-          "analysis_depth": "light",
+          "final_depth": "deep",
+          "depth_band": "deep",
+          "analysis_depth": "deep",
           "ranking_reasons": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:45",
+            "depth_gate:agent_skill_informs_our_structure_deep",
+            "manual_confirmation_required",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
@@ -677,7 +723,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3275",
-            "signal:total_stars:53826",
+            "signal:total_stars:54163",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,mcp",
             "signal:maturity:ci",
@@ -689,12 +735,12 @@
             "skills/hooks evidence",
             "model/RAG evidence"
           ],
-          "rejection_reasons": [
-            "depth_gate:teaching_skill_or_resource_max_light"
-          ],
-          "recommended_action": "monitor",
+          "rejection_reasons": [],
+          "recommended_action": "deep_dive",
           "needs_enrichment": false,
-          "review_verdict": "not_applicable",
+          "informs_our_structure": true,
+          "self_evo_eligible": true,
+          "review_verdict": "pending",
           "review_issues": [],
           "evidence_summary": {
             "readme_found": true,
@@ -769,7 +815,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 53826,
+          "stars": 54163,
           "monthlyStarsGained": 3275,
           "reasons": [
             "heat_gate:pass",
@@ -779,7 +825,7 @@
           ]
         },
         "project_type": "agent_skill",
-        "verdict": "L1",
+        "verdict": "clone_and_run",
         "ratings": {
           "relevance_to_ai_engineer": 5,
           "engineering_depth": 5,
@@ -787,12 +833,14 @@
           "maturity": 5
         },
         "rankingReason": {
-          "decision": "gated",
+          "decision": "deterministic",
           "rawScore": 45,
           "finalScore": 45,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:45",
+            "depth_gate:agent_skill_informs_our_structure_deep",
+            "manual_confirmation_required",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
@@ -802,7 +850,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3275",
-            "signal:total_stars:53826",
+            "signal:total_stars:54163",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,mcp",
             "signal:maturity:ci",
@@ -814,12 +862,10 @@
             "skills/hooks evidence",
             "model/RAG evidence"
           ],
-          "matchedCapTerms": [
-            "depth_gate:teaching_skill_or_resource_max_light"
-          ],
-          "explanation": "score=45; max=deep; final=light"
+          "matchedCapTerms": [],
+          "explanation": "score=45; max=deep; final=deep"
         },
-        "deep_status": "not_applicable"
+        "deep_status": "queued"
       },
       {
         "fullName": "soxoj/maigret",
@@ -830,8 +876,8 @@
         "description": "🕵️‍♂️ Collect a dossier on a person by username from 3000+ sites",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 32417,
-        "forks": 2381,
+        "stars": 32484,
+        "forks": 2383,
         "starsGained": 665,
         "starsGainedByWindow": {
           "daily": 665
@@ -845,9 +891,9 @@
           "skills",
           "models"
         ],
-        "light": "soxoj/maigret 得分 58，信号是 project_type:agent_framework, signal_score:58；暂不深挖，因为 bucket:老回潮。建议 monitor。",
-        "worthDeepDive": 58,
-        "ranking_score": 58,
+        "light": "soxoj/maigret 得分 23，信号是 project_type:non_ai_eng, signal_score:23；暂不深挖，因为 bucket:老回潮。建议 monitor。",
+        "worthDeepDive": 23,
+        "ranking_score": 23,
         "max_allowed_depth": "list_only",
         "final_depth": "list_only",
         "depth_band": "list_only",
@@ -867,7 +913,7 @@
           "what_it_does": "🕵️‍♂️ Collect a dossier on a person by username from 3000+ sites",
           "metadata": {
             "language": "Python",
-            "total_stars": 32417,
+            "total_stars": 32484,
             "stars_in_period": 665,
             "author": "soxoj"
           },
@@ -876,7 +922,7 @@
             "skills",
             "models"
           ],
-          "prose_body": "soxoj/maigret 得分 58，信号是 project_type:agent_framework, signal_score:58；暂不深挖，因为 bucket:老回潮。建议 monitor。",
+          "prose_body": "soxoj/maigret 得分 23，信号是 project_type:non_ai_eng, signal_score:23；暂不深挖，因为 bucket:老回潮。建议 monitor。",
           "index_only": {
             "name": "soxoj/maigret",
             "url": "https://github.com/soxoj/maigret",
@@ -886,20 +932,22 @@
             ]
           }
         },
-        "recommended_action": "monitor",
+        "recommended_action": "ignore",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": false,
         "ranking_reasons": [
-          "project_type:agent_framework",
-          "signal_score:58",
-          "depth_gate:standard_threshold",
+          "project_type:non_ai_eng",
+          "signal_score:23",
+          "depth_gate:light_default",
           "bucket:老回潮",
           "novelty:ai_builder_shape",
           "novelty:substantive_artifact",
           "heat:stars_in_period=665",
           "heat:daily_only_flash_penalty",
-          "gate:not_real_new_project",
+          "gate:irrelevant_to_ai",
           "signal:star_velocity:665",
-          "signal:total_stars:32417",
+          "signal:total_stars:32484",
           "signal:cross_source:1",
           "signal:topic_fit:agent,rag",
           "signal:maturity:tests",
@@ -907,11 +955,11 @@
           "signal:maturity:docs",
           "signal:maturity:examples",
           "signal:maturity:install",
+          "signal:penalty:non_ai_eng",
           "agent/workflow evidence",
           "skills/hooks evidence",
           "model/RAG evidence",
-          "AI terms found in README/tree/topics",
-          "substantial README"
+          "AI terms found in README/tree/topics"
         ],
         "rejection_reasons": [
           "bucket:老回潮"
@@ -968,27 +1016,27 @@
             "cross_source": 4,
             "topic_fit": 12,
             "maturity": 18,
-            "blacklist_penalty": 0
+            "blacklist_penalty": 35
           }
         },
         "depth_decision": {
-          "ranking_score": 58,
+          "ranking_score": 23,
           "max_allowed_depth": "list_only",
           "final_depth": "list_only",
           "depth_band": "list_only",
           "analysis_depth": "list_only",
           "ranking_reasons": [
-            "project_type:agent_framework",
-            "signal_score:58",
-            "depth_gate:standard_threshold",
+            "project_type:non_ai_eng",
+            "signal_score:23",
+            "depth_gate:light_default",
             "bucket:老回潮",
             "novelty:ai_builder_shape",
             "novelty:substantive_artifact",
             "heat:stars_in_period=665",
             "heat:daily_only_flash_penalty",
-            "gate:not_real_new_project",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:665",
-            "signal:total_stars:32417",
+            "signal:total_stars:32484",
             "signal:cross_source:1",
             "signal:topic_fit:agent,rag",
             "signal:maturity:tests",
@@ -996,17 +1044,19 @@
             "signal:maturity:docs",
             "signal:maturity:examples",
             "signal:maturity:install",
+            "signal:penalty:non_ai_eng",
             "agent/workflow evidence",
             "skills/hooks evidence",
             "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README"
+            "AI terms found in README/tree/topics"
           ],
           "rejection_reasons": [
             "bucket:老回潮"
           ],
-          "recommended_action": "monitor",
+          "recommended_action": "ignore",
           "needs_enrichment": false,
+          "informs_our_structure": true,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -1059,7 +1109,7 @@
               "cross_source": 4,
               "topic_fit": 12,
               "maturity": 18,
-              "blacklist_penalty": 0
+              "blacklist_penalty": 35
             }
           }
         },
@@ -1087,7 +1137,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 32417,
+          "stars": 32484,
           "monthlyStarsGained": 665,
           "reasons": [
             "heat_gate:pass",
@@ -1106,20 +1156,20 @@
         },
         "rankingReason": {
           "decision": "gated",
-          "rawScore": 58,
-          "finalScore": 58,
+          "rawScore": 23,
+          "finalScore": 23,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
-            "signal_score:58",
-            "depth_gate:standard_threshold",
+            "project_type:non_ai_eng",
+            "signal_score:23",
+            "depth_gate:light_default",
             "bucket:老回潮",
             "novelty:ai_builder_shape",
             "novelty:substantive_artifact",
             "heat:stars_in_period=665",
             "heat:daily_only_flash_penalty",
-            "gate:not_real_new_project",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:665",
-            "signal:total_stars:32417",
+            "signal:total_stars:32484",
             "signal:cross_source:1",
             "signal:topic_fit:agent,rag",
             "signal:maturity:tests",
@@ -1127,16 +1177,16 @@
             "signal:maturity:docs",
             "signal:maturity:examples",
             "signal:maturity:install",
+            "signal:penalty:non_ai_eng",
             "agent/workflow evidence",
             "skills/hooks evidence",
             "model/RAG evidence",
-            "AI terms found in README/tree/topics",
-            "substantial README"
+            "AI terms found in README/tree/topics"
           ],
           "matchedCapTerms": [
             "bucket:老回潮"
           ],
-          "explanation": "score=58; max=list_only; final=list_only"
+          "explanation": "score=23; max=list_only; final=list_only"
         },
         "deep_status": "not_applicable"
       },
@@ -1149,8 +1199,8 @@
         "description": "Advanced DNS tunneling VPN for censorship bypass, optimized beyond DNSTT and SlipStream with low-overhead ARQ, resolver load balancing, high packet-loss stability and speed.",
         "language": "Go",
         "languageColor": "#00ADD8",
-        "stars": 5530,
-        "forks": 513,
+        "stars": 5591,
+        "forks": 516,
         "starsGained": 510,
         "starsGainedByWindow": {
           "daily": 510
@@ -1185,7 +1235,7 @@
           "what_it_does": "Advanced DNS tunneling VPN for censorship bypass, optimized beyond DNSTT and SlipStream with low-overhead ARQ, resolver load balancing, high packet-loss stability and speed.",
           "metadata": {
             "language": "Go",
-            "total_stars": 5530,
+            "total_stars": 5591,
             "stars_in_period": 510,
             "author": "masterking32"
           },
@@ -1208,6 +1258,8 @@
         },
         "recommended_action": "monitor",
         "needs_enrichment": true,
+        "informs_our_structure": false,
+        "self_evo_eligible": false,
         "ranking_reasons": [
           "project_type:non_ai_eng",
           "signal_score:0",
@@ -1218,7 +1270,7 @@
           "heat:daily_only_flash_penalty",
           "gate:irrelevant_to_ai",
           "signal:star_velocity:510",
-          "signal:total_stars:5530",
+          "signal:total_stars:5591",
           "signal:cross_source:1",
           "signal:maturity:ci",
           "signal:maturity:install",
@@ -1302,7 +1354,7 @@
             "heat:daily_only_flash_penalty",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:510",
-            "signal:total_stars:5530",
+            "signal:total_stars:5591",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:install",
@@ -1322,6 +1374,8 @@
           ],
           "recommended_action": "monitor",
           "needs_enrichment": true,
+          "informs_our_structure": false,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -1391,7 +1445,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 5530,
+          "stars": 5591,
           "monthlyStarsGained": 510,
           "reasons": [
             "heat_gate:pass",
@@ -1422,7 +1476,7 @@
             "heat:daily_only_flash_penalty",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:510",
-            "signal:total_stars:5530",
+            "signal:total_stars:5591",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:install",
@@ -1453,64 +1507,56 @@
         "description": "Open-source live-chat, email support, omni-channel desk. An alternative to Intercom, Zendesk, Salesforce Service Cloud etc. 🔥💬",
         "language": "Ruby",
         "languageColor": "#701516",
-        "stars": 30199,
-        "forks": 7494,
+        "stars": 30244,
+        "forks": 7498,
         "starsGained": 31,
         "starsGainedByWindow": {
           "daily": 31
         },
         "rank": 5,
-        "tldr": "chatwoot/chatwoot：GitHub 描述为“Open-source live-chat, email support, omni-channel desk. An alternative to Intercom, Zendesk, Salesforce Service Cloud etc. 🔥💬”。",
+        "tldr": "chatwoot/chatwoot：GitHub 描述为“Open-source live-chat, email support, omni-channel desk. An alternative to Intercom, Zendes",
         "tags": [
-          "Tier 0",
-          "老回潮",
-          "agents",
-          "skills",
-          "models"
+          "customer-support",
+          "livechat",
+          "omnichannel",
+          "AI-agent",
+          "opensource"
         ],
-        "light": "chatwoot/chatwoot 得分 42，信号是 project_type:agent_framework, signal_score:42；暂不深挖，因为 bucket:老回潮。建议 monitor。",
+        "light": "Chatwoot是一个成熟的开源客服平台，作为Intercom等商业产品的替代方案。它支持多渠道收件箱、帮助中心门户，并提供了名为Captain的AI代理功能来自动化回复。项目使用Ruby on Rails后端和Vue.js前端，提供Docker部署、CI/CD和测试。它出现在每日趋势中，但这次登榜并非因为重大AI更新，而是持续活跃。对于AI builder，Captain的具体实现细节（如使用的模型、自定义能力）在README中提及较少，缺少本地化文档和扩展指南。建议关注其AI集成的实践，但若需要纯AI客服框架，可考虑其他项目。",
         "worthDeepDive": 42,
         "ranking_score": 42,
-        "max_allowed_depth": "list_only",
-        "final_depth": "list_only",
-        "depth_band": "list_only",
-        "analysis_depth": "list_only",
-        "project_tier": 0,
-        "project_tier_label": "Tier 0",
+        "max_allowed_depth": "light",
+        "final_depth": "light",
+        "depth_band": "light",
+        "analysis_depth": "light",
+        "project_tier": 1,
+        "project_tier_label": "Tier 1",
         "project_bucket": "老回潮",
         "bucket": "老回潮",
-        "tier_tag": "[Tier 0｜老回潮]",
-        "model_tier": "none",
+        "tier_tag": "[Tier 1｜老回潮]",
+        "model_tier": "cheap-extraction",
         "requires_manual_confirmation": false,
         "tier_template": {
-          "tier": 0,
+          "tier": 1,
           "bucket": "老回潮",
-          "tag": "[Tier 0｜老回潮]",
-          "one_sentence_positioning": "chatwoot/chatwoot：GitHub 描述为“Open-source live-chat, email support, omni-channel desk. An alternative to Intercom, Zendesk, Salesforce Service Cloud etc. 🔥💬”。",
-          "what_it_does": "Open-source live-chat, email support, omni-channel desk. An alternative to Intercom, Zendesk, Salesforce Service Cloud etc. 🔥💬",
+          "tag": "[Tier 1｜老回潮]",
+          "one_sentence_positioning": "Chatwoot是一个面向企业和开发者的开源全渠道客服平台，适合希望自托管并集成AI自动化回复的团队。",
+          "what_it_does": "提供统一的收件箱管理网站、邮件、社交媒体等多种渠道的客户对话，并内置Captain AI代理实现自动响应和任务分配。",
           "metadata": {
             "language": "Ruby",
-            "total_stars": 30199,
+            "total_stars": 30244,
             "stars_in_period": 31,
-            "author": "chatwoot"
+            "author": "Chatwoot Inc"
           },
           "labels": [
-            "agents",
-            "skills",
-            "models"
+            "agent"
           ],
-          "prose_body": "chatwoot/chatwoot 得分 42，信号是 project_type:agent_framework, signal_score:42；暂不深挖，因为 bucket:老回潮。建议 monitor。",
-          "index_only": {
-            "name": "chatwoot/chatwoot",
-            "url": "https://github.com/chatwoot/chatwoot",
-            "automatic_tags": [
-              "老回潮",
-              "bucket:老回潮"
-            ]
-          }
+          "prose_body": "chatwoot/chatwoot 得分 42，信号是 project_type:agent_framework, signal_score:42；暂不深挖，因为 bucket:老回潮:ai_min_light。建议 monitor。"
         },
         "recommended_action": "monitor",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": false,
         "ranking_reasons": [
           "project_type:agent_framework",
           "signal_score:42",
@@ -1522,7 +1568,7 @@
           "heat:daily_only_flash_penalty",
           "gate:not_real_new_project",
           "signal:star_velocity:31",
-          "signal:total_stars:30199",
+          "signal:total_stars:30244",
           "signal:cross_source:1",
           "signal:topic_fit:agent",
           "signal:maturity:tests",
@@ -1537,7 +1583,7 @@
           "repo tree available"
         ],
         "rejection_reasons": [
-          "bucket:老回潮"
+          "bucket:老回潮:ai_min_light"
         ],
         "review_verdict": "not_applicable",
         "review_issues": [],
@@ -1601,10 +1647,10 @@
         },
         "depth_decision": {
           "ranking_score": 42,
-          "max_allowed_depth": "list_only",
-          "final_depth": "list_only",
-          "depth_band": "list_only",
-          "analysis_depth": "list_only",
+          "max_allowed_depth": "light",
+          "final_depth": "light",
+          "depth_band": "light",
+          "analysis_depth": "light",
           "ranking_reasons": [
             "project_type:agent_framework",
             "signal_score:42",
@@ -1616,7 +1662,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:31",
-            "signal:total_stars:30199",
+            "signal:total_stars:30244",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:tests",
@@ -1631,10 +1677,12 @@
             "repo tree available"
           ],
           "rejection_reasons": [
-            "bucket:老回潮"
+            "bucket:老回潮:ai_min_light"
           ],
           "recommended_action": "monitor",
           "needs_enrichment": false,
+          "informs_our_structure": true,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -1720,7 +1768,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 30199,
+          "stars": 30244,
           "monthlyStarsGained": 31,
           "reasons": [
             "heat_gate:pass",
@@ -1729,8 +1777,8 @@
             "hacker_news"
           ]
         },
-        "project_type": "non_ai_eng",
-        "verdict": "skip",
+        "project_type": "ai_app",
+        "verdict": "L1",
         "ratings": {
           "relevance_to_ai_engineer": 5,
           "engineering_depth": 5,
@@ -1752,7 +1800,7 @@
             "heat:daily_only_flash_penalty",
             "gate:not_real_new_project",
             "signal:star_velocity:31",
-            "signal:total_stars:30199",
+            "signal:total_stars:30244",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:tests",
@@ -1767,9 +1815,9 @@
             "repo tree available"
           ],
           "matchedCapTerms": [
-            "bucket:老回潮"
+            "bucket:老回潮:ai_min_light"
           ],
-          "explanation": "score=42; max=list_only; final=list_only"
+          "explanation": "score=42; max=light; final=light"
         },
         "deep_status": "not_applicable"
       },
@@ -1782,84 +1830,96 @@
         "description": "Mattermost is an open source platform for secure collaboration across the entire software development lifecycle..",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 37169,
-        "forks": 8690,
+        "stars": 37215,
+        "forks": 8692,
         "starsGained": 26,
         "starsGainedByWindow": {
           "daily": 26
         },
         "rank": 6,
-        "tldr": "mattermost/mattermost：GitHub 描述为“Mattermost is an open source platform for secure collaboration across the entire softwa",
+        "tldr": "mattermost/mattermost：GitHub 描述为“Mattermost is an open source platform for secure collaboration across the entire software development lifecycle”。",
         "tags": [
-          "collaboration",
-          "self-hosted",
-          "chat",
-          "AI integration",
-          "workflow automation"
+          "Tier 0",
+          "老回潮",
+          "agents",
+          "skills",
+          "models"
         ],
-        "light": "Mattermost 是一个开源自托管的协作平台，核心功能包括即时消息、工作流自动化、语音/视频通话和 AI 集成。仓库为 monorepo，主要语言为 Go 和 React，依赖 PostgreSQL。进入雷达原因：每日 26 颗新增星标，GitHub 日榜第 18 位；支持 AI 集成和工作流自动化，适合 AI 工程师了解协作平台与 AI 的结合。已知事实：README 提供详细的部署指南（Docker、Ubuntu、Kubernetes 等），提及 AI 集成，但仓库中不包含 examples、tests 或 demo。缺失证据：无架构文档、无示例代码、无测试用例。推荐行动：监控，无需深入分析。",
-        "worthDeepDive": 9,
-        "ranking_score": 9,
-        "max_allowed_depth": "light",
-        "final_depth": "light",
-        "depth_band": "light",
-        "analysis_depth": "light",
-        "project_tier": 1,
-        "project_tier_label": "Tier 1",
+        "light": "mattermost/mattermost 得分 0，信号是 project_type:non_ai_eng, signal_score:0；暂不深挖，因为 awesome_course_tutorial_or_resource_list。建议 monitor。",
+        "worthDeepDive": 0,
+        "ranking_score": 0,
+        "max_allowed_depth": "list_only",
+        "final_depth": "list_only",
+        "depth_band": "list_only",
+        "analysis_depth": "list_only",
+        "project_tier": 0,
+        "project_tier_label": "Tier 0",
         "project_bucket": "老回潮",
         "bucket": "老回潮",
-        "tier_tag": "[Tier 1｜老回潮]",
-        "model_tier": "cheap-extraction",
+        "tier_tag": "[Tier 0｜老回潮]",
+        "model_tier": "none",
         "requires_manual_confirmation": false,
         "tier_template": {
-          "tier": 1,
+          "tier": 0,
           "bucket": "老回潮",
-          "tag": "[Tier 1｜老回潮]",
-          "one_sentence_positioning": "Mattermost 是一个开源自托管的协作平台，用于开发团队的安全沟通和自动化工作流，集成 AI 能力。",
-          "what_it_does": "提供即时聊天、语音/视频通话、屏幕共享、工作流自动化以及 AI 集成（如聊天机器人、模型调用）。支持自部署，使用 Go 和 React 构建，后端依赖 PostgreSQL。",
+          "tag": "[Tier 0｜老回潮]",
+          "one_sentence_positioning": "mattermost/mattermost：GitHub 描述为“Mattermost is an open source platform for secure collaboration across the entire software development lifecycle”。",
+          "what_it_does": "Mattermost is an open source platform for secure collaboration across the entire software development lifecycle..",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 37169,
+            "total_stars": 37215,
             "stars_in_period": 26,
             "author": "mattermost"
           },
           "labels": [
-            "agent",
-            "工具",
-            "infra"
+            "agents",
+            "skills",
+            "models"
           ],
-          "prose_body": "mattermost/mattermost 得分 9，信号是 project_type:agent_framework, signal_score:9；暂不深挖，因为 awesome_course_tutorial_or_resource_list。建议 monitor。"
+          "prose_body": "mattermost/mattermost 得分 0，信号是 project_type:non_ai_eng, signal_score:0；暂不深挖，因为 awesome_course_tutorial_or_resource_list。建议 monitor。",
+          "index_only": {
+            "name": "mattermost/mattermost",
+            "url": "https://github.com/mattermost/mattermost",
+            "automatic_tags": [
+              "老回潮",
+              "awesome_course_tutorial_or_resource_list",
+              "bucket:老回潮",
+              "depth_gate:teaching_resource_or_template_max_light"
+            ]
+          }
         },
-        "recommended_action": "monitor",
+        "recommended_action": "ignore",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": false,
         "ranking_reasons": [
-          "project_type:agent_framework",
-          "signal_score:9",
+          "project_type:non_ai_eng",
+          "signal_score:0",
           "bucket:老回潮",
           "novelty:ai_builder_shape",
           "novelty:substantive_artifact",
           "heat:stars_in_period=26",
           "heat:daily_only_flash_penalty",
-          "gate:not_real_new_project",
+          "gate:irrelevant_to_ai",
           "signal:star_velocity:26",
-          "signal:total_stars:37169",
+          "signal:total_stars:37215",
           "signal:cross_source:1",
           "signal:topic_fit:agent",
           "signal:maturity:ci",
           "signal:maturity:docs",
           "signal:maturity:install",
           "signal:penalty:resource_or_course",
+          "signal:penalty:non_ai_eng",
           "agent/workflow evidence",
           "skills/hooks evidence",
           "model/RAG evidence",
           "AI terms found in README/tree/topics",
-          "substantial README",
-          "repo tree available"
+          "substantial README"
         ],
         "rejection_reasons": [
           "awesome_course_tutorial_or_resource_list",
-          "bucket:老回潮:max_light",
-          "depth_gate:teaching_skill_or_resource_max_light"
+          "bucket:老回潮",
+          "depth_gate:teaching_resource_or_template_max_light"
         ],
         "review_verdict": "not_applicable",
         "review_issues": [],
@@ -1909,46 +1969,48 @@
             "cross_source": 4,
             "topic_fit": 8,
             "maturity": 10,
-            "blacklist_penalty": 28
+            "blacklist_penalty": 50
           }
         },
         "depth_decision": {
-          "ranking_score": 9,
-          "max_allowed_depth": "light",
-          "final_depth": "light",
-          "depth_band": "light",
-          "analysis_depth": "light",
+          "ranking_score": 0,
+          "max_allowed_depth": "list_only",
+          "final_depth": "list_only",
+          "depth_band": "list_only",
+          "analysis_depth": "list_only",
           "ranking_reasons": [
-            "project_type:agent_framework",
-            "signal_score:9",
+            "project_type:non_ai_eng",
+            "signal_score:0",
             "bucket:老回潮",
             "novelty:ai_builder_shape",
             "novelty:substantive_artifact",
             "heat:stars_in_period=26",
             "heat:daily_only_flash_penalty",
-            "gate:not_real_new_project",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:26",
-            "signal:total_stars:37169",
+            "signal:total_stars:37215",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:ci",
             "signal:maturity:docs",
             "signal:maturity:install",
             "signal:penalty:resource_or_course",
+            "signal:penalty:non_ai_eng",
             "agent/workflow evidence",
             "skills/hooks evidence",
             "model/RAG evidence",
             "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available"
+            "substantial README"
           ],
           "rejection_reasons": [
             "awesome_course_tutorial_or_resource_list",
-            "bucket:老回潮:max_light",
-            "depth_gate:teaching_skill_or_resource_max_light"
+            "bucket:老回潮",
+            "depth_gate:teaching_resource_or_template_max_light"
           ],
-          "recommended_action": "monitor",
+          "recommended_action": "ignore",
           "needs_enrichment": false,
+          "informs_our_structure": true,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -1997,7 +2059,7 @@
               "cross_source": 4,
               "topic_fit": 8,
               "maturity": 10,
-              "blacklist_penalty": 28
+              "blacklist_penalty": 50
             }
           }
         },
@@ -2025,7 +2087,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 37169,
+          "stars": 37215,
           "monthlyStarsGained": 26,
           "reasons": [
             "heat_gate:pass",
@@ -2035,7 +2097,7 @@
           ]
         },
         "project_type": "non_ai_eng",
-        "verdict": "L1",
+        "verdict": "skip",
         "ratings": {
           "relevance_to_ai_engineer": 5,
           "engineering_depth": 4,
@@ -2044,38 +2106,38 @@
         },
         "rankingReason": {
           "decision": "gated",
-          "rawScore": 9,
-          "finalScore": 9,
+          "rawScore": 0,
+          "finalScore": 0,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
-            "signal_score:9",
+            "project_type:non_ai_eng",
+            "signal_score:0",
             "bucket:老回潮",
             "novelty:ai_builder_shape",
             "novelty:substantive_artifact",
             "heat:stars_in_period=26",
             "heat:daily_only_flash_penalty",
-            "gate:not_real_new_project",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:26",
-            "signal:total_stars:37169",
+            "signal:total_stars:37215",
             "signal:cross_source:1",
             "signal:topic_fit:agent",
             "signal:maturity:ci",
             "signal:maturity:docs",
             "signal:maturity:install",
             "signal:penalty:resource_or_course",
+            "signal:penalty:non_ai_eng",
             "agent/workflow evidence",
             "skills/hooks evidence",
             "model/RAG evidence",
             "AI terms found in README/tree/topics",
-            "substantial README",
-            "repo tree available"
+            "substantial README"
           ],
           "matchedCapTerms": [
             "awesome_course_tutorial_or_resource_list",
-            "bucket:老回潮:max_light",
-            "depth_gate:teaching_skill_or_resource_max_light"
+            "bucket:老回潮",
+            "depth_gate:teaching_resource_or_template_max_light"
           ],
-          "explanation": "score=9; max=light; final=light"
+          "explanation": "score=0; max=list_only; final=list_only"
         },
         "deep_status": "not_applicable"
       }
@@ -2083,7 +2145,7 @@
   },
   "weekly": {
     "window": "weekly",
-    "generatedAt": "2026-06-11T14:38:20.278Z",
+    "generatedAt": "2026-06-11T17:35:01.426Z",
     "target": 3,
     "repos": [
       {
@@ -2095,81 +2157,95 @@
         "description": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon.",
         "language": "Swift",
         "languageColor": "#F05138",
-        "stars": 31240,
-        "forks": 875,
+        "stars": 31672,
+        "forks": 886,
         "starsGained": 2775,
         "starsGainedByWindow": {
           "daily": 2419,
           "weekly": 2775
         },
         "rank": 1,
-        "tldr": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac.",
+        "tldr": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon”。",
         "tags": [
-          "容器",
-          "虚拟机",
-          "macOS",
-          "Swift",
-          "OCI"
+          "Tier 0",
+          "无关类",
+          "skills",
+          "cli",
+          "docs"
         ],
-        "light": "Apple 开源的 container 工具，利用 macOS 26 虚拟化特性在 Mac 上以轻量级 VM 方式运行 Linux 容器，支持 OCI 标准镜像的拉取、推送和运行。项目处于早期开发阶段（0.x），仅保证补丁版本内稳定性，仅支持 Apple Silicon 和 macOS 26。有完整文档、示例和测试。与 AI 生态无直接关联，但展示了系统级虚拟化实现轻量级容器的工程实践。推荐关注其容器化技术和 Swift 实现，深度分析需等待更成熟版本。",
-        "worthDeepDive": 50,
-        "ranking_score": 50,
-        "max_allowed_depth": "deep",
-        "final_depth": "light",
-        "depth_band": "light",
-        "analysis_depth": "light",
-        "project_tier": 1,
-        "project_tier_label": "Tier 1",
-        "project_bucket": "真·新项目",
-        "bucket": "真·新项目",
-        "tier_tag": "[Tier 1｜真·新项目]",
-        "model_tier": "cheap-extraction",
+        "light": "apple/container 得分 15，信号是 project_type:non_ai_eng, signal_score:15；暂不深挖，因为 bucket:无关类。建议 monitor。",
+        "worthDeepDive": 15,
+        "ranking_score": 15,
+        "max_allowed_depth": "list_only",
+        "final_depth": "list_only",
+        "depth_band": "list_only",
+        "analysis_depth": "list_only",
+        "project_tier": 0,
+        "project_tier_label": "Tier 0",
+        "project_bucket": "无关类",
+        "bucket": "无关类",
+        "tier_tag": "[Tier 0｜无关类]",
+        "model_tier": "none",
         "requires_manual_confirmation": false,
         "tier_template": {
-          "tier": 1,
-          "bucket": "真·新项目",
-          "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "Apple 开源的 Mac 原生容器工具，面向 macOS 26+ 的 Apple Silicon 用户",
-          "what_it_does": "通过轻量级虚拟机在 Mac 上创建和运行 OCI 兼容的 Linux 容器，支持镜像拉取、构建和推送",
+          "tier": 0,
+          "bucket": "无关类",
+          "tag": "[Tier 0｜无关类]",
+          "one_sentence_positioning": "apple/container：GitHub 描述为“A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon”。",
+          "what_it_does": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon.",
           "metadata": {
             "language": "Swift",
-            "total_stars": 31240,
+            "total_stars": 31672,
             "stars_in_period": 2775,
             "author": "apple"
           },
           "labels": [
-            "工具"
+            "skills",
+            "cli",
+            "docs"
           ],
-          "prose_body": "apple/container 得分 50，信号是 project_type:agent_framework, signal_score:50。按确定性深度门控进入 light，建议 monitor。"
+          "prose_body": "apple/container 得分 15，信号是 project_type:non_ai_eng, signal_score:15；暂不深挖，因为 bucket:无关类。建议 monitor。",
+          "index_only": {
+            "name": "apple/container",
+            "url": "https://github.com/apple/container",
+            "automatic_tags": [
+              "无关类",
+              "bucket:无关类"
+            ]
+          }
         },
-        "recommended_action": "monitor",
+        "recommended_action": "ignore",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": false,
         "ranking_reasons": [
-          "project_type:agent_framework",
-          "signal_score:50",
+          "project_type:non_ai_eng",
+          "signal_score:15",
           "depth_gate:light_default",
-          "bucket:真·新项目",
+          "bucket:无关类",
           "novelty:new_repo",
           "novelty:substantive_artifact",
           "heat:stars_in_period=2775",
           "heat:multi_tab_coverage",
-          "gate:real_new_project",
-          "deep_gate:stars_gained_below_3000",
+          "gate:irrelevant_to_ai",
           "signal:star_velocity:2775",
-          "signal:total_stars:31240",
+          "signal:total_stars:31672",
           "signal:cross_source:1",
           "signal:maturity:tests",
           "signal:maturity:ci",
           "signal:maturity:docs",
           "signal:maturity:examples",
           "signal:maturity:install",
+          "signal:penalty:non_ai_eng",
           "skills/hooks evidence",
           "substantial README",
           "repo tree available",
           "key files available",
           "docs signal"
         ],
-        "rejection_reasons": [],
+        "rejection_reasons": [
+          "bucket:无关类"
+        ],
         "review_verdict": "not_applicable",
         "review_issues": [],
         "evidence_summary": {
@@ -2221,43 +2297,47 @@
             "cross_source": 4,
             "topic_fit": 0,
             "maturity": 18,
-            "blacklist_penalty": 0
+            "blacklist_penalty": 35
           }
         },
         "depth_decision": {
-          "ranking_score": 50,
-          "max_allowed_depth": "deep",
-          "final_depth": "light",
-          "depth_band": "light",
-          "analysis_depth": "light",
+          "ranking_score": 15,
+          "max_allowed_depth": "list_only",
+          "final_depth": "list_only",
+          "depth_band": "list_only",
+          "analysis_depth": "list_only",
           "ranking_reasons": [
-            "project_type:agent_framework",
-            "signal_score:50",
+            "project_type:non_ai_eng",
+            "signal_score:15",
             "depth_gate:light_default",
-            "bucket:真·新项目",
+            "bucket:无关类",
             "novelty:new_repo",
             "novelty:substantive_artifact",
             "heat:stars_in_period=2775",
             "heat:multi_tab_coverage",
-            "gate:real_new_project",
-            "deep_gate:stars_gained_below_3000",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:2775",
-            "signal:total_stars:31240",
+            "signal:total_stars:31672",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
             "signal:maturity:docs",
             "signal:maturity:examples",
             "signal:maturity:install",
+            "signal:penalty:non_ai_eng",
             "skills/hooks evidence",
             "substantial README",
             "repo tree available",
             "key files available",
             "docs signal"
           ],
-          "rejection_reasons": [],
-          "recommended_action": "monitor",
+          "rejection_reasons": [
+            "bucket:无关类"
+          ],
+          "recommended_action": "ignore",
           "needs_enrichment": false,
+          "informs_our_structure": true,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -2309,7 +2389,7 @@
               "cross_source": 4,
               "topic_fit": 0,
               "maturity": 18,
-              "blacklist_penalty": 0
+              "blacklist_penalty": 35
             }
           }
         },
@@ -2317,7 +2397,7 @@
           "hackerNews": {
             "title": "macOS Container Machines",
             "url": "https://github.com/apple/container/blob/main/docs/container-machine.md",
-            "points": 1228,
+            "points": 1233,
             "objectID": "48469658",
             "createdAt": "2026-06-10T00:29:01Z"
           },
@@ -2339,7 +2419,7 @@
             "hacker_news",
             "ossinsight_trending"
           ],
-          "stars": 31240,
+          "stars": 31672,
           "monthlyStarsGained": 2775,
           "reasons": [
             "heat_gate:pass",
@@ -2351,7 +2431,7 @@
           ]
         },
         "project_type": "non_ai_eng",
-        "verdict": "L1",
+        "verdict": "skip",
         "ratings": {
           "relevance_to_ai_engineer": 1,
           "engineering_depth": 2,
@@ -2359,36 +2439,38 @@
           "maturity": 5
         },
         "rankingReason": {
-          "decision": "deterministic",
-          "rawScore": 50,
-          "finalScore": 50,
+          "decision": "gated",
+          "rawScore": 15,
+          "finalScore": 15,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
-            "signal_score:50",
+            "project_type:non_ai_eng",
+            "signal_score:15",
             "depth_gate:light_default",
-            "bucket:真·新项目",
+            "bucket:无关类",
             "novelty:new_repo",
             "novelty:substantive_artifact",
             "heat:stars_in_period=2775",
             "heat:multi_tab_coverage",
-            "gate:real_new_project",
-            "deep_gate:stars_gained_below_3000",
+            "gate:irrelevant_to_ai",
             "signal:star_velocity:2775",
-            "signal:total_stars:31240",
+            "signal:total_stars:31672",
             "signal:cross_source:1",
             "signal:maturity:tests",
             "signal:maturity:ci",
             "signal:maturity:docs",
             "signal:maturity:examples",
             "signal:maturity:install",
+            "signal:penalty:non_ai_eng",
             "skills/hooks evidence",
             "substantial README",
             "repo tree available",
             "key files available",
             "docs signal"
           ],
-          "matchedCapTerms": [],
-          "explanation": "score=50; max=deep; final=light"
+          "matchedCapTerms": [
+            "bucket:无关类"
+          ],
+          "explanation": "score=15; max=list_only; final=list_only"
         },
         "deep_status": "not_applicable"
       },
@@ -2401,8 +2483,8 @@
         "description": "Find vulnerabilities, misconfigurations, secrets, SBOM in containers, Kubernetes, code repositories, clouds and more",
         "language": "Go",
         "languageColor": "#00ADD8",
-        "stars": 36312,
-        "forks": 467,
+        "stars": 36315,
+        "forks": 468,
         "starsGained": 991,
         "starsGainedByWindow": {
           "weekly": 991
@@ -2438,7 +2520,7 @@
           "what_it_does": "Find vulnerabilities, misconfigurations, secrets, SBOM in containers, Kubernetes, code repositories, clouds and more",
           "metadata": {
             "language": "Go",
-            "total_stars": 36312,
+            "total_stars": 36315,
             "stars_in_period": 991,
             "author": "aquasecurity"
           },
@@ -2460,6 +2542,8 @@
         },
         "recommended_action": "ignore",
         "needs_enrichment": false,
+        "informs_our_structure": false,
+        "self_evo_eligible": false,
         "ranking_reasons": [
           "project_type:non_ai_eng",
           "signal_score:7",
@@ -2469,7 +2553,7 @@
           "heat:stars_in_period=991",
           "gate:irrelevant_to_ai",
           "signal:star_velocity:991",
-          "signal:total_stars:36312",
+          "signal:total_stars:36315",
           "signal:cross_source:1",
           "signal:maturity:ci",
           "signal:maturity:docs",
@@ -2562,7 +2646,7 @@
             "heat:stars_in_period=991",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:991",
-            "signal:total_stars:36312",
+            "signal:total_stars:36315",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:docs",
@@ -2584,6 +2668,8 @@
           ],
           "recommended_action": "ignore",
           "needs_enrichment": false,
+          "informs_our_structure": false,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -2667,7 +2753,7 @@
             "github_trending",
             "hacker_news"
           ],
-          "stars": 36312,
+          "stars": 36315,
           "monthlyStarsGained": 991,
           "reasons": [
             "heat_gate:pass",
@@ -2697,7 +2783,7 @@
             "heat:stars_in_period=991",
             "gate:irrelevant_to_ai",
             "signal:star_velocity:991",
-            "signal:total_stars:36312",
+            "signal:total_stars:36315",
             "signal:cross_source:1",
             "signal:maturity:ci",
             "signal:maturity:docs",
@@ -2730,59 +2816,86 @@
         "description": "AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF generation, batch processing.",
         "language": "JavaScript",
         "languageColor": "#f1e05a",
-        "stars": 52651,
-        "forks": 10555,
+        "stars": 52707,
+        "forks": 10564,
         "starsGained": 3998,
         "starsGainedByWindow": {
           "weekly": 3998
         },
         "rank": 3,
-        "tldr": "santifer/career-ops：GitHub 描述为“AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF gene",
+        "tldr": "santifer/career-ops：GitHub 描述为“AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF generation, batch processing”。",
         "tags": [
-          "求职自动化",
-          "Claude Code",
-          "简历生成",
-          "AI Agent",
-          "开源工具"
+          "Tier 3",
+          "真·新项目",
+          "agents",
+          "skills",
+          "models"
         ],
-        "light": "Career-Ops是一个将AI编码CLI（如Claude Code）转变为求职命令中心的系统，由个人开发者创建并用于自身求职成功。它通过14种技能模式（如LLMOps、Agentic）对职位进行A-F评分，自动扫描45+公司的招聘门户，生成ATS优化的PDF简历，并提供Go语言终端仪表盘管理申请。该项目以5.2万星、周增近4000星的速度进入雷达，被WIRED、Business Insider报道。已知事实：提供文档、示例、安装命令（npx）、Docker部署、CI配置，支持Claude Code/Gemini/Codex等多AI提供商。缺失证据：无单元测试，架构细节仅靠README描述，实际效果依赖个人配置。推荐行动：适合想用AI优化求职流程的开发者，建议尝试并投入时间配置个人资料，再评估实际效果。",
+        "light": "santifer/career-ops 得分 64，信号是 project_type:agent_skill, signal_score:64。按确定性深度门控进入 deep，建议 deep_dive。",
         "worthDeepDive": 64,
         "ranking_score": 64,
         "max_allowed_depth": "deep",
-        "final_depth": "light",
-        "depth_band": "light",
-        "analysis_depth": "light",
-        "project_tier": 1,
-        "project_tier_label": "Tier 1",
+        "final_depth": "deep",
+        "depth_band": "deep",
+        "analysis_depth": "deep",
+        "project_tier": 3,
+        "project_tier_label": "Tier 3",
         "project_bucket": "真·新项目",
         "bucket": "真·新项目",
-        "tier_tag": "[Tier 1｜真·新项目]",
-        "model_tier": "cheap-extraction",
-        "requires_manual_confirmation": false,
+        "tier_tag": "[Tier 3｜真·新项目]",
+        "model_tier": "codex:gpt-5.5;model_reasoning_effort=high",
+        "requires_manual_confirmation": true,
         "tier_template": {
-          "tier": 1,
+          "tier": 3,
           "bucket": "真·新项目",
-          "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "一个基于AI CLI（Claude Code/Gemini等）的求职辅助系统，面向需要批量筛选职位、生成定制简历和跟踪申请进度的求职者。",
-          "what_it_does": "自动评估职位描述与个人简历匹配度，生成ATS优化PDF简历，扫描多个招聘门户，提供终端仪表盘管理申请流程，支持批量处理和多AI提供商。",
+          "tag": "[Tier 3｜真·新项目]",
+          "one_sentence_positioning": "santifer/career-ops：GitHub 描述为“AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF generation, batch processing”。",
+          "what_it_does": "AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF generation, batch processing.",
           "metadata": {
-            "language": "JavaScript, Go",
-            "total_stars": 52651,
+            "language": "JavaScript",
+            "total_stars": 52707,
             "stars_in_period": 3998,
             "author": "santifer"
           },
           "labels": [
-            "agent",
-            "推理",
-            "工具"
+            "agents",
+            "skills",
+            "models"
           ],
-          "prose_body": "santifer/career-ops 得分 64，信号是 project_type:agent_framework, signal_score:64；暂不深挖，因为 depth_gate:teaching_skill_or_resource_max_light。建议 try。"
+          "prose_body": "santifer/career-ops 得分 64，信号是 project_type:agent_skill, signal_score:64。按确定性深度门控进入 deep，建议 deep_dive。",
+          "pain_point": "数据不足",
+          "core_capabilities": [
+            "agent 工作流",
+            "CLI 入口",
+            "模型/RAG 组件"
+          ],
+          "how_to_run": {
+            "install_command": "见 README 安装说明",
+            "minimal_example": "见 README/examples 最小示例"
+          },
+          "maturity_signals": {
+            "star_velocity": "3998 period stars / 52707 total stars",
+            "recent_commit": "2026-06-11T17:30:46Z",
+            "releases": "数据不足",
+            "issue_activity": "数据不足"
+          },
+          "comparison": "数据不足",
+          "trajectory_note": "数据不足",
+          "manual_confirmation": true,
+          "how_it_works_with_analogy": "数据不足",
+          "essential_design_difference": "数据不足",
+          "practitioner_meaning": "数据不足",
+          "cross_links": []
         },
-        "recommended_action": "try",
+        "recommended_action": "deep_dive",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": true,
         "ranking_reasons": [
-          "project_type:agent_framework",
+          "project_type:agent_skill",
           "signal_score:64",
+          "depth_gate:agent_skill_informs_our_structure_deep",
+          "manual_confirmation_required",
           "bucket:真·新项目",
           "novelty:new_repo",
           "novelty:ai_builder_shape",
@@ -2791,7 +2904,7 @@
           "gate:real_new_project",
           "deep_gate:excluded_resource_teaching_list",
           "signal:star_velocity:3998",
-          "signal:total_stars:52651",
+          "signal:total_stars:52707",
           "signal:cross_source:2",
           "signal:topic_fit:agent,memory,eval,rag,self_evo",
           "signal:maturity:ci",
@@ -2804,10 +2917,8 @@
           "model/RAG evidence",
           "AI terms found in README/tree/topics"
         ],
-        "rejection_reasons": [
-          "depth_gate:teaching_skill_or_resource_max_light"
-        ],
-        "review_verdict": "not_applicable",
+        "rejection_reasons": [],
+        "review_verdict": "pending",
         "review_issues": [],
         "evidence_summary": {
           "readme_found": true,
@@ -2869,12 +2980,14 @@
         "depth_decision": {
           "ranking_score": 64,
           "max_allowed_depth": "deep",
-          "final_depth": "light",
-          "depth_band": "light",
-          "analysis_depth": "light",
+          "final_depth": "deep",
+          "depth_band": "deep",
+          "analysis_depth": "deep",
           "ranking_reasons": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:64",
+            "depth_gate:agent_skill_informs_our_structure_deep",
+            "manual_confirmation_required",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
@@ -2883,7 +2996,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3998",
-            "signal:total_stars:52651",
+            "signal:total_stars:52707",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,eval,rag,self_evo",
             "signal:maturity:ci",
@@ -2896,12 +3009,12 @@
             "model/RAG evidence",
             "AI terms found in README/tree/topics"
           ],
-          "rejection_reasons": [
-            "depth_gate:teaching_skill_or_resource_max_light"
-          ],
-          "recommended_action": "try",
+          "rejection_reasons": [],
+          "recommended_action": "deep_dive",
           "needs_enrichment": false,
-          "review_verdict": "not_applicable",
+          "informs_our_structure": true,
+          "self_evo_eligible": true,
+          "review_verdict": "pending",
           "review_issues": [],
           "evidence_summary": {
             "readme_found": true,
@@ -2980,7 +3093,7 @@
             "github_search",
             "ossinsight_trending"
           ],
-          "stars": 52651,
+          "stars": 52707,
           "monthlyStarsGained": 3998,
           "reasons": [
             "heat_gate:pass",
@@ -2991,7 +3104,7 @@
           ]
         },
         "project_type": "agent_skill",
-        "verdict": "L1",
+        "verdict": "clone_and_run",
         "ratings": {
           "relevance_to_ai_engineer": 5,
           "engineering_depth": 4,
@@ -2999,12 +3112,14 @@
           "maturity": 5
         },
         "rankingReason": {
-          "decision": "gated",
+          "decision": "deterministic",
           "rawScore": 64,
           "finalScore": 64,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:64",
+            "depth_gate:agent_skill_informs_our_structure_deep",
+            "manual_confirmation_required",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
@@ -3013,7 +3128,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:3998",
-            "signal:total_stars:52651",
+            "signal:total_stars:52707",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,eval,rag,self_evo",
             "signal:maturity:ci",
@@ -3026,18 +3141,16 @@
             "model/RAG evidence",
             "AI terms found in README/tree/topics"
           ],
-          "matchedCapTerms": [
-            "depth_gate:teaching_skill_or_resource_max_light"
-          ],
-          "explanation": "score=64; max=deep; final=light"
+          "matchedCapTerms": [],
+          "explanation": "score=64; max=deep; final=deep"
         },
-        "deep_status": "not_applicable"
+        "deep_status": "queued"
       }
     ]
   },
   "monthly": {
     "window": "monthly",
-    "generatedAt": "2026-06-11T14:38:20.278Z",
+    "generatedAt": "2026-06-11T17:35:01.426Z",
     "target": 3,
     "repos": [
       {
@@ -3049,8 +3162,8 @@
         "description": "Your Personal AI super intelligence. Private, Simple and extremely powerful.",
         "language": "Rust",
         "languageColor": "#dea584",
-        "stars": 31495,
-        "forks": 3064,
+        "stars": 31520,
+        "forks": 3066,
         "starsGained": 30921,
         "starsGainedByWindow": {
           "monthly": 30921
@@ -3086,7 +3199,7 @@
           "what_it_does": "Your Personal AI super intelligence. Private, Simple and extremely powerful.",
           "metadata": {
             "language": "Rust",
-            "total_stars": 31495,
+            "total_stars": 31520,
             "stars_in_period": 30921,
             "author": "tinyhumansai"
           },
@@ -3107,8 +3220,8 @@
             "minimal_example": "见 README/examples 最小示例"
           },
           "maturity_signals": {
-            "star_velocity": "30921 period stars / 31495 total stars",
-            "recent_commit": "2026-06-11T14:35:35Z",
+            "star_velocity": "30921 period stars / 31520 total stars",
+            "recent_commit": "2026-06-11T17:28:09Z",
             "releases": "数据不足",
             "issue_activity": "数据不足"
           },
@@ -3122,6 +3235,8 @@
         },
         "recommended_action": "deep_dive",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": false,
         "ranking_reasons": [
           "project_type:agent_framework",
           "signal_score:70",
@@ -3137,7 +3252,7 @@
           "deep_gate:stars_gained=30921",
           "deep_gate:quality_pass",
           "signal:star_velocity:30921",
-          "signal:total_stars:31495",
+          "signal:total_stars:31520",
           "signal:cross_source:1",
           "signal:topic_fit:agent,memory,rag",
           "signal:maturity:tests",
@@ -3230,7 +3345,7 @@
             "deep_gate:stars_gained=30921",
             "deep_gate:quality_pass",
             "signal:star_velocity:30921",
-            "signal:total_stars:31495",
+            "signal:total_stars:31520",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -3243,6 +3358,8 @@
           "rejection_reasons": [],
           "recommended_action": "deep_dive",
           "needs_enrichment": false,
+          "informs_our_structure": true,
+          "self_evo_eligible": false,
           "review_verdict": "pending",
           "review_issues": [],
           "evidence_summary": {
@@ -3323,7 +3440,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 31495,
+          "stars": 31520,
           "monthlyStarsGained": 30921,
           "reasons": [
             "heat_gate:pass",
@@ -3332,7 +3449,7 @@
             "ossinsight_trending"
           ]
         },
-        "project_type": "ai_app",
+        "project_type": "agent_framework",
         "verdict": "clone_and_run",
         "ratings": {
           "relevance_to_ai_engineer": 5,
@@ -3359,7 +3476,7 @@
             "deep_gate:stars_gained=30921",
             "deep_gate:quality_pass",
             "signal:star_velocity:30921",
-            "signal:total_stars:31495",
+            "signal:total_stars:31520",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -3383,60 +3500,86 @@
         "description": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
         "language": "TypeScript",
         "languageColor": "#3178c6",
-        "stars": 57118,
-        "forks": 4742,
+        "stars": 57212,
+        "forks": 4751,
         "starsGained": 42791,
         "starsGainedByWindow": {
           "monthly": 42791
         },
         "rank": 2,
-        "tldr": "Egonex-AI/Understand-Anything：GitHub 描述为“Graphs that teach > graphs that impress. Turn any code into an interactive know",
+        "tldr": "Egonex-AI/Understand-Anything：GitHub 描述为“Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more”。",
         "tags": [
-          "知识图谱",
-          "代码分析",
-          "Claude插件",
-          "开发者工具",
-          "AI代理"
+          "Tier 3",
+          "真·新项目",
+          "agents",
+          "skills",
+          "models"
         ],
-        "light": "该项目是一个多平台 AI 编码插件，通过多代理管道（项目扫描、文件分析、架构分析等）结合 Tree-sitter 静态分析与 LLM 语义理解，将代码库转化为可交互的知识图谱，并提供仪表盘、语义搜索、差异影响分析等功能。它因在 GitHub 上短期内获得 4.2 万星而进入雷达。已知事实包括支持多种平台、有测试与 CI、有安装脚本和在线演示。缺失示例目录和架构文档。建议尝试使用以评估其实际效果。",
+        "light": "Egonex-AI/Understand-Anything 得分 62，信号是 project_type:agent_skill, signal_score:62。按确定性深度门控进入 deep，建议 deep_dive。",
         "worthDeepDive": 62,
         "ranking_score": 62,
         "max_allowed_depth": "deep",
-        "final_depth": "light",
-        "depth_band": "light",
-        "analysis_depth": "light",
-        "project_tier": 1,
-        "project_tier_label": "Tier 1",
+        "final_depth": "deep",
+        "depth_band": "deep",
+        "analysis_depth": "deep",
+        "project_tier": 3,
+        "project_tier_label": "Tier 3",
         "project_bucket": "真·新项目",
         "bucket": "真·新项目",
-        "tier_tag": "[Tier 1｜真·新项目]",
-        "model_tier": "cheap-extraction",
-        "requires_manual_confirmation": false,
+        "tier_tag": "[Tier 3｜真·新项目]",
+        "model_tier": "codex:gpt-5.5;model_reasoning_effort=high",
+        "requires_manual_confirmation": true,
         "tier_template": {
-          "tier": 1,
+          "tier": 3,
           "bucket": "真·新项目",
-          "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "面向开发者，将任意代码库转换为交互式知识图谱的 AI 插件/工具，支持多种 AI 编码平台。",
-          "what_it_does": "通过多代理管道和 Tree-sitter + LLM 混合引擎，分析项目结构并生成知识图谱，提供可视化仪表盘、语义搜索、差异分析与引导导览。",
+          "tag": "[Tier 3｜真·新项目]",
+          "one_sentence_positioning": "Egonex-AI/Understand-Anything：GitHub 描述为“Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more”。",
+          "what_it_does": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
           "metadata": {
             "language": "TypeScript",
-            "total_stars": 57118,
+            "total_stars": 57212,
             "stars_in_period": 42791,
             "author": "Egonex-AI"
           },
           "labels": [
-            "agent",
-            "工具",
-            "数据",
-            "infra"
+            "agents",
+            "skills",
+            "models"
           ],
-          "prose_body": "Egonex-AI/Understand-Anything 得分 62，信号是 project_type:agent_framework, signal_score:62；暂不深挖，因为 depth_gate:teaching_skill_or_resource_max_light。建议 try。"
+          "prose_body": "Egonex-AI/Understand-Anything 得分 62，信号是 project_type:agent_skill, signal_score:62。按确定性深度门控进入 deep，建议 deep_dive。",
+          "pain_point": "数据不足",
+          "core_capabilities": [
+            "agent 工作流",
+            "CLI 入口",
+            "模型/RAG 组件"
+          ],
+          "how_to_run": {
+            "install_command": "见 README 安装说明",
+            "minimal_example": "见 README/examples 最小示例"
+          },
+          "maturity_signals": {
+            "star_velocity": "42791 period stars / 57212 total stars",
+            "recent_commit": "2026-06-11T17:31:23Z",
+            "releases": "数据不足",
+            "issue_activity": "数据不足"
+          },
+          "comparison": "数据不足",
+          "trajectory_note": "数据不足",
+          "manual_confirmation": true,
+          "how_it_works_with_analogy": "数据不足",
+          "essential_design_difference": "数据不足",
+          "practitioner_meaning": "数据不足",
+          "cross_links": []
         },
-        "recommended_action": "try",
+        "recommended_action": "deep_dive",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": true,
         "ranking_reasons": [
-          "project_type:agent_framework",
+          "project_type:agent_skill",
           "signal_score:62",
+          "depth_gate:agent_skill_informs_our_structure_deep",
+          "manual_confirmation_required",
           "bucket:真·新项目",
           "novelty:new_repo",
           "novelty:ai_builder_shape",
@@ -3445,7 +3588,7 @@
           "gate:real_new_project",
           "deep_gate:excluded_resource_teaching_list",
           "signal:star_velocity:42791",
-          "signal:total_stars:57118",
+          "signal:total_stars:57212",
           "signal:cross_source:2",
           "signal:topic_fit:agent,memory,rag",
           "signal:maturity:tests",
@@ -3458,10 +3601,8 @@
           "skills/hooks evidence",
           "model/RAG evidence"
         ],
-        "rejection_reasons": [
-          "depth_gate:teaching_skill_or_resource_max_light"
-        ],
-        "review_verdict": "not_applicable",
+        "rejection_reasons": [],
+        "review_verdict": "pending",
         "review_issues": [],
         "evidence_summary": {
           "readme_found": true,
@@ -3522,12 +3663,14 @@
         "depth_decision": {
           "ranking_score": 62,
           "max_allowed_depth": "deep",
-          "final_depth": "light",
-          "depth_band": "light",
-          "analysis_depth": "light",
+          "final_depth": "deep",
+          "depth_band": "deep",
+          "analysis_depth": "deep",
           "ranking_reasons": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:62",
+            "depth_gate:agent_skill_informs_our_structure_deep",
+            "manual_confirmation_required",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
@@ -3536,7 +3679,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:42791",
-            "signal:total_stars:57118",
+            "signal:total_stars:57212",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -3549,12 +3692,12 @@
             "skills/hooks evidence",
             "model/RAG evidence"
           ],
-          "rejection_reasons": [
-            "depth_gate:teaching_skill_or_resource_max_light"
-          ],
-          "recommended_action": "try",
+          "rejection_reasons": [],
+          "recommended_action": "deep_dive",
           "needs_enrichment": false,
-          "review_verdict": "not_applicable",
+          "informs_our_structure": true,
+          "self_evo_eligible": true,
+          "review_verdict": "pending",
           "review_issues": [],
           "evidence_summary": {
             "readme_found": true,
@@ -3631,7 +3774,7 @@
             "github_trending",
             "github_search"
           ],
-          "stars": 57118,
+          "stars": 57212,
           "monthlyStarsGained": 42791,
           "reasons": [
             "heat_gate:pass",
@@ -3640,8 +3783,8 @@
             "github_search"
           ]
         },
-        "project_type": "devtool_cli",
-        "verdict": "L1",
+        "project_type": "agent_skill",
+        "verdict": "clone_and_run",
         "ratings": {
           "relevance_to_ai_engineer": 5,
           "engineering_depth": 4,
@@ -3649,12 +3792,14 @@
           "maturity": 5
         },
         "rankingReason": {
-          "decision": "gated",
+          "decision": "deterministic",
           "rawScore": 62,
           "finalScore": 62,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:62",
+            "depth_gate:agent_skill_informs_our_structure_deep",
+            "manual_confirmation_required",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
@@ -3663,7 +3808,7 @@
             "gate:real_new_project",
             "deep_gate:excluded_resource_teaching_list",
             "signal:star_velocity:42791",
-            "signal:total_stars:57118",
+            "signal:total_stars:57212",
             "signal:cross_source:2",
             "signal:topic_fit:agent,memory,rag",
             "signal:maturity:tests",
@@ -3676,12 +3821,10 @@
             "skills/hooks evidence",
             "model/RAG evidence"
           ],
-          "matchedCapTerms": [
-            "depth_gate:teaching_skill_or_resource_max_light"
-          ],
-          "explanation": "score=62; max=deep; final=light"
+          "matchedCapTerms": [],
+          "explanation": "score=62; max=deep; final=deep"
         },
-        "deep_status": "not_applicable"
+        "deep_status": "queued"
       },
       {
         "fullName": "anthropics/knowledge-work-plugins",
@@ -3692,8 +3835,8 @@
         "description": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
         "language": "Python",
         "languageColor": "#3572A5",
-        "stars": 20227,
-        "forks": 2397,
+        "stars": 20252,
+        "forks": 2398,
         "starsGained": 8127,
         "starsGainedByWindow": {
           "monthly": 8127
@@ -3701,13 +3844,13 @@
         "rank": 3,
         "tldr": "anthropics/knowledge-work-plugins：GitHub 描述为“Open source repository of plugins primarily intended for knowledge workers ",
         "tags": [
-          "Claude插件",
+          "claude插件",
           "知识工作",
           "MCP",
-          "工作流自动化",
-          "企业工具"
+          "企业工具",
+          "工作流自动化"
         ],
-        "light": "该项目是Anthropic官方的Claude Cowork插件市场开源版，包含11个面向不同职业角色（如销售、客服、财务等）的预构建插件。每个插件由skills（领域知识markdown）、commands（斜杠命令）和connectors（基于MCP的外部工具连接）组成，全部基于Markdown/JSON文件，无需编码。项目近期在GitHub Trending上获得大量关注，但缺少独立文档、示例和测试用例，建议直接通过Claude Cowork或Claude Code尝试安装使用。",
+        "light": "这是 Anthropics 官方开源的一套 Claude Cowork 插件，旨在通过预配置的技能（skills）、斜杠命令（commands）和 MCP 工具连接（connectors），让 Claude 快速适应不同知识工作者角色（如销售、客服、产品、法务等）。共提供 11 个插件，每个插件包含 plugin.json 清单、.mcp.json 工具配置、commands/ 和 skills/ 文件夹。所有组件均为纯文本（Markdown/JSON），无需代码或构建。注意：仓库缺少独立文档、示例、测试和演示，实际使用依赖 Claude 平台。推荐直接试用或参考其插件结构设计自定义插件。",
         "worthDeepDive": 62,
         "ranking_score": 62,
         "max_allowed_depth": "light",
@@ -3725,33 +3868,36 @@
           "tier": 1,
           "bucket": "真·新项目",
           "tag": "[Tier 1｜真·新项目]",
-          "one_sentence_positioning": "Anthropic开源的Claude Cowork插件集合，面向知识工作者，用于定制Claude在特定角色下的行为。",
-          "what_it_does": "提供预构建的插件（如销售、支持、法律等），包含领域知识技能、斜杠命令和通过MCP连接的外部工具，用户可直接安装或修改适配自身流程。",
+          "one_sentence_positioning": "Anthropics 官方的面向知识工作者的 Claude 插件集合，用于让 Claude 快速适配不同岗位的专业工作流程",
+          "what_it_does": "提供 11 个预构建插件，每个包含领域技能、斜杠命令和 MCP 工具连接，可直接在 Claude Cowork 或 Claude Code 中使用。插件结构标准化，便于自定义和扩展。",
           "metadata": {
             "language": "Python",
-            "total_stars": 20227,
+            "total_stars": 20252,
             "stars_in_period": 8127,
-            "author": "anthropics"
+            "author": "Anthropics"
           },
           "labels": [
             "agent",
-            "tools"
+            "工具",
+            "infra"
           ],
-          "prose_body": "anthropics/knowledge-work-plugins 得分 62，信号是 project_type:agent_framework, signal_score:62；暂不深挖，因为 cannot_design_practical_test_plan。建议 try。"
+          "prose_body": "anthropics/knowledge-work-plugins 得分 62，信号是 project_type:agent_skill, signal_score:62；暂不深挖，因为 cannot_design_practical_test_plan。建议 try。"
         },
         "recommended_action": "try",
         "needs_enrichment": false,
+        "informs_our_structure": true,
+        "self_evo_eligible": false,
         "ranking_reasons": [
-          "project_type:agent_framework",
+          "project_type:agent_skill",
           "signal_score:62",
-          "depth_gate:light_default",
+          "depth_gate:agent_skill_informs_our_structure_deep",
           "bucket:真·新项目",
           "novelty:new_repo",
           "novelty:ai_builder_shape",
           "heat:stars_in_period=8127",
           "gate:real_new_project",
           "signal:star_velocity:8127",
-          "signal:total_stars:20227",
+          "signal:total_stars:20252",
           "signal:cross_source:1",
           "signal:topic_fit:agent,memory,rag,mcp",
           "signal:maturity:ci",
@@ -3832,16 +3978,16 @@
           "depth_band": "light",
           "analysis_depth": "light",
           "ranking_reasons": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:62",
-            "depth_gate:light_default",
+            "depth_gate:agent_skill_informs_our_structure_deep",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
             "heat:stars_in_period=8127",
             "gate:real_new_project",
             "signal:star_velocity:8127",
-            "signal:total_stars:20227",
+            "signal:total_stars:20252",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag,mcp",
             "signal:maturity:ci",
@@ -3861,6 +4007,8 @@
           ],
           "recommended_action": "try",
           "needs_enrichment": false,
+          "informs_our_structure": true,
+          "self_evo_eligible": false,
           "review_verdict": "not_applicable",
           "review_issues": [],
           "evidence_summary": {
@@ -3936,7 +4084,7 @@
             "github_trending",
             "ossinsight_trending"
           ],
-          "stars": 20227,
+          "stars": 20252,
           "monthlyStarsGained": 8127,
           "reasons": [
             "heat_gate:pass",
@@ -3958,16 +4106,16 @@
           "rawScore": 62,
           "finalScore": 62,
           "matchedBoostTerms": [
-            "project_type:agent_framework",
+            "project_type:agent_skill",
             "signal_score:62",
-            "depth_gate:light_default",
+            "depth_gate:agent_skill_informs_our_structure_deep",
             "bucket:真·新项目",
             "novelty:new_repo",
             "novelty:ai_builder_shape",
             "heat:stars_in_period=8127",
             "gate:real_new_project",
             "signal:star_velocity:8127",
-            "signal:total_stars:20227",
+            "signal:total_stars:20252",
             "signal:cross_source:1",
             "signal:topic_fit:agent,memory,rag,mcp",
             "signal:maturity:ci",

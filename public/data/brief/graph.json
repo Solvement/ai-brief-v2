@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T14:38:22.237Z",
+  "generatedAt": "2026-06-11T17:35:03.767Z",
   "note": "Unified associative-memory graph. Edges: references(wikilink)/same_track(tags)/implements(project↔paper)/builds_on·shares_method·same_use_case(authored focus clusters).",
   "nodes": [
     {
@@ -6959,6 +6959,28 @@
       "topic": "data"
     },
     {
+      "id": "paper:2606.05405",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.05405-agents-last-exam",
+      "title": "Agents' Last Exam",
+      "tags": [
+        "agent-benchmark",
+        "computer-use-agent",
+        "real-world-workflow",
+        "verifiable-evaluation",
+        "deterministic-grading",
+        "gate-and-score",
+        "economic-impact",
+        "gcua",
+        "long-horizon-agent",
+        "evaluation-harness"
+      ],
+      "file": "content/papers/2606.05405-agents-last-exam/metadata.json",
+      "arxiv_id": "2606.05405",
+      "topic": "agent"
+    },
+    {
       "id": "paper:2606.05563",
       "type": "paper",
       "family": "paper",
@@ -7158,6 +7180,25 @@
       "topic": "code"
     },
     {
+      "id": "paper:2606.07297",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.07297-swe-explore-repo-exploration",
+      "title": "SWE-Explore: Benchmarking How Coding Agents Explore Repositories",
+      "tags": [
+        "repository-exploration",
+        "coding-agent-benchmark",
+        "context-selection",
+        "trajectory-grounded-gt",
+        "line-level-localization",
+        "context-efficiency",
+        "swe-bench"
+      ],
+      "file": "content/papers/2606.07297-swe-explore-repo-exploration/metadata.json",
+      "arxiv_id": "2606.07297",
+      "topic": "agent"
+    },
+    {
       "id": "paper:2606.07591",
       "type": "paper",
       "family": "paper",
@@ -7220,6 +7261,24 @@
       "topic": "agent-evaluation"
     },
     {
+      "id": "paper:2606.09730",
+      "type": "paper",
+      "family": "paper",
+      "slug": "2606.09730-searchswarm-delegation-intelligence",
+      "title": "SearchSwarm: Towards Delegation Intelligence in Agentic LLMs for Long-Horizon Deep Research",
+      "tags": [
+        "delegation-intelligence",
+        "deep-research",
+        "context-management",
+        "agent-harness",
+        "trajectory-to-sft",
+        "sub-agent",
+        "long-horizon"
+      ],
+      "file": "content/papers/2606.09730-searchswarm-delegation-intelligence/metadata.json",
+      "arxiv_id": "2606.09730"
+    },
+    {
       "id": "paper:2606.12191",
       "type": "paper",
       "family": "paper",
@@ -7240,18 +7299,6 @@
       "file": "content/papers/2606.12191-agentic-environment-engineering-survey/metadata.json",
       "arxiv_id": "2606.12191",
       "topic": "agent"
-    },
-    {
-      "id": "radar:CopilotKit/CopilotKit",
-      "type": "project",
-      "family": "project",
-      "slug": "copilotkit",
-      "title": "CopilotKit/CopilotKit",
-      "tags": [],
-      "file": "public/data/trending.json",
-      "url": "https://github.com/CopilotKit/CopilotKit",
-      "ghost": true,
-      "radar": true
     },
     {
       "id": "ghost:hkuds-openspace",
@@ -16386,6 +16433,16 @@
     },
     {
       "from": "paper:2605.28556",
+      "to": "paper:2606.05405",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2605.28556",
       "to": "paper:2606.05563",
       "type": "same_track",
       "confidence": "medium",
@@ -16660,6 +16717,16 @@
       "type": "same_track",
       "confidence": "medium",
       "evidence": "共享标签:benchmark",
+      "kg_integrated": true,
+      "cross_doc": true,
+      "weak": true
+    },
+    {
+      "from": "paper:2606.09730",
+      "to": "paper:2606.05922",
+      "type": "same_track",
+      "confidence": "medium",
+      "evidence": "共享标签:agent-harness",
       "kg_integrated": true,
       "cross_doc": true,
       "weak": true
@@ -32393,8 +32460,8 @@
     }
   ],
   "summary": {
-    "nodes": 594,
-    "edges": 1486,
+    "nodes": 596,
+    "edges": 1488,
     "nodeByType": {
       "content": 64,
       "source-pack": 70,
@@ -32406,8 +32473,8 @@
       "evidence": 3,
       "artifact": 70,
       "taste": 1,
-      "paper": 37,
-      "project": 5
+      "paper": 40,
+      "project": 4
     },
     "edgeByType": {
       "references": 1395,
@@ -32416,7 +32483,7 @@
       "same_use_case": 3,
       "implements": 1,
       "composes_with": 9,
-      "same_track": 66,
+      "same_track": 68,
       "improves_on": 2,
       "contradicts": 2
     },
@@ -32437,8 +32504,8 @@
     "ghostCandidates": 12,
     "references": 1395,
     "associativeEdges": 25,
-    "crossDocEdges": 68,
-    "ghosts": 13,
+    "crossDocEdges": 70,
+    "ghosts": 12,
     "assessed": 42,
     "facetedNodes": 19
   }

@@ -84,6 +84,16 @@
 - **main 已三连快进**：16956f1→8383729(news 修复)→cd471e4(projects v2)→c4dfb11(范式)。
 - **遗留**：深读积压 3 篇（Mellum2/TIDE/Humanoid-GPT）——避开与交互会话共享的订阅 5h 窗，排今晚 boot 管线或交互不活跃时段跑 `npm run papers:deepread`+`papers:cold-audit`；articles.json（论文 publish 面）随之恢复。projects v2 的首次真实日跑待明早 boot 验证（trending 页三窗+新字段渲染）。
 
+### SESSION-0611-PM · 项目栏全覆盖+自进化闭环（多 loop, eval-first）+ boot 加固 + 并发撞车（Claude 主控）
+- **plan**：`docs/plans/2026-06-11-projects-coverage-self-evo.md`（Kevin 批准，多 loop）。决策：①全覆盖+分挡 ②skills 双轴 ③自进化非红线 verify 门后直接应用+周审、红线排队（选项①）。
+- **eval-first（Kevin 硬规则"审核前先写 eval"）**：`scripts/eval-projects-coverage.mjs`（分类≥0.85+覆盖100%+deep≤2）+ `scripts/eval-self-evo-loop.mjs`（schema+judge+verify门 poison必回退+红线必排队）+ `scripts/fixtures/project-type-golden.json`（30 手标，含 agent_skill 新品类）。
+- **codex C1（覆盖管线，Claude review 上线）**：新增 `agent_skill` 品类、修 agent 歧义（客服≠AI）/non_ai 漏网；覆盖挡位（AI 入榜≥light）、两轴挑深读、skills 双轴（informs_our_structure→deep+self_evo_eligible）。独立验证：分类器 30/30、覆盖 5/5、3 个瞬态失败测试合并态 23/23 绿。
+- **codex C2（自进化闭环，Claude review 上线）**：`scripts/kg/self-evo.mjs` 三函数（validateCandidate/judgeCandidate/applyCandidate）：深读→判更强吗→verify 门→非红线应用+`self-evo-applied.jsonl`/红线`self-evo-review.jsonl`。eval 全绿（poison 必回退、红线必排队实测）。这是"拿知识改造自己"闭环，不是更大记忆机器。
+- **范式 v2.1（Claude 著 4d249dc）**：projects.md 补 agent_skill 双轴+informs_our_structure 轴；skills 对我们=L1 自进化一手材料。
+- **⚠并发撞车（教训入 memory `concurrent-session-working-dir-hazard`）**：9 点 boot 的 `git add -A` 把 codex C1/C2 未提交改动扫进 247cdb0 并过门部署（feat=main）；同时 Kevin UI 会话把工作目录切到 codex/api → HEAD 全变虚惊，零丢失。处理=不抢 checkout，用隔离 worktree（OneDrive 外+junction node_modules）验证/改/推；worktree build 跑不了（Turbopack 拒 junction）只跑 lint/test/eval。
+- **boot 两层加固（2c955a0）**：① boot-daily.ps1 内部非 deploy 分支时 stash 具名+checkout feat；② task action 改 -Command 先 checkout 再跑（治 boot 脚本在别分支不存在的静默 no-op）。②需 admin 重注册（`scripts/register-boot-daily.ps1`）。
+- **遗留**：⚠工作目录现停 codex/api，今晚 boot 靠①自愈但②要 Kevin admin 重注册才治本；UI 会话收工后宜切回 feat。覆盖管线轻层已手动重跑产不冻住的 trending（本次提交）。
+
 ### PAPER-2606.09669 · SpatialWorld 深读从头重写（plan `docs/plans/2026-06-10-spatialworld-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 SpatialWorld 写成可进入 AI-Brief 知识库的深读资产，重点沉淀“统一 I/O 瓶颈 + 终态 verifier + TSR/SE 双指标 + 任务三件套”对 multimodal agent / 自进化 agent eval 的价值。
 - **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + 项目页 + clone `Hongcheng-Gao/SpatialWorld` 源码/数据；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09669.yaml`；区分论文自报、项目页/HF/GitHub 动态核验、仓库实读。
