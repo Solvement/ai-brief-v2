@@ -59,11 +59,21 @@ async function evalCoverage() {
   const t = await readJson("public/data/trending.json");
   if (!t) { fails.push("trending.json missing"); return; }
   const windows = ["daily", "weekly", "monthly"];
+  // 排序铁律 (Kevin 2026-06-11 "精读分析以及高收藏量的先展示"): depth band 非递减
+  // (deep/standard 在前 → light → list_only)，且同 band 内高 star 不应排在低 star 之后太多。
+  const DEPTH_ORDER = { deep: 0, standard: 1, analysis: 1, light: 2, list_only: 3, index: 3 };
+  const drank = (r) => DEPTH_ORDER[tierOf(r)] ?? 2;
   let aiTotal = 0, aiWithCard = 0, listOnlyAi = 0, deepTotalDay = 0;
   for (const w of windows) {
     const node = t[w];
     const repos = Array.isArray(node) ? node : (node?.repos || node?.items || []);
     let deepThisWindow = 0;
+    for (let i = 1; i < repos.length; i += 1) {
+      if (drank(repos[i]) < drank(repos[i - 1])) {
+        fails.push(`${w}: 排序违例 — ${repos[i].name || repos[i].full_name}(${tierOf(repos[i])}) 排在 ${tierOf(repos[i - 1])} 之后(深读/高star 应在前)`);
+        break;
+      }
+    }
     for (const r of repos) {
       const ty = typeOf(r);
       const tier = tierOf(r);

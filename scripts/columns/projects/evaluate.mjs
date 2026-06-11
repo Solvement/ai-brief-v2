@@ -54,7 +54,7 @@ export async function generateProjectLightAnalysis({ candidate, evidence, triage
         system: LIGHT_SYS,
         user: lightUser(repo, evidence, triage),
         model,
-        maxTokens: options.lightMaxTokens || Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200,
+        maxTokens: options.lightMaxTokens || Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 3000,
       });
     } catch (error) {
       logger?.warn?.(`project light analysis failed ${repo.fullName || repo.name || candidate?.id}: ${error.message}`);

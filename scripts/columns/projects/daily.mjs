@@ -56,9 +56,14 @@ export function parseArgs(argv = []) {
     topicLimit: 0,
     growthSearchLimit: 4,
     hfSource: false,
+    // Broad coverage default (Kevin 2026-06-11 "把 trending 的都做一下"): keep ALL deduped
+    // candidates instead of elite-filtering to ~12. Non-AI → list_only (no LLM), AI → ≥light
+    // (DeepSeek). The ledger de-dupes already-done repos, so steady-state cost is only today's
+    // NEW AI repos (naturally bounded). Restore the old elite-only board with --elite-selection.
+    eliteSelection: false,
     worthThreshold: 60,
     readmeMaxChars: 14000,
-    lightMaxTokens: Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 1200,
+    lightMaxTokens: Number(process.env.PROJECT_LIGHT_MAX_TOKENS) || 3000,
     deepDiveMaxTokens: Number(process.env.PROJECT_DEEP_DIVE_MAX_TOKENS) || Number(process.env.PROJECT_DEEP_MAX_TOKENS) || 16000,
     apiTimeoutMs: Number(process.env.DEEPSEEK_TIMEOUT_MS) || 180000,
   };
@@ -114,6 +119,10 @@ export function parseArgs(argv = []) {
       options.growthSearchLimit = 0;
     } else if (arg === "--hf-source") {
       options.hfSource = true;
+    } else if (arg === "--elite-selection") {
+      options.eliteSelection = true;
+    } else if (arg === "--no-elite-selection" || arg === "--broad") {
+      options.eliteSelection = false;
     } else if (arg === "--readme-max-chars") {
       options.readmeMaxChars = numberOption(nextValue(), options.readmeMaxChars);
     } else if (arg.startsWith("--readme-max-chars=")) {

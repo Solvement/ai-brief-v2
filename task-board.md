@@ -94,6 +94,14 @@
 - **boot 两层加固（2c955a0）**：① boot-daily.ps1 内部非 deploy 分支时 stash 具名+checkout feat；② task action 改 -Command 先 checkout 再跑（治 boot 脚本在别分支不存在的静默 no-op）。②需 admin 重注册（`scripts/register-boot-daily.ps1`）。
 - **遗留**：⚠工作目录现停 codex/api，今晚 boot 靠①自愈但②要 Kevin admin 重注册才治本；UI 会话收工后宜切回 feat。覆盖管线轻层已手动重跑产不冻住的 trending（本次提交）。
 
+### SESSION-0611-PM2 · 全展示+排序+有用工具信号+精读内容三铁律（Kevin 决策，Claude 主控，worktree 隔离）
+- **Kevin 决策**：trending 全展示，但**精读分析+高 star 先展示**，其余翻译 README 讲清做什么/解决什么；**有用工具凸显**（career-ops 类求职/效率工具值得装，不因是 skill 被埋）；精读前端**三铁律**：不堆砌文字/不中英夹杂/不含指令代码。
+- **breadth 真根因**（先前只治了分类）：discover 层 `eliteSelection` 砍 103→12 + `makeBoard` 的 `boardLimit=12` 双截断。修：daily 默认 `eliteSelection:false`（`--broad`/`--elite-selection` 开关）+ boardLimit 兜底 12→100（全展示）。
+- **截断 bug**：广覆盖卡多→DeepSeek 轻卡 `max_tokens=1200` 被 `finish_reason=length` 截断、JSON 残缺 jsonrepair 救不了。修：light token 1200→3000（两处）。
+- **排序**（index.mjs sortForWindow 重写）：depth band（deep/standard→light→list_only）→ user_utility（career/job/resume/productivity/PKM 等关键词加权，不埋长尾）→ stars desc（高收藏先）→ trending rank。eval 加排序断言（depth 非递减）。
+- **精读内容三铁律**入 `docs/paradigms/projects.md`：分层不堆砌、中文叙述（专名留英但句子中文）、正文禁安装命令/shell/代码块/配置（怎么用一句话带过，要跑去仓库 README）。**分工**：内容纪律=我（范式/prompt，feat 域）；视觉皮肤=UI 会话（codex/api 重设计 deep-dive interior），不互碰。
+- **状态**：worktree 隔离改+跑（不碰 codex/api UI 会话），广覆盖轻层重跑中，verify+eval 后提交 push main 部署。深读 authoring 留今晚加固 boot（codex gpt-5.5，不在交互窗硬跑避 429）。
+
 ### PAPER-2606.09669 · SpatialWorld 深读从头重写（plan `docs/plans/2026-06-10-spatialworld-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 SpatialWorld 写成可进入 AI-Brief 知识库的深读资产，重点沉淀“统一 I/O 瓶颈 + 终态 verifier + TSR/SE 双指标 + 任务三件套”对 multimodal agent / 自进化 agent eval 的价值。
 - **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + 项目页 + clone `Hongcheng-Gao/SpatialWorld` 源码/数据；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09669.yaml`；区分论文自报、项目页/HF/GitHub 动态核验、仓库实读。

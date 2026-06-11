@@ -529,7 +529,9 @@ export function makeBoard(window, items, options = {}) {
   const nativeItems = items
     .filter((item) => (!hasCurrentRunMarkers || item.currentRun) && isCurrentBoardWindow(item.repo, window))
     .sort((left, right) => sortForWindow(left, right, window));
-  const boardLimit = Number.isFinite(Number(options.boardLimit)) ? Number(options.boardLimit) : 12;
+  // 全展示 (Kevin 2026-06-11): show all covered repos, not a top-12 slice. A high ceiling still
+  // guards against a pathological flood; tune with --board-limit if needed.
+  const boardLimit = Number.isFinite(Number(options.boardLimit)) ? Number(options.boardLimit) : 100;
   const boardItems = nativeItems.slice(0, boardLimit);
   const repos = boardItems
     .map((item, index) => repoForBoard(item, window, index + 1, options));
@@ -638,13 +640,35 @@ function isCompletedDeepDive(item) {
   return tierTemplateHasAuthoredBody(authored);
 }
 
+// Board ordering (Kevin 2026-06-11 "全展示，精读分析以及高收藏量的先展示，其余翻译 README"):
+// 1) by depth band — deep/standard analyses first, then light cards, then list_only;
+// 2) useful-to-user tools (career-ops 类求职/效率工具) lifted within their band so they
+//    are not buried in the long tail;
+// 3) by total stars desc (高收藏量先展示); 4) by trending rank as a stable tiebreak.
+const DEPTH_ORDER = { deep: 0, standard: 1, analysis: 1, light: 2, list_only: 3, index: 3 };
+function depthRank(item) {
+  const d = item.light?.final_depth || item.light?.depth_decision?.final_depth || item.final_depth || "list_only";
+  return DEPTH_ORDER[d] ?? 2;
+}
+// "Worth installing" utility: tools a person adopts directly (job search, resume, productivity,
+// notes/PKM, browser/devtools). Keyword-based, deterministic. Lifts them above generic long-tail.
+const USER_UTILITY_RE = /\b(job|career|resume|cv|cover letter|interview|hiring|recruit|productivity|note[- ]?taking|notebook|knowledge base|pkm|second brain|todo|task manager|calendar|email|workflow|automation|self[- ]?host|backup|password|translate|transcription|study|learn)\b/i;
+function userUtility(item) {
+  const repo = item.repo || {};
+  if (item.light?.user_utility === true || repo.user_utility === true) return 1;
+  const text = `${repo.name || ""} ${repo.description || ""} ${item.light?.tldr || ""} ${(item.light?.tags || []).join(" ")}`;
+  return USER_UTILITY_RE.test(text) ? 1 : 0;
+}
 function sortForWindow(left, right, window) {
+  const depthDelta = depthRank(left) - depthRank(right);
+  if (depthDelta) return depthDelta;
+  const utilDelta = userUtility(right) - userUtility(left);
+  if (utilDelta) return utilDelta;
+  const starDelta = (Number(right.repo.stars) || 0) - (Number(left.repo.stars) || 0);
+  if (starDelta) return starDelta;
   const leftRank = Number(left.repo.ranksByWindow?.[window] || left.repo.rank || 9999);
   const rightRank = Number(right.repo.ranksByWindow?.[window] || right.repo.rank || 9999);
-  const leftSupplement = leftRank >= 1000;
-  const rightSupplement = rightRank >= 1000;
-  if (leftSupplement !== rightSupplement) return leftSupplement ? 1 : -1;
-  if (!leftSupplement && leftRank !== rightRank) return leftRank - rightRank;
+  if (leftRank !== rightRank) return leftRank - rightRank;
   return Number(right.light?.worthDeepDive || right.eval?.score || 0) - Number(left.light?.worthDeepDive || left.eval?.score || 0);
 }
 
