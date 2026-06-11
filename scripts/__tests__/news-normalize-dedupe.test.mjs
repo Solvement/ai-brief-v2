@@ -184,7 +184,9 @@ test("parses DeepMind card titles from hydrated HTML", () => {
 
 test("news daily args include daily cap option and env default", () => {
   assert.equal(parseNewsDailyArgs(["--daily-cap", "12"]).dailyCap, 12);
-  assert.equal(parseNewsDailyArgs([]).enableLlm, false);
+  // Chinese is non-negotiable (Kevin 2026-06-11): LLM ON by default (drives titleZh/summaryZh).
+  assert.equal(parseNewsDailyArgs([]).enableLlm, true);
+  assert.equal(parseNewsDailyArgs(["--no-llm"]).enableLlm, false);
   assert.equal(parseNewsDailyArgs(["--enable-llm"]).enableLlm, true);
 });
 

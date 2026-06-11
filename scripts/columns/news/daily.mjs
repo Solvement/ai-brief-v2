@@ -99,7 +99,12 @@ export function parseArgs(argv = []) {
   const options = {
     dryRun: false,
     noLlm: false,
-    enableLlm: process.env.NEWS_ENABLE_LLM === "1",
+    // Chinese is non-negotiable for this feed (Kevin 2026-06-11: 新闻必须中文). LLM ON by default —
+    // it drives titleZh/summaryZh (News.tsx falls back to English title when absent). Per-batch
+    // enrichment is already fail-soft (try/catch → keep English for that batch, never hangs the run);
+    // codex B's earlier "180s hang" was the 124s INTERACTIVE command cap, not a boot-time hang (4h limit).
+    // Escape hatches kept: --no-llm flag and NEWS_ENABLE_LLM=0.
+    enableLlm: process.env.NEWS_ENABLE_LLM !== "0",
     perSourceLimit: numberOption(process.env.NEWS_PER_SOURCE_LIMIT, 30),
     dailyCap: numberOption(process.env.NEWS_DAILY_CAP, 20),
     retentionDays: numberOption(process.env.NEWS_RETENTION_DAYS, 14),

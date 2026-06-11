@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-11T14:33:31.444Z",
+  "generatedAt": "2026-06-11T18:24:59.976Z",
   "ok": true,
   "status": "pass",
   "column": "news",
   "dataFile": "public/data/news.json",
-  "dataGeneratedAt": "2026-06-11T14:30:05.278Z",
+  "dataGeneratedAt": "2026-06-11T18:22:40.377Z",
   "maxAgeDays": 2,
   "ageDays": 0,
-  "totalDiscovered": 192,
+  "totalDiscovered": 166,
   "totalPublished": 219,
   "totalPublishedForGeneratedDay": 20,
-  "sourceCount": 15,
-  "successfulSourceCount": 13,
+  "sourceCount": 14,
+  "successfulSourceCount": 12,
   "failedSourceCount": 2,
   "failedSources": [
     {
@@ -31,19 +31,19 @@
       "id": "freshness",
       "label": "news.json generatedAt is no older than 2 days",
       "status": "pass",
-      "details": "ageDays=0, generatedAt=2026-06-11T14:30:05.278Z"
+      "details": "ageDays=0, generatedAt=2026-06-11T18:22:40.377Z"
     },
     {
       "id": "source-availability",
       "label": "at least one source succeeded",
       "status": "pass",
-      "details": "13/15 sources succeeded"
+      "details": "12/14 sources succeeded"
     },
     {
       "id": "discovery-nonempty",
       "label": "discovery produced publishable candidates",
       "status": "pass",
-      "details": "192 discovered"
+      "details": "166 discovered"
     },
     {
       "id": "published-total",

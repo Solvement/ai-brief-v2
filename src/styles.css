@@ -4813,11 +4813,14 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 }
 .dd-page .dd-section .pd-prose th { background: var(--dd-bg); font-weight: 700; color: var(--dd-ink); }
 /* architecture diagram: big, centered, light card — fills the (wide) section */
-.dd-page .dd-section .pd-mermaid {
-  display: flex; justify-content: center; margin: 6px 0 18px; padding: 22px;
-  background: var(--dd-bg); border: 1px solid var(--dd-line); border-radius: var(--dd-radius-sm); overflow-x: auto;
+/* deep-dive page: card + scroll/controls live on the wrap (the inner .pd-mermaid only holds the
+   scalable diagram, so no nested double-card). */
+.dd-page .dd-section .pd-mermaid-wrap {
+  margin: 6px 0 18px; background: var(--dd-bg); border: 1px solid var(--dd-line); border-radius: var(--dd-radius-sm);
 }
-.dd-page .dd-section .pd-mermaid svg { width: 100%; max-width: 920px; min-width: min(100%, 560px); height: auto; }
+.dd-page .dd-section .pd-mermaid-scroll { padding: 22px; }
+.dd-page .dd-section .pd-mermaid { display: flex; justify-content: flex-start; overflow: visible; background: none; border: 0; padding: 0; margin: 0; }
+.dd-page .dd-section .pd-mermaid svg { width: calc(100% * var(--mz, 1)); max-width: calc(920px * var(--mz, 1)); min-width: min(calc(100% * var(--mz, 1)), 560px); height: auto; }
 .dd-page .dd-section .pd-mermaid-fallback { background: #0f172a; color: #cbd5e1; border-radius: var(--dd-radius-sm); padding: 14px 16px; overflow-x: auto; font-size: 12.5px; }
 
 /* ── 为什么值得看 — verified vs caution checklist ── */
@@ -5321,9 +5324,19 @@ button.radar-chip:hover { color: var(--radar-ink); border-color: var(--radar-lin
 .pd-prose tr:nth-child(even) td { background: #fcfdff; }
 
 /* mermaid */
-.pd-mermaid { display: flex; justify-content: center; margin: 12px 0 26px; padding: 24px; background: var(--radar-bg); border: 1px solid var(--radar-line); border-radius: 12px; overflow-x: auto; }
-/* Enlarge the architecture diagrams: fill the (now wider) column instead of staying tiny. */
-.pd-mermaid svg { width: 100%; max-width: 900px; min-width: min(100%, 560px); height: auto; }
+/* Zoomable architecture diagram (Kevin 2026-06-11): card + controls on the wrap, scroll viewport
+   holds the scalable diagram so wide/横向 figures can be enlarged and panned. */
+.pd-mermaid-wrap { position: relative; margin: 12px 0 26px; background: var(--radar-bg); border: 1px solid var(--radar-line); border-radius: 12px; }
+.pd-mermaid-controls { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--radar-line); }
+.pd-mermaid-controls button { min-width: 30px; height: 28px; padding: 0 8px; font-size: 15px; line-height: 1; border: 1px solid var(--radar-line); background: #fff; color: var(--ink, #1e293b); border-radius: 7px; cursor: pointer; }
+.pd-mermaid-controls button:hover:not(:disabled) { border-color: var(--accent, #2563eb); color: var(--accent, #2563eb); }
+.pd-mermaid-controls button:disabled { opacity: 0.4; cursor: default; }
+.pd-mermaid-zoom { min-width: 46px; text-align: center; font-size: 12px; color: var(--muted, #64748b); font-variant-numeric: tabular-nums; }
+.pd-mermaid-scroll { overflow: auto; padding: 24px; max-height: 78vh; }
+.pd-mermaid { display: flex; justify-content: flex-start; overflow: visible; }
+/* Enlarge the architecture diagrams; --mz (set inline by <Mermaid>) zooms by growing the SVG box
+   so the scroll container can pan a widened/横向 figure. */
+.pd-mermaid svg { width: calc(100% * var(--mz, 1)); max-width: calc(900px * var(--mz, 1)); min-width: min(calc(100% * var(--mz, 1)), 560px); height: auto; }
 .pd-mermaid-fallback { background: #0f1729; color: #e6edf3; border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 12.5px; }
 
 /* heading anchor offset so TOC jumps don't tuck under the top */
