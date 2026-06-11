@@ -11,6 +11,7 @@ Return strict JSON:
   "tldr": "one plain Chinese sentence: what the project is and what it is for, using only evidence",
   "tags": ["3-5 short tags"],
   "light": "150-300 Chinese chars, one paragraph: what it is / why it entered radar / known facts / missing evidence / recommended action",
+  "highlight": "one plain Chinese sentence: why it got high stars or became hot this week/month; if evidence is thin, cite the trend/star signal only",
   "tier_template": {
     "one_sentence_positioning": "是什么/给谁用",
     "what_it_does": "1-2句",
@@ -24,6 +25,7 @@ Return strict JSON:
 Writing rules:
 - Write plain-language Chinese for applied AI builders.
 - tldr must be concrete Chinese, not an English placeholder or ranking label. Say project type + purpose.
+- highlight is required. It must answer why this repo is hot/high-starred, not repeat the description.
 - Keep it factual and conservative.
 - If README/tree does not show docs, examples, install, demo, architecture, or tests, say the evidence is missing.
 - Mark missing facts as "数据不足"; do not invent maturity, comparison, backing, install commands, or examples.

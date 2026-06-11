@@ -14,6 +14,13 @@
 
 ## 进行中
 
+### PROJECTS-BOARD-REUSE-HIGHLIGHT · 项目板块展示解耦去重 + 亮点轻卡（plan `docs/plans/2026-06-11-projects-board-display-reuse-highlight.md`）
+- **大方向**：ledger 去重只防重复分析，不防当前 trending 展示；月/周/日榜要反映真实窗口态势，已分析项目复用缓存并继续展示。
+- **小方向**：`filterNewProjectCandidates` 返回 `accepted+reuse`；`reuse` 标 `alreadyAnalyzed:true` 并跳过 analyze LLM；light 输出新增必填亮点 `highlight`；board/validate/types/tests 同步。
+- **阶段**：✅ Codex 实现完成，待独立 Claude review。
+- **阻塞**：无。
+- **交付结论**：已写 plan + `.agent/codex-board-display-report.md`；focused tests 23/23 绿（done-current 入 board、reuse 不调 LLM、light highlight）；live no-LLM 验证 `projects discover reused 21 already analyzed repo(s)`，三窗卡数由 17/8/5 验证到 19/17/19（验证产物未保留，避免固定 lightPayload 污染正式数据）；`node scripts/eval-projects-coverage.mjs` 绿（30/30, AI repos 20/20 >=light）；`npm run verify` 绿（294 tests + validate + build，仅既有 warning）；`npm run ops:baseline:diff` 无新增 validator 失败。
+
 ### PAPER-2606.05405 · Agents' Last Exam 深读第 1 轮（plan `docs/plans/2026-06-11-agents-last-exam-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 ALE 写成可进入 AI-Brief 的深读资产，重点沉淀“真实经济工作流 → task/env/agent 解耦 → hidden reference → deterministic-first gate-and-score”的 agent benchmark 工程范式。
 - **小方向**：读 arXiv v1 HTML/PDF/TeX 全文 + HF 页面 + 项目官网 + clone `rdi-berkeley/agents-last-exam` 源码；从头核写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.05405.yaml`；区分论文自报、README/官网自称、源码实读和动态页面核验。

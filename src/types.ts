@@ -90,6 +90,7 @@ export interface AnalyzedRepo extends RepoSummary {
   tldr: string;
   tags: string[];
   light: string;
+  highlight?: string;
   worthDeepDive: number;
   deep?: DeepDive;
   // ---- 2026-06-03 deterministic radar fields (project-radar-paradigm) ----

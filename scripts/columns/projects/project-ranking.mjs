@@ -197,19 +197,20 @@ export function decideProjectDepth({ ranking, evidence_signals: inputSignals } =
   if (isPlainUiWrapper(evidence_signals)) capToLight("plain_ui_wrapper_without_agent_infra_or_workflow");
   if (!canDesignTestPlan(evidence_signals)) capToLight("cannot_design_practical_test_plan");
 
+  // 全展示 (Kevin 2026-06-11 二次确认): 榜上的都给 light 亮点卡, list_only 只列名退役 —— 非 AI
+  // (VPN/备份/容器) 和资源/教材 (学习路径) 对 Kevin 使用/学习也有价值, 简单分析不精读即可。
   const aiRelevant = isAiRelevant(evidence_signals) || AI_PROJECT_TYPES.has(project_type);
-  if (canonical.project_tier === 0 && !aiRelevant) {
-    max_allowed_depth = "list_only";
-    rejection_reasons.push(`bucket:${canonical.project_bucket}`);
-  } else if (canonical.project_tier === 0 && aiRelevant) {
+  if (canonical.project_tier === 0) {
     max_allowed_depth = minDepth(max_allowed_depth, "light");
-    rejection_reasons.push(`bucket:${canonical.project_bucket}:ai_min_light`);
+    rejection_reasons.push(`bucket:${canonical.project_bucket}:${aiRelevant ? "ai_min_light" : "show_with_highlight"}`);
   }
 
   const tierDepth = depthGate.depth;
-  const final_depth = needs_enrichment && evidence_signals.readme_fetch_failed
+  let final_depth = needs_enrichment && evidence_signals.readme_fetch_failed
     ? "needs_enrichment"
     : minDepth(tierDepth, max_allowed_depth);
+  // 全展示地板 (Kevin 2026-06-11): 榜上的都给 light 亮点卡, 不留 list_only 只列名 (needs_enrichment 除外, 它走补抓)。
+  if (final_depth === "list_only") final_depth = "light";
   const final_project_tier = projectTierForDepthName(final_depth);
   const final_model_tier = modelForProjectTier(final_project_tier);
   const manualReasons = final_project_tier === 3 ? ["manual_confirmation_required"] : [];

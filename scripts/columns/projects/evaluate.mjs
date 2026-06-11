@@ -26,7 +26,11 @@ export async function evaluate(candidate, evidence, ctx = {}) {
   const ranking = scoreProject(evidence_signals);
   const depth_decision = decideProjectDepth({ ranking, evidence_signals });
   const evaluatedAt = nowIso(options);
-  const result = evaluationFromDecision({ candidate, repo, evidence, evidence_signals, ranking, depth_decision, evaluatedAt });
+  const result = mergeCachedEvaluation(
+    evaluationFromDecision({ candidate, repo, evidence, evidence_signals, ranking, depth_decision, evaluatedAt }),
+    repo.cachedAnalysis?.light,
+    repo,
+  );
 
   persistRadarEvaluation(options.db, candidate, result, evaluatedAt, "deterministic-project-radar");
   return result;
@@ -150,10 +154,12 @@ export function radarCardPayload(evaluation = {}) {
   const evidence_signals = decision.evidence_signals || evaluation.evidence_signals || {};
   const tier = Number(decision.project_tier ?? evaluation.project_tier ?? projectTierForDepth(decision.final_depth || evaluation.final_depth));
   const bucket = decision.project_bucket || evaluation.project_bucket || evaluation.bucket || "无关类";
+  const repo = evaluation.repo || {};
   return {
-    tldr: evaluation.tldr || deterministicTldr(evaluation.repo || {}, decision),
+    tldr: evaluation.tldr || deterministicTldr(repo, decision),
     tags: evaluation.tags || tagsFromDecision(decision),
-    light: evaluation.light || deterministicRadarText(evaluation.repo || {}, decision),
+    light: evaluation.light || deterministicRadarText(repo, decision),
+    highlight: cleanString(evaluation.highlight || decision.highlight || deterministicHighlight(repo, decision)),
     worthDeepDive: Number(evaluation.worthDeepDive ?? decision.ranking_score ?? evaluation.score ?? 0),
     intent: evaluation.intent || "understanding",
     project_type: evaluation.project_type || "non_ai_eng",
@@ -201,6 +207,7 @@ export function normalizeLightResult(input = {}, repo = {}, evidence = {}, triag
     tldr: fallbackTldr.slice(0, 120),
     tags: normalizeTags(input?.tags || fallback.tags || tagsFromDecision(triage)),
     light: cleanString(input?.light || input?.summary || fallback.light || deterministicRadarText(repo, triage)),
+    highlight: cleanString(input?.highlight || input?.hot_point || input?.why_hot || fallback.highlight || deterministicHighlight(repo, triage)),
     worthDeepDive: Number(triage?.ranking_score ?? triage?.score ?? fallback.worthDeepDive ?? 0),
     intent: normalizeIntent(input?.intent, triage?.intent || classifyProjectIntent({ repo, readme: evidence?.content, light: input?.light, tags: input?.tags })),
     project_type: normalizeProjectType(input?.project_type ?? input?.projectType, triage?.project_type || classifyProjectType({ repo, readme: evidence?.content, light: input?.light, tags: input?.tags })),
@@ -419,6 +426,7 @@ function evaluationFromDecision({ candidate, repo, evidence_signals, ranking, de
     tldr,
     tags,
     light,
+    highlight: deterministicHighlight(repo, depth_decision),
     intent,
     project_type,
     informs_our_structure: Boolean(depth_decision.informs_our_structure),
@@ -449,6 +457,72 @@ function evaluationFromDecision({ candidate, repo, evidence_signals, ranking, de
     depth_decision,
     evaluatedAt,
   };
+}
+
+function mergeCachedEvaluation(result = {}, cached = null, repo = {}) {
+  if (!repo?.alreadyAnalyzed || !cached || typeof cached !== "object") return result;
+  const cachedDepth = cached.final_depth || cached.depth_band || result.final_depth;
+  const merged = {
+    ...result,
+    ...pickCachedPublicFields(cached),
+    repo: result.repo,
+    evaluatedAt: result.evaluatedAt,
+    decision: result.decision,
+    mode: result.mode,
+    score: result.score,
+    worthDeepDive: Number(cached.worthDeepDive ?? cached.ranking_score ?? result.worthDeepDive ?? result.score ?? 0),
+    ranking_score: Number(cached.ranking_score ?? cached.worthDeepDive ?? result.ranking_score ?? result.score ?? 0),
+    ranking: result.ranking,
+    ranking_reasons: result.ranking_reasons,
+    rejection_reasons: result.rejection_reasons,
+    evidence_signals: result.evidence_signals,
+    evidence_summary: result.evidence_summary,
+    reused_analysis: true,
+    generated_by: cached.generated_by || "PROJECT_REUSE_CACHE",
+    highlight: cleanString(cached.highlight || result.highlight || deterministicHighlight(repo, result.depth_decision || result)),
+  };
+  merged.depth_decision = {
+    ...(result.depth_decision || {}),
+    ...(cached.depth_decision || {}),
+    ranking_score: merged.ranking_score,
+    final_depth: cachedDepth || result.final_depth,
+    depth_band: cached.depth_band || cached.analysis_depth || result.depth_band,
+    analysis_depth: cached.analysis_depth || cached.depth_band || result.analysis_depth,
+  };
+  merged.final_depth = merged.depth_decision.final_depth || result.final_depth;
+  merged.depth_band = merged.depth_decision.depth_band || result.depth_band;
+  merged.analysis_depth = merged.depth_decision.analysis_depth || result.analysis_depth;
+  return merged;
+}
+
+function pickCachedPublicFields(cached = {}) {
+  const keys = [
+    "tldr",
+    "tags",
+    "light",
+    "highlight",
+    "intent",
+    "project_type",
+    "verdict",
+    "ratings",
+    "project_tier",
+    "project_tier_label",
+    "project_bucket",
+    "bucket",
+    "model_tier",
+    "requires_manual_confirmation",
+    "tier_tag",
+    "tier_template",
+    "mind_palace",
+    "recommended_action",
+    "needs_enrichment",
+    "informs_our_structure",
+    "self_evo_eligible",
+    "review_verdict",
+    "review_issues",
+    "rankingReason",
+  ];
+  return Object.fromEntries(keys.filter((key) => cached[key] !== undefined).map((key) => [key, cached[key]]));
 }
 
 function evidenceSignalsFrom(repo = {}, evidence = {}) {
@@ -595,6 +669,30 @@ function deterministicRadarText(repo = {}, decision = {}) {
     return `${name} 得分 ${score}，信号是 ${reasons}；暂不深挖，因为 ${rejection}。建议 ${decision.recommended_action || "monitor"}。`;
   }
   return `${name} 得分 ${score}，信号是 ${reasons}。按确定性深度门控进入 ${decision.final_depth || "list_only"}，建议 ${decision.recommended_action || "monitor"}。`;
+}
+
+function deterministicHighlight(repo = {}, decision = {}) {
+  const name = repo.fullName || repo.name || decision.evidence_signals?.repo || "这个项目";
+  const signals = decision.evidence_signals || {};
+  const stars = Number(repo.stars ?? signals.stars ?? signals.total_stars) || 0;
+  const gained = Math.max(
+    0,
+    Number(repo.starsGained ?? signals.stars_today ?? signals.stars_in_period) || 0,
+    ...Object.values(repo.starsGainedByWindow || signals.stars_gained_by_window || {}).map((value) => Number(value) || 0),
+  );
+  const reasons = unique([
+    ...(decision.ranking_reasons || []),
+    signals.has_agents ? "agent 工作流" : "",
+    signals.has_mcp ? "MCP 连接" : "",
+    signals.has_skills ? "agent skill/插件" : "",
+    signals.has_models ? "模型/RAG 组件" : "",
+    signals.has_cli ? "CLI 工具" : "",
+  ]).slice(0, 2);
+  const heat = gained
+    ? `本期新增 ${gained} star`
+    : stars ? `累计 ${stars} star` : "本次进入 trending";
+  const why = reasons.length ? `，火点在 ${reasons.join("、")}` : "，说明社区正在集中关注它的用途";
+  return `${name} ${heat}${why}。`;
 }
 
 function tagsFromDecision(decision = {}) {

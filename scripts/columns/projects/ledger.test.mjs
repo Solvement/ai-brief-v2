@@ -42,19 +42,23 @@ test("upsertProjectSeen is idempotent and merges provenance by repo full_name", 
   assert.equal(record.provenance.find((item) => item.source === "hacker-news:show-hn").metrics.hn_points, 123);
 });
 
-test("filterNewProjectCandidates skips analyzed and deep_dived ledger records", () => {
+test("filterNewProjectCandidates reuses analyzed and deep_dived current candidates for display", () => {
   const ledger = new Map([
-    ["done/repo", { full_name: "done/repo", status: "analyzed" }],
+    ["done/repo", { full_name: "done/repo", status: "analyzed", analysis_file: "done.json" }],
     ["deep/repo", { full_name: "deep/repo", status: "deep_dived" }],
   ]);
   assert.equal(isProjectDone(ledger.get("done/repo")), true);
 
-  const { accepted, skipped } = filterNewProjectCandidates([
+  const { accepted, reuse, skipped } = filterNewProjectCandidates([
     candidate("done/repo", "github-trending:daily"),
     candidate("deep/repo", "github-trending:weekly"),
     candidate("new/repo", "github-search-growth:agent"),
   ], ledger);
 
   assert.deepEqual(accepted.map((item) => item.raw.fullName), ["new/repo"]);
-  assert.deepEqual(skipped.map((item) => item.reason), ["ledger_status:analyzed", "ledger_status:deep_dived"]);
+  assert.deepEqual(reuse.map((item) => item.raw.fullName), ["done/repo", "deep/repo"]);
+  assert.deepEqual(reuse.map((item) => item.raw.alreadyAnalyzedStatus), ["analyzed", "deep_dived"]);
+  assert.equal(reuse[0].raw.analysisFile, "done.json");
+  assert.equal(reuse[1].raw.alreadyDeepDived, true);
+  assert.deepEqual(skipped, []);
 });

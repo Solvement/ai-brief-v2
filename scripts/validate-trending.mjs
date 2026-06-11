@@ -92,6 +92,9 @@ function validateRepo(repo, path) {
   for (const key of requiredStrings) {
     if (typeof repo[key] !== "string" || repo[key].trim() === "") fail(`${path}.${key}`, "must be a non-empty string");
   }
+  if (Object.hasOwn(repo, "highlight") && !isNonEmptyString(repo.highlight)) {
+    fail(`${path}.highlight`, "must be a non-empty string when present");
+  }
 
   for (const key of ["stars", "forks", "starsGained", "rank", "worthDeepDive"]) {
     if (!isNumber(repo[key])) fail(`${path}.${key}`, "must be a number");

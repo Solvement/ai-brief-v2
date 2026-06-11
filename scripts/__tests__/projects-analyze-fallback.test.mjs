@@ -124,3 +124,35 @@ test("projects brief-wiki analyze falls back to a needs_enrichment radar payload
   assert.ok(insertedAnalyses.at(-1).payload.rejection_reasons.includes("deep_dive_generation_failed"));
   assert.ok(warnings.some((message) => /brief-wiki deep-dive failed/.test(message)));
 });
+
+test("projects analyze reuses already analyzed candidates without calling LLM", async () => {
+  let called = false;
+  const reused = candidate();
+  reused.raw.alreadyAnalyzed = true;
+  reused.raw.alreadyAnalyzedStatus = "deep_dived";
+  reused.raw.cachedAnalysis = {
+    light: {
+      tldr: "cached tldr",
+      light: "cached light",
+      highlight: "cached highlight",
+      final_depth: "deep",
+    },
+  };
+
+  const result = await analyze({ candidate: reused, eval: { ...triage(), final_depth: "deep" } }, evidence(), {
+    logger: { warn() {}, info() {} },
+    options: {
+      projectBriefWiki: true,
+      codexDeepDiveAuthoring: false,
+      chatJson: async () => {
+        called = true;
+        throw new Error("reuse must not call chatJson");
+      },
+    },
+  });
+
+  assert.equal(called, false);
+  assert.equal(result.status, "reused");
+  assert.equal(result.tier, "reuse-cache");
+  assert.equal(result.cached, true);
+});

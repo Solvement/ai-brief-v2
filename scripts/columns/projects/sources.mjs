@@ -118,23 +118,120 @@ export async function discover(ctx = {}) {
   const deepDivedRepos = readBriefWikiDeepDivedProjectRepos(options.briefWikiContentDir || BRIEF_WIKI_CONTENT);
   const mergedCandidates = mergeCandidates(rows).map((candidate) => annotateKnownDeepDive(candidate, deepDivedRepos));
   const ledger = await readProjectLedger(options.projectLedgerFile);
-  const { accepted: ledgerCandidates, skipped } = filterNewProjectCandidates(mergedCandidates, ledger, { seenAt: discoveredAt });
+  const { accepted, reuse, skipped } = filterNewProjectCandidates(mergedCandidates, ledger, { seenAt: discoveredAt });
+  const previousAnalysisCache = await readPreviousTrendingAnalysisCache(options.previousTrendingFile || PUBLIC_TRENDING);
+  const reuseCandidates = await attachReuseAnalysisCache(reuse, previousAnalysisCache, { options });
+  const acceptedCandidates = accepted.map((candidate) => markNeedsAnalysis(candidate));
   await writeProjectLedger(ledger, options.projectLedgerFile);
   const eliteCandidates = options.eliteSelection === false
-    ? ledgerCandidates
-    : await applyEliteSelection(ledgerCandidates, { options, logger: ctx.logger, offline });
+    ? [...acceptedCandidates, ...reuseCandidates]
+    : uniqueCandidates([
+        ...(await applyEliteSelection(acceptedCandidates, { options, logger: ctx.logger, offline })),
+        ...reuseCandidates,
+      ]);
   const discoveryCap = options.cap == null ? null : numberOption(options.cap, null);
   const candidates = eliteCandidates.slice(0, discoveryCap || undefined);
-  const reused = candidates.filter((candidate) => candidate.raw?.alreadyDeepDived).length;
+  const reused = candidates.filter((candidate) => candidate.raw?.alreadyAnalyzed || candidate.raw?.alreadyDeepDived).length;
   const capped = eliteCandidates.length - candidates.length;
-  if (reused) ctx.logger?.info?.(`projects discover reused ${reused} already deep-dived repo(s) from brief-wiki`);
-  if (skipped.length) ctx.logger?.info?.(`projects discover ledger skipped ${skipped.length} done repo(s)`);
+  if (reused) ctx.logger?.info?.(`projects discover reused ${reused} already analyzed repo(s) for display`);
+  if (skipped.length) ctx.logger?.info?.(`projects discover skipped ${skipped.length} malformed/non-display repo(s)`);
   if (options.eliteSelection !== false) ctx.logger?.info?.(`projects discover elite selected ${eliteCandidates.length}/${mergedCandidates.length} repo(s)`);
   if (capped) ctx.logger?.info?.(`projects discover capped ${capped} repo(s) by --cap debug limit`);
   if (options.db) {
     for (const candidate of candidates) options.db.upsertCandidate(candidate);
   }
   return candidates;
+}
+
+function markNeedsAnalysis(candidate) {
+  return {
+    ...candidate,
+    raw: {
+      ...(candidate.raw || {}),
+      needsAnalysis: true,
+    },
+    needsAnalysis: true,
+  };
+}
+
+async function attachReuseAnalysisCache(candidates = [], previousAnalysisCache = new Map(), { options = {} } = {}) {
+  const out = [];
+  for (const candidate of candidates) {
+    const repo = candidate.raw || {};
+    const key = normalizeRepoFullName(repo.fullName || repo.url);
+    const ledgerPayload = await readLedgerAnalysisPayload(candidate.ledgerRecord, options);
+    const cachedAnalysis = normalizeCachedAnalysis(
+      ledgerPayload || previousAnalysisCache.get(key) || null,
+      repo,
+    );
+    out.push({
+      ...candidate,
+      raw: normalizeRepo({
+        ...repo,
+        alreadyAnalyzed: true,
+        needsAnalysis: false,
+        cachedAnalysis,
+      }),
+      alreadyAnalyzed: true,
+      needsAnalysis: false,
+    });
+  }
+  return out;
+}
+
+async function readPreviousTrendingAnalysisCache(file = PUBLIC_TRENDING) {
+  const data = await readJson(file, null);
+  const cache = new Map();
+  for (const window of ["radar", ...DEFAULT_WINDOWS]) {
+    for (const repo of data?.[window]?.repos || []) {
+      const key = normalizeRepoFullName(repo.fullName || repo.url);
+      if (!key || cache.has(key)) continue;
+      cache.set(key, repo);
+    }
+  }
+  return cache;
+}
+
+async function readLedgerAnalysisPayload(record = {}, options = {}) {
+  const analysisFile = record?.analysis_file || record?.analysisFile;
+  if (!analysisFile) return null;
+  const base = options.projectLedgerFile ? path.dirname(options.projectLedgerFile) : ROOT;
+  const file = path.isAbsolute(analysisFile) ? analysisFile : path.resolve(base, analysisFile);
+  return readJson(file, null);
+}
+
+function normalizeCachedAnalysis(payload, repo = {}) {
+  if (!payload || typeof payload !== "object") {
+    return {
+      source: "fallback",
+      light: {
+        tldr: repo.tldr || repo.description || repo.fullName || "数据不足",
+        light: repo.light || repo.description || repo.fullName || "数据不足",
+        highlight: repo.highlight || fallbackHighlight(repo),
+        final_depth: repo.alreadyDeepDived ? "deep" : "light",
+        ranking_score: Number(repo.worthDeepDive) || 0,
+        worthDeepDive: Number(repo.worthDeepDive) || 0,
+        tier_template: repo.tier_template || null,
+      },
+    };
+  }
+  const light = payload.payload || payload.light || payload;
+  return {
+    source: payload.source || "cache",
+    light: {
+      ...light,
+      highlight: light.highlight || payload.highlight || fallbackHighlight(repo),
+    },
+  };
+}
+
+function fallbackHighlight(repo = {}) {
+  const stars = Number(repo.stars) || 0;
+  const gained = Math.max(0, ...Object.values(repo.starsGainedByWindow || {}).map((value) => Number(value) || 0), Number(repo.starsGained) || 0);
+  const windows = Array.isArray(repo.currentWindows) && repo.currentWindows.length ? repo.currentWindows : repo.windows || [];
+  const heat = gained ? `本期新增 ${gained} star` : stars ? `累计 ${stars} star` : "本次进入 trending";
+  const span = windows.length > 1 ? `，覆盖 ${windows.join("/")} 窗口` : "";
+  return `${heat}${span}，说明社区正在集中关注这个仓库。`;
 }
 
 export async function collectEvidence(candidate, ctx = {}) {
@@ -1239,6 +1336,13 @@ function normalizeRepo(repo) {
     provenance: Array.isArray(repo.provenance) ? repo.provenance : [],
     communityValidation: repo.communityValidation || null,
     eliteSelection: repo.eliteSelection || null,
+    alreadyAnalyzed: Boolean(repo.alreadyAnalyzed),
+    alreadyAnalyzedStatus: repo.alreadyAnalyzedStatus || null,
+    alreadyDeepDived: Boolean(repo.alreadyDeepDived),
+    needsAnalysis: repo.needsAnalysis !== false,
+    analysisFile: repo.analysisFile || repo.analysis_file || null,
+    briefSlug: repo.briefSlug || null,
+    cachedAnalysis: repo.cachedAnalysis || null,
   };
 }
 
@@ -1340,6 +1444,18 @@ function valueOrNotFound(value) {
 
 function unique(items) {
   return [...new Set(items.filter(Boolean))];
+}
+
+function uniqueCandidates(candidates = []) {
+  const seen = new Set();
+  const out = [];
+  for (const candidate of candidates) {
+    const key = candidate?.dedupeKey || normalizeRepoFullName(candidate?.raw?.fullName || candidate?.raw?.url) || candidate?.id;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(candidate);
+  }
+  return out;
 }
 
 function projectCandidateId(fullName) {

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { makeBoard } from "../columns/projects/index.mjs";
 
-function item(fullName, { windows = [], ranksByWindow = {}, currentWindows, currentRun, score = 80 } = {}) {
+function item(fullName, { windows = [], ranksByWindow = {}, currentWindows, currentRun, score = 80, alreadyAnalyzed = false } = {}) {
   const [owner, name] = fullName.split("/");
   const out = {
     candidate: {
@@ -21,6 +21,7 @@ function item(fullName, { windows = [], ranksByWindow = {}, currentWindows, curr
       stars: 100,
       forks: 10,
       starsGained: 5,
+      alreadyAnalyzed,
       windows,
       ranksByWindow,
       ...(currentWindows ? { currentWindows } : {}),
@@ -70,6 +71,30 @@ test("project boards drop stale accumulated repos outside the current run", () =
   ], { boardLimit: 12 });
 
   assert.deepEqual(board.repos.map((repo) => repo.fullName), ["owner/current"]);
+});
+
+test("project boards include done-but-currently-trending reuse repos", () => {
+  const board = makeBoard("monthly", [
+    item("owner/reused-deep", {
+      windows: ["monthly"],
+      ranksByWindow: { monthly: 2 },
+      currentWindows: ["monthly"],
+      currentRun: true,
+      score: 100,
+      alreadyAnalyzed: true,
+    }),
+    item("owner/current-light", {
+      windows: ["monthly"],
+      ranksByWindow: { monthly: 1 },
+      currentWindows: ["monthly"],
+      currentRun: true,
+      score: 20,
+    }),
+  ], { boardLimit: 12 });
+
+  assert.ok(board.repos.some((repo) => repo.fullName === "owner/reused-deep"));
+  assert.equal(board.repos.find((repo) => repo.fullName === "owner/reused-deep").alreadyAnalyzed, true);
+  assert.equal(board.target, 2);
 });
 
 test("project boards use current window membership instead of accumulated windows", () => {

@@ -77,15 +77,31 @@ export function select(items, ctx = {}) {
 
 export async function analyze(item, evidence, ctx = {}) {
   const options = ctx.options || {};
-  if (!isBriefWikiProjectPipeline(options)) {
-    return legacyAnalyze(item, evidence, ctx);
-  }
-
   const candidate = item.candidate || item;
   const triage = item.eval || {};
   const repo = candidate?.raw || candidate || {};
   const repoId = repo.fullName || repo.url || candidate?.id || "unknown-project";
   const finalDepth = triage.final_depth || triage.depth_decision?.final_depth || "list_only";
+
+  if (repo.alreadyAnalyzed || candidate.alreadyAnalyzed) {
+    ctx.logger?.info?.(`projects analysis reused ${repoId}: ledger status=${repo.alreadyAnalyzedStatus || "done"}`);
+    return {
+      tier: "reuse-cache",
+      status: "reused",
+      generated: false,
+      skipped: true,
+      reason: "ledger done repo is current trending; reuse cached analysis for display",
+      candidateId: candidate?.id,
+      repo: repoId,
+      final_depth: finalDepth,
+      cached: Boolean(repo.cachedAnalysis),
+      triage: summarizeTriage(triage),
+    };
+  }
+
+  if (!isBriefWikiProjectPipeline(options)) {
+    return legacyAnalyze(item, evidence, ctx);
+  }
 
   if (isProjectAlreadyDeepDived(candidate, options)) {
     ctx.logger?.info?.(`projects brief-wiki skipped ${repoId}: already deep-dived`);
@@ -331,6 +347,7 @@ export async function publish(_qaItems = [], ctx = {}) {
     checks: [
       gateCheck("boards-present", "daily / weekly / monthly boards exist", WINDOWS.every((window) => boards[window]?.repos?.length > 0), `windows=${WINDOWS.join(",")}`),
       gateCheck("cards-have-tldr", "every project card has a TL;DR", allRepos.every((repo) => repo.tldr && repo.light), `${allRepos.length} repos checked`),
+      gateCheck("cards-have-highlight", "every project card has a hot-point highlight", allRepos.every((repo) => repo.highlight), `${allRepos.length} repos checked`),
       gateCheck("worth-scores", "every project has a numeric worthDeepDive score", allRepos.every((repo) => Number.isFinite(repo.worthDeepDive)), `${allRepos.length} repos checked`),
       gateCheck("depth-fields", "every project card has final_depth and ranking_score", allRepos.every((repo) => repo.final_depth && Number.isFinite(repo.ranking_score)), `${allRepos.length} repos checked`),
       gateWarning("daily-radar-target", "radar carries the daily target count", allRepos.length >= radarTargetMin && allRepos.length <= radarTargetMax, `${allRepos.length} radar repos`),
@@ -533,8 +550,18 @@ export function makeBoard(window, items, options = {}) {
   // guards against a pathological flood; tune with --board-limit if needed.
   const boardLimit = Number.isFinite(Number(options.boardLimit)) ? Number(options.boardLimit) : 100;
   const boardItems = nativeItems.slice(0, boardLimit);
+  // Final authoritative sort on the OUTPUT depth_band (the field the frontend + eval read), then
+  // renumber. Fixes the reuse-path mismatch where an item's internal final_depth (e.g. deep) and its
+  // displayed depth_band (e.g. standard) disagreed, leaving a deep card ranked below a standard one.
   const repos = boardItems
-    .map((item, index) => repoForBoard(item, window, index + 1, options));
+    .map((item, index) => repoForBoard(item, window, index + 1, options))
+    .sort((a, b) => {
+      const da = DEPTH_ORDER[a.tier ?? a.depth_band ?? a.analysis_depth] ?? 2;
+      const db = DEPTH_ORDER[b.tier ?? b.depth_band ?? b.analysis_depth] ?? 2;
+      if (da !== db) return da - db;
+      return (Number(b.stars) || 0) - (Number(a.stars) || 0);
+    })
+    .map((repo, index) => ({ ...repo, rank: index + 1 }));
 
   return {
     window,
@@ -659,6 +686,18 @@ function userUtility(item) {
   const text = `${repo.name || ""} ${repo.description || ""} ${item.light?.tldr || ""} ${(item.light?.tags || []).join(" ")}`;
   return USER_UTILITY_RE.test(text) ? 1 : 0;
 }
+
+function fallbackHighlight(repo = {}, light = {}) {
+  const stars = Number(repo.stars) || 0;
+  const gained = Math.max(0, Number(repo.starsGained) || 0, ...Object.values(repo.starsGainedByWindow || {}).map((value) => Number(value) || 0));
+  const reasons = [
+    ...(Array.isArray(light.ranking_reasons) ? light.ranking_reasons : []),
+    ...(Array.isArray(light.tags) ? light.tags : []),
+  ].filter(Boolean).slice(0, 2);
+  const heat = gained ? `本期新增 ${gained} star` : stars ? `累计 ${stars} star` : "本次进入 trending";
+  return `${heat}${reasons.length ? `，火点在 ${reasons.join("、")}` : "，说明社区正在集中关注这个仓库"}。`;
+}
+
 function sortForWindow(left, right, window) {
   const depthDelta = depthRank(left) - depthRank(right);
   if (depthDelta) return depthDelta;
@@ -703,6 +742,7 @@ function repoForBoard(item, window, rank, options = {}) {
     tldr: String(light.tldr || repo.tldr || repo.description || repo.fullName),
     tags: Array.isArray(light.tags) ? light.tags : [],
     light: String(light.light || repo.light || repo.description || repo.fullName),
+    highlight: String(light.highlight || repo.highlight || fallbackHighlight(repo, light)),
     worthDeepDive: Number(light.worthDeepDive ?? rankingScore),
     ranking_score: rankingScore,
     max_allowed_depth: light.max_allowed_depth || depthDecision.max_allowed_depth || "list_only",
@@ -729,6 +769,7 @@ function repoForBoard(item, window, rank, options = {}) {
     depth_decision: publicDepthDecision(light),
     communityValidation: repo.communityValidation || null,
     eliteSelection: repo.eliteSelection || null,
+    alreadyAnalyzed: Boolean(repo.alreadyAnalyzed || light.reused_analysis),
   };
   if (light.mind_palace) out.mind_palace = light.mind_palace;
   if (light.project_type) out.project_type = light.project_type;

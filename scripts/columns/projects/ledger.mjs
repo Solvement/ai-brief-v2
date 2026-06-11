@@ -58,6 +58,7 @@ export function upsertProjectSeen(ledger, candidate, { seenAt = new Date().toISO
     last_seen_at: seenAt,
     sources: unique([...(existing?.sources || []), ...provenance.map((item) => item.source).filter(Boolean)]),
     provenance,
+    analysis_file: existing?.analysis_file || existing?.analysisFile || repo.analysis_file || repo.analysisFile || null,
     repo: {
       url: repo.url || existing?.repo?.url || `https://github.com/${key}`,
       owner: repo.owner || existing?.repo?.owner || key.split("/")[0],
@@ -70,16 +71,38 @@ export function upsertProjectSeen(ledger, candidate, { seenAt = new Date().toISO
 
 export function filterNewProjectCandidates(candidates = [], ledger = new Map(), { seenAt = new Date().toISOString() } = {}) {
   const accepted = [];
+  const reuse = [];
   const skipped = [];
   for (const candidate of candidates) {
     const { record } = upsertProjectSeen(ledger, candidate, { seenAt });
     if (record && isProjectDone(record)) {
-      skipped.push({ candidate, reason: `ledger_status:${record.status}` });
+      reuse.push(markAlreadyAnalyzed(candidate, record));
       continue;
     }
     accepted.push(candidate);
   }
-  return { accepted, skipped };
+  return { accepted, reuse, skipped };
+}
+
+function markAlreadyAnalyzed(candidate, record = {}) {
+  const repo = candidate.raw || {};
+  return {
+    ...candidate,
+    raw: {
+      ...repo,
+      alreadyAnalyzed: true,
+      alreadyAnalyzedStatus: record.status || "analyzed",
+      analysisFile: repo.analysisFile || repo.analysis_file || record.analysis_file || record.analysisFile || null,
+      ...(record.status === "deep_dived" ? { alreadyDeepDived: true } : {}),
+    },
+    alreadyAnalyzed: true,
+    needsAnalysis: false,
+    ledgerRecord: {
+      full_name: record.full_name,
+      status: record.status,
+      analysis_file: record.analysis_file || record.analysisFile || null,
+    },
+  };
 }
 
 function provenanceFromCandidate(candidate = {}, seenAt) {

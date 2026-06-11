@@ -168,6 +168,27 @@ test("light normalization ignores cross-repo LLM TLDR when repo description exis
   assert.doesNotMatch(normalized.tldr, /Markdown/);
 });
 
+test("light normalization always includes a non-empty highlight", () => {
+  const normalized = normalizeLightResult({
+    tldr: "owner/repo 是一个 agent 工具。",
+    light: "light paragraph",
+  }, {
+    fullName: "owner/repo",
+    name: "repo",
+    description: "Agent framework with MCP tools and RAG memory",
+    stars: 1200,
+    starsGained: 180,
+  }, evidence(), {
+    final_depth: "light",
+    ranking_score: 80,
+    ranking_reasons: ["MCP evidence"],
+  });
+
+  assert.equal(typeof normalized.highlight, "string");
+  assert.ok(normalized.highlight.length > 0);
+  assert.match(normalized.highlight, /star|火点|关注|MCP/);
+});
+
 test("project evaluate marks README fetch failure as needs_enrichment, not empty README", async () => {
   const result = await evaluate(candidate(), evidence({
     content: "",
