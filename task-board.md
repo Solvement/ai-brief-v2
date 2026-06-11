@@ -34,7 +34,10 @@
 - **Kevin 永久授权（2026-06-11）**：push main 快进上线 + codex bypass 派发不再逐次问（memory `durable-authorizations`）；schema/删数据/密钥/强推仍🔴。main 已确认在 16956f1。
 - **codex B 完成（已 Claude review 通过）**：新闻栏根因两个——① news CLI 的 LLM 默认开 + DeepSeek 180s 重试 → 例行跑超时假死；② 链路无健康门，全源失败仍静默写 news.json 报成功。修复：LLM 默认关（`NEWS_ENABLE_LLM=1` 可开；已核实前端不渲染 titleZh/summaryZh，产品零损失）；新增 `buildNewsHealth` 5 项检查 + `public/data/news-health.json` + `validate-news-health.mjs` 接进 validate；unhealthy 时 daily 非零退出（失败显式化）。实测 `npm run news:daily` 3.7s，health ok 12/14 源。
 - **⚠误判修正（0610 核查的归因错误）**：`articles.json`≠新闻栏——它是**论文栏 publish 产物**（前端论文页渲染 papers-index.json，新闻页渲染 news.json，0609 审计早已记录）。articles.json 停 6-04 = 论文 publish surface 落后，随深读积压清掉+publish 重跑自然恢复，不是新闻链路 bug。教训：栏目核查契约里"数据文件→前端消费方"映射要先核实再归因。
-- **codex A 进行中**：projects v2 管线（已见 ledger.mjs/project-facet.mjs/scripts/ops/ 新文件产出中）；期间 `npm run test` 的 projects 测试红是 A 半成品状态，等 A 完成后统一 verify。
+- **codex A 完成（Claude review 通过并上线 cd471e4）**：项目栏 v2 全套——三窗 trending+HN Algolia+GitHub Search 增速+HF 可选源；ledger.jsonl full_name 幂等；rank 5 分项可解释；depth_band 挡位门（月榜前10默认deep/教学类封顶light）；深读 mind_palace 块（problem_solved/discovery_trace/method/self_evo_use三段/core_concepts）过 precheckProjectFacet 硬门入队 project-ingest-queue.jsonl。review 核查：范式/news/bench 零触碰 ✓、无裸 claude -p ✓、verify 实跑 279/279 绿 ✓。注意：`scripts/ops/token-usage-by-model.mjs` 非 A 产出（并行 harness 会话的），未并入提交。
+- **项目范式 v2 已重写上线（c4dfb11，Claude 著）**：Mind Palace 取向——三元组为灵魂、self_evo_use 三段、core_concepts 承重概念、discovery_trace 默认数据不足+source_span 禁编造、project_type 选择性抽取；分流/打分/定级移交上游确定性管线，引擎只析不评级。
+- **main 已三连快进**：16956f1→8383729(news 修复)→cd471e4(projects v2)→c4dfb11(范式)。
+- **遗留**：深读积压 3 篇（Mellum2/TIDE/Humanoid-GPT）——避开与交互会话共享的订阅 5h 窗，排今晚 boot 管线或交互不活跃时段跑 `npm run papers:deepread`+`papers:cold-audit`；articles.json（论文 publish 面）随之恢复。projects v2 的首次真实日跑待明早 boot 验证（trending 页三窗+新字段渲染）。
 
 ### PAPER-2606.09669 · SpatialWorld 深读从头重写（plan `docs/plans/2026-06-10-spatialworld-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 SpatialWorld 写成可进入 AI-Brief 知识库的深读资产，重点沉淀“统一 I/O 瓶颈 + 终态 verifier + TSR/SE 双指标 + 任务三件套”对 multimodal agent / 自进化 agent eval 的价值。
