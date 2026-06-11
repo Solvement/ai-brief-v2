@@ -11,7 +11,7 @@ import {
   parseHtmlLinks,
   parseRssItems,
 } from "../columns/news/sources.mjs";
-import { parseArgs as parseNewsDailyArgs } from "../columns/news/daily.mjs";
+import { buildNewsHealth, parseArgs as parseNewsDailyArgs } from "../columns/news/daily.mjs";
 
 test("normalizes news items and strips tracking from dedupe URLs", () => {
   const item = normalizeNewsItem({
@@ -184,4 +184,47 @@ test("parses DeepMind card titles from hydrated HTML", () => {
 
 test("news daily args include daily cap option and env default", () => {
   assert.equal(parseNewsDailyArgs(["--daily-cap", "12"]).dailyCap, 12);
+  assert.equal(parseNewsDailyArgs([]).enableLlm, false);
+  assert.equal(parseNewsDailyArgs(["--enable-llm"]).enableLlm, true);
+});
+
+test("news health passes with fresh generated-day items and partial source failures", () => {
+  const health = buildNewsHealth({
+    generatedAt: "2026-06-11T12:00:00.000Z",
+    sourceStats: [
+      { id: "openai", source: "OpenAI", ok: false, count: 0, error: "fetch failed" },
+      { id: "techcrunch-ai", source: "TechCrunch AI", ok: true, count: 5, error: "" },
+    ],
+    totalDiscovered: 5,
+    totalPublished: 12,
+    totalPublishedForGeneratedDay: 3,
+  }, {
+    now: () => new Date("2026-06-11T13:00:00.000Z"),
+  });
+
+  assert.equal(health.ok, true);
+  assert.equal(health.status, "pass");
+  assert.equal(health.failedSourceCount, 1);
+});
+
+test("news health fails stale or empty all-source runs", () => {
+  const health = buildNewsHealth({
+    generatedAt: "2026-06-08T12:00:00.000Z",
+    sourceStats: [
+      { id: "openai", source: "OpenAI", ok: false, count: 0, error: "fetch failed" },
+      { id: "hacker-news", source: "Hacker News", ok: false, count: 0, error: "timeout" },
+    ],
+    totalDiscovered: 0,
+    totalPublished: 10,
+    totalPublishedForGeneratedDay: 0,
+  }, {
+    now: () => new Date("2026-06-11T13:00:00.000Z"),
+  });
+
+  assert.equal(health.ok, false);
+  assert.equal(health.status, "fail");
+  assert.match(health.failures.join("\n"), /freshness/);
+  assert.match(health.failures.join("\n"), /source-availability/);
+  assert.match(health.failures.join("\n"), /discovery-nonempty/);
+  assert.match(health.failures.join("\n"), /generated-day-nonempty/);
 });

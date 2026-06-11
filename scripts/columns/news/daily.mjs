@@ -10,9 +10,11 @@ import { discoverNews, mergeWithExisting } from "./sources.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..", "..");
 const NEWS_FILE = path.join(ROOT, "public", "data", "news.json");
+const NEWS_HEALTH_FILE = path.join(ROOT, "public", "data", "news-health.json");
 const NEWS_ENRICH_MODEL = "deepseek-v4-flash";
 const NEWS_ENRICH_BATCH_SIZE = 8;
 const NEWS_IMAGE_CANDIDATE_LIMIT = 10;
+const NEWS_FRESHNESS_MAX_AGE_DAYS = 2;
 const DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; ai-brief/0.1; news enricher)";
 
 export async function main(argv = process.argv.slice(2)) {
@@ -77,7 +79,19 @@ export async function main(argv = process.argv.slice(2)) {
     console.log(`[news] wrote ${NEWS_FILE}`);
   }
 
+  const health = buildNewsHealth(doc, { now: () => new Date() });
+  if (!options.dryRun) {
+    await writeJson(NEWS_HEALTH_FILE, health);
+    console.log(`[news] wrote ${NEWS_HEALTH_FILE}`);
+  }
+
   printSummary(doc);
+  printHealthSummary(health);
+  if (!health.ok) {
+    const error = new Error(`news daily unhealthy: ${health.failures.join("; ")}`);
+    error.health = health;
+    throw error;
+  }
   return doc;
 }
 
@@ -85,7 +99,7 @@ export function parseArgs(argv = []) {
   const options = {
     dryRun: false,
     noLlm: false,
-    enableLlm: process.env.NEWS_ENABLE_LLM !== "0",
+    enableLlm: process.env.NEWS_ENABLE_LLM === "1",
     perSourceLimit: numberOption(process.env.NEWS_PER_SOURCE_LIMIT, 30),
     dailyCap: numberOption(process.env.NEWS_DAILY_CAP, 20),
     retentionDays: numberOption(process.env.NEWS_RETENTION_DAYS, 14),
@@ -140,6 +154,82 @@ export function parseArgs(argv = []) {
   }
 
   return options;
+}
+
+export function buildNewsHealth(doc = {}, { now = () => new Date(), maxAgeDays = NEWS_FRESHNESS_MAX_AGE_DAYS } = {}) {
+  const checkedAt = now().toISOString();
+  const generatedAt = String(doc.generatedAt || "");
+  const generatedMs = Date.parse(generatedAt);
+  const ageDays = Number.isFinite(generatedMs)
+    ? Math.max(0, (now().getTime() - generatedMs) / 864e5)
+    : null;
+  const sourceStats = Array.isArray(doc.sourceStats) ? doc.sourceStats : [];
+  const successfulSources = sourceStats.filter((stat) => stat?.ok);
+  const failedSources = sourceStats.filter((stat) => !stat?.ok);
+  const totalDiscovered = Number(doc.totalDiscovered) || 0;
+  const totalPublished = Number(doc.totalPublished) || 0;
+  const totalPublishedForGeneratedDay = Number(doc.totalPublishedForGeneratedDay) || 0;
+
+  const checks = [
+    healthCheck(
+      "freshness",
+      `news.json generatedAt is no older than ${maxAgeDays} days`,
+      ageDays !== null && ageDays <= maxAgeDays,
+      ageDays === null ? "generatedAt missing or invalid" : `ageDays=${round(ageDays)}, generatedAt=${generatedAt}`,
+    ),
+    healthCheck(
+      "source-availability",
+      "at least one source succeeded",
+      successfulSources.length > 0,
+      `${successfulSources.length}/${sourceStats.length} sources succeeded`,
+    ),
+    healthCheck(
+      "discovery-nonempty",
+      "discovery produced publishable candidates",
+      totalDiscovered > 0,
+      `${totalDiscovered} discovered`,
+    ),
+    healthCheck(
+      "published-total",
+      "published feed is non-empty",
+      totalPublished > 0,
+      `${totalPublished} retained items`,
+    ),
+    healthCheck(
+      "generated-day-nonempty",
+      "generated day has at least one item",
+      totalPublishedForGeneratedDay > 0,
+      `${totalPublishedForGeneratedDay} items for generated day`,
+    ),
+  ];
+  const failures = checks.filter((check) => check.status === "fail").map((check) => `${check.id}: ${check.details}`);
+  return {
+    schemaVersion: 1,
+    generatedAt: checkedAt,
+    ok: failures.length === 0,
+    status: failures.length === 0 ? "pass" : "fail",
+    column: "news",
+    dataFile: "public/data/news.json",
+    dataGeneratedAt: generatedAt,
+    maxAgeDays,
+    ageDays: ageDays === null ? null : round(ageDays),
+    totalDiscovered,
+    totalPublished,
+    totalPublishedForGeneratedDay,
+    sourceCount: sourceStats.length,
+    successfulSourceCount: successfulSources.length,
+    failedSourceCount: failedSources.length,
+    failedSources: failedSources.map((stat) => ({
+      id: String(stat.id || stat.source || "unknown"),
+      source: String(stat.source || stat.id || "unknown"),
+      error: String(stat.error || "failed"),
+    })),
+    checks,
+    failures,
+    note: failures.length === 0
+      ? "News freshness healthy."
+      : "News freshness unhealthy; rerun npm run news:daily and inspect source failures.",
+  };
 }
 
 async function enrichNewsItems(items = [], options = {}) {
@@ -316,6 +406,25 @@ function printSummary(doc) {
   }
 }
 
+function printHealthSummary(health) {
+  const marker = health.ok ? "ok" : "failed";
+  console.log(`news health: ${marker} (${health.successfulSourceCount}/${health.sourceCount} sources, age ${health.ageDays ?? "n/a"} days, generated-day items ${health.totalPublishedForGeneratedDay})`);
+  for (const failure of health.failures) console.warn(`news health failure: ${failure}`);
+}
+
+function healthCheck(id, label, ok, details) {
+  return {
+    id,
+    label,
+    status: ok ? "pass" : "fail",
+    details,
+  };
+}
+
+function round(value) {
+  return Math.round(value * 100) / 100;
+}
+
 function valueAfterEquals(arg) {
   return arg.slice(arg.indexOf("=") + 1);
 }
@@ -381,7 +490,7 @@ Runs the AI news aggregation chain:
 
 Flags:
   --no-llm              Aggregate only. Default.
-  --enable-llm          Reserved for optional cheap summaries; disabled unless NEWS_ENABLE_LLM=1 or this flag is passed.
+  --enable-llm          Optional cheap DeepSeek summaries; disabled unless NEWS_ENABLE_LLM=1 or this flag is passed.
   --per-source-limit N  Safety cap per source. Default: 30
   --daily-cap N         Max published items per retained day. Default: 20
   --retention-days N    Rolling window. Default: 14

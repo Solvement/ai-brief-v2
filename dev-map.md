@@ -37,7 +37,7 @@ scripts/
 ## 数据契约
 
 ```
-public/data/   trending / models / articles / articles-archive / paper-radar / pipeline-status .json
+public/data/   trending / models / articles / articles-archive / paper-radar / pipeline-status / news-health .json
 data/          agent-memory/*.json、papers/*、knowledge-graph/*  （本地生成，不直接服务前端）
 ```
 

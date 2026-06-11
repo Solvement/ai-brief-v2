@@ -22,7 +22,7 @@
     "lint:content": "node scripts/lint.mjs",
     "lint": "npm run lint:eslint && npm run lint:content",
     "verify": "npm run lint && npm run test && npm run build",
-    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs && node scripts/validate-papers-deepread.mjs && node scripts/validate-daily-digest.mjs && node scripts/validate-mind-palace.mjs",
+    "validate": "node scripts/validate-text-encoding.mjs && node scripts/validate-trending.mjs && node scripts/validate-models.mjs && node scripts/validate-articles.mjs && node scripts/validate-papers-radar.mjs && node scripts/validate-pipeline-status.mjs && node scripts/validate-papers-deepread.mjs && node scripts/validate-news-health.mjs && node scripts/validate-daily-digest.mjs && node scripts/validate-mind-palace.mjs",
     "digest:daily": "node --env-file-if-exists=.env.local --no-warnings scripts/columns/digest/daily.mjs",
     "test": "node --test scripts/**/*.test.mjs && npm run validate",
     "preview": "next start",

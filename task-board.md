@@ -30,6 +30,12 @@
 - **6.9/6.10 栏目核查**：papers 5 篇深读已沉淀+过审但未上线 → 本次提交部署；trending/models/pipeline 6-10 新鲜 ✓；**新闻栏 articles.json 停 6-04（断 6 天，静默失败）→ codex B 修根因**；深读积压 3 篇（Mellum2/TIDE/Humanoid-GPT）→ 文末跑 papers:deepread 清。
 - **codex 并行派单**：A=项目栏 v2（plan `docs/plans/2026-06-10-projects-column-v2.md`，gpt-5.5 high）；B=新闻栏断档根因（gpt-5.5 medium）。任务书在 `.agent/codex-task-*.md`，产出报告待 Claude review。
 
+### SESSION-0611 · 永久授权 + codex A/B 实跑 + 新闻栏修复落地（Claude 主控）
+- **Kevin 永久授权（2026-06-11）**：push main 快进上线 + codex bypass 派发不再逐次问（memory `durable-authorizations`）；schema/删数据/密钥/强推仍🔴。main 已确认在 16956f1。
+- **codex B 完成（已 Claude review 通过）**：新闻栏根因两个——① news CLI 的 LLM 默认开 + DeepSeek 180s 重试 → 例行跑超时假死；② 链路无健康门，全源失败仍静默写 news.json 报成功。修复：LLM 默认关（`NEWS_ENABLE_LLM=1` 可开；已核实前端不渲染 titleZh/summaryZh，产品零损失）；新增 `buildNewsHealth` 5 项检查 + `public/data/news-health.json` + `validate-news-health.mjs` 接进 validate；unhealthy 时 daily 非零退出（失败显式化）。实测 `npm run news:daily` 3.7s，health ok 12/14 源。
+- **⚠误判修正（0610 核查的归因错误）**：`articles.json`≠新闻栏——它是**论文栏 publish 产物**（前端论文页渲染 papers-index.json，新闻页渲染 news.json，0609 审计早已记录）。articles.json 停 6-04 = 论文 publish surface 落后，随深读积压清掉+publish 重跑自然恢复，不是新闻链路 bug。教训：栏目核查契约里"数据文件→前端消费方"映射要先核实再归因。
+- **codex A 进行中**：projects v2 管线（已见 ledger.mjs/project-facet.mjs/scripts/ops/ 新文件产出中）；期间 `npm run test` 的 projects 测试红是 A 半成品状态，等 A 完成后统一 verify。
+
 ### PAPER-2606.09669 · SpatialWorld 深读从头重写（plan `docs/plans/2026-06-10-spatialworld-deepread-round1.md`）
 - **大方向**：按 canonical 论文范式把 SpatialWorld 写成可进入 AI-Brief 知识库的深读资产，重点沉淀“统一 I/O 瓶颈 + 终态 verifier + TSR/SE 双指标 + 任务三件套”对 multimodal agent / 自进化 agent eval 的价值。
 - **小方向**：读 arXiv HTML/PDF 全文 + HF 页面 + 项目页 + clone `Hongcheng-Gao/SpatialWorld` 源码/数据；重写 `paper.mdx`、`career.mdx`、`metadata.json`、`data/autosci/primitives/2606.09669.yaml`；区分论文自报、项目页/HF/GitHub 动态核验、仓库实读。
