@@ -29,3 +29,54 @@
   name: 记忆系统有效性评测
   parent: mem
   description: 如何证明一个 memory 系统真的有用——区分检索命中率提升与端到端任务收益。
+
+# ——— 2026-06-12 全量回填扩展（各簇骨架种子；细分词条由各波蒸馏 propose、主控收口）———
+- id: agent
+  name: 长程 LLM agent 可靠性
+  parent: null
+  description: 让 LLM agent 在长程/真实任务中可靠工作的总问题域。
+
+- id: agent.self-evolution
+  name: agent 自进化
+  parent: agent
+  description: agent 从自身轨迹/反馈/经验出发改进自身结构（记忆/技能/harness/环境），而非仅执行固定流程。
+
+- id: agent.harness-engineering
+  name: harness 工程化
+  parent: agent
+  description: 编排、调度、约束 agent 的工程骨架——角色契约/工作流门/可判定规则/接力与审计。
+
+- id: agent.planning-adaptivity
+  name: 规划自适应
+  parent: agent
+  description: 隐藏约束、动态环境、信息渐露条件下的规划与重规划能力。
+
+- id: agent.environment
+  name: 环境工程
+  parent: agent
+  description: 训练/评测环境本身的构造、进化与质量控制（环境侧基础设施）。
+
+- id: agent.multi-agent-orchestration
+  name: 多 agent 协作编排
+  parent: agent
+  description: 多角色分工、消息/工件传递、生成与审核分离等协作结构的设计。
+
+- id: eval.agent-capability
+  name: agent 能力评测
+  parent: null
+  description: 如何评测 agent 真实能力——任务构造、隐藏参照、确定性打分、构造任务与真实工作流的差距。
+
+- id: code.repo-understanding
+  name: 代码库导航与理解
+  parent: null
+  description: agent 对真实代码仓库的探索、检索、符号/调用图理解与上下文预算控制。
+
+- id: skill.knowledge-parameterization
+  name: 知识/技能参数化
+  parent: null
+  description: 把技能、知识、经验从 prompt/context 搬进模型参数（LoRA/adapter/权重编辑）的路线及其边界。
+
+- id: train.credit-assignment
+  name: 长轨迹信用分配
+  parent: null
+  description: 长轨迹、稀疏/延迟奖励下，把结果信号正确分配给早期决策的训练问题。
