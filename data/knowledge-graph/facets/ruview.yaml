@@ -1,0 +1,46 @@
+schema: v2
+node_id: content/ruview
+slug: ruview
+kind: project
+title: RuView — 深度拆解
+source: public/data/brief/deep-dives.json:ruview-deep-dive
+facets:
+  problem_solved: RuView — 深度拆解
+    的核心判断：提供了一套完整且开放的方案，使廉价ESP32硬件结合自监督学习，能够从WiFi信道状态信息中提取出通常需要摄像头和雷达才能达到的多维空间感知。
+    本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自
+    README.md（详细功能表、硬件选项、安装命令）；仓库目录结构（firmware/、python/、scripts/、docs/、.mcp.json）；GitHub
+    Topics（claude、skills、spatial-intelligence等）；硬件成本与能力对比表。没有源码级证据的地方保留“数据不足”。
+  method: 提供了一套完整且开放的方案，使廉价ESP32硬件结合自监督学习，能够从WiFi信道状态信息中提取出通常需要摄像头和雷达才能达到的多维空间感知。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    该系统不用摄像头，靠分析WiFi无线电波的变化来感知墙后是否有人、测他们的呼吸和心跳。 该模型判断有没有人时，正确概率约82.3%。
+    每个测量数据都有数字签名，能证明是哪个设备在什么时间生成的，改不了。
+    在公开数据集MM-Fi上，该系统用WiFi信号推断人体17个关键点的准确率最高，超过了之前的模型。
+  innovation: 软件层面的信号处理和AI训练管道可复用到类似的无线感知任务；但硬件特定层（CSI驱动、固件配置）不可直接复用。MCP集成模式、轻量化状态存储设计值得借鉴到其他Edge
+    AI应用。 clone-and-run read-docs
+  weakness: 硬件可获得性和成本影响广泛部署（ESP32虽然便宜，但需要采购和烧录）。；无线环境的不可预测性可能导致精度波动，用户期望管理困难。；如果密码学运算占用过多MCU资源，会影响实时传感性能。
+  transfer: 软件层面的信号处理和AI训练管道可复用到类似的无线感知任务；但硬件特定层（CSI驱动、固件配置）不可直接复用。MCP集成模式、轻量化状态存储设计值得借鉴到其他Edge
+    AI应用。 clone-and-run read-docs
+self_evo_use: 记忆：把 RuView — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: RuView — 深度拆解
+      的核心判断：提供了一套完整且开放的方案，使廉价ESP32硬件结合自监督学习，能够从WiFi信道状态信息中提取出通常需要摄像头和雷达才能达到的多维空间感知。
+      本条由旧深读聚合内容重整为 RuView light_…
+  - name: 机制链路
+    role: primary
+    evidence: 提供了一套完整且开放的方案，使廉价ESP32硬件结合自监督学习，能够从WiFi信道状态信息中提取出通常需要摄像头和雷达才能达到的多维空间感知。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 软件层面的信号处理和AI训练管道可复用到类似的无线感知任务；但硬件特定层（CSI驱动、固件配置）不可直接复用。MCP集成模式、轻量化状态存储设计值得借鉴到其他Edge
+      AI应用。 clone-and-run read-docs
+  - name: 风险边界
+    role: supporting
+    evidence: 硬件可获得性和成本影响广泛部署（ESP32虽然便宜，但需要采购和烧录）。；无线环境的不可预测性可能导致精度波动，用户期望管理困难。；如果密码学运算占用过多MCU资源，会影响实时传感性能。
+  - name: 证据账本
+    role: mentioned
+    evidence: RuView仅用WiFi信号即可实现穿墙存在检测、呼吸和心率监测。
+discovery_trace: 数据不足
+edges: []
+status: extracted

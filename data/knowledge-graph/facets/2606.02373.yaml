@@ -1,0 +1,64 @@
+schema: v2
+node_id: paper:2606.02373
+slug: 2606.02373-harness-1-search-agent-rl
+kind: paper
+title: "Harness-1: Reinforcement Learning for Search Agents with
+  State-Externalizing Harnesses"
+arxiv_id: "2606.02373"
+source: content/papers/2606.02373-harness-1-search-agent-rl +
+  data/autosci/primitives/2606.02373.yaml
+facets:
+  problem_solved: offload-recoverable-state-to-editable-environment-interface-then-RL-the-semantic-policy
+  method: 把 agent 的"可恢复记账"从策略上下文里卸载到环境侧的可编辑持久状态(stateful cognitive offloading),
+    策略只保留语义决策;动作 = 编辑状态(curate/verify/reviewdocs)而非 append 文字; 同一状态渲染器贯穿 teacher
+    数据生成 / RL replay / 评测; 并用三条可训练性要求让"富接口"真的训得动:warm-started 热启动(避免早期奖励无法区分)、
+    compact derived-state rendering 紧凑派生状态(避免和证据抢上下文)、diversity-preserving
+    incentives 保多样性激励(避免塌缩成单一动作); 奖励显式分"发现 vs 选择"(trajectory 项 vs curated 项 +
+    answer-miss 罚找到却没提升)。 关键立论:agent 性能一大半藏在接口里——同模型换 harness 差几十分;行为先验搬进接口 →
+    小模型也能跨域迁移。
+  result: 取一个证据寻找型检索任务集(可用 BrowseComp+ 或自建多跳)→ 同时报 curated recall / trajectory
+    recall / final-answer recall + 一个留出迁移集;对照"裸 agent vs 状态外置 harness",验证 ①
+    接口本身是否提召回、 ② 失败是 selection 还是
+    discovery(轨迹召回高但精选召回低=选择问题);再做消融:逐个关掉重要性标签/热启动/
+    证据图/句子压缩,看策略是否退化成又宽又浅的乱搜。1-14 天。
+  innovation: 把 agent 的"可恢复记账"从策略上下文里卸载到环境侧的可编辑持久状态(stateful cognitive
+    offloading), 策略只保留语义决策;动作 = 编辑状态(curate/verify/reviewdocs)而非 append 文字;
+    同一状态渲染器贯穿 teacher 数据生成 / RL replay / 评测; 并用三条可训练性要求让"富接口"真的训得动:warm-started
+    热启动(避免早期奖励无法区分)、 compact derived-state rendering
+    紧凑派生状态(避免和证据抢上下文)、diversity-preserving incentives 保多样性激励(避免塌缩成单一动作);
+    奖励显式分"发现 vs 选择"(trajectory 项 vs curated 项 + answer-miss 罚找到却没提升)。 关键立论:agent
+    性能一大半藏在接口里——同模型换 harness 差几十分;行为先验搬进接口 → 小模型也能跨域迁移。
+  weakness: trajectory_internal_only；engineered_brittleness；trainability_overhead；narrow_task_scope；eval_annotation_limits；number_extraction_gap
+  transfer: Mini 版(无需训练,先验证接口价值):给一个现成模型套上"状态外置接口"—— 动作集 = search / readdocs /
+    curate(加重要性标签) / verify / stop, state_renderer 每步渲染候选池+精选集+证据图摘要+核实记录;实现
+    warm-start(首次成功搜索自动种精选集) + observation_compressor(去重压缩)。100-300
+    行可跑通,直接对比"有接口 vs 裸 ReAct"的 curated recall。 进阶版:再接 SFT(窄监督教接口用法)→ 一段
+    on-policy RL,reward 分发现/选择项 + answer-miss 罚。
+self_evo_use: '记忆：保留 Harness-1: Reinforcement Learning for Search Agents with
+  State-Externalizing Harnesses 的问题、方法、概念和证据边界。理解：用它补齐
+  offload-recoverable-state-to-editable-environment-interface-then-RL-the-semantic-policy
+  的方法坐标。自进化：Mini 版(无需训练,先验证接口价值):给一个现成模型套上"状态外置接口"—— 动作集 = search / readdocs /
+  curate(加重要性标签) / verify / stop, state_renderer 每步渲染候选池+精选集+证据图摘要+核实记录;实现
+  warm-start(首次成功搜索自动种精选集) + observation_compressor(去重压缩)。100-300 行可跑通,直接对比"有接口
+  vs 裸 ReAct"的 curated recall。 进阶版:再接 SFT(窄监督教接口用法)→ 一段 on-policy RL,reward
+  分发现/选择项 + answer-miss 罚。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: offload-recoverable-state-to-editable-environment-interface-then-RL-the-semantic-policy
+  - name: 方法原语
+    role: supporting
+    evidence: offload-recoverable-state-to-editable-environment-interface-then-RL-the-semantic-policy
+  - name: 迁移边界
+    role: supporting
+    evidence: offload-recoverable-state-to-editable-environment-interface-then-RL-the-semantic-policy
+discovery_trace: 数据不足
+edges:
+  - to: grepseek
+    type: compares_with
+    confidence: medium
+    evidence: Harness-1 与 GrepSeek 都面向 search agent，但 Harness-1 强调
+      state-externalizing harness 的 RL 训练，GrepSeek 强调 Direct Corpus Interaction
+      与 shell 检索轨迹。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

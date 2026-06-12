@@ -1,0 +1,43 @@
+schema: v2
+node_id: paper:2308.00352
+slug: 2308.00352-metagpt-multi-agent-sop
+kind: paper
+title: "MetaGPT: Meta Programming for a Multi-Agent Collaborative Framework"
+arxiv_id: "2308.00352"
+source: content/papers/2308.00352-metagpt-multi-agent-sop +
+  data/autosci/primitives/2308.00352.yaml
+facets:
+  problem_solved: multi-agent-collaboration-needs-structure-to-avoid-cascading-hallucination
+  method: 把一个复杂任务交给一支"角色专精 + SOP 约束"的 agent 团队:每个角色(产品/架构/项目/工程/QA) 产出带 schema
+    的结构化工件(PRD/设计/任务单/代码/测试),通过共享消息池 + 按角色发布订阅协作
+    (不自由对话、不一对一索要);工程师角色用"可执行反馈"真跑产物、按报错对照历史自纠(≤3 轮)。 关键开关 = 用人类成熟流程(SOP)+ 结构化产物
+    + 运行反馈,从源头压住级联幻觉。
+  result: 对照 A=单 super-agent 一把梭 vs B=四角色 SOP 团队 + 可执行反馈,在一组小编程任务上比可执行性、 人工修订次数与
+    token;消融去掉"可执行反馈"看可执行性掉多少(复刻 MetaGPT 消融:角色 1.0→4.0, 可执行反馈 HumanEval
+    +4.2%)。1-7 天。
+  innovation: 用人类成熟流程(SOP)约束 agent 协作,而非自由对话——中间结果可被角色检查,压住级联幻觉。；agent 间传 schema
+    化工件而非大白话:降歧义、可机器校验、可订阅。；公共消息池 + 按角色订阅 > 一对一传话:防信息过载、省 token。；能真跑就别只靠 LLM
+    互评——用运行结果纠错是质量最大来源(与 DRIFT/Crafter 的 refine 同族)。
+  weakness: token_cost_blowup；context_window_limit；rigid_protocol；hallucination_persists
+  transfer: 100~200 行最小版:一个 message pool(list + tag 订阅)+ 若干 role(各自 prompt + 输出
+    schema)+ 一个 executable_feedback 包装(跑代码→读 traceback→改→再跑,封顶 3
+    轮)。先用"产品→架构→工程→测试" 四角色跑一个小需求,再抽象成与领域无关的 role/SOP 配置。
+self_evo_use: '记忆：保留 MetaGPT: Meta Programming for a Multi-Agent Collaborative
+  Framework 的问题、方法、概念和证据边界。理解：用它补齐
+  multi-agent-collaboration-needs-structure-to-avoid-cascading-hallucination
+  的方法坐标。自进化：100~200 行最小版:一个 message pool(list + tag 订阅)+ 若干 role(各自 prompt + 输出
+  schema)+ 一个 executable_feedback 包装(跑代码→读 traceback→改→再跑,封顶 3
+  轮)。先用"产品→架构→工程→测试" 四角色跑一个小需求,再抽象成与领域无关的 role/SOP 配置。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: multi-agent-collaboration-needs-structure-to-avoid-cascading-hallucination
+  - name: 方法原语
+    role: supporting
+    evidence: multi-agent-collaboration-needs-structure-to-avoid-cascading-hallucination
+  - name: 迁移边界
+    role: supporting
+    evidence: multi-agent-collaboration-needs-structure-to-avoid-cascading-hallucination
+discovery_trace: 数据不足
+edges: []
+status: extracted

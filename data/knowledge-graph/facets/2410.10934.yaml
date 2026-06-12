@@ -1,0 +1,42 @@
+schema: v2
+node_id: paper:2410.10934
+slug: 2410.10934-agent-as-a-judge
+kind: paper
+title: "Agent-as-a-Judge: Evaluate Agents with Agents"
+arxiv_id: "2410.10934"
+source: content/papers/2410.10934-agent-as-a-judge +
+  data/autosci/primitives/2410.10934.yaml
+facets:
+  problem_solved: evaluating-agents-needs-trajectory-level-modular-judging-not-final-output-only
+  method: 用一个带模块的 agent 去评另一个 agent:Graph(建产出工程结构图)→ Locate(按需求定位文件)→ Read(读懂多格式)→
+    Retrieve(从长轨迹抽相关信息)→ Ask(逐条判定需求是否满足)。评估对象是 完整"想+做"轨迹而非仅最终输出,按分层需求(DAG
+    依赖)逐条给过程级反馈;该反馈可直接当训练/ 优化 agent 的 reward。诚实消融:砍掉
+    search/planning/memory(memory 放大错误传播)。
+  result: 对照 A=LLM 只看最终输出打分 vs B=模块化 agent 看完整轨迹逐需求判定,在一小批带依赖的任务上
+    比与"人类多数共识"的一致性(复刻:Agent 86–92% vs LLM 60–72%);消融加回 memory 看错误传播。1-7 天。
+  innovation: 评 agent 看完整'想+做'轨迹、逐需求判定,而非只看最终输出——复杂/有依赖任务才判得准。；过程级逐步反馈可直接当训练/优化
+    agent 的 reward——评估与自改进是一条闭环。；把裁判拆成 建图/定位/读/检索/判定 模块各司其职,优于一个大 prompt
+    硬判。；诚实消融:没用甚至有害的模块要敢砍(memory 放大错误传播)。
+  weakness: graybox_trajectory_inaccessible；judge_bias；memory_error_propagation；self_opt_unsolved
+  transfer: 最小版:Locate + Read + Ask 三模块,对一个小工程按 5-10 条需求逐条判定;把判定接成 per-requirement
+    / per-step reward。先复刻"Agent 一致性 > LLM 一致性"的对照,再把过程反馈 接进一个优化循环。直接可改造成本站深读冷审的
+    Stage B(逐条核 claim)。
+self_evo_use: '记忆：保留 Agent-as-a-Judge: Evaluate Agents with Agents
+  的问题、方法、概念和证据边界。理解：用它补齐
+  evaluating-agents-needs-trajectory-level-modular-judging-not-final-output-only
+  的方法坐标。自进化：最小版:Locate + Read + Ask 三模块,对一个小工程按 5-10 条需求逐条判定;把判定接成
+  per-requirement / per-step reward。先复刻"Agent 一致性 > LLM 一致性"的对照,再把过程反馈
+  接进一个优化循环。直接可改造成本站深读冷审的 Stage B(逐条核 claim)。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: evaluating-agents-needs-trajectory-level-modular-judging-not-final-output-only
+  - name: 方法原语
+    role: supporting
+    evidence: evaluating-agents-needs-trajectory-level-modular-judging-not-final-output-only
+  - name: 迁移边界
+    role: supporting
+    evidence: evaluating-agents-needs-trajectory-level-modular-judging-not-final-output-only
+discovery_trace: 数据不足
+edges: []
+status: extracted

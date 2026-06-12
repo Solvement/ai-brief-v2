@@ -1,0 +1,48 @@
+schema: v2
+node_id: paper:2605.31264
+slug: 2605.31264-colleague-skill
+kind: paper
+title: "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge
+  Distillation"
+arxiv_id: "2605.31264"
+source: content/papers/2605.31264-colleague-skill +
+  data/autosci/primitives/2605.31264.yaml
+facets:
+  problem_solved: distill-heterogeneous-traces-into-inspectable-correctable-reusable-skills
+  method: 把异构执行/交互轨迹端到端蒸馏成"可检视、可纠正、可版本化、可跨宿主安装"的 skill package：
+    双轨分离(capability=做事本事 / behavior=风格规则);自然语言反馈→结构化补丁→存档旧版→版本+1→可回滚; 工件带 schema
+    + 来源边界 + 生命周期状态(显式 > 隐藏 memory)。
+  result: 让 AutoSci 跑 N 个相似研究任务 → 蒸馏成 1 个 skill → 在第 N+1 个任务上对照"有 skill vs 无
+    skill"的 首轮成功率/步数;再测纠错闭环:注入一条 NL 反馈,验证 skill 版本+1 且行为改变、可回滚。1-14 天。
+  innovation: 把异构执行/交互轨迹端到端蒸馏成"可检视、可纠正、可版本化、可跨宿主安装"的 skill package：
+    双轨分离(capability=做事本事 / behavior=风格规则);自然语言反馈→结构化补丁→存档旧版→版本+1→可回滚; 工件带 schema
+    + 来源边界 + 生命周期状态(显式 > 隐藏 memory)。
+  weakness: no_fidelity_proof；editor_bias；skill_rot；over_distill
+  transfer: Mini 版:喂一批 AutoSci 成功轨迹 → analyzer 抽 capability/behavior 两轨 → writer 产
+    SKILL.md+manifest.json; 实现 correction_handler(NL→补丁) +
+    version_manager(存档/回滚)。100-300 行可跑通。
+self_evo_use: "记忆：保留 COLLEAGUE.SKILL: Automated AI Skill Generation via Expert
+  Knowledge Distillation 的问题、方法、概念和证据边界。理解：用它补齐
+  distill-heterogeneous-traces-into-inspectable-correctable-reusable-skills
+  的方法坐标。自进化：Mini 版:喂一批 AutoSci 成功轨迹 → analyzer 抽 capability/behavior 两轨 → writer
+  产 SKILL.md+manifest.json; 实现 correction_handler(NL→补丁) +
+  version_manager(存档/回滚)。100-300 行可跑通。"
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: distill-heterogeneous-traces-into-inspectable-correctable-reusable-skills
+  - name: 方法原语
+    role: supporting
+    evidence: distill-heterogeneous-traces-into-inspectable-correctable-reusable-skills
+  - name: 迁移边界
+    role: supporting
+    evidence: distill-heterogeneous-traces-into-inspectable-correctable-reusable-skills
+discovery_trace: 数据不足
+edges:
+  - to: leonxlnx-taste-skill
+    type: compares_with
+    confidence: medium
+    evidence: COLLEAGUE.SKILL 从专家知识蒸馏自动生成 AI skill；taste-skill 是人工策展的品味/写作约束
+      skill。两者同属 skill 形态，但一个偏自动生成，一个偏人工规范。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

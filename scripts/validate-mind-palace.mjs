@@ -9,7 +9,11 @@ const FACETS_DIR = path.join(ROOT, "data", "knowledge-graph", "facets");
 const GRAPH_FILE = path.join(ROOT, "public", "data", "brief", "graph.json");
 const EMBEDDINGS_FILE = path.join(ROOT, "public", "data", "brief", "mind-palace-embeddings.json");
 const REQUIRED_FACETS = ["problem_solved", "method", "result", "innovation", "weakness", "transfer"];
-const EDGE_TYPES = new Set(["improves_on", "extends", "contradicts", "composes_with", "implements", "applies", "tool_for", "evaluates"]);
+const EDGE_TYPES = new Set([
+  "improves_on", "extends", "contradicts", "composes_with", "implements", "applies", "tool_for",
+  "layers_with", "complements", "supersedes", "replaces", "cheaper_alt", "compares_with",
+  "tension_with", "precedes", "lineage_anchor", "validates", "isomorphic_with", "evaluates",
+]);
 const KILLED_EDGE_TYPES = new Set(["same_problem", "same_use_case"]);
 const CORE_CONCEPT_ROLES = new Set(["primary", "supporting", "mentioned"]);
 const CROSS_TYPE_EDGE_TYPES = new Set(["implements", "applies", "tool_for"]);

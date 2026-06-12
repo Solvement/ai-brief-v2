@@ -1,0 +1,71 @@
+schema: v2
+node_id: content/yikart-aitoearn
+slug: yikart-aitoearn
+kind: project
+title: AiToEarn — 深度拆解
+source: public/data/brief/deep-dives.json:yikart-aitoearn-deep-dive
+facets:
+  problem_solved: AiToEarn 是一个面向内容创作者的一站式 AI
+    内容营销应用，把内容生成、草稿管理、账号连接、跨平台发布和部分互动运营放在同一套 Web/后端/AI Agent 系统里。 人话：它不是一个通用
+    Agent 框架，而是把“生成内容、存草稿、找账号、发到平台”做成产品化流程的 AI 应用；README 自称围绕
+    Monetize、Publish、Engage、Create 四块能力工作。（来源：README 核心功能） 术语：代码里有 NestJS
+    后端、Next.js 前端、Electron 客户端、MCP 工具层和 Claude Agent SDK 运行时；AI 服务的 Agent 入口是
+    `POST /agent/tasks`，DTO 字段包括
+    `prompt`、`model`、`includePartialMessages`、`taskId`。（来源：project/aitoearn-backend/apps/aitoearn-ai/src/core/agent/agent.controller.ts；project/aitoearn-backend/apps/aitoearn-ai/src/core/agent/agent.dto.ts）
+  method: "人话：一个真实流程可以这样走：用户在前端/接口创建 Agent 任务，AI 服务把用户请求交给 Claude Agent SDK，Agent
+    先分析技能，再调用媒体生成、草稿、账号、发布等 MCP 工具，最后返回结构化 action 给产品界面。具体入口是 `POST
+    /agent/tasks`，请求 schema 是
+    `prompt`、`model`、`includePartialMessages`、`taskId`；默认模型 schema 是
+    `claude-opus-4-6`。（来源：project/aitoearn-backend/apps/aitoearn-ai/src/core/ag\
+    ent/agent.controller.ts；project/aitoearn-backend/apps/aitoearn-ai/src/core/\
+    agent/agent.dto.ts） 术语：`AgentRuntimeService` 创建任务后会
+    `normalizePrompt`、`enhancePrompt`，构造 `SYSTEM_PROMPT`，再通过 `query()` 调 Claude
+    Agent SDK；它设置 `ANTHROPIC_BASE_URL:
+    'http://127.0.0.1:3456'`、`ANTHROPIC_AUTH_TOKEN: 'ccr'`、`DISABLE_TELEMETRY:
+    'true'`，并把 MCP servers 传入 query
+    options。（来源：project/aitoearn-backend/apps/aitoearn-ai/src/core/agent/servic\
+    es/agent-runtime.service.ts） 具体例子：用户说“生成 8 秒竖屏视频并发到 YouTube”。系统提示词要求先调用
+    `skill-analyzer`，加载 `generating-videos`，展示执行计划；`generating-videos/SKILL.md`
+    规定 Grok 默认 `grok-imagine-video…"
+  result: 人话：README 的渠道、赚钱、AI Agent、10+
+    平台等表述需要按“自称”看；源码能核实的是配置、工具、服务、路由、限制表和运行脚本。术语：下面把 claim 分成 README claim 与
+    tree/code verified facts。 项目自称覆盖赚钱、发布、互动、创作四个内容营销环节。 仓库提供可启动完整应用栈的 Docker
+    Compose 配置。 项目公开说明可用 `https://aitoearn.ai/api/unified/mcp` 和 `x-api-key` 接入。
+    Agent 提示词强制先做技能分析和执行计划，生成后调用草稿工具；发布前先查账号和限制。 前端和限制表包含 Xhs/Douyin，但 Agent
+    提示词明确说这两个没有自动发布工具，需要引导人工发布。 技能文件规定 Grok 优先，Veo 用于 16-36 秒、首尾帧、参考图等高级场景。
+    仓库包含后端和 MCP 工具相关 spec 文件。
+  innovation: 人话：最值得拆出来学的是“业务工具 MCP 化”和“Agent 输出 action 给产品
+    UI”，而不是具体社交平台适配。术语：这些抽象可以迁移到 CRM、客服、增长运营、内部知识库等 AI 应用。 NestJS MCP Tool
+    Decorator Draft-first Agent Workflow Action-based UI Handoff Platform
+    Restriction Map Relay OAuth For Self-hosting
+  weakness: 人话：这个项目的核心风险集中在外部平台和模型服务，而不是单纯代码能不能编译。术语：风险主要来自 OAuth/API policy、模型
+    ID、MCP/Claude SDK、Relay 中继、对象存储与队列。
+  transfer: 人话：最值得拆出来学的是“业务工具 MCP 化”和“Agent 输出 action 给产品
+    UI”，而不是具体社交平台适配。术语：这些抽象可以迁移到 CRM、客服、增长运营、内部知识库等 AI 应用。 NestJS MCP Tool
+    Decorator Draft-first Agent Workflow Action-based UI Handoff Platform
+    Restriction Map Relay OAuth For Self-hosting
+self_evo_use: 记忆：把 AiToEarn — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 ai_app
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: AiToEarn 是一个面向内容创作者的一站式 AI 内容营销应用，把内容生成、草稿管理、账号连接、跨平台发布和部分互动运营放在同一套
+      Web/后端/AI Agent 系统里。 人话：它不是一个通用 Agent 框架，而是把“生成内容、存…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：一个真实流程可以这样走：用户在前端/接口创建 Agent 任务，AI 服务把用户请求交给 Claude Agent SDK，Agent
+      先分析技能，再调用媒体生成、草稿、账号、发布等 MCP 工具，最后返回结构化 action 给产…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：最值得拆出来学的是“业务工具 MCP 化”和“Agent 输出 action 给产品
+      UI”，而不是具体社交平台适配。术语：这些抽象可以迁移到 CRM、客服、增长运营、内部知识库等 AI 应用。 NestJS MCP Tool De…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：这个项目的核心风险集中在外部平台和模型服务，而不是单纯代码能不能编译。术语：风险主要来自 OAuth/API policy、模型
+      ID、MCP/Claude SDK、Relay 中继、对象存储与队列。
+  - name: 证据账本
+    role: mentioned
+    evidence: “Monetize · Publish · Engage · Create —— 一站式平台。”
+discovery_trace: 数据不足
+edges: []
+status: extracted

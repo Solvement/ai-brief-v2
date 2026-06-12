@@ -1,0 +1,44 @@
+schema: v2
+node_id: content/easy-vibe
+slug: easy-vibe
+kind: project
+title: easy-vibe — 深度拆解
+source: public/data/brief/deep-dives.json:easy-vibe-deep-dive
+facets:
+  problem_solved: easy-vibe — 深度拆解 的核心判断：提供了一套完整、多语言、沉浸式的 AI
+    编程教学方案，让任何背景的人都能通过对话式编程快速构建应用，并覆盖到高级 agent 工作流。 本条由旧深读聚合内容重整为 RuView
+    light_spine；证据边界来自 README.md；topics；tree；package.json；Dockerfile；docs-readme
+    目录结构。没有源码级证据的地方保留“数据不足”。
+  method: 提供了一套完整、多语言、沉浸式的 AI 编程教学方案，让任何背景的人都能通过对话式编程快速构建应用，并覆盖到高级 agent 工作流。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    项目声称，即使不会写代码，只要用自然语言说出需求，就能做出记账本、预约系统等应用。 项目高级阶段教用户使用先进的 AI 开发技术。
+    项目宣称已支持包括中、英、日、韩、西、法、德、阿、越在内的 10 种语言。
+  innovation: 可复用其多语言文档工程模式、AI 友好索引设计，以及分阶段教学路径规划；但不建议直接复用其静态站点代码或教学内容。 read-docs
+    clone-and-run extract-pattern(llms.txt 设计模式、多语言文档组织)
+  weakness: 项目热度可能来自炒作而非实际教学效果；教学内容未经验证，可能缺乏深度；依赖第三方闭源产品，长期可用性存疑
+  transfer: 可复用其多语言文档工程模式、AI 友好索引设计，以及分阶段教学路径规划；但不建议直接复用其静态站点代码或教学内容。 read-docs
+    clone-and-run extract-pattern(llms.txt 设计模式、多语言文档组织)
+self_evo_use: 记忆：把 easy-vibe — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: easy-vibe — 深度拆解 的核心判断：提供了一套完整、多语言、沉浸式的 AI
+      编程教学方案，让任何背景的人都能通过对话式编程快速构建应用，并覆盖到高级 agent 工作流。 本条由旧深读聚合内容重整为 RuView
+      light_s…
+  - name: 机制链路
+    role: primary
+    evidence: 提供了一套完整、多语言、沉浸式的 AI 编程教学方案，让任何背景的人都能通过对话式编程快速构建应用，并覆盖到高级 agent 工作流。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用其多语言文档工程模式、AI 友好索引设计，以及分阶段教学路径规划；但不建议直接复用其静态站点代码或教学内容。 read-docs
+      clone-and-run extract-pattern(llms.txt 设计模式、多语言文档组织)
+  - name: 风险边界
+    role: supporting
+    evidence: 项目热度可能来自炒作而非实际教学效果；教学内容未经验证，可能缺乏深度；依赖第三方闭源产品，长期可用性存疑
+  - name: 证据账本
+    role: mentioned
+    evidence: Easy-Vibe 让任何人都能通过口头描述来构建应用程序
+discovery_trace: 数据不足
+edges: []
+status: extracted

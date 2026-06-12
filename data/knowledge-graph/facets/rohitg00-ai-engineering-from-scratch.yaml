@@ -1,0 +1,63 @@
+schema: v2
+node_id: content/rohitg00-ai-engineering-from-scratch
+slug: rohitg00-ai-engineering-from-scratch
+kind: project
+title: ai-engineering-from-scratch — 深度拆解
+source: public/data/brief/deep-dives.json:rohitg00-ai-engineering-from-scratch-deep-dive
+facets:
+  problem_solved: 这是一个从数学、模型、LLM 到 Agent/MCP/安全的开源 AI 工程课程仓库，不是一个可直接接入生产的 agent
+    framework。 人话：它更像“AI 工程训练场 + 可复制工具箱”，每课有 docs、code、quiz、outputs。术语上，它把
+    curriculum、agent skills、MCP 示例、agent workbench pack 放在一个 repo 里。（来源：README
+    How this works；scripts/build_catalog.py totals）
+  method: 真实流：读者从 README 选 phase，进入某个 lesson；每课通常有
+    `docs/en.md`、`code/`、`quiz.json`、`outputs/`。（来源：README The shape of a
+    lesson） Phase 14 Lesson 01 的实际例子： 这次运行得到 5 次工具调用：先 `kv_set base=120`，再
+    `calculator 120 * 0.15` 得 18.0，再算 `120 + 18.0` 得 138.0，最后 `kv_get base` 后
+    finish。（来源：phases/14-agent-engineering/01-the-agent-loop/code/main.py；本地运行）
+    MCP 例子走另一条线：Phase 13 Lesson 07 的 server 从 stdin 读 JSON-RPC，一行一个
+    request；`tools/call` 调 `notes_create` 后返回 text block 和 `notes://...`
+    resource。（来源：phases/13-tools-and-protocols/07-building-an-mcp-server/code/main.py）
+    可复用交付物走安装线： 脚本按前缀识别 `skill-`、`prompt-`、`agent-`，默认写成
+    `<target>/<name>/SKILL.md` 并生成 manifest。（来源：scripts/install_skills.py
+    target_path/write_manifest）
+  result: 核心判断：课程广度是真的；“每课都 ship 一个 artifact”的营销说法需要按仓库实际输出重新解释；工程模板比课程口号更值得抽取。 不是
+    README 单说；本次调用 `scripts.build_catalog.build_catalog()` 也得到
+    phases=20、lessons=503。 repo 里确实有大量 outputs，但本次 catalog 只识别到 385 skills、99
+    prompts、0 agents；README 同页又写 388 skills。 它不是调用 LangGraph/CrewAI，而是用 ToyLLM
+    脚本、ToolRegistry、max_turns、history 自己跑一遍。 Phase 13 Lesson 07 的 notes server 用
+    stdio + JSON-RPC，暴露 tools、resources、prompts 三类 MCP primitive。
+    `scripts/install_skills.py` 会扫描 `phases/**/outputs`，支持
+    `--phase`、`--tag`、`--layout`、`--dry-run`、`--force`。 `site/stats.json` 写着
+    150,639 readers、241,669 page views、updated 2026-06-07，但 note 说明 Vercel 没有
+    public analytics API。
+  innovation: 最值得抽的不是课程文本，而是这些小而完整的工程形状。 ReAct loop 教学骨架 MCP notes server 形状 Agent
+    Workbench pack Catalog-as-truth Rules engine 示例
+  weakness: 主要风险不是“跑不起来”，而是口径漂移、长路径、生态 API 变化。
+  transfer: 最值得抽的不是课程文本，而是这些小而完整的工程形状。 ReAct loop 教学骨架 MCP notes server 形状 Agent
+    Workbench pack Catalog-as-truth Rules engine 示例
+self_evo_use: 记忆：把 ai-engineering-from-scratch — 深度拆解
+  的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 template_boilerplate 的判断，不把 README
+  自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: 这是一个从数学、模型、LLM 到 Agent/MCP/安全的开源 AI 工程课程仓库，不是一个可直接接入生产的 agent
+      framework。 人话：它更像“AI 工程训练场 + 可复制工具箱”，每课有 docs、code、quiz、o…
+  - name: 机制链路
+    role: primary
+    evidence: 真实流：读者从 README 选 phase，进入某个 lesson；每课通常有
+      `docs/en.md`、`code/`、`quiz.json`、`outputs/`。（来源：README The shape of a
+      lesson） …
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最值得抽的不是课程文本，而是这些小而完整的工程形状。 ReAct loop 教学骨架 MCP notes server 形状 Agent
+      Workbench pack Catalog-as-truth Rules engine 示例
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险不是“跑不起来”，而是口径漂移、长路径、生态 API 变化。
+  - name: 证据账本
+    role: mentioned
+    evidence: 仓库覆盖 20 phases、503 lessons。
+discovery_trace: 数据不足
+edges: []
+status: extracted

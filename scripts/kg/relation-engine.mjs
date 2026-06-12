@@ -83,7 +83,7 @@ const FIELD_HINTS = ["method", "core_concept", "core_concepts"];
 const LLM_EDGE_DIRECTIONS = new Set(["A_TO_B", "B_TO_A"]);
 const DEFAULT_LLM_MODEL = "claude-sonnet-4-6";
 const DEFAULT_LLM_TIMEOUT_MS = 45_000;
-const MAX_LLM_CANDIDATES = 80;
+const MAX_LLM_CANDIDATES = 300;
 const SYMMETRIC_LLM_EDGE_TYPES = new Set([
   "complements",
   "compares_with",
@@ -287,8 +287,8 @@ export function generateFacetCandidates(facets, { topK = 6 } = {}) {
   return [...picked.values()].sort((a, b) => b.score - a.score);
 }
 
-export function limitFacetCandidates(facets, { topK = 5, maxCandidates = MAX_LLM_CANDIDATES } = {}) {
-  const boundedTopK = Math.max(1, Math.min(Number(topK) || 5, 5));
+export function limitFacetCandidates(facets, { topK = 10, maxCandidates = MAX_LLM_CANDIDATES } = {}) {
+  const boundedTopK = Math.max(1, Math.min(Number(topK) || 10, 10));
   const boundedMax = Math.max(1, Math.min(Number(maxCandidates) || MAX_LLM_CANDIDATES, MAX_LLM_CANDIDATES));
   return generateFacetCandidates(facets, { topK: boundedTopK }).slice(0, boundedMax);
 }
@@ -509,7 +509,7 @@ export async function extractEdgesLLM(facets, {
     noEdge: 0,
     failed: 0,
     rejected: 0,
-    topK: Math.min(Math.max(1, Number(topK) || 5), 5),
+    topK: Math.min(Math.max(1, Number(topK) || 10), 10),
     maxCandidates: Math.min(Math.max(1, Number(maxCandidates) || MAX_LLM_CANDIDATES), MAX_LLM_CANDIDATES),
   };
 

@@ -1,0 +1,49 @@
+schema: v2
+node_id: content/pixelle-video
+slug: pixelle-video
+kind: project
+title: Pixelle-Video — 深度拆解
+source: public/data/brief/deep-dives.json:pixelle-video-deep-dive
+facets:
+  problem_solved: Pixelle-Video — 深度拆解 的核心判断：提供了一个开箱即用的全自动短视频生成工作流，并创新性地将
+    ComfyUI/RunningHub 工作流和直连 API 统一为可替换的原子能力 本条由旧深读聚合内容重整为 RuView
+    light_spine；证据边界来自 README.md 内容；top-level directory structure；package files
+    (pyproject.toml, Dockerfile, docker-compose.yml)；docs signal (mkdocs.yml,
+    docs/ directory)；topics and description；license file
+    existence。没有源码级证据的地方保留“数据不足”。
+  method: 提供了一个开箱即用的全自动短视频生成工作流，并创新性地将 ComfyUI/RunningHub 工作流和直连 API 统一为可替换的原子能力
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。 用户给一个话题，AI
+    就能自动写出稿子、配上插图或视频、合成语音和背景音乐，最后生成一个完整的短片 可以选择不同的 AI
+    模型来做文案生成（GPT、通义千问等）、图像生成（ComfyUI 工作流或
+    API）、语音合成（Edge-TTS、Index-TTS），并且可以像搭积木一样任意组合 如果用户有本地显卡，可以用免费的本地大模型 Ollama
+    加上开源 ComfyUI，整个视频生成过程不花一分钱 不需要视频剪辑知识，也不用写脚本，AI 全都自动搞定
+  innovation: 可复用其工作流集成模式和结构化脚本生成思路，但整个 agent 循环过于简单，不适合直接作为通用 agent
+    框架迁移，可取其编排思想用于其他内容生产工具 clone-and-run write-deepdive
+  weakness: README 中的性能声明和功能完整性无法仅通过文档验证，需实际运行测试；缺少测试，长期维护性和可靠性存疑；依赖的外部模型服务可能存在
+    API 变更或收费风险
+  transfer: 可复用其工作流集成模式和结构化脚本生成思路，但整个 agent 循环过于简单，不适合直接作为通用 agent
+    框架迁移，可取其编排思想用于其他内容生产工具 clone-and-run write-deepdive
+self_evo_use: 记忆：把 Pixelle-Video — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Pixelle-Video — 深度拆解 的核心判断：提供了一个开箱即用的全自动短视频生成工作流，并创新性地将
+      ComfyUI/RunningHub 工作流和直连 API 统一为可替换的原子能力 本条由旧深读聚合内容重整为 RuView …
+  - name: 机制链路
+    role: primary
+    evidence: 提供了一个开箱即用的全自动短视频生成工作流，并创新性地将 ComfyUI/RunningHub 工作流和直连 API 统一为可替换的原子能力
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用其工作流集成模式和结构化脚本生成思路，但整个 agent 循环过于简单，不适合直接作为通用 agent
+      框架迁移，可取其编排思想用于其他内容生产工具 clone-and-run write-deepdive
+  - name: 风险边界
+    role: supporting
+    evidence: README 中的性能声明和功能完整性无法仅通过文档验证，需实际运行测试；缺少测试，长期维护性和可靠性存疑；依赖的外部模型服务可能存在
+      API 变更或收费风险
+  - name: 证据账本
+    role: mentioned
+    evidence: 只需输入一个主题就能自动生成完整视频
+discovery_trace: 数据不足
+edges: []
+status: extracted

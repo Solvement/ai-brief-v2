@@ -1,0 +1,65 @@
+schema: v2
+node_id: content/modelscope-funasr
+slug: modelscope-funasr
+kind: project
+title: FunASR — 深度拆解
+source: public/data/brief/deep-dives.json:modelscope-funasr-deep-dive
+facets:
+  problem_solved: FunASR 是一个把离线/流式语音识别、VAD、标点、说话人分离、OpenAI 兼容 API、MCP 工具和 vLLM
+    加速放在同一套 Python/部署栈里的 ASR 工具箱。 人话：它不是只给一个模型下载链接，而是给工程团队一条从
+    `AutoModel(...).generate(input="meeting.wav")` 到 `funasr-server --model
+    sensevoice --device cuda`、再到 Docker/Kubernetes/MCP 的完整私有转写路径。技术定义：ASR
+    是语音转文字；VAD 是先找出音频里有说话的片段；speaker diarization 是给片段打说话人标签；OpenAI 兼容 API
+    是把本地服务做成 `/v1/audio/transcriptions` 这种客户端容易接入的接口。（来源：README Quick
+    Start；examples/openai_api/README_zh.md 快速开始/API
+    端点；examples/mcp_server/README.md Tools）
+  method: 人话流程：上传一段 `meeting.wav`，FunASR
+    先把音频里真正有人说话的段落找出来，再把每段送进识别模型，最后把文字、时间、说话人信息拼回一个结果。技术流程可以从两个真实入口看。 入口一，Python
+    API：README 的例子是 `AutoModel(model="iic/SenseVoiceSmall",
+    vad_model="fsmn-vad", spk_model="cam++", device="cuda")` 后调用
+    `model.generate(input="meeting.wav")`。（来源：README Quick Start）源码里
+    `AutoModel.generate` 会先判断有没有 `vad_model`：没有就走 `inference()`，有就走
+    `inference_with_vad()`；`inference_with_vad` 先调用 `self.vad_model` 得到
+    `vadsegments`，再按片段长度排序批处理，用 `slice_padding_audio_samples` 取音频片段，调用主 ASR
+    模型，必要时调用 `punc_model`，有 `spk_model` 时提取 `spk_embedding`、聚类并把结果写到
+    `sentence_info`。（来源：funasr/auto/auto_model.py generate/inference_with_vad）
+    入口二，OpenAI 兼容服务：`funasr-server --model sensevoice --device cuda` 最终调用
+    `funasr.bin._server_app.create_app`。如果 `preload_model == "auto"`，GPU 默认选
+    `fun-asr-nano`，CPU 默认选 `sensevoice`；`/v1/audio/transcriptions` 接收
+    `file`、`model`、`language`、`response_format`、`spk`。当 `mod…
+  result: 下面把营销性说法和文件可验证事实分开。README/badge/benchmark/“supports N”
+    一律按自称；从源码、配置、脚本、目录直接读到的机制按已核实。 项目首页把 FunASR 定位成高吞吐、多语言的私有语音识别工具。
+    它提供了公开对比口径，但仍是项目方报告。 可以用 OpenAI 风格 SDK 或 multipart HTTP 上传音频。 它把转写包装成一个本地工具
+    `transcribe_audio`。 用户传模型名和子模型名，FunASR 下载模型、解析配置、组装
+    tokenizer/frontend/model，再加载权重。 先切语音片段，再识别，再合并时间戳和文本，最后加标点/说话人。 Fun-ASR-Nano
+    在 GPU 服务里优先走 vLLM，引擎失败时回退 AutoModel。 仓库不只给 Python 脚本，还给容器和集群模板。
+  innovation: 最值得复用的不是某个模型名，而是几层边界：模型别名、AutoModel 组装、兼容 API、Agent 工具、迁移 benchmark。
+    AutoModel 组件组装器 模型 alias 层 OpenAI 兼容转写端点 MCP 本地工具包装 迁移评测脚本 部署选型表
+  weakness: 主要风险集中在模型权重、GPU/vLLM、服务安全、音频依赖和许可证边界。
+  transfer: 最值得复用的不是某个模型名，而是几层边界：模型别名、AutoModel 组装、兼容 API、Agent 工具、迁移 benchmark。
+    AutoModel 组件组装器 模型 alias 层 OpenAI 兼容转写端点 MCP 本地工具包装 迁移评测脚本 部署选型表
+self_evo_use: 记忆：把 FunASR — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 model_infra
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: FunASR 是一个把离线/流式语音识别、VAD、标点、说话人分离、OpenAI 兼容 API、MCP 工具和 vLLM 加速放在同一套
+      Python/部署栈里的 ASR 工具箱。 人话：它不是只给一个模型下载链接，而是给工程团队一条从 …
+  - name: 机制链路
+    role: primary
+    evidence: 人话流程：上传一段 `meeting.wav`，FunASR
+      先把音频里真正有人说话的段落找出来，再把每段送进识别模型，最后把文字、时间、说话人信息拼回一个结果。技术流程可以从两个真实入口看。
+      入口一，Python API：README …
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最值得复用的不是某个模型名，而是几层边界：模型别名、AutoModel 组装、兼容 API、Agent 工具、迁移 benchmark。
+      AutoModel 组件组装器 模型 alias 层 OpenAI 兼容转写端点 MCP 本地工具包…
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险集中在模型权重、GPU/vLLM、服务安全、音频依赖和许可证边界。
+  - name: 证据账本
+    role: mentioned
+    evidence: “比 Whisper 快 170 倍、支持 50+ 语言”。
+discovery_trace: 数据不足
+edges: []
+status: extracted

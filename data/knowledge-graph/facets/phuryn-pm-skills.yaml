@@ -1,0 +1,57 @@
+schema: v2
+node_id: content/phuryn-pm-skills
+slug: phuryn-pm-skills
+kind: project
+title: pm-skills — 深度拆解
+source: public/data/brief/deep-dives.json:phuryn-pm-skills-deep-dive
+facets:
+  problem_solved: pm-skills 是一套面向产品经理和 AI 应用交付者的 Claude/Codex 技能与工作流市场，不是模型或运行时框架。
+    人话：它把 PRD、发现、策略、发布检查等 PM 工作拆成可安装的 skill 和 slash command。术语：skill
+    是可自动加载的领域提示词，command 是用户输入 `/discover` 这类命令后串起多个 skill 的工作流。（来源：README How
+    It Works；.claude-plugin/marketplace.json）
+  method: "真实流以 `/discover` 为例： 安装入口写在 README： `claude plugin marketplace add
+    phuryn/pm-skills` `claude plugin install pm-product-discovery@pm-skills`
+    这表示宿主平台加载 `.claude-plugin/marketplace.json`，再按 `source:
+    ./pm-product-discovery` 找到插件目录。（来源：README Claude Code
+    CLI；.claude-plugin/marketplace.json） `/discover` 的具体输入例子是 `/discover Smart
+    notification system for our project management
+    tool`；它要求先问用户已有研究、客户反馈、数据和本次决策目标，再让用户在 10 个想法中选 3-5
+    个继续压力测试。（来源：pm-product-discovery/commands/discover.md Invocation / Workflow）
+    关键机制不是代码调用，而是 Markdown 指令组合：command 文件用粗体 skill 名引用同插件 skill；validator 会检查
+    command 里 `**skill-name** skill` 这种引用是否在同一插件中存在。（来源：validate_plugins.py
+    validate_cross_references）"
+  result: 下面只把能从真实仓库文件或本地脚本验证的内容当“已核实”；README 的平台安装和兼容性按“自称”处理。 这不是单个
+    prompt，而是一个多插件市场包。 它不是只说“做 discovery”，而是规定先判断新/旧产品，再发散想法、找假设、排序、设计实验、输出
+    Discovery Plan。 它把“能不能发版”拆成文档基线、agent 上下文、安全审计、性能审计、测试覆盖、shipping packet。
+    作者给出了贡献约束，并提供脚本检查 manifest、frontmatter、同插件 skill 引用。 在 Codex 里更像可调用技能库，不是完整的
+    `/discover` 命令体验。 没有 package.json、pyproject、requirements、Dockerfile；核心资产是
+    Markdown skill/command 和 JSON manifest。
+  innovation: 最可复用的是“把专家流程拆成 command 编排 + skill 知识块 + validator 形状检查”。这套模式适合迁移到自己的
+    AI 应用内置工作流。 command 编排多个 skill 意图先行的交付审计 轻量 manifest 与 frontmatter 校验
+  weakness: 主要风险来自宿主 agent 平台，而不是依赖库。仓库本身几乎没有运行时代码。
+  transfer: 最可复用的是“把专家流程拆成 command 编排 + skill 知识块 + validator 形状检查”。这套模式适合迁移到自己的
+    AI 应用内置工作流。 command 编排多个 skill 意图先行的交付审计 轻量 manifest 与 frontmatter 校验
+self_evo_use: 记忆：把 pm-skills — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: pm-skills 是一套面向产品经理和 AI 应用交付者的 Claude/Codex 技能与工作流市场，不是模型或运行时框架。 人话：它把
+      PRD、发现、策略、发布检查等 PM 工作拆成可安装的 skill 和 slash comman…
+  - name: 机制链路
+    role: primary
+    evidence: 真实流以 `/discover` 为例： 安装入口写在 README： `claude plugin marketplace add
+      phuryn/pm-skills` `claude plugin install pm-product-…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最可复用的是“把专家流程拆成 command 编排 + skill 知识块 + validator 形状检查”。这套模式适合迁移到自己的
+      AI 应用内置工作流。 command 编排多个 skill 意图先行的交付审计 轻量 manife…
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险来自宿主 agent 平台，而不是依赖库。仓库本身几乎没有运行时代码。
+  - name: 证据账本
+    role: mentioned
+    evidence: 仓库包含 9 个插件、68 个 skills、42 个 commands。
+discovery_trace: 数据不足
+edges: []
+status: extracted

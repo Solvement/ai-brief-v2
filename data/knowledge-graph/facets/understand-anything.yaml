@@ -1,31 +1,30 @@
-# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z + 创新/缺点。
 node_id: content/understand-anything
 slug: understand-anything
 kind: project
-title: "Understand-Anything — Tree-sitter+LLM 混合管道把代码库变可视知识图谱"
-source: "github.com/Lum1104/Understand-Anything + deep-dive understand-anything"
+title: Understand-Anything — Tree-sitter+LLM 混合管道把代码库变可视知识图谱
+source: github.com/Lum1104/Understand-Anything + deep-dive understand-anything
 facets:
   problem_solved: >
     新人进组面对 20 万行代码不知从哪读起：grep/静态工具只给碎片，直接喂 LLM 上下文窗口又不够、缺结构；
     缺一张既能看宏观架构又能下钻细节、还能随提交持续更新的代码「地图」。
-  method: >
-    确定性解析 + LLM 语义分析的混合管道：先用 Tree-sitter 把代码确定性地解析出文件/函数/类/依赖这些结构事实（保证相同输入→相同输出、不被 LLM 幻觉破坏关系），
-    再让 LLM 在这些结构事实之上写语义描述和导览。一条多智能体流水线分工跑：项目扫描→文件分析→架构层识别→导览构建→图谱审查，支持并发与增量更新（靠指纹+importMap 预计算避免重复分析）。
-    产物是一个图谱 JSON，可提交进 Git 让全队共享（文档即代码），配可视化仪表盘做分层着色、模糊/语义搜索、差异影响分析。作为插件接入 Claude Code/Cursor 等 15 个平台。
+  method: |
+    确定性解析 + LLM 语义分析的混合管道：先用 Tree-sitter 把代码确定性地解析出文件/函数/类/依赖这些结构事实（保证相同输入→相同输出、不被 LLM 幻觉破坏关系）， 再让 LLM 在这些结构事实之上写语义描述和导览。一条多智能体流水线分工跑：项目扫描→文件分析→架构层识别→导览构建→图谱审查，支持并发与增量更新（靠指纹+importMap 预计算避免重复分析）。 产物是一个图谱 JSON，可提交进 Git 让全队共享（文档即代码），配可视化仪表盘做分层着色、模糊/语义搜索、差异影响分析。作为插件接入 Claude Code/Cursor 等 15 个平台。
   result: >
-    [自报·README] 支持 15 个 AI 编程平台（表格列全、evidence_strength=high，但无各平台运行截图）；图谱 JSON 可 Git 共享（给了 gitignore/git-lfs 示例 + 示例仓库）；
-    Tree-sitter 确定性解析（描述了 importMap 预解析+指纹增量，但无测试证明，未给 grammar 列表）。
-    [成熟度信号] 30 天涨星 40734、最新 v2.7.3、162 开放 issue。无图谱准确性指标。
+    [自报·README] 支持 15 个 AI 编程平台（表格列全、evidence_strength=high，但无各平台运行截图）；图谱 JSON 可
+    Git 共享（给了 gitignore/git-lfs 示例 + 示例仓库）； Tree-sitter 确定性解析（描述了 importMap
+    预解析+指纹增量，但无测试证明，未给 grammar 列表）。 [成熟度信号] 30 天涨星 40734、最新 v2.7.3、162 开放
+    issue。无图谱准确性指标。
   innovation: >
     核心创新是「把 Tree-sitter 的确定性结构当事实喂给 LLM」这一招——让结构可复现、用 LLM 只补语义，避免 LLM 幻觉破坏依赖关系；
     加上多智能体分工流水线 + 增量指纹 + 图谱 JSON 进 Git 的「可共享、可版本化的代码知识库」分发形态，以及跨 15 平台的插件分发。
   weakness: >
-    深读偏薄（Tier 2）：多智能体之间的通信协议/调度机制 README 没说、无源码证据，内部实现不可知、不宜直接复刻；
-    LLM 调用的模型/提示工程/成本延迟全未披露；语义搜索的 embedding 方案（本地 vs 远程）未知；图谱准确性无指标、LLM 幻觉风险实打实；
+    深读偏薄（Tier 2）：多智能体之间的通信协议/调度机制 README 没说、无源码证据，内部实现不可知、不宜直接复刻； LLM
+    调用的模型/提示工程/成本延迟全未披露；语义搜索的 embedding 方案（本地 vs 远程）未知；图谱准确性无指标、LLM 幻觉风险实打实；
     多人同改图谱 JSON 的冲突合并逻辑未说明；强依赖各平台插件 API（弃用即失效）。所有核心 claim 均为「自称」。
   transfer: >
-    可借的是架构模式而非实现：① 「确定性解析做结构事实 + LLM 只补语义」的混合管道——任何要建可解释知识库、又怕 LLM 乱接关系的场景都该这么分层（本站论文/项目知识图谱抽取同理）；
-    ② 增量指纹 + importMap 预计算省重复分析；③ 知识图谱 JSON 进 Git 当「文档即代码」共享。多智能体协调细节不可见，无法照抄。
+    可借的是架构模式而非实现：① 「确定性解析做结构事实 + LLM 只补语义」的混合管道——任何要建可解释知识库、又怕 LLM
+    乱接关系的场景都该这么分层（本站论文/项目知识图谱抽取同理）； ② 增量指纹 + importMap 预计算省重复分析；③ 知识图谱 JSON 进
+    Git 当「文档即代码」共享。多智能体协调细节不可见，无法照抄。
   architecture: |
     ```mermaid
     flowchart TD
@@ -42,15 +41,19 @@ facets:
       GRAPH --> DASH[可视化仪表盘<br/>分层着色/语义搜索/差异影响]
       PLUGIN[15 平台插件接入: Claude Code/Cursor...] -.调用 /understand.-> PIPE
     ```
-self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
+self_evo_use: >
   记忆：部分——产出的代码知识图谱可作为 agent 的外部结构记忆（图谱进 Git 即持久化），但无写入策略与生命周期管理。
 
-  理解：能用（核心价值）——把「确定性结构 + LLM 语义」的混合抽取范式坐实了：结构事实用 Tree-sitter 确定性解析、LLM 只补语义防幻觉；自进化 agent 建自己的代码/知识地图时该照此分层。
+  理解：能用（核心价值）——把「确定性结构 + LLM 语义」的混合抽取范式坐实了：结构事实用 Tree-sitter 确定性解析、LLM
+  只补语义防幻觉；自进化 agent 建自己的代码/知识地图时该照此分层。
 
   自进化：不能直接复用——多智能体通信/调度是黑盒、无策略学习回路、内部不开放。它是「怎么抽一张可信知识图谱」的方法参考，不是自进化大脑。
 edges:
   - to: colbymchenry-codegraph
     type: composes_with
-    evidence: "同样 Tree-sitter→代码知识图谱给 agent；understand-anything 在上层做多agent语义导览+可视化仪表盘+图谱进Git，codegraph 在底层做 SQLite 索引基础设施+MCP工具+staleness——表现层 vs 基础设施层互补。"
+    evidence: 同样 Tree-sitter→代码知识图谱给 agent；understand-anything
+      在上层做多agent语义导览+可视化仪表盘+图谱进Git，codegraph 在底层做 SQLite
+      索引基础设施+MCP工具+staleness——表现层 vs 基础设施层互补。
     confidence: high
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
 status: extracted

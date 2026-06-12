@@ -1,0 +1,63 @@
+schema: v2
+node_id: content/imbad0202-academic-research-skills
+slug: imbad0202-academic-research-skills
+kind: project
+title: academic-research-skills — 深度拆解
+source: public/data/brief/deep-dives.json:imbad0202-academic-research-skills-deep-dive
+facets:
+  problem_solved: 给 Claude Code 用的学术研究工作流套件：把找文献、写论文、审稿、修订、终稿检查拆成可路由的 skills、slash
+    commands、hooks 和校验脚本。 人话：它不是一个可 pip install 的研究模型，而是一套 Claude Code
+    工作流包装。已核实仓库里有 4 个顶层 skill、14 个 `commands/ars-*.md`、39 个 agent prompt
+    文件、`hooks/hooks.json`、167 个顶层 Python 脚本；`pyproject.toml` 只配置 pytest
+    path，不是产品入口。（来源：README Quick
+    install；.claude-plugin/plugin.json；commands/；hooks/hooks.json；repo tree）
+  method: 真实例子：`academic-pipeline/examples/full_pipeline_example.md`
+    里，用户从“台湾私校少子化招生策略”开始，orchestrator 识别从 Stage 1 进入，推荐 `deep-research
+    socratic`、`academic-paper plan`、`academic-paper-reviewer
+    full`、revision、finalize。这个流不是一个 agent 独跑，而是 skill/agent/sidecar/schema 交接。
+    两个关键实现点：第一，插件加载时 `SessionStart` 调 `scripts/announce-ars-loaded.sh`，把命令和 3 个
+    plugin agents 注入上下文；第二，写文件或 Bash 前 `PreToolUse` 调
+    `scripts/ars_write_scope_guard.py`，用 `scripts/ars_phase_scope_manifest.json`
+    判断 agent
+    能否写入目标路径。（来源：hooks/hooks.json；scripts/announce-ars-loaded.sh；scripts/ars_write_scope_guard.py）
+    最小入口只有两行： 这会让 Claude Code 发现四个 skills；传统方式则要求四个 skill 分别位于
+    `.claude/skills/<skill-name>/SKILL.md`。（来源：README Quick install；QUICKSTART
+    Step 1；docs/SETUP Method 0/1）
+  result: 下面把 README/manifest 自称和代码树已核实分开。插件描述里的“35+ modes、38-agent
+    ensemble”按自称处理；本次按文件树核到 39 个 agent prompt 文件。 不是让用户手动复制一大堆 prompt；Claude
+    Code 里可以装 plugin，然后用 slash command 触发具体模式。 它把研究、写作、审稿、总编排拆成四个 Claude Code
+    skill，不是一个单体 agent。 核心不是让 AI 一路写完，而是在论文完成前后插入强制核验关卡。 它试图防止子 agent
+    写到不属于自己阶段的文件夹，减少跨阶段污染。 它不是只让审稿 agent “看一眼引用”，而是把 resolver 结果汇总成结构化字段。
+    至少部分判断逻辑有可跑的离线基准，不完全靠 README 口号。
+  innovation: 最值得复用的不是“论文 prompt”，而是几个工程边界：状态账本、写入围栏、确定性 reducer、显式未知。 Material
+    Passport Scoped Write Guard Narrowed False Reducer Gold Set + Lift Gate
+    Prose Contract
+  weakness: 主要风险不是 Python 依赖，而是运行时和平台边界。离开 Claude Code，很多能力会退化成普通文档。
+  transfer: 最值得复用的不是“论文 prompt”，而是几个工程边界：状态账本、写入围栏、确定性 reducer、显式未知。 Material
+    Passport Scoped Write Guard Narrowed False Reducer Gold Set + Lift Gate
+    Prose Contract
+self_evo_use: 记忆：把 academic-research-skills — 深度拆解
+  的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 agent_framework 的判断，不把 README
+  自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: 给 Claude Code 用的学术研究工作流套件：把找文献、写论文、审稿、修订、终稿检查拆成可路由的 skills、slash
+      commands、hooks 和校验脚本。 人话：它不是一个可 pip install 的研究模型，而是一套…
+  - name: 机制链路
+    role: primary
+    evidence: 真实例子：`academic-pipeline/examples/full_pipeline_example.md`
+      里，用户从“台湾私校少子化招生策略”开始，orchestrator 识别从 Stage 1 进入，推荐 `deep-re…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最值得复用的不是“论文 prompt”，而是几个工程边界：状态账本、写入围栏、确定性 reducer、显式未知。 Material
+      Passport Scoped Write Guard Narrowed False Reducer Go…
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险不是 Python 依赖，而是运行时和平台边界。离开 Claude Code，很多能力会退化成普通文档。
+  - name: 证据账本
+    role: mentioned
+    evidence: 可通过 Claude Code plugin 安装，并提供 `/ars-*` 命令入口。
+discovery_trace: 数据不足
+edges: []
+status: extracted

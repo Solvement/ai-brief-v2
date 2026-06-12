@@ -1,45 +1,43 @@
-# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
-# 不编造，未知标「数据不足」，自报数字标「自报/受控」。源：brief-wiki/deep-dives/rohitg00-agentmemory-deep-dive.md
 node_id: content/rohitg00-agentmemory
 slug: rohitg00-agentmemory
 kind: project
-title: "agentmemory — 给编程代理装一层会自动采集的本地记忆服务器"
-source: "repo github.com/rohitg00/agentmemory (TypeScript, Apache-2.0, v0.9.27)"
-
+title: agentmemory — 给编程代理装一层会自动采集的本地记忆服务器
+source: repo github.com/rohitg00/agentmemory (TypeScript, Apache-2.0, v0.9.27)
 facets:
-  problem_solved: >    # Y
-    编程代理（Claude Code/Codex/Cursor）每开一个新会话就失忆——你得反复重讲项目偏好、上次为什么改某段代码；
-    单写一个 MEMORY.md 文件又存不下几百条观察、也没法跨 agent/跨会话检索。
-
-  method: >            # X：大白话 + 例子
-    像给团队装一个"自动记账的秘书"：不靠人手动 add，而是挂在代理生命周期的 hook 上自动采集。
-    每次代理用工具（PostToolUse）、提交 prompt、结束会话，hook 都把这件事转成一条统一的"观察"（HookPayload：sessionId/hookType/timestamp/project/cwd），
-    先脱敏去重、写进本地 KV、再写检索流。要回忆时走三路混合检索：BM25 关键词 + 向量语义 + 实体图谱，
-    再用 RRF（倒数排名融合，常数 60）把三路结果合并排序，按会话最多取 3 条多样化返回。
-    对外同时开三个面：CLI、REST（128 个 trigger）、MCP（53 个 memory_* 工具，可用 AGENTMEMORY_TOOLS=core 收成精简面）。
-
-  result: >            # Z：proven_case + 真实数字（标自报/受控）
-    [自报·未独立复现] LongMemEval-S（500 题）BM25+Vector 检索 R@5 95.2%、R@10 98.6%、MRR 88.2%（无 LLM in loop，embedding all-MiniLM-L6-v2）；
-    [自报·受控] 内部 coding-agent-life-v1（15 fictional sessions / 15 queries）hybrid Hit rate 15/15、P@5 0.240（受 gold-sparse 数学上限封顶）、p50 延迟 14ms。
-    工程面已核实（读源码）：hook 链路、53 MCP 工具、128 REST trigger、三路混合检索 RRF 都在代码里数得到。
-
-  innovation: >        # 创新
-    赛道里多数记忆产品（mem0/Letta）靠手动 add() 或当 full agent runtime；
-    agentmemory 的差异是"hook 自动采集 + 进度式工具面 + 优雅降级混合检索"——
-    没有 embedding provider 时自动跳过向量腿、退到 BM25+Graph，不会因为 embedding API 挂了就整个失忆。
-
-  weakness: >          # 缺点/边界/坑
-    成熟度扣分在文档漂移与未复现：README 说无 key 也有 local embeddings，但源码 detectEmbeddingProvider() 默认返回 null（需显式 EMBEDDING_PROVIDER=local）；
-    .env.example 写 core7/all51 与源码 53/8 不一致；benchmark 命令与 package.json scripts 对不上；"1423+ tests"是自称。
-    强绑 iii-engine（pin 0.11.2，升级未适配）、Node>=20、特定客户端 hook 名；Windows 原生路径需 WSL2，connect 不支持原生 Win。本次未实跑 npm install/test。
-
-  transfer: >          # 能迁移到什么 / 研究·自进化
-    最该抄的是几个明确工程接口，不是"记忆"这个词：① Hook-to-observation 管道（把任意 agent 生命周期事件统一成可审计、可检索的观察）；
-    ② 进度式 MCP 工具面（core/all 分层，治"工具太多导致模型错用"）；③ 混合检索优雅降级（向量挂了也能回忆）；④ agent scope 隔离（多代理共享记忆时 fail-closed）。
-    对 AI-Brief 自进化 agent：这是记忆控制器的"固定式"参考基线——能直接复用接口骨架，但它本身是写死的 hook 规则，不会自己学。
-
-  architecture: |
+  problem_solved: >
+    编程代理（Claude Code/Codex/Cursor）每开一个新会话就失忆——你得反复重讲项目偏好、上次为什么改某段代码； 单写一个
+    MEMORY.md 文件又存不下几百条观察、也没法跨 agent/跨会话检索。
+  method: >
+    像给团队装一个"自动记账的秘书"：不靠人手动 add，而是挂在代理生命周期的 hook 上自动采集。 每次代理用工具（PostToolUse）、提交
+    prompt、结束会话，hook
+    都把这件事转成一条统一的"观察"（HookPayload：sessionId/hookType/timestamp/project/cwd），
+    先脱敏去重、写进本地 KV、再写检索流。要回忆时走三路混合检索：BM25 关键词 + 向量语义 + 实体图谱， 再用 RRF（倒数排名融合，常数
+    60）把三路结果合并排序，按会话最多取 3 条多样化返回。 对外同时开三个面：CLI、REST（128 个 trigger）、MCP（53 个
+    memory_* 工具，可用 AGENTMEMORY_TOOLS=core 收成精简面）。
+  result: >
+    [自报·未独立复现] LongMemEval-S（500 题）BM25+Vector 检索 R@5 95.2%、R@10 98.6%、MRR
+    88.2%（无 LLM in loop，embedding all-MiniLM-L6-v2）； [自报·受控] 内部
+    coding-agent-life-v1（15 fictional sessions / 15 queries）hybrid Hit rate
+    15/15、P@5 0.240（受 gold-sparse 数学上限封顶）、p50 延迟 14ms。 工程面已核实（读源码）：hook 链路、53
+    MCP 工具、128 REST trigger、三路混合检索 RRF 都在代码里数得到。
+  innovation: >
+    赛道里多数记忆产品（mem0/Letta）靠手动 add() 或当 full agent runtime； agentmemory 的差异是"hook
+    自动采集 + 进度式工具面 + 优雅降级混合检索"—— 没有 embedding provider 时自动跳过向量腿、退到
+    BM25+Graph，不会因为 embedding API 挂了就整个失忆。
+  weakness: >
+    成熟度扣分在文档漂移与未复现：README 说无 key 也有 local embeddings，但源码
+    detectEmbeddingProvider() 默认返回 null（需显式 EMBEDDING_PROVIDER=local）；
+    .env.example 写 core7/all51 与源码 53/8 不一致；benchmark 命令与 package.json scripts
+    对不上；"1423+ tests"是自称。 强绑 iii-engine（pin 0.11.2，升级未适配）、Node>=20、特定客户端 hook
+    名；Windows 原生路径需 WSL2，connect 不支持原生 Win。本次未实跑 npm install/test。
+  transfer: >
+    最该抄的是几个明确工程接口，不是"记忆"这个词：① Hook-to-observation 管道（把任意 agent
+    生命周期事件统一成可审计、可检索的观察）； ② 进度式 MCP 工具面（core/all 分层，治"工具太多导致模型错用"）；③
+    混合检索优雅降级（向量挂了也能回忆）；④ agent scope 隔离（多代理共享记忆时 fail-closed）。 对 AI-Brief 自进化
+    agent：这是记忆控制器的"固定式"参考基线——能直接复用接口骨架，但它本身是写死的 hook 规则，不会自己学。
+  architecture: >
     ```mermaid
+
     flowchart TD
       H[代理生命周期 hook<br/>PostToolUse/UserPromptSubmit/Stop/SessionEnd] -->|HookPayload| O[mem::observe]
       O -->|脱敏去重| KV[(本地 iii KV)]
@@ -57,22 +55,24 @@ facets:
         CLI[CLI]; REST[REST 128 trigger]; MCP[MCP 53 工具]
       end
     ```
-
-self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
+self_evo_use: >
   记忆：能用（工程地基）——hook 自动采集 + 三路混合检索 + scope 隔离，接口现成，是跨会话持久记忆的扎实落地。
 
   理解：基本不提供——采集与检索都是规则式，不做抽象/归因；它解决「存取」，不解决「懂」。
 
-  自进化：部分能用但要降级看——hook 规则、检索权重、工具面都是人写死的"固定式"基线，系统不会从反馈改自己的记忆策略，所以不是真自进化；而是自进化 agent 可以站上去的地基。要做真自进化得在它之上加可学习的记忆控制器（见 agemem 的 RL 路线）。
-
+  自进化：部分能用但要降级看——hook 规则、检索权重、工具面都是人写死的"固定式"基线，系统不会从反馈改自己的记忆策略，所以不是真自进化；而是自进化
+  agent 可以站上去的地基。要做真自进化得在它之上加可学习的记忆控制器（见 agemem 的 RL 路线）。
 edges:
   - to: agemem
     type: improves_on
-    evidence: "agemem 用 RL 把 agentmemory 写死的 hook 记忆操作变成可学习的策略动作（agemem facet 已声明对侧 improves_on）；二者方向相反、互为对照"
+    evidence: agemem 用 RL 把 agentmemory 写死的 hook 记忆操作变成可学习的策略动作（agemem facet 已声明对侧
+      improves_on）；二者方向相反、互为对照
     confidence: high
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
   - to: memoryagentbench
     type: composes_with
-    evidence: "agentmemory 自带 LongMemEval/coding-life 评测 adapter；MemoryAgentBench 提供 AR/TTL/LRU/CR 四维协议，正可当 agentmemory 检索层的外部体检尺"
+    evidence: agentmemory 自带 LongMemEval/coding-life 评测 adapter；MemoryAgentBench 提供
+      AR/TTL/LRU/CR 四维协议，正可当 agentmemory 检索层的外部体检尺
     confidence: medium
-
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
 status: extracted

@@ -45,6 +45,8 @@ KG-2 / Mind Palace 入口（2026-06-10）：`npm run kg:build` = brief graph →
 
 KG-3 / relation engine（2026-06-11）：`scripts/kg/relation-engine.mjs` 统一 typed 边规则：`same_use_case` 映射到 taxonomy 内 `complements`，`references` / `same_track` / `shares_tag` / `shares_concept` 标为 `layer:"mechanical"` + `hidden:true`，typed 边自动补 `use` 动作。`build-brief-graph.mjs` 与 `integrate-kg.mjs` 都在写图前调用同一 normalization；deterministic CI 路径用 facet 明示证据 + lexical/shared-core candidate top-K，不调用 LLM。DONE 机检为 `node scripts/eval-relation-engine.mjs`。
 
+Projects remine（2026-06-12）：一次性数据重挖入口 `scripts/ops/remine-data.mjs`，用于按 `specs/2026-06-11-projects-remine.md` 机械清理 duplicate deep-dives、补 `meta.light_spine`、重写 `trending.light`、从 deep-dives / AutoSci primitives 生成缺失 Mind Palace facet YAML。KG-3 relation candidate 默认已放宽到 `topK=10` / `maxCandidates=300`；`integrate-kg.mjs` 可为无法解析的 project facet 创建轻量 project node。最终报告在 `logs/remine-summary.md`，进度在 `logs/remine-progress.md`。
+
 Mind Palace agent 使用层（2026-06-11）：复杂 agent / 记忆 / 预测 / 自进化 / 架构任务前先读 `docs/workflow/mind-palace-operating-contract.md`，再跑 `npm run kg:research -- "<问题>"`。实现落点是 `scripts/kg/research-loop.mjs`：hybrid(vector+BM25+RRF) 召回 → contest table → role coverage → gaps；**Synthesis/Evolution actions 由消费输出的 agent 产出，脚本不代写**（战略七层形态只在战略/预测类查询作为 hint 附带）。测试 `scripts/kg/research-loop.test.mjs`。它是 agent 自用的第二大脑入口，不是前端展示入口。
 
 Self-evolution Loop C（2026-06-11）：消费侧 scaffold 在 `scripts/kg/self-evo.mjs`，入口队列 `data/knowledge-graph/self-evo-queue.jsonl`，导出 `validateCandidate` / `judgeCandidate` / `applyCandidate`；红线与不确定候选写 `self-evo-review.jsonl`，非红线 stronger 候选必须过 `npm run verify`（dry-run 用确定性桩）后才写 `self-evo-applied.jsonl`。测试 `scripts/kg/self-evo.test.mjs`。

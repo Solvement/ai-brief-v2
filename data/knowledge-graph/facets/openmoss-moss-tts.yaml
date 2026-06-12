@@ -1,0 +1,78 @@
+schema: v2
+node_id: content/openmoss-moss-tts
+slug: openmoss-moss-tts
+kind: project
+title: MOSS-TTS — 深度拆解
+source: public/data/brief/deep-dives.json:openmoss-moss-tts-deep-dive
+facets:
+  problem_solved: MOSS-TTS 是一个开源语音/声音生成模型家族仓库，把长文本 TTS、音色克隆、实时流式
+    TTS、多人对话语音、音效生成和本地/边缘推理放在同一个工程里。 人话：它不是单个 TTS
+    demo，而是一组围绕“文本或提示词进来、音频出来”的模型、推理后端、微调脚本和 Gradio/CLI 示例。README 的 Released
+    Models 表列出 MOSS-TTS-v1.5、MOSS-TTS
+    1.0、MOSS-TTS-Local-Transformer、MOSS-TTSD-V1.0、MOSS-VoiceGenerator、MOSS-SoundEffect、MOSS-SoundEffect-v2.0、MOSS-TTS-Realtime，并标注
+    8B、1.7B、1.3B DiT 等规模；仓库当前浅 clone HEAD 为
+    c4dff47d9adbf80c30484102c518bf11a5c18fa1。术语：TTS 是 text-to-speech；模型家族指同一套音频
+    tokenizer/自回归或扩散生成思路下的多个任务模型；这里的“可用”指仓库给出了代码、配置和下载命令，不等于我已下载权重并跑通音频。（来源：README
+    Released Models；来源：git rev-parse HEAD）
+  method: 人话：以 README 的 MOSS-TTS-v1.5 例子为真实流程：先建 Python 3.12 环境并安装 `pip install
+    --extra-index-url https://download.pytorch.org/whl/cu128 -e
+    ".[torch-runtime]"`；代码选择 `device = "cuda" if torch.cuda.is_available() else
+    "cpu"`，CUDA 上用 `torch.bfloat16`，并通过 `resolve_attn_implementation()` 在
+    FlashAttention 2、SDPA、eager 之间选后端。接着
+    `AutoProcessor.from_pretrained("OpenMOSS-Team/MOSS-TTS-v1.5",
+    trust_remote_code=True)` 加载 processor，把 `processor.audio_tokenizer` 移到
+    device；输入不是裸字符串，而是消息：例如法语 `processor.build_user_message(text=text_7,
+    language="French")`，克隆声音 `processor.build_user_message(text=text_1,
+    reference=[ref_audio_1])`，控时长 `processor.build_user_message(text=text_2,
+    tokens=325)`，显式停顿 `我今天学习了一首中国的古诗，它的名字是[pause 3.2s]静夜思！`。这些 conversation 送进
+    `processor(batch_conversations, mode="generation")` 变成 `input_ids` 和
+    `attention_mask`，再由 `model.generate(..., max_new_tokens=4096)`
+    生成；`processor.decode(outputs)` 得到 `m…
+  result: 人话：下面把“仓库确实写了什么/代码确实做了什么”和“作者声称模型效果如何”分开。术语：已核实是我在
+    README、代码、配置或包文件里看到的机制；自称是 README/model card 的能力、榜单或性能说法，未独立复现实验。 作者说 v1.5
+    覆盖 31 种语言，README 还列出了
+    zh、yue、en、ar、cs、da、nl、fi、fr、de、el、he、hi、hu、it、ja、ko、mk、ms、fa、pl、pt、ro、ru、es、sw、sv、tl、th、tr、vi。
+    README 示例构造 `conversations`，其中包括 `processor.build_user_message(text=text_7,
+    language="French")`、`reference=[ref_audio_1]`、`tokens=325`、`tokens=600` 和含
+    `[pause 3.2s]` 的 `text_8`，再统一送进 `processor(..., mode="generation")` 和
+    `model.generate(...)`。 架构文档写明 `Prediction Heads` 为 `33 LM Heads (1 Main + 32
+    RVQ Heads)`，`Codebooks` 为 `32 RVQ layers`；代码中 `DelayState`、`delay_step(...)`
+    返回形状为 `(33,)` 的 `[text_token, audio_0, ..., audio_31]`。
+    `moss_tts_delay/llama_cpp/pipeline.py` 把 Tokenizer、NumPy embedding
+    lookup、llama.cpp backbone、NumPy/Torch LM heads、delay state、ONNX/TRT/Torch
+    audio tokenizer 串起来；`pyproject.toml` 注册脚本 `moss-tts-llama-cpp =
+    "moss_tts_delay.llam…
+  innovation: 人话：这个仓库最可复用的不是某个 UI，而是几类“把音频当 token
+    系统做工程”的模式。术语：抽象指可以迁移到其他语音模型或多模态系统的接口/配置/训练组织方式。 消息式 TTS 输入 Delay-pattern
+    multi-codebook 生成 安装画像拆分 低显存 staged loading 流式文本到流式音频 session
+  weakness: 人话：这个项目的风险主要不在 Python 语法，而在模型权重、CUDA 栈、远程代码和子模块。术语：exposure
+    表示如果该依赖变动，对运行/集成的影响面。
+  transfer: 人话：这个仓库最可复用的不是某个 UI，而是几类“把音频当 token
+    系统做工程”的模式。术语：抽象指可以迁移到其他语音模型或多模态系统的接口/配置/训练组织方式。 消息式 TTS 输入 Delay-pattern
+    multi-codebook 生成 安装画像拆分 低显存 staged loading 流式文本到流式音频 session
+self_evo_use: 记忆：把 MOSS-TTS — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 model_infra
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: MOSS-TTS 是一个开源语音/声音生成模型家族仓库，把长文本 TTS、音色克隆、实时流式
+      TTS、多人对话语音、音效生成和本地/边缘推理放在同一个工程里。 人话：它不是单个 TTS demo，而是一组围绕“文本或提示词进来、音频出来”…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：以 README 的 MOSS-TTS-v1.5 例子为真实流程：先建 Python 3.12 环境并安装 `pip install
+      --extra-index-url https://download.pytorch.org/wh…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：这个仓库最可复用的不是某个 UI，而是几类“把音频当 token
+      系统做工程”的模式。术语：抽象指可以迁移到其他语音模型或多模态系统的接口/配置/训练组织方式。 消息式 TTS 输入 Delay-pattern
+      multi-code…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：这个项目的风险主要不在 Python 语法，而在模型权重、CUDA 栈、远程代码和子模块。术语：exposure
+      表示如果该依赖变动，对运行/集成的影响面。
+  - name: 证据账本
+    role: mentioned
+    evidence: MOSS-TTS-v1.5 支持 31 languages，并保留 MOSS-TTS 1.0 的 20 languages。
+discovery_trace: 数据不足
+edges: []
+status: extracted

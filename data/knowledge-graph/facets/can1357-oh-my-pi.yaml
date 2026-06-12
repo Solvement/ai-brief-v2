@@ -1,0 +1,72 @@
+schema: v2
+node_id: content/can1357-oh-my-pi
+slug: can1357-oh-my-pi
+kind: project
+title: oh-my-pi — 深度拆解
+source: public/data/brief/deep-dives.json:can1357-oh-my-pi-deep-dive
+facets:
+  problem_solved: "oh-my-pi 是一个 Bun/TypeScript 终端编码代理，把读文件、hashline
+    编辑、LSP、DAP、浏览器、MCP、子代理、记忆和本地 Rust native 工具打包成同一个 `omp` CLI/SDK。
+    人话：它不是只包一层聊天模型，而是把“模型如何看代码、改代码、运行代码、分派任务、接入外部工具”做成一套完整终端工作台；安装入口包括 `curl
+    -fsSL https://omp.sh/install | sh`、`bun install -g
+    @oh-my-pi/pi-coding-agent`、Windows PowerShell `irm
+    https://omp.sh/install.ps1 | iex`，CLI 包的 `bin` 是 `omp: src/cli.ts`。术语：仓库是
+    Bun monorepo，根 `package.json` 使用 `packageManager: bun@1.3.14` 和 `workspaces:
+    packages/*`，`packages/coding-agent/package.json` 暴露 CLI/SDK，Rust workspace 由
+    `crates/pi-natives`、`pi-shell`、`pi-ast`、`pi-iso` 等组成，版本为
+    `15.10.4`。（来源：README Install；package.json
+    workspaces；packages/coding-agent/package.json bin；Cargo.toml workspace）"
+  method: '人话：一个真实 flow 可以这样走：用户运行 `omp -p "List all .ts files in
+    src/"`，`packages/coding-agent/src/cli.ts` 会把非子命令 argv 改写为
+    `launch`，`packages/coding-agent/src/commands/launch.ts` 定义
+    `-p/--print`、`--model`、`--tools`、`--no-lsp`、`--approval-mode` 等参数，然后
+    `runRootCommand` 创建 agent session。session 创建后，`createTools()` 默认注册
+    `read,bash,edit` 等工具；当模型需要看文件，`read` 对本地文本输出 `¶src/foo.ts#0A1B` 加 `41:def
+    alpha():` 这种 hashline header/行号，并把读取内容写入 `session.fileReadCache`。模型编辑时调用
+    `edit`，输入像 `¶a.ts#0A3B replace 1..1: +const X = "b";`；`edit` 通过 snapshot tag
+    验证 live file 是否仍匹配，失败时走 snapshot recovery 或返回 mismatch。结构性替换则走 `ast_edit`：输入
+    `ops: [{ pat, out }], paths: [...]`，先 dry-run 预览，真正落盘必须后续
+    `resolve(action:"apply")`。如果任务很大，`task` 会按 `task.maxConcurrency` 分派子代理，子代理输出
+    `<id>.md`，父代理再读 `agent://<id>` 汇总。术语：这条链路包含 CLI routing、session
+    discovery、tool registry、read snapshot store、hashline patcher、resolve preview
+    queue、subagent…'
+  result: 人话：下面把 README 的营销句和仓库里能验的机制分开。术语：`自称` 只代表 README/文档声称；`已核实` 代表在源码、配置或
+    docs 里找到对应机制。 作者说盒子里有 32 个工具，但实际代码注册表显示 29 个公开内置工具和 5 个隐藏工具；这说明 README
+    的统计口径未在代码里直接等同为一个 32 项数组。 模型不是靠全文 diff 猜位置，而是先从 `read` 得到文件 tag，再用 `replace
+    1..1:`、`insert after 5:`、`delete 4..5` 这类行操作提交补丁。 代理看到的不是裸 `cat`
+    输出，而是带选择器、截断、摘要、hashline header、内部协议解析的读取层。 它把 IDE 语言服务器能力暴露给模型，例如 rename
+    文件前先发 `workspace/willRenameFiles`，应用后发 `workspace/didRenameFiles`。
+    一个大任务可以分给多个 worker；每个 worker 的完整输出写成 artifact，父代理用统一 `read agent://...` 读取。
+    搜索不是写死一个供应商；`auto` 会按固定顺序找已配置 provider，先成功先返回。 如果模型开始写团队禁止的模式，规则可以在 token
+    流中截停，而不是等整段错误输出结束。 不只能用 TUI；可以把代理嵌到自己的程序，订阅流事件，限制工具集，用内存 session。
+  innovation: 人话：可复用的不是某个 UI，而是几套把 LLM 失误面缩小的协议。术语：下面只列仓库里能看到的抽象。 Hashline
+    anchored edits Preview-first structural rewrite Internal URL filesystem TTSR
+    stream interruption Subagent artifact protocol
+  weakness: 人话：风险主要来自运行时、外部模型/搜索服务、native 二进制、语言服务器和本地权限边界。术语：下面按依赖面列。
+  transfer: 人话：可复用的不是某个 UI，而是几套把 LLM 失误面缩小的协议。术语：下面只列仓库里能看到的抽象。 Hashline anchored
+    edits Preview-first structural rewrite Internal URL filesystem TTSR stream
+    interruption Subagent artifact protocol
+self_evo_use: 记忆：把 oh-my-pi — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: oh-my-pi 是一个 Bun/TypeScript 终端编码代理，把读文件、hashline
+      编辑、LSP、DAP、浏览器、MCP、子代理、记忆和本地 Rust native 工具打包成同一个 `omp` CLI/SDK。 人话：它不…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：一个真实 flow 可以这样走：用户运行 `omp -p "List all .ts files in
+      src/"`，`packages/coding-agent/src/cli.ts` 会把非子命令 argv 改写为 `launc…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：可复用的不是某个 UI，而是几套把 LLM 失误面缩小的协议。术语：下面只列仓库里能看到的抽象。 Hashline anchored
+      edits Preview-first structural rewrite Internal U…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：风险主要来自运行时、外部模型/搜索服务、native 二进制、语言服务器和本地权限边界。术语：下面按依赖面列。
+  - name: 证据账本
+    role: mentioned
+    evidence: README 自称 `32 built-in tools`。
+discovery_trace: 数据不足
+edges: []
+status: extracted

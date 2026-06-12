@@ -1,0 +1,56 @@
+schema: v2
+node_id: paper:2606.09669
+slug: 2606.09669-spatialworld-interactive-spatial-benchmark
+kind: paper
+title: "SpatialWorld: Benchmarking Interactive Spatial Reasoning of Multimodal
+  Agents in Real-World Tasks"
+arxiv_id: "2606.09669"
+source: content/papers/2606.09669-spatialworld-interactive-spatial-benchmark +
+  data/autosci/primitives/2606.09669.yaml
+facets:
+  problem_solved: evaluate-closed-loop-agent-capability-across-heterogeneous-environments
+  method: 用严格 I/O 瓶颈评跨环境 agent：把异构后端统一成第一人称视觉观察 + 高层文本动作， 由 action-to-code adapter
+    翻译到各自 simulator；任务成败不比轨迹，而由 task-specific terminal-state verifier
+    查最终世界状态；质量线用 TSR，代价线用 SE=人类参考步数/agent 实际步数
+    且只在成功集计算；每个任务至少有人工校验初始状态、人类参考轨迹、终态 verifier 三件套； 最后按场景/复杂度/后端切片找能力断崖，而非只看总分
+    leaderboard。
+  result: 对 KG-2 判边做两个 probe：1) SE 指标，每条正确边/NO_EDGE 消耗多少候选检查与证据读取； 2)
+    抽象对照组，把概念名替换成无语义代号后重跑判边，若准确率大幅下降，说明系统依赖词面而非证据结构。 这等价于 SpatialWorld 用 3D
+    Games 剥离写实语义捷径。
+  innovation: 先把后端差异压进统一 I/O 契约，再比较 agent；否则分数混入接口适配、传感器特权和后端私货，无法归因。；开放式 agent
+    可以有多条合理路径；判分器应查最终 state/artifact 是否满足条件，而不是轨迹是否像参考答案。；TSR 回答做成了吗，SE
+    回答成功时是不是绕路；两者分开报，避免把穷举试错伪装成能力。；合格任务不是一段 instruction，而是初始状态 + 参考轨迹/预算基线 + 终态
+    verifier；参考轨迹不用于路径匹配，只用于可行性和效率分母。；写实场景会混入常识捷径；需要抽象 probe
+    剥离语义，单测几何/状态/结构推理。；真正有用的是能力断崖：Navigation-Interaction 4.2% mean
+    TSR、Multi-ProcTHOR 最好 5.9%，比总排名更能指导下一步修哪。
+  weakness: sim_only；high_level_actions_only；thin_fine_grained_cells；se_success_set_bias；interface_prompt_sensitivity；no_inter_annotator_agreement_reported；expensive_full_regression
+  transfer: 把 AI-Brief 的多栏目/多工具质量门改造成 SpatialWorld 式协议：统一输入 artifact+source， 统一动作
+    Search/Read/Extract/Write/Verify/Stop，各栏目用 adapter 调本地脚本或工具； 终态 verifier 用
+    lint/validate/source-grounded checks，不看生成过程像不像；同时报告成功率、
+    token/返工轮数/证据检查数，并按任务类型切片找断崖。先在 20 个深读冷审任务和 20 个 KG 判边任务上做小样。
+self_evo_use: "记忆：保留 SpatialWorld: Benchmarking Interactive Spatial Reasoning of
+  Multimodal Agents in Real-World Tasks 的问题、方法、概念和证据边界。理解：用它补齐
+  evaluate-closed-loop-agent-capability-across-heterogeneous-environments
+  的方法坐标。自进化：把 AI-Brief 的多栏目/多工具质量门改造成 SpatialWorld 式协议：统一输入 artifact+source，
+  统一动作 Search/Read/Extract/Write/Verify/Stop，各栏目用 adapter 调本地脚本或工具； 终态 verifier
+  用 lint/validate/source-grounded checks，不看生成过程像不像；同时报告成功率、
+  token/返工轮数/证据检查数，并按任务类型切片找断崖。先在 20 个深读冷审任务和 20 个 KG 判边任务上做小样。"
+core_concepts:
+  - name: 交互式空间推理（interactive spatial reasoning）
+    role: primary
+    evidence: interactive spatial understanding
+  - name: 统一跨平台接口（unified cross-platform interface）
+    role: primary
+    evidence: shared, simulator-agnostic protocol
+  - name: 终态验证（terminal-state verification）
+    role: primary
+    evidence: terminal-state verification
+  - name: 视觉单一部分可观测（vision-only partial observability）
+    role: supporting
+    evidence: vision-only partial observability
+  - name: 步效率（step efficiency）
+    role: supporting
+    evidence: Step Efficiency
+discovery_trace: 数据不足
+edges: []
+status: extracted

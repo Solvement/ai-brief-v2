@@ -111,7 +111,29 @@ async function readPaperMetadata(dir) {
 async function ensurePaperFacetNode(facet) {
   const existing = resolveFacetNode(facet);
   if (existing) return existing;
-  if (facet?.kind !== "paper") return null;
+  if (facet?.kind !== "paper") {
+    if (facet?.kind !== "project") return null;
+    const slug = facet.slug || slugOf(facet.node_id);
+    const id = facet.node_id || `content/${slug}`;
+    if (!slug || byId.has(id)) return byId.get(id) || null;
+    const node = {
+      id,
+      type: "project",
+      kind: "project",
+      family: "project",
+      slug,
+      title: facet.title || slug,
+      tags: [],
+      file: facet.source || undefined,
+      href: `/brief/${encodeURIComponent(slug)}`,
+      source: facet.source || undefined,
+      kg_integrated: true,
+      ghost: false,
+    };
+    nodes.push(node);
+    registerNode(node);
+    return node;
+  }
 
   const paperDir = paperDirFromSource(facet.source) || (facet.slug && bySlug.has(facet.slug) ? facet.slug : "");
   const metadata = await readPaperMetadata(paperDir);
@@ -264,8 +286,8 @@ for (const edge of relationEngineEdges) {
 if (process.env.KG_RELATION_LLM === "1") {
   const llmModel = process.env.KG_RELATION_MODEL || "claude-sonnet-4-6";
   const llmProvider = process.env.KG_RELATION_PROVIDER || undefined;
-  const llmTopK = Number(process.env.KG_RELATION_TOPK) || 5;
-  const llmMaxCandidates = Number(process.env.KG_RELATION_MAX_CANDIDATES) || 80;
+  const llmTopK = Number(process.env.KG_RELATION_TOPK) || 10;
+  const llmMaxCandidates = Number(process.env.KG_RELATION_MAX_CANDIDATES) || 300;
   const llmTimeoutMs = Number(process.env.KG_RELATION_TIMEOUT_MS) || undefined;
   // Preferred path: replay precomputed decisions from a strong model (codex
   // gpt-5.5, separate quota) via a file judge — zero model calls at build time,

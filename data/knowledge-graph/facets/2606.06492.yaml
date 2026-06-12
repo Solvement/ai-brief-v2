@@ -1,0 +1,59 @@
+schema: v2
+node_id: paper:2606.06492
+slug: 2606.06492-code2lora-hypernetwork-repo-adapters
+kind: paper
+title: "Code2LoRA: Hypernetwork-Generated Adapters for Code Language Models
+  under Software Evolution"
+arxiv_id: "2606.06492"
+source: content/papers/2606.06492-code2lora-hypernetwork-repo-adapters +
+  data/autosci/primitives/2606.06492.yaml
+facets:
+  problem_solved: repository-aware-code-agent-needs-low-token-overhead-and-versioned-memory
+  method: "把 repository context 从 per-query retrieved tokens 改造成 versioned
+    parameter memory: 先用 frozen code embedder 把 non-test source snapshot 压成 repo
+    embedding,再用 hypernetwork 生成 repo-specific LoRA adapter;对活跃仓库,用 initial repo
+    embedding 初始化 GRU state, 再按 chronological commit diffs 更新 hidden state,从当前
+    state 生成 commit-indexed LoRA。 关键不是“LoRA 本身”,而是 repo_id + commit_sha 绑定的
+    adapter state,让仓库知识以可缓存、 可失效、可验证的参数先验参与 coding agent 推理。"
+  result: Mini RepoPeftBench:静态 track 用 last snapshot;演化 track 每个修改 assertion 的
+    commit 生成 prefix-target pair,每 commit cap <=8 tasks。比较 Static state vs
+    GRU/diff state, 看 temporal CR EM 是否因 diff state 提升。额外做 DRC coverage
+    分层:imports 可解析 vs 不可解析, 检查 RAG/DRC 是否只在 coverage 子集有效。
+  innovation: 长期 repo conventions 适合进入 adapter 参数;局部证据仍可由 RAG 查,但不要每次把整个仓库当 token
+    塞进 prompt。；repo adapter 必须绑定 repo_id + commit_sha + embedding_hash;否则只是把
+    stale context 换成 stale parameters。；稳定 snapshot knowledge 与 commit diff
+    knowledge 分开建模;活跃软件系统需要 incremental refresh policy。；生成的 LoRA 提供
+    repo-specific prior,不证明输出正确;必须接 execution/static-analysis/license
+    verifier。；报告 EM/EditSim/CodeBLEU 之外,必须同时报告 extra tokens、latency、adapter
+    storage、训练/刷新成本。
+  weakness: source_repo_unavailable_for_audit；hf_artifacts_unavailable_for_audit；narrow_python_assertion_completion_scope；exact_match_misses_functional_equivalence；hypernetwork_parameter_count_large；stale_adapter_without_commit_versioning；private_repo_attribution_and_license_risk；adapter_prior_can_emit_insecure_or_wrong_code
+  transfer: "不先复现论文约 720M/745M 参数 hypernetwork。先做小型版本: 从 20-50 个 permissively
+    licensed Python repos 抽 pytest/unittest assertion completion, 建
+    CR/IR/temporal split。实现 A=RAG@k,B=dependency-resolved context,C=shared LoRA,
+    D=repo-conditioned lightweight adapter/router。repo state 绑定
+    repo_id+commit_sha, 每个 commit 更新 diff embedding cache。输出后跑
+    pytest/ruff/mypy,记录 EM、execution pass、 latency、extra tokens、adapter storage
+    与 stale-after-commit 下降。"
+self_evo_use: "记忆：保留 Code2LoRA: Hypernetwork-Generated Adapters for Code
+  Language Models under Software Evolution 的问题、方法、概念和证据边界。理解：用它补齐
+  repository-aware-code-agent-needs-low-token-overhead-and-versioned-memory
+  的方法坐标。自进化：不先复现论文约 720M/745M 参数 hypernetwork。先做小型版本: 从 20-50 个 permissively
+  licensed Python repos 抽 pytest/unittest assertion completion, 建 CR/IR/temporal
+  split。实现 A=RAG@k,B=dependency-resolved context,C=shared LoRA,
+  D=repo-conditioned lightweight adapter/router。repo state 绑定
+  repo_id+commit_sha, 每个 commit 更新 diff embedding cache。输出后跑 pytest/ruff/mypy,记录
+  EM、execution pass、 latency、extra tokens、adapter storage 与 stale-after-commit
+  下降。"
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: repository-aware-code-agent-needs-low-token-overhead-and-versioned-memory
+  - name: 方法原语
+    role: supporting
+    evidence: repository-aware-code-agent-needs-low-token-overhead-and-versioned-memory
+  - name: 迁移边界
+    role: supporting
+    evidence: repository-aware-code-agent-needs-low-token-overhead-and-versioned-memory
+discovery_trace: 数据不足
+edges: []
+status: extracted

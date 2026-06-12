@@ -1,0 +1,46 @@
+schema: v2
+node_id: content/ecc
+slug: ecc
+kind: project
+title: ECC — 深度拆解
+source: public/data/brief/deep-dives.json:ecc-deep-dive
+facets:
+  problem_solved: ECC — 深度拆解 的核心判断：将 AI
+    编程助手从一次性工具升级为具备记忆、安全审查、自我进化的智能体操作系统的完整实施方案。 本条由旧深读聚合内容重整为 RuView
+    light_spine；证据边界来自 README.md（包含简介、版本日志、安装指引）；项目目录树（agents/, skills/, hooks/,
+    src/, tests/ 等）；artifactAudit 数据（stars, forks, license, 文件标志）；package.json /
+    pyproject.toml 存在性；CI 与文档标志。没有源码级证据的地方保留“数据不足”。
+  method: 将 AI 编程助手从一次性工具升级为具备记忆、安全审查、自我进化的智能体操作系统的完整实施方案。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。 该项目在 GitHub 上获得了超过 18.2
+    万颗星 一套配置可以同时在这些 AI 编程助手中使用 仓库提供了 63 个专用智能体和 249 个可复用技能 项目有 997
+    个以上的内部测试用例全部通过 系统能从使用过程中自动总结有用模式，并创建新的技能
+  innovation: 可复用其钩子架构、技能目录组织和记忆持久化策略，但需剥离与具体助手绑定的部分，并重新实现底层通信。安全扫描组件
+    (AgentShield) 可作为独立模块迁移。 clone-and-run read-docs write-deepdive
+  weakness: 声称的兼容性可能仅在特定版本的部分助手上完成浅度测试，边界情况未覆盖；大批量技能的可能仅在特定场景下可用，通用性存疑；自学习和记忆持久化的具体机制未在
+    README 中详述，可能仅为概念演示
+  transfer: 可复用其钩子架构、技能目录组织和记忆持久化策略，但需剥离与具体助手绑定的部分，并重新实现底层通信。安全扫描组件 (AgentShield)
+    可作为独立模块迁移。 clone-and-run read-docs write-deepdive
+self_evo_use: 记忆：把 ECC — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 agent_framework
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: ECC — 深度拆解 的核心判断：将 AI 编程助手从一次性工具升级为具备记忆、安全审查、自我进化的智能体操作系统的完整实施方案。
+      本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自 README.md（包含简…
+  - name: 机制链路
+    role: primary
+    evidence: 将 AI 编程助手从一次性工具升级为具备记忆、安全审查、自我进化的智能体操作系统的完整实施方案。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用其钩子架构、技能目录组织和记忆持久化策略，但需剥离与具体助手绑定的部分，并重新实现底层通信。安全扫描组件 (AgentShield)
+      可作为独立模块迁移。 clone-and-run read-docs write-deepdive
+  - name: 风险边界
+    role: supporting
+    evidence: 声称的兼容性可能仅在特定版本的部分助手上完成浅度测试，边界情况未覆盖；大批量技能的可能仅在特定场景下可用，通用性存疑；自学习和记忆持久化的具体机制未在
+      README 中详述，可能仅为概念演示
+  - name: 证据账本
+    role: mentioned
+    evidence: 182K+ stars
+discovery_trace: 数据不足
+edges: []
+status: extracted

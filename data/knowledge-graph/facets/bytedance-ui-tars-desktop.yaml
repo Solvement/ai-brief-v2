@@ -1,0 +1,65 @@
+schema: v2
+node_id: content/bytedance-ui-tars-desktop
+slug: bytedance-ui-tars-desktop
+kind: project
+title: UI-TARS-desktop — 深度拆解
+source: public/data/brief/deep-dives.json:bytedance-ui-tars-desktop-deep-dive
+facets:
+  problem_solved: UI-TARS-desktop 是一个把桌面/浏览器截图、视觉语言模型、动作解析器和本机/MCP 工具执行串成闭环的多模态
+    Agent monorepo。 人话：它不是单一桌面壳，而是一套从“用户说一句话”到“截图、问模型、解析
+    Action、点击/输入/滚动”的工程栈；同仓库还包含 Agent TARS/Tarko 的 MCP Agent 框架、CLI、AIO Sandbox
+    接入与浏览器/文件系统/命令工具编排。技术上：已核实 monorepo 使用 pnpm workspace，包含
+    `apps/ui-tars`、`packages/ui-tars/*`、`packages/agent-infra/*`、`multimodal/agent-tars/*`、`multimodal/tarko/*`、`multimodal/gui-agent/*`；根
+    `package.json` 要求 `node >=20.x`，`@agent-tars/cli` 要求 `node
+    >=22.15.0`（来源：pnpm-workspace.yaml packages；package.json
+    engines；multimodal/agent-tars/cli package.json engines）。
+  method: "人话：最小链路可以从 CLI 跑起来：`npx @ui-tars/cli start`（文档写法），CLI 先拿模型配置，再让你选
+    `nut-js` 或 `adb`，最后把自然语言任务交给
+    GUIAgent。技术上：`packages/ui-tars/cli/src/cli/start.ts` 会读
+    `~/.ui-tars-cli.json`；如果传 `--presets`，它 fetch YAML 并读取
+    `vlmApiKey`、`vlmBaseUrl`、`vlmModelName`、`useResponsesApi`；没有配置就用
+    `@clack/prompts` 询问 `baseURL/apiKey/model`，并写回 `~/.ui-tars-cli.json`。随后它选择
+    operator：`adb` 会 `getAndroidDeviceId()` 后 new `AdbOperator(deviceId)`，默认
+    `nut-js` 会 new `NutJSOperator()`；再 new `GUIAgent({ model: { baseURL, apiKey,
+    model, useResponsesApi }, operator, signal })`，执行 `await
+    guiAgent.run(answers.instruction)`（来源：packages/ui-tars/cli/src/cli/start.ts\
+    ）。 真实的一轮执行是：`GUIAgent.run()` 初始化 conversations，把用户 instruction 放入 human
+    message；每轮调用 `operator.screenshot()`，用 Jimp 读出 width/height/mime，把截图作为 human
+    `<image>` 放回 conversations；构造 `vlmParams`，包含 `screenContext: { width, height
+    }`、`scaleFactor`、`uiTarsVersion`、`previousRes…"
+  result: 以下把 README/文档的自称和代码树可验证事实分开。自称不等于实测性能；已核实只表示文件/源码存在并支持该机制。 仓库定位自己为多模态
+    Agent 栈，主线有 Agent TARS 和 UI-TARS Desktop 两块。 桌面应用不是内置一个可直接离线跑的模型；你要给它一个
+    OpenAI-compatible 的视觉模型服务。 用户指令不会直接变成鼠标动作，中间有截图、多模态模型响应和动作解析。
+    它能控制真实桌面鼠标键盘，但不是任意 OS API 自动化。 浏览器任务可以走 DOM 工具，也可以走截图视觉点击，或者混用。 它能把一个 MCP
+    server 挂成 HTTP 服务，客户端可走 `/sse` 或 `/mcp`。 它尝试避免 Agent 一次把整个仓库树塞进上下文，也把相对路径解析到
+    workspace。
+  innovation: 这些不是“照搬项目名”，而是可抽出的工程构件。 Operator 接口 Action grammar + parser MCP
+    transport adapter Browser control strategy 安全目录树替换 Preset 配置格式
+  weakness: 风险重点不是“能不能点鼠标”，而是模型、OS 权限、远程服务、MCP 工具边界和 telemetry/share 配置。
+  transfer: 这些不是“照搬项目名”，而是可抽出的工程构件。 Operator 接口 Action grammar + parser MCP
+    transport adapter Browser control strategy 安全目录树替换 Preset 配置格式
+self_evo_use: 记忆：把 UI-TARS-desktop — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: UI-TARS-desktop 是一个把桌面/浏览器截图、视觉语言模型、动作解析器和本机/MCP 工具执行串成闭环的多模态 Agent
+      monorepo。 人话：它不是单一桌面壳，而是一套从“用户说一句话”到“截图、问模型、解析 Acti…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：最小链路可以从 CLI 跑起来：`npx @ui-tars/cli start`（文档写法），CLI 先拿模型配置，再让你选
+      `nut-js` 或 `adb`，最后把自然语言任务交给 GUIAgent。技术上：`packages/u…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 这些不是“照搬项目名”，而是可抽出的工程构件。 Operator 接口 Action grammar + parser MCP
+      transport adapter Browser control strategy 安全目录树替换 Pres…
+  - name: 风险边界
+    role: supporting
+    evidence: 风险重点不是“能不能点鼠标”，而是模型、OS 权限、远程服务、MCP 工具边界和 telemetry/share 配置。
+  - name: 证据账本
+    role: mentioned
+    evidence: "“TARS is a Multimodal AI Agent stack, currently shipping two
+      projects: Agent TARS and UI-TARS-desktop”。"
+discovery_trace: 数据不足
+edges: []
+status: extracted

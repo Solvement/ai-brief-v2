@@ -1,0 +1,60 @@
+schema: v2
+node_id: content/panniantong-agent-reach
+slug: panniantong-agent-reach
+kind: project
+title: Agent-Reach — 深度拆解
+source: public/data/brief/deep-dives.json:panniantong-agent-reach-deep-dive
+facets:
+  problem_solved: Agent Reach 是给 AI Agent 装互联网工具箱的安装器和健康检查 CLI，不是把所有平台重新封装成一个 SDK。
+    人话：它帮你把 Twitter、Reddit、YouTube、B站、小红书、GitHub、RSS、Exa 搜索等上游工具装好、配好、写进 Agent
+    Skill，之后 Agent 直接调用这些工具。术语：这是 tool scaffolding，不是 agent
+    runtime；`pyproject.toml` 暴露的入口是 `agent-reach = agent_reach.cli:main`，核心类
+    `AgentReach` 只提供 `doctor()` 和 `doctor_report()`（来源：pyproject.toml
+    project.scripts；来源：agent_reach/core.py）。
+  method: 真实流：用户让 Agent 查 Reddit bug 讨论时，Skill 先路由到 social 文档；Agent 调 `rdt search`
+    找帖子，再用 `rdt read POST_ID` 读全文和评论；`agent-reach doctor` 只负责检查 `rdt status
+    --json` 是否已认证（来源：agent_reach/skill/references/social.md
+    Reddit；来源：agent_reach/channels/reddit.py）。 最小命令是两步： `rdt search "query"
+    --limit 10` `rdt read POST_ID` 第一行找帖子，第二行读正文和评论；如果未登录，代码提示写入
+    `~/.config/rdt-cli/credential.json` 或运行 `rdt
+    login`（来源：agent_reach/channels/reddit.py）。 同一模式也用于别的平台：YouTube 检测 `yt-dlp` 和
+    Node/Deno JS runtime，小红书检测 `xhs status`，抖音检测 `mcporter list douyin`，V2EX
+    直接请求公开 JSON
+    API（来源：agent_reach/channels/youtube.py；来源：agent_reach/channels/xiaohongshu.py；来源：agent_reach/channels/douyin.py；来源：agent_reach/channels/v2ex.py）。
+  result: 下面区分“项目自称”和“我从代码/配置核实到的事实”。README 里的星标数、免费、持续更新、平台数量等营销说法不直接当事实。 Agent
+    Reach 负责装工具、检查工具，读取和搜索动作仍由上游 CLI 或 MCP 直接完成。 这是一个可安装 Python 包，入口命令叫
+    `agent-reach`。 Skill 文案这么写，但代码注册表和 README 表格存在数量不一致。 Cookie 和 token
+    默认写到用户家目录的 Agent Reach 配置，而不是仓库目录。 搜索不是内置搜索引擎，而是把 `exa` 注册成 MCP 服务。 不是原样把
+    API 返回塞给模型，而是保留 id、title、desc、user、互动数、图片 URL、tags、comments 等字段。 我在指定
+    checkout 直接跑了测试，结果是 78 passed, 7 failed。
+  innovation: 最值得抄的是“把平台能力拆成 channel + health check + skill command
+    reference”，而不是抄具体平台抓取方式。 Channel 注册表 Doctor 优先于封装 API Skill 路由文档 输出清洗器
+  weakness: 它的主风险不是 Python 代码复杂，而是外部平台和上游工具链太多。Agent Reach
+    的优势和脆弱点是同一个东西：不自建后端，直接站在别人 CLI/MCP 上。
+  transfer: 最值得抄的是“把平台能力拆成 channel + health check + skill command
+    reference”，而不是抄具体平台抓取方式。 Channel 注册表 Doctor 优先于封装 API Skill 路由文档 输出清洗器
+self_evo_use: 记忆：把 Agent-Reach — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  devtool_cli 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Agent Reach 是给 AI Agent 装互联网工具箱的安装器和健康检查 CLI，不是把所有平台重新封装成一个 SDK。
+      人话：它帮你把 Twitter、Reddit、YouTube、B站、小红书、GitHub、RSS、Exa 搜…
+  - name: 机制链路
+    role: primary
+    evidence: 真实流：用户让 Agent 查 Reddit bug 讨论时，Skill 先路由到 social 文档；Agent 调 `rdt
+      search` 找帖子，再用 `rdt read POST_ID` 读全文和评论；`agent-reach …
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最值得抄的是“把平台能力拆成 channel + health check + skill command
+      reference”，而不是抄具体平台抓取方式。 Channel 注册表 Doctor 优先于封装 API Skill 路由文档 …
+  - name: 风险边界
+    role: supporting
+    evidence: 它的主风险不是 Python 代码复杂，而是外部平台和上游工具链太多。Agent Reach
+      的优势和脆弱点是同一个东西：不自建后端，直接站在别人 CLI/MCP 上。
+  - name: 证据账本
+    role: mentioned
+    evidence: 它是安装器和健康检查器，不是统一代理框架。
+discovery_trace: 数据不足
+edges: []
+status: extracted

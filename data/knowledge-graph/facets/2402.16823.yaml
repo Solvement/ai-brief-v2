@@ -1,0 +1,41 @@
+schema: v2
+node_id: paper:2402.16823
+slug: 2402.16823-gptswarm-agents-as-graphs
+kind: paper
+title: "GPTSwarm: Language Agents as Optimizable Graphs"
+arxiv_id: "2402.16823"
+source: content/papers/2402.16823-gptswarm-agents-as-graphs +
+  data/autosci/primitives/2402.16823.yaml
+facets:
+  problem_solved: agent-orchestration-topology-and-prompts-should-be-learned-not-hand-designed
+  method: 把单 agent 和多 agent 群都表示成有向无环图(节点=LLM/工具/动作,边=信息流,G=(N,E,F,o)),
+    然后在图上做两层优化:① 节点优化——节点存历史 h,用改写器 p←I(h,p,d) 迭代改提示; ② 边优化——把"选哪些边"松弛成"所有可行 DAG
+    上的概率分布",用 REINFORCE 无偏梯度学拓扑, 自动剪掉无用/有害(对抗)连边。关键洞见:"连对边" > "连更多边",结构本身是可优化参数。
+  result: 对照 A=手搭固定拓扑 vs B=边优化学拓扑(+剪枝);再 A=仅边优化 vs B=边+节点优化, 比任务得分(复刻:边 0.575→边+节点
+    0.668);并塞一个对抗 agent 验证其边被剪。1-7 天。
+  innovation: 把 agent 系统(提示 + 拓扑)当图上参数,能优化就别手调——结构本身可学。；'谁连谁'用 RL 学,且'连对边' >
+    '连更多边';别堆
+    agent,学连接。；把离散结构选择松弛成概率分布,才能用梯度优化(REINFORCE)。；让优化器自动断开有害/对抗连边,比人工挑队友更稳。
+  weakness: optimization_cost；hardest_tasks_flat；tool_bottleneck；combinatorial_edges
+  transfer: 最小版:给一个 3-agent 群的每条候选边一个保留概率 θ;采样 M 张图各跑任务得分, 用 REINFORCE ∇θ E[u] ≈
+    (1/M)Σ û_i ∇θ log p_θ(G_i) 更新 θ;节点侧加一个 prompt-improver 按历史迭代改提示。先在一个可打分小任务(如
+    Crosswords 子集)跑通,验证"剪掉坏边/连对边"。
+self_evo_use: '记忆：保留 GPTSwarm: Language Agents as Optimizable Graphs
+  的问题、方法、概念和证据边界。理解：用它补齐
+  agent-orchestration-topology-and-prompts-should-be-learned-not-hand-designed
+  的方法坐标。自进化：最小版:给一个 3-agent 群的每条候选边一个保留概率 θ;采样 M 张图各跑任务得分, 用 REINFORCE ∇θ E[u] ≈
+  (1/M)Σ û_i ∇θ log p_θ(G_i) 更新 θ;节点侧加一个 prompt-improver 按历史迭代改提示。先在一个可打分小任务(如
+  Crosswords 子集)跑通,验证"剪掉坏边/连对边"。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: agent-orchestration-topology-and-prompts-should-be-learned-not-hand-designed
+  - name: 方法原语
+    role: supporting
+    evidence: agent-orchestration-topology-and-prompts-should-be-learned-not-hand-designed
+  - name: 迁移边界
+    role: supporting
+    evidence: agent-orchestration-topology-and-prompts-should-be-learned-not-hand-designed
+discovery_trace: 数据不足
+edges: []
+status: extracted

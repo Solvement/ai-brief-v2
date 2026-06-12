@@ -1,38 +1,32 @@
-# Mind Palace facet — 内化层（AI-only）。GOLD 示例：sub-agent 蒸馏其余节点照此格式。
-# spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。不编造，未知标「数据不足」，自报数字标「自报/受控」。
 schema: v2
 node_id: content/agemem
 slug: agemem
-kind: paper            # paper | project
-title: "AgeMem — 记忆即可学习的策略动作"
-source: "arxiv:2601.01885v2 + repo github.com/y1y5/AgeMem"
-
+kind: paper
+title: AgeMem — 记忆即可学习的策略动作
+source: arxiv:2601.01885v2 + repo github.com/y1y5/AgeMem
 facets:
-  problem_solved: >    # Y：解决哪类问题（一句，犀利）
+  problem_solved: |
     记忆生命周期（写入/检索/更新/删除/压缩/过滤）缺乏端到端监督——固定规则的记忆管理是死的，跟不上任务变化。
-
-  method: >            # X：用什么方法（大白话+例子，不堆术语）
-    把六个记忆操作（长期记忆 Add/Update/Delete + 短期上下文 Retrieve/Summary/Filter）变成 agent 能像调工具一样随时调用的「一等策略动作」，
-    再用三阶段课程（先学记、再学在干扰下管上下文、最后学用记忆答题）+ step-wise GRPO（把"最后答对"的奖励回传给前面每一步）
-    强化学习教它「什么时候按哪个按钮」。核心：记忆不是旁边的管家，是大脑的一部分，边想边记。
-
-  result: >            # Z：在自己实验展现了什么（proven_case + 真实数字，标自报/受控）
-    [自报·受控环境] 两个 backbone、五基准均分最高：Qwen2.5-7B 41.96%（vs Mem0 37.14%）、Qwen3-4B 54.31%（vs 最强基线 45.74%）；
-    消融证承重的是 RL 训练不是接口（去 RL 掉 8.53/8.72pp）；面向记忆的奖励 > 只看答案（记忆质量 MQ 0.533 vs 0.479，Table 4）。
-
-  innovation: >        # 创新：与同赛道比新在哪
-    把记忆操作从「外挂的固定管道」变成「可学习的策略动作」——发明的不是新数据库，是新控制方式。
-    step-wise GRPO 用终局优势广播解决「早期存/删决定拿不到监督信号」的延迟信用分配难题。
-
-  weakness: >          # 缺点/适用边界/坑（该不该用它靠这条）
+  method: >
+    把六个记忆操作（长期记忆 Add/Update/Delete + 短期上下文 Retrieve/Summary/Filter）变成 agent
+    能像调工具一样随时调用的「一等策略动作」， 再用三阶段课程（先学记、再学在干扰下管上下文、最后学用记忆答题）+ step-wise
+    GRPO（把"最后答对"的奖励回传给前面每一步） 强化学习教它「什么时候按哪个按钮」。核心：记忆不是旁边的管家，是大脑的一部分，边想边记。
+  result: >
+    [自报·受控环境] 两个 backbone、五基准均分最高：Qwen2.5-7B 41.96%（vs Mem0 37.14%）、Qwen3-4B
+    54.31%（vs 最强基线 45.74%）； 消融证承重的是 RL 训练不是接口（去 RL 掉 8.53/8.72pp）；面向记忆的奖励 >
+    只看答案（记忆质量 MQ 0.533 vs 0.479，Table 4）。
+  innovation: >
+    把记忆操作从「外挂的固定管道」变成「可学习的策略动作」——发明的不是新数据库，是新控制方式。 step-wise GRPO
+    用终局优势广播解决「早期存/删决定拿不到监督信号」的延迟信用分配难题。
+  weakness: >
     训练轨迹全来自单一数据集 HotpotQA，跨域泛化未证（作者自承）；记忆质量由 LLM-judge 打分、非人工，主结果与消融共享同一评判偏差；
-    信用分配粗糙（一个终局优势广播给所有步，会奖到无关动作）；复现重——需 Qwen + DashScope 付费 key + Trinity-RFT 框架，非 turnkey。
-
-  transfer: >          # 能迁移到什么 / 用于研究·自进化
-    最值得借的不是 RL 代码，是「可训练记忆接口」设计：把 AI-Brief/自进化 agent 的记忆写入/更新/删除做成 typed action（先学接口、后学算法），
-    短期不上 GRPO，先把 backend 设计成「未来可训练的 memory controller」。直接喂本站 BriefMem 的 typed memory 设计。
-
-  architecture: |      # Mermaid 源码（架构/流程，前端懒渲染）
+    信用分配粗糙（一个终局优势广播给所有步，会奖到无关动作）；复现重——需 Qwen + DashScope 付费 key + Trinity-RFT
+    框架，非 turnkey。
+  transfer: >
+    最值得借的不是 RL 代码，是「可训练记忆接口」设计：把 AI-Brief/自进化 agent 的记忆写入/更新/删除做成 typed
+    action（先学接口、后学算法）， 短期不上 GRPO，先把 backend 设计成「未来可训练的 memory controller」。直接喂本站
+    BriefMem 的 typed memory 设计。
+  architecture: |
     ```mermaid
     flowchart TD
       T[任务规格 T] --> P{AgeMem Policy}
@@ -46,32 +40,38 @@ facets:
       A --> R[奖励: 任务完成 + 上下文管理 + 记忆质量<br/>惩罚: 上下文溢出/轮数过多]
       R -.->|step-wise GRPO: 终局优势广播回每一步| P
     ```
-
 core_concepts:
   - name: 可学习的记忆操作
     role: primary
-    evidence: "深读 reasoning_trace.central_contribution 逐字『让记忆操作成为一等 policy action，用 step-wise GRPO 端到端学何时存取改删』+ 问题拆解节逐字『Add/Update/Delete 变成 policy action』『Retrieve/Summary/Filter 变成 policy action』——拿掉它这篇就只剩普通 RL（规范名统一为『可学习的记忆操作』=与 memoryagentbench 同名的跨文件锚）。"
+    evidence: 深读 reasoning_trace.central_contribution 逐字『让记忆操作成为一等 policy action，用
+      step-wise GRPO 端到端学何时存取改删』+ 问题拆解节逐字『Add/Update/Delete 变成 policy
+      action』『Retrieve/Summary/Filter 变成 policy action』——拿掉它这篇就只剩普通
+      RL（规范名统一为『可学习的记忆操作』=与 memoryagentbench 同名的跨文件锚）。
   - name: step-wise GRPO
     role: primary
-    evidence: "深读机制图逐字『step-wise GRPO —— 终局优势广播到每一步，给跨阶段记忆动作延迟监督』+ 消融节逐字『AgeMem-noRL 均分只有 33.43 / 45.59；加上 RL 才到 41.96 / 54.31（+8.53 / +8.72pp）』——承重的是这套训练而非接口本身。"
+    evidence: 深读机制图逐字『step-wise GRPO —— 终局优势广播到每一步，给跨阶段记忆动作延迟监督』+ 消融节逐字『AgeMem-noRL
+      均分只有 33.43 / 45.59；加上 RL 才到 41.96 / 54.31（+8.53 /
+      +8.72pp）』——承重的是这套训练而非接口本身。
   - name: 三阶段课程
     role: supporting
-    evidence: "深读机制图 Training 逐字『Stage 1: 从上下文构建长期记忆 / Stage 2: 在干扰信息下管理短期上下文 / Stage 3: 检索已存记忆并完成最终任务』。"
+    evidence: "深读机制图 Training 逐字『Stage 1: 从上下文构建长期记忆 / Stage 2: 在干扰信息下管理短期上下文 /
+      Stage 3: 检索已存记忆并完成最终任务』。"
   - name: 记忆质量奖励
     role: supporting
-    evidence: "深读消融节逐字『All-Returns vs Answer-Only：MQ 0.533 vs 0.479、Judge 0.544 vs 0.509 → memory-aware reward 真的改善了记忆质量，而非顺带产物』（规范名『记忆质量奖励』，源文原词『memory-aware reward / All-Returns』）。"
-self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
-  记忆：能用——"记忆即动作"的可落地范式：六个记忆操作（长期 Add/Update/Delete + 短期 Retrieve/Summary/Filter）成为一等策略动作，自进化 agent 的记忆控制器可直接抄这套 typed action 接口。
+    evidence: 深读消融节逐字『All-Returns vs Answer-Only：MQ 0.533 vs 0.479、Judge 0.544 vs
+      0.509 → memory-aware reward
+      真的改善了记忆质量，而非顺带产物』（规范名『记忆质量奖励』，源文原词『memory-aware reward / All-Returns』）。
+self_evo_use: >
+  记忆：能用——"记忆即动作"的可落地范式：六个记忆操作（长期 Add/Update/Delete + 短期
+  Retrieve/Summary/Filter）成为一等策略动作，自进化 agent 的记忆控制器可直接抄这套 typed action 接口。
 
   理解：部分——三阶段课程 + 面向记忆的奖励显示「记忆质量可以被教出来」；它不建世界模型，理解层贡献在于把"什么时候记/忘"变成可归因的策略决策。
 
   自进化：能用，属真自进化（系统从反馈改自己的记忆策略，不是固定流程）——「用冷审/反馈当 reward 的训练回路」可直接借给本站记忆控制器设计。
-
-# typed 边（走冷审门核验后入图；非自动 tag 噪声）
 edges:
   - to: rohitg00-agentmemory
     type: improves_on
-    evidence: "AgeMem 用 RL 学习记忆策略，取长补短 agentmemory 的写死 hook（学习式 > 固定式）"
+    evidence: AgeMem 用 RL 学习记忆策略，取长补短 agentmemory 的写死 hook（学习式 > 固定式）
     confidence: high
-
-status: gold            # gold = 人手核验的模板；sub-agent 产出标 extracted，过冷审后标 verified
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: gold

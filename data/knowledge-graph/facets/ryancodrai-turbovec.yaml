@@ -1,0 +1,67 @@
+schema: v2
+node_id: content/ryancodrai-turbovec
+slug: ryancodrai-turbovec
+kind: project
+title: turbovec — 深度拆解
+source: public/data/brief/deep-dives.json:ryancodrai-turbovec-deep-dive
+facets:
+  problem_solved: turbovec 是一个 Rust 写的本地向量索引库，提供 Python 绑定，用 TurboQuant/TQ+ 把
+    embedding 压到 2-4 bit/维，并重点支持带 allowlist/mask 的过滤式检索。
+    人话：它不是托管向量数据库，而是一个可以嵌进本机进程的压缩向量索引；典型用法是 `TurboQuantIndex(dim=1536,
+    bit_width=4)` 或 `IdMapIndex(dim=1536, bit_width=4)`，然后
+    `add`/`add_with_ids`、`search`、`write`/`load`（来源：README Python；docs/api.md
+    TurboQuantIndex；turbovec-python/src/lib.rs Python binding）。 术语：TurboQuant
+    是压缩向量方向的量化算法；`IdMapIndex` 是在内部 slot 之上维护稳定 `u64` 外部 ID
+    的封装；`allowlist`/`mask` 是搜索时把候选集合限制到指定 ID 或 slot 的过滤机制。
+  method: 人话流程：假设你有 1536 维 embedding 和业务文档 ID。Python 侧用 `idx =
+    IdMapIndex(dim=1536, bit_width=4)`，再 `idx.add_with_ids(vectors,
+    np.array([1001, 1002, 1003], dtype=np.uint64))`。搜索时可以直接 `idx.search(query,
+    k=10)`，也可以先从 SQL 拿候选：`allowed = ... SELECT id FROM docs WHERE tenant=?
+    ...`，再 `idx.search(query, k=10, allowlist=allowed)`（来源：README Python；README
+    Hybrid retrieval）。 源码路径：`turbovec-python/src/lib.rs` 接收
+    `PyReadonlyArray2<f32>` 和 `PyReadonlyArray1<u64>`，要求数组
+    C-contiguous；`add_with_ids` 调
+    `turbovec_core::IdMapIndex::add_with_ids_2d`。`turbovec/src/id_map.rs` 先检查
+    `ids.len() == vectors.len()/dim` 和重复 ID，再调用内部 `TurboQuantIndex.add_2d`，成功后才写
+    `id_to_slot` 和 `slot_to_id`，避免 inner add 失败后留下 ghost
+    ID（来源：turbovec-python/src/lib.rs add_with_ids；turbovec/src/id_map.rs
+    add_with_ids_2d）。 编码路径：`turbovec/src/encode.rs` 对每行向量计算 norm、归一化、乘同一个
+    rotation matrix；如果首批样本数 `n >= 1000`，TQ+ 用每个坐标的经验 5%/95% 分位去拟合 `shift` 和
+    `sca…
+  result: 下面把 README/benchmark 的自称和从源码核实的事实分开。benchmark 数字即使来自仓库内
+    JSON，也仍然按“项目自称”处理，因为本次没有复现实验。 作者想解决的是大规模 embedding 的内存占用和本地检索速度。
+    在仓库提交的结果文件里，4-bit 大约对应 8 倍压缩，2-bit 大约对应 16 倍压缩量级。 如果你只要内部数组位置，用
+    `TurboQuantIndex`；如果删除后外部文档 ID 还要稳定，用 `IdMapIndex`。 SQL/BM25/ACL 先给一批候选
+    ID，再让向量搜索只在这批 ID 里排 top-k。 过滤很窄时，不只是算完再丢，而是整块不算。 它不保存原始 float32 向量；它保存压缩
+    code 和一个用于修正分数的 per-vector scale。 性能依赖 CPU 指令集；现代 x86 会走 AVX2/AVX-512，ARM 会走
+    NEON。 当前源码写出的文件不是 docs/api.md 里旧图示的裸 9-byte `.tv` header。
+  innovation: 这些模式比具体 TurboQuant 算法更容易复用到别的 AI 基建里。 稳定 ID 包装层 候选集先解析、内核只接 bitset
+    首次 add 锁定维度 二进制索引 + JSON side-car 文档化的“不支持”
+  weakness: 主要风险不在 API 会不会存在，而在原生扩展、CPU 指令集、BLAS 链接、文件格式和框架版本漂移。
+  transfer: 这些模式比具体 TurboQuant 算法更容易复用到别的 AI 基建里。 稳定 ID 包装层 候选集先解析、内核只接 bitset 首次
+    add 锁定维度 二进制索引 + JSON side-car 文档化的“不支持”
+self_evo_use: 记忆：把 turbovec — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 library_sdk
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: turbovec 是一个 Rust 写的本地向量索引库，提供 Python 绑定，用 TurboQuant/TQ+ 把 embedding
+      压到 2-4 bit/维，并重点支持带 allowlist/mask 的过滤式检索。 人话：它不是…
+  - name: 机制链路
+    role: primary
+    evidence: 人话流程：假设你有 1536 维 embedding 和业务文档 ID。Python 侧用 `idx =
+      IdMapIndex(dim=1536, bit_width=4)`，再 `idx.add_with_ids(vectors, np…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 这些模式比具体 TurboQuant 算法更容易复用到别的 AI 基建里。 稳定 ID 包装层 候选集先解析、内核只接 bitset 首次
+      add 锁定维度 二进制索引 + JSON side-car 文档化的“不支持”
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险不在 API 会不会存在，而在原生扩展、CPU 指令集、BLAS 链接、文件格式和框架版本漂移。
+  - name: 证据账本
+    role: mentioned
+    evidence: README 自称：`A 10 million document corpus takes 31 GB of RAM as float32.
+      turbovec fits it in 4 GB - and searches it faste…
+discovery_trace: 数据不足
+edges: []
+status: extracted

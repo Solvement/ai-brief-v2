@@ -1,0 +1,50 @@
+schema: v2
+node_id: content/codewhale
+slug: codewhale
+kind: project
+title: CodeWhale — 深度拆解
+source: public/data/brief/deep-dives.json:codewhale-deep-dive
+facets:
+  problem_solved: "CodeWhale — 深度拆解 的核心判断：通过宪法式九级法律体系解决 LLM 代理的指令冲突和权限混乱，并利用
+    DeepSeek V4 的前缀缓存特性将长期记忆成本降低约 100 倍，同时以 Rust 高性能终端应用形式提供工程化落地。 本条由旧深读聚合内容重整为
+    RuView light_spine；证据边界来自 README.md 主文件；topics 标签；top_level_dirs
+    列表；key_files: Cargo.toml, Dockerfile, package.json；evidence_signals 中
+    agent/workflow/MCP/skills/model 等标识。没有源码级证据的地方保留“数据不足”。"
+  method: 通过宪法式九级法律体系解决 LLM 代理的指令冲突和权限混乱，并利用 DeepSeek V4 的前缀缓存特性将长期记忆成本降低约 100
+    倍，同时以 Rust 高性能终端应用形式提供工程化落地。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    模型接收到冲突指令时，有一个明确的先后排名，用户刚说的话比以前的项目说明更管用。 宪法很长的提示每轮只要花原先 1%
+    的费用，因为模型会缓存之前读取过的部分。 父代理可以同时派多个子任务去并行跑，子任务完成时会发通知，并附上一个精简的报告。
+    发正式请求前先用一个便宜的调用判断任务难不难，简单就用便宜模型，难就用贵的，自动帮你省钱。
+    代码改完立刻跑语言检查，把报错喂回模型，让它在下一步里自动修掉。
+  innovation: 可复用宪法治理模式、子代理并发设计和自动路由思想，但具体的 Rust 终端实现和 DeepSeek 专属优化不适合直接复制。
+    clone-and-run read-docs write-deepdive
+  weakness: 项目热度虽高，但核心功能（宪法、自动路由）的有效性缺乏独立基准验证。；过度依赖 DeepSeek V4
+    的前缀缓存和指令遵循能力，模型迭代可能破坏兼容性。；开源社区贡献质量未知，v0.8.x 版本快速迭代可能引入不成熟特性。
+  transfer: 可复用宪法治理模式、子代理并发设计和自动路由思想，但具体的 Rust 终端实现和 DeepSeek 专属优化不适合直接复制。
+    clone-and-run read-docs write-deepdive
+self_evo_use: 记忆：把 CodeWhale — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: CodeWhale — 深度拆解 的核心判断：通过宪法式九级法律体系解决 LLM 代理的指令冲突和权限混乱，并利用 DeepSeek V4
+      的前缀缓存特性将长期记忆成本降低约 100 倍，同时以 Rust 高性能终端应用形式提供工程化落地…
+  - name: 机制链路
+    role: primary
+    evidence: 通过宪法式九级法律体系解决 LLM 代理的指令冲突和权限混乱，并利用 DeepSeek V4 的前缀缓存特性将长期记忆成本降低约 100
+      倍，同时以 Rust 高性能终端应用形式提供工程化落地。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用宪法治理模式、子代理并发设计和自动路由思想，但具体的 Rust 终端实现和 DeepSeek 专属优化不适合直接复制。
+      clone-and-run read-docs write-deepdive
+  - name: 风险边界
+    role: supporting
+    evidence: 项目热度虽高，但核心功能（宪法、自动路由）的有效性缺乏独立基准验证。；过度依赖 DeepSeek V4
+      的前缀缓存和指令遵循能力，模型迭代可能破坏兼容性。；开源社区贡献质量未知，v0.8.x 版本快速迭代可能引入不成熟特性。
+  - name: 证据账本
+    role: mentioned
+    evidence: 宪法提供九级法律体系，用户当前消息优先级高于过期项目指令。
+discovery_trace: 数据不足
+edges: []
+status: extracted

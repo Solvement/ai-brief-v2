@@ -1,0 +1,49 @@
+schema: v2
+node_id: content/vibe-trading
+slug: vibe-trading
+kind: project
+title: Vibe-Trading — 深度拆解
+source: public/data/brief/deep-dives.json:vibe-trading-deep-dive
+facets:
+  problem_solved: Vibe-Trading — 深度拆解 的核心判断：将 LLM 代理融入端到端量化交易流程，并以 mandate +
+    多道防线实现了有界自主交易的安全框架。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自 README last full
+    version (including all news entries up to 2026-06-03)；repo top-level entries
+    (dirs and key files)；topics list (+ MCP, multi-agent)；license
+    file；package_file pyproject.toml；Dockerfile and
+    docker-compose。没有源码级证据的地方保留“数据不足”。
+  method: 将 LLM 代理融入端到端量化交易流程，并以 mandate + 多道防线实现了有界自主交易的安全框架。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。 最新版暴露了 36 个 MCP 工具供代理使用
+    代理的交易能力受到用户预先定义的限制，并有 kill switch 等安全措施 可连接 Robinhood, IBKR, Binance 等多家券商进行
+    paper 或 live 交易
+  innovation: 可复用 mandate 安全模型和 MCP 工具集成模式，但不复用特定的金融数据处理和券商 API 细节。 clone-and-run
+    write-deepdive extract-pattern(mandate-gated-agent-safety)
+  weakness: 安全声明的实现可能存在逻辑漏洞，绕过 mandate 或 kill switch；LLM 工具调用链的可靠性未经大规模检验；依赖的第三方
+    API 可能随时变更；目前没有正式的安全审计报告；未在 README 中提供完整的测试覆盖情况，尽管新闻提到有回归测试；未说明最小硬件要求与 LLM
+    调用成本估算；内部信号引擎的具体实现和模型细节未在 README 中公开；mandate 限价在极端市场波动下的有效性未量化；Swarm
+    的跨节点通信安全细节未说明；前端代码细节及是否支持移动端未提
+  transfer: 可复用 mandate 安全模型和 MCP 工具集成模式，但不复用特定的金融数据处理和券商 API 细节。 clone-and-run
+    write-deepdive extract-pattern(mandate-gated-agent-safety)
+self_evo_use: 记忆：把 Vibe-Trading — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Vibe-Trading — 深度拆解 的核心判断：将 LLM 代理融入端到端量化交易流程，并以 mandate +
+      多道防线实现了有界自主交易的安全框架。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自 …
+  - name: 机制链路
+    role: primary
+    evidence: 将 LLM 代理融入端到端量化交易流程，并以 mandate + 多道防线实现了有界自主交易的安全框架。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用 mandate 安全模型和 MCP 工具集成模式，但不复用特定的金融数据处理和券商 API 细节。 clone-and-run
+      write-deepdive extract-pattern(mandate-gated-agent-…
+  - name: 风险边界
+    role: supporting
+    evidence: 安全声明的实现可能存在逻辑漏洞，绕过 mandate 或 kill switch；LLM 工具调用链的可靠性未经大规模检验；依赖的第三方
+      API 可能随时变更；目前没有正式的安全审计报告；未在 README 中提供完整的测试覆盖情况，尽管…
+  - name: 证据账本
+    role: mentioned
+    evidence: v0.1.9 版本已有 36 MCP tools
+discovery_trace: 数据不足
+edges: []
+status: extracted

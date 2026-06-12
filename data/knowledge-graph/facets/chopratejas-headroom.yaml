@@ -1,0 +1,70 @@
+schema: v2
+node_id: content/chopratejas-headroom
+slug: chopratejas-headroom
+kind: project
+title: headroom — 深度拆解
+source: public/data/brief/deep-dives.json:chopratejas-headroom-deep-dive
+facets:
+  problem_solved: Headroom 是一个本地运行的 LLM 上下文压缩层，把工具输出、日志、RAG
+    结果、文件内容和消息历史在进入模型前压缩，并用 CCR 哈希保留原文可取回。 人话：它不是只做一段文本摘要，而是把 AI coding agent
+    常见的大块输入放到一个统一入口里处理：Python `compress(messages)`、TypeScript SDK、`headroom
+    proxy --port 8787`、`headroom wrap claude|codex|cursor|aider|copilot`、MCP 工具
+    `headroom_compress` / `headroom_retrieve` / `headroom_stats`（来源：README What
+    it does；docs/content/docs/mcp.mdx Tools）。 术语：这是一个 agent context compression
+    / proxy / MCP 混合项目；Python 包名和 npm 包名都是 `headroom-ai`，版本在仓库包配置中是
+    `0.23.0`，Python 要求 `>=3.10`，许可证是 Apache-2.0（来源：pyproject.toml
+    project；sdk/typescript/package.json；Cargo.toml workspace.package）。
+  method: '人话：一个真实使用流可以从 quickstart 的 500 条搜索结果开始。Python 里构造 `messages`：system
+    是“You analyze search results.”，assistant 里有 `tool_calls`，tool 消息把 500 个
+    `{title, snippet, score}` 结果 JSON 化，最后用户问“What are the top 3 results?”，然后调用
+    `result = compress(messages,
+    model="gpt-4o")`（来源：docs/content/docs/quickstart.mdx 2. Compress messages）。
+    术语流程：`compress()` 先处理 hooks，再从消息里抽取 user query 给变换器做 relevance scoring，然后调用
+    pipeline；返回
+    `tokens_before`、`tokens_after`、`tokens_saved`、`compression_ratio`、`transforms_applied`（来源：headroom/compress.py
+    compress）。默认 pipeline 在源码注释中是 `CacheAligner -> ContentRouter`，其中
+    ContentRouter 会跳过 user/system/developer 消息、小内容、近期代码、analysis intent 下的代码和已有
+    `Retrieve more: hash=` marker 的内容（来源：headroom/compress.py
+    _get_pipeline；headroom/transforms/content_router.py message loop）。 对那条 500
+    结果 tool 消息，ContentRouter 会把 cache miss 放入 `pending_tasks`，最多用
+    `HEADROOM_COMPRESS_WORKERS`，默认字符串 `"4"`，并行调…'
+  result: 下面把项目自称和仓库可核实事实分开。README 的 savings、benchmark、compatibility
+    表都按自称处理；包配置、源码路径、测试文件和文档命令按已核实处理。 项目说自己能在本地用库、代理和 MCP 三种方式减少 token，并保留可逆取回。
+    不是只有 README，包配置真的声明了可安装包和命令。 Node 侧调用 `compress()` 时，需要一个本地 Headroom proxy
+    来真正跑压缩管线。 压缩不是永久丢弃；原始内容被放进本地 store，压缩结果带 hash，模型可以调用 retrieve。 MCP 客户端不必走
+    HTTP proxy，也可以让模型主动调用工具压缩大内容或取回原文。 它不是一律压缩所有东西；用户原话、系统提示、近期代码、分析意图下的代码会被跳过。
+    它给出了若干数字，但这些仍是仓库文档中的项目方结果。
+  innovation: 这些抽象可以从项目里单独拆出来复用，不必照搬整个产品。 Compress-Cache-Retrieve marker
+    ContentRouter safety gates Proxy-first SDK Agent failure learning marker
+    block
+  weakness: 主要风险不是“能不能写 demo”，而是部署边界：本地 proxy、Rust 扩展、可选 ML/向量依赖、agent 配置文件改写、以及
+    Windows wheel 缺口。
+  transfer: 这些抽象可以从项目里单独拆出来复用，不必照搬整个产品。 Compress-Cache-Retrieve marker
+    ContentRouter safety gates Proxy-first SDK Agent failure learning marker
+    block
+self_evo_use: 记忆：把 headroom — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Headroom 是一个本地运行的 LLM 上下文压缩层，把工具输出、日志、RAG 结果、文件内容和消息历史在进入模型前压缩，并用 CCR
+      哈希保留原文可取回。 人话：它不是只做一段文本摘要，而是把 AI coding agent 常见的…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：一个真实使用流可以从 quickstart 的 500 条搜索结果开始。Python 里构造 `messages`：system
+      是“You analyze search results.”，assistant 里有 `tool_c…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 这些抽象可以从项目里单独拆出来复用，不必照搬整个产品。 Compress-Cache-Retrieve marker
+      ContentRouter safety gates Proxy-first SDK Agent failure lea…
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险不是“能不能写 demo”，而是部署边界：本地 proxy、Rust 扩展、可选 ML/向量依赖、agent 配置文件改写、以及
+      Windows wheel 缺口。
+  - name: 证据账本
+    role: mentioned
+    evidence: “60–95% fewer tokens · library · proxy · MCP · 6 algorithms ·
+      local-first · reversible”。
+discovery_trace: 数据不足
+edges: []
+status: extracted

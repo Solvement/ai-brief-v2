@@ -1,0 +1,48 @@
+schema: v2
+node_id: content/iii
+slug: iii
+kind: project
+title: iii — 深度拆解
+source: public/data/brief/deep-dives.json:iii-deep-dive
+facets:
+  problem_solved: iii — 深度拆解 的核心判断：提出将一切后端能力抽象为 Worker、Function、Trigger
+    三种原语，并通过统一运行时消除集成工作，实现实时可组合、可观测的活系统表面 本条由旧深读聚合内容重整为 RuView
+    light_spine；证据边界来自 README；仓库目录树；关键文件存在性；许可证信息；SDK
+    配置；文档目录；技能目录。没有源码级证据的地方保留“数据不足”。
+  method: 提出将一切后端能力抽象为 Worker、Function、Trigger 三种原语，并通过统一运行时消除集成工作，实现实时可组合、可观测的活系统表面
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    只用一条命令就能给系统增加新功能，不用额外配置集成 智能代理在遇到系统没有的功能时，可以自己添加一个 Worker 然后使用它 可以用三种主流语言写
+    Worker 不管怎么调用的，系统都会自动记录调用链，可以在控制台查看
+  innovation: 核心模式（Worker/Function/Trigger 抽象 +
+    动态目录）可复用，但引擎的许可和未公开细节限制直接迁移，建议提取设计模式而非直接 Fork clone-and-run read-docs
+    write-deepdive
+  weakness: Elastic License 2.0
+    可能阻碍核心引擎的商业采用和社区贡献；缺少核心实现细节使得信任度不足，潜在用户可能对生产部署持保留态度；项目文档虽全面，但测试和示例的缺失增加了评估难度
+  transfer: 核心模式（Worker/Function/Trigger 抽象 +
+    动态目录）可复用，但引擎的许可和未公开细节限制直接迁移，建议提取设计模式而非直接 Fork clone-and-run read-docs
+    write-deepdive
+self_evo_use: 记忆：把 iii — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 agent_framework
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: iii — 深度拆解 的核心判断：提出将一切后端能力抽象为 Worker、Function、Trigger
+      三种原语，并通过统一运行时消除集成工作，实现实时可组合、可观测的活系统表面 本条由旧深读聚合内容重整为 RuView light_…
+  - name: 机制链路
+    role: primary
+    evidence: 提出将一切后端能力抽象为 Worker、Function、Trigger 三种原语，并通过统一运行时消除集成工作，实现实时可组合、可观测的活系统表面
+  - name: 可复用抽象
+    role: supporting
+    evidence: 核心模式（Worker/Function/Trigger 抽象 +
+      动态目录）可复用，但引擎的许可和未公开细节限制直接迁移，建议提取设计模式而非直接 Fork clone-and-run read-docs
+      write-deepdive
+  - name: 风险边界
+    role: supporting
+    evidence: Elastic License 2.0
+      可能阻碍核心引擎的商业采用和社区贡献；缺少核心实现细节使得信任度不足，潜在用户可能对生产部署持保留态度；项目文档虽全面，但测试和示例的缺失增加了评估难度
+  - name: 证据账本
+    role: mentioned
+    evidence: iii 可通过 `iii worker add` 命令即时添加队列、代理、沙箱等多种能力
+discovery_trace: 数据不足
+edges: []
+status: extracted

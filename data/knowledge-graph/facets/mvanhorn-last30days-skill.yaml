@@ -1,0 +1,63 @@
+schema: v2
+node_id: content/mvanhorn-last30days-skill
+slug: mvanhorn-last30days-skill
+kind: project
+title: last30days-skill — 深度拆解
+source: public/data/brief/deep-dives.json:mvanhorn-last30days-skill-deep-dive
+facets:
+  problem_solved: last30days-skill 是一个把“最近 30 天社区信号”塞进 Agent Skills 工作流的研究技能：先并发抓
+    Reddit、X、YouTube、HN、Polymarket、GitHub 和网页，再让宿主模型合成一份可追问的简报。 人话：它不是普通搜索框，而是给
+    Claude Code、Codex、Cursor、Gemini CLI 等 agent 宿主用的研究技能。术语上，它由
+    `skills/last30days/SKILL.md` 定义 agent 合约，由 `scripts/last30days.py`
+    执行抓取、融合、重排和渲染（来源：CONCEPTS.md The package；来源：skills/last30days/SKILL.md
+    frontmatter；来源：skills/last30days/scripts/last30days.py build_parser）。
+  method: 真实流可以从 `/last30days OpenClaw --github-repo=openclaw/openclaw
+    --emit=compact` 这一类调用理解：宿主模型读 `SKILL.md`，先做实体解析和 query plan，再把 plan 文件路径传给
+    Python engine（来源：skills/last30days/SKILL.md Research Execution）。
+    关键机制很具体：`DEPTH_SETTINGS` 把 `quick/default/deep` 映射到 per-stream、pool、rerank
+    三个限制；`pipeline.run()` 对每个 subquery/source 提交 future；`_retrieve_stream()`
+    分别调用 `reddit_public`、`bird_x`/`xai_x`、`youtube_yt`、`polymarket`、`grounding`
+    等模块（来源：pipeline.py DEPTH_SETTINGS/run/_retrieve_stream）。 最小直跑形态是： 这能运行，但
+    SKILL.md 对 named entity 的正式路径要求宿主模型生成 `--plan` tmpfile，并加
+    `--x-handle`、`--subreddits`、`--github-repo` 等解析结果；否则会走 deterministic
+    fallback，项目自己把这称为退化路径（来源：skills/last30days/SKILL.md LAW 7；来源：planner.py
+    plan_query）。
+  result: "下面只把能在仓库里对上的说法当证据。README 的“zero config”“1,012 tests”“50+
+    hosts”等属于项目自称；代码、配置、测试命令能验证的单独标成已核实。 技能本体是 `SKILL.md` 加同级
+    `scripts/`，`last30days.py` 是实现层。 CLI 参数默认 `--days 30`，watchlist 另用 90 天。 每个
+    subquery/source 组合提交到 ThreadPoolExecutor。 Reddit、HN、Polymarket
+    代码层默认加入；TikTok/Instagram 要 ScrapeCreators；YouTube 要 `yt-dlp` 或 SC；X 要
+    xAI、cookie 或 xurl。 先归一化、打本地相关度/新鲜度/质量，再用 weighted RRF 融合，并做作者上限和来源保底。
+    `--store` 把 findings 写进 SQLite，watchlist 用外部调度跑周期任务。 仓库文本这么写，但我本地复跑不是全绿。 CI
+    有 pip-audit 和 TruffleHog，但两个步骤都 `continue-on-error: true`。"
+  innovation: 最值得抄的是“agent 合约 + engine”的边界，而不是逐个 scraper。它把易漂移的写作/调用纪律放进
+    SKILL.md，把可测试逻辑放进 Python。 SKILL.md 作为运行时合约 外部 query plan 文件 源 fanout 后统一
+    SourceItem Weighted RRF + 多样性保护 本地 SQLite research store
+  weakness: 风险主要不是 Python 包，而是平台接口、浏览器 cookie、本地 CLI 和宿主 agent 的契约漂移。
+  transfer: 最值得抄的是“agent 合约 + engine”的边界，而不是逐个 scraper。它把易漂移的写作/调用纪律放进
+    SKILL.md，把可测试逻辑放进 Python。 SKILL.md 作为运行时合约 外部 query plan 文件 源 fanout 后统一
+    SourceItem Weighted RRF + 多样性保护 本地 SQLite research store
+self_evo_use: 记忆：把 last30days-skill — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: last30days-skill 是一个把“最近 30 天社区信号”塞进 Agent Skills 工作流的研究技能：先并发抓
+      Reddit、X、YouTube、HN、Polymarket、GitHub 和网页，再让宿主模型合成一份可追问…
+  - name: 机制链路
+    role: primary
+    evidence: 真实流可以从 `/last30days OpenClaw --github-repo=openclaw/openclaw
+      --emit=compact` 这一类调用理解：宿主模型读 `SKILL.md`，先做实体解析和 query pla…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最值得抄的是“agent 合约 + engine”的边界，而不是逐个 scraper。它把易漂移的写作/调用纪律放进
+      SKILL.md，把可测试逻辑放进 Python。 SKILL.md 作为运行时合约 外部 query plan 文件 …
+  - name: 风险边界
+    role: supporting
+    evidence: 风险主要不是 Python 包，而是平台接口、浏览器 cookie、本地 CLI 和宿主 agent 的契约漂移。
+  - name: 证据账本
+    role: mentioned
+    evidence: 这是 Agent Skills 包，不只是 CLI。
+discovery_trace: 数据不足
+edges: []
+status: extracted

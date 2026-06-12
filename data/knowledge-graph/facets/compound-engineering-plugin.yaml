@@ -1,0 +1,50 @@
+schema: v2
+node_id: content/compound-engineering-plugin
+slug: compound-engineering-plugin
+kind: project
+title: compound-engineering-plugin — 深度拆解
+source: public/data/brief/deep-dives.json:compound-engineering-plugin-deep-dive
+facets:
+  problem_solved: compound-engineering-plugin — 深度拆解 的核心判断：将复利工程理念固化为可跨平台部署的 Agent
+    工作流插件，用文件系统实现 Agent 的跨会话记忆。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自
+    README.md；package.json；src/ 目录存在性；plugins/ 目录存在性；tests/
+    目录存在性；topics；license；CI badge。没有源码级证据的地方保留“数据不足”。
+  method: 将复利工程理念固化为可跨平台部署的 Agent 工作流插件，用文件系统实现 Agent 的跨会话记忆。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。 包含 37 个技能和 51 个代理 支持 10
+    多个 AI 编码平台 复利工程让后续改动更简单
+  innovation: 可迁移的核心抽象是「文档阶梯工作流」和「多平台适配器模式」；不可迁移的是与特定平台 API 的胶水代码。 clone-and-run
+    read-docs extract-pattern(agent-delegation-tree)
+  weakness: 未公开的 Agent 交互细节可能隐藏错误执行或死锁风险。；平台依赖可能导致项目未来维护成本爆炸。；37 个 Skill 和 51 个
+    Agent 的完整清单及具体定义——README 仅提到数量，未列出明细，文档链接
+    plugins/compound-engineering/README.md 未检查。；Agent 间通信机制：子 Agent
+    如何接收任务、返回结果，是否有并发控制。；沙箱执行环境：Agent 是否有权限访问文件系统、网络，是否在隔离容器中运行。；人类审批 / 权限控制：在
+    /ce-work 或 /ce-code-review 中，Agent 的代码修改或审查是否会有人工确认步骤。；/ce-compound
+    的知识存储格式与检索方式：生成的文档是纯文本还是结构化数据，未来 Agent 如何找到相关知识点。；规划器 /ce-plan
+    的输出格式：生成的实现计划的具体结构。；多 Agent 审查的 parallel degree 与 fallback 策略。
+  transfer: 可迁移的核心抽象是「文档阶梯工作流」和「多平台适配器模式」；不可迁移的是与特定平台 API 的胶水代码。 clone-and-run
+    read-docs extract-pattern(agent-delegation-tree)
+self_evo_use: 记忆：把 compound-engineering-plugin — 深度拆解
+  的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 agent_framework 的判断，不把 README
+  自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: compound-engineering-plugin — 深度拆解 的核心判断：将复利工程理念固化为可跨平台部署的 Agent
+      工作流插件，用文件系统实现 Agent 的跨会话记忆。 本条由旧深读聚合内容重整为 RuView light…
+  - name: 机制链路
+    role: primary
+    evidence: 将复利工程理念固化为可跨平台部署的 Agent 工作流插件，用文件系统实现 Agent 的跨会话记忆。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可迁移的核心抽象是「文档阶梯工作流」和「多平台适配器模式」；不可迁移的是与特定平台 API 的胶水代码。 clone-and-run
+      read-docs extract-pattern(agent-delegation-tree)
+  - name: 风险边界
+    role: supporting
+    evidence: 未公开的 Agent 交互细节可能隐藏错误执行或死锁风险。；平台依赖可能导致项目未来维护成本爆炸。；37 个 Skill 和 51 个
+      Agent 的完整清单及具体定义——README 仅提到数量，未列出明细，文档链接 plugins/c…
+  - name: 证据账本
+    role: mentioned
+    evidence: ships 37 skills and 51 agents
+discovery_trace: 数据不足
+edges: []
+status: extracted

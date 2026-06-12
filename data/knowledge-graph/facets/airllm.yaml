@@ -1,0 +1,51 @@
+schema: v2
+node_id: content/airllm
+slug: airllm
+kind: project
+title: airllm — 深度拆解
+source: public/data/brief/deep-dives.json:airllm-deep-dive
+facets:
+  problem_solved: airllm — 深度拆解
+    的核心判断：通过分层加载和块级量化压缩，在不使用传统量化、蒸馏或剪枝的情况下，大幅降低大语言模型推理的内存门槛，使得 70B 模型能够在 4GB GPU
+    上运行。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自
+    README.md；requirements.txt；topics；top_level_dirs；open_issues_count；stars；forks；license。没有源码级证据的地方保留“数据不足”。
+  method: 通过分层加载和块级量化压缩，在不使用传统量化、蒸馏或剪枝的情况下，大幅降低大语言模型推理的内存门槛，使得 70B 模型能够在 4GB GPU 上运行。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。 70B 大模型可以在单张 4GB GPU
+    上推理，无需量化、蒸馏或剪枝。 现在可以在 8GB VRAM 上运行 405B Llama3.1。 块级量化模型压缩可提速最高 3
+    倍，精度损失几乎可忽略。 支持当时 Open LLM Leaderboard 上排名前 10 的模型。 预取功能将模型加载和计算重叠，实现 10%
+    速度提升。
+  innovation: 值得尝试在低资源环境中集成，但需自行验证精度和稳定性；分层加载和权重仅量化思路可复用。 clone-and-run star
+  weakness: 缺乏独立第三方评测，所有性能声明来自开发者；未提供完整测试，可能隐藏内存泄漏或兼容性问题；依赖 Hugging Face 和
+    bitsandbytes 等第三方库，演化风险高；量化压缩的具体精度损失数据：README 称“almost ignorable”，但未提供
+    benchmark 或评估报告。；支持的模型完整列表：README 仅列举了部分模型，实际支持的模型种类和版本未完整列出。；性能基准测试：除了
+    README 图表显示的压缩加速效果，没有与同类工具（如 llama.cpp、ExLlama）的定量对比。；推理 latency 和
+    throughput 的详细测试：未在 README 中提供。；多 GPU 和模型并行策略：README 未说明是否支持多 GPU，似乎仅针对单 GPU
+    场景。；预取功能的具体实现和适用范围：v2.5 提到 10% 提升，但未详细说明测量条件，且目前仅限 AirLLMLlama2。；discord 社区和
+    problem tracker 的活跃度：未提供具体数据。；训练相关代码（training 目录）：README 未提及训练功能，但仓库包含
+    training 目录，可能支持微调，但未在 README 中说明。
+  transfer: 值得尝试在低资源环境中集成，但需自行验证精度和稳定性；分层加载和权重仅量化思路可复用。 clone-and-run star
+self_evo_use: 记忆：把 airllm — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: airllm — 深度拆解
+      的核心判断：通过分层加载和块级量化压缩，在不使用传统量化、蒸馏或剪枝的情况下，大幅降低大语言模型推理的内存门槛，使得 70B 模型能够在 4GB
+      GPU 上运行。 本条由旧深读聚合内容重整为 RuView li…
+  - name: 机制链路
+    role: primary
+    evidence: 通过分层加载和块级量化压缩，在不使用传统量化、蒸馏或剪枝的情况下，大幅降低大语言模型推理的内存门槛，使得 70B 模型能够在 4GB GPU 上运行。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 值得尝试在低资源环境中集成，但需自行验证精度和稳定性；分层加载和权重仅量化思路可复用。 clone-and-run star
+  - name: 风险边界
+    role: supporting
+    evidence: 缺乏独立第三方评测，所有性能声明来自开发者；未提供完整测试，可能隐藏内存泄漏或兼容性问题；依赖 Hugging Face 和
+      bitsandbytes 等第三方库，演化风险高；量化压缩的具体精度损失数据：README 称“almost i…
+  - name: 证据账本
+    role: mentioned
+    evidence: 70B large language models to run inference on a single 4GB GPU card
+      without quantization, distillation and pruning.
+discovery_trace: 数据不足
+edges: []
+status: extracted

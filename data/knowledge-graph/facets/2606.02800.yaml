@@ -1,0 +1,44 @@
+schema: v2
+node_id: paper:2606.02800
+slug: 2606.02800-cosmos-3-world-model
+kind: paper
+title: "Cosmos 3: Omnimodal World Models for Physical AI"
+arxiv_id: "2606.02800"
+source: content/papers/2606.02800-cosmos-3-world-model +
+  data/autosci/primitives/2606.02800.yaml
+facets:
+  problem_solved: unify-heterogeneous-understanding-and-generation-under-one-backbone-switchable-by-io-config
+  method: 用「单一底座 + 由 token 排列决定工作模式」统一异构能力:一条序列前段走自回归(理解/语言)、
+    后段走扩散(生成),每层双套参数(reasoner/generator 双塔)从预训练模型初始化、层内共享注意力; 各模态(含 action)用专用
+    encoder 投影进统一表示空间,异构来源用分域投影、共享主干; 跨模态按真实物理时间轴对齐位置编码;不改架构、只换输入输出配置即可
+    post-train 出专用模型。
+  result: 对照"统一底座 post-train vs 从零训专用模型"在同一小任务上的首轮成功率/收敛步数(验证 MT-init 式
+    迁移先验是否真省事);再做"世界模型生成合成数据 → 训下游小模型 vs 真实数据"对照,测合成数据增益。 另测评判稳健性:同一批生成结果用两个不同
+    VLM 裁判打分,量化裁判分歧(防 LLM-judge 偏置)。1-21 天。
+  innovation: 用「单一底座 + 由 token 排列决定工作模式」统一异构能力:一条序列前段走自回归(理解/语言)、
+    后段走扩散(生成),每层双套参数(reasoner/generator 双塔)从预训练模型初始化、层内共享注意力; 各模态(含 action)用专用
+    encoder 投影进统一表示空间,异构来源用分域投影、共享主干; 跨模态按真实物理时间轴对齐位置编码;不改架构、只换输入输出配置即可
+    post-train 出专用模型。
+  weakness: judge_bias；compute_moat；physics_unsolved；benchmark_snapshot；single_platform_action；not_agent_core
+  transfer: Mini 版(不训大模型):取一个开源多模态底座,实现"统一 token 排列路由"——同一前向按 输入形态切换 理解/生成
+    模式;实现一个分域投影把 2-3 种异构信号(如不同传感器/控制)映射进同一空间; 跑通"下载权重 → 小数据 post-train →
+    出专用能力"一条最短链。200-500 行可演示路由+post-train 骨架。
+self_evo_use: '记忆：保留 Cosmos 3: Omnimodal World Models for Physical AI
+  的问题、方法、概念和证据边界。理解：用它补齐
+  unify-heterogeneous-understanding-and-generation-under-one-backbone-switchable-by-io-config
+  的方法坐标。自进化：Mini 版(不训大模型):取一个开源多模态底座,实现"统一 token 排列路由"——同一前向按 输入形态切换 理解/生成
+  模式;实现一个分域投影把 2-3 种异构信号(如不同传感器/控制)映射进同一空间; 跑通"下载权重 → 小数据 post-train →
+  出专用能力"一条最短链。200-500 行可演示路由+post-train 骨架。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: unify-heterogeneous-understanding-and-generation-under-one-backbone-switchable-by-io-config
+  - name: 方法原语
+    role: supporting
+    evidence: unify-heterogeneous-understanding-and-generation-under-one-backbone-switchable-by-io-config
+  - name: 迁移边界
+    role: supporting
+    evidence: unify-heterogeneous-understanding-and-generation-under-one-backbone-switchable-by-io-config
+discovery_trace: 数据不足
+edges: []
+status: extracted

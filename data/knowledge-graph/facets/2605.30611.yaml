@@ -1,0 +1,42 @@
+schema: v2
+node_id: paper:2605.30611
+slug: 2605.30611-crafter-multi-agent-harness
+kind: paper
+title: "Crafter: A Multi-Agent Harness for Editable Scientific Figure Generation
+  from Diverse Inputs"
+arxiv_id: "2605.30611"
+source: content/papers/2605.30611-crafter-multi-agent-harness +
+  data/autosci/primitives/2605.30611.yaml
+facets:
+  problem_solved: unreliable-one-shot-generation-needs-controlled-iterative-correction
+  method: 把任意不可靠的"一步生成 engine"包进 plan→render→diagnose→refine 循环： 以可被 typed-edit
+    修改的结构化规格 𝒮 当记忆；指令式批评家输出逐维度分+缺陷+修正； Convergence Judge 决定接受/精修/回退；非单调时回退到
+    best-so-far；便宜判据早退省预算。
+  result: 对照 A=自由文本改写 vs B=typed-edit 𝒮 + 指令式 critic + best-so-far，
+    在"研究实验设计草案"任务上跑 3 轮，比第 3 轮被独立冷评委判为"可执行"的比例； 并消融去掉结构化记忆 / 指令式 critic 各掉多少（复刻
+    Crafter Table 3 思路）。1-14 天。
+  innovation: 把任意不可靠的"一步生成 engine"包进 plan→render→diagnose→refine 循环： 以可被
+    typed-edit 修改的结构化规格 𝒮 当记忆；指令式批评家输出逐维度分+缺陷+修正； Convergence Judge
+    决定接受/精修/回退；非单调时回退到 best-so-far；便宜判据早退省预算。
+  weakness: judge_self_bias；cost_blowup；typed_edit_expressivity#
+    研究任务的结构化规格难定义，设计不好退化为自由文本；over_transfer
+  transfer: 100~200 行实现领域无关版：Spec 对象 + 一组 typed-edit 操作 + 调 OpenRouter 的
+    engine/critic； 先在单任务（如"生成实验设计草案"）跑通 3 轮循环，再抽象成与领域无关的小库。
+self_evo_use: '记忆：保留 Crafter: A Multi-Agent Harness for Editable Scientific
+  Figure Generation from Diverse Inputs 的问题、方法、概念和证据边界。理解：用它补齐
+  unreliable-one-shot-generation-needs-controlled-iterative-correction
+  的方法坐标。自进化：100~200 行实现领域无关版：Spec 对象 + 一组 typed-edit 操作 + 调 OpenRouter 的
+  engine/critic； 先在单任务（如"生成实验设计草案"）跑通 3 轮循环，再抽象成与领域无关的小库。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: unreliable-one-shot-generation-needs-controlled-iterative-correction
+  - name: 方法原语
+    role: supporting
+    evidence: unreliable-one-shot-generation-needs-controlled-iterative-correction
+  - name: 迁移边界
+    role: supporting
+    evidence: unreliable-one-shot-generation-needs-controlled-iterative-correction
+discovery_trace: 数据不足
+edges: []
+status: extracted

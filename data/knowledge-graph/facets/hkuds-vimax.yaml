@@ -1,0 +1,80 @@
+schema: v2
+node_id: content/hkuds-vimax
+slug: hkuds-vimax
+kind: project
+title: ViMax — 深度拆解
+source: public/data/brief/deep-dives.json:hkuds-vimax-deep-dive
+facets:
+  problem_solved: ViMax 是一个把想法、剧本或小说拆成故事、角色、分镜、镜头、关键帧和视频片段的多阶段视频生成代理框架，但端到端效果依赖外部
+    LLM、图片生成和视频生成 API。
+    人话：它不是单个视频模型，而是把“我要一个视频”拆成一串可落盘、可复用、可修改的中间产物：`story.txt`、`characters.json`、`script.json`、`storyboard.json`、`shot_description.json`、`camera_tree.json`、`first_frame.png`、`video.mp4`、`final_video.mp4`。README
+    自称是“multi-agent video framework”，源码已核实存在
+    `Idea2VideoPipeline`、`Script2VideoPipeline`、`Novel2MoviePipeline`、`AgentLoop`、`ToolRegistry`
+    和 TUI 入口。（来源：README
+    Architecture；来源：pipelines/idea2video_pipeline.py；来源：pipelines/script2video_pipeline.py；来源：agent_runtime/loop.py；来源：vimax）
+    术语定义：agent framework 在这里指一个能让模型调用工具、记录 session、检查依赖、拆分规划与渲染的运行时；video
+    pipeline 指固定顺序的 Python 流水线；artifact authority 指
+    `.working_dir/<session_id-or-run_id>/` 里的文件才是事实来源。（来源：prompts/workflow.md）
+  method: '人话：以仓库自带的 `main_script2video.py` 为例，用户先在文件里写剧本。实际示例是 `EXT. SCHOOL GYM -
+    DAY`，包含 John 和 Jane 的篮球训练对白；约束是 `Fast-paced with no more than 15 shots.`，风格是
+    `Anime Style`。入口调用
+    `Script2VideoPipeline.init_from_config(config_path="configs/script2video.yaml")`，再
+    `await pipeline(script=script, user_requirement=user_requirement,
+    style=style)`。（来源：main_script2video.py） 第一步，配置加载。`configs/script2video.yaml`
+    把 chat model 设为
+    `google/gemini-2.5-flash-lite-preview-09-2025`，`model_provider:
+    openai`，`base_url: https://openrouter.ai/api/v1`；图片生成类是
+    `tools.ImageGeneratorNanobananaGoogleAPI`，视频生成类是
+    `tools.VideoGeneratorVeoGoogleAPI`；工作目录是
+    `.working_dir/script2video`。`RenderBackend.from_config()` 会按 `class_path` 动态
+    import 这些类，并按 `max_requests_per_minute` / `max_requests_per_day` 创建
+    `RateLimiter`。（来源：configs/script2video.yaml；来源：tools/render_backend.py）
+    第二步，结构化文本规划。`Script2VideoPipeline.plan_text_artifacts()` 的真实顺序…'
+  result: 人话：下面把项目说了什么、文件实际证明了什么分开。README、徽章和营销语都算自称；源码、配置、测试、脚本能直接验证的算已核实。
+    术语定义：evidence_strength 不是效果评分，而是“这个结论被仓库文件支撑到什么程度”。 README
+    把它定位成多代理长视频生成框架，强调多镜头、角色和场景一致性。 源码里有一个 OpenAI-compatible tool-calling
+    loop，会采样模型、执行工具、写 session 历史，并限制最多 50 轮工具调用。 agent
+    工具先生成结构化文本文件；真正生成关键帧、视频片段和最终视频要走另一个 render 工具。 YAML 里写类名和限额，`RenderBackend`
+    动态 import 类并注入 `RateLimiter`。
+    剧本转视频不是直接把剧本丢给视频模型，而是先做角色提取、分镜、镜头拆解、相机树，再生成首尾帧和每个镜头视频。 当候选参考图达到 8
+    张或更多时，它先让文本模型选一批，再把图片内容发给多模态模型做最终选择和 prompt。
+    小说改编管线不是空目录，里面实现了压缩、事件、检索、场景等步骤；但作者自己在文件顶部留下未完成标记，应按不稳定/部分实现看待。 README 写了
+    Generate Video from Your Photo，但未找到 `AutoCameo` 模块、命令或配置。
+  innovation: 人话：最值得复用的不是提示词本身，而是“把创作状态变成可检查文件”的方式。它让代理不是凭聊天记忆判断进度，而是查
+    `.working_dir` 里哪些文件存在。 术语定义：abstraction 这里指可以抽出来用于别的 AI
+    应用的设计模式，不等于直接复制整套代码。 Artifact Authority Planning/Rendering Split
+    Config-Driven Render Backend Reference Image Selection Cascade Camera Tree
+  weakness: 人话：最大风险不在 Python 代码本身，而在外部模型、API
+    网关、视频生成任务排队和本地多媒体依赖。仓库把供应商抽象了一部分，但没有消除这些依赖。 术语定义：exposure
+    是依赖变化对项目能否运行的影响；mitigation_or_unknown 是仓库里已经有的缓解，或尚未说明的部分。
+  transfer: 人话：最值得复用的不是提示词本身，而是“把创作状态变成可检查文件”的方式。它让代理不是凭聊天记忆判断进度，而是查
+    `.working_dir` 里哪些文件存在。 术语定义：abstraction 这里指可以抽出来用于别的 AI
+    应用的设计模式，不等于直接复制整套代码。 Artifact Authority Planning/Rendering Split
+    Config-Driven Render Backend Reference Image Selection Cascade Camera Tree
+self_evo_use: 记忆：把 ViMax — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: ViMax 是一个把想法、剧本或小说拆成故事、角色、分镜、镜头、关键帧和视频片段的多阶段视频生成代理框架，但端到端效果依赖外部
+      LLM、图片生成和视频生成 API。 人话：它不是单个视频模型，而是把“我要一个视频”拆成一串可落盘、可复用、…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：以仓库自带的 `main_script2video.py` 为例，用户先在文件里写剧本。实际示例是 `EXT. SCHOOL GYM
+      - DAY`，包含 John 和 Jane 的篮球训练对白；约束是 `Fast-paced wit…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：最值得复用的不是提示词本身，而是“把创作状态变成可检查文件”的方式。它让代理不是凭聊天记忆判断进度，而是查
+      `.working_dir` 里哪些文件存在。 术语定义：abstraction 这里指可以抽出来用于别的 AI 应用的设计…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：最大风险不在 Python 代码本身，而在外部模型、API
+      网关、视频生成任务排队和本地多媒体依赖。仓库把供应商抽象了一部分，但没有消除这些依赖。 术语定义：exposure
+      是依赖变化对项目能否运行的影响；mitigation_o…
+  - name: 证据账本
+    role: mentioned
+    evidence: ViMax 是“multi-agent video framework”，面向 automated multi-shot video
+      generation 和 character/scene consistency。
+discovery_trace: 数据不足
+edges: []
+status: extracted

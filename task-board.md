@@ -14,6 +14,13 @@
 
 ## 进行中
 
+### PROJECTS-REMINE-2026-06-11 · 项目内容统一重生成 + 关系引擎再深挖（plan `docs/plans/2026-06-11-projects-remine.md`）
+- **大方向**：项目深读、light 文案、Mind Palace facet 和 typed relation graph 收敛成同一套可检索知识基底；删旧重、补 spine/facet、关系边从厚证据里挖。
+- **小方向**：清理 ownerless 旧 deep-dive 重复项；`trending.light` 去模板化且与实际深度决策一致；`worthDeepDive >= 60` 全部有 `briefSlug`；项目/论文 facets 覆盖扩大；relation candidate 默认放宽到 topK=10/max=300；孤立 faceted node 落 `track` label。
+- **阶段**：✅ Codex 实现完成 + 数据侧门禁通过，待独立冷审。
+- **阻塞**：独立冷审未跑（generator≠critic 红线）；未跑 `next build` / `npm run verify` 是本任务 spec 红线。
+- **交付结论**：报告 `logs/remine-summary.md`；进度 `logs/remine-progress.md`。`public/data/brief/deep-dives.json` 59 条且 `meta.light_spine` 缺口 0；`trending.json` 90 条 light 去模板化，高分缺 `briefSlug` 为 0；公开 facets 93（paper 37 / project 56），embeddings 93；graph typed primary edges 33（mechanical-in-primary=0），track label 基数 8。验证：`npm run validate` 通过（仅既有 articles warning）；`node scripts/eval-relation-engine.mjs` 通过；`node scripts/kg/bench-retrieval.mjs hybrid` recall@3=8/8、precision=14/15；`node scripts/kg/recall-eval.mjs` recall@3=1.000。红线复核：`src/`、`app/` 无 diff，未运行 Next build。
+
 ### KG-3-RELATION-ENGINE · Mind Palace typed 关系引擎 Loop B+C（plan `docs/plans/2026-06-11-mind-palace-relation-engine.md`）
 - **大方向**：Mind Palace 主图从 references/same_track 毛球切到 typed relation reasoning；机械边保留为 secondary plumbing，不再占主边层。
 - **小方向**：新增 `scripts/kg/relation-engine.mjs` 确定性 CI 路径（facet 明示证据 + lexical/shared-core candidate top-K，不调模型）；`same_use_case` 并入 `complements`；typed 边补 `use`；`build-brief-graph` / `integrate-kg` 统一 normalize。

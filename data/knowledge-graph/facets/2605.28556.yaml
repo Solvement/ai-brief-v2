@@ -1,0 +1,38 @@
+schema: v2
+node_id: paper:2605.28556
+slug: 2605.28556-taste
+kind: paper
+title: "A Matter of TASTE: Improving Coverage and Difficulty of Agent Benchmarks"
+arxiv_id: "2605.28556"
+source: content/papers/2605.28556-taste + data/autosci/primitives/2605.28556.yaml
+facets:
+  problem_solved: auto-generate-valid-difficult-high-coverage-eval-tasks-for-tool-agents
+  method: 反转生成方向 + 覆盖感知评测:与其从场景反推动作序列,不如直接对"动作序列空间"采样 (自适应对比 n-gram,LLM 判合法性,在线
+    sample-and-validate)→ k-medoids 选代表 → 实例化成任务 + 提示验证可解 +
+    难度演化(含糊用户/诱饵)。基准须同时满足 validity/difficulty/coverage, 覆盖用工具序列(TTR/编辑距离/熵)量化。
+  result: 对 AutoSci 现有的一组任务,量工具组合覆盖(TTR/唯一组合数);再用反转采样合成 10 个更高覆盖的新任务, 对照 AutoSci 在
+    原任务 vs 新任务 的成功率落差(若新任务掉分大 = 原基准饱和)。1-14 天。
+  innovation: 反转生成方向 + 覆盖感知评测:与其从场景反推动作序列,不如直接对"动作序列空间"采样 (自适应对比 n-gram,LLM
+    判合法性,在线 sample-and-validate)→ k-medoids 选代表 → 实例化成任务 + 提示验证可解 +
+    难度演化(含糊用户/诱饵)。基准须同时满足 validity/difficulty/coverage, 覆盖用工具序列(TTR/编辑距离/熵)量化。
+  weakness: judge_bias；env_binding；heuristic_difficulty；coverage_proxy
+  transfer: Mini 版:小工具集上建 n-gram(合法/不合法两表,LLM 判)→ 采样合法序列 → 套任务模板 → LLM 判可解 →
+    难度变体。先量"覆盖"(唯一组合数/TTR),再加生成。100-300 行起步。
+self_evo_use: '记忆：保留 A Matter of TASTE: Improving Coverage and Difficulty of
+  Agent Benchmarks 的问题、方法、概念和证据边界。理解：用它补齐
+  auto-generate-valid-difficult-high-coverage-eval-tasks-for-tool-agents
+  的方法坐标。自进化：Mini 版:小工具集上建 n-gram(合法/不合法两表,LLM 判)→ 采样合法序列 → 套任务模板 → LLM 判可解 →
+  难度变体。先量"覆盖"(唯一组合数/TTR),再加生成。100-300 行起步。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: auto-generate-valid-difficult-high-coverage-eval-tasks-for-tool-agents
+  - name: 方法原语
+    role: supporting
+    evidence: auto-generate-valid-difficult-high-coverage-eval-tasks-for-tool-agents
+  - name: 迁移边界
+    role: supporting
+    evidence: auto-generate-valid-difficult-high-coverage-eval-tasks-for-tool-agents
+discovery_trace: 数据不足
+edges: []
+status: extracted

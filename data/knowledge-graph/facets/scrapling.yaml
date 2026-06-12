@@ -1,0 +1,45 @@
+schema: v2
+node_id: content/scrapling
+slug: scrapling
+kind: project
+title: Scrapling — 深度拆解
+source: public/data/brief/deep-dives.json:scrapling-deep-dive
+facets:
+  problem_solved: Scrapling — 深度拆解 的核心判断：将自适应网页解析与现代隐身请求结合，并原生集成 AI
+    代理调用（MCP/Skill），形成一站式抗反爬采集工具。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自 README
+    (全文)；topics (ai, mcp, mcp-server, ai-scraping, ...)；top_level_dirs
+    (agent-skill, docs, tests, ...)；key_files (Dockerfile,
+    pyproject.toml)；documentation links (MCP, CLI, etc.)。没有源码级证据的地方保留“数据不足”。
+  method: 将自适应网页解析与现代隐身请求结合，并原生集成 AI 代理调用（MCP/Skill），形成一站式抗反爬采集工具。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    页面改版后，爬虫仍能找到之前定义的目标元素，无需修改代码。 无需额外配置即可通过隐身模式请求被 Cloudflare Turnstile 保护的网站。
+    可以同时跑多个抓取任务，随时暂停并恢复，还能自动切换代理 IP。 AI 模型可以像调用工具一样使用这个爬虫。
+    先保存元素的特征，页面变化后根据特征找回元素。
+  innovation: 可复用自适应选择器模式（记忆+模糊匹配）和 MCP 工具封装模式；底层反爬技巧因强依赖 Chromium 环境，抽象复用时成本可能较高。
+    clone-and-run read-docs star extract-pattern(adaptive-element-relocation)
+  weakness: 反爬技术不断升级，隐身请求可能失效；自适应匹配误报可能污染数据；社区大量赞助内容，可能影响项目技术重心
+  transfer: 可复用自适应选择器模式（记忆+模糊匹配）和 MCP 工具封装模式；底层反爬技巧因强依赖 Chromium 环境，抽象复用时成本可能较高。
+    clone-and-run read-docs star extract-pattern(adaptive-element-relocation)
+self_evo_use: 记忆：把 Scrapling — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Scrapling — 深度拆解 的核心判断：将自适应网页解析与现代隐身请求结合，并原生集成 AI
+      代理调用（MCP/Skill），形成一站式抗反爬采集工具。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自…
+  - name: 机制链路
+    role: primary
+    evidence: 将自适应网页解析与现代隐身请求结合，并原生集成 AI 代理调用（MCP/Skill），形成一站式抗反爬采集工具。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用自适应选择器模式（记忆+模糊匹配）和 MCP 工具封装模式；底层反爬技巧因强依赖 Chromium 环境，抽象复用时成本可能较高。
+      clone-and-run read-docs star extract-pattern(adapt…
+  - name: 风险边界
+    role: supporting
+    evidence: 反爬技术不断升级，隐身请求可能失效；自适应匹配误报可能污染数据；社区大量赞助内容，可能影响项目技术重心
+  - name: 证据账本
+    role: mentioned
+    evidence: 解析器能从网站变化中学习并自动重定位你的元素。
+discovery_trace: 数据不足
+edges: []
+status: extracted

@@ -1,0 +1,70 @@
+schema: v2
+node_id: content/nesquena-hermes-webui
+slug: nesquena-hermes-webui
+kind: project
+title: hermes-webui — 深度拆解
+source: public/data/brief/deep-dives.json:nesquena-hermes-webui-deep-dive
+facets:
+  problem_solved: Hermes WebUI 是给 Hermes Agent 用的自托管浏览器工作台：用 Python 标准库 HTTP 服务和
+    vanilla JS，把聊天、会话、工作区文件、审批、任务、技能、记忆和多 profile 管理放到一个 Web UI 里。
+    人话：它不是一个新的大模型框架，而是把已经安装在服务器上的 Hermes Agent 搬进浏览器和手机可访问的界面；官方 README 自称接近
+    “1:1 parity with Hermes CLI”，但仓库同时承认 WebUI 仍直接依赖 Hermes Agent 的 Python
+    内部模块和状态布局。（来源：README 顶部介绍；README
+    Compatibility；docs/rfcs/agent-source-boundary.md） 术语：vanilla JS 指不用
+    React/Vue 等前端框架；SSE 指浏览器通过 EventSource 接收服务端持续推送；profile 指 Hermes Agent
+    的一套配置、凭证、技能、记忆和状态目录。
+  method: "真实流程示例：用户在浏览器 composer 里按发送。前端 `static/messages.js` 先把 user message
+    乐观插入 `S.messages`，上传附件时调用 `uploadPendingFiles()`；如果只有附件，会把消息文本构造成 `I've
+    uploaded N file(s): ...`，如果有正文则追加 `[Attached files: ...]`。随后它 POST
+    `/api/chat/start`，body 里包含
+    `session_id`、`message`、`model`、`workspace`、`model_provider`、`profile`、`expl\
+    icit_model_pick` 和 `attachments`。（来源：static/messages.js send flow） 后端
+    `api/routes.py` 的 `_handle_chat_start` 先 `require(body, \"session_id\")`，找
+    session，校验 profile id，要求 `message` 非空，最多取 20 个 attachments，然后解析
+    workspace/model/provider。普通 legacy 路径会进入 `_start_chat_stream_for_session`，生成
+    stream，浏览器拿到 `stream_id`。（来源：api/routes.py `_handle_chat_start`） 流式部分由
+    `api/streaming.py` 执行。worker 注册 active run，创建 cancel event，把
+    `CANCEL_FLAGS[stream_id]`、`STREAM_PARTIAL_TEXT[stream_id]`、`STREAM_REASONIN\
+    G_TEXT[stream_id]`、`STREAM_LIVE_TOOL_CALLS[stream_id]` 放进全局表。跑 Agent
+    前，它设置线程/进程环境：`TERMINAL_CWD=str…"
+  result: 下面把 README/文档自称和从文件树、配置、代码中能核实的事实分开。竞品对比、平台数量、稳定性和“best/closest
+    competitor”类说法只按自称处理。 这个 WebUI 不需要前端构建链，开发依赖也没有承担运行时打包职责。
+    浏览器里覆盖聊天、sessions、workspace、Tasks、Skills、Memory、Profiles、Todos、Spaces
+    等面板，但“1:1 parity”本身是项目自称。 用户发消息后，前端先 POST 开始任务，再打开 EventSource 监听流式事件。 Agent
+    请求危险操作时，浏览器显示命令和 allow once/session/always/deny 类交互。 仓库提供三个 compose 形态：WebUI
+    内跑 agent、agent+WebUI 分离、agent+dashboard+WebUI。 这个 WebUI 不是只调用稳定 HTTP API；它会
+    import Agent Python 模块、读 Agent state.db/schema 和配置。 README 自称约 7,150 tests
+    collected、约 700 test files；实际 checkout 文件树中测试文件更多。
+  innovation: 这个项目最可复用的不是 UI 颜色，而是把“长时间运行的 CLI/Agent 进程”产品化时的边界处理。 start/observe
+    分离的聊天协议 审批卡片作为运行时控制面 profile-scoped runtime env 管理员控制的同源扩展面 工作区 Git 的只读默认 +
+    显式破坏性开关
+  weakness: 主要风险不是 Python/JS 技术栈本身，而是 WebUI 仍包在 Hermes Agent 内部实现上。仓库自己把这点写成兼容性和
+    source-boundary RFC。
+  transfer: 这个项目最可复用的不是 UI 颜色，而是把“长时间运行的 CLI/Agent 进程”产品化时的边界处理。 start/observe
+    分离的聊天协议 审批卡片作为运行时控制面 profile-scoped runtime env 管理员控制的同源扩展面 工作区 Git 的只读默认 +
+    显式破坏性开关
+self_evo_use: 记忆：把 hermes-webui — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 ai_app
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Hermes WebUI 是给 Hermes Agent 用的自托管浏览器工作台：用 Python 标准库 HTTP 服务和 vanilla
+      JS，把聊天、会话、工作区文件、审批、任务、技能、记忆和多 profile 管理放到一个 Web…
+  - name: 机制链路
+    role: primary
+    evidence: 真实流程示例：用户在浏览器 composer 里按发送。前端 `static/messages.js` 先把 user message
+      乐观插入 `S.messages`，上传附件时调用 `uploadPendingFiles()`；如果…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 这个项目最可复用的不是 UI 颜色，而是把“长时间运行的 CLI/Agent 进程”产品化时的边界处理。 start/observe
+      分离的聊天协议 审批卡片作为运行时控制面 profile-scoped runtime env 管理员控…
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险不是 Python/JS 技术栈本身，而是 WebUI 仍包在 Hermes Agent 内部实现上。仓库自己把这点写成兼容性和
+      source-boundary RFC。
+  - name: 证据账本
+    role: mentioned
+    evidence: “No build step, no framework, no bundler. Just Python and vanilla JS.”
+discovery_trace: 数据不足
+edges: []
+status: extracted

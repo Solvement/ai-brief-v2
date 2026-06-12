@@ -1,0 +1,64 @@
+schema: v2
+node_id: content/ogulcancelik-herdr
+slug: ogulcancelik-herdr
+kind: project
+title: herdr — 深度拆解
+source: public/data/brief/deep-dives.json:ogulcancelik-herdr-deep-dive
+facets:
+  problem_solved: Herdr 是一个面向 AI coding agents 的 Rust 终端复用器，用
+    workspace/tab/pane、后台 session server、agent 状态识别和本地 socket API，把多个终端里的 agent
+    工作流放在一个 TUI 里管理。 人话：它更像“给 AI agent 用的 tmux + 状态看板”，不是一个替你调用模型的 agent
+    框架。你在终端里开多个 pane 跑 Claude Code、Codex、Copilot CLI 等工具，Herdr
+    负责保活、切换、拆分、读取输出、等待状态、远程 attach。术语：terminal multiplexer
+    指把多个终端会话组织在一个界面里；agent awareness 指从进程、屏幕文本或 hook/plugin 上报中判断 agent 是
+    working、blocked、done、idle。项目 Cargo 描述为“terminal workspace manager for AI
+    coding agents”，版本为 0.6.7。（来源：Cargo.toml package）
+  method: 人话：Herdr 启动后默认连到一个后台 server；client 可以 detach，server 继续托管 pane
+    进程。界面上把项目组织成 workspaces，workspace 里有 tabs，tab 里有 panes。agent
+    状态来自三路信号：前台进程识别、终端屏幕启发式、hook/plugin/socket 上报。agent 或脚本优先用 CLI
+    wrapper；需要长连接或精细控制时才用 raw socket。术语：Unix domain socket
+    是本机进程通信通道；newline-delimited JSON 是一行一个 JSON request/response；semantic state
+    是影响 wait、notification、rollup 的状态字段，不等同于 UI 上的 custom_status。（来源：README core
+    concepts；docs/socket-api.mdx Choose an integration layer / Socket transport
+    / Agent state reporting；docs/integrations.mdx How Herdr uses integrations）
+  result: 人话：README 的强卖点要分开看。能从源码/配置确认的是 Rust CLI、socket method schema、agent
+    检测模块、集成安装资产、许可和文档；“体验更好”“single binary”“支持多少 agent”的实际效果仍依赖运行环境和各 agent UI
+    变化。术语：evidence_strength high 表示仓库源码或 docs 明确存在；medium 表示 README/docs
+    自称且有部分源码结构支撑；low 表示未运行验证。 它管理终端里的 agent 进程和布局，而不是自己实现 LLM agent loop。 它不是重画
+    agent UI，而是在真实终端里托管 shell/agent/server/test 进程。 外部脚本或 pane 内 agent 可以通过 CLI
+    或 socket 控制 Herdr。 README/docs 说它能识别多种 coding agent 的 idle/working/blocked
+    状态，但覆盖质量按 agent 不同。 不是所有集成都能恢复对话；有的只上报状态，有的只上报会话身份。 官方文档说它主要面向
+    Linux/macOS，Windows 用户走 WSL。 开源使用要注意 AGPL；不能遵守 AGPL 的组织可联系商业许可。
+  innovation: 人话：最值得复用的不是 TUI 皮肤，而是“终端真实进程 + 可脚本化控制面 + 状态上报协议”的组合。术语：control plane
+    是让外部工具操作系统的 API；rollup 是把 pane 状态汇总到 tab/workspace。 CLI-first socket API
+    Agent state authority split Session restore matrix Agent skill guardrail
+  weakness: 人话：Herdr 的风险主要来自终端生态和外部 agent CLI，而不是云 API。只要 agent UI 文案、hook
+    配置或终端协议变了，状态识别和交互体验就会受影响。术语：PTY 是伪终端；screen heuristic 是从屏幕文本推断状态。
+  transfer: 人话：最值得复用的不是 TUI 皮肤，而是“终端真实进程 + 可脚本化控制面 + 状态上报协议”的组合。术语：control plane
+    是让外部工具操作系统的 API；rollup 是把 pane 状态汇总到 tab/workspace。 CLI-first socket API
+    Agent state authority split Session restore matrix Agent skill guardrail
+self_evo_use: 记忆：把 herdr — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 devtool_cli
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Herdr 是一个面向 AI coding agents 的 Rust 终端复用器，用 workspace/tab/pane、后台
+      session server、agent 状态识别和本地 socket API，把多个终端里的 agent…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：Herdr 启动后默认连到一个后台 server；client 可以 detach，server 继续托管 pane
+      进程。界面上把项目组织成 workspaces，workspace 里有 tabs，tab 里有 panes。ag…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：最值得复用的不是 TUI 皮肤，而是“终端真实进程 + 可脚本化控制面 + 状态上报协议”的组合。术语：control plane
+      是让外部工具操作系统的 API；rollup 是把 pane 状态汇总到 tab/workspace…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：Herdr 的风险主要来自终端生态和外部 agent CLI，而不是云 API。只要 agent UI 文案、hook
+      配置或终端协议变了，状态识别和交互体验就会受影响。术语：PTY 是伪终端；screen heuristic 是从…
+  - name: 证据账本
+    role: mentioned
+    evidence: Herdr 是面向 AI coding agents 的终端 workspace manager。
+discovery_trace: 数据不足
+edges: []
+status: extracted

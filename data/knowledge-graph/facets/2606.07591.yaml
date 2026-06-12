@@ -1,0 +1,55 @@
+schema: v2
+node_id: paper:2606.07591
+slug: 2606.07591-researchclawbench-autonomous-research
+kind: paper
+title: "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research"
+arxiv_id: "2606.07591"
+source: content/papers/2606.07591-researchclawbench-autonomous-research +
+  data/autosci/primitives/2606.07591.yaml
+facets:
+  problem_solved: evaluate-open-ended-end-to-end-autonomous-research-without-exact-match
+  method: 评测端到端自主科研：每题锚定一篇真论文但对系统隐藏（hidden target），给问题/文献/原始数据，
+    让系统从零走完"文献→处理数据→设计执行实验→出图→写报告"全流程； 用专家拆解的加权
+    rubric（围绕目标论文关键科学产物的、可验证子项+技术关键词）逐项判分； 钉 50
+    分=复现线、>50=真发现，把"复刻"与"超越"放进同一刻度。配极简 ReAct 壳（ResearchHarness）让裸 LLM 同台可比。
+  result: 在 AI-Brief 冷审门上试：选 3 篇已深读论文，把每篇拆成 5-7 项加权 rubric（隐藏原 paper.mdx）， 让 judge
+    对"新生成深读 vs grandfathered 金样"逐项打分；对比"整体打分 vs 逐项打分"的方差，
+    验证逐项+关键词核对是否更稳、更能区分。再对失败深读做 6 类错误归因。3-7 天。
+  innovation: ；；；；
+  weakness: dry_lab_only；scores_final_not_process；single_judge_bias；rubric_caps_at_known；small_scale；all_self_reported
+  transfer: 评测端到端自主科研：每题锚定一篇真论文但对系统隐藏（hidden target），给问题/文献/原始数据，
+    让系统从零走完"文献→处理数据→设计执行实验→出图→写报告"全流程； 用专家拆解的加权
+    rubric（围绕目标论文关键科学产物的、可验证子项+技术关键词）逐项判分； 钉 50
+    分=复现线、>50=真发现，把"复刻"与"超越"放进同一刻度。配极简 ReAct 壳（ResearchHarness）让裸 LLM 同台可比。
+self_evo_use: "记忆：保留 ResearchClawBench: A Benchmark for End-to-End Autonomous
+  Scientific Research 的问题、方法、概念和证据边界。理解：用它补齐
+  evaluate-open-ended-end-to-end-autonomous-research-without-exact-match
+  的方法坐标。自进化：作为后续 AutoSci/评测/记忆原语候选。"
+core_concepts:
+  - name: 隐藏目标论文再发现（hidden-target re-discovery）
+    role: primary
+    evidence: we keep the target paper hidden on the evaluation side ... enabling
+      evaluation of target-paper-level re-discovery while leaving room for new
+      discovery (Abstrac…
+  - name: 加权可验证 rubric 拆解（expert-curated weighted rubric）
+    role: primary
+    evidence: Expert-curated multimodal rubrics decompose the target scientific
+      artifacts into weighted criteria ... specific criteria ... technical
+      keywords that the judge …
+  - name: 50=复现 / >50=发现 评分刻度（re-discovery-to-discovery scale）
+    role: primary
+    evidence: we set 50 rather than 100 as the re-discovery boundary ... 50 means
+      the model recovered the target result, and scores above 50 indicate
+      discoveries (§3.4)
+  - name: 失败集中于科学严谨（protocol/evidence/scientific-core mismatch）
+    role: supporting
+    evidence: failures concentrate in experimental protocol mismatch, evidence
+      mismatch, and missing scientific core (Abstract/§4.5, 280 runs)
+  - name: ResearchHarness 极简 ReAct 评测壳
+    role: supporting
+    evidence: a lightweight tool-using harness ... a concise ReAct-style loop ...
+      automatic context compaction ... default compaction trigger is 128k tokens
+      (§3.3)
+discovery_trace: 数据不足
+edges: []
+status: extracted

@@ -1,0 +1,46 @@
+schema: v2
+node_id: paper:2606.01249
+slug: 2606.01249-tropd-trust-region-distillation
+kind: paper
+title: Trust Region On-Policy Distillation
+arxiv_id: "2606.01249"
+source: content/papers/2606.01249-tropd-trust-region-distillation +
+  data/autosci/primitives/2606.01249.yaml
+facets:
+  problem_solved: unreliable-stepwise-supervision-under-teacher-student-distribution-mismatch
+  method: 当强老师/强裁判在弱学生自己生成的轨迹上逐步给监督时,分布错位会让少数步骤产生极端或误导信号。 TrOPD 的可复用模式是:先按每个
+    token/step 的可靠度自适应分区,而不是用全局阈值一刀切; 可靠区使用高效主目标继续学习,不可靠的 outlier
+    区切换到更温和、从老师视角出发的 fallback 信号; 冷启动阶段允许老师给高质量前缀,再用退火逐步撤掉,最终回到学生自己的 on-policy
+    分布。
+  result: 在一对小开源师生模型上做迷你数学蒸馏,对比 A=vanilla OPD, B=固定阈值 clipping, C=acceptance-ratio
+    trust region + outlier top-k FKL。即使只跑几十到几百步,也记录 grad-norm/entropy/accuracy
+    曲线。 第二个实验把同样分区思想迁到 agent judge:对同一批轨迹,比较统一打分 vs 低信任 step 降权/回退后的自训练样本质量。
+  innovation: 强监督进入训练前先按可靠度分区;不要假设老师对学生自生成的每一步都同样可信。；优先用样本自身信号(如
+    min(p_teacher/p_student,1))确定信任度,少依赖固定全局阈值。；低信任样本不一定全丢;用更温和、不会放大坏梯度的
+    fallback 保留可用信息。；冷启动阶段给老师前缀/脚手架,再逐步退火撤掉,最终回到目标 on-policy 分布。
+  weakness: code_not_released；models_not_released；teacher_distribution_may_be_unreliable；hyperparameter_sensitivity_underexplored；controlled_benchmark_no_deployment；student_ceiling_remains_below_teacher
+  transfer: "先做一个 100-300 行的通用分区器:输入 teacher/student logprob,计算
+    P_trust=min(exp(logp_T-logp_S),1), 采样或阈值化得到 trust/outlier mask。trust
+    区走原主目标;outlier 区用老师 top-k 分布构造 forward-KL fallback; 训练日志记录
+    grad-norm、policy-entropy、trust ratio、outlier ratio。对 agent 自进化时,把 token 换成
+    step/claim: 高信任步骤进入训练样本,低信任步骤只给温和修正或要求老师示范前缀。"
+self_evo_use: "记忆：保留 Trust Region On-Policy Distillation 的问题、方法、概念和证据边界。理解：用它补齐
+  unreliable-stepwise-supervision-under-teacher-student-distribution-mismatch
+  的方法坐标。自进化：先做一个 100-300 行的通用分区器:输入 teacher/student logprob,计算
+  P_trust=min(exp(logp_T-logp_S),1), 采样或阈值化得到 trust/outlier mask。trust
+  区走原主目标;outlier 区用老师 top-k 分布构造 forward-KL fallback; 训练日志记录
+  grad-norm、policy-entropy、trust ratio、outlier ratio。对 agent 自进化时,把 token 换成
+  step/claim: 高信任步骤进入训练样本,低信任步骤只给温和修正或要求老师示范前缀。"
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: unreliable-stepwise-supervision-under-teacher-student-distribution-mismatch
+  - name: 方法原语
+    role: supporting
+    evidence: unreliable-stepwise-supervision-under-teacher-student-distribution-mismatch
+  - name: 迁移边界
+    role: supporting
+    evidence: unreliable-stepwise-supervision-under-teacher-student-distribution-mismatch
+discovery_trace: 数据不足
+edges: []
+status: extracted

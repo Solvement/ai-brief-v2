@@ -1,0 +1,36 @@
+schema: v2
+node_id: paper:2605.29707
+slug: 2605.29707-domino
+kind: paper
+title: "Domino: Decoupling Causal Modeling from Autoregressive Drafting in
+  Speculative Decoding"
+arxiv_id: "2605.29707"
+source: content/papers/2605.29707-domino + data/autosci/primitives/2605.29707.yaml
+facets:
+  problem_solved: latency-cost-tradeoff-in-iterative-generation
+  method: 成本结构拆分:把昂贵算子并行摊掉只算一次,只让便宜的小分支承担串行依赖。 Domino 用并行 backbone 出整块草稿(贵的
+    LM-head 并行一次)+ 低秩残差头(便宜)按 token 串行补因果。
+  result: 在固定硬件上对 AutoSci 用的基座模型跑 有/无 推测解码 的吞吐与延迟对比,量端到端成本下降。1-3 天。
+  innovation: 成本结构拆分:把昂贵算子并行摊掉只算一次,只让便宜的小分支承担串行依赖。 Domino 用并行 backbone 出整块草稿(贵的
+    LM-head 并行一次)+ 低秩残差头(便宜)按 token 串行补因果。
+  weakness: inference_only；framework_lockin；hardware_variance；not_a_reasoning_gain
+  transfer: AutoSci 不必自己实现 Domino;在 serving 层(SGLang/vLLM)接现成推测解码即可。
+    若要自研收益,先用现成方案做评测(加速×接受长度×TPS),再决定是否训练定制 draft head。
+self_evo_use: "记忆：保留 Domino: Decoupling Causal Modeling from Autoregressive
+  Drafting in Speculative Decoding 的问题、方法、概念和证据边界。理解：用它补齐
+  latency-cost-tradeoff-in-iterative-generation 的方法坐标。自进化：AutoSci 不必自己实现
+  Domino;在 serving 层(SGLang/vLLM)接现成推测解码即可。
+  若要自研收益,先用现成方案做评测(加速×接受长度×TPS),再决定是否训练定制 draft head。"
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: latency-cost-tradeoff-in-iterative-generation
+  - name: 方法原语
+    role: supporting
+    evidence: latency-cost-tradeoff-in-iterative-generation
+  - name: 迁移边界
+    role: supporting
+    evidence: latency-cost-tradeoff-in-iterative-generation
+discovery_trace: 数据不足
+edges: []
+status: extracted

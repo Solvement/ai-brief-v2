@@ -1,0 +1,46 @@
+schema: v2
+node_id: paper:2606.05259
+slug: 2606.05259-videokr-video-understanding
+kind: paper
+title: "VideoKR: Towards Knowledge- and Reasoning-Intensive Video Understanding"
+arxiv_id: "2606.05259"
+source: content/papers/2606.05259-videokr-video-understanding +
+  data/autosci/primitives/2606.05259.yaml
+facets:
+  problem_solved: synthesize-trustworthy-domain-training-and-eval-data-without-single-model-bias-or-shortcuts
+  method: 把"领域能力训练数据"当成可控流水线端到端生产:先建分层知识库(范围定义)→把知识点
+    场景化成可检索查询去采真实素材(而非讲解材料)→按"技能维度"分层定向合成样本并配 CoT→ 三重过滤(自洽性重答一致 /
+    去捷径:少量上下文还能答对就删 / 独立强模型逐步验证 CoT 证据支撑)→ 管线级质控(多模型池 + 每步抽样人验准入门槛 +
+    去评测污染)。关键内核是「生成器≠评判器 + 去捷径 + 模型选型量化准入」三件套,把"模型造的数据"逼到可信。
+  result: 对照"有去捷径过滤 vs 无"两版数据各训一个小模型, 在同一个去捷径评测集上比知识密集准确率; 再做"单模型生成 vs 多模型池生成"对照,
+    看下游泛化差异;并量化最终语料的残噪率(抽样人核), 与"人工种子错误率"对齐当可接受基线。3-14 天。
+  innovation: 把"领域能力训练数据"当成可控流水线端到端生产:先建分层知识库(范围定义)→把知识点
+    场景化成可检索查询去采真实素材(而非讲解材料)→按"技能维度"分层定向合成样本并配 CoT→ 三重过滤(自洽性重答一致 /
+    去捷径:少量上下文还能答对就删 / 独立强模型逐步验证 CoT 证据支撑)→ 管线级质控(多模型池 + 每步抽样人验准入门槛 +
+    去评测污染)。关键内核是「生成器≠评判器 + 去捷径 + 模型选型量化准入」三件套,把"模型造的数据"逼到可信。
+  weakness: generator_equals_critic；residual_noise；specialization_tax；cost_and_human_load；release_unverified
+  transfer: Mini 版(文本或图文, 不必视频):选一个小垂直域 → knowledge_bank_builder 列 20 知识点 →
+    scenario_query_maker 生成检索词采 50 条真实素材 → skill_tiered_generator 按 3 技能各出题 →
+    self_consistency_filter + shortcut_filter(只喂题不喂关键证据, 答对就删) + cot_verifier →
+    最后用 model_qualification_gate(每步抽 20 条人评错定准入)。200-400 行可跑通一条端到端管线。
+self_evo_use: "记忆：保留 VideoKR: Towards Knowledge- and Reasoning-Intensive Video
+  Understanding 的问题、方法、概念和证据边界。理解：用它补齐
+  synthesize-trustworthy-domain-training-and-eval-data-without-single-model-bia\
+  s-or-shortcuts 的方法坐标。自进化：Mini 版(文本或图文, 不必视频):选一个小垂直域 → knowledge_bank_builder
+  列 20 知识点 → scenario_query_maker 生成检索词采 50 条真实素材 → skill_tiered_generator 按 3
+  技能各出题 → self_consistency_filter + shortcut_filter(只喂题不喂关键证据, 答对就删) +
+  cot_verifier → 最后用 model_qualification_gate(每步抽 20 条人评错定准入)。200-400
+  行可跑通一条端到端管线。"
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: synthesize-trustworthy-domain-training-and-eval-data-without-single-model-bias-or-shortcuts
+  - name: 方法原语
+    role: supporting
+    evidence: synthesize-trustworthy-domain-training-and-eval-data-without-single-model-bias-or-shortcuts
+  - name: 迁移边界
+    role: supporting
+    evidence: synthesize-trustworthy-domain-training-and-eval-data-without-single-model-bias-or-shortcuts
+discovery_trace: 数据不足
+edges: []
+status: extracted

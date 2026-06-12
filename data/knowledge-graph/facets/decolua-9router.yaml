@@ -1,0 +1,80 @@
+schema: v2
+node_id: content/decolua-9router
+slug: decolua-9router
+kind: project
+title: 9router — 深度拆解
+source: public/data/brief/deep-dives.json:decolua-9router-deep-dive
+facets:
+  problem_solved: 9Router 是一个本地运行的 AI 编程工具网关：把 Claude Code、Codex、Cursor、Cline
+    等客户端接到统一的 `/v1` 接口，再按模型名、账号、组合和错误状态转发到不同上游 provider。 通俗说，它像一个本地“AI API
+    总插线板”：你的工具只认 `http://localhost:20128/v1`，9Router 在后面决定走
+    `kr/claude-sonnet-4.5`、`cx/gpt-5.5`、`glm/glm-5.1` 还是
+    combo。术语定义：OpenAI-compatible endpoint 指客户端按 OpenAI `/v1/chat/completions`
+    形状发请求；provider executor 指 `open-sse/executors/*` 里面真正调用上游服务的适配器；combo
+    指数据库里的一个模型序列，失败后按顺序或 round-robin 尝试下一个模型。（来源：README Quick
+    Start；src/app/api/v1/chat/completions/route.js POST；src/sse/handlers/chat.js
+    handleChat；open-sse/services/combo.js）
+  method: "通俗说，真实请求流是：用户在 Claude Code/Codex/Cline 这类工具里配置 `Endpoint:
+    http://localhost:20128/v1`、`API Key: [dashboard key]`、`Model:
+    kr/claude-sonnet-4.5`。请求到 `/v1/chat/completions` 后，`next.config.mjs` rewrite
+    到 `/api/v1/chat/completions`；`src/app/api/v1/chat/completions/route.js` 初始化
+    translator 后调用 `handleChat(request)`。`handleChat` 读取 JSON、缓存 Claude
+    header、检查 `settings.requireApiKey`，没有 model 就返回 400；如果 model 是 combo 名，会取
+    `getComboModels(modelStr)` 并调用 `handleComboChat`；如果是 `kr/claude-sonnet-4.5`
+    这种 `alias/model`，`open-sse/services/model.js` 把 `kr` 解析为 provider `kiro`。然后
+    `src/sse/services/auth.js` 选择账号：无认证 provider 会返回虚拟 `noauth` connection；普通
+    provider 会查 active `providerConnections`，过滤 `modelLock_*`，按 `fill-first` 或
+    `round-robin` 选连接。之后 `handleChatCore` 检测来源格式，决定目标格式；非 native passthrough 时调用
+    `translateRequest(sourceFormat, targetFormat, upstreamModel, ...)`；发送前执行
+    `compressMessages` 和可选 `injectCav…"
+  result: 通俗说，README 的“省 20-40% token”“40+
+    providers”“免费无限”等必须分开看：数字和免费额度大多是自称；源码能验证的是路由、压缩、fallback、模型清单和运行入口。术语定义：自称是
+    README/营销文字；已核实是文件、配置、源码路径能直接支持；证据强度 high 表示代码路径清楚，medium 表示配置/文档支持但未运行真实请求。
+    客户端可以把 base URL 指到 `http://localhost:20128/v1`；Next.js rewrite 会把
+    `/v1/chat/completions` 转到 `/api/v1/chat/completions`，route 再调用 `handleChat`。
+    如果 model 字符串不是 `provider/model`，`handleChat` 会查 combo；`handleComboChat`
+    遍历模型序列，失败则根据 `checkFallbackError` 决定是否尝试下一个。单 provider 内部也会用
+    `getProviderCredentials` 过滤被锁定的连接并选择可用账号。 `handleChatCore` 在 dispatch 前调用
+    `compressMessages(translatedBody, rtkEnabled)`；它会处理 OpenAI tool
+    message、Claude `tool_result`、OpenAI Responses `function_call_output` 和 Kiro
+    `conversationState`。 README 是自称；源码配置当前列出更多：89 个 provider config id、102 个
+    `PROVIDER_MODELS` key、710 个模型条目。 根包是 private `9router-app`，有 `npm run
+    dev/build/start`；`cli/package.json` 暴露 bin `9router`；Dockerfile 构建 Next
+    standal…
+  innovation: 通俗说，最值得复用的不是“免费 provider 列表”，而是本地 AI 网关的几层边界：统一入口、模型名解析、combo
+    fallback、账号锁、格式翻译、工具输出压缩、SQLite 状态仓库。术语定义：抽象是可以迁到别的 AI 应用里的设计单元；copy
+    是值得借鉴；skip 是不要照搬的部分。 Model string as routing contract Combo fallback service
+    Per-model account lock RTK pre-dispatch compression Driver chain for local
+    persistence
+  weakness: 通俗说，9Router 的核心风险不在 Next.js，而在“许多上游不是稳定公共网关契约”：OAuth、CLI 指纹、私有
+    endpoint、免费层和模型名都会变。术语定义：exposure 是变更影响面；mitigation 是仓库已有缓解或仍未知。
+  transfer: 通俗说，最值得复用的不是“免费 provider 列表”，而是本地 AI 网关的几层边界：统一入口、模型名解析、combo
+    fallback、账号锁、格式翻译、工具输出压缩、SQLite 状态仓库。术语定义：抽象是可以迁到别的 AI 应用里的设计单元；copy
+    是值得借鉴；skip 是不要照搬的部分。 Model string as routing contract Combo fallback service
+    Per-model account lock RTK pre-dispatch compression Driver chain for local
+    persistence
+self_evo_use: 记忆：把 9router — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 devtool_cli
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: 9Router 是一个本地运行的 AI 编程工具网关：把 Claude Code、Codex、Cursor、Cline 等客户端接到统一的
+      `/v1` 接口，再按模型名、账号、组合和错误状态转发到不同上游 provider。 通俗说，它像…
+  - name: 机制链路
+    role: primary
+    evidence: "通俗说，真实请求流是：用户在 Claude Code/Codex/Cline 这类工具里配置 `Endpoint:
+      http://localhost:20128/v1`、`API Key: [dashboard key]`、`Model:…"
+  - name: 可复用抽象
+    role: supporting
+    evidence: 通俗说，最值得复用的不是“免费 provider 列表”，而是本地 AI 网关的几层边界：统一入口、模型名解析、combo
+      fallback、账号锁、格式翻译、工具输出压缩、SQLite 状态仓库。术语定义：抽象是可以迁到别的 AI 应用…
+  - name: 风险边界
+    role: supporting
+    evidence: 通俗说，9Router 的核心风险不在 Next.js，而在“许多上游不是稳定公共网关契约”：OAuth、CLI 指纹、私有
+      endpoint、免费层和模型名都会变。术语定义：exposure 是变更影响面；mitigation 是仓库已…
+  - name: 证据账本
+    role: mentioned
+    evidence: 提供本地 OpenAI-compatible `/v1` API 给 AI 编程工具使用。
+discovery_trace: 数据不足
+edges: []
+status: extracted

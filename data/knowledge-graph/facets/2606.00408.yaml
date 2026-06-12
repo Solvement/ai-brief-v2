@@ -1,0 +1,71 @@
+schema: v2
+node_id: paper:2606.00408
+slug: 2606.00408-masking-stale-observations-search-agents
+kind: paper
+title: "Masking Stale Observations Helps Search Agents -- Until It Doesn't: A
+  Regime Map and Its Mechanism"
+arxiv_id: "2606.00408"
+source: content/papers/2606.00408-masking-stale-observations-search-agents +
+  data/autosci/primitives/2606.00408.yaml
+facets:
+  problem_solved: long-horizon-agent-context-grows-with-retrieved-observation-noise
+  method: Treat context management for long-horizon search agents as a
+    regime-dependent control problem, not a default compression heuristic. Keep
+    reasoning traces and tool-call structure visible, mask only stale
+    observations outside a retention window, preserve tool errors for
+    self-repair, and decouple visible context from a persistent page pool so
+    masked evidence can be re-opened by cursor/id/URL. Enable masking only when
+    retrieval has surfaced enough signal but the model is not yet able to filter
+    that signal from noisy observations; disable or protect evidence when the
+    model is saturated and external masking risks evicting useful signal.
+  result: "On 50-200 deep-search tasks, run the same scaffold with and without
+    observation masking. Bucket tasks by a retriever-quality proxy and No-CM
+    accuracy. Measure wrong->correct, correct->wrong, delta calls/query, and
+    rolling input tokens. Ablate preserving tool errors and exact URL/cursor
+    rendering. Expected pattern from the source paper: masking helps most in the
+    retrieval-strong/model-mid regime, helps little when retriever signal is
+    weak, and can harm saturated readers by evicting evidence."
+  innovation: Context management is not a default on/off optimization; it should
+    be gated by retriever signal and model filtering capacity.；Mask stale
+    observation content from visible context while preserving reasoning,
+    tool-call structure, tool errors, and page-pool state.；Any masked evidence
+    must remain addressable by stable cursor/id/URL; masking must be reversible
+    through tools.；Average accuracy hides the mechanism; evaluate wrong->correct
+    and correct->wrong transitions plus extra tool calls and rolling token
+    cost.；For high-baseline agents, external masking can remove evidence the
+    model would have used; add evidence pinning or disable masking in saturated
+    regimes.；When the retriever is the bottleneck, context pruning cannot
+    amplify absent signal; improve retrieval quality before tuning masking.
+  weakness: descriptive_not_predictive；frontier_model_coverage_missing；evidence_eviction_in_saturated_regime；extra_tool_call_cost；masking_safety_or_edge_case_context；cannot_fix_intrinsic_hallucination
+  transfer: "Implement the minimal controller first: keep the most recent K
+    observation turns visible, replace older non-error observations with
+    placeholders, never mask reasoning/tool-call records, never mask tool
+    errors, and store every fetched page in an append-only page pool with stable
+    cursor and exact URL. Add an evaluator that runs paired No-CM/CM
+    trajectories and reports wrong->correct, correct->wrong, extra calls/query,
+    rolling input tokens, and final accuracy. Use this report to choose among
+    three actions: fix retriever first, enable masking, or disable masking/add
+    evidence pinning for saturated settings."
+self_evo_use: "记忆：保留 Masking Stale Observations Helps Search Agents -- Until It
+  Doesn't: A Regime Map and Its Mechanism 的问题、方法、概念和证据边界。理解：用它补齐
+  long-horizon-agent-context-grows-with-retrieved-observation-noise
+  的方法坐标。自进化：Implement the minimal controller first: keep the most recent K
+  observation turns visible, replace older non-error observations with
+  placeholders, never mask reasoning/tool-call records, never mask tool errors,
+  and store every fetched page in an append-only page pool with stable cursor
+  and exact URL. Add an evaluator that runs paired No-CM/CM trajectories and
+  reports wrong->correct, correct->wrong, extra calls/query, rolling input
+  tokens, and final accuracy. Use this report to choose among three…"
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: long-horizon-agent-context-grows-with-retrieved-observation-noise
+  - name: 方法原语
+    role: supporting
+    evidence: long-horizon-agent-context-grows-with-retrieved-observation-noise
+  - name: 迁移边界
+    role: supporting
+    evidence: long-horizon-agent-context-grows-with-retrieved-observation-noise
+discovery_trace: 数据不足
+edges: []
+status: extracted

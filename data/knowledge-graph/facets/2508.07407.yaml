@@ -1,0 +1,47 @@
+schema: v2
+node_id: paper:2508.07407
+slug: 2508.07407-comprehensive-self-evolving-agents-survey
+kind: paper
+title: "A Comprehensive Survey of Self-Evolving AI Agents: A New Paradigm
+  Bridging Foundation Models and Lifelong Agentic Systems"
+arxiv_id: "2508.07407"
+source: content/papers/2508.07407-comprehensive-self-evolving-agents-survey +
+  data/autosci/primitives/2508.07407.yaml
+facets:
+  problem_solved: unifying-self-evolving-agents-under-one-optimisation-feedback-loop
+  method: 把任意自进化 agent 系统统一成一个优化反馈回路:System Inputs(数据/任务)→ Agent System
+    (被优化对象:模型/提示/记忆/工具/工作流)→ Environment(提供反馈信号)→ Optimisers(驱动进化的算法,用反馈改 agent
+    系统)→ 循环。 外加一条四阶段发展路线 MOP(模型离线预训练)→MOA(模型在线适配)→MAO(多 agent 编排)→MASE(多 agent
+    自进化), 和一组带优先级的自进化三定律 Endure(安全)> Excel(性能)> Evolve(进化)做护栏。 再按"优化器改的对象"分类:单
+    agent 优化(LLM行为/提示/记忆/工具/统一)/ 多 agent 优化(自动构建+MAS优化)/ 领域专用(生物医药/编程/科研/金融法律)/
+    评估(基准+LLM+安全)。 与 2507.21046 的 What/When/How/Where 是互补的两把尺子(优化器+安全视角 vs
+    过程视角)。
+  result: 搭一个最小四组件闭环:环境=一个可打分任务;优化器=按反馈迭代改提示(单 agent 优化); 比"进化前后"得分;再把优化对象换成多
+    agent 拓扑看差异(接 GPTSwarm 原语)。1-14 天。
+  innovation: 把自改进画成 输入→agent→环境→优化器 的闭环;没有清晰的环境反馈源就没有优化。；自进化三定律带优先级:Endure(安全)>
+    Excel(性能)> Evolve(进化);自动改动不得为刷分牺牲安全/稳定。；优化对象决定成本/收益:单 agent(提示/记忆便宜)< 多
+    agent 拓扑 < 领域微调;先选对象再选方法。；四阶段发展路线 MOP→MOA→MAO→MASE:从冻结模型→参数微调→多 agent
+    编排→闭环自进化;先给系统定阶段再补下一步。；优化器+安全视角(本篇)+
+    What/When/How/Where(2507.21046)叠用,设计自进化最不漏环。
+  weakness: survey_not_benchmark；overlap_with_2507；body_numbers_unread；safety_unsolved
+  transfer: 把本站 L1 直接填进四组件:输入=每日候选;agent 系统=选稿+冷审流水线;环境=Kevin 反馈+质量门; 优化器=用反馈改口味记忆
+    + 提示/连边。先做单 agent 优化(提示/记忆),再上多 agent 优化(冷审团队拓扑)。
+self_evo_use: "记忆：保留 A Comprehensive Survey of Self-Evolving AI Agents: A New
+  Paradigm Bridging Foundation Models and Lifelong Agentic Systems
+  的问题、方法、概念和证据边界。理解：用它补齐
+  unifying-self-evolving-agents-under-one-optimisation-feedback-loop
+  的方法坐标。自进化：把本站 L1 直接填进四组件:输入=每日候选;agent 系统=选稿+冷审流水线;环境=Kevin 反馈+质量门;
+  优化器=用反馈改口味记忆 + 提示/连边。先做单 agent 优化(提示/记忆),再上多 agent 优化(冷审团队拓扑)。"
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: unifying-self-evolving-agents-under-one-optimisation-feedback-loop
+  - name: 方法原语
+    role: supporting
+    evidence: unifying-self-evolving-agents-under-one-optimisation-feedback-loop
+  - name: 迁移边界
+    role: supporting
+    evidence: unifying-self-evolving-agents-under-one-optimisation-feedback-loop
+discovery_trace: 数据不足
+edges: []
+status: extracted

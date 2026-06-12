@@ -11,8 +11,8 @@ const outPath = process.argv[2]
   ? path.resolve(process.argv[2])
   : path.join(ROOT, ".agent", "relation-candidates.json");
 
-const topK = Number(process.env.KG_RELATION_TOPK) || 5;
-const maxCandidates = Number(process.env.KG_RELATION_MAX_CANDIDATES) || 80;
+const topK = Number(process.env.KG_RELATION_TOPK) || 10;
+const maxCandidates = Number(process.env.KG_RELATION_MAX_CANDIDATES) || 300;
 
 const facets = await loadFacets();
 const records = await dumpCandidates(facets, { topK, maxCandidates });

@@ -1,0 +1,51 @@
+schema: v2
+node_id: content/pi-agent
+slug: pi-agent
+kind: project
+title: pi — 深度拆解
+source: public/data/brief/deep-dives.json:pi-agent-deep-dive
+facets:
+  problem_solved: pi — 深度拆解 的核心判断：一套分层的程序员 AI 工具箱:可自我扩展的 coding agent +
+    一套统一调各家大模型的 API,且把供应链安全当一等公民。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自 repo
+    metadata(58.7k star / 4387 commits / 225 releases / v0.78.0 @ 2026-05-29 /
+    7k forks)；monorepo 包:pi-coding-agent / pi-agent-core / pi-ai /
+    pi-tui；README:self-extensible agent、unified LLM API、供应链加固；CI(npm run check +
+    ./test.sh + 定时 npm …。没有源码级证据的地方保留“数据不足”。
+  method: 一套分层的程序员 AI 工具箱:可自我扩展的 coding agent + 一套统一调各家大模型的 API,且把供应链安全当一等公民。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    它牛不在花哨界面,而在底下那套『统一调各家大模型 + 锁死依赖防投毒』的硬功夫。 一套接口调
+    OpenAI/Anthropic/Google,换模型不用改业务代码——我们也要这层。
+    它认真防『依赖被投毒』——精确锁版本、锁文件校验、定时扫描,这在个人项目里很少见。
+    它能自己写新技能再用上——很强,但也意味着它能给自己加本事,安全得盯紧。
+  innovation: clone & run 当编程搭子;重点抽 pi-ai 统一 LLM API 抽象 + 供应链 pinning 实践,迁到
+    AI-Brief 的模型调用层与依赖治理;agent-core 的 tool-calling+state 供 BriefMem 参考。
+    clone-and-run extract-pattern(统一 LLM API 抽象) extract-pattern(供应链 pinning +
+    shrinkwrap) star/watch
+  weakness: coding agent 执行代码 + 可自我扩展 → 安全/越权；v0.78 高速迭代,API 不稳
+  transfer: clone & run 当编程搭子;重点抽 pi-ai 统一 LLM API 抽象 + 供应链 pinning 实践,迁到 AI-Brief
+    的模型调用层与依赖治理;agent-core 的 tool-calling+state 供 BriefMem 参考。 clone-and-run
+    extract-pattern(统一 LLM API 抽象) extract-pattern(供应链 pinning + shrinkwrap)
+    star/watch
+self_evo_use: 记忆：把 pi — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 devtool_cli
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: pi — 深度拆解 的核心判断：一套分层的程序员 AI 工具箱:可自我扩展的 coding agent + 一套统一调各家大模型的
+      API,且把供应链安全当一等公民。 本条由旧深读聚合内容重整为 RuView light_spine；证据…
+  - name: 机制链路
+    role: primary
+    evidence: 一套分层的程序员 AI 工具箱:可自我扩展的 coding agent + 一套统一调各家大模型的 API,且把供应链安全当一等公民。
+  - name: 可复用抽象
+    role: supporting
+    evidence: clone & run 当编程搭子;重点抽 pi-ai 统一 LLM API 抽象 + 供应链 pinning 实践,迁到 AI-Brief
+      的模型调用层与依赖治理;agent-core 的 tool-calling+state 供 Br…
+  - name: 风险边界
+    role: supporting
+    evidence: coding agent 执行代码 + 可自我扩展 → 安全/越权；v0.78 高速迭代,API 不稳
+  - name: 证据账本
+    role: mentioned
+    evidence: pi 是真·工具箱,不是 demo;工程深度藏在不显眼的『管道』里。
+discovery_trace: 数据不足
+edges: []
+status: extracted

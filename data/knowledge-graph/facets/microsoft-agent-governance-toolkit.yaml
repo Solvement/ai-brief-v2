@@ -1,0 +1,72 @@
+schema: v2
+node_id: content/microsoft-agent-governance-toolkit
+slug: microsoft-agent-governance-toolkit
+kind: project
+title: agent-governance-toolkit — 深度拆解
+source: public/data/brief/deep-dives.json:microsoft-agent-governance-toolkit-deep-dive
+facets:
+  problem_solved: Agent Governance Toolkit 是一个面向 AI Agent
+    的运行时治理工具集，用策略引擎、身份、审计、MCP/框架适配和 SRE 组件在工具调用前做 allow/deny/escalate/transform
+    决策。 人话：它解决的不是“让模型听话”，而是在 agent 真正调用工具、发消息、访问资源之前，加一层应用代码里的检查门。 技术词：这是
+    application-layer interception，也就是在 agent 框架/中间件/sidecar 层拦截动作；策略可来自
+    YAML、OPA/Rego、Cedar 或 ACS manifest；决策结果由宿主代码执行。（来源：README How It
+    Works；来源：policy-engine README What ACS is）
+  method: 人话：AGT 的核心流程是：agent
+    想做一件事；治理层先拿到动作上下文；策略引擎判断允许、拒绝、警告、升级审批或改写；宿主代码按结果执行或拦下；同时写审计记录。最小用法可以只是
+    `govern()` 包一个工具函数，复杂用法可以把策略、身份、信任分数、MCP 网关、OpenTelemetry、SRE 和运行时限制都加上。
+    技术词： - Policy：一组规则，决定某个 action
+    是否能执行。（来源：docs/tutorials/policy-as-code/01-your-first-policy.md What is a
+    policy） - PEP/PDP：宿主 adapter 是 Policy Enforcement Point；ACS/runtime 是 Policy
+    Decision Point。（来源：policy-engine README Agent Control Specification） -
+    Intervention point：agent 生命周期里的拦截点，包括
+    `agent_startup`、`input`、`pre_model_call`、`post_model_call`、`pre_tool_call`、`post_tool_call`、`output`、`agent_shutdown`。（来源：policy-engine
+    README Intervention points） - Fail closed：策略运行失败时返回
+    deny，而不是默认放行。（来源：policy-engine README Core properties） - 同进程边界：AGT 文档明确说
+    policy engine 和 agent 共享进程边界；高安全场景要加容器/VM 隔离。（来源：README
+    Security；docs/ARCHITECTURE Security Model & Boundaries）
+  result: 人话：最可靠的证据是文件树、包配置、示例代码和 policy-engine 的实现边界。README 中“Public Preview”“any
+    framework”“<0.1ms”“992 conformance tests”等属于项目自称，不能直接当第三方验证结论。 技术词：证据强度 high
+    表示我能从仓库文件/配置直接确认；medium 表示有文档和部分结构支撑但未运行验证；low 表示主要是 README/docs 自述；none
+    表示没有足够证据。 这是公开预览，不应按稳定 GA 组件对待。 它试图覆盖 agent 的动作授权、身份、隔离和可靠性治理。 README 说一个
+    pip 包可以接入任意框架。 项目声称策略评估很快，但这个数字只适用于策略引擎本身或特定部署。 README 给了规格和测试数量，但本次文件树计数发现
+    ADR 口径不完全一致。 它不是操作系统级沙箱；被治理代码和治理层通常在同一进程边界内。 policy-engine
+    的核心设计是每次由宿主传完整快照，运行时不靠可变历史状态，失败时 deny。 最小示例是本地规则检查，不依赖 LLM 服务。
+  innovation: 人话：最值得复用的不是具体包名，而是它把 agent 治理拆成几个清楚边界：动作前策略、完整快照、统一 verdict、审计证据、框架
+    adapter、最小到全栈的渐进路径。 技术词：这些抽象可以迁移到别的 agent 平台，即使不采用 AGT 本身。
+    Intervention-point contract Normalized verdict Fail-closed runtime
+    Progressive governance Evidence-aware audit
+  weakness: 人话：这个项目依赖面很宽。它的好处是覆盖很多生态；风险是每个生态都有自己的版本、构建、发布和安全维护成本。 技术词：这是
+    multi-runtime governance stack，不是单语言 library。
+  transfer: 人话：最值得复用的不是具体包名，而是它把 agent 治理拆成几个清楚边界：动作前策略、完整快照、统一 verdict、审计证据、框架
+    adapter、最小到全栈的渐进路径。 技术词：这些抽象可以迁移到别的 agent 平台，即使不采用 AGT 本身。
+    Intervention-point contract Normalized verdict Fail-closed runtime
+    Progressive governance Evidence-aware audit
+self_evo_use: 记忆：把 agent-governance-toolkit — 深度拆解
+  的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 agent_framework 的判断，不把 README
+  自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Agent Governance Toolkit 是一个面向 AI Agent
+      的运行时治理工具集，用策略引擎、身份、审计、MCP/框架适配和 SRE 组件在工具调用前做
+      allow/deny/escalate/transform 决策。…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：AGT 的核心流程是：agent
+      想做一件事；治理层先拿到动作上下文；策略引擎判断允许、拒绝、警告、升级审批或改写；宿主代码按结果执行或拦下；同时写审计记录。最小用法可以只是
+      `govern()` 包一个工具函数，复杂用法可以把策略…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：最值得复用的不是具体包名，而是它把 agent 治理拆成几个清楚边界：动作前策略、完整快照、统一 verdict、审计证据、框架
+      adapter、最小到全栈的渐进路径。 技术词：这些抽象可以迁移到别的 agent 平台，即使不采用 …
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：这个项目依赖面很宽。它的好处是覆盖很多生态；风险是每个生态都有自己的版本、构建、发布和安全维护成本。 技术词：这是
+      multi-runtime governance stack，不是单语言 library。
+  - name: 证据账本
+    role: mentioned
+    evidence: Public Preview；production-quality, Microsoft-signed releases；GA 前可能有
+      breaking changes。
+discovery_trace: 数据不足
+edges: []
+status: extracted

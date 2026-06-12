@@ -1,0 +1,47 @@
+schema: v2
+node_id: content/voxcpm
+slug: voxcpm
+kind: project
+title: VoxCPM — 深度拆解
+source: public/data/brief/deep-dives.json:voxcpm-deep-dive
+facets:
+  problem_solved: VoxCPM — 深度拆解 的核心判断：提出 tokenizer-free 的扩散自回归
+    TTS，实现语音设计和可控克隆，并提供完整的开源工具链。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自
+    README.md（功能、快速入门、CLI 示例）；仓库目录（src, tests, examples,
+    conf）；pyproject.toml（构建配置）；license（Apache-2.0）；topics（tts, voice-cloning
+    等）。没有源码级证据的地方保留“数据不足”。
+  method: 提出 tokenizer-free 的扩散自回归 TTS，实现语音设计和可控克隆，并提供完整的开源工具链。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    直接生成连续语音，不经过离散音素等中间表示，语音更自然。 能处理 30 种不同语言的文本到语音，无需手动指定语言标签。
+    输入如“一个年轻女性，温柔甜美的声音”，即可生成符合描述的声音。 最终音频采样率达 48kHz，即使参考音频是 16kHz 也能输出高质量音频。
+  innovation: 可复用 CLI 设计模式、Python API 调用风格，以及 OpenAI 兼容接口的部署方式；核心模型架构无法直接迁移。
+    clone-and-run write-deepdive
+  weakness: 模型效果可能在不同语言或口音上参差不齐，且 README 未给出评测数据。；Voice Design 的效果可能依赖 MiniCPM
+    的语言理解能力，未给出定性分析。；生产部署的稳定性未经验证（如高并发下的长尾延迟）。
+  transfer: 可复用 CLI 设计模式、Python API 调用风格，以及 OpenAI 兼容接口的部署方式；核心模型架构无法直接迁移。
+    clone-and-run write-deepdive
+self_evo_use: 记忆：把 VoxCPM — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 devtool_cli
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: VoxCPM — 深度拆解 的核心判断：提出 tokenizer-free 的扩散自回归
+      TTS，实现语音设计和可控克隆，并提供完整的开源工具链。 本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自
+      READM…
+  - name: 机制链路
+    role: primary
+    evidence: 提出 tokenizer-free 的扩散自回归 TTS，实现语音设计和可控克隆，并提供完整的开源工具链。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用 CLI 设计模式、Python API 调用风格，以及 OpenAI 兼容接口的部署方式；核心模型架构无法直接迁移。
+      clone-and-run write-deepdive
+  - name: 风险边界
+    role: supporting
+    evidence: 模型效果可能在不同语言或口音上参差不齐，且 README 未给出评测数据。；Voice Design 的效果可能依赖 MiniCPM
+      的语言理解能力，未给出定性分析。；生产部署的稳定性未经验证（如高并发下的长尾延迟）。
+  - name: 证据账本
+    role: mentioned
+    evidence: VoxCPM 是无 tokenizer 的端到端 TTS
+discovery_trace: 数据不足
+edges: []
+status: extracted

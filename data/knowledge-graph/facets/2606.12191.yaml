@@ -1,0 +1,54 @@
+schema: v2
+node_id: paper:2606.12191
+slug: 2606.12191-agentic-environment-engineering-survey
+kind: paper
+title: "Agentic Environment Engineering for Large Language Models: A Survey of
+  Environment Modeling, Synthesis, Evaluation, and Application"
+arxiv_id: "2606.12191"
+source: content/papers/2606.12191-agentic-environment-engineering-survey +
+  data/autosci/primitives/2606.12191.yaml
+facets:
+  problem_solved: model-synthesize-evaluate-and-evolve-agentic-environments-for-self-improving-agents
+  method: 把 LLM agent 的“环境”从临时 benchmark / sandbox / world model 升级为可建模、可合成、可评估、
+    可演化的工程对象：先用 POMDP 定义状态、动作、转移、奖励和观察；再用 8 组属性与 8 个任务领域定位环境； 合成侧分 symbolic
+    synthesis 与 neural synthesis；质量门分 correctness、diversity、complexity、fidelity；
+    应用侧分 agent evolution 4 路径与 environment evolution 3 范式。对 AutoSci 的直接启发是：
+    自进化不能只改 agent 自身，也要把“训练场/评测场”做成会验证、会调难度、会扩分布的环境层。
+  result: 综述归纳；没有作者自做实验或 benchmark；空白点多为定性判断。
+  innovation: ；；；；；
+  weakness: survey_not_method；no_new_benchmark；no_official_code_repo；taxonomy_subjective；qualitative_gap_claims；fast_staleness；verifier_overtrust；synthetic_environment_bias
+  transfer: 把 LLM agent 的“环境”从临时 benchmark / sandbox / world model 升级为可建模、可合成、可评估、
+    可演化的工程对象：先用 POMDP 定义状态、动作、转移、奖励和观察；再用 8 组属性与 8 个任务领域定位环境； 合成侧分 symbolic
+    synthesis 与 neural synthesis；质量门分 correctness、diversity、complexity、fidelity；
+    应用侧分 agent evolution 4 路径与 environment evolution 3 范式。对 AutoSci 的直接启发是：
+    自进化不能只改 agent 自身，也要把“训练场/评测场”做成会验证、会调难度、会扩分布的环境层。
+self_evo_use: "记忆：保留 Agentic Environment Engineering for Large Language Models:
+  A Survey of Environment Modeling, Synthesis, Evaluation, and Application
+  的问题、方法、概念和证据边界。理解：用它补齐
+  model-synthesize-evaluate-and-evolve-agentic-environments-for-self-improving-\
+  agents 的方法坐标。自进化：作为后续 AutoSci/评测/记忆原语候选。"
+core_concepts:
+  - name: 环境工程生命周期（modeling-synthesis-evaluation-application）
+    role: primary
+    evidence: modeling, synthesis, evaluation and application
+  - name: 符号合成 vs 神经合成（symbolic vs neural environment synthesis）
+    role: primary
+    evidence: Symbolic Synthesis ... Neural Synthesis
+  - name: 环境质量四维评估（correctness/diversity/complexity/fidelity）
+    role: primary
+    evidence: correctness, diversity, complexity, and fidelity
+  - name: agent↔环境协同进化（agent-environment co-evolution）
+    role: primary
+    evidence: agent-environment co-evolution
+  - name: Environment-as-a-Service（EaaS）
+    role: supporting
+    evidence: Environment-as-a-Service (EaaS)
+discovery_trace: 数据不足
+edges:
+  - to: ai-scientist-v2
+    type: complements
+    confidence: high
+    evidence: Agentic Environment Engineering 关注环境建模、合成、评估与应用；AI-Scientist-v2 关注自主科研
+      agent。环境侧基础设施与 agent 侧实验搜索互补。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

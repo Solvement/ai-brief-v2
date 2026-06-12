@@ -1,41 +1,37 @@
-# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
-# 不编造，未知标「数据不足」，自报数字标「自报/受称」。源：brief-wiki/deep-dives/supermemory-deep-dive.md
 schema: v2
 node_id: content/supermemory
 slug: supermemory
 kind: project
-title: "supermemory — 一个 API 全包的有状态记忆引擎（记忆≠RAG）"
-source: "repo github.com/supermemoryai/supermemory (Bun/Turborepo monorepo, MIT)"
-
+title: supermemory — 一个 API 全包的有状态记忆引擎（记忆≠RAG）
+source: repo github.com/supermemoryai/supermemory (Bun/Turborepo monorepo, MIT)
 facets:
-  problem_solved: >    # Y
+  problem_solved: |
     AI 应用对话即忘，逼用户反复澄清、破坏个性化；自己搭记忆栈又要配向量库、嵌入管线、分块策略、用户画像系统一大堆底层。
-
-  method: >            # X：大白话 + 例子
-    把记忆当成一张"随时间更新的事实知识图谱"，而不是文档分块。像一个会自己整理的私人助理：
-    用 LLM 从对话里抽出原子事实存进去；当新信息和旧事实冲突（"我搬到 SF" vs "我住 NYC"）自动消解、覆盖旧的；
+  method: >
+    把记忆当成一张"随时间更新的事实知识图谱"，而不是文档分块。像一个会自己整理的私人助理： 用 LLM
+    从对话里抽出原子事实存进去；当新信息和旧事实冲突（"我搬到 SF" vs "我住 NYC"）自动消解、覆盖旧的；
     临时事实（"我明天有考试"）到点自动过期遗忘。用户画像分静态（长期偏好/身份）+ 动态（近期活动/项目），一次调用即取（自报延迟约 50ms）。
-    对外用单一 API/MCP 暴露：client.add() 存任意内容自动抽取索引、client.profile() 取画像、search.memories() 做混合搜索（个人记忆 + 知识库 RAG 同时检索）；
-    用 containerTag 做多项目/多租户隔离。开发者不用碰向量库、嵌入、分块。
-
-  result: >            # Z：自报（README，未独立复现）
-    [自报] 三大 AI 记忆基准 LongMemEval / LoCoMo / ConvoMem 均排名第一；
-    [自报] 用户画像一次调用取静态+动态事实、延迟约 50ms。原仓库未附评测代码/数据/复现命令（artifact_audit 多项 not_found），分数无配置细节、未独立核验。
-
-  innovation: >        # 创新
-    赛道里 mem0/Zep 也做记忆，supermemory 的卖点是"全栈即插即用 + 范式叙事"：把记忆、RAG、用户画像、连接器（Drive/Gmail/Notion webhook 实时同步）、
-    文件处理打包进单一 API，并明确把"有状态记忆（自动更新/遗忘/消解矛盾）"和"无状态 RAG 检索"区分开。原生集成 8+ 框架（Claude Code/Cursor/Vercel AI SDK/LangChain/Mastra）。
-
-  weakness: >          # 缺点/边界/坑
+    对外用单一 API/MCP 暴露：client.add() 存任意内容自动抽取索引、client.profile()
+    取画像、search.memories() 做混合搜索（个人记忆 + 知识库 RAG 同时检索）； 用 containerTag
+    做多项目/多租户隔离。开发者不用碰向量库、嵌入、分块。
+  result: >
+    [自报] 三大 AI 记忆基准 LongMemEval / LoCoMo / ConvoMem 均排名第一； [自报]
+    用户画像一次调用取静态+动态事实、延迟约 50ms。原仓库未附评测代码/数据/复现命令（artifact_audit 多项
+    not_found），分数无配置细节、未独立核验。
+  innovation: >
+    赛道里 mem0/Zep 也做记忆，supermemory 的卖点是"全栈即插即用 +
+    范式叙事"：把记忆、RAG、用户画像、连接器（Drive/Gmail/Notion webhook 实时同步）、 文件处理打包进单一
+    API，并明确把"有状态记忆（自动更新/遗忘/消解矛盾）"和"无状态 RAG 检索"区分开。原生集成 8+ 框架（Claude
+    Code/Cursor/Vercel AI SDK/LangChain/Mastra）。
+  weakness: >
     最大风险是云依赖与不透明：核心记忆处理走 hosted API，自托管方案 README 未说明（厂商锁定 + 数据主权风险，离线/内网受限）；
-    高度封装掩盖底层，遇问题难调优调试；artifact 证据偏薄——无 tests、无 examples、无 benchmark 代码、存储后端只能从 tech stack（Cloudflare Workers/KV/Postgres/Drizzle）推测，非实证；
+    高度封装掩盖底层，遇问题难调优调试；artifact 证据偏薄——无 tests、无 examples、无 benchmark 代码、存储后端只能从
+    tech stack（Cloudflare Workers/KV/Postgres/Drizzle）推测，非实证；
     多模态提取（PDF/视频/代码）无准确率数据；自动遗忘/更新出错可能丢重要信息；wrapper 集成的维护状态未知。
-
-  transfer: >          # 能迁移到什么 / 研究·自进化
-    值得借的是设计模式而非实现（实现依赖其内部托管推理管线，要完全掌控须评估自托管可行性）：
-    ① "事实抽取→画像构建→混合搜索（RAG+记忆）→连接器"的记忆引擎分层；② containerTag 多租户/多项目隔离，可直接用于 BriefMem 组织多项目记忆；
-    ③ "静态画像+动态活动"的上下文注入；④ 自动遗忘/矛盾消解逻辑可作 BriefMem 处理过时知识的参考机制。
-
+  transfer: >
+    值得借的是设计模式而非实现（实现依赖其内部托管推理管线，要完全掌控须评估自托管可行性）： ①
+    "事实抽取→画像构建→混合搜索（RAG+记忆）→连接器"的记忆引擎分层；② containerTag 多租户/多项目隔离，可直接用于 BriefMem
+    组织多项目记忆； ③ "静态画像+动态活动"的上下文注入；④ 自动遗忘/矛盾消解逻辑可作 BriefMem 处理过时知识的参考机制。
   architecture: |
     ```mermaid
     flowchart TD
@@ -53,38 +49,45 @@ facets:
       end
       CT[containerTag 多项目隔离] -.-> KG
     ```
-
 core_concepts:
   - name: 事实图谱记忆
     role: primary
-    evidence: "深读技术拆解逐字『Supermemory 将记忆定义为随时间和对话更新的事实知识图谱，而非简单的文档分块。它从对话中提取原子事实，并维护一个动态更新的用户画像』——拿掉它整个『记忆≠RAG』范式不成立（规范名『事实图谱记忆』，源文原词『事实知识图谱』）。"
+    evidence: 深读技术拆解逐字『Supermemory
+      将记忆定义为随时间和对话更新的事实知识图谱，而非简单的文档分块。它从对话中提取原子事实，并维护一个动态更新的用户画像』——拿掉它整个『记忆≠RAG』范式不成立（规范名『事实图谱记忆』，源文原词『事实知识图谱』）。
   - name: 冲突消解
     role: primary
-    evidence: "深读事实提取与更新节逐字『当新信息与旧事实冲突时（如我搬到了 SF vs 我住在 NYC），自动消解矛盾，旧事实被覆盖』——有状态记忆区别于无状态 RAG 的承重件（规范名统一为『冲突消解』=跨文件锚，源文原词『消解矛盾』）。"
+    evidence: 深读事实提取与更新节逐字『当新信息与旧事实冲突时（如我搬到了 SF vs 我住在
+      NYC），自动消解矛盾，旧事实被覆盖』——有状态记忆区别于无状态 RAG 的承重件（规范名统一为『冲突消解』=跨文件锚，源文原词『消解矛盾』）。
   - name: 自动遗忘
     role: supporting
-    evidence: "深读自动遗忘节逐字『临时事实（如我明天有考试）在时间点后自动过期；矛盾和新信息会触发旧记忆的降权或删除』。"
+    evidence: 深读自动遗忘节逐字『临时事实（如我明天有考试）在时间点后自动过期；矛盾和新信息会触发旧记忆的降权或删除』。
   - name: 混合搜索
     role: supporting
-    evidence: "深读 API 节逐字『client.search.memories()：混合搜索（Hybrid Search），同时检索个人记忆和知识库文档，解决通用知识和个人上下文结合的问题』。"
+    evidence: 深读 API 节逐字『client.search.memories()：混合搜索（Hybrid
+      Search），同时检索个人记忆和知识库文档，解决通用知识和个人上下文结合的问题』。
   - name: containerTag 多租户隔离
     role: supporting
-    evidence: "深读状态与存储设计节逐字『隔离机制：通过 containerTag（项目标签）实现多租户/多项目隔离，每个标签下的记忆和画像独立演化，可用于区分不同用户或不同项目』。"
-self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
-  记忆：有限可用、且要打折——"自动遗忘 + 矛盾消解 + 画像随对话演进"确实是自进化记忆需要的能力，可当设计参考；但记忆处理是黑箱托管 API、无自托管、无开放评测。
+    evidence: 深读状态与存储设计节逐字『隔离机制：通过
+      containerTag（项目标签）实现多租户/多项目隔离，每个标签下的记忆和画像独立演化，可用于区分不同用户或不同项目』。
+self_evo_use: >
+  记忆：有限可用、且要打折——"自动遗忘 + 矛盾消解 + 画像随对话演进"确实是自进化记忆需要的能力，可当设计参考；但记忆处理是黑箱托管
+  API、无自托管、无开放评测。
 
-  理解：部分——「把记忆当有状态图谱来做」（LLM 抽取事实知识图谱）是理解式/抽取式记忆路线的概念参照，与 mempalace 的逐字路线正相反，两边对照着看才完整。
+  理解：部分——「把记忆当有状态图谱来做」（LLM 抽取事实知识图谱）是理解式/抽取式记忆路线的概念参照，与 mempalace
+  的逐字路线正相反，两边对照着看才完整。
 
   自进化：不能当核心——黑箱不可改不可测，无法当可掌控的自进化记忆引擎，更适合当概念参照，不适合直接做研究底座。
-
 edges:
   - to: mempalace
     type: contradicts
-    evidence: "同做 AI 记忆但路线相反：supermemory=云托管 + LLM 抽取事实图谱（黑箱）；MemPalace=本地优先 + 逐字存储零 API。一个抽取压缩、一个不摘要不释义，权衡正相反"
+    evidence: 同做 AI 记忆但路线相反：supermemory=云托管 + LLM 抽取事实图谱（黑箱）；MemPalace=本地优先 + 逐字存储零
+      API。一个抽取压缩、一个不摘要不释义，权衡正相反
     confidence: high
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
   - to: memoryagentbench
     type: composes_with
-    evidence: "supermemory 自报 LongMemEval/LoCoMo/ConvoMem #1 但无复现；MemoryAgentBench 的四维增量协议正可独立核验这类自报记忆分数"
+    evidence: "supermemory 自报 LongMemEval/LoCoMo/ConvoMem #1 但无复现；MemoryAgentBench
+      的四维增量协议正可独立核验这类自报记忆分数"
     confidence: medium
-
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
 status: extracted

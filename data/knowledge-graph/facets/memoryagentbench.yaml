@@ -1,44 +1,39 @@
-# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z 结果 + 创新/缺点。
-# 不编造，未知标「数据不足」，自报数字标「自报/受控」。源：brief-wiki/deep-dives/memoryagentbench-deep-dive.md
 schema: v2
 node_id: content/memoryagentbench
 slug: memoryagentbench
 kind: paper
-title: "MemoryAgentBench — 给有记忆的 AI agent 设计的一场更真实的考试"
-source: "arxiv:2507.05257 + repo github.com/HUST-AI-HYZ/MemoryAgentBench (MIT) + HF datasets/ai-hyz/MemoryAgentBench"
-
+title: MemoryAgentBench — 给有记忆的 AI agent 设计的一场更真实的考试
+source: arxiv:2507.05257 + repo github.com/HUST-AI-HYZ/MemoryAgentBench (MIT) +
+  HF datasets/ai-hyz/MemoryAgentBench
 facets:
-  problem_solved: >    # Y
-    现有"记忆评测"是把整本书一次性塞给模型再提问——测的是"会不会在长文里翻到答案"，不是"记不记得住"。
-    真实 agent 是边读边记、原文收走后只能看自己的笔记答题，旧评测测不出这种增量记忆，导致记忆能力被严重误判。
-
-  method: >            # X：大白话 + 例子
-    像把一次性开卷考改成"每天发几页、让你自己记笔记，几天后收走原文只准看笔记答题，中途还通知你某条信息作废了要记新忘旧"——
-    论文叫 incremental multi-turn evaluation（增量多轮评测）：把语料拆成块 c1…cn 顺序喂入、每块附"请记住"，读完再用 q1…qm 提问。
-    考试拆成四门正交的课：AR 精确检索、TTL 测试时学习、LRU 长程理解、CR 冲突消解；
-    再自建两套定向难题（EventQA 超长书籍事件链 / FactConsolidation 反事实编辑对）专戳薄弱维度。它不提新记忆方法，只造"怎样才算公平地测记忆"。
-
-  result: >            # Z：真实数字（论文报告/受控）
-    [论文报告] 没有全能选手，赢家随维度切换：AR 上 NV-Embed RULER-QA 83.0%、BM25 NIAH 100%；TTL 上 GPT-4o BANKING 87.6% 但 Mem0 Movie-Recom 仅 3.4% 崩盘；
-    LRU 上 Claude-3.7 52.5% 而 RAG/agentic 全线 0.4–20.7% 塌方；CR 多跳冲突消解全体 ≤6%（GPT-4o 5.0%、Contriever 7.0%，连推理模型 o4-mini@32K 也仅 14.0%）。
-    一句结论：多跳冲突消解是全行业系统性盲区，不是某系统差。
-
-  innovation: >        # 创新
-    把"记忆能力"从单一事实 recall 拆成四个正交维度（AR/TTL/LRU/CR），并用"增量逐块喂入 + 每块请记住"的供给方式取代一次性长上下文——
-    证明了不存在"最佳记忆系统"这一命题，并把"多跳+冲突"识别为范式级共同短板（而非实现 bug）。
-
-  weakness: >          # 缺点/边界/坑
-    数据集主要为人工合成（作者 §5 自承 "primarily synthetic, may not fully reflect real-world conversations"）——
-    所以"多跳 CR 全体≤6%"有几分是真范式短板、几分是 FactConsolidation 反事实拼接所致，尚不可分辨（构念效度风险）；
-    开放题用 GPT-4o 当 judge，评判模型偏好会渗进排名（评判效度风险）；复现门槛是付费 OpenAI API（judge + 多个商用 agent 对象），非算力；
-    主要英文、跨语言/领域泛化未讨论；Mem0/MemGPT 随产品版本漂移，结论有保鲜期。
-
-  transfer: >          # 能迁移到什么 / 研究·自进化
-    几乎为 AI-Brief/BriefMem 量身定做的体检表：AR=写 deep-dive 时能否准确取回旧论文/方法卡不漏不串；TTL=新论文推翻旧结论时能否即时纳入并改后续选择；
-    LRU=跨多篇形成专题综述/赛道判断；CR=检测矛盾结论，正对应图谱里的 contradicts 边。
-    路线建议：①先立 contradicts/supports 边（已做）→②用"增量多轮+四维"做 BriefMem 自测集→③把"多跳冲突消解"当红线指标盯死。
+  problem_solved: >
+    现有"记忆评测"是把整本书一次性塞给模型再提问——测的是"会不会在长文里翻到答案"，不是"记不记得住"。 真实 agent
+    是边读边记、原文收走后只能看自己的笔记答题，旧评测测不出这种增量记忆，导致记忆能力被严重误判。
+  method: >
+    像把一次性开卷考改成"每天发几页、让你自己记笔记，几天后收走原文只准看笔记答题，中途还通知你某条信息作废了要记新忘旧"—— 论文叫
+    incremental multi-turn evaluation（增量多轮评测）：把语料拆成块 c1…cn 顺序喂入、每块附"请记住"，读完再用
+    q1…qm 提问。 考试拆成四门正交的课：AR 精确检索、TTL 测试时学习、LRU 长程理解、CR 冲突消解； 再自建两套定向难题（EventQA
+    超长书籍事件链 / FactConsolidation 反事实编辑对）专戳薄弱维度。它不提新记忆方法，只造"怎样才算公平地测记忆"。
+  result: >
+    [论文报告] 没有全能选手，赢家随维度切换：AR 上 NV-Embed RULER-QA 83.0%、BM25 NIAH 100%；TTL 上
+    GPT-4o BANKING 87.6% 但 Mem0 Movie-Recom 仅 3.4% 崩盘； LRU 上 Claude-3.7 52.5% 而
+    RAG/agentic 全线 0.4–20.7% 塌方；CR 多跳冲突消解全体 ≤6%（GPT-4o 5.0%、Contriever
+    7.0%，连推理模型 o4-mini@32K 也仅 14.0%）。 一句结论：多跳冲突消解是全行业系统性盲区，不是某系统差。
+  innovation: >
+    把"记忆能力"从单一事实 recall 拆成四个正交维度（AR/TTL/LRU/CR），并用"增量逐块喂入 +
+    每块请记住"的供给方式取代一次性长上下文—— 证明了不存在"最佳记忆系统"这一命题，并把"多跳+冲突"识别为范式级共同短板（而非实现 bug）。
+  weakness: >
+    数据集主要为人工合成（作者 §5 自承 "primarily synthetic, may not fully reflect real-world
+    conversations"）—— 所以"多跳 CR 全体≤6%"有几分是真范式短板、几分是 FactConsolidation
+    反事实拼接所致，尚不可分辨（构念效度风险）； 开放题用 GPT-4o 当 judge，评判模型偏好会渗进排名（评判效度风险）；复现门槛是付费
+    OpenAI API（judge + 多个商用 agent 对象），非算力； 主要英文、跨语言/领域泛化未讨论；Mem0/MemGPT
+    随产品版本漂移，结论有保鲜期。
+  transfer: >
+    几乎为 AI-Brief/BriefMem 量身定做的体检表：AR=写 deep-dive
+    时能否准确取回旧论文/方法卡不漏不串；TTL=新论文推翻旧结论时能否即时纳入并改后续选择；
+    LRU=跨多篇形成专题综述/赛道判断；CR=检测矛盾结论，正对应图谱里的 contradicts 边。 路线建议：①先立
+    contradicts/supports 边（已做）→②用"增量多轮+四维"做 BriefMem 自测集→③把"多跳冲突消解"当红线指标盯死。
     复用它的"四维+增量协议"当验收尺，别复刻它的合成数据集。
-
   architecture: |
     ```mermaid
     flowchart TD
@@ -54,35 +49,47 @@ facets:
       EVAL --> CR[CR 冲突消解<br/>SubEM 单跳/多跳]
       CR -.->|多跳全体≤6% 系统性盲区| GAP[暴露范式短板而非排名]
     ```
-
 core_concepts:
   - name: 增量多轮评测协议
     role: primary
-    evidence: "深读大白话带读逐字『论文里管这叫 incremental multi-turn evaluation（增量多轮评测）』+ 评测协议节逐字『chunks c_1…c_n（每块附「请记忆」指令，顺序喂入）；queries q_1…q_m（读完后提问）』——是这套 benchmark 取代『一次性长上下文』的承重件，拿掉它整篇命题不成立。"
+    evidence: 深读大白话带读逐字『论文里管这叫 incremental multi-turn evaluation（增量多轮评测）』+
+      评测协议节逐字『chunks c_1…c_n（每块附「请记忆」指令，顺序喂入）；queries q_1…q_m（读完后提问）』——是这套
+      benchmark 取代『一次性长上下文』的承重件，拿掉它整篇命题不成立。
   - name: 四维能力(AR/TTL/LRU/CR)
     role: primary
-    evidence: "深读创新节逐字『把记忆能力从单一事实 recall 拆成四个正交维度（AR/TTL/LRU/CR）』+ 能力地图表逐字『AR 精确检索 / TTL 测试时学习 / LRU 长程理解 / CR 冲突消解』——证明『不存在最佳记忆系统』的核心框架（规范名取源文原词『四维能力(AR/TTL/LRU/CR)』）。"
+    evidence: 深读创新节逐字『把记忆能力从单一事实 recall 拆成四个正交维度（AR/TTL/LRU/CR）』+ 能力地图表逐字『AR 精确检索 /
+      TTL 测试时学习 / LRU 长程理解 / CR
+      冲突消解』——证明『不存在最佳记忆系统』的核心框架（规范名取源文原词『四维能力(AR/TTL/LRU/CR)』）。
   - name: 冲突消解
     role: supporting
-    evidence: "深读能力地图逐字『CR 冲突消解：检测并消解矛盾，使 agent 与最新事实对齐』+ 失效模式逐字『多跳+冲突是系统性盲区…全体≤6%（多跳）』——是四维之一，对应图谱 contradicts 边（规范名统一为『冲突消解』=跨文件锚，与 supermemory 同名）。"
+    evidence: 深读能力地图逐字『CR 冲突消解：检测并消解矛盾，使 agent 与最新事实对齐』+
+      失效模式逐字『多跳+冲突是系统性盲区…全体≤6%（多跳）』——是四维之一，对应图谱 contradicts
+      边（规范名统一为『冲突消解』=跨文件锚，与 supermemory 同名）。
   - name: 可学习的记忆操作
     role: mentioned
-    evidence: "深读为什么值得看逐字『它还跟我们已收的 AgeMem 是一对：AgeMem 提『可学习的记忆方法』，这篇负责『考这些方法到底行不行』（连 Mem0 都是两篇共同的对象）』——本文不提该方法，仅作为受测/对照对象提及（规范名统一为『可学习的记忆操作』=与 agemem 同名的跨文件锚，源文原词『可学习的记忆方法』）。"
-self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
-  记忆：是"尺子"不是"引擎"——本身不构建记忆，无法直接当记忆模块；但 AR/TTL/LRU/CR 四维协议可直接当 AI-Brief 记忆系统的回归测试门。
+    evidence: 深读为什么值得看逐字『它还跟我们已收的 AgeMem 是一对：AgeMem 提『可学习的记忆方法』，这篇负责『考这些方法到底行不行』（连
+      Mem0 都是两篇共同的对象）』——本文不提该方法，仅作为受测/对照对象提及（规范名统一为『可学习的记忆操作』=与 agemem
+      同名的跨文件锚，源文原词『可学习的记忆方法』）。
+self_evo_use: >
+  记忆：是"尺子"不是"引擎"——本身不构建记忆，无法直接当记忆模块；但 AR/TTL/LRU/CR 四维协议可直接当 AI-Brief
+  记忆系统的回归测试门。
 
-  理解：能用（评测视角的理解框架）——四维正交拆解 + 增量多轮协议把「记忆系统好不好」变成可检查的问题；「多跳冲突消解全体 ≤6%」是对整个领域失败模式的系统性归因。
+  理解：能用（评测视角的理解框架）——四维正交拆解 + 增量多轮协议把「记忆系统好不好」变成可检查的问题；「多跳冲突消解全体
+  ≤6%」是对整个领域失败模式的系统性归因。
 
-  自进化：对自进化极关键——自进化的定义是"系统从反馈把自己改得越来越懂用户"，TTL（即时学新行为）+ CR（消解过时/矛盾事实）正是衡量"有没有真在进化"的核心维度；把"多跳冲突消解"列为自进化记忆的红线指标。
-
+  自进化：对自进化极关键——自进化的定义是"系统从反馈把自己改得越来越懂用户"，TTL（即时学新行为）+
+  CR（消解过时/矛盾事实）正是衡量"有没有真在进化"的核心维度；把"多跳冲突消解"列为自进化记忆的红线指标。
 edges:
   - to: agemem
     type: composes_with
-    evidence: "AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0 都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）"
+    evidence: AgeMem 提可学习的记忆方法、MemoryAgentBench 负责考这些方法行不行（连 Mem0
+      都是两篇共同评测对象）；方法×评测天然配对（deep-read 明确称二者『是一对』）
     confidence: high
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
   - to: mempalace
     type: composes_with
-    evidence: "MemPalace 自报 LongMemEval R@5 96.6%；MemoryAgentBench 指出仅靠 AR 单维高分不够，正可补 TTL/LRU/CR 三维的独立体检"
+    evidence: MemPalace 自报 LongMemEval R@5 96.6%；MemoryAgentBench 指出仅靠 AR 单维高分不够，正可补
+      TTL/LRU/CR 三维的独立体检
     confidence: medium
-
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
 status: extracted

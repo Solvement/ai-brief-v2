@@ -1,0 +1,52 @@
+schema: v2
+node_id: paper:2606.02060
+slug: 2606.02060-drift-agent-error-localization
+kind: paper
+title: Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in
+  Agent Trajectories
+arxiv_id: "2606.02060"
+source: content/papers/2606.02060-drift-agent-error-localization +
+  data/autosci/primitives/2606.02060.yaml
+facets:
+  problem_solved: long-noisy-agent-trajectory-needs-explainable-process-level-error-attribution
+  method: 把"判断一条 agent 轨迹哪里错"重构成三步可解释审计:① Claim Keeper 通读全轨,记一本 claim 账本 (每条 claim
+    的引入处 / 首次变关键处 bk / 复用链 / 类型状态);② Support Seeker 只对"关键(consequential)
+    claim"查证据档位(direct/weak/missing/conflicting),此步只暴露风险不下判;③ Dependency Tracer
+    只把 被 commit/reuse/amplify/finalize 进答案路径的"无证据/被矛盾的关键 claim"标为有害片段,并取最早者为首错。
+    关键开关 = 区分"探索"(query 里试候选)与"承诺"(把候选当既定前提),只追承诺。
+  result: 对照 A=把整条轨迹/整篇分析丢给 LLM 直接找错(bare) vs B=claim 账本+查证+依赖追责, 在一小批带已知错点的轨迹上比
+    span-F1 与 first-error accuracy;消融去掉"探索 vs 承诺"区分看误报涨多少 (复刻 DRIFT 主结论:claim 中心
+    >> bare,通用 agent 包装不稳)。1-7 天。
+  innovation: 评 agent 看过程级信用分配(哪一步开始坏)而非只看最终对错;36.9%
+    成功轨迹仍含错=终答正确≠过程可靠。；只对'被当成既定前提'的承诺追责,弱支持/试探本身不算错——护栏卡在'承诺'那一刻。；轨迹内证据一致 ≠
+    真实为真;高影响 claim 需外部 verifier 重新取证。；把'判错'拆成 记录→查证→追责 三段,而非黑箱打分,才能解释'为什么判它错'。
+  weakness: consequential_underdefined；cost_blowup；first_error_hard；over_trust_internal
+  transfer: 100~200 行实现领域无关版:Claim 对象 + ledger;一个 LLM 提示做 support 分档;一个依赖图把
+    commit/reuse/amplify/finalize 连起来。先在单条轨迹(或本站一篇深读)跑通"记账→查证→追责", 再接进冷审门当 Stage
+    B 的结构化诊断器。
+self_evo_use: 记忆：保留 Where Do Deep-Research Agents Go Wrong? Span-Level Error
+  Localization in Agent Trajectories 的问题、方法、概念和证据边界。理解：用它补齐
+  long-noisy-agent-trajectory-needs-explainable-process-level-error-attribution
+  的方法坐标。自进化：100~200 行实现领域无关版:Claim 对象 + ledger;一个 LLM 提示做 support 分档;一个依赖图把
+  commit/reuse/amplify/finalize 连起来。先在单条轨迹(或本站一篇深读)跑通"记账→查证→追责", 再接进冷审门当 Stage B
+  的结构化诊断器。
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: long-noisy-agent-trajectory-needs-explainable-process-level-error-attribution
+  - name: 方法原语
+    role: supporting
+    evidence: long-noisy-agent-trajectory-needs-explainable-process-level-error-attribution
+  - name: 迁移边界
+    role: supporting
+    evidence: long-noisy-agent-trajectory-needs-explainable-process-level-error-attribution
+discovery_trace: 数据不足
+edges:
+  - to: 2606.09730-searchswarm-delegation-intelligence
+    type: complements
+    confidence: medium
+    evidence: Drift Agent Error Localization 定位 deep-research agent
+      轨迹中的错误跨度；SearchSwarm 研究长程 deep research 中的 delegation
+      intelligence。一个做错误定位，一个做任务委派能力。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

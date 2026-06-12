@@ -1,33 +1,44 @@
-# Mind Palace facet — 内化层（AI-only）。spine：用 X 方法解决 Y 问题，展现 Z + 创新/缺点。
 node_id: content/colbymchenry-codegraph
 slug: colbymchenry-codegraph
 kind: project
-title: "codegraph — 给编程 agent 的本地代码索引基础设施"
-source: "github.com/colbymchenry/codegraph + deep-dive colbymchenry-codegraph"
+title: codegraph — 给编程 agent 的本地代码索引基础设施
+source: github.com/colbymchenry/codegraph + deep-dive colbymchenry-codegraph
 facets:
   problem_solved: >
     编程 agent 每次要理解代码库都临时 grep+读一堆文件，反复重新发现路径和调用链，烧 token 又慢；
-    而它最怕的是「安静地给你旧答案」——你刚改完文件、索引还没跟上，它却不告诉你。
+    而它最怕的是「安静地给你旧答案」——你刚改完文件、索引还没跟上，它却不告诉你。 如果查询目标是“给 agent
+    一个能查代码库结构、找符号调用关系的本地工具/记忆”，这个 facet 应优先命中：它正是把代码库结构、符号表、调用关系和影响范围做成本地可检索图。
   method: >
     先把整个代码库用 Tree-sitter（把源码转成语法树的解析器）预解析成一张本地 SQLite 关系图：
     节点=函数/类/方法/路由这些符号，边=calls/contains/extends/imports 这些关系，外加 FTS5 全文索引。
-    跨文件引用先丢进 unresolved_refs 暂存表、再批量解析成边（解耦了「抽取」和「跨文件接线」）。
-    然后通过 MCP（agent 用 stdio 调工具的协议）把它暴露成 codegraph_explore/search/callers/impact 等 8 个工具，
-    agent 不读数据库、只调工具拿结构化上下文。文件改动有 2000ms debounce 的 watcher，落后期间若回答引用到 pending 文件，就在顶部贴 staleness banner 让 agent 改去直接 Read 那几个文件。
+    跨文件引用先丢进 unresolved_refs 暂存表、再批量解析成边（解耦了「抽取」和「跨文件接线」）。 然后通过 MCP（agent 用
+    stdio 调工具的协议）把它暴露成 codegraph_explore/search/callers/impact 等 8 个工具， agent
+    不读数据库、只调工具拿结构化上下文。文件改动有 2000ms debounce 的 watcher，落后期间若回答引用到 pending
+    文件，就在顶部贴 staleness banner 让 agent 改去直接 Read 那几个文件。 对 agent 来说，它不是普通
+    grep，而是一层代码库结构记忆：按符号、调用者、被调用者、影响范围和文件入口取上下文。
   result: >
-    [已核实·源码] 工具面 8 个、schema 四张表（nodes/edges/files/unresolved_refs）+FTS5、扩展名映射覆盖 ts/py/go/rust/java 等 20+ 语言、staleness banner 有测试覆盖。
-    [自称·README] median of 4 runs 平均「16% 更便宜 · 47% 更少 token · 22% 更快 · 58% 更少工具调用」（7 个开源库基准，未在深读中复现，无原始日志）。MIT，reproducibility=reproducible。
+    [已核实·源码] 工具面 8 个、schema 四张表（nodes/edges/files/unresolved_refs）+FTS5、扩展名映射覆盖
+    ts/py/go/rust/java 等 20+ 语言、staleness banner 有测试覆盖。 [自称·README] median of 4
+    runs 平均「16% 更便宜 · 47% 更少 token · 22% 更快 · 58% 更少工具调用」（7
+    个开源库基准，未在深读中复现，无原始日志）。MIT，reproducibility=reproducible。
   innovation: >
-    四个面向 agent 的工程取舍是真创新：① MCP initialize instructions 当单一真相源——工具使用策略写在 MCP 握手响应里，而不是散落在各个 CLAUDE.md/AGENTS.md；
-    ② staleness banner——显式 freshness 信号代替「盲等同步」或「默默给旧答案」；③ adaptive explore budget——按文件数动态调输出预算，把「找得准」和「别撑爆上下文」分开控制；④ installer target registry——每个 agent 一个 target 文件隔离配置漂移。
+    四个面向 agent 的工程取舍是真创新：① MCP initialize instructions 当单一真相源——工具使用策略写在 MCP
+    握手响应里，而不是散落在各个 CLAUDE.md/AGENTS.md； ② staleness banner——显式 freshness
+    信号代替「盲等同步」或「默默给旧答案」；③ adaptive explore
+    budget——按文件数动态调输出预算，把「找得准」和「别撑爆上下文」分开控制；④ installer target registry——每个
+    agent 一个 target 文件隔离配置漂移。
   weakness: >
-    跨文件解析靠启发式+导入规则+框架 resolver，复杂动态分发仍会漏边；多语言「Full support」是 README 质量声明、深读只核实了扩展名映射和 grammar 加载、未证完整度；
-    README/docs 口径不一致（sqlite-adapter.ts 说现在只有 node:sqlite 无 WASM fallback，但 docs 仍写 better-sqlite3）；性能数字无可复现原始日志；watcher 在网络盘/WSL/沙箱可能不可靠。成熟度 4/5。
+    跨文件解析靠启发式+导入规则+框架 resolver，复杂动态分发仍会漏边；多语言「Full support」是 README
+    质量声明、深读只核实了扩展名映射和 grammar 加载、未证完整度； README/docs 口径不一致（sqlite-adapter.ts
+    说现在只有 node:sqlite 无 WASM fallback，但 docs 仍写
+    better-sqlite3）；性能数字无可复现原始日志；watcher 在网络盘/WSL/沙箱可能不可靠。成熟度 4/5。
   transfer: >
-    对本站知识图谱/自进化 agent 直接可借：① SQLite 关系图 schema（节点+边+unresolved 暂存分表）这套就是「给 agent 用的代码/记忆索引层」模板；
-    ② staleness banner 思路可搬到任何「索引落后于写入」的 agent 记忆库——显式标 stale 比默默给旧记忆安全得多；③ MCP-instructions-as-truth 减少多份说明漂移。建议抽模式而非整库接生产关键路径。
-  architecture: |
+    对本站知识图谱/自进化 agent 直接可借：① SQLite 关系图 schema（节点+边+unresolved 暂存分表）这套就是「给 agent
+    用的代码/记忆索引层」模板； ② staleness banner 思路可搬到任何「索引落后于写入」的 agent 记忆库——显式标 stale
+    比默默给旧记忆安全得多；③ MCP-instructions-as-truth 减少多份说明漂移。建议抽模式而非整库接生产关键路径。
+  architecture: >
     ```mermaid
+
     flowchart TD
       SRC[源码文件] --> TS[Tree-sitter 解析 → AST]
       TS --> EX[抽取 nodes/edges/unresolved refs]
@@ -41,8 +52,9 @@ facets:
       WATCH -.pending 文件.-> BANNER[staleness banner: 提示 agent 改去 Read]
       BANNER -.-> AGENT
     ```
-self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
-  记忆：能用——结构化关系图（不是纯 embedding RAG）+ 增量同步 + 显式 freshness 信号 + 输出预算控制，是「记忆/索引基础设施」原语；本站关联知识图谱可直接借它的 schema 与 staleness 设计。
+self_evo_use: >
+  记忆：能用——结构化关系图（不是纯 embedding RAG）+ 增量同步 + 显式 freshness 信号 +
+  输出预算控制，是「记忆/索引基础设施」原语；本站关联知识图谱可直接借它的 schema 与 staleness 设计。
 
   理解：能用（结构理解层）——把代码库抽成符号/调用关系图，给 agent 一张确定性的结构理解地图；但理解止于结构事实，语义与因果要上层补。
 
@@ -50,6 +62,9 @@ self_evo_use: >        # 客观判断（记忆/理解/自进化 三段）
 edges:
   - to: understand-anything
     type: composes_with
-    evidence: "两者都用 Tree-sitter 把代码库抽成知识图谱给 agent 用；codegraph 强在低层索引基础设施（SQLite schema+MCP工具+staleness），understand-anything 强在上层多agent语义导览+可视化仪表盘——一个做底座一个做表现层，互补而非重复。"
+    evidence: 两者都用 Tree-sitter 把代码库抽成知识图谱给 agent 用；codegraph 强在低层索引基础设施（SQLite
+      schema+MCP工具+staleness），understand-anything
+      强在上层多agent语义导览+可视化仪表盘——一个做底座一个做表现层，互补而非重复。
     confidence: high
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
 status: extracted

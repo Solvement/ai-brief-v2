@@ -1,0 +1,60 @@
+schema: v2
+node_id: content/refactoringhq-tolaria
+slug: refactoringhq-tolaria
+kind: project
+title: tolaria — 深度拆解
+source: public/data/brief/deep-dives.json:refactoringhq-tolaria-deep-dive
+facets:
+  problem_solved: Tolaria 是一个本地优先的 Markdown 知识库桌面应用，把 vault 文件、Git、MCP 和多种 CLI/模型
+    AI 入口接在一起。 人话：它更像“给 AI 可读的个人/团队 Markdown vault 管理器”，不是单纯笔记 App，也不是通用 agent
+    framework。术语上，它用 Tauri + React 做桌面壳，用 Rust 扫描/写入 vault，用 Node MCP server 给
+    Claude/Codex/Gemini/OpenCode 等工具暴露读写入口。（来源：README
+    Principles；docs/ARCHITECTURE System Overview；mcp-server/index.js TOOLS）
+  method: '真实流：用户打开 `demo-vault-v2/25q2-laputa-v2.md` 这类文件，frontmatter 里有 `type:
+    Project`、`belongs_to`、`related_to`，正文里有 `「laputa-qa-reference」(Obsidian
+    式双链)`。Rust 扫描后生成 `VaultEntry`，React 显示四栏；AI 面板把 active note、open tabs、note
+    list 和 vault summary 组装成 JSON context；CLI agent 或 MCP tool
+    再读写同一批文件。（来源：demo-vault-v2/25q2-laputa-v2.md；src-tauri/src/vault/mod.rs；src/utils/ai-context.ts）
+    关键点：MCP 的 `create_note` 不覆盖已有文件，fallback 内容会写成 `type: "Project"` 加 H1；多
+    vault 同名路径会报 ambiguous，要求传 `vaultPath`。（来源：mcp-server/tool-service.test.js）
+    这是真桌面开发入口；浏览器 mock 用 `pnpm dev`，不覆盖 Tauri/Rust/MCP 全路径。（来源：README Quick
+    start；docs/GETTING-STARTED Quick Start）'
+  result: 下面把“自称”和“已核实”分开。README 的口号只算自称；源码、配置、测试里能看到的机制算已核实。 笔记是普通 `.md` 文件，YAML
+    frontmatter 承载 `type`、`status`、关系等字段；解析入口是 Rust 的 `parse_md_file()`。 Git
+    是同步/历史能力，不再是打开 vault 的硬门槛；非 Git 模式隐藏 commit/sync 等功能。 AI 不是强绑定云服务；应用可用 CLI
+    agents，也能配置 API/local model provider。 MCP server 是 Node stdio server；工具调用时从
+    `VAULT_PATH`、`VAULT_PATHS` 或 app 的 `vaults.json` 解析 active vault。 同一个 UI 模式按
+    adapter 映射成不同 CLI 参数：Codex Safe 是 read-only + untrusted，Power User 是
+    workspace-write + never。 README 说作者用一个 10,000+ notes 的 workspace；ADR-0014 提到
+    9000+ Markdown 文件扫描痛点。
+  innovation: 最可复用的是“让普通文件变成 agent 可操作对象”的边界设计，不是 UI 组件本身。 VaultEntry 作为文件图谱投影
+    持久外部 MCP 配置不写 vault path Adapter-specific permission mapping Git-backed
+    disposable cache 直接模型只给窄工具
+  weakness: 主要风险来自桌面跨平台、外部 CLI、MCP runtime 和许可证，而不是模型算法。
+  transfer: 最可复用的是“让普通文件变成 agent 可操作对象”的边界设计，不是 UI 组件本身。 VaultEntry 作为文件图谱投影 持久外部
+    MCP 配置不写 vault path Adapter-specific permission mapping Git-backed
+    disposable cache 直接模型只给窄工具
+self_evo_use: 记忆：把 tolaria — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 ai_app
+  的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Tolaria 是一个本地优先的 Markdown 知识库桌面应用，把 vault 文件、Git、MCP 和多种 CLI/模型 AI
+      入口接在一起。 人话：它更像“给 AI 可读的个人/团队 Markdown vault 管理器”，不是单…
+  - name: 机制链路
+    role: primary
+    evidence: "真实流：用户打开 `demo-vault-v2/25q2-laputa-v2.md` 这类文件，frontmatter 里有 `type:
+      Project`、`belongs_to`、`related_to`，正文里有 `「laputa-…"
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最可复用的是“让普通文件变成 agent 可操作对象”的边界设计，不是 UI 组件本身。 VaultEntry 作为文件图谱投影 持久外部
+      MCP 配置不写 vault path Adapter-specific permission m…
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险来自桌面跨平台、外部 CLI、MCP runtime 和许可证，而不是模型算法。
+  - name: 证据账本
+    role: mentioned
+    evidence: 本地文件优先、无导出锁定
+discovery_trace: 数据不足
+edges: []
+status: extracted

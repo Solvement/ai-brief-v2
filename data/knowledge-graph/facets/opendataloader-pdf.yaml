@@ -1,0 +1,50 @@
+schema: v2
+node_id: content/opendataloader-pdf
+slug: opendataloader-pdf
+kind: project
+title: opendataloader-pdf — 深度拆解
+source: public/data/brief/deep-dives.json:opendataloader-pdf-deep-dive
+facets:
+  problem_solved: opendataloader-pdf — 深度拆解 的核心判断：提供一套开源、高精度、混合模式的 PDF
+    数据提取与自动标签化工具，解决 AI 应用中 PDF 结构信息丢失和无障碍合规人工成本高的痛点。 本条由旧深读聚合内容重整为 RuView
+    light_spine；证据边界来自 README 核心 banner 与特性列表；Capability Matrix 功能矩阵；Extraction
+    Benchmarks 基准测试表；Hybrid Mode 操作说明；Accessibility Pipeline 描述；仓库结构（目录和
+    package.json）。没有源码级证据的地方保留“数据不足”。
+  method: 提供一套开源、高精度、混合模式的 PDF 数据提取与自动标签化工具，解决 AI 应用中 PDF 结构信息丢失和无障碍合规人工成本高的痛点。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    在自测的基准测试中，opendataloader-pdf 的混合模式整体提取准确率位列第一，得分为 0.907。 首个能够端到端自动生成 Tagged
+    PDF 的开源工具。 与 veraPDF 开发者 Dual Lab 合作，基于 PDF 协会规范构建。
+  innovation: 可复用混合决策路由的架构模式及工具接口封装设计，但具体 Java 引擎实现难以移植。 clone-and-run read-docs
+    extract-pattern(hybrid-decision-router)
+  weakness: 基准测试由项目方自行实施，可能存在自我评估偏差；关键的企业功能（PDF/UA 导出）为闭源组件，影响开源完整度；Hybrid
+    模式下的路由决策具体算法或规则未在 README 说明。；AI safety 过滤器（prompt injection
+    filtering）的实现方式、检测模型未在自述文件透露。；自动标签化（Auto-tagging）的版面分析模型准确率及适用 PDF
+    类型边界未给出量化数据。；LangChain 集成的详细接口与示例代码未在 README 展示。；该工具在大规模并发处理（>1000 篇
+    PDF）场景下的性能与稳定性未给出 benchmark。
+  transfer: 可复用混合决策路由的架构模式及工具接口封装设计，但具体 Java 引擎实现难以移植。 clone-and-run read-docs
+    extract-pattern(hybrid-decision-router)
+self_evo_use: 记忆：把 opendataloader-pdf — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: opendataloader-pdf — 深度拆解 的核心判断：提供一套开源、高精度、混合模式的 PDF 数据提取与自动标签化工具，解决
+      AI 应用中 PDF 结构信息丢失和无障碍合规人工成本高的痛点。 本条由旧深读聚合内容重整为 RuV…
+  - name: 机制链路
+    role: primary
+    evidence: 提供一套开源、高精度、混合模式的 PDF 数据提取与自动标签化工具，解决 AI 应用中 PDF 结构信息丢失和无障碍合规人工成本高的痛点。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用混合决策路由的架构模式及工具接口封装设计，但具体 Java 引擎实现难以移植。 clone-and-run read-docs
+      extract-pattern(hybrid-decision-router)
+  - name: 风险边界
+    role: supporting
+    evidence: 基准测试由项目方自行实施，可能存在自我评估偏差；关键的企业功能（PDF/UA 导出）为闭源组件，影响开源完整度；Hybrid
+      模式下的路由决策具体算法或规则未在 README 说明。；AI safety 过滤器（prompt inject…
+  - name: 证据账本
+    role: mentioned
+    evidence: "opendataloader-pdf [hybrid] ranks #1 overall (0.907) across reading
+      order, table, and heading extraction accuracy."
+discovery_trace: 数据不足
+edges: []
+status: extracted

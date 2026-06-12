@@ -1,0 +1,76 @@
+schema: v2
+node_id: content/cloakhq-cloakbrowser
+slug: cloakhq-cloakbrowser
+kind: project
+title: CloakBrowser — 深度拆解
+source: public/data/brief/deep-dives.json:cloakhq-cloakbrowser-deep-dive
+facets:
+  problem_solved: CloakBrowser 是一个 Python/JavaScript 浏览器自动化 SDK，用
+    Playwright/Puppeteer 风格 API 启动 CloakHQ 自己分发的 patched Chromium 二进制，并把
+    fingerprint、proxy、GeoIP、humanize、CDP server 等反检测相关配置封装成启动参数。 人话：它不是新的 Agent
+    框架，而是给浏览器 Agent、爬虫、自动化测试换一颗浏览器内核；调用方仍然写
+    `launch()`、`page.goto()`、`browser.close()`。技术词：`pyproject.toml` 声明 Python 包
+    `cloakbrowser`、入口 `cloakbrowser = cloakbrowser.__main__:main`，依赖
+    `playwright>=1.40` 和 `httpx>=0.24`；`js/package.json` 声明 npm 包 `cloakbrowser`
+    版本 `0.3.31`，导出 Playwright、Puppeteer、human 模块，并要求 Node
+    `>=20.0.0`。（来源：pyproject.toml
+    project/project.scripts/dependencies；js/package.json exports/engines）
+  method: 真实流程示例：`examples/basic.py` 写的是 `from cloakbrowser import launch`，然后
+    `browser = launch(headless=False)`，`page =
+    browser.new_page()`，`page.goto("https://example.com")`，最后
+    `browser.close()`。（来源：examples/basic.py） 调用进入 `cloakbrowser/browser.py
+    launch()` 后，第一步是 `ensure_binary()`。它先看 `CLOAKBROWSER_BINARY_PATH`，没有本地
+    override 就用 `get_platform_tag()`、`get_effective_version()` 找缓存路径；Windows 目标是
+    `~/.cloakbrowser/chromium-<version>/chrome.exe`，Linux 是 `chrome`，macOS 是
+    `Chromium.app/Contents/MacOS/Chromium`。（来源：cloakbrowser/download.py
+    ensure_binary；cloakbrowser/config.py get_binary_path）
+    如果缓存没有二进制，`_download_and_extract()` 先从
+    `https://cloakbrowser.dev/chromium-v<version>/cloakbrowser-<platform>.<ext>`
+    下载，失败时 fallback 到 GitHub Releases；下载后默认读取 `SHA256SUMS` 校验，tar/zip 解压有 path
+    traversal 检查，macOS 还会运行 `xattr -cr` 去掉
+    quarantine。（来源：cloakbrowser/download.py
+    _download_and_extract/_verify_download_checksu…
+  result: 下面把 README/营销说法和代码可核实事实分开。凡是 live benchmark、通过检测站点、patch
+    数量、性能数字，没有本次实际运行验证的，都按“自称”。 人话：用户把原来的 Playwright/Puppeteer 启动入口替换成
+    CloakBrowser 的 `launch()`，后续仍用熟悉的 page/browser API。技术词：wrapper 将自定义
+    `executable_path`/`executablePath` 注入到 Playwright/Puppeteer launch options。
+    人话：第一次运行时它会找缓存，没有就下载；之后会按间隔检查更新。技术词：`ensure_binary()` 使用 cache
+    marker、platform tag、release API 和 SHA256SUMS。 人话：README 说浏览器指纹不是靠 JS
+    注入，而是编译进 Chromium 的 C++ patch。技术词：这属于 binary-level fingerprint patch，而
+    wrapper 只负责启动参数和下载。 人话：这是 README 的检测结果表，不是本次复测结果。技术词：这些是 live anti-bot
+    benchmark claims。 人话：开这个 flag 后，它会把一些 Playwright
+    页面方法包一层，让点击、输入、滚动慢一点、更像人。技术词：monkey patch Page/Context/Browser methods，并用
+    `HumanConfig` 控制 timing、overshoot、scroll 等参数。
+    人话：给代理时，它会尝试查代理出口在哪里，然后把浏览器时区、语言和 WebRTC IP 对齐。技术词：GeoIP database + proxy
+    exit IP echo +
+    `--fingerprint-timezone`/`--fingerprint-locale`/`--fingerprint-webrtc-ip`
+    flags。 人话：它能在一个端口上接多个 CDP…
+  innovation: 这些模式比“反检测”本身更容易复用到一般 AI 工程。 二进制获取契约 启动参数去重器 CDP 多路复用与身份隔离 人类行为层作为可选
+    patch 安全边界测试写进示例
+  weakness: 这个项目的风险不只在 Python/JS wrapper，而在“下载并运行专有 patched Chromium binary”。
+  transfer: 这些模式比“反检测”本身更容易复用到一般 AI 工程。 二进制获取契约 启动参数去重器 CDP 多路复用与身份隔离 人类行为层作为可选
+    patch 安全边界测试写进示例
+self_evo_use: 记忆：把 CloakBrowser — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  library_sdk 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: CloakBrowser 是一个 Python/JavaScript 浏览器自动化 SDK，用 Playwright/Puppeteer
+      风格 API 启动 CloakHQ 自己分发的 patched Chromium 二进制，并把 fi…
+  - name: 机制链路
+    role: primary
+    evidence: 真实流程示例：`examples/basic.py` 写的是 `from cloakbrowser import launch`，然后
+      `browser = launch(headless=False)`，`page = browser.…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 这些模式比“反检测”本身更容易复用到一般 AI 工程。 二进制获取契约 启动参数去重器 CDP 多路复用与身份隔离 人类行为层作为可选
+      patch 安全边界测试写进示例
+  - name: 风险边界
+    role: supporting
+    evidence: 这个项目的风险不只在 Python/JS wrapper，而在“下载并运行专有 patched Chromium binary”。
+  - name: 证据账本
+    role: mentioned
+    evidence: “Drop-in Playwright/Puppeteer replacement for Python and JavaScript”。
+discovery_trace: 数据不足
+edges: []
+status: extracted

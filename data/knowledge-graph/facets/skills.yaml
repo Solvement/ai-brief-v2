@@ -1,0 +1,46 @@
+schema: v2
+node_id: content/skills
+slug: skills
+kind: project
+title: skills — 深度拆解
+source: public/data/brief/deep-dives.json:skills-deep-dive
+facets:
+  problem_solved: skills — 深度拆解 的核心判断：将成熟的软件工程实践系统化为可直接安装的代理技能，同时保持轻量和可改造性。
+    本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自 README.md (全文)；top_level_dirs
+    (skills/, docs/, scripts/)；artifact audit data (stargazers, license, key
+    files)。没有源码级证据的地方保留“数据不足”。
+  method: 将成熟的软件工程实践系统化为可直接安装的代理技能，同时保持轻量和可改造性。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    通过盘问会话，技能解决了用户和代理之间最常见的失败模式：需求不对齐。 共享语言（CONTEXT.md）减少代理的冗长和 token
+    使用，同时提高代码一致性。 TDD 技能通过强制执行红-绿-重构循环，显著改进代码质量。 在 AI 驱动的开发中，软件工程基础比以往更重要。
+  innovation: 可复用：共享语言记忆模式、盘问对齐、交接文档。不可直接复用：特定于代理的实现细节（如 npx 安装命令）。 clone-and-run
+    read-docs extract-pattern(shared-language-memory)
+    extract-pattern(grilling-sessions)
+  weakness: 证据仅来自作者个人叙述，缺乏独立评测。；技能的效果依赖于代理底层能力（如 Claude Code、Codex），可能随模型更新而改变。
+  transfer: 可复用：共享语言记忆模式、盘问对齐、交接文档。不可直接复用：特定于代理的实现细节（如 npx 安装命令）。 clone-and-run
+    read-docs extract-pattern(shared-language-memory)
+    extract-pattern(grilling-sessions)
+self_evo_use: 记忆：把 skills — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: skills — 深度拆解 的核心判断：将成熟的软件工程实践系统化为可直接安装的代理技能，同时保持轻量和可改造性。
+      本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自 README.md (全文)；top_le…
+  - name: 机制链路
+    role: primary
+    evidence: 将成熟的软件工程实践系统化为可直接安装的代理技能，同时保持轻量和可改造性。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可复用：共享语言记忆模式、盘问对齐、交接文档。不可直接复用：特定于代理的实现细节（如 npx 安装命令）。 clone-and-run
+      read-docs extract-pattern(shared-language-memory) e…
+  - name: 风险边界
+    role: supporting
+    evidence: 证据仅来自作者个人叙述，缺乏独立评测。；技能的效果依赖于代理底层能力（如 Claude Code、Codex），可能随模型更新而改变。
+  - name: 证据账本
+    role: mentioned
+    evidence: The skills fix the common failure mode of misalignment between user
+      and agent through grilling sessions.
+discovery_trace: 数据不足
+edges: []
+status: extracted

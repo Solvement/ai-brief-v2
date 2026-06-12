@@ -1,0 +1,43 @@
+schema: v2
+node_id: paper:2507.21046
+slug: 2507.21046-self-evolving-agents-survey
+kind: paper
+title: "A Survey of Self-Evolving Agents: On Path to Artificial Super Intelligence"
+arxiv_id: "2507.21046"
+source: content/papers/2507.21046-self-evolving-agents-survey +
+  data/autosci/primitives/2507.21046.yaml
+facets:
+  problem_solved: how-to-make-an-agent-continually-self-improve-design-space-map
+  method: 把"让 agent 自我进化"形式化成 f(Π,τ,r)=Π′(把 agent 系统 Π=(架构Γ,模型ψ,上下文C,工具W) 按轨迹 τ
+    与反馈 r 升级),并用四轴决策框架覆盖整片领域:What(进化哪个部件)、When(任务内/任务间)、
+    How(奖励式/模仿/群体进化)、Where(通用/专用域),配五维评估(适应/保持/泛化/效率/安全)与安全清单
+    (价值漂移/灾难性遗忘/奖励错配)。= 造自进化系统的目录 + 决策树。
+  result: 给本站选稿器加一个会进化的"口味记忆":每天用 Kevin 的阅读/反馈更新偏好向量(inter-test-time,
+    奖励式),并设"学新不忘旧"的回归门(挡灾难性遗忘);比进化前后选稿与 Kevin 偏好的一致性。1-14 天。
+  innovation: 进化成本阶梯:改上下文/记忆 < 改提示 < 改工具/架构 <
+    改模型参数;能记忆解决就别微调。；真正复利来自跨任务积累(inter-test-time),不是单次任务内调一调。；外部/隐式反馈可当自进化
+    reward(连接 Agent-as-a-Judge:过程反馈即奖励)。；自改进的最大风险是价值漂移 + 灾难性遗忘,每次自更新都要过'学新不忘旧 +
+    安全'回归门。
+  weakness: survey_not_benchmark；safety_unsolved；eval_immature；asi_framing_aspirational
+  transfer: 把本站 L1 BriefEvolve 直接映射到四轴:What=上下文(选稿口味记忆)+架构(冷审流水线连边);
+    When=inter-test-time(跨天积累);How=奖励式(用冷审/Kevin 反馈当 reward);Where=通用域(论文选读)。
+    先落"记忆进化 + 回归护栏"这条最便宜的线,再逐步上提示/连边自优化。
+self_evo_use: '记忆：保留 A Survey of Self-Evolving Agents: On Path to Artificial
+  Super Intelligence 的问题、方法、概念和证据边界。理解：用它补齐
+  how-to-make-an-agent-continually-self-improve-design-space-map 的方法坐标。自进化：把本站
+  L1 BriefEvolve 直接映射到四轴:What=上下文(选稿口味记忆)+架构(冷审流水线连边);
+  When=inter-test-time(跨天积累);How=奖励式(用冷审/Kevin 反馈当 reward);Where=通用域(论文选读)。
+  先落"记忆进化 + 回归护栏"这条最便宜的线,再逐步上提示/连边自优化。'
+core_concepts:
+  - name: 问题域
+    role: primary
+    evidence: how-to-make-an-agent-continually-self-improve-design-space-map
+  - name: 方法原语
+    role: supporting
+    evidence: how-to-make-an-agent-continually-self-improve-design-space-map
+  - name: 迁移边界
+    role: supporting
+    evidence: how-to-make-an-agent-continually-self-improve-design-space-map
+discovery_trace: 数据不足
+edges: []
+status: extracted

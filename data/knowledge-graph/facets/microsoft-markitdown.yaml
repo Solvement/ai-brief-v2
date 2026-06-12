@@ -1,0 +1,77 @@
+schema: v2
+node_id: content/microsoft-markitdown
+slug: microsoft-markitdown
+kind: project
+title: markitdown — 深度拆解
+source: public/data/brief/deep-dives.json:microsoft-markitdown-deep-dive
+facets:
+  problem_solved: MarkItDown 是微软维护的 Python CLI/库，把 PDF、Office、HTML、音频、图片、ZIP
+    等输入转成更适合 LLM 与文本分析管线消费的 Markdown。 人话：它不是一个 Agent 框架，而是把杂乱文件先清洗成 Markdown
+    的入口层；CLI 示例是 `markitdown path-to-file.pdf > document.md`，Python 示例是
+    `MarkItDown(enable_plugins=False).convert("test.xlsx")`。术语：这是文档转换
+    devtool，核心对象是 `MarkItDown`、`DocumentConverter`、`StreamInfo` 和
+    `DocumentConverterResult`，包版本在源码中为 `0.1.6`。（来源：README
+    Usage；来源：packages/markitdown/src/markitdown/__about__.py；来源：packages/markitdown/src/markitdown/_markitdown.py）
+  method: 人话：以真实 README 示例 `markitdown path-to-file.pdf -o document.md` 为流：CLI 在
+    `packages/markitdown/src/markitdown/__main__.py` 解析 `filename` 和 `-o`，构造
+    `MarkItDown(enable_plugins=args.use_plugins)`；`MarkItDown.__init__()` 默认启用
+    builtins，注册
+    `PdfConverter()`、`DocxConverter()`、`XlsxConverter()`、`HtmlConverter()`、`ZipConverter(markitdown=self)`
+    等；`convert()` 看到 source 是普通字符串路径，就调用 `convert_local()`；`convert_local()` 建一个
+    `StreamInfo(local_path=path, extension=os.path.splitext(path)[1],
+    filename=os.path.basename(path))`，打开文件后调用
+    `_get_stream_info_guesses()`；该函数先用扩展名推 MIME，再调用
+    `magika.Magika().identify_stream()`，文本还会用 `charset_normalizer` 读前 4096 bytes
+    猜 charset；`_convert()` 把 converter 按 priority 排序，逐个执行 `accepts()`，PDF 文件命中
+    `PdfConverter.accepts()` 的 `.pdf` 或
+    `application/pdf`；`PdfConverter.convert()` 用 `pdfplumber` 按页尝试表单/表格式内容抽取，若没有
+    form 页面或出错就用 `pdfminer.high_level.extract_text()`，最后合并 MasterFormat…
+  result: 人话：README 的格式支持、LLM 友好、Azure 更高质量等描述按自称处理；源码中能看到的 CLI 入口、转换器注册、MCP
+    工具、插件优先级按已核实处理。术语：下面把 claim、mechanism、support boundary 和 threat
+    拆开，避免把营销句当实现事实。（来源：README；来源：packages tree） 定位是先把 PDF/Office/网页/媒体等输入变成
+    Markdown，而不是做高保真排版还原。 可以作为命令行工具，也可以嵌入 Python 代码。 它不是一个大 if/else，而是注册一组
+    converter，再按 priority 轮流问谁接受该文件。 不想装全家桶时，可以只装 PDF、DOCX、PPTX 等需要的部分。 遇到表单/表格式
+    PDF 时先按页面词坐标处理，否则回退到整文档文本提取。 本地 agent 可以通过 MCP 调 MarkItDown，把 URI 转
+    Markdown。 启用插件后，它先尝试带 LLM Vision OCR 的 converter；没配置 llm_client/llm_model 时
+    OCR 服务为空。 云端高质量提取不是免费本地转换，每次被 CU 路由的 convert 都会打 Azure。
+  innovation: 人话：最可复用的不是某个 PDF trick，而是它把文档读取拆成一组小接口：文件信息猜测、converter
+    接受判断、converter 转换、插件注册、MCP 封装。术语：这些是 adapter chain、metadata
+    object、entry-point plugin、priority override、tool
+    wrapper。（来源：packages/markitdown/src/markitdown/_base_converter.py；来源：packages/markitdown/src/markitdown/_stream_info.py；来源：packages/markitdown-sample-plugin/README.md）
+    DocumentConverter 接口 StreamInfo 数据对象 优先级 converter 注册 entry point 插件协议 MCP
+    薄封装
+  weakness: 人话：这个项目的风险主要不在核心类数量，而在输入权限、可选依赖、云服务、插件和 MCP 暴露面。术语：dependency exposure
+    包括 package extras、native tools、cloud API、dynamic plugin loading、local
+    network
+    server。（来源：packages/markitdown/pyproject.toml；来源：Dockerfile；来源：packages/markitdown-mcp/README.md）
+  transfer: 人话：最可复用的不是某个 PDF trick，而是它把文档读取拆成一组小接口：文件信息猜测、converter 接受判断、converter
+    转换、插件注册、MCP 封装。术语：这些是 adapter chain、metadata object、entry-point
+    plugin、priority override、tool
+    wrapper。（来源：packages/markitdown/src/markitdown/_base_converter.py；来源：packages/markitdown/src/markitdown/_stream_info.py；来源：packages/markitdown-sample-plugin/README.md）
+    DocumentConverter 接口 StreamInfo 数据对象 优先级 converter 注册 entry point 插件协议 MCP
+    薄封装
+self_evo_use: 记忆：把 markitdown — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  devtool_cli 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: MarkItDown 是微软维护的 Python CLI/库，把 PDF、Office、HTML、音频、图片、ZIP 等输入转成更适合
+      LLM 与文本分析管线消费的 Markdown。 人话：它不是一个 Agent 框架，而是把杂乱文件先…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：以真实 README 示例 `markitdown path-to-file.pdf -o document.md` 为流：CLI 在
+      `packages/markitdown/src/markitdown/__main__.py`…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：最可复用的不是某个 PDF trick，而是它把文档读取拆成一组小接口：文件信息猜测、converter 接受判断、converter
+      转换、插件注册、MCP 封装。术语：这些是 adapter chain、metadata obj…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：这个项目的风险主要不在核心类数量，而在输入权限、可选依赖、云服务、插件和 MCP 暴露面。术语：dependency exposure
+      包括 package extras、native tools、cloud API、dynamic…
+  - name: 证据账本
+    role: mentioned
+    evidence: MarkItDown 是轻量 Python 工具，把各种文件转 Markdown，供 LLM 和文本分析管线使用。
+discovery_trace: 数据不足
+edges: []
+status: extracted

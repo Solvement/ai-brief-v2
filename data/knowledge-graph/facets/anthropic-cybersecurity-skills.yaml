@@ -1,0 +1,52 @@
+schema: v2
+node_id: content/anthropic-cybersecurity-skills
+slug: anthropic-cybersecurity-skills
+kind: project
+title: Anthropic-Cybersecurity-Skills — 深度拆解
+source: public/data/brief/deep-dives.json:anthropic-cybersecurity-skills-deep-dive
+facets:
+  problem_solved: Anthropic-Cybersecurity-Skills — 深度拆解 的核心判断：提供了一个 AI 原生且符合
+    agentskills.io 标准的网络安全技能库，覆盖 754 个技能并映射到五大框架，使通用 LLM 代理能够像安全专家一样工作。
+    本条由旧深读聚合内容重整为 RuView light_spine；证据边界来自
+    README.md；仓库目录树（top_level_dirs）；许可证；releases；topics。没有源码级证据的地方保留“数据不足”。
+  method: 提供了一个 AI 原生且符合 agentskills.io 标准的网络安全技能库，覆盖 754 个技能并映射到五大框架，使通用 LLM
+    代理能够像安全专家一样工作。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。 仓库内包含 754
+    个不同的网络安全操作指南，每个指南是一个技能，分为 26 个专业领域。
+    每个技能文档都会标注它对应哪种攻击技术（ATT&CK）、哪种防御措施（D3FEND）、符合哪些合规要求（NIST CSF）等，一个技能可以满足多个标准。
+    AI 代理在寻找合适技能时，只需读取大约 30 个 token 的摘要信息，找到后再读取详细步骤（约 500-2000
+    token），这样就不会超过每次对话的 token 限制。 仓库使用 MITRE 官方 Python 工具检查了所有 ATT&CK 技术
+    ID，确认没有过时或无效的编号。 这个技能库可以在 Claude Code、GitHub Copilot、Cursor 等 26
+    个以上的开发工具里直接用，不需要额外配置。
+  innovation: "重用技能结构格式（YAML frontmatter + Markdown body）和渐进式加载思想，但需要为其他领域定制工作流内容。
+    clone-and-run read-docs: 查看 agentskills.io 标准 write-deepdive:
+    深入分析技能的质量和映射准确性 extract-pattern: 提取技能结构模板，用于其他领域（如 DevOps、医疗）"
+  weakness: README 未提供技能质量保证机制的证据；危险命令执行风险未解决；框架映射可能过时；社区贡献可能导致事实错误
+  transfer: "重用技能结构格式（YAML frontmatter + Markdown body）和渐进式加载思想，但需要为其他领域定制工作流内容。
+    clone-and-run read-docs: 查看 agentskills.io 标准 write-deepdive:
+    深入分析技能的质量和映射准确性 extract-pattern: 提取技能结构模板，用于其他领域（如 DevOps、医疗）"
+self_evo_use: 记忆：把 Anthropic-Cybersecurity-Skills — 深度拆解
+  的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对 agent_framework 的判断，不把 README
+  自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Anthropic-Cybersecurity-Skills — 深度拆解 的核心判断：提供了一个 AI 原生且符合
+      agentskills.io 标准的网络安全技能库，覆盖 754 个技能并映射到五大框架，使通用 LLM 代理能够像安全…
+  - name: 机制链路
+    role: primary
+    evidence: 提供了一个 AI 原生且符合 agentskills.io 标准的网络安全技能库，覆盖 754 个技能并映射到五大框架，使通用 LLM
+      代理能够像安全专家一样工作。
+  - name: 可复用抽象
+    role: supporting
+    evidence: "重用技能结构格式（YAML frontmatter + Markdown body）和渐进式加载思想，但需要为其他领域定制工作流内容。
+      clone-and-run read-docs: 查看 agentskills.io 标准 write…"
+  - name: 风险边界
+    role: supporting
+    evidence: README 未提供技能质量保证机制的证据；危险命令执行风险未解决；框架映射可能过时；社区贡献可能导致事实错误
+  - name: 证据账本
+    role: mentioned
+    evidence: 754 个结构化技能覆盖 26 个安全域
+discovery_trace: 数据不足
+edges: []
+status: extracted

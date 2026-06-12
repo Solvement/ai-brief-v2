@@ -1,0 +1,72 @@
+schema: v2
+node_id: paper:2606.05922
+slug: 2606.05922-retrospective-harness-optimization
+kind: paper
+title: "Evolving Agents in the Dark: Retrospective Harness Optimization via
+  Self-Preference"
+arxiv_id: "2606.05922"
+source: content/papers/2606.05922-retrospective-harness-optimization +
+  data/autosci/primitives/2606.05922.yaml
+facets:
+  problem_solved: improve-editable-agent-harness-from-unlabeled-past-trajectories
+  method: 把 agent 自进化限制在可审计的 harness 文件层：从无标签历史轨迹中用 difficulty judge + DPP
+    选出难且多样的核心任务；用当前 harness 对每题平行重做 G 遍；用 self-validation 查单条轨迹的
+    错误假设、工具误用、提前停止，用 self-consistency 查多条轨迹之间的关键分歧；把诊断压成 severity 加权的
+    task-agnostic improvement directions；并行生成 N 个候选 harness；候选再重做核心集， 与原 harness
+    的固定 baseline trajectory 做 pairwise self-preference；只有最高平均分 S_j>0 才采纳， 否则保持原
+    harness。核心是“从轨迹复盘生成可 diff 的工具/技能/指令更新”，不训练权重、不用标签。
+  result: 选 10 个历史 HOLD 的论文深读案例做 trajectory pool，Mini-RHO 自动建议一个“数字表核对/自报 vs
+    实测”skill 和一个 “paper-footnote completeness” helper。下一批 5 篇深读随机分成有/无候选
+    harness，两组比较首轮冷审 major_gaps 数量、返工轮数和 validate 失败数；故意注入一版过度冗长/错误 skill，确认
+    pairwise gate 拒绝。
+  innovation: 自进化的更新单位必须是可 diff、可回滚的 harness
+    文件，而不是模糊的“模型学到了”。；没有标签时可以用自偏好代理效用，但不能跳过门控；S_j<=0 必须拒绝改动。；先把失败拆成
+    self-validation 与 self-consistency 结构化诊断，再让 optimizer
+    改文件；直接喂原始轨迹效果差。；优化样本要难且多样；只挑最难会聚类，只看覆盖会稀释信号。；流程性错误要沉淀成脚本或检查器；只写进记忆容易被忽略。；自偏好只能作为弱代理，敏感
+    harness edits 仍需独立冷审/人工批准。
+  weakness: self_judge_bias；adversarial_trajectory_poisoning；irreversible_tasks_not_supported；high_agent_call_cost；same_model_solver_judge_blind_spots；overfitting_to_coreset；full_reproduction_requires_codex_gpt55_and_bench_infra
+  transfer: Mini-RHO for AI-Brief：扫 logs/papers-cold-audit 与失败作者轮，抽出 replayable
+    任务； difficulty_judge 产 0-10 分和 task fingerprint；DPP 选 k=10；每个任务让作者/修订 agent
+    在隔离工作区重跑 G=3； diagnose prompt 输出 fixed JSON；optimizer 只允许修改
+    `.agents/skills/*/SKILL.md`、docs prompt 或 helper scripts； 每个 candidate 在
+    held-out 失败样本上重跑并与 baseline pairwise judge；S_j>0 才 stage，仍需独立 cold audit
+    才发布。
+self_evo_use: "记忆：保留 Evolving Agents in the Dark: Retrospective Harness
+  Optimization via Self-Preference 的问题、方法、概念和证据边界。理解：用它补齐
+  improve-editable-agent-harness-from-unlabeled-past-trajectories
+  的方法坐标。自进化：Mini-RHO for AI-Brief：扫 logs/papers-cold-audit 与失败作者轮，抽出 replayable
+  任务； difficulty_judge 产 0-10 分和 task fingerprint；DPP 选 k=10；每个任务让作者/修订 agent
+  在隔离工作区重跑 G=3； diagnose prompt 输出 fixed JSON；optimizer 只允许修改
+  `.agents/skills/*/SKILL.md`、docs prompt 或 helper scripts； 每个 candidate 在
+  held-out 失败样本上重跑并与 baseline pairwise judge；S_j>0 才 stage，仍需独立 cold audit 才发布。"
+core_concepts:
+  - name: 自进化 agent
+    role: primary
+    evidence: agents that keep improving from the experience they accumulate in
+      deployment
+  - name: 难度×多样性 DPP 核心集（difficulty-diversity DPP coreset）
+    role: primary
+    evidence: select a diverse coreset of challenging tasks
+  - name: 双信号回溯诊断（self-validation × self-consistency）
+    role: primary
+    evidence: self-validation within a trajectory and self-consistency across
+      parallel trajectories
+  - name: Best-of-N 自偏好择优 + 严格优于闸（accept only if S_j>0）
+    role: primary
+    evidence: selects the most effective one by its own pairwise self-preference
+  - name: 可执行反馈（executable feedback）
+    role: supporting
+    evidence: executable scripts as tools, along with text files for skills and
+      instructions
+discovery_trace:
+  hypothesis: 数据不足
+  failed_attempts: 数据不足
+  source_span: paper.mdx 未写“解法是怎么找到的”节；原文只有方法动机、算法、消融和定位表，没有逐步试错发现叙事。
+edges:
+  - to: ai-scientist-v2
+    type: complements
+    confidence: high
+    evidence: Retrospective Harness Optimization 处理无标签历史轨迹到候选 harness
+      的自优化；AI-Scientist-v2 处理自动科研实验搜索。前者补自进化反馈门，后者补研究执行引擎。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

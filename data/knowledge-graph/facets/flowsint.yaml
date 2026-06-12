@@ -1,0 +1,46 @@
+schema: v2
+node_id: content/flowsint
+slug: flowsint
+kind: project
+title: flowsint — 深度拆解
+source: public/data/brief/deep-dives.json:flowsint-deep-dive
+facets:
+  problem_solved: flowsint — 深度拆解 的核心判断：提供一个开源、可视化的 OSINT
+    调查平台，通过模块化的丰富器（enricher）生态系统和实时图谱，降低了数字调查的技术门槛。 本条由旧深读聚合内容重整为 RuView
+    light_spine；证据边界来自 README.md；top_level_dirs；package.json /
+    pyproject.toml；docker-compose.yml；ETHICS.md；LICENSE；Makefile；CHANGELOG.md。没有源码级证据的地方保留“数据不足”。
+  method: 提供一个开源、可视化的 OSINT 调查平台，通过模块化的丰富器（enricher）生态系统和实时图谱，降低了数字调查的技术门槛。
+  result: 把旧深读 claim ledger 改成可渲染证据项；未实测的 claim 只标自报或中低证据。
+    用于数字调查的免费工具，能自动查询网站、IP、邮箱等信息并画成关系图。 即使图谱很复杂，界面也不卡。 调查数据不会上传到云端，全在自己电脑上。
+  innovation: 可重用 enricher
+    的接口设计和模块化编排模式，但完整的后端基础设施（Celery/Neo4j）较重，轻量场景可简化为无状态函数调用。 clone-and-run
+    read-docs write-deepdive
+  weakness: 测试覆盖率低，隐藏缺陷可能在复杂调查中暴露。；无内置的沙箱隔离，enricher
+    执行依赖外部服务，可能引入安全风险。；伦理指南无强制技术限制，滥用风险由使用者自行承担。
+  transfer: 可重用 enricher 的接口设计和模块化编排模式，但完整的后端基础设施（Celery/Neo4j）较重，轻量场景可简化为无状态函数调用。
+    clone-and-run read-docs write-deepdive
+self_evo_use: 记忆：把 flowsint — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: flowsint — 深度拆解 的核心判断：提供一个开源、可视化的 OSINT
+      调查平台，通过模块化的丰富器（enricher）生态系统和实时图谱，降低了数字调查的技术门槛。 本条由旧深读聚合内容重整为 RuView
+      light_spin…
+  - name: 机制链路
+    role: primary
+    evidence: 提供一个开源、可视化的 OSINT 调查平台，通过模块化的丰富器（enricher）生态系统和实时图谱，降低了数字调查的技术门槛。
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可重用 enricher 的接口设计和模块化编排模式，但完整的后端基础设施（Celery/Neo4j）较重，轻量场景可简化为无状态函数调用。
+      clone-and-run read-docs write-deepdive
+  - name: 风险边界
+    role: supporting
+    evidence: 测试覆盖率低，隐藏缺陷可能在复杂调查中暴露。；无内置的沙箱隔离，enricher
+      执行依赖外部服务，可能引入安全风险。；伦理指南无强制技术限制，滥用风险由使用者自行承担。
+  - name: 证据账本
+    role: mentioned
+    evidence: Flowsint 是一个开源的 OSINT 图谱探索工具，内置数十种自动数据丰富器。
+discovery_trace: 数据不足
+edges: []
+status: extracted

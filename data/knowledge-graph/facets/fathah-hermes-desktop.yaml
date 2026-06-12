@@ -1,0 +1,70 @@
+schema: v2
+node_id: content/fathah-hermes-desktop
+slug: fathah-hermes-desktop
+kind: project
+title: hermes-desktop — 深度拆解
+source: public/data/brief/deep-dives.json:fathah-hermes-desktop-deep-dive
+facets:
+  problem_solved: Hermes Desktop 是 Hermes Agent 的 Electron 桌面控制台：负责安装
+    Hermes、写入模型/API 配置，并把聊天、会话、技能、记忆、网关和远程 SSH 管理做成 GUI。 人话：它不是新的 agent 引擎，而是把
+    Hermes Agent 从命令行包装成桌面应用；核心价值在于把 `~/.hermes`、`config.yaml`、`.env`、gateway
+    进程和 SSE 聊天流集中管理。术语：Electron 是桌面壳，Hermes Agent 是上游 agent runtime，SSE 是服务端持续推送
+    token/tool event 的流式协议。（来源：README Features；README How It
+    Works；src/main/hermes.ts sendMessage；src/main/installer.ts HERMES_HOME）
+  method: '人话流程：第一次启动时，安装页先调用 `inspectInstallTarget()` 显示将写入的 `repoPath`，状态是
+    `fresh`、`update` 或 `replace`；用户点确认后才 `startInstall()`，进度对象固定有
+    `step`、`totalSteps:
+    7`、`title`、`detail`、`log`。（来源：src/renderer/src/screens/Install/Install.tsx；src/main/installer.ts
+    inspectInstallTarget） 接着 Setup 页默认选 `openrouter`，如果 provider 需要 key，就把 key
+    写进对应 env，例如 `OPENROUTER_API_KEY`；如果选 local/custom，则从 base URL 推导 env
+    key，最后调用 `setModelConfig(provider, model, baseUrl)` 写 `config.yaml` 的
+    `model.provider`、`model.default`、`model.base_url`。（来源：src/renderer/src/screens/Setup/Setup.tsx；src/main/config.ts
+    setEnvValue/setModelConfig；src/shared/url-key-map.ts） 真正聊天时，`sendMessage()`
+    先区分 local/remote/ssh。local 会探测 API server，不通就
+    `startGatewayWithRecovery()`；gateway 启动时 spawn `HERMES_PYTHON`，参数来自
+    `gatewayCliCommandArgs(profile, ["gateway"])`，非默认 profile 会加 `--profile
+    <name>`，stderr 写进 profile log。（来源：src/main/hermes.ts sendMessage…'
+  result: 人话：README 的“支持多少 providers/toolsets/gateways”要当自称；源码里的路径、端口、脚本、env
+    key、IPC/API 流程可以当已核实。术语：自称是项目文档或 badge 说法；已核实是从代码、配置、文件树直接看到的机制。 安装页先展示目标目录和
+    fresh/update/replace 状态，用户确认后才调用安装；也允许选择已有安装并校验 venv binary。 发送消息时先判断
+    remote/SSH；本地模式会检查 `/health`、尝试启动 gateway；API 可用时走 TUI gateway、runs API 或
+    `/v1/chat/completions`，最后才走 `hermes chat -q`。 普通 Remote 只够聊天；SSH Tunnel 才把
+    Sessions、Skills、Memory、Soul、Tools、Schedules、Gateway、Profiles、Models、Logs
+    等管理屏幕代理到远端 `~/.hermes`。 README 的数量是项目自称；源码中可核实 provider/base URL、toolset 和
+    messaging catalog，但数量与 README 文案不完全一致。 Sessions 不是简单文本日志；它打开 active profile
+    的 `state.db`，查询 `sessions`、`messages`、可选 `messages_fts`，并把 assistant
+    reasoning、tool call、tool result 展开成时间线项。
+  innovation: 人话：这个仓库最可复用的不是 UI，而是把一个 CLI agent
+    变成桌面产品时的边界处理。术语：抽象不是类名，而是一组可迁移的工程模式。 安装目标预检与显式确认 profile-aware gateway port
+    allocator capabilities-gated transport selection 配置写入只改目标 YAML block Skill
+    文件读取白名单
+  weakness: 人话：风险集中在上游 Hermes Agent、Electron 打包/签名、模型 provider key 映射、SQLite
+    schema、SSH 环境。术语：平台风险是外部依赖变化导致桌面端同样代码失效。
+  transfer: 人话：这个仓库最可复用的不是 UI，而是把一个 CLI agent 变成桌面产品时的边界处理。术语：抽象不是类名，而是一组可迁移的工程模式。
+    安装目标预检与显式确认 profile-aware gateway port allocator capabilities-gated
+    transport selection 配置写入只改目标 YAML block Skill 文件读取白名单
+self_evo_use: 记忆：把 hermes-desktop — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  ai_app 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Hermes Desktop 是 Hermes Agent 的 Electron 桌面控制台：负责安装 Hermes、写入模型/API
+      配置，并把聊天、会话、技能、记忆、网关和远程 SSH 管理做成 GUI。 人话：它不是新的 agent…
+  - name: 机制链路
+    role: primary
+    evidence: 人话流程：第一次启动时，安装页先调用 `inspectInstallTarget()` 显示将写入的 `repoPath`，状态是
+      `fresh`、`update` 或 `replace`；用户点确认后才 `startInstall()`…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：这个仓库最可复用的不是 UI，而是把一个 CLI agent 变成桌面产品时的边界处理。术语：抽象不是类名，而是一组可迁移的工程模式。
+      安装目标预检与显式确认 profile-aware gateway port allocator…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：风险集中在上游 Hermes Agent、Electron 打包/签名、模型 provider key 映射、SQLite
+      schema、SSH 环境。术语：平台风险是外部依赖变化导致桌面端同样代码失效。
+  - name: 证据账本
+    role: mentioned
+    evidence: 桌面端会安装或复用 Hermes Agent，并把 Hermes 文件放到 Hermes home。
+discovery_trace: 数据不足
+edges: []
+status: extracted

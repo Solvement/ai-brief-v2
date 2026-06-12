@@ -1,0 +1,63 @@
+schema: v2
+node_id: paper:2606.07297
+slug: 2606.07297-swe-explore-repo-exploration
+kind: paper
+title: "SWE-Explore: Benchmarking How Coding Agents Explore Repositories"
+arxiv_id: "2606.07297"
+source: content/papers/2606.07297-swe-explore-repo-exploration +
+  data/autosci/primitives/2606.07297.yaml
+facets:
+  problem_solved: isolate-and-measure-repository-exploration-with-trajectory-grounded-line-level-gt
+  method: 把端到端 pass/fail 拆开，单拎"仓库探索"做行级可比评测：ground truth 不靠人工标，而从≥2 条成功修复 轨迹的 read
+    动作取行级交集（+ LLM 精炼 + 人工审）得核心区域；explorer 只交 K=5 排序区域清单，
+    沿覆盖（precision/recall/HitFile/HitRegion）×排序（行预算 nDCG@B、FUH）×效率（context
+    efficiency、 noise）三维打分；再用受限上下文协议（只露选中区域喂固定 patcher）量上游指标对下游修复率的相关性，
+    以此挑该信的指标。核心实测：coding agent 文件级强、行级 recall 是瓶颈；缺上下文比冗余更致命。
+  result: 对一个 coding agent，量 HitFile vs Rec ℓ 的差（验证文件强/行弱）；再做缺/冗余上下文 sweep （藏 α%
+    核心 vs 填等量噪声），画修复率曲线验"缺>冗余"。3-10 天。
+  innovation: 评 agent 检索别只看文件命中；翻到对的文件只是到街区，关键是承重的那些行有没有读全（行级
+    recall）。；高覆盖区里缺核心证据比多塞无关代码致命得多；喂上下文宁全勿漏，先保召回再谈紧凑。；行 recall
+    天花板靠更好的探索机制（迭代代码图搜索如 CoSIL）突破，换更强 patcher 不解决探索瓶颈。；给某能力造 ground
+    truth，先找'多条成功轨迹的交集'，比雇人标既省又稳，且天然接地于成功行为。
+  weakness: self_report_only；solved_issue_bias；refine_subjectivity；hyperparam_sensitivity
+  transfer: Mini 版：录几条成功 agent 轨迹，抽 read 动作（编辑器查看/cat/sed -n/grep -n）取行级交集做迷你靶； 让
+    explorer 交 K=5 区域，算 precision/recall/HitFile/nDCG@B/CtxEff；做缺/冗余上下文消融看下游差。
+    本项目可用此法评 AutoSci/codex 子 agent 的"找相关代码"质量，并落实"召回优先于过滤"的喂料策略。100-400 行起步。
+self_evo_use: '记忆：保留 SWE-Explore: Benchmarking How Coding Agents Explore
+  Repositories 的问题、方法、概念和证据边界。理解：用它补齐
+  isolate-and-measure-repository-exploration-with-trajectory-grounded-line-level-gt
+  的方法坐标。自进化：Mini 版：录几条成功 agent 轨迹，抽 read 动作（编辑器查看/cat/sed -n/grep -n）取行级交集做迷你靶；
+  让 explorer 交 K=5 区域，算 precision/recall/HitFile/nDCG@B/CtxEff；做缺/冗余上下文消融看下游差。
+  本项目可用此法评 AutoSci/codex 子 agent 的"找相关代码"质量，并落实"召回优先于过滤"的喂料策略。100-400 行起步。'
+core_concepts:
+  - name: 轨迹接地的标准答案（trajectory-grounded ground truth）
+    role: primary
+    evidence: derive line-level ground truth from independent agent trajectories
+      that successfully solved the same issue ... regions repeatedly surfaced
+      across independent s…
+  - name: 仓库探索作为独立评测靶（repository exploration as isolated target）
+    role: primary
+    evidence: isolates the evaluation of repository exploration ... formalize it as
+      a ranked, line-level context selection task
+  - name: 行级 recall 瓶颈（file-level strong, line-level recall-limited）
+    role: primary
+    evidence: file-level localization is already strong for modern methods,
+      line-level coverage and efficient ranking remain the key axes ... their
+      Rec ℓ remains only around…
+  - name: 上下文效率（context efficiency）
+    role: supporting
+    evidence: Context Efficiency has the highest Pearson correlation (r=0.950),
+      suggesting that useful context must be both relevant and compact
+  - name: 缺上下文比冗余更致命（missing context dominates redundancy）
+    role: supporting
+    evidence: missing core evidence matters more than moderate precision loss, so
+      recall-oriented improvements are more valuable than small filtering gains
+discovery_trace: 数据不足
+edges:
+  - to: colbymchenry-codegraph
+    type: validates
+    confidence: high
+    evidence: SWE-Explore 单独评估 coding agent 的仓库探索能力；codegraph
+      正是把代码库符号、调用关系和影响范围做成本地可检索图。 benchmark 需求独立验证了这种结构索引的价值。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

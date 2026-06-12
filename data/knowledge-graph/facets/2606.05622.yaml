@@ -1,0 +1,60 @@
+schema: v2
+node_id: paper:2606.05622
+slug: 2606.05622-adaplanbench-dual-constraint-planning
+kind: paper
+title: "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model
+  Agents under World and User Constraints"
+arxiv_id: "2606.05622"
+source: content/papers/2606.05622-adaplanbench-dual-constraint-planning +
+  data/autosci/primitives/2606.05622.yaml
+facets:
+  problem_solved: evaluate-adaptive-replanning-under-hidden-accumulating-constraints
+  method: 评测 agent 自适应规划时，不把全部规则写进输入，而是把 world constraints 与 user constraints
+    分成隐藏档案；agent 每轮提交方案后，judge 用完整档案检查，但 user simulator 只披露被选中的违规约束
+    （世界约束优先，用户约束其次）。成功指标分两层：VPR=最终约束满足，Acc=最终约束满足且 rubric 质量门通过。
+    诊断指标额外记录重复违规、每轮触发的新约束数、平均轮数与 early stop，借此区分“守规矩但无效”“忘旧约束” “修新坏旧”和“探索不足”。
+  result: 在冷审返工流程上复刻两组干预：A=每轮把全部已披露冷审意见贴回 prompt，B=只给最新失败 rubric 反馈。
+    对比最终内容通过率、旧问题回归率、重复违规率和轮数。预期 A 提升合规但不显著提升内容质量，B 容易修新坏旧。
+  innovation: VPR 与 Acc 必须分开；合规通过不代表任务成功，格式/约束 lint 绿也不代表内容有效。；把约束藏起来，违反才披露，才能测
+    adaptive
+    replanning，而不是测模型是否一次性读懂长规则。；重复违反已披露约束是独立失败信号；它不同于首次探索，也不同于最终答案错误。；追加 rubric
+    反馈可能导致 recency bias，修新问题时破坏旧约束；返工提示必须显式保护已过项。；连续 N
+    轮没有新信息增量时停止；这比只设最大轮数更能防止原地打转。
+  weakness: judge_family_bias；perverse_elicitation_by_violation；text_only_physicality；no_human_baseline；household_domain_narrowness
+  transfer: Mini 版可在 AI-Brief 内部任务上跑：给 20 个“深读/判边/选稿”任务各藏 5-8 条约束（来源范围、概念命名、
+    禁止边型、证据粒度、脚注要求），generator 每轮产出后由 judge 查完整约束，但只披露一个维度的违规； tracker
+    记录已披露/新披露/重复违规，连续 2 轮无新违规 early stop。最后同时报告 compliance pass 与
+    content-quality pass，防止 lint 绿但内容没用。
+self_evo_use: "记忆：保留 AdaPlanBench: Evaluating Adaptive Planning in Large
+  Language Model Agents under World and User Constraints 的问题、方法、概念和证据边界。理解：用它补齐
+  evaluate-adaptive-replanning-under-hidden-accumulating-constraints
+  的方法坐标。自进化：Mini 版可在 AI-Brief 内部任务上跑：给 20 个“深读/判边/选稿”任务各藏 5-8 条约束（来源范围、概念命名、
+  禁止边型、证据粒度、脚注要求），generator 每轮产出后由 judge 查完整约束，但只披露一个维度的违规； tracker
+  记录已披露/新披露/重复违规，连续 2 轮无新违规 early stop。最后同时报告 compliance pass 与 content-quality
+  pass，防止 lint 绿但内容没用。"
+core_concepts:
+  - name: 增量多轮评测协议
+    role: primary
+    evidence: progressively disclosed through interaction
+  - name: 可执行反馈（executable feedback）
+    role: primary
+    evidence: the user simulator rewrites the selected constraint items into
+      explicit user feedback
+  - name: 结构化产物代替对话
+    role: supporting
+    evidence: constraint profile \mathcal{E}=(\mathcal{B}_{w},\mathcal{B}_{u})
+  - name: stability-plasticity（稳定-可塑权衡）
+    role: supporting
+    evidence: recency-biased adaptation pattern
+discovery_trace:
+  hypothesis: 数据不足
+  failed_attempts: 数据不足
+  source_span: paper.mdx 未写「解法是怎么找到的」节；原文没有逐步试错发现叙事，只给 benchmark 动机、构造算法与实验分析。
+edges:
+  - to: 2606.05405-agents-last-exam
+    type: complements
+    confidence: medium
+    evidence: AdaPlanBench 评估 world/user 双约束下的自适应规划；Agents Last Exam
+      评估可验证经济工作流。一个压规划约束，一个压真实专业交付。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

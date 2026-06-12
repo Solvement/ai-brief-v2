@@ -1,0 +1,78 @@
+schema: v2
+node_id: content/pbakaus-impeccable
+slug: pbakaus-impeccable
+kind: project
+title: impeccable — 深度拆解
+source: public/data/brief/deep-dives.json:pbakaus-impeccable-deep-dive
+facets:
+  problem_solved: Impeccable 是一个面向 AI 编程工具的前端设计技能包：把“怎么做得不像 AI 生成的 UI”写成一个可安装
+    skill、23 个子命令、跨工具构建产物和一个本地 anti-pattern detector。 人话：它不是组件库，也不是生成 UI
+    的模型，而是一套给 Claude Code、Cursor、Codex、Gemini 等 AI coding harness 读的设计工作规程，外加一个
+    `impeccable detect` 命令行扫描器。（来源：README Why Impeccable；来源：skill/SKILL.src.md
+    Setup；来源：package.json bin） 术语：这里的 skill 指 AI harness 可加载的指令包；detector 指无需
+    LLM 的静态/浏览器规则扫描器；harness 指 Claude Code、Cursor、Codex CLI 这类承载 AI coding agent
+    的工具。
+  method: 人话：一个典型流程是：先安装 skill，再让 AI harness 加载 `/impeccable`，skill
+    首先跑上下文脚本，然后按子命令读取对应参考，必要时调用本地 detector。 具体例子一，安装路径：`npx impeccable skills
+    install` 进入 `cli/bin/cli.js` 的 `skills` 分支，再到
+    `cli/bin/commands/skills.mjs`。安装逻辑会找项目里已有 provider 目录，或者从全局
+    `~/.claude`、`~/.codex` 等推断；找不到时默认写 `.claude` 和 `.agents`。它从
+    `https://impeccable.style/api/download/bundle/universal` 下载 bundle，再把每个
+    provider 的 compiled skill copy 到对应 `skills/` 目录。（来源：README
+    Installation；来源：cli/bin/cli.js；来源：cli/bin/commands/skills.mjs
+    resolveInstallTargets/downloadAndExtractBundle/copyProviderSkills）
+    具体例子二，agent 执行 `/impeccable audit checkout`：`skill/SKILL.src.md` 要求先运行 `node
+    {{scripts_path}}/context.mjs`；如果有子命令，就必须读 `reference/audit.md`；还必须读
+    brand/product register。`reference/audit.md` 把 audit 定义成 5
+    维检查：Accessibility、Performance、Theming、Responsive Design、Anti-Patterns，总分 20
+    分，并要求 P0-P3 分级。（来源：skill/SKILL.src.md Setup；来源：skill/reference…
+  result: 人话：README 的大方向可信，但数字需要看源码校正。当前源码比 README 文案更新：命令数 23 能核实；规则数
+    README/README.npm/registry 三处不一致，应以 registry 和构建脚本的 source of truth
+    为准。（来源：README；来源：README.npm.md；来源：scripts/build.js
+    generateCounts；来源：cli/engine/registry/antipatterns.mjs） 术语：把 README 当
+    marketing/documentation claim，把 `package.json`、registry、transformer、测试和脚本当
+    implementation evidence。 项目现在把多个设计动作收敛到一个 `/impeccable` skill，下挂 23 个子命令。
+    README 表格仍列
+    `typography.md`、`color-and-contrast.md`、`spatial-design.md`、`motion-design.md`、`responsive-design.md`、`ux-writing.md`
+    等旧链接。 `impeccable detect` 是本地 CLI：HTML 走 static HTML/CSS analysis，非 HTML 走
+    regex，URL 走 Puppeteer 渲染路径。 源码里实际规则数不是 README 的 24/27，而是 registry 导出的 41 个
+    rule id。 构建系统按 provider 编译 frontmatter、placeholder、provider tag 和 subagent
+    格式。 `/impeccable live` 会启动 helper、注入页面、poll 事件，并在 `generate` 时用
+    `live-wrap.mjs` 或 `live-insert.mjs` 包装/插入元素，生成多个可热替换变体。
+  innovation: 人话：最有复用价值的不是某条设计建议，而是把“agent 做设计”拆成可路由的命令、可编译的 provider 产物、可运行的
+    deterministic scan、以及可恢复的 live session。 术语：这些是 agent-native design tooling
+    patterns。 单 skill 多子命令路由 provider transformer 规则 registry + skill rule
+    markers live session journal
+  weakness: 人话：最大风险不是代码跑不起来，而是外部 harness 和远程分发面变化。它把价值放在
+    Claude/Cursor/Codex/Gemini 等工具会按预期读取 skill 目录、frontmatter 和 nested agents 上。
+    术语：这是 platform-coupled tooling。
+  transfer: 人话：最有复用价值的不是某条设计建议，而是把“agent 做设计”拆成可路由的命令、可编译的 provider 产物、可运行的
+    deterministic scan、以及可恢复的 live session。 术语：这些是 agent-native design tooling
+    patterns。 单 skill 多子命令路由 provider transformer 规则 registry + skill rule
+    markers live session journal
+self_evo_use: 记忆：把 impeccable — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: Impeccable 是一个面向 AI 编程工具的前端设计技能包：把“怎么做得不像 AI 生成的 UI”写成一个可安装 skill、23
+      个子命令、跨工具构建产物和一个本地 anti-pattern detector。 人话：它不是组件库…
+  - name: 机制链路
+    role: primary
+    evidence: 人话：一个典型流程是：先安装 skill，再让 AI harness 加载 `/impeccable`，skill
+      首先跑上下文脚本，然后按子命令读取对应参考，必要时调用本地 detector。 具体例子一，安装路径：`npx impec…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 人话：最有复用价值的不是某条设计建议，而是把“agent 做设计”拆成可路由的命令、可编译的 provider 产物、可运行的
+      deterministic scan、以及可恢复的 live session。 术语：这些是 agent-na…
+  - name: 风险边界
+    role: supporting
+    evidence: 人话：最大风险不是代码跑不起来，而是外部 harness 和远程分发面变化。它把价值放在
+      Claude/Cursor/Codex/Gemini 等工具会按预期读取 skill 目录、frontmatter 和 nested agents
+      …
+  - name: 证据账本
+    role: mentioned
+    evidence: “1 skill, 23 commands”
+discovery_trace: 数据不足
+edges: []
+status: extracted

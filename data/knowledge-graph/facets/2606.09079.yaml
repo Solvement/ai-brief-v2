@@ -1,0 +1,78 @@
+schema: v2
+node_id: paper:2606.09079
+slug: 2606.09079-flashmemory-lookahead-sparse-attention
+kind: paper
+title: "FlashMemory-DeepSeek-V4: Lightning Index Ultra-Long Context via
+  Lookahead Sparse Attention"
+arxiv_id: "2606.09079"
+source: content/papers/2606.09079-flashmemory-lookahead-sparse-attention +
+  data/autosci/primitives/2606.09079.yaml
+facets:
+  problem_solved: keep-only-predicted-relevant-state-in-expensive-resource
+  method: 把"贵资源里该驻留什么"从被动携带改成主动预测:小检索器(双塔,文档侧表示冻结预计算) 周期性(每 τ
+    步)预测未来窗口要用的记忆块,阈值召回(≥0.5 全取、允许零召回)从冷存预取; 标签由冻结宿主离线自产并经
+    Softmax→Top-p→跨源多数投票去噪;训练与宿主物理解耦 (只训 <0.1% 查询端,单个 H20 GPU-hour
+    收敛),实验吞吐(8×H20 一周 500 次扫描)本身成为架构发现引擎。
+  result: 在 mind-palace 召回上做两改造实验:① Top-k 改阈值召回,统计"空手而归"比例与下游
+    引用命中率(预期:低相关查询空手率上升、假引用下降,呼应零假边精神);② 复刻 oracle
+    诊断:把人工挑的金记忆直喂生成端,若仍答错则瓶颈在生成不在召回。各 1-2 天。
+  innovation: 贵资源(显存/上下文窗)只放'预测会用到的',其余冷存按需搬——上下文管理是预测问题不是携带问题。；把宿主和文档侧表示全部冻结预计算,只训
+    <0.1% 的查询端小件 → 单个 H20 GPU-hour 收敛,8×H20 一周 500 次扫描;实验吞吐本身是架构发现的前提。；固定 Top-k
+    强迫召回固定数量,既是标签噪声源也是资源浪费源;阈值召回让数量随置信度动态、允许零召回。；宿主自产标签噪声极大(naive 并集 ~10000
+    正样本/窗);Softmax→Top-p→跨层 ≥3/21 多数投票压到 100-1000 才可训。；组件背锅还是任务本质难?把真值直喂下游:MRCR
+    给 50% 金块仍掉 2% → 任务需要密集全局记忆,非索引器之过;另三个基准 10-25% 金块即 100% 保底。；被排除的
+    trick(pairwise 链式/强负例挖掘/加权 loss)和被推翻的假设(O(1) 内存/无限长度泛化)写成正式章节,各带证据。
+  weakness: false_positive_leak；capacity_ceiling；length_generalization_2x；host_specific_labels；immature_no_ablation；release_not_production_stack；versioned_source_drift
+  transfer: 应用层复刻不必动注意力:给长程 agent 加预取层——便宜 embedding 模型每个任务段预测
+    要装载的记忆条目(阈值召回),其余不进上下文;对照①每步全量带历史②只带最近 N 条 ③随机带 k 条,量 token
+    成本与任务成功率。标签可用"事后真被引用的记忆"自产。3-5 天。
+self_evo_use: '记忆：保留 FlashMemory-DeepSeek-V4: Lightning Index Ultra-Long Context
+  via Lookahead Sparse Attention 的问题、方法、概念和证据边界。理解：用它补齐
+  keep-only-predicted-relevant-state-in-expensive-resource
+  的方法坐标。自进化：应用层复刻不必动注意力:给长程 agent 加预取层——便宜 embedding 模型每个任务段预测
+  要装载的记忆条目(阈值召回),其余不进上下文;对照①每步全量带历史②只带最近 N 条 ③随机带 k 条,量 token
+  成本与任务成功率。标签可用"事后真被引用的记忆"自产。3-5 天。'
+core_concepts:
+  - name: 前瞻稀疏注意力（lookahead sparse attention）
+    role: primary
+    evidence: proactively predicts future context demands and preserves only the
+      query-critical KV chunks in the GPU memory
+  - name: 解耦训练（backbone-free decoupled training）
+    role: primary
+    evidence: train it independently using standard retrieval training frameworks
+      without ever loading the massive backbone model into GPU memory
+  - name: 阈值召回（threshold-based recall）
+    role: supporting
+    evidence: we replace the rigid Top-k selector with a threshold-based mechanism
+      to recall a dynamic number of historical entries
+  - name: 跨层多数投票（cross-layer majority voting）
+    role: supporting
+    evidence: uses a Cross-Layer Majority Voting mechanism to identify the true
+      "golden entries"
+  - name: oracle 诊断（oracle simulation）
+    role: mentioned
+    evidence: "we conducted a rigorous oracle simulation: we pre-computed the global
+      golden attention weights"
+discovery_trace:
+  hypothesis: 该留哪些 KV 可以表述为独立的双塔检索问题,从而在不加载骨干的情况下便宜地训练与搜索架构
+  failed_attempts:
+    - 浅层放索引器:早期探索发现浅层只装低级 token 统计,lookahead 预测奇差(§2.4)
+    - 8 层联合索引(6-20 层):召回 mask 过松,实测取 30-49% 历史块进显存,违背省内存初衷 → 退到 10/12/20 三层
+      Pareto 甜点(§2.4)
+    - pairwise→pointwise 链式训练:无统计增益,弃(§2.4)
+    - LLM 标注语义块当强负例:引入二次标签噪声,随机负采样反而更稳,弃(§2.4)
+    - 按层匹配数加权 loss:精度微涨但伤召回下界,违背安全网目标,弃(§2.4)
+    - 初始假设'上下文无关时 Sigmoid 门塌缩到零召回 → O(1) 内存':No-Context 对抗测试证伪,绝对块数随长度涨 2.5
+      倍(§3.3.1)
+    - 初始假设'点式打分可短训长推到 1M+':实测在训练长度 2 倍处硬性崩坏,归因位置编码出分布(§3.3.3)
+  source_span: 原文 §2.3(解耦动机)、§2.4(层配置探索与 500-run 扫描、被排除 trick、Note on
+    Hyperparameter Selection)、§3.3.1/§3.3.3(两个被推翻的假设);对应
+    paper.mdx「解法是怎么找到的(选读)」节
+edges:
+  - to: mempalace
+    type: tension_with
+    confidence: medium
+    evidence: FlashMemory 处理超长上下文 KV cache 预取与稀疏注意力；MemPalace
+      走本地逐字存储和检索。一个扩上下文窗口，一个把记忆外置为可检索存储，代表两种长期上下文路线。
+    negative_rationale: 不是仅因同属 agent/AI 类目连接；边成立依赖 evidence 中写明的具体评测、互补、验证、张力或方法差异。
+status: extracted

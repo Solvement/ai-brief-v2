@@ -1,0 +1,57 @@
+schema: v2
+node_id: content/harry0703-moneyprinterturbo
+slug: harry0703-moneyprinterturbo
+kind: project
+title: MoneyPrinterTurbo — 深度拆解
+source: public/data/brief/deep-dives.json:harry0703-moneyprinterturbo-deep-dive
+facets:
+  problem_solved: MoneyPrinterTurbo 是一个把主题或脚本自动变成短视频的开源 AI 应用：LLM 写文案和搜索词，TTS
+    配音，素材来自 Pexels/Pixabay 或本地文件，最后用 MoviePy/FFmpeg 合成成片。 人话：它把“我想做一个关于 X
+    的短视频”变成一个可下载的 MP4。术语：这是一个面向短视频生产的编排型 AI app，不是从像素生成视频的 diffusion/video
+    model。（来源：README 功能特性；app/services/task.py start）
+  method: 真实流程可以从 API 的 `/videos` 看：控制器创建任务 ID，把 `TaskVideoRequest` 丢给任务管理器，后台线程执行
+    `app/services/task.py:start`。（来源：app/controllers/v1/video.py
+    create_task；app/controllers/manager/base_manager.py）
+    一个具体例子：`VideoParams(video_subject="金钱的作用",
+    voice_name="zh-CN-XiaoyiNeural-Female")` 是 `task.py` 里自带的本地调用示例；完整任务会把脚本写入
+    `script.json`，音频写入 `audio.mp3`，字幕写入 `subtitle.srt`，最后生成
+    `final-1.mp4`。（来源：app/services/task.py
+    __main__/save_script_data/generate_final_videos） 最小运行路径是先复制配置，再启动
+    API：`config.example.toml -> config.toml`，`uv run python main.py`；Docker 路径是
+    `docker-compose up`，WebUI/API 分别映射到 `8501/8080`。（来源：README
+    安装部署；docker-compose.yml）
+  result: 下面区分 README 自称和代码已核实。README
+    里的“支持多模型、高清、无版权”等说法需要看配置和实现；代码层面能确认的是接入点、流程、默认值和约束。 API/WebUI 最小任务围绕
+    `video_subject` 或 `video_script` 展开；主流程会生成脚本、搜索词、音频、字幕、素材和最终视频。
+    它不是只有脚本命令；WebUI 和 API 是两个入口。 配置文件和服务代码确实列出并分支处理多家模型入口。 README 说默认 Edge
+    TTS；代码里普通 voice 默认走 edge_tts 分支。 素材来源不是抽象能力：代码里有 Pexels/Pixabay
+    搜索，也有本地素材预处理。 GPU 只用于 Whisper 字幕转录，不会加速脚本、TTS 或视频剪辑。
+  innovation: 最值得复用的不是 UI，而是这些“短视频流水线”的工程切分。它把 AI 不稳定输出包在可观测、可降级、可排队的任务系统里。 分阶段
+    stop_at 流水线 外部素材白名单目录 LLM provider 适配层 硬件编码失败回退
+  weakness: 风险集中在外部平台、媒体处理二进制、以及公开 API 成本控制。它已经做了一些防护，但不是托管级产品。
+  transfer: 最值得复用的不是 UI，而是这些“短视频流水线”的工程切分。它把 AI 不稳定输出包在可观测、可降级、可排队的任务系统里。 分阶段
+    stop_at 流水线 外部素材白名单目录 LLM provider 适配层 硬件编码失败回退
+self_evo_use: 记忆：把 MoneyPrinterTurbo — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  ai_app 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: MoneyPrinterTurbo 是一个把主题或脚本自动变成短视频的开源 AI 应用：LLM 写文案和搜索词，TTS 配音，素材来自
+      Pexels/Pixabay 或本地文件，最后用 MoviePy/FFmpeg 合成成片。 人话：它把…
+  - name: 机制链路
+    role: primary
+    evidence: 真实流程可以从 API 的 `/videos` 看：控制器创建任务 ID，把 `TaskVideoRequest`
+      丢给任务管理器，后台线程执行 `app/services/task.py:start`。（来源：app/controlle…
+  - name: 可复用抽象
+    role: supporting
+    evidence: 最值得复用的不是 UI，而是这些“短视频流水线”的工程切分。它把 AI 不稳定输出包在可观测、可降级、可排队的任务系统里。 分阶段
+      stop_at 流水线 外部素材白名单目录 LLM provider 适配层 硬件编码失败回退
+  - name: 风险边界
+    role: supporting
+    evidence: 风险集中在外部平台、媒体处理二进制、以及公开 API 成本控制。它已经做了一些防护，但不是托管级产品。
+  - name: 证据账本
+    role: mentioned
+    evidence: 输入主题或关键词后自动生成短视频。
+discovery_trace: 数据不足
+edges: []
+status: extracted

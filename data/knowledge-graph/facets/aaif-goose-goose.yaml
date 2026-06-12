@@ -1,0 +1,47 @@
+schema: v2
+node_id: content/aaif-goose-goose
+slug: aaif-goose-goose
+kind: project
+title: goose — 深度拆解
+source: public/data/brief/deep-dives.json:aaif-goose-goose-deep-dive
+facets:
+  problem_solved: aaif-goose/goose 是一个 Rust 项目：an open source, extensible AI agent
+    that goes beyond code suggestions - install, execute, edit, and test with
+    any LLM 它进入深读队列的直接原因是项目热度和结构信号同时出现；本轮依据 GitHub metadata / trending evidence
+    for aaif-goose/goose，没有把 README 自称当成实测。
+  method: 数据不足：当前聚合数据没有足够源码级证据把 aaif-goose/goose 的内部机制拆成可复述链条。可确认的是它围绕「an open
+    source, extensible AI agent that goes beyond code suggestions - install,
+    execute, edit, and test with any LLM」组织能力；下一轮应 clone 后读
+    README、入口文件和核心模块再补机制图。
+  result: 以下只记录可由榜单元数据或已有抓取摘要支撑的保守 claim；能力细节未实测时不写成确定事实。 aaif-goose/goose
+    在榜单窗口中新增 2502 stars。 an open source, extensible AI agent that goes beyond
+    code suggestions - install, execute, edit, and test with any LLM
+  innovation: 可迁移部分先保守记为候选：如果源码复核成立，它可能为 AI-Brief 提供 Tier
+    2、真·新项目、agents、mcp、models 方向的案例；当前不能直接复用为实现。 热度筛选案例 源码复核候选
+  weakness: 主要风险是证据不足：榜单热度与 README 自称不能替代运行、测试、API 依赖和维护状况复核。
+  transfer: 可迁移部分先保守记为候选：如果源码复核成立，它可能为 AI-Brief 提供 Tier 2、真·新项目、agents、mcp、models
+    方向的案例；当前不能直接复用为实现。 热度筛选案例 源码复核候选
+self_evo_use: 记忆：把 goose — 深度拆解 的问题、机制、证据边界和风险作为项目案例入图。理解：用它校准我们对
+  agent_framework 的判断，不把 README 自称等同于实测。自进化：复用前必须先过源码/验证门；当前只把可复用抽象作为候选。
+core_concepts:
+  - name: 项目问题定义
+    role: primary
+    evidence: aaif-goose/goose 是一个 Rust 项目：an open source, extensible AI agent that
+      goes beyond code suggestions - install, execute, …
+  - name: 机制链路
+    role: primary
+    evidence: 数据不足：当前聚合数据没有足够源码级证据把 aaif-goose/goose 的内部机制拆成可复述链条。可确认的是它围绕「an open
+      source, extensible AI agent that goes beyond code …
+  - name: 可复用抽象
+    role: supporting
+    evidence: 可迁移部分先保守记为候选：如果源码复核成立，它可能为 AI-Brief 提供 Tier 2、真·新项目、agents、mcp、models
+      方向的案例；当前不能直接复用为实现。 热度筛选案例 源码复核候选
+  - name: 风险边界
+    role: supporting
+    evidence: 主要风险是证据不足：榜单热度与 README 自称不能替代运行、测试、API 依赖和维护状况复核。
+  - name: 证据账本
+    role: mentioned
+    evidence: 项目获得当前窗口显著关注。
+discovery_trace: 数据不足
+edges: []
+status: extracted
