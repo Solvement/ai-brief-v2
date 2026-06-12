@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { AnalyzedRepo, ScoreBreakdown, TrendingData, TrendingWindow, LimitationItem, TryStep } from "../types";
 import { loadTrending } from "../lib/data";
 import { Markdown } from "../components/Markdown";
-import { ProjectFacetSpine, type FacetRecord } from "../components/ProjectFacetSpine";
+import type { FacetRecord } from "../components/ProjectFacetSpine";
 
 /* ============================================================
    /repo/[owner]/[name] — 统一项目页契约（Kevin 2026-06-11）
@@ -134,7 +134,12 @@ export function Detail({ owner, name }: Props) {
 
       <Hero repo={repo} win={win} deep={deep ?? null} />
 
-      {facet && <ProjectFacetSpine facet={facet} />}
+      {/* 蒸馏内化归 Mind Palace 检索区（Kevin 2026-06-11 深夜：项目页=纯精读，不混蒸馏关联）——只留一条直达链接 */}
+      {facet && (
+        <a className="mp-link-bar" href={`/mind-palace?q=${encodeURIComponent(name)}`}>
+          🧠 此项目已内化进 Mind Palace——蒸馏拆解与知识关联在检索区查看 →
+        </a>
+      )}
 
       {deep ? <DeepReading repo={repo} deep={deep} /> : <RadarLite repo={repo} hasFacet={!!facet} />}
     </div>
@@ -155,7 +160,7 @@ function RadarLite({ repo, hasFacet }: { repo: AnalyzedRepo; hasFacet: boolean }
         ) : (
           <div className="body">
             {repo.tldr && <p>{repo.tldr}</p>}
-            <p style={{ color: "var(--ink-3)" }}>这个项目还没有人话速读{hasFacet ? "（上方 Mind Palace 内化是已有的深度判断）" : ""}，下方判断来自确定性深度门控。</p>
+            <p style={{ color: "var(--ink-3)" }}>这个项目还没有人话速读{hasFacet ? "（已内化进 Mind Palace，见上方链接）" : ""}，下方判断来自确定性深度门控。</p>
           </div>
         )}
       </section>

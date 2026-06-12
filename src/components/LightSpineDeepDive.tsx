@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Markdown } from "./Markdown";
-import { ProjectFacetSpine, type FacetRecord } from "./ProjectFacetSpine";
+import type { FacetRecord } from "./ProjectFacetSpine";
 
 /* ============================================================
    Light-spine deep-dive reading page (project-light-spine/v1)
@@ -164,8 +164,12 @@ export function LightSpineDeepDive({ item, spine, facet }: { item: DiveItem; spi
         )}
       </header>
 
-      {/* Mind Palace 深度内化（统一契约：每个深析项目标配，Kevin 2026-06-11） */}
-      {facet && <ProjectFacetSpine facet={facet} />}
+      {/* 蒸馏内化归 Mind Palace 检索区（Kevin 2026-06-11 深夜：精读页不混蒸馏关联）——只留直达链接 */}
+      {facet && (
+        <a className="mp-link-bar" href={`/mind-palace?q=${encodeURIComponent((repo || title).split("/").pop() || title)}`}>
+          🧠 此项目已内化进 Mind Palace——蒸馏拆解与知识关联在检索区查看 →
+        </a>
+      )}
 
       {/* ── 2-column body: main content + sticky verdict rail ── */}
       <div className="dd-body">

@@ -35,6 +35,12 @@ export function MindPalaceBrowse() {
       .then((r) => (r.ok ? r.json() : null)).then(setEmb).catch(() => setEmb(null));
   }, []);
 
+  // ?q= 直达：项目页"已内化"链接跳过来时预填搜索（检索区入口）
+  useEffect(() => {
+    const initQ = new URLSearchParams(location.search).get("q");
+    if (initQ) setQ(initQ);
+  }, []);
+
   const records = useMemo(() => {
     if (!doc) return [] as (FacetRecord & { slug: string })[];
     return Object.entries(doc.facets)
