@@ -26,6 +26,27 @@
 - **E. 强化测试**：弱指标会骗（见下 retro）→ 做**对抗 / 更难的 benchmark** 当裁判，再比方法。
 - **F. 迭代**：问题 + 决策记进 `task-board.md` / `memory/changelog.md`。
 
+## 记忆怎么 compound：5 阶进阶 + 写回哪里（Boris/Fable 镜子，2026-06-12）
+
+> 来源：Anthropic Continual Learning Bench 的 5 阶记忆进阶 + Boris「overnight sub-agents do deeper work」。当镜子用——一条教训值不值得留、留在哪，从此有判据。`self-improving ≠ self-learning`：模型不改权重，是**模型周围的系统**在 compound。
+
+**5 阶进阶**（一条失败要 compound 必须往上走，不是记个 note 就完）：
+1. **Fail** — 出错，且记下足够细节日后可用。
+2. **Investigate** — 走之前先弄清为什么败（到这一步才够格进 `task-board.md` 失败登记）。
+3. **Verify** — 把诊断变成核实过的事实，不是猜。
+4. **Distill** — 把核实升成**跨案例的通用规则**（这一步正是外脑「对任意未来问题给建议」的承重层 = 三元组里的 method 升维）。
+5. **Consult** — 下次开工**先读**规则，不再从零推。
+
+**两条硬纪律**（决定文件是 compound 还是只长大，已下沉 RULES#21）：
+- **Write before walk away** — 每个 session 收尾**必须**更新 `task-board.md` 接力指针（上一跑 / 下一跑）+ 把新失败写进失败登记。不写 = 下一跑从零重启。
+- **Read at session start** — 开工先读接力指针 + 失败登记 + 最相关 paradigm。不读，strong 模型也会退化成「记了不查」（Continual Learning Bench 实证：缺这步，Fable 级也掉回 Sonnet 级记忆行为）。
+
+**写回哪里**（项目记忆 vs 程序记忆，别混）：
+- **项目记忆**（随任务死）→ `task-board.md`（接力指针 / 失败登记 / SESSION 记录）。
+- **程序记忆**（跨任务存活、会被搬到下个项目）→ 确认的失败模式**写回相关 paradigm / prompt 的「已知失败模式」段**，不只写 task-board。先例：冷审「指控数字造假必须附原文逐字引文」已写回 cold-audit prompt——这就是把教训写进 skill 本身，而不只写进聊天记录。
+
+**verifier 机制**（为什么独立冷审打败自审，详见 [specs/quality-gate.md](../../specs/quality-gate.md) §②）：maker 看得到自己的推理链、偏向与已写结论一致的判断；独立 verifier 只看 artifact + rubric，**在 maker 的游戏里没有筹码**。所以「零生成上下文」是它生效的结构条件，不是形式。
+
 ## Worked example（2026-06-09 这次的 retro）
 
 **怎么发现的问题：**

@@ -4,6 +4,28 @@
 > 阶段定义见 [docs/workflow/workflow.md](./docs/workflow/workflow.md)；角色见 [docs/agents/README.md](./docs/agents/README.md)。
 > 谁推进谁更新本表。
 
+## 🧭 接力指针 (last session → next run) — 每次收尾必更
+
+> Boris/Fable 配方「PROJECT_MEMORY: last session / next run」落地。**开工先读、收尾必写**——不更新 = 下一跑从零重启（write-before-walk-away，见 [research-loop §记忆怎么 compound](./docs/method/research-loop.md)）。verified facts 在 `MEMORY.md` 热核 + KG；本指针只管「上一跑做了什么 / 下一跑该做什么」。
+
+- **上一跑 (2026-06-12)**：读 0xCodez Fable 5 自进化帖 + Boris「overnight sub-agents do deeper work」当镜子照自己；判定云端长时自治那半篇不采纳（与本地确定性 run model 冲突，RULES#17/PIPE-1），抽出五个真缺口落地——① 失败登记 ② 本接力指针 ③ 记忆 5 阶 compound 尺子 ④ verifier 机制说辞 ⑤ 失败模式写回 paradigm。本次改 `task-board / research-loop / quality-gate / RULES#21`。
+- **下一跑 → 该做什么**：用一次真实 session 收尾验证本指针确被更新（让 write-before-walk-away 成习惯）；新任务动手前先查下方失败登记。深读积压 3 篇（Mellum2 / TIDE / Humanoid-GPT）仍排今晚 boot 跑 `papers:deepread` + `papers:cold-audit`。
+
+## ⚠️ 失败登记 (failed attempts — 动手前先查，别重试踩过的坑)
+
+> Boris/Fable 配方「PROJECT_MEMORY: failed attempts」落地。一条失败要够格留下，至少走到 research-loop 5 阶的 stage-2（Investigate，知道为什么），最好到 stage-4（Distill，升成通用规则）。个案细节散在下方 SESSION 记录与 `MEMORY.md`；这里是「试过、为什么败、现在怎么办」的速查册。
+
+| 试过什么 | 为什么败 | 现状 / 通用规则 |
+|---|---|---|
+| boot-daily.ps1 `$EAP=Stop` + native stderr 经 Tee 重定向 | 子进程瞬时重试日志被误判致命 → 整管线静默死、无 marker | 已修（EAP=Continue + 显式 `$LASTEXITCODE`）；规则：PS 里别把 native stderr 当致命。→ PIPE-1 论据 |
+| 新闻链路无健康门 | 全源失败仍静默写 news.json 报成功（断 6 天没人知道） | 已修（buildNewsHealth 5 检查 + unhealthy 非零退出）；规则：每条发布链要有健康门，失败必须显式化 |
+| 冷审读「批次开始快照」而非发布版本 | 审计对象 ≠ 将发布的那份，改完的稿没被重审 | 已修（每轮审前重读盘）；规则：审计对象必须是将要发布的那一份 |
+| 冷审错杀（FlashMemory 显存数字被当造假 HOLD） | 审稿幻觉：指控「数字造假」却没核原文 | 已修（prompt 加「指控数字造假必须附原文逐字引文」）；规则：infra 故障 ≠ 编辑判决，指控须逐字引证 |
+| 弱 benchmark 当裁判（recall holdout 仅 5 条简单题） | `recall@3=1.0` 假绿，骗过自审 | 规则：先把 benchmark 做强再比方法（research-loop 铁律 4） |
+| 纯向量检索 | agent-memory 领域实测最弱路，区分不开近义节点 | 已换 hybrid（BM25+向量+RRF）；规则：检索别单路走到死 |
+| 多会话共享单工作树切分支 / boot `git add -A` | 互抢地基：扫走别人未提交改动、HEAD 全变 | 规则：并发写用隔离 worktree；派 codex 前先 commit 自己的工作（memory concurrent-session / codex-shared-tree） |
+| 每日管线放开放式 agent | 挂起 / timeout / 静默发布 | 红线：管线必须确定性脚本；自治只留有界 loop（RULES#17 / PIPE-1） |
+
 ## 已完成 (2026-06-09)
 
 ### ✅ MP-1+MP-2 · Mind Palace 重构成"真记忆" + 项目深读改写 — 高质量上线

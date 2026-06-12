@@ -32,6 +32,8 @@
 
 适用：论文深读（`content/papers/*/paper.mdx`）等强模型产出。**生成者 ≠ 批判者**——审稿必须是独立的 COLD agent（无生成上下文，只见 artifact + 原文 + rubric）。
 
+> **为什么独立冷审打败自审（机制，不是「更努力」）**：maker 评自己的产出时看得到自己的推理链，会偏向与已写结论一致的判断；独立 verifier 只看 artifact + rubric，**在 maker 的游戏里没有筹码**。所以「零生成上下文」不是形式要求，是它生效的**结构条件**——给 verifier 喂生成上下文 = 自废武功。（来源：Anthropic 工程博客 self-critique 实测 + Fable 5 verifier 实验，2026-06-12 当镜子收。）
+
 流程（`scripts/columns/papers/cold-audit/`，跨模型：codex 作者 / claude 审，封顶 3 轮）：
 1. 新深读产出时 `cold_audit.status = "needs_human"` → `build-index.mjs` **默认排除**（不进 `papers-index.json`）。
 2. **两段式独立冷审**：盲读可教性 → 开卷忠实对账 → 逐维诊断补差循环（≤3 轮）。
