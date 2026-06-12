@@ -1,0 +1,170 @@
+# ROS L3 · LLM 残差判定（schema: ros-v1）
+# 范围：KG-4 残差队列 4 对（residual-queue.yaml）。只判结构推导（derived.yaml）未覆盖的对象级关系。
+# 纪律：NO_EDGE 默认；关系连子对象不连整篇；类目级配对（"都是 memory"）拒；
+#       derived_by: llm_judgment 必带 boundary；功能关系 confidence 最高 medium（实测才 high）。
+# 已有结构边参照：derived.yaml r-0025..r-0028 = 4 条 tension_with（agemem↔rohitg00 / mab↔mempalace /
+#       mab↔supermemory / mempalace↔supermemory）；本文件不重判它们，只补增量。
+
+- id: j-0001
+  # 对 1：agemem ↔ memoryagentbench。MAB 实测清单不含 AgeMem（双方对象已核实），评测关系不成立。
+  # 增量关系：MAB 的 SF 维（多跳选择性遗忘，全行业 ≤7% 系统性盲区）正是 AgeMem 可学习 Delete/Update
+  # 机制所攻的那一面——诊断尺与攻坚机制互补。
+  source:
+    type: mechanism
+    id: agemem.m1
+  target:
+    type: mechanism
+    id: memoryagentbench.m2
+  relation_type: complements
+  derived_by: llm_judgment
+  evidence_anchors:
+    source: >
+      agemem.m1 §3.1–§3.2 Table 1：把 LTM 的 Add/Update/Delete 暴露为一等可学习策略动作
+      （"LTM 写入侧：Add / Update / Delete"），机制定位=记忆生命周期里的"改写/删除旧记忆"控制决策。
+    target: >
+      memoryagentbench.m2 §1 四维划分中的 SF（Selective Forgetting）："遇矛盾证据时改写/覆盖/删除旧记忆"；
+      memoryagentbench.c4/Table 4 实测全体系统多跳 SF ≤7%、o4-mini 6K=80.0 但 32K=14.0——指认这是范式短板。
+  boundary: >
+    互补不等于"已被验证攻克"：MAB 未实测 AgeMem（agemem.canonical.benchmarks 为空、c3 核实全文不含 MAB），
+    AgeMem 也未在 FactConsolidation 式多跳 SF 任务上报过分数。关系仅成立于"诊断维度 ↔ 目标机制"的设计层面；
+    一旦有人真把 AgeMem 放进 MAB 的 SF 维跑出结果，本边应升级为 validates 或被推翻。
+  validation_experiment: >
+    把 AgeMem 的 Update/Delete 策略接入 MAB 的 FactConsolidation 多跳 SF 任务（6K/32K），看其学习式删除/覆盖
+    是否突破 ≤7% 的盲区基线；若显著高于固定基线则 complements 升级为 validates，若同样崩塌则边界论断（范式短板）成立、互补落空。
+  confidence:
+    value: medium
+    reason: >
+      双端锚点具体（agemem.m1 的 Delete/Update 动作 vs MAB.m2 的 SF 维 + c4 的 ≤7% 实测），机制面对位清晰；
+      但纯功能/设计层互补、无任何实测交集（MAB 未测 AgeMem），按纪律功能关系封顶 medium。
+  status: candidate
+
+- id: j-0002
+  # 对 2：memoryagentbench ↔ rohitg00-agentmemory。MAB 未测它（受测清单逐字核实不含）；
+  # agentmemory 自测 LongMemEval-S。两者共享 problem（derived r-0020 已记 shares_problem）。
+  # 增量关系：agentmemory 把 R@K/MRR 当系统有效性主证据，直接对撞 MAB 的中心命题（recall ≠ memory）。
+  source:
+    type: object
+    id: project/rohitg00-agentmemory
+  target:
+    type: object
+    id: paper/memoryagentbench
+  relation_type: tension_with
+  derived_by: llm_judgment
+  evidence_anchors:
+    source: >
+      rohitg00-agentmemory.a3（implicit）："检索价值可用检索召回指标（R@K/MRR）近似衡量；R@5 95.2% 被当作系统
+      有效性的主证据"；c4 仅报 LongMemEval-S 检索召回，自承"不能推出端到端任务收益…无更新/遗忘/冲突维度"。
+    target: >
+      memoryagentbench.c1 §1："memory serves as a compressed and distilled representation…rather than storing
+      all historical content verbatim"；m2 四维（AR/TTL/LRU/SF）+ c4 多跳 SF ≤7% 实证"只看检索命中会漏掉
+      更新/遗忘维度的系统性短板"。
+  boundary: >
+    张力是方法论层（"检索召回够不够衡量记忆"），不是实测对抗：MAB 从未把 agentmemory 放进受测清单
+    （memoryagentbench.c3 cannot_prove 逐字"不能据此评判 AgeMem/supermemory/MemPalace"，agentmemory 同理不在表内）。
+    且 agentmemory 并不声称解决更新/遗忘——它定位检索地基，故二者并非就同一主张正面冲突，而是评测哲学相左。
+    若 agentmemory 仅被当作"检索层"而非"完整记忆系统"，张力消解。
+  validation_experiment: >
+    把 agentmemory 放进 MAB 的四维协议（尤其 SF/TTL 维）实跑：若其 R@5 95.2% 的检索强度在 SF/TTL 维同样崩塌
+    （落入 ≤7% 盲区），则证明"recall 高 ≠ 记忆能力强"、张力坐实；若它在生命周期维也不弱，则 MAB 的命题被削弱。
+  confidence:
+    value: medium
+    reason: >
+      双端假设/命题对位明确且各有逐字锚（a3 vs c1+四维+c4），是真方法论张力而非类目级配对；
+      但无实测交集、且 agentmemory 未主张覆盖生命周期维（部分失配），按纪律功能关系封顶 medium。
+  status: candidate
+
+- id: j-0003
+  # 对 3：mempalace ↔ rohitg00-agentmemory。同赛道（本地、无 LLM in loop、混合检索、自报 LongMemEval 高分）。
+  # compares_with 候选。dominance：两边自报口径不可直比（bench.longmemeval limitations 已记），判 mixed。
+  source:
+    type: mechanism
+    id: mempalace.m2
+  target:
+    type: mechanism
+    id: rohitg00-agentmemory.m2
+  relation_type: compares_with
+  dominance: mixed
+  derived_by: llm_judgment
+  evidence_anchors:
+    source: >
+      mempalace.m2 三级检索（混合 BM25+向量 0.6/0.4 → 候选并集 → 可选 LLM 重排，searcher.py:183-225/353-406）；
+      mempalace.c1 自报 LongMemEval 500 题 R@5 96.6%（raw=pure semantic, no heuristics, no LLM），
+      c1 cannot_prove 自承 raw 96.6% 未声明 held-out、hybrid v4 98.4% 才是"honest generalisable figure"。
+    target: >
+      rohitg00-agentmemory.m2 三路 RRF 混合检索（BM25 0.4/向量 0.6/图 0.3，K=60，hybrid-search.ts:22-240）+ 缺腿降级；
+      c4 自报 LongMemEval-S 500 题 BM25+Vector R@5 95.2%（本地 all-MiniLM-L6-v2，无 LLM in loop），
+      COMPARISON.md 自承"only…95.2% is our own measured result…not independently reproduced"。
+  boundary: >
+    数字不可直接比大小：① 模式口径不同——mempalace 96.6% 是 raw 纯语义档，agentmemory 95.2% 是 BM25+Vector 档，
+    各自的混合/降级档（mempalace 98.4%、agentmemory BM25-only 86.2%）又是另一组数；② 两者均为开发者自报、均未第三方复现
+    （bench.longmemeval.limitations 逐字"跨系统数字不可直比"）；③ 候选集/scope 设置不一。故只能判"同赛道可对照其设计取舍"，
+    不能判孰优——dominance=mixed。任何"96.6 > 95.2 所以 mempalace 更强"的推断越界。
+  validation_experiment: >
+    在同一 LongMemEval 切分、同一 embedding、同一候选集/scope 设置下重跑两系统的同档检索（如都用 BM25+Vector，
+    关掉各自的 rerank/图腿），统一口径后才可比 R@5；若需对象级 dominance 升级到 high，须独立复现而非引用自报数。
+  confidence:
+    value: medium
+    reason: >
+      双端机制同构（本地、零 LLM-in-loop、向量+BM25 混合、自报 LongMemEval）锚点具体，compares_with 成立；
+      dominance 明确判 mixed（口径不可比有 registry limitations 背书），按纪律功能/自报关系封顶 medium。
+  status: candidate
+
+- id: j-0004
+  # 对 4：rohitg00-agentmemory ↔ supermemory。本地固定 hook+逐字观察 vs 云端抽取+版本链覆盖。
+  # 查 derived.yaml：tension_with 4 条（r-0025..r-0028）均不含本对；shares_problem r-0024 仅覆盖 mem.retrieval-precision。
+  # 结构推导漏判原因：concepts.yaml 里 mem.fixed-rule-hooks 与 mem.fact-graph 互不在对方 distinct_from/conflicts_with，
+  # 故 conflicts_assumption 规则未触发。增量补判：双轴对立（本地可审计 vs 云端黑箱；逐字存 vs 抽取覆盖）。
+  source:
+    type: object
+    id: project/rohitg00-agentmemory
+  target:
+    type: object
+    id: project/supermemory
+  relation_type: tension_with
+  derived_by: llm_judgment
+  evidence_anchors:
+    source: >
+      rohitg00-agentmemory.a1（implicit）："记忆操作可由写死的规则与权重覆盖，无需学习"+ m1 逐字存
+      RawObservation（无抽取，buildSyntheticCompression 零-LLM）+ 全本地、可审计（trigger_hooks"可解释、可审计、能逐条调试"）。
+    target: >
+      supermemory.a2（implicit）："服务端 LLM 事实抽取质量足够高，可信到直接覆盖旧记忆并自动遗忘"+ m1 事实版本链
+      （抽取→supersede→forgetAfter）+ c3 实读"引擎在 hosted 后端 api.supermemory.ai、本仓库不可核验"（a1 云端可接受）。
+  boundary: >
+    张力跨两条独立轴：① 控制范式（固定规则 vs 服务端抽取/消解）；② 部署/可审计（本地可审计 vs 云端黑箱不可审计）。
+    边界：二者 problem 仅在 mem.retrieval-precision 重叠（derived r-0024），在"是否抽取/是否云端"上并非就同一主张
+    针锋相对，而是设计哲学整体相左；agentmemory 不解决冲突消解、supermemory 不主打本地审计，部分是错位而非正面冲突。
+    若把范围收窄到"都只当检索层用"，抽取/云端这层张力消解、退回 shares_problem。
+  validation_experiment: >
+    给同一组含"事实随时间被覆盖/矛盾更新"的输入（如"I live in NYC"→"moved to SF"），分别跑两系统：
+    看 agentmemory（逐字存、无消解）是否两条都留下且检索混淆，supermemory（版本链 supersede）是否正确覆盖且可回溯——
+    若 agentmemory 在冲突更新上失败而 supermemory 成功，则"逐字 vs 抽取"的张力在该场景被实证；反之看 supermemory 误删（f2）频率。
+  confidence:
+    value: medium
+    reason: >
+      双端假设对位明确（a1 固定规则+逐字 vs a2 抽取可信+云端），结构推导确实漏判（concept 对未互指 distinct_from），
+      是真增量张力；但纯功能/设计层、无实测交集，按纪律封顶 medium。
+  status: candidate
+
+# ════════════════════════════════════════════════════════════════
+# NO_EDGE 判例（判不出有锚点支撑的具体增量关系，明确记录不硬凑）
+# ════════════════════════════════════════════════════════════════
+no_edge:
+  - pair: "agemem ↔ memoryagentbench :: evaluates / can_be_evaluated_by（实测评测关系）"
+    reason: >
+      MAB 受测清单逐字核实不含 AgeMem（memoryagentbench.c3 + bench.memoryagentbench.tested_systems "明确不含 AgeMem"），
+      AgeMem 全文亦不出现 MAB（agemem.canonical.benchmarks 为空、c12 注释核实）。实测评测关系不成立。
+      （功能层"可被评测"已由结构推导 derived r-0001..r-0003 的 can_be_evaluated_by 覆盖，本残差轮不重复；
+      唯一增量是 j-0001 的 complements，不存在实测 evaluates 边。）
+  - pair: "memoryagentbench ↔ rohitg00-agentmemory :: evaluates（实测评测关系）"
+    reason: >
+      MAB 未把 agentmemory 放进受测清单（bench.memoryagentbench.tested_systems 逐字无此项；
+      memoryagentbench.c3 cannot_prove 同款排除）。实测 evaluates 边不成立；增量只在 j-0002 的方法论 tension_with。
+      功能层 can_be_evaluated_by 已由 derived r-0008/r-0010 覆盖（agentmemory.m1/m2 → bench.memoryagentbench）。
+  - pair: "mempalace ↔ rohitg00-agentmemory :: composes_with（可组合）"
+    reason: >
+      两者是同位替代品（都做"本地混合检索记忆地基"），非可组合的互补组件——把它们叠在一起没有锚点支撑的协同语义
+      （没有一方产出喂另一方输入的接口证据）。关系是 compares_with（j-0003），不是 composes_with。
+  - pair: "rohitg00-agentmemory ↔ supermemory :: supersedes（取代）"
+    reason: >
+      无任一方在时间/能力上取代另一方的锚点：二者是并行的不同路线（本地固定规则 vs 云端抽取），
+      且各有对方不具备的能力（agentmemory 可审计/离线；supermemory 抽取/版本链消解）。判 tension_with（j-0004），非 supersedes。

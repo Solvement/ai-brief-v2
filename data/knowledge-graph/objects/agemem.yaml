@@ -37,7 +37,7 @@ claims:
         quote: "AgeMem exposes memory operations as tool-based actions, enabling the LLM agent to autonomously decide what and when to store, retrieve, update, summarize, or discard information."
         strength: medium
     cannot_prove:
-      - 不能证明在真实开放部署中也胜出——5 个均为受控基准，原文摘要自承评测 "relatively controlled compared to open-ended real-world deployments"。
+      - 不能证明在真实开放部署中也胜出——5 个均为受控基准，原文 Limitations 段自承评测 "relatively controlled compared to open-ended real-world deployments"（出处标注经冷审 2026-06-12 校正）。
       - 不能证明对非 HotpotQA 来源的任务课程仍有效——RL 三阶段轨迹全部来自 HotpotQA（作者自承，见 a1）。
       - 不能把均分领先归因到「统一接口」本身——主结果未隔离接口与训练的贡献（见 c2）。
     confidence: high
