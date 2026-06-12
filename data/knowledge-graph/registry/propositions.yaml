@@ -35,6 +35,23 @@
   possible_synthesis: 分层混合——逐字层保真可追溯 + 有损索引层导航（mempalace 实际架构）+ 版本链 supersede 管理事实演化（supermemory.c2 的数据契约可借）
   state: open
 
+- id: prop.parametric-vs-external-memory
+  statement: agent 的个人状态/技能应存进模型参数（PEFT/LoRA），而非外部记忆库
+  support:
+    - latentskill.c1   # 技能编译进 LoRA 后任务分提升+token 大幅节省（自报）
+    - scaling.c2       # Scale Up 杠杆：每用户 adapter 的个人化收益（自报）
+  oppose:
+    - scaling.c5       # 同一路线的内部反证：LoRA-as-memory 容量律——事实塞参数会容量崩塌
+    - mempalace.c1     # 外部逐字+本地嵌入即可自报 R@5 96.6%，无需动参数
+  assumptions:
+    - 参数侧：低秩空间足以表达个人状态/技能（scaling.a2）；技能调用频率高到值得编译成本
+    - 外部侧：检索延迟与上下文占用可接受
+  open_questions:
+    - 技能（过程性知识）与事实（陈述性知识）可能命运不同——参数适合前者、崩塌于后者，但无统一实验切分
+    - 无共同 benchmark：两路线各自自报，未同台
+  possible_synthesis: 分型混合——技能/行为进参数（weight-space skill），事实/记录留外部检索（verbatim/fact-graph），以知识类型路由介质
+  state: open
+
 - id: prop.retrieval-metrics-insufficient
   statement: 记忆系统的价值不能用检索命中率衡量，必须用生命周期能力与端到端任务收益衡量
   support:

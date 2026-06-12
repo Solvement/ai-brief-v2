@@ -1,0 +1,311 @@
+schema: ros-v1
+object_id: paper/latentskill
+slug: latentskill
+kind: paper
+title: "LatentSkill — From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents"
+source: "arxiv:2606.06087v1 + content/papers/2606.06087-latentskill-weight-space-skills/paper.mdx（深读冷审稿）。⚠官方 repo github.com/yuaofan0-oss/LatentSkill 仅 README+图片，Code/Data/Checkpoints 全 Coming soon → 全部结果与代码主张只能 author_claim，无 fact。"
+one_sentence_thesis: >
+  主张「可复用的 agent 技能不必每步以文本进 context，可被编译成权重」，方法是训练一个 hypernetwork（skill compiler）把技能文档 s 一次前向编成可插拔 LoRA 补丁 Δs=Gφ(s)、挂在冻结 backbone 上（θ⊕αΔs），
+  在 ALFWorld 与 Search-QA 两类任务、Qwen3-8B 单一 backbone 的作者自报评测上，对同内容 in-context skill 基线提升成功率/EM 且大幅降 prefill token（仓库尚未开源，数字均自报）。
+
+# ── 正典挂接（R4）。proposals 见 .agent/kg4/latentskill-registry-proposals.md
+# concepts 为本篇 propose 的新词条（技能参数化概念族，registry 现仅有 problem 无对应 concept）；canonical.concepts 暂留空，转正后回填，先入 proposed_concepts。
+canonical:
+  problems: [skill.knowledge-parameterization]   # 命中现有 problem（本篇=该问题树代表作）；agent.self-evolution 仅弱关联→不挂（见 proposals 不确定点 2）
+  concepts: [skill.weight-space-skill, skill.hypernetwork-lora-compiler, skill.component-level-lora-arithmetic]
+  benchmarks: []                                 # 留空：ALFWorld/Search-QA 有自报结果表但无对应 registry 词条（建议 agent 簇统一新建，见 proposals）
+  proposed_problems: []
+  proposed_concepts: []   # 收口：3 条转正；continuous-injection-coefficient 驳回（编译器的属性参数，非独立概念族，折进 m1）
+
+# ════════════════════════════════════════════════════════════════
+# R1 忠实提取：claims + 逐字证据（anchor 指向原文；结果型全 author_claim——repo 未开源）
+# ════════════════════════════════════════════════════════════════
+claims:
+  - id: latentskill.c1
+    statement: >
+      把技能从 in-context 文本编译成 in-weight LoRA，在 ALFWorld 对同内容 in-context skill 基线提升成功率且大幅省 prefill token：
+      seen 74.3 vs 52.9（+21.4）、unseen 69.4 vs 56.0（+13.4），prefill token/step 约 1.21k→0.44k（摘要称 64.1% fewer prefill tokens）。
+    type: author_claim
+    evidence:
+      - anchor: "Abstract"
+        quote: "it improves ALFWorld success by 21.4 and 13.4 points on the seen and unseen splits with 64.1% fewer prefill tokens"
+        strength: strong
+      - anchor: "Table 1 (ALFWorld success rate / prefill cost)"
+        quote: "Seen: In-context Skill 52.9 → LatentSkill 74.3; Unseen: 56.0 → 69.4; prefill token/step 1.21k → 0.44k"
+        strength: strong
+    cannot_prove:
+      - 不能证明换 backbone 家族/规模仍成立——全部实验固定 Qwen3-8B 与单一 LoRA 配置（Limitations 自承）。
+      - 不能证明在 ALFWorld/Search-QA 之外的任务域（web browsing / 软件工程 / 多工具副作用 / 多 agent）仍领先——原文未评（Limitations 自承评测域窄）。
+      - 不能把数字当第三方实测——官方仓库 Code/Data/Checkpoints 全 Coming soon，全部为论文自报。
+    confidence: high
+    confidence_reason: 原文明确——摘要逐字给出 +21.4/+13.4/64.1%，Table 1 数字与深读资产、WebFetch 摘要一致；置信度针对「论文如此声称」而非「事实已被复现」（后者由 source 行与 cannot_prove 限定）。
+
+  - id: latentskill.c2
+    statement: >
+      Search-QA 上平均 EM 最高且 token 开销低（LatentSkill 35.6 vs RAG 34.4 / in-context skill 32.6；cost/step 0.31k vs in-context 1.10k，摘要称 +3.0 EM、72.2% lower skill-token overhead），但并非全胜：NQ 输 RAG（36.2 vs 39.0）、Bamboogle 输 in-context（25.6 vs 38.4）。
+    type: author_claim
+    evidence:
+      - anchor: "Abstract"
+        quote: "improves Search-QA exact match by 3.0 points with 72.2% lower skill-token overhead"
+        strength: strong
+      - anchor: "Table 2 (Search-QA exact match / cost)"
+        quote: "LatentSkill Avg EM 35.6, cost 0.31k; RAG 34.4; In-context Skill 32.6 cost 1.10k; NQ 36.2 vs RAG 39.0; Bamboogle 25.6 vs In-context 38.4"
+        strength: strong
+    cannot_prove:
+      - 不能说「所有 QA 子集都压倒性胜出」——子集互有胜负（NQ/Bamboogle 输），正确表述只是「平均更好、overhead 更低」。
+      - 不能把 cost 优势当 production 成本结论——原文只报 token overhead，未计 adapter 生成时间/显存/存储/延迟。
+    confidence: high
+    confidence_reason: 原文明确——摘要 +3.0/72.2% 逐字，Table 2 子集数字深读已抄录；同 c1，置信度限于「声称」层。
+
+  - id: latentskill.c3
+    statement: >
+      注入系数 α 是连续强度旋钮且呈倒 U 曲线：ALFWorld seen 平均成功率 α=0 的 43.57% 升到 α=0.6 峰值 74.29%、α=1.2 崩到 22.86%；unseen α=0.5 峰值 70.90%、α=1.2 掉到 8.21%——过强会压坏 backbone 原能力。
+    type: author_claim
+    evidence:
+      - anchor: "§4.4 + Appendix G（α sweep）"
+        quote: "seen: α=0 43.57% → α=0.6 74.29% → α=1.2 22.86%; unseen: α=0.5 70.90% → α=1.2 8.21%"
+        strength: strong
+      - anchor: "Abstract"
+        quote: "can be precisely controlled via the LoRA scaling coefficient"
+        strength: medium
+    cannot_prove:
+      - 不能证明单一全局最优 α 适用所有 split——原文自承统一用 seen 最优 α=0.6 会让 unseen Heat/Pick2/Clean 分别低 21.74/17.65/12.90 点，需 adaptive α（未实现）。
+    confidence: medium
+    confidence_reason: 由流程推断——α 曲线数字来自本地深读资产抄录 §4.4/App G，WebFetch 摘要仅核到「可由 scaling coefficient 控制」的定性表述，逐点数值未独立复核。
+
+  - id: latentskill.c4
+    statement: >
+      多技能组合上，组件级合并优于直接相加/文本拼接：在 31 个 Look episodes 上 Component Merging seen 84.6%(11/13)、unseen 77.8%(14/18)，高于 Look-Only(61.5%/72.2%)；而 Direct Merging 与 Text Merging unseen 均只 61.1% 并丢掉 Look-Only 原本成功的样本。
+    type: author_claim
+    evidence:
+      - anchor: "§4.5 Table 3（Look/Pick composition）"
+        quote: "Component Merging seen 11/13=84.6%, unseen 14/18=77.8%; Look-Only 61.5%/72.2%; Direct & Text Merging unseen 61.1%"
+        strength: strong
+      - anchor: "Abstract"
+        quote: "can be composed through parameter-space arithmetic when skill components are aligned"
+        strength: medium
+    cannot_prove:
+      - 不能推广成「任意 LoRA 技能可随便相加」——结论只在 Look+Pick 一对互补技能上展示，且依赖人工语义组件对齐。
+      - 不能证明组件拆分可自动化——general/task-specific/mistakes 的对齐在文中是人工的。
+    confidence: medium
+    confidence_reason: 由流程推断——Table 3 数字来自深读资产，摘要仅核到「组件对齐时可参数空间组合」的定性主张，逐表数值未独立复核。
+
+  - id: latentskill.c5
+    statement: >
+      把技能从 prompt 移入权重，使其更难被 prompt 级攻击直接命中：Hijack 攻击下 ALFWorld in-context 从 52.9 崩到 8.57，而 Latent 仍保 38.6；Search-QA Hijack 下 Latent 35.6→34.0，Extract 下 Latent 29.3 高于 in-context 21.3。
+    type: author_claim
+    evidence:
+      - anchor: "§5 Table 4 + Appendix E（Hijack/Extract）"
+        quote: "Hijack: In-context ALFWorld 52.9→8.57, Latent →38.6; Search-QA Latent 35.6→34.0; Extract Search-QA In-context 21.3 vs Latent 29.3"
+        strength: medium
+    cannot_prove:
+      - 不能证明「明文不在 prompt」=安全——原文明确：adapter 仍可携带敏感行为，可被恶意 skill document / adapter-loading interface 攻击；未覆盖 adapter poisoning/反向工程/权限隔离。
+    confidence: medium
+    confidence_reason: 由流程推断——Table 4 数字来自深读资产抄录，安全结论的边界由原文 §5/warn 框逐字限定（已写入 cannot_prove）；WebFetch 未单独核该表。
+
+  - id: latentskill.c6
+    statement: >
+      生成的 LoRA 补丁不是黑箱噪声而有低秩可解释结构：生成 ΔW 的 stable rank 约 2.17–2.40，远低于同形状随机 LoRA 的 837.87；top-2 奇异方向约捕获 67% 能量、top-5 约 93%；MDS 显示按技能域分簇。
+    type: author_claim
+    evidence:
+      - anchor: "Appendix D/F（low-rank encoding analysis）+ §4.3/Appendix G（MDS）"
+        quote: "generated ΔW stable rank ~2.35-2.40 (pretrain) / 2.17-2.23 (SFT) vs random LoRA 837.87; top-2 ~67% energy, top-5 ~93%"
+        strength: medium
+    cannot_prove:
+      - 不能从「结构可解释」推出「行为正确/安全」——低秩结构是几何性质，与下游策略对错无直接因果。
+    confidence: medium
+    confidence_reason: 由流程推断——stable rank/能量数字来自深读资产抄录 App D/F，摘要核到「form a structured semantic geometry」定性主张，逐数未独立复核。
+
+  - id: latentskill.c7
+    statement: >
+      skill compiler 用两阶段训练：先在约 171K 去重 GitHub 技能文档（约 300M tokens）上做重建/补全预训练，再用 (技能文档+teacher 轨迹) 做轨迹监督 SFT（同一 adapter 挂完整轨迹），backbone 全程冻结、只更新 compiler 参数 φ。
+    type: author_claim
+    evidence:
+      - anchor: "§3.2 / §3.3 + Appendix A（Training Details）"
+        quote: "171K deduped GitHub skill docs, ~300M tokens, 8×H100; SFT on 237 ALFWorld + 500 Search-QA teacher trajectories; backbone frozen, update only φ"
+        strength: strong
+    cannot_prove:
+      - 不能证明训练成本对一次性技能划算——两阶段 8×H100、171K 文档/300M tokens，只适合高复用技能（Limitations/warn 框自承）。
+    confidence: high
+    confidence_reason: 原文明确——训练细节在深读资产抄自 Appendix A；摘要核到「pretrained hypernetwork」一致。仍标 author_claim（数据/代码未开源，无法核实数量真实性）。
+
+# ════════════════════════════════════════════════════════════════
+# R2 机制重构：能据此画流程图
+# ════════════════════════════════════════════════════════════════
+mechanisms:
+  - id: latentskill.m1
+    name: skill compiler（hypernetwork 一次前向把技能文档编成 LoRA）
+    canonical_concept: skill.hypernetwork-lora-compiler   # proposed_concept，待转正
+    problem: skill.knowledge-parameterization
+    input: 技能文档 s（自然语言 procedure：任务策略、工具使用模式、失败恢复规则；预训练时去掉 name/description metadata，只留 markdown body）。
+    output: 一组 LoRA 权重补丁 Δs = Gφ(s)，挂到冻结 backbone 上得到 θ⊕αΔs。
+    operations:
+      - "compiler Gφ 是 Transformer-based hypernetwork，读 s 一次前向输出 Δs（不为每个技能单独训练一个 LoRA）"
+      - "推理时把技能库每个技能预编译成 adapter cache（compile once, reuse many）"
+      - "任务来时 selector 选技能 → 挂对应 LoRA → α 控制强度；技能原文不再进 prompt"
+      - "前向 p_{θ⊕αΔs}(y_t | h_t)：任务历史 h_t 不含技能原文"
+    optimization: >
+      由两阶段训练提供信号（m2）；compiler 本身无独立目标，loss 来自文档重建/补全与轨迹 SFT。
+    replaceable:
+      - "技能 selector 的实现（论文用按类别/数据集直接匹配，理想化；真实 selector 会犯错）"
+      - "backbone LLM（论文固定 Qwen3-8B，是否换家族未验证→接口位但未证）"
+      - "LoRA 的 target modules / rank（消融显示 attn_o+mlp_down 最辨别，但配置固定）"
+    non_replaceable:
+      - "用一个 hypernetwork 一次前向生成 LoRA（拿掉就退回逐技能单独 fine-tune，不再是本方法）"
+      - "技能以独立可挂载 LoRA module 存在（拿掉模块化接口就变成不可逆内化 SKILL0 式，焊死）"
+    reusable_pattern: 把高频复用的"过程知识"从每次进上下文的检索项，编译成可缓存/可挂载的参数补丁——介质从 context space 移到 weight space 但保留模块化接口。
+    anchor: "§3 Method（Δs=Gφ(s), adapter cache）, Abstract"
+
+  - id: latentskill.m2
+    name: 两阶段编译器训练（文档预训练 + 轨迹监督 SFT）
+    canonical_concept: skill.hypernetwork-lora-compiler   # proposed_concept，待转正
+    problem: skill.knowledge-parameterization
+    input: 阶段一=约 171K GitHub 技能文档（约 300M tokens）；阶段二=(技能文档, teacher trajectory) 对（237 ALFWorld + 500 Search-QA 轨迹，来自 SkillRL 释放）。
+    output: 一个既「懂技能文本」又能「把技能编成跨多步稳定行为偏置」的 compiler。
+    operations:
+      - "阶段一 文档预训练：两类任务——重建完整技能文档 / 从截断前缀补全文档（学把 procedure text 压进 adapter）"
+      - "阶段二 轨迹 SFT：同一 skill LoRA 挂整条 teacher trajectory，loss 对所有 decision steps + target tokens 求和（学跨多步稳定行为，而非记单步答案）"
+      - "全程冻结 backbone θ，只更新 compiler 参数 φ"
+    optimization: >
+      监督学习（重建/补全 + 轨迹 token-level loss）；注意——LatentSkill 不是 RL 方法（用的是 SkillRL 释放的 teacher 轨迹做 SFT，无 agent policy RL loop，原文 §防张冠李戴 明确）。
+    replaceable:
+      - "teacher 轨迹来源（论文用 SkillRL 释放轨迹）"
+      - "预训练语料规模/来源（171K GitHub docs）"
+    non_replaceable:
+      - "文档预训练 + 轨迹 SFT 的分工（只做文档重建会缺多步行为一致性；只做轨迹 SFT 缺技能文本理解）"
+      - "同一 adapter 挂完整轨迹（决定了它学的是跨步行为偏置而非单步映射）"
+    reusable_pattern: 把「懂材料」与「变成稳定行为」拆成两阶段教——先在大规模无标注材料上学表征，再在少量带轨迹的监督数据上学行为一致性。
+    anchor: "§3.2 Skill Document Pretraining / §3.3 Trajectory-Supervised Fine-Tuning, Appendix A"
+
+  - id: latentskill.m3
+    name: 组件级 LoRA 算术（语义组件分别编译再组合）
+    canonical_concept: skill.component-level-lora-arithmetic   # proposed_concept，待转正
+    problem: skill.knowledge-parameterization
+    input: 两个（或多个）需要组合的技能，及其拆分出的语义组件（general / task-specific / mistakes）。
+    output: 一个组合后的 LoRA，行为上能连贯执行多技能序列（如 Look+Pick）。
+    operations:
+      - "不直接相加完整 LoRA（Direct Merging：会重复放大 general/mistakes 共享组件，扰乱 perception-to-action 阈值——App H Case 2 能识别 keychain 却不触发 pick-up）"
+      - "不拼接技能文本再编译（Text Merging：超出 hypernetwork 训练分布 OOD，能执行单动作但无法连贯成序列）"
+      - "改为：把技能拆成 general/task-specific/mistakes 语义组件，分别编译，再在组件层组合（Component Merging）"
+    optimization: none（推理期权重运算，无训练）。
+    replaceable:
+      - "组件的语义划分粒度（论文用 general/task-specific/mistakes 三类）"
+      - "组件对齐方式（论文中为人工对齐）"
+    non_replaceable:
+      - "先拆共享组件再组合这一步（拿掉就退回 Direct/Text Merging，重复放大共享部分而失败）"
+    reusable_pattern: 组合可复用单元时，先分离出被多个单元共享的部分再合并——整块叠加会重复放大共享组件（对本站「拼多个范式 prompt 时共享 house rules 不要重复注入」同构）。
+    anchor: "§4.5 Table 3, Appendix H（composition case studies）"
+
+# ════════════════════════════════════════════════════════════════
+# R3 批判轮：assumptions / failure_modes
+# ════════════════════════════════════════════════════════════════
+assumptions:
+  - id: latentskill.a1
+    statement: 技能是"高频复用"的——隐含假设值得为它付两阶段 8×H100、171K 文档/300M tokens 的编译训练成本；一次性指令不在适用范围。
+    kind: explicit
+    anchor: "warn 框逐字「训练 skill compiler 需要 171K 文档、300M tokens 和 8×H100；适合高复用技能，不适合一次性指令」"
+    conflicts_hint: 与「轻量/即用即弃技能」「低资源场景」类需求天然张力——编译成本只在复用率高时摊得平。
+
+  - id: latentskill.a2
+    statement: 技能 selector 能可靠选对技能——论文按任务类别/数据集直接匹配技能、不做检索，隐含假设选择近乎理想。
+    kind: explicit
+    anchor: "Limitations 逐字「技能选择很理想化：ALFWorld 按类别直接匹配 skill……真实 agent 里 skill selector 本身会犯错」"
+    conflicts_hint: 与「真实部署 selector 会犯错」互斥——选错技能时挂错 LoRA 的代价未评估。
+
+  - id: latentskill.a3
+    statement: 单一 backbone（Qwen3-8B）+ 固定 LoRA 配置上的结论可代表方法本身——隐含假设换家族/规模/target modules/rank 后行为稳定。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「跨 backbone 泛化需独立验证」互斥；α 倒 U 峰值、stable rank 等均可能随 backbone 漂移。
+
+  - id: latentskill.a4
+    statement: 把技能藏进权重就降低安全暴露——隐含假设 prompt 不可见 ≈ 更安全；但 adapter 自身的攻击面（poisoning/装载接口/反向工程）被假设可忽略。
+    kind: implicit
+    anchor: "warn 框逐字「不暴露明文不等于安全……adapter 仍可能携带敏感行为，也可能被恶意 skill document / adapter-loading interface 攻击」"
+    conflicts_hint: 与「参数化反而引入新攻击面（adapter poisoning/反向工程）」的安全假设互斥。
+
+failure_modes:
+  - id: latentskill.f1
+    statement: 跨域 / 跨 backbone 泛化失效。
+    triggered_when: 部署到 ALFWorld/Search-QA 之外的任务域，或换 Qwen3-8B 之外的 backbone 家族/规模。
+    consequence: 自报优势不再保证；α 峰值、组件划分、stable rank 等可能漂移，需重训 compiler（成本高）。
+  - id: latentskill.f2
+    statement: α 配置不当导致能力崩塌。
+    triggered_when: α 过大（如 1.2）或对不同 split 套用单一全局 α。
+    consequence: 倒 U 右侧——backbone 原能力被压坏（seen α=1.2 掉到 22.86%、unseen 8.21%）；统一 α 在 unseen 比各自最优低至 21.74 点。
+  - id: latentskill.f3
+    statement: 多技能直接组合相互干扰。
+    triggered_when: 直接相加完整 LoRA（共享组件重复放大）或拼接技能文本（hypernetwork OOD）。
+    consequence: 能识别对象却不触发动作、能执行单步却无法连贯成序列（App H Case 2）；unseen 仅 61.1% 且丢掉原本成功样本。
+  - id: latentskill.f4
+    statement: 安全错觉——adapter 被投毒或被恶意装载接口攻击。
+    triggered_when: 把"明文不在 prompt"当作安全保证，忽视 adapter 自身攻击面。
+    consequence: adapter 携带的敏感/恶意行为被静默挂载执行，比一次性 prompt 错误更难清理（无明文可审计）。
+  - id: latentskill.f5
+    statement: 选错技能挂错补丁。
+    triggered_when: 真实 selector 出错（论文用理想化类别匹配，未建模 selector 错误）。
+    consequence: 挂载与任务不匹配的 LoRA，行为偏置指向错误策略，且权重态比文本态更难诊断。
+
+# ════════════════════════════════════════════════════════════════
+# R4 挂接与钩子
+# ════════════════════════════════════════════════════════════════
+trigger_hooks:
+  - symptom: 同一份说明/规则被反复塞进每一步的 context，prefill token 越长越贵，但内容其实每次都一样。
+    why_recall: 本篇正是把"每步重复进 context 的高频技能文本"从检索项编译成一次挂载的权重补丁，省掉 per-step skill token（prefill 1.21k→0.44k）。
+    related_object: latentskill.m1
+    risk: 编译有重训成本（171K 文档/8×H100），只对高复用内容划算；一次性内容照搬会得不偿失（a1/f1）。
+  - symptom: 想把两个可复用模块拼起来用，直接叠加后效果反而比单用还差，像把共享部分喊了两遍。
+    why_recall: 本篇发现完整 LoRA 直接相加会重复放大 general/mistakes 共享组件、文本拼接会 OOD，必须先拆语义组件再组合。
+    related_object: latentskill.m3
+    risk: 组件对齐在论文里是人工的、只在一对互补技能上验证；别推广成"任意单元可随便相加"（c4 cannot_prove）。
+  - symptom: 给某个能力/插件加了"强度"参数，发现不是越强越好——调高到一定程度整体反而崩。
+    why_recall: 本篇的 α 注入系数呈倒 U 曲线（峰值 ~0.5-0.6，α=1.2 崩），是"连续强度旋钮而非有/无开关"的样板，且单一全局值不适配所有子任务。
+    related_object: latentskill.c3
+    risk: 最优 α 随 split/backbone 漂移，需 adaptive 选择（原文未实现）；别假设有一个全局最优值。
+  - symptom: 想"把明文规则藏起来更安全"，把敏感逻辑从可见配置挪进不可读的权重/二进制。
+    why_recall: 本篇验证了 prompt 级攻击确实更难直接命中（Hijack 52.9→8.57 而 Latent 仍 38.6），但同时明确：不可读 ≠ 安全，反而引入 adapter poisoning/装载接口新攻击面。
+    related_object: latentskill.f4
+    risk: 把"看不见明文"误当安全保证；权重态出问题比文本态更难审计/清理。
+
+exam_questions:
+  - q: 若把 LatentSkill 的两阶段编译器训练整个去掉、退回"每步把技能文本贴进 prompt"，最直接会失去哪两项收益，又会重新拿回哪一项能力？
+    type: counterfactual
+    expected_points:
+      - "失去：per-step prefill token 节省（1.21k→0.44k 反弹）+ 对 prompt 级 Hijack 的抗性（Latent 38.6 退回 in-context 8.57）"
+      - "失去：跨多步稳定的行为偏置（轨迹 SFT 给的，c7/m2）"
+      - "拿回：技能可读/可人工即时编辑、零训练成本、selector 选错时易诊断（文本态可见）"
+    tested_objects: [latentskill.c1, latentskill.c5, latentskill.m1]
+  - q: 论文所有实验固定 Qwen3-8B 与单一 LoRA 配置。若换到一个不同家族/规模的 backbone，最可能先在哪个结论上失效，为什么？
+    type: boundary
+    expected_points:
+      - "最可能 α 倒 U 峰值漂移（c3/f2）——α 与 backbone 的容量/敏感度耦合，峰值与崩溃点非通用常数"
+      - "其次组件级组合（c4/m3）与 stable rank 结构（c6）可能随 backbone 变化"
+      - "根因：a3 单 backbone 假设，原文未做跨家族验证（Limitations 自承）"
+    tested_objects: [latentskill.a3, latentskill.c3, latentskill.f1]
+  - q: 把"高频技能编译而非检索"这条范式迁移到一个无可训练 model-client 的纯工程系统（如本站每天重复进 context 的深读范式/判边 rubric/冷审 prompt），哪部分能搬、哪部分搬不动？
+    type: transfer
+    expected_points:
+      - "搬不动：编译进 LoRA 本身（无可训练 backbone/hypernetwork/8×H100/付费 key），m1/m2 训练回路落不了地"
+      - "能搬的设计直觉：① α=连续强度旋钮而非开关（用于 prompt 权重/指令优先级）；② 组件级组合——拼多个范式 prompt 时先拆共享 house rules 再合并，别整块叠加重复放大（m3 reusable_pattern）"
+      - "能搬的判断框架：什么知识值得'编译/固化'(高复用) vs 保留为'检索项'(一次性)——眼下本站全在 context 端是对的，但语料/facet 应保持可编译性（结构化、组件化）"
+    tested_objects: [latentskill.m1, latentskill.m3, latentskill.c3]
+  - q: 论文称"把技能藏进权重比明文 prompt 更安全"，并以 Hijack 攻击数字（in-context 8.57 vs Latent 38.6）支撑。这条安全主张的边界在哪？要排除"安全错觉"需补什么实验？
+    type: boundary
+    expected_points:
+      - "边界：只证明 prompt 级直接抽取/劫持更难命中（c5），未覆盖 adapter poisoning / 装载接口攻击 / 反向工程 / 权限隔离（f4, a4）"
+      - "威胁：adapter 仍可携带敏感/恶意行为，且不可读 → 出问题更难审计清理"
+      - "补的实验：恶意 skill document 投毒编译后的行为审计、adapter-loading interface 攻击面测试、从 ΔW 反向恢复技能内容的可行性"
+    tested_objects: [latentskill.c5, latentskill.f4, latentskill.a4]
+
+self_evo_verdict:
+  state: "no"
+  reason: >
+    系统层不能用、且这是有效的"收敛"结论而非遗漏：本站 agent 是订阅 CLI、无自有可训练 backbone/hypernetwork/可训练层，无法编译 LoRA；
+    且官方仓库 Code/Data/Checkpoints 全 Coming soon、结果全自报、评测域窄（仅 ALFWorld+Search-QA、单 Qwen3-8B）——既无可复用代码也无落地介质。
+    **但保留两条不依赖训练的设计直觉以备未来（已转入 trigger_hooks / m3 reusable_pattern / transfer 题）**：
+    ① 技能/能力强度应是连续旋钮而非有/无开关（α 思路可用于 prompt 权重、指令优先级）；
+    ② 拼接多个可复用单元（如多个范式 prompt）时先拆共享组件再合并、共享 house rules 不在多处重复注入（直接整块叠加会重复放大共享部分，对应本文 Direct Merging 失败）。
+    另一条架构提醒：本站语料/facet 设计应保持"可编译性"（结构化、组件化），未来若有可训练介质，介质迁移时不必重写。
+    当下系统层判 no（无可训练介质），typed 设计直觉已 apply 到工程纪律层。
+
+status: draft

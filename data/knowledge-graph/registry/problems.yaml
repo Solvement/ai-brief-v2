@@ -76,7 +76,32 @@
   parent: null
   description: 把技能、知识、经验从 prompt/context 搬进模型参数（LoRA/adapter/权重编辑）的路线及其边界。
 
+- id: train
+  name: 训练与监督信号
+  parent: null
+  description: 训练 LLM/agent 时监督信号的构造、可信度与分配问题域。
+
 - id: train.credit-assignment
   name: 长轨迹信用分配
-  parent: null
+  parent: train
   description: 长轨迹、稀疏/延迟奖励下，把结果信号正确分配给早期决策的训练问题。
+
+- id: train.distillation-supervision-reliability
+  name: 蒸馏监督信号可信度
+  parent: train
+  description: 老师信号并非处处可信——逐 token/逐区域判断监督信号该不该用、用多强。（2026-06-12 tropd 蒸馏转正）
+
+- id: infra
+  name: 推理与服务基础设施
+  parent: null
+  description: 模型推理时效率/显存/服务化问题域（KV cache、量化、长上下文服务）。
+
+- id: infra.kv-cache-compression
+  name: KV cache 压缩
+  parent: infra
+  description: 长上下文推理的 KV cache 显存压缩（量化/稀疏/预取）及其精度代价。（2026-06-12 kvarn 蒸馏转正）
+
+- id: infra.quantization-eval-realism
+  name: 量化评测的真实性
+  parent: infra
+  description: 量化方法的评测协议是否还原真实部署条件（如 decode 时量化误差累积），防评测虚高。（2026-06-12 kvarn 蒸馏转正）

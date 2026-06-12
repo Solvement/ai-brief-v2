@@ -1,0 +1,317 @@
+schema: ros-v1
+object_id: paper/scaling
+slug: scaling
+kind: paper
+title: "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters"
+source: "arxiv:2606.02437v2 + content/papers/2606.02437-scaling-peft-million-personal-models/paper.mdx（深读冷审稿，逐字锚点指向 arXiv TeX source；代码仓库未披露）"
+one_sentence_thesis: >
+  主张「PEFT/LoRA 不只是省钱的微调替代，而是长在共享强基座上的持久个人状态（local adaptive state）」，
+  方法是把问题拆成三根依赖轴——Scale Up（强先验给低秩更新杠杆）/ Scale Down（找低秩仍稳定的操作区间）/
+  Scale Out（让百万 adapter 可寻址·版本化·回滚·评测·聚合），并配 MinT 生命周期基础设施，
+  在作者体系内一组自有实验（rank sweep / OLoRA-tail / δ-Mem / LoRA-as-memory 容量律 / majority vote / MinT 工程指标）上展示该范式可行——
+  但全篇为 position+synthesis paper，代码未披露、多变量未隔离、关键证据自报。
+
+# ── 正典挂接（R4）。problems 三挂均有现成词条；concepts 无「参数化状态/LoRA-as-memory/adapter 生命周期」词条 → 全部走 proposed（见 proposals md）。
+# benchmarks 留空：本篇 benchmark（AIME/GPQA/DishName/ALFWorld/MemoryAgentBench…）多为作者自报结果表，
+#   除 MemoryAgentBench 外均无 registry 词条；MemoryAgentBench 在本篇仅作 δ-Mem 的一个被测分项（自报），关系走 derive 的 can_be_evaluated_by 候选而非 canonical 直挂。
+canonical:
+  problems: [skill.knowledge-parameterization, train.credit-assignment, mem.lifecycle-management]
+  concepts: [skill.parametric-local-state, skill.lora-as-memory-capacity, skill.adapter-population-governance]
+  benchmarks: []
+  proposed_problems: []
+  proposed_concepts: []   # 收口：3 条转正；train.rl-prior-limited 驳回（是发现/限制不是训练方案族，已由 a1+相关 claim 承载）
+
+# ════════════════════════════════════════════════════════════════
+# R1 忠实提取：claims + 逐字证据（anchor 指向原文 / 深读冷审稿）
+# ════════════════════════════════════════════════════════════════
+claims:
+  - id: scaling.c1
+    statement: >
+      论文的核心论点不是「微调更省」，而是把 PEFT/LoRA 重定义为「长在少数 trillion-scale 共享 base 上的持久个人状态」：
+      标题里的「million personal models of trillion parameters」不应读作每人训练一份 trillion 参数 checkpoint，
+      而是少数强 base model + 百万级轻量 adapter，adapter 承载偏好/技能/工具习惯/记忆式更新。
+    type: author_claim
+    evidence:
+      - anchor: "Abstract（arXiv:2606.02437v2）"
+        quote: "small trainable adapters as persistent local state on top of strong shared foundation models … adapters carry instance-specific behavior such as preferences, skills, tool habits, and memory-like updates"
+        strength: strong
+      - anchor: "§7 Conclusion（arXiv source sections/07-conclusion.tex）"
+        quote: "标题不应读作每个用户拥有并训练单独 trillion-parameter checkpoint，而是少数强 base + millions lightweight adapters"
+        strength: strong
+    cannot_prove:
+      - 不能证明该范式在生产中真能治理百万 adapter——「百万」此处是 addressability/lifecycle 的目录规模（10^6-entry catalog），不是百万 adapter 同时进 GPU（见 c7）。
+      - 不能把 adapter 当完整记忆系统——原文明确 raw facts/documents/日历/数据库仍应留外部 memory/tools，adapter 只存「反复经验造成的行为后果」（见 f2、self_evo_verdict）。
+    confidence: high
+    confidence_reason: 原文明确——abstract 逐字、§7 conclusion 立场在深读冷审稿与 WebFetch arXiv 摘要两处一致可核。
+
+  - id: scaling.c2
+    statement: >
+      Scale Up：在固定可训练预算下，「强 base + 小 LoRA」比「弱 base + full RL」更有杠杆——
+      motivating table 中 DS-Distill-Qwen-32B LoRA r=8（0.07B trainable）得 AIME2025 20.61% / GPQA Diamond 33.02%，
+      高于 1.5B full RL（1.5B trainable）的 8.33% / 25.00%。
+    type: author_claim
+    evidence:
+      - anchor: "Scale Up motivating table（arXiv source tables/scale_up/prior_comparison.tex）"
+        quote: "DS-Distill-Qwen-32B, LoRA r=8 | 0.07B | 20.61% | 33.02%；DS-Distill-Qwen-1.5B, full RL | 1.5B | 8.33% | 25.00%"
+        strength: medium
+    cannot_prove:
+      - 不能把领先干净归因到「强先验」——作者自承该比较同时变化 model size 和 training method，不能 cleanly isolate prior strength（出处 prior_comparison.tex caption）。
+    confidence: high
+    confidence_reason: 数字逐字可核（深读冷审稿表格抄录自 arXiv TeX）；「强先验有杠杆」属作者解读，已在 cannot_prove 标注未隔离因果，故 evidence strength=medium。
+
+  - id: scaling.c3
+    statement: >
+      Scale Down 的 rank sweep 把 LoRA 切成三个操作区间：rank 16/32 当前实用默认（mean gain/downside risk/token efficiency 最平衡）；
+      rank 1-4 best seed 可接近但 across-seed mean 与 seed reliability 不稳（「稳定性问题大于硬容量问题」）；
+      rank 64/128/256 成本涨而 best-run frontier 没明显抬高（cost-warning 区）。
+    type: author_claim
+    evidence:
+      - anchor: "§4 Scale Down, Rank Reduction Under Minimal Parameters（arXiv source sections/04-scale-down.tex）"
+        quote: "216 runs = 9 ranks × 4 batch sizes × 6 seeds，每个配置 500-step PPO；rank 16/32 当前实用默认；rank 1-4 best seed 可接近但 mean/seed reliability 不稳"
+        strength: strong
+    cannot_prove:
+      - 不能证明 rank 1-4 的不稳是「初始化/优化」而非「容量」造成——作者解读为稳定性问题，但 sweep 本身不隔离这两者。
+      - 不能外推到非数学/非 PPO 任务——sweep 仅 Qwen3-8B + mixed mathematics corpus + verifiable rewards。
+    confidence: high
+    confidence_reason: 原文明确——sweep 规模（216 runs/9 ranks/6 seeds/500-step PPO）逐字可核；三区间为作者结论性陈述。
+
+  - id: scaling.c4
+    statement: >
+      Scale Down 的 OLoRA-tail：标准 SVD-based 初始化从 SFT 搬到 RL 会过猛——OLoRA 在 DeepSeek-R1-Distill-Qwen-1.5B + DAPO
+      约 step 100 collapse（reward 到 -1.0、KL 到 ~8）；OLoRA-tail 用 minor singular vectors 初始化 B0=U_-r, A0=V_-r^T
+      但去掉 singular-value scaling，500 steps 内稳定，并在 DAPO-Math-17k / constant LR 1e-5 / batch 32 / r=16,α=32
+      下六个数学 benchmark 平均 58.3% vs LoRA 56.3%。
+    type: author_claim
+    evidence:
+      - anchor: "§4 Scale Down, RL-Native Initialization for Stability（arXiv source sections/04-scale-down.tex）"
+        quote: "OLoRA 约 step 100 collapse，reward -1.0、KL ~8；OLoRA-tail 500 steps 内稳定；六 benchmark 平均 58.3% vs LoRA 56.3%"
+        strength: strong
+    cannot_prove:
+      - 不能证明 +2.0pp 的领先稳健——单一设置、未报方差/种子数，差幅小于一般种子噪声量级（与 c3 自述 seed reliability 不稳同源张力）。
+    confidence: medium
+    confidence_reason: 由流程推断——崩溃数字与设置逐字来自深读冷审稿（抄录 04-scale-down.tex），但 58.3/56.3 为单点对比、WebFetch 摘要未含该表逐点值；故 confidence=medium。
+
+  - id: scaling.c5
+    statement: >
+      Scale Out 的 LoRA-as-memory 容量律：用 DishNameBenchmark（263 runs）测「memory tokens / trainable parameter」——
+      低于约 1e-3 时 accuracy 接近 1；1e-3 到 1e-2 为 transition；超过约 1e-2 后 collapse toward zero。
+      模块效率 MLP > Attention ≈ All >> Unembed（写 MLP LoRA 最 parameter-efficient）。
+    type: author_claim
+    evidence:
+      - anchor: "§5 Scale Out, LoRA as memory: capacity scaling law（arXiv source sections/05-scale-out.tex）"
+        quote: "DishNameBenchmark 263 runs；capacity efficiency 10^-3 接近 1，10^-3 到 10^-2 transition，>10^-2 collapse toward zero；MLP > Attention ≈ All >> Unembed"
+        strength: strong
+    cannot_prove:
+      - 不能外推该数值阈值到非 fact-recall 任务——DishNameBenchmark 是合成事实记忆任务，行为状态（偏好/技能）是否同律未测。
+      - 不能据此判定 adapter 适合存事实——容量律恰恰是「不该把事实塞参数」的反向证据（支撑 f2 的边界）。
+    confidence: high
+    confidence_reason: 原文明确——263 runs、两条阈值、模块排序为作者结论性陈述，逐字来自 05-scale-out.tex；逐点曲线值以原文图为准（已在 weakness 标注图多表少）。
+
+  - id: scaling.c6
+    statement: >
+      Scale Out 的 adapter population 可被 majority vote 聚合成集体智能：同 base/同 RL recipe、只因 data permutation/masking
+      不同的多个 LoRA 变体，collaboration accuracy 从 0.3644(k=1) 升到最佳 0.4867(k=198)，
+      拟合 accuracy ≈ 0.386 + 0.0172 ln(k)（R² ≈ 0.888），且优于同模型重复采样的 repetition baseline。
+    type: author_claim
+    evidence:
+      - anchor: "§5 Scale Out, Diversity as a Source of Collective Intelligence（arXiv source sections/05-scale-out.tex）"
+        quote: "0.3644(k=1) → 0.4267(k=10) → 0.4633(k=100) → 0.4867(k=198)；accuracy ≈ 0.386 + 0.0172 ln(k)，R² ≈ 0.888"
+        strength: medium
+    cannot_prove:
+      - 不能证明该 log 律泛化到别的任务/基座——仅 Qwen3-30B + Math17k + AIME24 一个设置，diversity 来自 LoRA 训练轨迹的偶然差异。
+    confidence: medium
+    confidence_reason: 由流程推断——四个 k 点与拟合式逐字来自深读冷审稿（05-scale-out.tex），WebFetch 摘要未含此表；属作者自报系统实验，故 strength=medium、confidence=medium。
+
+  - id: scaling.c7
+    statement: >
+      MinT 工程指标说明「百万 adapter」是 addressability/lifecycle 而非 GPU 同时驻留：
+      rank-32 LoRA 252 MiB vs merged full 8.061 GB（Qwen3-4B）；built/audited 10^6-entry packed adapter catalog；
+      same-batch window 仅 64 distinct adapters；cold loading 16 misses 形成 1.375-23.267 s staircase；
+      packed loader 把 37,248→672 tensor objects、live loading 快 8.5-8.7×。
+    type: author_claim
+    evidence:
+      - anchor: "§6 Infrastructure / MinT（arXiv source sections/06-infrastructure.tex + tables/infrastructure/*.tex）"
+        quote: "rank-32 LoRA 252 MiB vs merged full 8.061 GB；10^6-entry packed adapter catalog；same-batch window 64 distinct adapters；cold loading 1.375-23.267 s；37,248→672 tensor objects, 8.5-8.7× faster"
+        strength: medium
+    cannot_prove:
+      - 不能证明这套基础设施已生产可用/可复现——MinT 为作者引用的体系内 managed infrastructure，无公开仓库；冷启动/缓存局部性/回滚/安全治理仍是开放工程约束。
+    confidence: medium
+    confidence_reason: 由流程推断——工程数字逐字来自深读冷审稿（06-infrastructure.tex 表），但 MinT 闭源自报、WebFetch 摘要仅确认 MinT 存在与职责（identity/revision/provenance/evaluation/serving residency），故 confidence=medium。
+
+# ════════════════════════════════════════════════════════════════
+# R2 机制重构：能据此画流程图
+# ════════════════════════════════════════════════════════════════
+mechanisms:
+  - id: scaling.m1
+    name: 三轴依赖链（Scale Up → Down → Out，强先验·稳低秩·治理 population）
+    canonical_concept: skill.parametric-local-state   # proposed
+    problem: skill.knowledge-parameterization
+    input: >
+      少数 trillion-scale 共享 base model（dense/MoE 强先验）+ 某用户/agent 的反复交互（偏好/工具结果/失败恢复/技能轨迹）。
+    output: >
+      一个「共享强 base + 轻量持久 adapter population」的个人化状态架构：base 提供通用能力，
+      adapter 承载实例特定的可训练·可回滚行为状态。
+    operations:
+      - "Scale Up：把强 base 带进 RL/适配循环——RL 是 prior-limited，只能强化当前 policy 采得到的好轨迹，强 base 让有用轨迹更易出现；LoRA 让强 base 可在固定预算下反复适配。"
+      - "Scale Down：用 rank sweep（找 16/32 稳定区）+ OLoRA-tail（RL-native 初始化）+ rank/alpha/lr 联动规则，把 adapter 压到低秩但稳定的操作区间。"
+      - "Scale Out：把许多 adapter 当可命名/版本化/缓存/评测/回滚的 population；先学『什么进 adapter、什么留外部』，再用 majority vote/routing/distillation/simulation 把多样性变系统资源。"
+    optimization: >
+      各轴各自的训练信号（RL/PPO/DAPO/GRPO-style on-policy）；三轴本身是架构论点而非单一优化目标。
+    replaceable:
+      - "具体 base model（dense 或 MoE，论文跨 Qwen3 / DeepSeek-Distill / Kimi K2 / Qwen3-235B）"
+      - "具体 RL 算法（PPO/DAPO 等）"
+      - "聚合方式（majority vote / routing / distillation 之一）"
+    non_replaceable:
+      - "「共享强 base + 轻量 adapter population」的分离架构（拿掉就退回 full checkpoint per user，不再是本范式）"
+      - "三轴的依赖关系（弱 base 让低秩没杠杆、不稳低秩让个人状态不可训练、无治理让百万 adapter 只是文件名）"
+    reusable_pattern: 把「持续学习状态」拆成共享强先验 + 小而稳定的本地状态 + 可治理的状态 population 三层，而非给每个实例复制一份大模型。
+    anchor: "Abstract + §3/§4/§5 三轴 + §7 Conclusion"
+
+  - id: scaling.m2
+    name: Context Learning 写策略（决定什么经验值得固化进参数）
+    canonical_concept: skill.parametric-local-state   # proposed
+    problem: skill.knowledge-parameterization
+    input: 当前轮通过上下文/检索/工具/验证拿到的高质量反馈与行为后果。
+    output: 一个「query-only 时也变好」的 adapter——只把重复有用的行为改进蒸馏进参数，一次性事实留外部。
+    operations:
+      - "当前轮：用 context/tools/retrieval 拿到更好的反馈（不立即写参数）"
+      - "判定：这是一次性事实，还是反复出现、可复用的行为后果？"
+      - "固化：仅把后者经 Context Distillation 写进 LoRA/PEFT adapter（原文给伪代码 listing）"
+    optimization: Context Distillation（把上下文条件下的好行为蒸馏成 query-only 参数行为）。
+    replaceable:
+      - "蒸馏的具体损失/采样方式"
+      - "判定『值得固化』的阈值策略"
+    non_replaceable:
+      - "「先上下文验证、后只固化重复有用改进」的写入门顺序（拿掉就退回无差别灌参数，撞 LoRA-as-memory 容量律）"
+    reusable_pattern: 记忆/状态写入前先过一道「一次性事实 vs 可复用行为后果」的写策略闸门，只把后者下沉为持久状态。
+    anchor: "§5 Scale Out, Context Learning as write policy（Context Distillation pseudo-code）"
+
+  - id: scaling.m3
+    name: MinT adapter 生命周期治理（policy record / revision / provenance / eval / residency 分离）
+    canonical_concept: skill.adapter-population-governance   # proposed
+    problem: mem.lifecycle-management
+    input: 大量持久 adapter（每个=某 policy 的某次 revision）。
+    output: 可寻址、可版本化、可回滚、可评测、可控驻留的 adapter population——「百万」指目录可寻址而非同时上 GPU。
+    operations:
+      - "把 base deployment / policy record / policy session / adapter revision / serving residency 分开管理"
+      - "adapter-only handoff：移动 252 MiB adapter 而非 8.061 GB merged 模型"
+      - "用 CPU cache 吸收 locality（512 hotset 载 369 个 / 2048 弱局部性载 550 个），GPU same-batch window 仅 64 distinct"
+      - "packed loader：把 tensor 对象 37,248→672 降冷加载 fanout；two-phase readiness 把冷启动转成可控 prewarm（409.04 s）"
+    optimization: none（系统工程层，无训练优化目标）。
+    replaceable:
+      - "具体缓存/打包/预热实现（MinT 是 one infrastructure example）"
+      - "residency 调度策略"
+    non_replaceable:
+      - "adapter 身份/版本/provenance/可评测/可回滚的一等管理（拿掉则百万 adapter 退化为硬盘上无治理的文件名）"
+    reusable_pattern: 把每次状态更新当成带 provenance 的可评测·可回滚 revision 来治理，而非就地覆盖不可追溯的单体状态。
+    anchor: "§6 Infrastructure / MinT + tables/infrastructure/*.tex"
+
+# ════════════════════════════════════════════════════════════════
+# R3 批判轮：assumptions / failure_modes
+# ════════════════════════════════════════════════════════════════
+assumptions:
+  - id: scaling.a1
+    statement: >
+      RL 是 prior-limited——隐含假设「能力来自挑选并强化 base 已能采样到的好轨迹」，故强先验是低秩更新有杠杆的前提。
+    kind: explicit
+    anchor: "§3 Scale Up, Why RL is Prior-Limited / LoRA as Budgeted Access to Strong Priors"
+    conflicts_hint: 与「RL 能从零探索出 base 采不到的新能力」类主张张力——若新能力可被探索习得，则强先验非必要前提。
+
+  - id: scaling.a2
+    statement: >
+      个人化所需的状态可被低秩 adapter 充分表达——隐含假设偏好/技能/工具习惯/部分记忆这类行为后果落在低秩可写区间内。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与 LoRA-as-memory 容量律（c5）自相张力——超过约 1e-2 memory tokens/trainable param 即 collapse，故「事实型状态」证伪本假设，只有「行为型状态」可能成立。
+
+  - id: scaling.a3
+    statement: >
+      adapter 多样性（来自 data permutation/masking 的训练轨迹偶然差异）是可被 majority vote 利用的有效多样性——
+      隐含假设这种差异带来互补错误而非同向偏差。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「同 base 同 recipe 的变体高度相关、投票收益快速饱和」张力——若变体错误同向，则 log 增益不成立。
+
+failure_modes:
+  - id: scaling.f1
+    statement: 低秩 RL 训练崩溃。
+    triggered_when: 用从 SFT 搬来的 SVD 初始化（含 singular-value scaling）做 RL，或 rank 落在 1-4 不稳区。
+    consequence: 约 step 100 reward collapse 到 -1.0、KL 爆到 ~8（OLoRA 案例）；或 across-seed mean 不稳、不可靠种子拖低均值。
+
+  - id: scaling.f2
+    statement: 把事实硬塞进 adapter 触发容量崩塌。
+    triggered_when: memory tokens / trainable parameter 超过约 1e-2（把 adapter 当无限事实仓库）。
+    consequence: accuracy collapse toward zero——事实记忆必须继续分层放外部 memory/tools，不能写进参数。
+
+  - id: scaling.f3
+    statement: 错误行为被固化进持久状态，难以清理。
+    triggered_when: prompt injection / 错误权限边界 / 坏工具习惯 被 Context Learning 写进 adapter。
+    consequence: 比一次性上下文错误更难清理——治理（回滚/provenance/评测）成为安全闭环的硬约束，而论文承认安全治理远未闭环。
+
+  - id: scaling.f4
+    statement: 大 MoE PEFT 的 policy 语义断裂。
+    triggered_when: 训练-推理不一致（TIM）在 MoE 上改变 expert routing，训练优化的 computation path ≠ rollout 采样的 path。
+    consequence: 优化信号与实际行为脱节；需 Router Replay（R3）记录并回放 rollout routing 才把 PPO KL 降到 step46=0.000026 量级。
+
+# ════════════════════════════════════════════════════════════════
+# R4 挂接与钩子
+# ════════════════════════════════════════════════════════════════
+trigger_hooks:
+  - symptom: 想让系统「记住」反复出现的偏好/习惯/风格，但又怕把一次性事实也固化进来、之后难清理。
+    why_recall: 本篇 Context Learning 写策略 + LoRA-as-memory 容量律给出「一次性事实留外部、可复用行为后果才下沉」的写入门与量化边界。
+    related_object: scaling.m2
+    risk: 照搬「写进参数」会撞容量律（>1e-2 collapse）；本站无可训练介质，能搬的只是写入门的判定逻辑而非 adapter 训练。
+  - symptom: 状态/记忆一旦写错就只能就地覆盖，追不回是谁/哪一版改的，也没法回滚或评测改动好坏。
+    why_recall: MinT 把每次更新当带 provenance 的可评测·可回滚 revision，正是「状态治理」而非「状态存储」的样板。
+    related_object: scaling.m3
+    risk: MinT 是闭源自报的重工程基础设施；轻量系统该搬的是 revision/provenance/rollback 的治理纪律，不是它的打包/缓存实现。
+  - symptom: 想靠「多跑几个变体投票」提升准确率，但不确定收益会不会很快饱和、值不值这份算力。
+    why_recall: 本篇 majority vote 给出 accuracy ≈ 0.386 + 0.0172 ln(k) 的对数增益律，且 diversity 投票优于同模型重复采样。
+    related_object: scaling.c6
+    risk: 该律仅单任务单基座自报；变体若错误同向（同 base 同 recipe），实际增益可能远低于 log 拟合——需自测互补性。
+  - symptom: 在大 MoE 上做强化/微调，训练曲线看着对但部署行为对不上，怀疑训练和推理走的不是同一条路。
+    why_recall: 本篇点名训练-推理不一致（TIM）在 MoE 上改 expert routing，用 Router Replay 对齐——是「优化信号≠实际行为」的诊断范式。
+    related_object: scaling.f4
+    risk: Router Replay 数字（KL=0.000026）来自闭源 Kimi K2 自报实验，是诊断思路而非可复现配方。
+
+exam_questions:
+  - q: 论文反复说「million personal models of trillion parameters」。若有人据此去给每个用户训练一份 trillion 参数 checkpoint，错在哪？论文的真实架构是什么？
+    type: boundary
+    expected_points:
+      - "误读：标题不是每人一份 trillion checkpoint（§7 conclusion 明确否定）"
+      - "真实架构：少数强 base + 百万级轻量 adapter（c1）；adapter 只存行为后果，事实留外部"
+      - "「百万」是 addressability/lifecycle 的目录规模（10^6-entry catalog），非 GPU 同时驻留（c7，same-batch window 仅 64）"
+    tested_objects: [scaling.c1, scaling.c7, scaling.m1]
+  - q: 若把所有用户事实（日历、文档、历史记录）都写进 LoRA adapter 当记忆库，会发生什么？论文哪条证据预言了结果？
+    type: counterfactual
+    expected_points:
+      - "撞 LoRA-as-memory 容量律（c5/f2）：>约 1e-2 memory tokens/trainable param 后 accuracy collapse toward zero"
+      - "正确做法=记忆分层：事实留外部 memory/tools，adapter 只存反复稳定的行为后果（m2 写策略）"
+      - "与 a2 张力：低秩可表达的是行为型状态，不是事实型状态"
+    tested_objects: [scaling.c5, scaling.f2, scaling.a2]
+  - q: 把本篇的方法论迁移到一个无可训练 model-client 的纯工程系统（如本站知识库维护），哪几件能搬、哪件搬不动？
+    type: transfer
+    expected_points:
+      - "能搬：① Context Learning 写策略（m2）=写入前判『一次性事实 vs 可复用策略』；② MinT 治理纪律（m3）=每次写入是带 provenance 的可回滚 revision；③ population 思维（c6）=多判断经冷审/投票聚合"
+      - "搬不动：LoRA/PEFT adapter 训练本身、OLoRA-tail/rank sweep/RL 回路（本站无可训练介质、无 RL 框架）"
+      - "可重用范式（m1）=分层（共享先验/本地稳定状态/可治理 population），但本站的『本地状态』是结构化记录而非参数"
+    tested_objects: [scaling.m2, scaling.m3, scaling.c6]
+  - q: 论文是 position+synthesis paper、代码未披露、多个关键实验自报。这对它的哪类结论威胁最大、哪类最小？该怎么用它？
+    type: boundary
+    expected_points:
+      - "威胁最大：具体 headline 数字（Kimi K2 10% footprint、majority vote log 律、MinT 工程指标）——闭源自报、单设置、多变量未隔离（c2 自承未隔离 prior strength）"
+      - "威胁最小：架构论点与边界（共享 base+adapter population、LoRA-as-memory 有容量律、三轴依赖链）——这些是可迁移的判断框架"
+      - "正确用法：搬模式与边界判断，不把每个数字当已独立验证的通用定律"
+    tested_objects: [scaling.c1, scaling.c2, scaling.c5]
+
+self_evo_verdict:
+  state: queue
+  reason: >
+    核心机制（LoRA/PEFT adapter 训练、rank sweep、OLoRA-tail、adapter population）需可训练 model-client，本站无可训练介质 → 训练部分排 self-evo-queue（红线/大改）。
+    但**记忆治理方法论可立即 apply**（非红线，直击本站 Mind Palace / KG 记忆写入门），与 facet self_evo_use 一致，落三件：
+    ① 记忆分层 + 写入策略（m2 Context Learning）：原始论文/事实/链接留外部数据层，反复稳定的阅读偏好/边界判断/失败归因写进可版本化策略层——同构于本站 memory 维护协议「热核（稳定策略）vs 数据层（事实）」，写入前先判「一次性事实 vs 可复用行为后果」；
+    ② 生命周期治理（m3 MinT）：每次写入当带 provenance 的可评测·可回滚 revision——= 本站「每条记录带 provenance/version」红线 + supersede 不删除；
+    ③ population 思维（c6）：多策略/判断经冷审·投票·路由·蒸馏聚合，而非单体永久自改 agent——对应本站多 agent doctrine。
+    落地动作=确认本站记忆写入门已分层（外部事实 vs 内化策略）+ 每次写入是可回滚 revision（治理层已基本对齐）；adapter 训练 → queue/no。
+
+status: draft

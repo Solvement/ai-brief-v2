@@ -1,133 +1,86 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { RosObjectPanel, useRosObject } from "./RosObjectPanel";
 
 // ════════════════════════════════════════════════════════════════════
-//  Mind Palace 星图 v2 — 真 3D 记忆球（Kevin 2026-06-11 深夜定）
-//  - 3d-force-graph（MIT，three.js）懒加载，只在星图 tab 实例化
-//  - 有规律布局：节点按 track/主题聚簇，固定在球壳分区上（非力学乱抖）
-//  - 点一簇（连通分量）→ 相机动画聚焦、画布让位左侧、右侧大面板展开
-//    成员间「密切联系」分析（关系型+怎么利用+逐字证据）
-//  - 点孤点 → 同动画，面板=这篇的核心(XYZ 拆解) + 为什么还没连边（诚实）
-//  - 面板=深蓝玻璃风，刻意区别于检索区的白卡片
-//  - 缺口视图（gap view）从旧 KnowledgeGraph 迁入（唯一真相，不留旧文件）
+//  Mind Palace 星图 v3（KG-4 Research Object Store 投影，2026-06-12 重做）
+//  - 数据源：public/data/brief/ros-graph.json（对象库投影，只含 kind=paper 文章）
+//  - 节点=文章；边=对象级关系聚合（claim/机制/假设级，点开展开）；
+//    命题/张力（propositions）= 面板的群体分析层。
+//  - 项目 col 不进星图（Kevin 2026-06-12 产品决策）；项目对象保留在数据层作命题证据。
+//  - 球壳分区布局/聚焦让位机制沿用 v2（Kevin 已验收的交互），旧 facet 投影退役。
 // ════════════════════════════════════════════════════════════════════
 
-interface RawNode {
-  id: string; type?: string; slug?: string; title?: string; name?: string;
-  tags?: string[]; track?: string; ghost?: boolean;
-  facets?: Record<string, string>; self_evo_use?: string; design_idea?: string;
-  no_edge_reason?: { kind?: string; note?: string };
-  [k: string]: unknown;
+export interface RosGraphNode {
+  id: string; slug: string; kind: string; title: string; thesis?: string;
+  problems?: string[]; concepts?: string[]; benchmarks?: string[];
+  cluster?: string; counts?: Record<string, number>;
+  fx?: number; fy?: number; fz?: number; x?: number; y?: number; z?: number;
+  deg?: number;
 }
-interface RawEdge {
-  source?: string; target?: string; from?: string; to?: string;
-  type?: string; evidence?: string; use?: string; confidence?: string | number;
-  layer?: string; hidden?: boolean;
-  [k: string]: unknown;
+export interface RosRelation {
+  relation_type: string; source_object?: string; target_object?: string;
+  confidence?: string; derived_by?: string; boundary?: string; reason?: string;
 }
-export interface RawGraph { nodes?: RawNode[]; edges?: RawEdge[] }
+export interface RosGraphEdge {
+  id?: string; source: string; target: string;
+  primary_type: string; confidence?: string; count?: number;
+  relations?: RosRelation[];
+}
+export interface RosPropEvidence { claim_id: string; owner: string; owner_kind?: string; excerpt?: string }
+export interface RosProposition {
+  id: string; statement: string; state?: string; cluster?: string;
+  possible_synthesis?: string; support?: RosPropEvidence[]; oppose?: RosPropEvidence[];
+}
+export interface RosGraph { schema?: string; nodes?: RosGraphNode[]; edges?: RosGraphEdge[]; propositions?: RosProposition[] }
 
-export interface GNode {
-  id: string; title: string; kind: "paper" | "project" | "ghost" | "other";
-  track: string; tags: string[]; ghost: boolean;
-  facets?: Record<string, string>; selfEvoUse?: string;
-  noEdgeReason?: { kind?: string; note?: string };
-  deg: number;
-  // 3d-force-graph 固定坐标（球壳分区布局）
-  fx?: number; fy?: number; fz?: number;
-  x?: number; y?: number; z?: number;
-}
-export interface GEdge {
-  source: string; target: string; type: string;
-  evidence?: string; use?: string; confidence?: string;
-}
-// 簇综述（群体分析，docs/paradigms/mind-palace-content.md）：这一簇合起来告诉我们什么
-export interface ClusterSynthesis { title?: string; synthesis: string; member_ids?: string[]; updated?: string }
-export type SynthesisDoc = Record<string, ClusterSynthesis>;
-export function findSynthesis(doc: SynthesisDoc | null, memberIds: Set<string>): ClusterSynthesis | null {
-  if (!doc) return null;
-  for (const v of Object.values(doc)) {
-    if (v?.member_ids?.some((m) => memberIds.has(m))) return v;
-  }
-  return null;
-}
-
+export const CLUSTER_LABEL: Record<string, string> = {
+  mem: "记忆", agent: "Agent 工程", eval: "评测", code: "代码理解",
+  skill: "技能参数化", train: "训练信号", infra: "推理设施", data: "数据工厂", 未分区: "未分区",
+};
 export const EDGE_LABEL: Record<string, string> = {
-  improves_on: "取长补短/优化", composes_with: "可合并/前后关联", contradicts: "思路相反",
-  builds_on: "演进自", implements: "实现", shares_method: "共享方法",
-  shares_concept: "共享概念", same_track: "同赛道", same_use_case: "同用例",
-  complements: "互补", references: "引用", related: "关联",
+  evaluates: "实测评测", can_be_evaluated_by: "可被评测（功能）", shares_problem: "同问题底座",
+  tension_with: "张力/路线冲突", complements: "取长补短", compares_with: "同赛道对比",
+  composes_with: "可拼接", supersedes: "替代", precedes: "谱系前作", validates: "互证",
 };
 export const EDGE_COLOR: Record<string, string> = {
-  improves_on: "#f87171", composes_with: "#22d3ee", contradicts: "#fbbf24",
-  builds_on: "#fb923c", implements: "#a78bfa", shares_method: "#34d399",
-  shares_concept: "#c4b5fd", complements: "#67e8f9", related: "#94a3b8",
+  evaluates: "#0e7490", can_be_evaluated_by: "#0891b2", shares_problem: "#cbd5e1",
+  tension_with: "#b91c1c", complements: "#15803d", compares_with: "#b45309",
+  composes_with: "#4338ca", supersedes: "#7c3aed", precedes: "#64748b", validates: "#0f766e",
 };
-// 浅底高对比色板（light theme 宪法；色相拉开 + 高饱和，浅底上彼此可分）
-const TRACK_COLORS = ["#1d4ed8", "#7c3aed", "#0e7490", "#15803d", "#b45309", "#b91c1c", "#be185d", "#4338ca", "#0f766e", "#86198f"];
+const STATE_LABEL: Record<string, { label: string; color: string; bg: string }> = {
+  open: { label: "尚无定论", color: "#64748b", bg: "#f8fafc" },
+  "leaning-support": { label: "证据偏向成立", color: "#15803d", bg: "#f0fdf4" },
+  "leaning-oppose": { label: "证据偏向不成立", color: "#b91c1c", bg: "#fef2f2" },
+  resolved: { label: "已收敛", color: "#0e7490", bg: "#ecfeff" },
+};
 
 export function shortTitle(t: string, max = 30): string {
   const head = t.replace(/\s*[—:：].*$/, "").trim() || t;
   return head.length > max ? head.slice(0, max - 1) + "…" : head;
 }
 
-// ── normalize ──
-export function normalize(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
-  const PAPER = new Set(["paper", "content", "deep-dive", "article"]);
-  const PROJ = new Set(["project", "repo"]);
-  const rawNodes = raw.nodes || [];
-  const ids = new Set(rawNodes.map((n) => n.id));
-  const edges: GEdge[] = [];
-  for (const e of raw.edges || []) {
-    if (e.layer === "mechanical" || e.hidden === true) continue;
-    const s = (e.source || e.from || "") as string;
-    const t = (e.target || e.to || "") as string;
-    if (!s || !t || s === t || !ids.has(s) || !ids.has(t)) continue;
-    edges.push({ source: s, target: t, type: (e.type || "related").toLowerCase(), evidence: e.evidence, use: e.use as string | undefined, confidence: e.confidence != null ? String(e.confidence) : undefined });
-  }
-  const deg = new Map<string, number>();
-  for (const e of edges) { deg.set(e.source, (deg.get(e.source) || 0) + 1); deg.set(e.target, (deg.get(e.target) || 0) + 1); }
+// 浅底高对比色板（light theme 宪法）
+const CLUSTER_COLORS = ["#1d4ed8", "#7c3aed", "#0e7490", "#15803d", "#b45309", "#b91c1c", "#be185d", "#4338ca", "#0f766e", "#86198f"];
 
-  const nodes: GNode[] = rawNodes
-    .filter((n) => n.facets || n.self_evo_use || n.design_idea || n.ghost) // 只画真·内化记忆 + 幽灵紧邻
-    .map((n) => {
-      const t = (n.type || "").toLowerCase();
-      const kind = n.ghost ? "ghost" : PAPER.has(t) ? "paper" : PROJ.has(t) ? "project" : "other";
-      return {
-        id: n.id,
-        title: (n.title || n.name || n.slug || n.id).toString(),
-        kind, ghost: !!n.ghost,
-        track: (n.track || n.tags?.[0] || "未分区").toString(),
-        tags: Array.isArray(n.tags) ? n.tags : [],
-        facets: n.facets, selfEvoUse: n.self_evo_use,
-        noEdgeReason: n.no_edge_reason,
-        deg: deg.get(n.id) || 0,
-      } as GNode;
-    });
-  const nodeIds = new Set(nodes.map((n) => n.id));
-  return { nodes, edges: edges.filter((e) => nodeIds.has(e.source) && nodeIds.has(e.target)) };
-}
-
-// ── 球壳分区布局：track 簇 = 球面"大洲"，成员绕簇心切平面散开后投回球壳 ──
-// R 调大 + spread 调大（Kevin：球粘在一起不好点击）
-export function sphereLayout(nodes: GNode[], R = 430) {
-  const tracks = [...new Set(nodes.map((n) => n.track))];
-  // fibonacci sphere 给每个 track 一个簇心方向
+// ── 球壳分区布局：cluster（正典问题域）= 球面"大洲" ──
+export function sphereLayout(nodes: RosGraphNode[], R = 430) {
+  const clusters = [...new Set(nodes.map((n) => n.cluster || "未分区"))];
   const centers = new Map<string, [number, number, number]>();
-  const k = tracks.length;
-  tracks.forEach((t, i) => {
+  const k = Math.max(1, clusters.length);
+  clusters.forEach((t, i) => {
     const phi = Math.acos(1 - (2 * (i + 0.5)) / k);
     const theta = Math.PI * (1 + Math.sqrt(5)) * i;
     centers.set(t, [Math.sin(phi) * Math.cos(theta), Math.sin(phi) * Math.sin(theta), Math.cos(phi)]);
   });
-  const byTrack = new Map<string, GNode[]>();
+  const byCluster = new Map<string, RosGraphNode[]>();
   for (const n of nodes) {
-    if (!byTrack.has(n.track)) byTrack.set(n.track, []);
-    byTrack.get(n.track)!.push(n);
+    const c = n.cluster || "未分区";
+    if (!byCluster.has(c)) byCluster.set(c, []);
+    byCluster.get(c)!.push(n);
   }
-  for (const [t, members] of byTrack) {
+  for (const [t, members] of byCluster) {
     const c = centers.get(t)!;
-    // 簇内再用小 fibonacci 盘绕簇心散开（切平面），投影回球壳 → 规则的"洲"
     const up: [number, number, number] = Math.abs(c[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
     const tx = norm3(cross3(up, c));
     const ty = cross3(c, tx);
@@ -140,11 +93,10 @@ export function sphereLayout(nodes: GNode[], R = 430) {
         c[1] + (tx[1] * Math.cos(a) + ty[1] * Math.sin(a)) * r,
         c[2] + (tx[2] * Math.cos(a) + ty[2] * Math.sin(a)) * r,
       ]);
-      const rr = m.ghost ? R * 1.12 : R; // 幽灵节点略外壳
-      m.fx = p[0] * rr; m.fy = p[1] * rr; m.fz = p[2] * rr;
+      m.fx = p[0] * R; m.fy = p[1] * R; m.fz = p[2] * R;
     });
   }
-  return { centers, trackColor: (t: string) => TRACK_COLORS[Math.max(0, tracks.indexOf(t)) % TRACK_COLORS.length] };
+  return { centers, clusterColor: (t: string) => CLUSTER_COLORS[Math.max(0, clusters.indexOf(t)) % CLUSTER_COLORS.length] };
 }
 function cross3(a: number[], b: number[]): [number, number, number] {
   return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
@@ -154,10 +106,11 @@ function norm3(v: number[]): [number, number, number] {
   return [v[0] / l, v[1] / l, v[2] / l];
 }
 
-// ── 连通分量（typed 边） ──
-export function componentOf(id: string, edges: GEdge[]): Set<string> {
+// ── 连通分量（同问题底座边不算连通依据，判断型关系才把记忆连成串） ──
+export function componentOf(id: string, edges: RosGraphEdge[]): Set<string> {
   const adj = new Map<string, string[]>();
   for (const e of edges) {
+    if (e.primary_type === "shares_problem") continue;
     if (!adj.has(e.source)) adj.set(e.source, []);
     if (!adj.has(e.target)) adj.set(e.target, []);
     adj.get(e.source)!.push(e.target);
@@ -172,80 +125,148 @@ export function componentOf(id: string, edges: GEdge[]): Set<string> {
   return seen;
 }
 
-// ── 缺口视图（从旧 KnowledgeGraph 迁入，唯一真相） ──
-interface Cluster { tag: string; members: GNode[]; uncovered: GNode[]; density: number }
-function computeClusters(nodes: GNode[], edges: GEdge[]): Cluster[] {
-  const byId = new Map(nodes.map((n) => [n.id, n]));
-  const adj = new Map<string, Set<string>>();
-  for (const e of edges) {
-    if (!adj.has(e.source)) adj.set(e.source, new Set());
-    if (!adj.has(e.target)) adj.set(e.target, new Set());
-    adj.get(e.source)!.add(e.target);
-    adj.get(e.target)!.add(e.source);
-  }
-  const tagGroups = new Map<string, GNode[]>();
-  for (const n of nodes) {
-    if (n.ghost) continue;
-    for (const tag of n.tags) {
-      if (!tagGroups.has(tag)) tagGroups.set(tag, []);
-      tagGroups.get(tag)!.push(n);
-    }
-  }
-  const clusters: Cluster[] = [];
-  for (const [tag, members] of tagGroups) {
-    if (members.length < 2) continue;
-    const memberIds = new Set(members.map((m) => m.id));
-    let density = 0;
-    for (const e of edges) if (memberIds.has(e.source) && memberIds.has(e.target)) density++;
-    const uncoveredIds = new Set<string>();
-    for (const m of members) for (const nb of adj.get(m.id) || []) {
-      if (memberIds.has(nb)) continue;
-      const node = byId.get(nb);
-      if (node?.ghost) uncoveredIds.add(nb);
-    }
-    clusters.push({ tag, members, uncovered: [...uncoveredIds].map((i) => byId.get(i)!).filter(Boolean), density });
-  }
-  clusters.sort((a, b) => (b.uncovered.length * 3 + b.density * 2 + b.members.length) - (a.uncovered.length * 3 + a.density * 2 + a.members.length));
-  return clusters;
+function edgeWidth(e: RosGraphEdge): number {
+  if (e.primary_type === "shares_problem") return 0.4;
+  return e.confidence === "high" ? 1.9 : e.confidence === "medium" ? 1.2 : 0.7;
+}
+function edgeBaseColor(e: RosGraphEdge): string {
+  if (e.primary_type === "shares_problem") return "rgba(148,163,184,0.25)";
+  return EDGE_COLOR[e.primary_type] || "#64748b";
+}
+
+// ── 关系卡（边的对象级展开） ──
+export function RelationCards({ edges, byId }: { edges: RosGraphEdge[]; byId: Map<string, RosGraphNode> }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const judged = edges.filter((e) => e.primary_type !== "shares_problem");
+  const base = edges.filter((e) => e.primary_type === "shares_problem");
+  return (
+    <div className="globe-edges">
+      {judged.map((e, i) => {
+        const a = byId.get(e.source); const b = byId.get(e.target);
+        const key = e.id || `${e.source}|${e.target}|${i}`;
+        const expanded = open === key;
+        const rels = e.relations || [];
+        return (
+          <div key={key} className="globe-edge-card">
+            <div className="globe-edge-head">
+              <span className="globe-edge-type" style={{ color: EDGE_COLOR[e.primary_type] || "#94a3b8" }}>{EDGE_LABEL[e.primary_type] || e.primary_type}</span>
+              <span className="globe-edge-pair">{a ? shortTitle(a.title, 18) : e.source} ↔ {b ? shortTitle(b.title, 18) : e.target}</span>
+              {e.confidence && <span className="globe-edge-conf">置信 {e.confidence}</span>}
+              {rels.length > 1 && (
+                <button onClick={() => setOpen(expanded ? null : key)}
+                  style={{ marginLeft: "auto", fontSize: 11, color: "#2563eb", background: "none", border: "none", cursor: "pointer" }}>
+                  {expanded ? "收起" : `${rels.length} 条对象级关系 ▸`}
+                </button>
+              )}
+            </div>
+            {(expanded ? rels : rels.slice(0, 1)).map((r, j) => (
+              <div key={j} style={{ marginTop: 6, fontSize: 12.5, color: "#475569", borderLeft: "2px solid #e2e8f0", paddingLeft: 9 }}>
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#334155" }}>{r.source_object}</b> → <b style={{ color: "#334155" }}>{r.target_object}</b>
+                  <span style={{ color: "#94a3b8" }}>（{EDGE_LABEL[r.relation_type] || r.relation_type}{r.derived_by === "structural_join" ? " · 结构推导" : r.derived_by === "llm_judgment" ? " · 判定" : ""}）</span>
+                </p>
+                {r.reason && <p style={{ margin: "2px 0 0" }}>{r.reason}</p>}
+                {r.boundary && <p style={{ margin: "2px 0 0", color: "#9a3412" }}>边界：{r.boundary}</p>}
+              </div>
+            ))}
+          </div>
+        );
+      })}
+      {base.length > 0 && (
+        <p className="globe-empty" style={{ marginTop: 8 }}>另有 {base.length} 条「同问题底座」关联（结构推导，不构成判断）。</p>
+      )}
+      {judged.length === 0 && base.length === 0 && <p className="globe-empty">（这串记忆之间暂无已判定关系。）</p>}
+    </div>
+  );
+}
+
+// ── 命题板（群体分析层：科研张力的正反证据） ──
+export function PropositionCards({ props: propositions }: { props: RosProposition[] }) {
+  if (!propositions.length) return null;
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div className="globe-synth-h" style={{ marginBottom: 8 }}>群体视角 · 这一簇在争什么命题</div>
+      <div style={{ display: "grid", gap: 10 }}>
+        {propositions.map((p) => {
+          const st = STATE_LABEL[p.state || "open"] || STATE_LABEL.open;
+          return (
+            <div key={p.id} style={{ border: "1px solid #e0e7ff", background: "#fafbff", borderRadius: 12, padding: "12px 14px" }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: st.color, background: st.bg, padding: "1px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{st.label}</span>
+                <b style={{ fontSize: 13.5, color: "#0f172a" }}>{p.statement}</b>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 8 }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#15803d", marginBottom: 4 }}>正方证据</div>
+                  {(p.support || []).map((s) => (
+                    <p key={s.claim_id} style={{ margin: "0 0 4px", fontSize: 12, color: "#475569" }}>
+                      <b>{s.owner}</b>{s.owner_kind === "project" && <span style={{ color: "#94a3b8" }}>（项目证据）</span>}：{s.excerpt}
+                    </p>
+                  ))}
+                  {!(p.support || []).length && <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>（暂无）</p>}
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#b91c1c", marginBottom: 4 }}>反方证据</div>
+                  {(p.oppose || []).map((s) => (
+                    <p key={s.claim_id} style={{ margin: "0 0 4px", fontSize: 12, color: "#475569" }}>
+                      <b>{s.owner}</b>{s.owner_kind === "project" && <span style={{ color: "#94a3b8" }}>（项目证据）</span>}：{s.excerpt}
+                    </p>
+                  ))}
+                  {!(p.oppose || []).length && <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>（暂无）</p>}
+                </div>
+              </div>
+              {p.possible_synthesis && (
+                <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "#0e7490" }}><b>可能的第三条路：</b>{p.possible_synthesis}</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 // ════════════════════════════════════════════════════════════════════
 export function MindPalaceGlobe() {
-  const [raw, setRaw] = useState<RawGraph | null>(null);
-  const [synth, setSynth] = useState<SynthesisDoc | null>(null);
+  const [raw, setRaw] = useState<RosGraph | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [mode, setMode] = useState<"globe" | "gaps">("globe");
-  const [focus, setFocus] = useState<Set<string> | null>(null); // 选中的连通分量（或单点）
+  const [focus, setFocus] = useState<Set<string> | null>(null);
   const [focusRoot, setFocusRoot] = useState<string | null>(null);
   const [libErr, setLibErr] = useState<string | null>(null);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
   const fgRef = useRef<ReturnType<typeof Object> | null>(null);
-  const dataRef = useRef<{ nodes: GNode[]; edges: GEdge[] } | null>(null);
-  const colorFnRef = useRef<(t: string) => string>(() => "#2563eb");
+  const dataRef = useRef<{ nodes: RosGraphNode[]; edges: RosGraphEdge[] } | null>(null);
   const focusRef = useRef<Set<string> | null>(null);
   focusRef.current = focus;
 
   useEffect(() => {
     let alive = true;
-    fetch("/data/brief/graph.json", { cache: "no-cache" })
+    fetch("/data/brief/ros-graph.json", { cache: "no-cache" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
       .then((d) => alive && setRaw(d))
       .catch((e) => alive && setErr(e?.message || String(e)));
-    fetch("/data/brief/cluster-synthesis.json", { cache: "no-cache" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => alive && setSynth(d))
-      .catch(() => alive && setSynth(null));
     return () => { alive = false; };
   }, []);
 
-  const { nodes, edges } = useMemo(() => (raw ? normalize(raw) : { nodes: [], edges: [] }), [raw]);
-  const clusters = useMemo(() => computeClusters(nodes, edges), [nodes, edges]);
-  const ghostCount = useMemo(() => nodes.filter((n) => n.ghost).length, [nodes]);
+  const { nodes, edges } = useMemo(() => {
+    const ns = (raw?.nodes || []).filter((n) => n.kind === "paper");
+    const ids = new Set(ns.map((n) => n.id));
+    const es = (raw?.edges || []).filter((e) => ids.has(e.source) && ids.has(e.target) && e.source !== e.target);
+    const deg = new Map<string, number>();
+    for (const e of es) {
+      if (e.primary_type === "shares_problem") continue;
+      deg.set(e.source, (deg.get(e.source) || 0) + 1);
+      deg.set(e.target, (deg.get(e.target) || 0) + 1);
+    }
+    for (const n of ns) n.deg = deg.get(n.id) || 0;
+    return { nodes: ns, edges: es };
+  }, [raw]);
+  const propositions = useMemo(() => raw?.propositions || [], [raw]);
 
-  // ── 3D 球实例化（懒加载库；只在 globe 模式 + 有数据时） ──
+  // ── 3D 球实例化（懒加载库） ──
   useEffect(() => {
-    if (mode !== "globe" || !nodes.length || !mountRef.current) return;
+    if (!nodes.length || !mountRef.current) return;
     let disposed = false;
     const el = mountRef.current;
     (async () => {
@@ -253,49 +274,55 @@ export function MindPalaceGlobe() {
         const mod = await import("3d-force-graph");
         if (disposed) return;
         const ForceGraph3D = mod.default;
-        const { trackColor } = sphereLayout(nodes);
-        colorFnRef.current = trackColor;
+        const { clusterColor } = sphereLayout(nodes);
         dataRef.current = { nodes, edges };
 
         const fg = new ForceGraph3D(el)
           .width(el.clientWidth).height(el.clientHeight)
-          .backgroundColor("#f4f7fc") // 浅底（light theme 宪法；Kevin：不理解为什么黑底）
+          .backgroundColor("#f4f7fc") // 浅底（light theme 宪法）
           .graphData({ nodes: nodes as object[], links: edges.map((e) => ({ ...e })) as object[] })
-          .cooldownTicks(0) // 固定坐标布局，不跑力学
+          .cooldownTicks(0)
           .enableNodeDrag(false)
           .showNavInfo(false)
           .nodeId("id")
           .nodeRelSize(5)
-          .nodeLabel((o: object) => { const n = o as GNode; return `<div style="font:12.5px sans-serif;color:#0f172a;background:rgba(255,255,255,.96);border:1px solid #cbd5e1;padding:5px 9px;border-radius:7px;max-width:300px;box-shadow:0 4px 14px rgba(15,23,42,.12)">${n.title}${n.ghost ? " · 幽灵（未深读）" : ""}</div>`; })
-          .nodeVal((o: object) => { const n = o as GNode; return n.ghost ? 1.5 : 2.5 + Math.min(6, n.deg * 1.2); })
+          .nodeLabel((o: object) => {
+            const n = o as RosGraphNode;
+            return `<div style="font:12.5px sans-serif;color:#0f172a;background:rgba(255,255,255,.96);border:1px solid #cbd5e1;padding:5px 9px;border-radius:7px;max-width:320px;box-shadow:0 4px 14px rgba(15,23,42,.12)"><b>${n.title}</b>${n.thesis ? `<br/><span style="color:#475569">${n.thesis.slice(0, 110)}…</span>` : ""}</div>`;
+          })
+          .nodeVal((o: object) => {
+            const n = o as RosGraphNode;
+            const substance = (n.counts?.claims || 0) + (n.counts?.mechanisms || 0);
+            return 2.5 + Math.min(5, substance * 0.5) + Math.min(4, (n.deg || 0) * 0.9);
+          })
           .nodeColor((o: object) => {
-            const n = o as GNode;
+            const n = o as RosGraphNode;
             const f = focusRef.current;
-            const base = n.ghost ? "#94a3b8" : trackColor(n.track);
+            const base = clusterColor(n.cluster || "未分区");
             if (!f) return base;
             return f.has(n.id) ? base : "rgba(148,163,184,0.18)";
           })
           .nodeOpacity(0.95)
           .linkColor((o: object) => {
-            const l = o as { type?: string; source?: GNode | string; target?: GNode | string };
+            const l = o as RosGraphEdge & { source?: RosGraphNode | string; target?: RosGraphNode | string };
             const f = focusRef.current;
-            const c = EDGE_COLOR[l.type || "related"] || "#64748b";
+            const c = edgeBaseColor(l as RosGraphEdge);
             if (!f) return c;
-            const s = typeof l.source === "object" ? l.source?.id : l.source;
-            const t = typeof l.target === "object" ? l.target?.id : l.target;
-            return s && t && f.has(s) && f.has(t) ? c : "rgba(148,163,184,0.08)";
+            const s = typeof l.source === "object" ? (l.source as RosGraphNode)?.id : l.source;
+            const t = typeof l.target === "object" ? (l.target as RosGraphNode)?.id : l.target;
+            return s && t && f.has(s as string) && f.has(t as string) ? c : "rgba(148,163,184,0.06)";
           })
-          .linkWidth((o: object) => { const l = o as { type?: string }; return l.type === "improves_on" || l.type === "composes_with" ? 1.6 : 0.8; })
+          .linkWidth((o: object) => edgeWidth(o as RosGraphEdge))
           .linkOpacity(0.55)
-          .linkDirectionalParticles((o: object) => { const l = o as { type?: string }; return l.type === "improves_on" || l.type === "builds_on" ? 2 : 0; })
+          .linkDirectionalParticles((o: object) => {
+            const l = o as RosGraphEdge;
+            return l.primary_type === "evaluates" || l.primary_type === "supersedes" ? 2 : 0;
+          })
           .linkDirectionalParticleWidth(1.6)
-          .onNodeClick((o: object) => focusOn(o as GNode))
-          .onBackgroundClick(() => {
-            // 聚焦中误点空白不再清空（球挤时误点频发导致"解释会消失"）——退出只走「返回全球」按钮
-            if (focusRef.current) return;
-          });
-        // 聚焦逻辑（点击 / ?focus= 深链 / 测试钩子共用）：相机沿该点方向推近，画布让位（CSS）→"移到一边放大"
-        function focusOn(n: GNode) {
+          .onNodeClick((o: object) => focusOn(o as RosGraphNode))
+          .onBackgroundClick(() => { if (focusRef.current) return; });
+
+        function focusOn(n: RosGraphNode) {
           const comp = componentOf(n.id, dataRef.current!.edges);
           setFocus(comp);
           setFocusRoot(n.id);
@@ -307,14 +334,14 @@ export function MindPalaceGlobe() {
         fg.cameraPosition({ x: 0, y: 0, z: 980 });
         fgRef.current = fg as object;
 
-        // ?focus=<id> 深链：检索区/项目页可直达某条记忆的球聚焦（也作自动化验证钩子）
+        // ?focus=<id|slug|title> 深链（检索区/自动化验证钩子共用）
         const focusParam = new URLSearchParams(location.search).get("focus");
         if (focusParam) {
-          const target = nodes.find((x) => x.id === focusParam || x.title === focusParam);
+          const target = nodes.find((x) => x.id === focusParam || x.slug === focusParam || x.title === focusParam);
           if (target) setTimeout(() => focusOn(target), 400);
         }
         (window as unknown as { __mpFocus?: (id: string) => boolean }).__mpFocus = (id: string) => {
-          const target = nodes.find((x) => x.id === id || x.title.includes(id));
+          const target = nodes.find((x) => x.id === id || x.slug === id || x.title.includes(id));
           if (target) { focusOn(target); return true; }
           return false;
         };
@@ -335,22 +362,38 @@ export function MindPalaceGlobe() {
       el.innerHTML = "";
       fgRef.current = null;
     };
-  }, [mode, nodes, edges]);
+  }, [nodes, edges]);
 
-  // focus 变化 → 重画颜色 + 画布让位动画由 CSS 完成
+  // focus 变化 → 画布尺寸同步（CSS 过渡后），防 WebGL 画布盖住面板
   useEffect(() => {
-    const fg = fgRef.current as { refresh?: () => void } | null;
-    fg?.refresh?.();
+    const fg = fgRef.current as { width?: (n: number) => void; height?: (n: number) => void; refresh?: () => void } | null;
+    const el = mountRef.current;
+    if (!fg) return;
+    fg.refresh?.();
+    if (!el) return;
+    const t = setTimeout(() => {
+      fg.width?.(el.clientWidth);
+      fg.height?.(el.clientHeight);
+      fg.refresh?.();
+    }, 650);
+    return () => clearTimeout(t);
   }, [focus]);
 
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
   const focusNodes = useMemo(() => (focus ? [...focus].map((i) => byId.get(i)!).filter(Boolean) : []), [focus, byId]);
   const focusEdges = useMemo(() => {
-    if (!focus) return [] as GEdge[];
+    if (!focus) return [] as RosGraphEdge[];
     return edges.filter((e) => focus.has(e.source) && focus.has(e.target));
   }, [focus, edges]);
   const rootNode = focusRoot ? byId.get(focusRoot) : null;
   const isCluster = focusNodes.length > 1;
+  const focusProps = useMemo(() => {
+    if (!focus) return [] as RosProposition[];
+    const slugs = new Set(focusNodes.map((n) => n.slug));
+    return propositions.filter((p) =>
+      (p.support || []).some((s) => slugs.has(s.owner)) || (p.oppose || []).some((s) => slugs.has(s.owner)));
+  }, [focus, focusNodes, propositions]);
+  const { obj: rootObj, loading: rootLoading } = useRosObject(rootNode && !isCluster ? rootNode.slug : null);
 
   return (
     <main className="page kg-page">
@@ -359,23 +402,18 @@ export function MindPalaceGlobe() {
           <div className="eyebrow">Mind Palace · AI 记忆球</div>
           <h1>星图 · 记忆球</h1>
           <p>
-            这是<b>AI 的自我记忆库</b>（区别于上方检索区=给你学习用的蒸馏）。深读内化的论文/项目按<b>主题分区</b>固定在球壳上，
-            <b>已核验的语义边</b>连接它们。<b>拖动旋转 · 滚轮缩放 · 点一个点/一串点</b> → 球让位、面板展开关系分析。
+            这是<b>AI 的自我记忆库</b>——只含<b>深读过的文章</b>。每篇被拆成主张/机制/假设/失败模式等可推理对象，
+            按<b>问题域分区</b>固定在球壳上；连线=<b>带证据与边界的对象级关系</b>（淡虚线=同问题底座，彩线=已判定关系，线越粗置信越高）。
+            <b>拖动旋转 · 滚轮缩放 · 点一个点</b> → 球让位、面板展开。
           </p>
-        </div>
-        <div className="kg-legend">
-          <div className="kg-modetabs">
-            <button className={`kg-modetab ${mode === "globe" ? "on" : ""}`} onClick={() => setMode("globe")}>记忆球</button>
-            <button className={`kg-modetab ${mode === "gaps" ? "on" : ""}`} onClick={() => setMode("gaps")}>缺口视图{ghostCount ? ` · ${ghostCount}` : ""}</button>
-          </div>
         </div>
       </div>
 
-      {err && <div className="notice error">知识图谱加载失败：{err}</div>}
+      {err && <div className="notice error">记忆球加载失败：{err}</div>}
       {libErr && <div className="notice error">3D 引擎加载失败：{libErr}（可刷新重试）</div>}
       {!err && !raw && <div className="kg-loading">加载记忆球…</div>}
 
-      {raw && mode === "globe" && (
+      {raw && (
         <div className={`globe-stage ${focus ? "focused" : ""}`}>
           <div className="globe-canvas" ref={mountRef} />
           {focus && (
@@ -390,122 +428,36 @@ export function MindPalaceGlobe() {
               {isCluster ? (
                 <>
                   <div className="globe-panel-kicker">关系分析 · 这一串记忆为什么连在一起</div>
-                  <h2 className="globe-panel-title">{focusNodes.length} 条记忆的密切联系</h2>
-                  {(() => { const s = findSynthesis(synth, focus!); return s ? (
-                    <div className="globe-synth">
-                      <div className="globe-synth-h">群体视角 · 这一簇合起来告诉我们什么</div>
-                      <p>{s.synthesis}</p>
-                    </div>
-                  ) : null; })()}
+                  <h2 className="globe-panel-title">{focusNodes.length} 篇文章的对象级关系</h2>
+                  <PropositionCards props={focusProps} />
                   <div className="globe-members">
                     {focusNodes.map((n) => (
-                      <span key={n.id} className={`globe-member ${n.id === focusRoot ? "root" : ""} ${n.ghost ? "ghost" : ""}`}>
+                      <a key={n.id} className={`globe-member ${n.id === focusRoot ? "root" : ""}`}
+                        href={`/mind-palace/node/${encodeURIComponent(n.id)}`}>
                         {shortTitle(n.title, 24)}
-                      </span>
+                      </a>
                     ))}
                   </div>
-                  <div className="globe-edges">
-                    {focusEdges.map((e, i) => {
-                      const a = byId.get(e.source); const b = byId.get(e.target);
-                      return (
-                        <div key={i} className="globe-edge-card">
-                          <div className="globe-edge-head">
-                            <span className="globe-edge-type" style={{ color: EDGE_COLOR[e.type] || "#94a3b8" }}>{EDGE_LABEL[e.type] || e.type}</span>
-                            <span className="globe-edge-pair">{a ? shortTitle(a.title, 18) : e.source} ↔ {b ? shortTitle(b.title, 18) : e.target}</span>
-                            {e.confidence && <span className="globe-edge-conf">置信 {e.confidence}</span>}
-                          </div>
-                          {e.use && <p className="globe-edge-use"><b>怎么利用：</b>{e.use}</p>}
-                          {e.evidence && <p className="globe-edge-ev"><b>证据：</b>{e.evidence}</p>}
-                        </div>
-                      );
-                    })}
-                    {focusEdges.length === 0 && <p className="globe-empty">（这串点之间的 typed 边数据缺失。）</p>}
-                  </div>
+                  <RelationCards edges={focusEdges} byId={byId} />
                 </>
               ) : rootNode ? (
                 <>
-                  <div className="globe-panel-kicker">{rootNode.ghost ? "幽灵节点 · 未深读紧邻" : "孤立记忆 · 还没连上边"}</div>
-                  <h2 className="globe-panel-title">{rootNode.title}</h2>
-                  {rootNode.facets && (
-                    <div className="globe-core">
-                      {rootNode.facets.problem_solved && <p><b>解决什么：</b>{rootNode.facets.problem_solved}</p>}
-                      {rootNode.facets.method && <p><b>用什么方法：</b>{rootNode.facets.method}</p>}
-                      {rootNode.facets.result && <p><b>展现结果：</b>{rootNode.facets.result}</p>}
-                    </div>
-                  )}
-                  <div className="globe-noedge">
-                    <b>为什么还没连边？</b>
-                    <p>
-                      {rootNode.ghost
-                        ? "它是已知但还没深读的紧邻——深读后蒸馏 facet 才能进关系判定。"
-                        : rootNode.noEdgeReason?.note
-                          ? rootNode.noEdgeReason.note + (rootNode.noEdgeReason.kind === "no_real_relation" ? "（判定过候选，确实没有可证实的语义关系——诚实不硬凑）" : "（还没进入候选比较，关系引擎下轮覆盖）")
-                          : "关系引擎按 NO_EDGE 默认运行：要么判定过候选无真实关系，要么尚未与它比较——不硬凑边。"}
-                    </p>
+                  <div className="globe-panel-kicker">
+                    {CLUSTER_LABEL[rootNode.cluster || ""] || rootNode.cluster || "记忆"} · {rootNode.counts?.claims || 0} 主张 · {rootNode.counts?.mechanisms || 0} 机制
                   </div>
-                  {rootNode.selfEvoUse && (
-                    <div className="globe-core" style={{ marginTop: 10 }}>
-                      <p><b>能否用于研究/自进化：</b>{rootNode.selfEvoUse}</p>
-                    </div>
+                  <h2 className="globe-panel-title">{rootNode.title}</h2>
+                  {rootLoading && <p className="kg-loading">加载对象层…</p>}
+                  {rootObj && <RosObjectPanel obj={rootObj} compact />}
+                  {!rootLoading && !rootObj && rootNode.thesis && (
+                    <div className="globe-core"><p>{rootNode.thesis}</p></div>
                   )}
+                  {focusProps.length > 0 && <div style={{ marginTop: 12 }}><PropositionCards props={focusProps} /></div>}
                 </>
               ) : null}
             </aside>
           )}
         </div>
       )}
-
-      {raw && mode === "gaps" && <GapView clusters={clusters} />}
     </main>
-  );
-}
-
-// ── 缺口视图（迁入版：纯列表，点击不再依赖 2D 图） ──
-function GapView({ clusters }: { clusters: Cluster[] }) {
-  const withGaps = clusters.filter((c) => c.uncovered.length > 0);
-  const dense = clusters.filter((c) => c.uncovered.length === 0).slice(0, 12);
-  return (
-    <div className="kg-gaps">
-      <div className="kg-gaps-intro">
-        缺口发现 = 记忆库的杀手用法：<b>你在某个簇投入很深（深读多），但它的强关联邻居还没覆盖</b>（幽灵节点 / 未深读）。
-        这些就是「该深读谁」的信号，反哺选品。
-      </div>
-      {withGaps.length === 0 && (
-        <div className="kg-gaps-empty">当前数据里还没算出「有未覆盖邻居的密集簇」。</div>
-      )}
-      {withGaps.map((c) => (
-        <div key={c.tag} className="kg-gapcard">
-          <div className="kg-gapcard-head">
-            <div className="kg-gapcard-tag">{c.tag}</div>
-            <div className="kg-gapcard-stat">
-              深读 <b>{c.members.length}</b> · 簇内连边 {c.density} · 未覆盖紧邻 <b className="kg-gap-n">{c.uncovered.length}</b>
-            </div>
-          </div>
-          <div className="kg-gapcard-body">
-            <div className="kg-gapcol">
-              <div className="kg-gapcol-h">已深读（投入深）</div>
-              <div className="kg-chiprow">
-                {c.members.slice(0, 8).map((m) => <span key={m.id} className="kg-memberchip">{shortTitle(m.title, 22)}</span>)}
-                {c.members.length > 8 && <span className="kg-more">+{c.members.length - 8}</span>}
-              </div>
-            </div>
-            <div className="kg-gapcol">
-              <div className="kg-gapcol-h kg-gapcol-h--gap">⚠ 紧邻但还没深读（建议深读）</div>
-              <div className="kg-chiprow">
-                {c.uncovered.map((u) => <span key={u.id} className="kg-ghostchip" title={u.title}>{shortTitle(u.title, 26)}</span>)}
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-      {dense.length > 0 && (
-        <div className="kg-densesec">
-          <div className="kg-densesec-h">投入最深的簇（暂无缺口）</div>
-          <div className="kg-chiprow">
-            {dense.map((c) => <span key={c.tag} className="kg-densechip">{c.tag} <em>{c.members.length}</em></span>)}
-          </div>
-        </div>
-      )}
-    </div>
   );
 }

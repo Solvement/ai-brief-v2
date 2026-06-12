@@ -71,3 +71,100 @@
   aliases: [scoped retrieval, wings/rooms/drawers, namespace-scoped memory]
   distinct_from: [mem.external-vector-store]
   conflicts_with: []
+
+# ——— 2026-06-12 波次 1 收口转正（kvarn/tropd/longtracerl/latentskill/scaling）———
+- id: train.entity-level-process-reward
+  name: 实体级过程奖励
+  type: training-scheme
+  description: 用可枚举的实体/要点召回构造逐跳稠密过程分（rubric reward），替代整轨迹单一终局信号。（longtracerl）
+  aliases: [rubric reward, entity recall process reward]
+  distinct_from: [train.terminal-credit-broadcast]
+  conflicts_with: []
+
+- id: train.outcome-gated-process-reward
+  name: 结果门控的过程奖励
+  type: training-scheme
+  description: 过程分只在最终结果正确（positive-only）时发放——防过程分被堆要素刷分（reward hacking 的结构解）。（longtracerl）
+  aliases: [positive-only process reward, outcome-gated reward]
+  distinct_from: [train.entity-level-process-reward]
+  conflicts_with: []
+
+- id: data.trajectory-mined-hard-distractor
+  name: 轨迹挖掘难负例
+  type: mechanism-family
+  description: 从 agent 自身轨迹分层挖掘难度严格递增的干扰项/负例，替代随机负例的数据工厂。（longtracerl）
+  aliases: [traj-tiered distractors, trajectory-mined negatives]
+  distinct_from: []
+  conflicts_with: []
+
+- id: train.trust-region-supervision-gating
+  name: 信任区监督门控
+  type: training-scheme
+  description: 逐 token 按可信度（如投机解码接受率）门控监督强度，离群区温和回退——分区可靠度门的训练形态。（tropd）
+  aliases: [trust-region gating, per-token supervision trust]
+  distinct_from: [train.terminal-credit-broadcast, train.outcome-gated-process-reward]
+  conflicts_with: []
+
+- id: quant.dual-axis-variance-normalization
+  name: 双轴方差归一化量化
+  type: mechanism-family
+  description: KV cache 量化前先做（Hadamard 去相干 +）按双轴方差归一化，再低位 RTN——治离群值主导误差。（kvarn）
+  aliases: [VarN, variance normalization quantization]
+  distinct_from: []
+  conflicts_with: []
+
+- id: quant.pseudo-decode-protocol
+  name: 伪解码评测协议
+  type: eval-dimension
+  description: 量化评测时模拟真实 decode 的逐步误差累积（而非一次性 prefill 打分），还原部署条件。（kvarn）
+  aliases: [pseudo-decode evaluation]
+  distinct_from: []
+  conflicts_with: []
+
+- id: skill.weight-space-skill
+  name: 权重空间技能
+  type: mechanism-family
+  description: 把 agent 的文本技能/经验编译进 LoRA 等参数增量，调用=加载权重而非塞 prompt。（latentskill/scaling 同族）
+  aliases: [weight-space skill, LoRA skill]
+  distinct_from: [mem.local-verbatim-log, mem.external-vector-store]
+  conflicts_with: []
+
+- id: skill.hypernetwork-lora-compiler
+  name: 超网络技能编译器
+  type: mechanism-family
+  description: 用 hypernetwork 把文本技能描述直接编译成 LoRA 参数（免每技能单独训练）。（latentskill）
+  aliases: [skill compiler]
+  distinct_from: [skill.weight-space-skill]
+  conflicts_with: []
+
+- id: skill.component-level-lora-arithmetic
+  name: 组件级 LoRA 算术
+  type: mechanism-family
+  description: 在组件粒度对 LoRA 做加减组合实现技能合成/移除，而非整 adapter 互斥切换。（latentskill）
+  aliases: [LoRA arithmetic, skill composition]
+  distinct_from: []
+  conflicts_with: []
+
+- id: skill.parametric-local-state
+  name: 参数化本地适应状态
+  type: mechanism-family
+  description: 把个人/局部适应状态存进每用户 PEFT 参数（而非外部记忆库）——「百万个人模型」路线的承重概念。（scaling）
+  aliases: [per-user adapter, parametric personalization]
+  distinct_from: [mem.external-vector-store, mem.local-verbatim-log]
+  conflicts_with: []
+
+- id: skill.lora-as-memory-capacity
+  name: LoRA 记忆容量律
+  type: eval-dimension
+  description: 把事实塞进低秩参数的容量极限与崩塌行为——参数化记忆路线的边界测量。（scaling）
+  aliases: [LoRA memory capacity]
+  distinct_from: []
+  conflicts_with: []
+
+- id: skill.adapter-population-governance
+  name: adapter 群体治理
+  type: mechanism-family
+  description: 大规模 adapter 群体的生命周期治理（写入策略/修订/退役），与 mem.lifecycle-management 同问题不同介质。（scaling）
+  aliases: [MinT governance, adapter lifecycle]
+  distinct_from: [mem.fixed-rule-hooks]
+  conflicts_with: []

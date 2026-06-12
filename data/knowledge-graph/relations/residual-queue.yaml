@@ -2,6 +2,18 @@
   target: paper/memoryagentbench
   shared_problems:
     - mem.lifecycle-management
+- source: paper/agemem
+  target: paper/scaling
+  shared_problems:
+    - mem.lifecycle-management
+- source: paper/latentskill
+  target: paper/scaling
+  shared_problems:
+    - skill.knowledge-parameterization
+- source: paper/longtracerl
+  target: paper/scaling
+  shared_problems:
+    - train.credit-assignment
 - source: paper/memoryagentbench
   target: project/rohitg00-agentmemory
   shared_problems:

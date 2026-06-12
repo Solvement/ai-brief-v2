@@ -181,6 +181,24 @@
 - id: r-0011
   source:
     type: mechanism
+    id: scaling.m3
+  target:
+    type: benchmark
+    id: bench.memoryagentbench
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §6 Infrastructure / MinT + tables/infrastructure/*.tex
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem mem.lifecycle-management is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
+  status: candidate
+- id: r-0012
+  source:
+    type: mechanism
     id: supermemory.m1
   target:
     type: benchmark
@@ -196,7 +214,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.staleness-conflict is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0012
+- id: r-0013
   source:
     type: mechanism
     id: supermemory.m2
@@ -214,7 +232,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.longmemeval (functional join, not an actual test run)"
   status: candidate
-- id: r-0013
+- id: r-0014
   source:
     type: mechanism
     id: supermemory.m2
@@ -232,7 +250,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0014
+- id: r-0015
   source:
     type: mechanism
     id: mempalace.m2
@@ -250,7 +268,7 @@
     value: medium
     reason: "same_concept_family: both mechanisms attach to mem.external-vector-store"
   status: candidate
-- id: r-0015
+- id: r-0016
   source:
     type: benchmark
     id: bench.longmemeval
@@ -268,7 +286,7 @@
     value: medium
     reason: "evaluates: object declares an actual test record on bench.longmemeval (canonical.benchmarks = tested relation by ruling 2026-06-12)"
   status: candidate
-- id: r-0016
+- id: r-0017
   source:
     type: benchmark
     id: bench.longmemeval
@@ -286,7 +304,7 @@
     value: medium
     reason: "evaluates: object declares an actual test record on bench.longmemeval (canonical.benchmarks = tested relation by ruling 2026-06-12)"
   status: candidate
-- id: r-0017
+- id: r-0018
   source:
     type: object
     id: paper/agemem
@@ -304,7 +322,25 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management"
   status: candidate
-- id: r-0018
+- id: r-0019
+  source:
+    type: object
+    id: paper/agemem
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to mem.lifecycle-management"
+  status: candidate
+- id: r-0020
   source:
     type: object
     id: paper/agemem
@@ -322,7 +358,61 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management"
   status: candidate
-- id: r-0019
+- id: r-0021
+  source:
+    type: object
+    id: paper/latentskill
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to skill.knowledge-parameterization"
+  status: candidate
+- id: r-0022
+  source:
+    type: object
+    id: paper/longtracerl
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to train.credit-assignment"
+  status: candidate
+- id: r-0023
+  source:
+    type: object
+    id: paper/memoryagentbench
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to mem.lifecycle-management"
+  status: candidate
+- id: r-0024
   source:
     type: object
     id: paper/memoryagentbench
@@ -340,7 +430,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0020
+- id: r-0025
   source:
     type: object
     id: paper/memoryagentbench
@@ -358,7 +448,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management, mem.retrieval-precision"
   status: candidate
-- id: r-0021
+- id: r-0026
   source:
     type: object
     id: paper/memoryagentbench
@@ -376,7 +466,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision, mem.staleness-conflict"
   status: candidate
-- id: r-0022
+- id: r-0027
   source:
     type: object
     id: project/mempalace
@@ -394,7 +484,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0023
+- id: r-0028
   source:
     type: object
     id: project/mempalace
@@ -412,7 +502,25 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0024
+- id: r-0029
+  source:
+    type: object
+    id: project/rohitg00-agentmemory
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to mem.lifecycle-management"
+  status: candidate
+- id: r-0030
   source:
     type: object
     id: project/rohitg00-agentmemory
@@ -430,7 +538,43 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0025
+- id: r-0031
+  source:
+    type: object
+    id: paper/agemem
+  target:
+    type: object
+    id: paper/longtracerl
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: agemem.a1, agemem.a2, agemem.a3
+    target: longtracerl.a1, longtracerl.a2, longtracerl.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: train.terminal-credit-broadcast is distinct_from/conflicts_with train.entity-level-process-reward; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0032
+  source:
+    type: object
+    id: paper/agemem
+  target:
+    type: object
+    id: paper/tropd
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: agemem.a1, agemem.a2, agemem.a3
+    target: tropd.a1, tropd.a2, tropd.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: train.terminal-credit-broadcast is distinct_from/conflicts_with train.trust-region-supervision-gating; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0033
   source:
     type: object
     id: paper/agemem
@@ -448,7 +592,97 @@
     value: medium
     reason: "conflicts_assumption: mem.learned-policy-controller is distinct_from/conflicts_with mem.fixed-rule-hooks; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0026
+- id: r-0034
+  source:
+    type: object
+    id: paper/latentskill
+  target:
+    type: object
+    id: paper/memoryagentbench
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: latentskill.a1, latentskill.a2, latentskill.a3, latentskill.a4
+    target: memoryagentbench.a1, memoryagentbench.a2, memoryagentbench.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: skill.weight-space-skill is distinct_from/conflicts_with mem.external-vector-store; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0035
+  source:
+    type: object
+    id: paper/latentskill
+  target:
+    type: object
+    id: project/mempalace
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: latentskill.a1, latentskill.a2, latentskill.a3, latentskill.a4
+    target: mempalace.a1, mempalace.a2, mempalace.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: skill.weight-space-skill is distinct_from/conflicts_with mem.local-verbatim-log; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0036
+  source:
+    type: object
+    id: paper/latentskill
+  target:
+    type: object
+    id: project/supermemory
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: latentskill.a1, latentskill.a2, latentskill.a3, latentskill.a4
+    target: supermemory.a1, supermemory.a2, supermemory.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: skill.weight-space-skill is distinct_from/conflicts_with mem.external-vector-store; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0037
+  source:
+    type: object
+    id: paper/longtracerl
+  target:
+    type: object
+    id: paper/tropd
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: longtracerl.a1, longtracerl.a2, longtracerl.a3
+    target: tropd.a1, tropd.a2, tropd.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: train.outcome-gated-process-reward is distinct_from/conflicts_with train.trust-region-supervision-gating; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0038
+  source:
+    type: object
+    id: paper/memoryagentbench
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: memoryagentbench.a1, memoryagentbench.a2, memoryagentbench.a3
+    target: scaling.a1, scaling.a2, scaling.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: mem.external-vector-store is distinct_from/conflicts_with skill.parametric-local-state; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0039
   source:
     type: object
     id: paper/memoryagentbench
@@ -466,7 +700,7 @@
     value: medium
     reason: "conflicts_assumption: mem.external-vector-store is distinct_from/conflicts_with mem.local-verbatim-log; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0027
+- id: r-0040
   source:
     type: object
     id: paper/memoryagentbench
@@ -484,7 +718,43 @@
     value: medium
     reason: "conflicts_assumption: mem.external-vector-store is distinct_from/conflicts_with mem.fact-graph; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0028
+- id: r-0041
+  source:
+    type: object
+    id: paper/scaling
+  target:
+    type: object
+    id: project/supermemory
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: scaling.a1, scaling.a2, scaling.a3
+    target: supermemory.a1, supermemory.a2, supermemory.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: skill.parametric-local-state is distinct_from/conflicts_with mem.external-vector-store; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0042
+  source:
+    type: object
+    id: project/mempalace
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: mempalace.a1, mempalace.a2, mempalace.a3
+    target: scaling.a1, scaling.a2, scaling.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: mem.local-verbatim-log is distinct_from/conflicts_with skill.parametric-local-state; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0043
   source:
     type: object
     id: project/mempalace
@@ -501,4 +771,22 @@
   confidence:
     value: medium
     reason: "conflicts_assumption: mem.local-verbatim-log is distinct_from/conflicts_with mem.fact-graph; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0044
+  source:
+    type: object
+    id: project/rohitg00-agentmemory
+  target:
+    type: object
+    id: paper/scaling
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: rohitg00-agentmemory.a1, rohitg00-agentmemory.a2, rohitg00-agentmemory.a3
+    target: scaling.a1, scaling.a2, scaling.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: mem.fixed-rule-hooks is distinct_from/conflicts_with skill.adapter-population-governance; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
