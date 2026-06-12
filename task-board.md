@@ -16,10 +16,10 @@
 
 ### KG-4 · Research Object Store 记忆本体重构（plan `docs/plans/KG-4-research-object-store.md`，Kevin 2026-06-12 拍板）
 - **大方向**：以高质量为唯一标准**重构记忆本体、保留基础设施**——「论文级 facet + 论文级边」→ 六层对象库（L0 锚点→L1 claims/mechanisms/assumptions/failure_modes/trigger_hooks/exam_questions→L2 正典注册层→L3 结构推导关系→L4 视图=投影→L5 考题盲测→L6 迁移钩子）。依据=GPT 分析 1/2/3 + Claude 架构共识。**本条目取代 KG-2/KG-3 的范式口径**（其基础设施成果保留）。
-- **小方向**：正典 `docs/paradigms/research-object-store.md` ✅；旧正典 superseded/收编 ✅；registry 4 表种子 ✅（commit 24397b1）；memory 簇 5 篇试点蒸馏（5×opus 并行）+ codex 三脚本（validate-objects/derive-relations/exam-blindtest）跑批中。
-- **阶段**：试点执行中（蒸馏+后端并行）。
-- **阻塞**：无。
-- **交付结论**：—
+- **小方向**：正典 `docs/paradigms/research-object-store.md` ✅；旧正典 superseded/收编 ✅；registry 4 表种子+收口 ✅；memory 簇 5 篇试点蒸馏 ✅（5×opus 并行）；codex 三脚本 ✅；关系两层（结构推导+残差判定）✅；命题 3 个正反证据回填 ✅；盲测+冷审 ✅。
+- **阶段**：✅ 试点全链完成（commit 24397b1 → b2e3c30 → 3818223，feat 分支）。下一切片=前端投影切换+旧投影退役、存量回填。
+- **阻塞**：无（部署未做：本轮纯数据/脚本层，且全站 verify 有他人会话未提交 facet 改动的既有红，见下）。
+- **交付结论**：① 5/5 对象过 `npm run kg:ros:validate`（0 err 0 warn；claims 带逐字锚+cannot_prove，trigger_hooks/考题/self_evo_verdict 齐）。② 关系=28 derived（13 功能 medium/2 实测 evaluates/4 聚合 tension/8 底座/1 对比）+ 4 judged 边 + 4 NO_EDGE 判例，`kg:ros:derive:check` 幂等绿；修了推导引擎两缺陷（assumption 笛卡尔积 36→4、功能关系 high→medium 按判边口径）。③ 独立冷审双 PASS：agemem(arxiv HTML 10 锚逐字)+mempalace(本地 clone 12 锚逐字)数字零误，1 个出处标注瑕疵已修。④ 盲测（agemem，A=只给定位 vs B=给对象库，sonnet 双盲作答+opus 评卷）：B 胜 3/4 题，证据可追溯轴 A 全程 0 分 B 满分，Q2 实证对象库**纠正了 A 自信的机制误解**（GRPO 终局广播被 A 误解为逐步打分）；裁决=无字段需删，缺口在题目覆盖（c4/c6 零消费，下轮补题）。⑤ ROS 测试 7/7 绿；`ops:baseline:diff` 唯一新红=validate-mind-palace，已用 `git show --name-only` 证明来自他人会话未提交的旧 facet 改动（M memoryagentbench.yaml/?? role-agent.yaml），KG-4 三个 commit 零涉 facets。证据文件：`.agent/kg4/{cold-audit-report,blindtest-verdict}.md`、`.agent/codex-kg4-backend-report.md`（本地）。
 
 ### PROJECTS-REMINE-2026-06-11 · 项目内容统一重生成 + 关系引擎再深挖（plan `docs/plans/2026-06-11-projects-remine.md`）
 - **⚠范式注记（2026-06-12）**：本任务的 facet/关系产物按旧口径生成；KG-4 重构后 facets 降级为草稿输入、论文级边待对象级重推导。基础设施成果（管线/validator/bench）继续有效。
