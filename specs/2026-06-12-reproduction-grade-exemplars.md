@@ -1,15 +1,17 @@
-# SPEC: 复现级精读样板 ×3 + 关系引擎显式引用规则 + 边文案中文化（Kevin 2026-06-12 凌晨）
+# SPEC: 白板测试级精读样板 ×3 + 关系引擎显式引用规则 + 边文案中文化（Kevin 2026-06-12 凌晨，二次修正版）
 
-> 执行者：codex（gpt-5.5 high）。前置：必须先读 `docs/paradigms/projects.md` v3 段（复现级四问）。
+> 执行者：codex（gpt-5.5 high）。前置：必须先读 `docs/paradigms/projects.md` v3 段（白板测试 eval + 导师式生成）。
 > **红线（动作禁令）**：禁 git reset/checkout/stash/clean 任何形式；不碰 src/ app/；树中他人工作保持原样。验证只用数据侧命令。
 > 进度 `logs/exemplar-progress.md`；总结 `logs/exemplar-summary.md`。
 
-## A — 复现级精读样板（只做 3 篇，Kevin 验过再批量——iterate-point-to-point）
-对以下三个项目，**真 clone 读源码/架构目录**后按 v3「复现级四问」重写 light_spine（结构映射：四问→ why_worth_attention(锚点对比)/how_it_works(机制级架构+Mermaid)/reusable_abstractions(可拆可换可偷)/one_sentence；risk+unknowns 合计 ≤15% 篇幅）：
-1. **nousresearch/hermes-agent** —— 锚点=OpenClaw（Kevin 点名）：为什么 Hermes 比 OpenClaw 好？区别？多 agent 怎么编排、harness 怎么搭？
-2. **can1357/oh-my-pi**（oh-my-claude-code 类）—— 核心洞察=Claude Code 壳与内核模型可分离：为什么可以？怎么实现的（API 层拦截/协议适配在哪个模块）？Claude Code 壳子好在什么？
-3. **nesquena/hermes-webui** —— 和 Hermes Agent 的配套关系显式写出；WebUI 火点是什么？和其他 agent WebUI 区别？能不能换成别的 web 前端（可替换性）？
-全中文正文（三铁律照旧：不堆砌/不夹生/正文无指令代码）。claims 带自报/已核实。
+## A — 白板测试级精读样板（只做 3 篇，Kevin 验过再批量——iterate-point-to-point）
+**DONE 定义（eval，非大纲）**：读完分析的人不看项目，能在白板上画出——项目结构、优势区间、自己的理解、创新点、解决了什么问题、用了什么方法。
+**生成方法（导师式，禁填表式）**：每篇先**真 clone 读源码/架构目录**，然后第一步判断"这个项目该从什么角度讲"（它的灵魂在哪），再以「带我读懂 xxx 项目，读完要能过白板测试」的导师框架让 gpt-5.5 high 生成正文，最后才映射进 light_spine 字段做渲染容器。**不同项目不同角度，不适用的角度不硬写。**
+三个样板（各自的灵魂仅供启发，由你读源码后自判）：
+1. **nousresearch/hermes-agent** —— 它活在与 OpenClaw 的对比里（Kevin 锚点）：编排、harness 怎么搭、凭什么更好。
+2. **can1357/oh-my-pi**（oh-my-claude-code 类）—— 灵魂=Claude Code 壳与内核模型可分离：为什么可以、在哪个模块实现、壳子好在哪。
+3. **nesquena/hermes-webui** —— 配套关系显式写出；火点、与其他 WebUI 区别、可替换性。
+硬纪律：优势/实现为主（risk+unknowns ≤15%）；全中文正文（三铁律：不堆砌/不夹生/正文无指令代码）；claims 带自报/已核实；结构复杂配 Mermaid。
 
 ## B — 关系引擎补"显式引用"候选规则（修 Hermes↔Hermes-WebUI 漏连事故）
 - 候选生成加规则：A 项目的 README/描述/facet 里**点名** B（仓库名/产品名匹配，归一化大小写与连字符）→ 必须成为候选对（绕过向量重叠门）。
