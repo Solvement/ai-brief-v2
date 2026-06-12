@@ -1,72 +1,98 @@
 #!/usr/bin/env node
-// Mind Palace — 向量召回底座（本地，无 API）。
-// 读 data/knowledge-graph/facets/*.yaml → 用本地 multilingual-e5-small 嵌入 facet 文本
-// → 写 public/data/brief/mind-palace-embeddings.json（前端 in-browser query 同模型做 cosine NN）。
-// 这是冷审指出缺的"功能"层：agent 真能 query 的记忆，不是词面图。
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
+// ROS-backed local embedding index. Output shape stays compatible with the
+// existing frontend consumer: public/data/brief/mind-palace-embeddings.json.
+import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import YAML from "yaml";
+import { parse as parseYaml } from "yaml";
 import { pipeline } from "@huggingface/transformers";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-const FACETS = path.join(ROOT, "data", "knowledge-graph", "facets");
+const OBJECTS = path.join(ROOT, "data", "knowledge-graph", "objects");
 const OUT = path.join(ROOT, "public", "data", "brief", "mind-palace-embeddings.json");
-const MODEL = "Xenova/multilingual-e5-small"; // 384-dim multilingual (zh+en), local ONNX, no API
+const MODEL = "Xenova/multilingual-e5-small";
 
-// e5: embed text = title + 核心 facet（problem/method/innovation/transfer/result），passage: 前缀
-function embedText(f) {
-  const x = f.facets || {};
-  const parts = [f.title, x.problem_solved, x.method, x.innovation, x.transfer, x.result, x.self_evo_use ?? f.self_evo_use]
-    .filter(Boolean)
-    .map((s) => String(s).trim());
-  return "passage: " + parts.join(" \n");
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
 }
 
-async function loadFacets() {
+function text(value) {
+  if (value === undefined || value === null) return "";
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.map(text).join(" ");
+  if (typeof value === "object") return Object.values(value).map(text).join(" ");
+  return String(value);
+}
+
+export function embedText(object) {
+  const parts = [
+    object.title,
+    object.one_sentence_thesis,
+    ...asArray(object.claims).map((claim) => claim?.statement),
+    ...asArray(object.mechanisms).flatMap((mechanism) => [
+      mechanism?.name,
+      mechanism?.problem,
+      mechanism?.reusable_pattern,
+    ]),
+    ...asArray(object.trigger_hooks).map((hook) => hook?.symptom),
+  ].map(text).map((item) => item.trim()).filter(Boolean);
+  return `passage: ${parts.join("\n")}`;
+}
+
+async function loadPaperObjects() {
   let files = [];
-  try { files = (await readdir(FACETS)).filter((n) => n.endsWith(".yaml") || n.endsWith(".yml")); }
-  catch { console.error(`[embed] no facets dir ${FACETS}`); return []; }
-  const out = [];
+  try {
+    files = (await readdir(OBJECTS)).filter((name) => /\.ya?ml$/i.test(name)).sort((a, b) => a.localeCompare(b));
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+  const objects = [];
   for (const file of files) {
     try {
-      const f = YAML.parse(await readFile(path.join(FACETS, file), "utf8"));
-      if (!f || !f.node_id) { console.warn(`[embed] skip ${file}: no node_id`); continue; }
-      out.push(f);
-    } catch (e) { console.warn(`[embed] skip ${file}: ${e.message}`); }
+      const object = parseYaml(await readFile(path.join(OBJECTS, file), "utf8"));
+      if (!object || object.kind !== "paper") continue;
+      objects.push({
+        ...object,
+        object_id: object.object_id || `paper/${object.slug || path.basename(file, path.extname(file))}`,
+      });
+    } catch (error) {
+      console.warn(`[embed] skip ${file}: ${error.message}`);
+    }
   }
-  return out;
+  return objects.sort((a, b) => String(a.slug).localeCompare(String(b.slug)));
 }
 
-const facets = await loadFacets();
-if (!facets.length) { console.error("[embed] no facets to embed — nothing written"); process.exit(0); }
+const objects = await loadPaperObjects();
+if (!objects.length) {
+  console.error("[embed] no paper ROS objects to embed - nothing written");
+  process.exit(0);
+}
 
-console.log(`[embed] loading ${MODEL} …`);
+console.log(`[embed] loading ${MODEL} ...`);
 const extractor = await pipeline("feature-extraction", MODEL);
-const embed = async (t) => Array.from((await extractor(t, { pooling: "mean", normalize: true })).data);
+const embed = async (input) => Array.from((await extractor(input, { pooling: "mean", normalize: true })).data);
 
 const vectors = [];
-for (const f of facets) {
-  const vec = await embed(embedText(f));
-  vectors.push({ id: f.node_id, slug: f.slug, title: f.title, kind: f.kind || "paper", status: f.status || "extracted", vec });
-  console.log(`[embed] ${f.slug} (${vec.length}d)`);
+for (const object of objects) {
+  const vec = await embed(embedText(object));
+  vectors.push({
+    id: object.object_id,
+    slug: object.slug,
+    title: object.title,
+    kind: object.kind,
+    status: object.status || "draft",
+    vec,
+  });
+  console.log(`[embed] ${object.slug} (${vec.length}d)`);
 }
 
 await mkdir(path.dirname(OUT), { recursive: true });
-await writeFile(OUT, JSON.stringify({ model: MODEL, dim: vectors[0]?.vec.length || 0, generated_at: new Date().toISOString(), count: vectors.length, vectors }, null, 0) + "\n", "utf8");
-console.log(`[embed] wrote ${vectors.length} vectors → ${path.relative(ROOT, OUT)}`);
-
-// Frontend-readable facet index (slug → facets), so 项目人读页 / 文章页 can render the spine
-// without parsing yaml or graph.json. Reject ones are excluded.
-const FACETS_OUT = path.join(ROOT, "public", "data", "brief", "facets.json");
-const facetIndex = {};
-for (const f of facets) {
-  if (f.status === "reject") continue;
-  facetIndex[f.slug] = {
-    node_id: f.node_id, title: f.title, kind: f.kind || "paper", status: f.status || "extracted",
-    facets: f.facets || {}, self_evo_use: f.self_evo_use ?? null, edges: f.edges || [],
-    core_concepts: f.core_concepts || [], discovery_trace: f.discovery_trace ?? null,
-  };
-}
-await writeFile(FACETS_OUT, JSON.stringify({ generated_at: new Date().toISOString(), count: Object.keys(facetIndex).length, facets: facetIndex }, null, 0) + "\n", "utf8");
-console.log(`[embed] wrote ${Object.keys(facetIndex).length} facet records → ${path.relative(ROOT, FACETS_OUT)}`);
+await writeFile(OUT, `${JSON.stringify({
+  model: MODEL,
+  dim: vectors[0]?.vec.length || 0,
+  generated_at: new Date().toISOString(),
+  count: vectors.length,
+  vectors,
+})}\n`, "utf8");
+console.log(`[embed] wrote ${vectors.length} vectors -> ${path.relative(ROOT, OUT)}`);

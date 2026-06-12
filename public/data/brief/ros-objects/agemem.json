@@ -1,0 +1,348 @@
+{
+  "assumptions": [
+    {
+      "anchor": "Limitations 逐字 'The training currently relies on HotpotQA as the source of three-stage trajectories'",
+      "conflicts_hint": "与「跨域/开放部署有效性」类主张天然张力——单源课程上的策略未必迁移。",
+      "id": "agemem.a1",
+      "kind": "explicit",
+      "statement": "训练课程的三阶段轨迹全部来自 HotpotQA 这一单一数据源——隐含假设其交互结构足以泛化到其他任务域。"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "与「评测必须人工/exact-match 才可信」类方法论假设互斥；同一 judge 贯穿主结果与奖励消融。",
+      "id": "agemem.a2",
+      "kind": "implicit",
+      "statement": "记忆质量可由 LLM-as-judge（DashScope/Qwen）可靠度量——隐含假设评判模型偏差不会同向污染主结果与消融。"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "与「需要步级/细粒度信用分配」的假设互斥。",
+      "id": "agemem.a3",
+      "kind": "implicit",
+      "statement": "终局奖励对一条轨迹内所有步均一致的广播，足以给早期记忆动作正确的信用——隐含假设无关动作被错误奖励的噪声可被训练平均掉。"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "mem.learned-policy-controller",
+      "train.terminal-credit-broadcast"
+    ],
+    "problems": [
+      "mem.lifecycle-management"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明在真实开放部署中也胜出——5 个均为受控基准，原文 Limitations 段自承评测 \"relatively controlled compared to open-ended real-world deployments\"（出处标注经冷审 2026-06-12 校正）。",
+        "不能证明对非 HotpotQA 来源的任务课程仍有效——RL 三阶段轨迹全部来自 HotpotQA（作者自承，见 a1）。",
+        "不能把均分领先归因到「统一接口」本身——主结果未隔离接口与训练的贡献（见 c2）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 2 数字与 abstract 表述均逐字可核。",
+      "evidence": [
+        {
+          "anchor": "Table 2 (§4 main results)",
+          "quote": "AgeMem on Qwen2.5-7B: 41.96% average; Mem0: 37.14%",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 2 (§4 main results)",
+          "quote": "AgeMem on Qwen3-4B: 54.31% average; A-Mem: 45.74%",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Abstract",
+          "quote": "AgeMem exposes memory operations as tool-based actions, enabling the LLM agent to autonomously decide what and when to store, retrieve, update, summarize, or discard information.",
+          "strength": "medium"
+        }
+      ],
+      "id": "agemem.c1",
+      "statement": "把 LTM+STM 管理折叠进 agent 自身策略（并用 RL 训练）在长程任务上胜过模块化的「记忆增强」基线： Qwen2.5-7B 均分 41.96% vs 最强基线 Mem0 37.14%；Qwen3-4B 均分 54.31% vs 最强基线 A-Mem 45.74%。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 noRL 基线已是「接口本身」的最强配置——原文抓取正文未报告方差/随机种子，无法排除 noRL 调参不足。",
+        "不能区分「RL 这一训练范式」与「具体的 step-wise GRPO 信用分配设计」各自的贡献——该消融只隔离 RL 有无，未隔离信用分配方式。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 2 的 noRL 行逐字可核，差值由两数相减得出。",
+      "evidence": [
+        {
+          "anchor": "Table 2 (AgeMem vs AgeMem-noRL)",
+          "quote": "AgeMem-noRL on Qwen2.5: 33.43%; AgeMem-noRL on Qwen3: 45.59%",
+          "strength": "strong"
+        }
+      ],
+      "id": "agemem.c2",
+      "statement": "真正承重的是 RL 训练阶段而非统一记忆接口本身：去掉 RL 的 AgeMem-noRL 均分仅 33.43%（Qwen2.5）/ 45.59%（Qwen3）， 加上 RL 才到 41.96% / 54.31%，即 RL 贡献 +8.53 / +8.72 个百分点。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明这种改善反映真实记忆质量而非评判模型偏好——MQ 与 Judge 均由 LLM-as-judge（DashScope/Qwen）给分，非人工标注或 exact match。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 4 数字逐字可核；「反映真实质量」一句属 interpretation，已在 cannot_prove 与 f-级风险中标注。",
+      "evidence": [
+        {
+          "anchor": "Table 4 (reward ablation, HotpotQA)",
+          "quote": "All-Returns: Judge=0.544, MQ=0.533; Answer-Only: Judge=0.509, MQ=0.479",
+          "strength": "strong"
+        }
+      ],
+      "id": "agemem.c3",
+      "statement": "面向记忆的奖励（All-Returns，奖励中段记忆质量）优于只看最终答案的奖励（Answer-Only）： 记忆质量 MQ 0.533 vs 0.479、Judge 分 0.544 vs 0.509。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明增强是否公平、各基线配置是否等价——精确数值未从原文逐字提取，仅确认该实验存在于 App D.3。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "由流程推断——deep-dive 资产记录该实验存在于 App D.3，但 WebFetch 全文核对未独立取到 App D.3 逐表数字，故 strength=weak、confidence=medium。",
+      "evidence": [
+        {
+          "anchor": "Appendix D.3 (Augmented Baseline Comparison)",
+          "quote": "Augmented Baseline Comparison (App D.3) — augmented modular baselines still trail AgeMem",
+          "strength": "weak"
+        }
+      ],
+      "id": "agemem.c4",
+      "statement": "增益不是「给旧基线补齐同样的短期管理/RL 模块」就能追上的——v2 在附录给 LangMem/A-Mem/Mem0 增强后比较，AgeMem 仍领先， 作者据此论证「统一策略 ≠ 模块叠加」。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明这种广播在「运气好」的 rollout 上不会奖励到无关动作——终局优势对一条轨迹内所有步均一致，原文未给步级信用细分。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——§3.4 句子逐字可核。",
+      "evidence": [
+        {
+          "anchor": "§3.4 (step-wise GRPO)",
+          "quote": "This advantage is then broadcast to all preceding steps of the same trajectory, which assigns a consistent learning signal to all memory and reasoning actions along the trajectory.",
+          "strength": "strong"
+        }
+      ],
+      "id": "agemem.c5",
+      "statement": "step-wise GRPO 把单条多阶段轨迹的终局优势广播回该轨迹的全部前序步骤，给跨阶段、奖励稀疏/不连续的早期记忆动作提供一致的延迟监督信号。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能把它当主要卖点——绝对降幅小（约 3–5%），易被实现细节淹没。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "由流程推断——数字来自本地深读资产抄录 Fig 3，WebFetch 未单独复核该图数值；故 confidence=medium。",
+      "evidence": [
+        {
+          "anchor": "Figure 3 (HotpotQA, active-context tokens)",
+          "quote": "active-context tokens 2117 vs 2186 (-3.1%); 2191 vs 2310 (-5.1%)",
+          "strength": "medium"
+        }
+      ],
+      "id": "agemem.c6",
+      "statement": "短期上下文管理顺带降低活跃上下文 token：AgeMem 2117 vs RAG 2186（-3.1%）、2191 vs 2310（-5.1%）。\n",
+      "type": "author_claim"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "均分掉到 AgeMem-noRL：33.43%（Qwen2.5）/ 45.59%（Qwen3），降约 8.53 / 8.72pp",
+        "说明承重的是 RL 训练而非统一接口本身（c2）",
+        "但 noRL 是否为接口最强配置、无方差报告 → 不能完全坐实"
+      ],
+      "q": "若把 AgeMem 的 RL 训练阶段整个去掉、只保留统一的六操作记忆接口，均分会怎样？这说明承重的是什么？",
+      "tested_objects": [
+        "agemem.c2",
+        "agemem.m1",
+        "agemem.m2"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "最可能跨域泛化失效（f1）——学到的策略绑定 HotpotQA 的交互/记忆模式",
+        "根因：单一数据源假设 a1，原文未在新域验证（作者自承）",
+        "step-wise GRPO 的终局广播在新域可能把信用配错（f2）"
+      ],
+      "q": "AgeMem 的三阶段课程全部来自 HotpotQA。若换成一个交互结构很不同的新任务域（如长程具身规划），最可能在哪个环节先失效，为什么？",
+      "tested_objects": [
+        "agemem.a1",
+        "agemem.f1",
+        "agemem.m3"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "能搬：typed memory action 接口（Add/Update/Delete/Retrieve/Summary/Filter 即一等动作），先把控制决策从写死 hook 抽成接口",
+        "搬不动：step-wise GRPO 训练回路（无可训练 policy / RL 框架 / 付费 key）",
+        "可重用范式（m1）：把控制决策建模为 typed action；m2 范式仅在有训练信号时才有意义"
+      ],
+      "q": "把「记忆操作即可学习策略动作」这条范式迁移到一个无可训练 model-client 的纯工程系统（如本站知识库维护），哪部分能搬、哪部分搬不动？",
+      "tested_objects": [
+        "agemem.m1",
+        "agemem.m2",
+        "agemem.c1"
+      ],
+      "type": "transfer"
+    },
+    {
+      "expected_points": [
+        "威胁：主结果与奖励消融共享同一评判偏差（f3, a2），MQ 提升可能是迎合 judge 而非真实质量",
+        "结论 c3 的数字真实，但『反映真实记忆质量』的解读受限",
+        "排除实验：人工标注或 exact-match 子集复核 MQ；换不同 judge 模型重测奖励消融看排序是否一致"
+      ],
+      "q": "论文用同一个 LLM-judge 既生成 distractor 又给记忆质量 MQ 打分。这对「面向记忆的奖励优于只看答案」这一结论的可信度构成什么威胁？如何设计实验排除？",
+      "tested_objects": [
+        "agemem.c3",
+        "agemem.f3",
+        "agemem.a2"
+      ],
+      "type": "counterfactual"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "学到的记忆策略在新域不再领先甚至劣于固定基线（原文未在新域验证，作者自承）。",
+      "id": "agemem.f1",
+      "statement": "跨域泛化失效。",
+      "triggered_when": "部署到非 HotpotQA 结构的任务（不同交互模式/记忆需求）。"
+    },
+    {
+      "consequence": "终局优势被均匀广播，无关记忆动作也被强化，策略学到噪声行为。",
+      "id": "agemem.f2",
+      "statement": "信用分配把奖励错配到无关动作。",
+      "triggered_when": "「运气好」的 rollout——终局答对但中途有无效的存/删动作。"
+    },
+    {
+      "consequence": "主结果与奖励消融共享同一评判偏差，记忆质量提升可能部分是迎合评判模型而非真实质量。",
+      "id": "agemem.f3",
+      "statement": "评测偏差自我印证。",
+      "triggered_when": "用同一 LLM-judge（DashScope/Qwen）既生成 distractor 又给 MQ/Judge 打分。"
+    },
+    {
+      "consequence": "策略表达力受限（作者将更细粒度可组合工具列为 future work）。",
+      "id": "agemem.f4",
+      "statement": "工具集粒度不足。",
+      "triggered_when": "任务需要比六个固定操作更细/可组合的记忆动作。"
+    }
+  ],
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§3.1–§3.2, Table 1, Abstract",
+      "canonical_concept": "mem.learned-policy-controller",
+      "id": "agemem.m1",
+      "input": "状态 s_t = (C_t, ℳ_t, 𝒯)：短期上下文 C_t、长期记忆库 ℳ_t、任务规格 𝒯（§3.1 逐字 \"s_t=(C_t,ℳ_t,𝒯)\"）。\n",
+      "name": "记忆操作即一等策略动作（unified memory-as-policy-action）",
+      "non_replaceable": [
+        "把记忆操作纳入同一策略的混合动作空间（拿掉就退回外挂式固定记忆管道，不再是本方法）",
+        "状态对 LTM ℳ_t 与 STM C_t 的显式分离"
+      ],
+      "operations": [
+        "LTM 写入侧：Add（新增条目）/ Update（改写已存条目）/ Delete（删除条目）",
+        "STM 控制侧：Retrieve（把 top-k 记忆取入活跃上下文）/ Summary（压缩上下文）/ Filter（丢弃相似度过高/冗余的上下文）",
+        "agent 在每一步自主决定：发文本动作 还是 发某个记忆 tool 动作（§3.2, Table 1）"
+      ],
+      "optimization": "由下游 step-wise GRPO（m2）提供训练信号；接口本身无独立优化目标。\n",
+      "output": "混合动作空间下的一步动作——要么生成普通文本/推理，要么发出一个结构化记忆 tool-call（{name, arguments}）， 改变记忆状态或刷新上下文。\n",
+      "problem": "mem.lifecycle-management",
+      "replaceable": [
+        "具体六个工具的粒度/集合（作者将『更细粒度可组合工具』列为 future work）",
+        "底层检索实现（Retrieve 的 top-k 检索器）",
+        "backbone LLM（论文用 Qwen2.5-7B / Qwen3-4B 两种）"
+      ],
+      "reusable_pattern": "把组件的「控制决策」（何时写/取/改/删）建模为 agent 可调用的 typed action，而非写死在外部 hook 里。"
+    },
+    {
+      "anchor": "§3.4, 机制图 (Optimization/Reward)",
+      "canonical_concept": "train.terminal-credit-broadcast",
+      "id": "agemem.m2",
+      "input": "一条多阶段轨迹 τ = (τ1, τ2, τ3) 及其终局奖励（任务完成 + 上下文管理 + 长期记忆质量，并对上下文溢出/轮数过多施惩罚）。\n",
+      "name": "step-wise GRPO 终局优势广播（延迟信用分配）",
+      "non_replaceable": [
+        "把终局信号回传到早期记忆决策这一动作（拿掉则早期 Add/Delete 无监督，退化为只学最后一步）"
+      ],
+      "operations": [
+        "按三阶段课程采样轨迹（见 m3）",
+        "计算终局奖励并归一化为优势（GRPO 群体相对优势）",
+        "§3.4 逐字：把该优势 broadcast 到同一轨迹的所有前序步，使早期『存了什么/删了什么』也领到信用"
+      ],
+      "optimization": "step-wise GRPO（GRPO 的多阶段轨迹变体）；解决「最终答对对早期记忆动作没有直接监督」的延迟信用分配难题。\n",
+      "output": "把该轨迹的终局优势（advantage）广播到轨迹内每一个前序步骤，作为对所有记忆与推理动作的一致学习信号。",
+      "problem": "mem.lifecycle-management",
+      "replaceable": [
+        "优势估计的具体 RL 算法（GRPO 可换 PPO 等）",
+        "奖励各分量的权重"
+      ],
+      "reusable_pattern": "当一个决策的价值要到很久以后才显现（决策摊在多个阶段），把终局优势广播回每一步给延迟监督。"
+    },
+    {
+      "anchor": "§3.3, 机制图 (Training)",
+      "canonical_concept": "mem.learned-policy-controller",
+      "id": "agemem.m3",
+      "input": "HotpotQA 衍生的多阶段交互轨迹。",
+      "name": "三阶段课程（curriculum）",
+      "non_replaceable": [
+        "分阶段隔离不同记忆子能力的训练结构（决定了奖励能落到对应子能力上）"
+      ],
+      "operations": [
+        "Stage 1：LTM construction——从对话上下文构建长期记忆（§3.3 逐字 'Stage 1 (LTM construction)'）",
+        "Stage 2：STM control under distractors——LTM 保留、上下文重置，在干扰信息下学管短期上下文",
+        "Stage 3：Integrated reasoning and memory coordination——检索已存记忆并完成最终形式化查询"
+      ],
+      "optimization": "课程顺序为训练课程设计（curriculum），优化信号仍由 m2 提供。",
+      "output": "一个按「先学记、再学在干扰下管上下文、最后学用记忆答题」顺序习得的记忆策略。",
+      "problem": "mem.lifecycle-management",
+      "replaceable": [
+        "三阶段的具体划分与数据来源（当前全来自 HotpotQA）"
+      ],
+      "reusable_pattern": "把一个复合能力拆成「先建材料、再抗干扰、最后综合使用」的递进课程分阶段教。"
+    }
+  ],
+  "object_id": "paper/agemem",
+  "one_sentence_thesis": "主张「记忆操作应是 agent 策略的一部分而非旁挂存储层」，方法是把六个记忆操作（LTM 的 Add/Update/Delete + STM 的 Retrieve/Summary/Filter）暴露为一等 tool-based policy action 并用三阶段课程 + step-wise GRPO 端到端强化学习训练， 在 ALFWorld/SciWorld/PDDL/BabyAI/HotpotQA 五个长程基准、Qwen2.5-7B 与 Qwen3-4B 两个 backbone 的受控评测上均分超过模块化记忆基线。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "核心训练机制（step-wise GRPO 训练记忆策略，m2）对本站是大改/红线——本站无可训练 model-client，RL 回路无法直接落地，排 self-evo-queue 周审。 但机制 m1「记忆操作即 typed action」的接口设计可立即对齐：本站 KG 记忆维护协议的显式 ADD/UPDATE/SUPERSEDE/ARCHIVE/MERGE 操作 本就是 typed memory action 的非训练版。落地动作=确认本站记忆操作已是 typed action（已满足）、把 backend 结构上预留为「未来可训练的 memory controller」，短期不上 GRPO。 整体判 queue：训练回路排周审，typed 接口部分已 apply/对齐。\n",
+    "state": "queue"
+  },
+  "slug": "agemem",
+  "source": "arxiv:2601.01885v2 + github.com/y1y5/AgeMem",
+  "status": "draft",
+  "title": "AgeMem — Learning Unified Long-Term and Short-Term Memory Management for LLM Agents",
+  "trigger_hooks": [
+    {
+      "related_object": "agemem.m1",
+      "risk": "直接搬「用 RL 训练」会过度工程化——多数系统先要的是 typed action 接口而非强化学习。",
+      "symptom": "系统里「什么时候保存/更新/删除一条记录」全靠写死的 if-else 规则，新场景一来就跟不上、要不停打补丁。",
+      "why_recall": "本篇把这些控制决策从外部 hook 提升为 agent 可调用的 typed action，是「固定规则→可学策略」的范式样板。"
+    },
+    {
+      "related_object": "agemem.m2",
+      "risk": "广播是粗粒度的，会把功劳/过错平摊给无关步骤；别当成精确归因。",
+      "symptom": "一个决策的好坏要到很久之后（任务结束）才知道，早期那步拿不到反馈信号，没法判断当初存/删对不对。",
+      "why_recall": "step-wise GRPO 的终局优势广播正是为这种延迟信用分配设计的回传机制。"
+    },
+    {
+      "related_object": "agemem.c3",
+      "risk": "其 MQ 由 LLM-judge 给分，照搬会继承评判模型偏差——需配人工或 exact-match 抽检。",
+      "symptom": "想评测「记忆/知识管理是否真的变好」，却只有最终任务准确率，说不清是记得好还是碰巧答对。",
+      "why_recall": "本篇用面向记忆的奖励（All-Returns）+ 记忆质量 MQ 维度把「记得好」与「答对」分开度量。"
+    },
+    {
+      "related_object": "agemem.a1",
+      "risk": "把受控基准的领先当作开放部署的承诺。",
+      "symptom": "评测分数很漂亮，但全在受控/单一数据集上得到，怀疑换真实场景就不灵。",
+      "why_recall": "本篇主结果在 5 个受控基准、训练课程仅 HotpotQA，作者明确自承「relatively controlled」且跨域未证——提醒先问泛化边界。"
+    }
+  ]
+}

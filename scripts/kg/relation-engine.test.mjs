@@ -107,16 +107,17 @@ test("facetRelationProse includes prose fields and core concept evidence for LLM
   assert.match(prose, /core_concept:freshness gate: pending files/);
 });
 
-test("limitFacetCandidates caps LLM work to topK<=5 and maxCandidates<=80", () => {
-  const facets = Array.from({ length: 20 }, (_, index) => ({
+test("limitFacetCandidates caps LLM work to topK<=10 and maxCandidates<=300", () => {
+  const facets = Array.from({ length: 40 }, (_, index) => ({
     slug: `facet-${index}`,
     node_id: `content/facet-${index}`,
     title: `Facet ${index}`,
     facets: { method: `shared memory controller ${index}` },
     core_concepts: [{ name: "shared relation candidate" }],
   }));
+  // REMINE (0e9eb16) 把 MAX_LLM_CANDIDATES 提到 300 以覆盖 93 个 facet；上界断言跟随常量。
   const candidates = limitFacetCandidates(facets, { topK: 99, maxCandidates: 999 });
-  assert.ok(candidates.length <= 80);
+  assert.ok(candidates.length <= 300);
 });
 
 test("extractEdgesLLM accepts mock taxonomy edge with verbatim evidence and use", async () => {

@@ -1,0 +1,344 @@
+{
+  "assumptions": [
+    {
+      "anchor": "",
+      "conflicts_hint": "与「只有真生产栈逐 token 解码实测才算数」的方法论假设张力；块大小 b 的敏感性原文未消融。",
+      "id": "kvarn.a1",
+      "kind": "implicit",
+      "statement": "pseudo-decode 的块级累积误差能代表真实逐 token 自回归解码的误差累积——隐含假设块内并行近似不引入与真实解码方向性偏差。\n"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "与 MLA / SSM 等不同 KV 结构天然张力（作者自承 MLA 影响未知、SSM 无 KV-Cache，见 f4）。",
+      "id": "kvarn.a2",
+      "kind": "implicit",
+      "statement": "最大量化误差由 token 幅度（scale）主导这一现象在受测模型族上普遍成立——隐含假设可外推到未测架构。\n"
+    },
+    {
+      "anchor": "Appendix D（有效 bit/元素含 scale+zeropoint：KVarN 2.25/2.3，KVQuant ~2.4，TurboQuant 3/3）",
+      "conflicts_hint": "与「按名义 bit（如都叫 2-bit）直接比」的口径互斥——不折算辅助存储会高估 KVarN 相对劣势或对手优势。",
+      "id": "kvarn.a3",
+      "kind": "explicit",
+      "statement": "有效 bit/元素（2.3）的同档对照是公平比较的正确口径——隐含假设各对照方法的辅助存储都已折算进 bit 数。\n"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "quant.dual-axis-variance-normalization",
+      "quant.pseudo-decode-protocol"
+    ],
+    "problems": [
+      "infra.kv-cache-compression",
+      "infra.quantization-eval-realism"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明「幅度主导」在所有模型/层/任务上普遍成立——证据来自 K 矩阵的误差分布图（Fig.1a），未给跨模型/跨层的统计显著性。",
+        "不能把「prefill 评测失真」量化为具体的真实部署损失——pseudo-decode 是近似协议（c4），非生产栈实测（见 f3）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——abstract 与 §3.1 Fig.1(a) 表述均经 arxiv HTML 逐字核对。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "in the latter regime, quantization errors accumulate across timesteps, driven primarily by incorrect token scales",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Abstract",
+          "quote": "current methods are evaluated under prefill-like settings and errors behave differently under autoregressive decoding",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§3.1 Fig.1(a)",
+          "quote": "Large quantization errors in K are mostly due to incorrect token scaling",
+          "strength": "strong"
+        }
+      ],
+      "id": "kvarn.c1",
+      "statement": "在自回归解码（而非 prefill）场景下，KV-Cache 量化误差会跨时间步累积，且主要由 token 幅度（scale）被压坏驱动—— 作者据此论证现有方法的 prefill 评测对不上 test-time scaling 的真实负载。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能把领先解读为「压得更准」——天花板是 FP16，个别格高于 FP16 属 Avg@3 采样方差（paper.mdx warn①）。",
+        "不能跨 bit 档比较——KVarN 2.3 bit 含两 FP8 scale + FP16 zeropoint，TurboQuant 是 3/3 bit（~4.5–4.8），同档对照才公平（warn②）。",
+        "表内逐格数字来自本地深读资产抄录（hf read 逐格抽取），WebFetch 仅独立核对了 abstract 的 SOTA 表述，未逐格复核 Table 1。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "由流程推断——SOTA 总表述经 arxiv 原文核对（strong），但具体逐格数字仅来自本地 paper.mdx 抄录、未在 HTML 逐格复核，故整条降为 medium。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "KVarN establishes a new state-of-the-art for KV-cache quantization on generative benchmarks, including MATH500, AIME24 and HumanEval, at 2-bit precision",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 1 (AIME24 / MATH500, Avg@3)",
+          "quote": "Qwen3-4B FP16 61.1/82.6, KIVI 55.5/77.8, QuaRot 56.7/78.9, KVarN 60.0/79.2; Phi-4-14B KIVI 57.8/74.4, KVarN 61.7/84.8",
+          "strength": "medium"
+        }
+      ],
+      "id": "kvarn.c2",
+      "statement": "KVarN（Hadamard 旋转 + 双轴方差归一化 + RTN）在 2-bit / 平均 2.3 bit/元素同档下，于生成式 benchmark 上取得 KV-Cache 量化新 SOTA：Qwen3-4B AIME24 60.0（FP16 61.1 / KIVI 55.5 / QuaRot 56.7），MATH500 79.2（FP16 82.6）； Phi-4-14B MATH500 84.8 几乎无损（FP16 84.9 / KIVI 74.4）；HumanEval Phi-4-14B 88.2（FP16 88.9 / KIVI 74.6）。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 5% 这一阈值是普适最优——原文用 top 5% 作示例（\"e.g.\"），未给最优裁剪比例的扫描。",
+        "不能把 KL 散度改善等同于下游任务准确率改善——证据是 KL 代理指标，非端到端任务分。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——§2.4 Fig.3 两句均经 arxiv HTML 逐字核对。",
+      "evidence": [
+        {
+          "anchor": "§2.4 Fig.3",
+          "quote": "Replacing the 5% worst outlier errors with high precision values improves end-to-end KL-divergence more than fixing the other 95%",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§2.4 Fig.3",
+          "quote": "The largest, e.g. top 5%, errors in the KV-Cache cause most of the end-to-end degradation",
+          "strength": "strong"
+        }
+      ],
+      "id": "kvarn.c3",
+      "statement": "离群误差不成比例地重要：把最大的 top 5% 量化误差换回高精度，带来的端到端 KL 散度改善比修好其余 95% 还多—— 即便那 95% 在 MSE 里占大头。作者据此论证「MSE 最优 ≠ 端到端最优」。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 pseudo-decode 的累积误差与真实逐 token 解码完全等价——它是块级近似（一块内并行），真实解码是逐 token，块大小 b 的影响未系统消融。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——§3.2 Fig.4 描述经 arxiv HTML 逐字核对。",
+      "evidence": [
+        {
+          "anchor": "§3.2 Fig.4",
+          "quote": "divide our full prefill sequence into blocks of size b. Whenever b tokens have passed through the model ... we quantize the KV-Cache. Then ... compute latent states with this quantized KV-Cache",
+          "strength": "strong"
+        }
+      ],
+      "id": "kvarn.c4",
+      "statement": "pseudo-decode 评测协议：把 prefill 序列切成大小为 b 的块，每过一块就量化一次 KV-Cache，后续 token 都基于「已量化」缓存 算潜状态——以此便宜地模拟真实自回归解码下的误差累积，无需真跑逐 token 解码。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明「降重建误差」是 VarN 在 KV-Cache 唯一的得益机制——这是作者对自身方法的归因解释（interpretation 性质的 author_claim），非独立消融隔离。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——§3.3 两句对比表述均经 arxiv HTML 逐字核对。",
+      "evidence": [
+        {
+          "anchor": "§3.3",
+          "quote": "In weight quantization ... helpful because it approximates calibration data from weight structure",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§3.3",
+          "quote": "In our setting, this normalization is useful because it reduces directly the matrix reconstruction error ... by fixing the magnitude with an additional high-precision scale",
+          "strength": "strong"
+        }
+      ],
+      "id": "kvarn.c5",
+      "statement": "双轴方差归一化（源自 SINQ）在 KV-Cache 里有用的原因与它在权重量化里有用的原因不同：权重量化里它「从权重结构近似出校准数据」， 而在 KV-Cache 里它「直接降低矩阵重建误差」（靠一组额外高精度 scale 修正幅度）——作者明确辨析以防张冠李戴。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能当作端到端部署收益——2-bit KV-Cache 暂无公开服务框架支持，省显存/加速是推算非生产栈实测（见 f3、c2 cannot_prove）。",
+        "0.18% 仅在 Qwen3-4B 单配置量到，跨 GPU/batch/反量化吞吐曲线原文未给完整数据。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "由流程推断——数字来自本地 paper.mdx 抄录 §4.2/Appendix I，WebFetch 未单独复核该节，故 medium。",
+      "evidence": [
+        {
+          "anchor": "§4.2 + Fig.6 + Appendix I",
+          "quote": "vLLM 生成 128 token 1050 ms，方差归一化 1.9 ms ⇒ 0.18%；双 scale 反量化约慢 1%",
+          "strength": "medium"
+        }
+      ],
+      "id": "kvarn.c6",
+      "statement": "在线开销极小：Qwen3-4B 上 vLLM 生成 128 token 耗 1050 ms，每层 8 次迭代方差归一化合计 1.9 ms，即相对量化基线多约 0.18% 实测开销； 双 scale 反量化比单 scale 约慢 1%。\n",
+      "type": "author_claim"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "token 幅度极端值治不住——Hadamard 压分布主体但对特别大/小 token 反而更差（Appendix B Fig.8）",
+        "误差跨时间步重新累积——因为元凶『token scale 被压坏』没被处理（c1）",
+        "VarN 承重：沿 token 轴加一组幅度缩放直接修幅度（m1 non_replaceable）"
+      ],
+      "q": "若只用 Hadamard 旋转、去掉双轴方差归一化（退回 QuaRot 式），在自回归解码场景下最可能出什么问题？这说明 VarN 承担的是什么？",
+      "tested_objects": [
+        "kvarn.m1",
+        "kvarn.c1",
+        "kvarn.c5"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "SSM/Mamba：无 KV-Cache，方法完全用不上（f1）",
+        "MLA：训练时压缩 KV-Cache，作者明说量化质量影响未知、未验证（f2）",
+        "根因 a2：方法成立依赖标准 KV-Cache 结构与『幅度主导误差』现象在该架构上成立"
+      ],
+      "q": "把 KVarN 拿去压 DeepSeek 这类用 MLA 的模型、或 Mamba 这类 SSM，分别会怎样？根因是什么？",
+      "tested_objects": [
+        "kvarn.f1",
+        "kvarn.f2",
+        "kvarn.a2"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "能搬（方法论）：质量门评测应在『agent 连续读完做决策』的真实使用场景下设计，而非单篇静态对照——对应 pseudo-decode 的『复现累积负载』思路（m2 reusable_pattern）",
+        "能搬：冷审先暴露最严重 major_gap / 幻觉而非平铺平均覆盖率——对应 top 5% 离群主导（c3）",
+        "搬不动：量化算子本身（本站订阅 CLI 不跑裸推理栈，无法部署 2-bit KV-Cache，见 f3）"
+      ],
+      "q": "把本篇「评测设定要对齐真实负载（pseudo-decode）」这条原语迁移到 AI-Brief 的深读质量门 / 冷审 agent，能搬什么、搬不动什么？",
+      "tested_objects": [
+        "kvarn.m2",
+        "kvarn.c3",
+        "kvarn.f3"
+      ],
+      "type": "transfer"
+    },
+    {
+      "expected_points": [
+        "不能——天花板是 FP16；个别格高于属 Avg@3 采样/三次平均方差，非压缩更准（c2 cannot_prove）",
+        "比较口径：必须看有效 bit/元素同档（KVarN 2.3 含 FP8 scale + FP16 zeropoint；TurboQuant 3/3 ~4.5–4.8 不同档）（a3）",
+        "且数字属论文自报、无第三方复现"
+      ],
+      "q": "论文报 KVarN 在某些格子上准确率高于 FP16，能否说明「2-bit 压缩比全精度更准」？如何正确解读，且与对手比较时要注意什么？",
+      "tested_objects": [
+        "kvarn.c2",
+        "kvarn.a3"
+      ],
+      "type": "boundary"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "KVarN 无对象可压，完全用不上（作者 Appendix E 自承）。",
+      "id": "kvarn.f1",
+      "statement": "方法整体不适用。",
+      "triggered_when": "部署到无 KV-Cache 的架构（状态空间模型 SSM / Mamba）。"
+    },
+    {
+      "consequence": "作者明说「不清楚这类注意力机制如何影响量化质量」，兼容性与收益未验证。",
+      "id": "kvarn.f2",
+      "statement": "量化质量未知/可能失效。",
+      "triggered_when": "模型用训练时压缩 KV-Cache 的注意力（MLA，DeepSeek 多头潜在注意力）。"
+    },
+    {
+      "consequence": "2-bit KV-Cache 暂无公开服务框架支持，端到端收益是推算值，未在生产栈量到（作者 Appendix E 自承）。",
+      "id": "kvarn.f3",
+      "statement": "端到端部署收益落空/无法兑现。",
+      "triggered_when": "想在生产服务框架（vLLM 等）上拿到实际省显存/加速。"
+    },
+    {
+      "consequence": "个别任务需特例调参（IFEval 需 S=32），说明最优超参随任务漂移，原文无系统敏感性表。",
+      "id": "kvarn.f4",
+      "statement": "超参跨任务不稳。",
+      "triggered_when": "换任务用默认三区布局超参（G/S/R=128）。"
+    }
+  ],
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§2.2 + §3.3 + Appendix A/B/D/H Alg.1",
+      "canonical_concept": "quant.dual-axis-variance-normalization",
+      "id": "kvarn.m1",
+      "input": "新生成的一块 token（默认 G=128）的 16-bit K / V 矩阵。\n",
+      "name": "两段式块级量化管线（Hadamard → 双轴 VarN → RTN）",
+      "non_replaceable": [
+        "Hadamard 与 VarN 两段互补组合（Appendix B Fig.8：Hadamard 压分布主体但对极端大/小 token 反而更差，VarN 恰治这两个极端；去掉任一段就不再锁住幅度、累积误差回来）",
+        "沿 token 轴显式加一组幅度缩放（拿掉就退回单轴量化、不治 token 幅度被压坏的元凶）"
+      ],
+      "operations": [
+        "第一道 Hadamard 旋转：沿通道轴做固定正交变换（沿用 QuaRot 排布，两个吸收进权重 + 两个 RoPE 后在线，O(N log N)），把少数通道的极端离群值摊薄成近似高斯——治『通道方向离群』，但管不住 token 整体幅度",
+        "第二道双轴方差归一化 VarN：攒够一块后，沿通道轴和 token 轴各放一组缩放因子，迭代 8 次（改自 SINQ 的 log 域交替 dual-scale balancing）把行、列方差都拉均匀——专治『token 幅度被压歪』的离群",
+        "第三步 RTN：对归一化后矩阵做普通四舍五入量化到 2-bit",
+        "token 轴只做 VarN 不做 Hadamard：解压时每 token 位置都要在线撤旋转太贵（~128² 次/128 token/通道），改用『多一组缩放因子』的 VarN（每 token 每通道仅多 1 FLOP）"
+      ],
+      "optimization": "none——全程免校准（calibration-free），所有 scale 在线从当前块自身 K/V 算出，换模型/领域不重调；无训练/离线优化信号。\n",
+      "output": "该块的 2-bit 量化 KV-Cache（含辅助存储：每元素有效 2.3 bit ≈ 量化值 + 两个 FP8 scale + FP16 zeropoint）， 下一块解码直接读这份已量化缓存算注意力。\n",
+      "problem": "infra.kv-cache-compression",
+      "replaceable": [
+        "backbone LLM（论文用 Qwen3-4B / Llama-3.1-8B / Phi-4-14B）",
+        "块大小 / 三区布局超参（G=128, S=128 sink, R=128 trailing；IFEval 用 S=32）",
+        "VarN 迭代次数（默认 8）"
+      ],
+      "reusable_pattern": "把同一对象沿两个正交轴分别治理（一个治方向离群、一个治幅度离群），且对最贵的轴换用更便宜的等效手段（token 轴用 VarN 代 Hadamard）。"
+    },
+    {
+      "anchor": "§3.2 Fig.4",
+      "canonical_concept": "quant.pseudo-decode-protocol",
+      "id": "kvarn.m2",
+      "input": "一段长 prefill 序列 + 一个 KV-Cache 量化器。\n",
+      "name": "pseudo-decode 累积误差评测协议",
+      "non_replaceable": [
+        "『后续基于已量化缓存计算』这一步（拿掉就退回 prefill 静态评测，看不到累积效应——这是协议存在的全部意义）"
+      ],
+      "operations": [
+        "把 prefill 序列切成大小为 b 的块",
+        "每过一块就量化一次 KV-Cache（不是一次性把整段固定上下文压完）",
+        "后续 token 一律基于『已量化』缓存计算潜状态——让误差像真实解码那样跨块/跨时间步叠加",
+        "便宜：仍走并行 prefill 算力，不必真跑逐 token 串行解码"
+      ],
+      "optimization": "none",
+      "output": "对齐真实自回归解码的累积量化误差度量（及由此得到的端到端 benchmark 分数曲线）。\n",
+      "problem": "infra.quantization-eval-realism",
+      "replaceable": [
+        "块大小 b（即三区布局里的 G）"
+      ],
+      "reusable_pattern": "评测协议必须复现真实工作流里误差/状态如何跨步累积，而非在静态单次场景下一次性度量。"
+    }
+  ],
+  "object_id": "paper/kvarn",
+  "one_sentence_thesis": "主张「KV-Cache 量化的真实负载是自回归解码下的误差跨时间步累积、且罪魁是 token 幅度（scale）被压坏而非方向偏」， 方法是免校准地对每块 K/V 先做 Hadamard 旋转（治通道离群）再做双轴方差归一化（治 token 幅度极端值）后用 RTN 压到 2-bit， 在 Qwen3-4B / Llama-3.1-8B / Phi-4-14B 上、用对齐真实负载的 pseudo-decode 协议评测，于 MATH500/AIME24/HumanEval 等生成式 benchmark 在 2.3 bit/元素同档下取得新 SOTA（均为论文自报，无第三方复现）。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "能用（两条工程判断原语，非红线；量化栈本站不部署）：KVarN 是推理时 KV-Cache 量化，本站订阅 CLI 不跑裸推理栈、无法部署 2-bit—— 但它两条方法论原语直接落本站质量门： ① 「评测设定要对齐真实负载」（pseudo-decode, m2）：本站深读质量门 / 审计 agent 的评分应在「agent 连续读完做决策」的真实使用 场景下设计，不只在单篇静态对照下验证； ② 「盯离群点比盯平均更值钱」（top 5% 误差主导 KL, c3）：冷审 agent 应优先暴露最严重错误/幻觉（先找 major_gap），不只汇报平均覆盖率。 落地动作=冷审/质量门改为「真实负载场景评 + 离群优先暴露」（apply 方法论层）；量化算子不接入。 与 TrOPD 的「分区处理离群」纪律互补（m1）。\n",
+    "state": "apply"
+  },
+  "slug": "kvarn",
+  "source": "arxiv:2606.03458v1 + github.com/huawei-csl/KVarN（vLLM 实现，342★·自报快照）",
+  "status": "draft",
+  "title": "KVarN — Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
+  "trigger_hooks": [
+    {
+      "related_object": "kvarn.m2",
+      "risk": "直接照搬「切块近似」未必适用——pseudo-decode 是块级并行近似真实串行，换场景要先验证近似不引入方向性偏差。",
+      "symptom": "一个系统在 benchmark / 单元测试上分数很漂亮，可一上真实连续工作流（多步累积、状态滚动）就掉链子，怀疑评测设定本身没对上真实负载。",
+      "why_recall": "本篇正是发现「现有评测在 prefill 静态场景做、真实是逐步累积」，并造了 pseudo-decode 协议把累积误差量出来——是「评测设定要对齐真实负载」的范式样板。"
+    },
+    {
+      "related_object": "kvarn.c3",
+      "risk": "「盯离群」不等于无脑只看最坏样本——5% 是示例阈值非普适最优，盲目裁剪可能误伤正常分布。",
+      "symptom": "平均指标（平均覆盖率 / 平均误差 / 总 MSE）看着没问题，但少数极端坏样本把端到端质量拖垮，优化平均反而救不到要害。",
+      "why_recall": "本篇证明 top 5% 离群误差主导端到端 KL（MSE 最优 ≠ 端到端最优），把优化目标从「降平均」改为「先救离群」。"
+    },
+    {
+      "related_object": "kvarn.c5",
+      "risk": "这是一条方法论纪律而非可直接搬的算子；别把它当成「VarN 万能」的背书。",
+      "symptom": "同一招/同一组件在 A 场景被验证有效，照搬到 B 场景，但根本不确定它在 B 起作用的原因是不是同一个。",
+      "why_recall": "本篇明确辨析双轴 VarN 在 KV-Cache 有用（直接降重建误差）vs 在权重量化有用（近似校准数据）是两个不同原因——防「张冠李戴地搬迁机制」。"
+    },
+    {
+      "related_object": "kvarn.m1",
+      "risk": "互补性是本篇在 KV-Cache 上实测的（Appendix B Fig.8），跨域不保证；分区方案要各自验证互补而非假设互补。",
+      "symptom": "想给一个治理/压缩问题做分区处理——正常区一种策略、极端异常区另一种——但不确定边界怎么切、互补性靠不靠谱。",
+      "why_recall": "本篇 Hadamard（治分布主体/通道离群）+ VarN（治极端大/小 token 幅度）两段互补，是「分区/分轴治理离群」的工程样板（与 TrOPD 的训练侧离群门互补）。"
+    }
+  ]
+}

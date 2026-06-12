@@ -1,0 +1,289 @@
+{
+  "assumptions": [
+    {
+      "anchor": "§1 Introduction",
+      "conflicts_hint": "与\"记忆应逐字本地保留原始记录\"(prop.verbatim-vs-extraction 的支持侧)天然张力——若逐字保全派成立，则\"长文档一次性给出不算记忆评测\"的前提被削弱。",
+      "id": "memoryagentbench.a1",
+      "kind": "explicit",
+      "statement": "记忆的\"正确\"定义是压缩蒸馏式表示（选择性抽取+去冗余+新推断），而非逐字保全。"
+    },
+    {
+      "anchor": "§3.1 / §4.3.4 (作者自承数据为构造)",
+      "conflicts_hint": "与\"构念效度优先\"的评测假设冲突——合成反事实对的难度分布未必映射真实冲突更新。",
+      "id": "memoryagentbench.a2",
+      "kind": "explicit",
+      "statement": "用合成/重构数据集（MQUAKE 反事实拼接、自动流水线生成的 EventQA、重构的七个旧数据集）测得的维度短板能代表真实记忆 agent 的能力。"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "judge 模型偏好可能系统性偏向同族(GPT 系)被测对象，与\"评判中立\"假设冲突。",
+      "id": "memoryagentbench.a3",
+      "kind": "implicit",
+      "statement": "用 GPT-4o 作开放题(LRU 摘要/DetectiveQA)的 LLM-judge 能给出可比的相对排名。"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [
+      "bench.memoryagentbench"
+    ],
+    "concepts": [
+      "eval.lifecycle-dimensions",
+      "eval.incremental-multi-turn-protocol",
+      "mem.external-vector-store",
+      "mem.fact-graph"
+    ],
+    "problems": [
+      "mem.evaluation",
+      "mem.lifecycle-management",
+      "mem.retrieval-precision",
+      "mem.staleness-conflict"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明\"压缩蒸馏式记忆\"在端到端任务上一定优于\"逐字保全 + 强 long-context 模型\"——本篇结果反而显示 long-context 模型在 TTL/LRU 上最强，该区分是设计前提而非被验证的结论。",
+        "不能证明这条本质区分对所有任务域成立（语料以英文合成/小说/QA 为主）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文引言逐字明确陈述，为全篇设计出发点。",
+      "evidence": [
+        {
+          "anchor": "§1 Introduction",
+          "quote": "There is a fundamental distinction between memory and long context: memory serves as a compressed and distilled representation of past information.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§1 Introduction",
+          "quote": "Rather than storing all historical content verbatim, memory selectively extracts salient details, removes irrelevant information, and often incorporates new inferences derived from prior experiences.",
+          "strength": "strong"
+        }
+      ],
+      "id": "memoryagentbench.c1",
+      "statement": "记忆与长上下文存在本质区别：记忆是对过去信息的压缩与蒸馏表示（选择性抽取要点、删冗余、并融入新推断）， 而非逐字保存全部历史；因此把整段上下文一次性给出的旧数据集不适用于评测记忆 agent。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明这些商用系统\"本质更差\"——它们的部署假设是长会话对话(LoCoMo 式)与跨会话压缩，本篇任务族(长文档 QA/小说事件链/反事实编辑)与其设计场景不完全重合，低分含场景失配成分。",
+        "不能证明排名跨 backbone 稳定（默认仅 GPT-4o-mini backbone；换 backbone 排名可能变）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "数字逐一对照 v2 Table 2 与 WebFetch 复核，原文明确报告。",
+      "evidence": [
+        {
+          "anchor": "Table 2 (backbone GPT-4o-mini)",
+          "quote": "all methods fail on the multi-hop situation (with achieving at most 7% accuracy)",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 2 overall scores",
+          "quote": "Claude-3.7-Sonnet 49.6 / GPT-4o 48.8 / GPT-4.1-mini 46.9 / GPT-4o-mini 42.2 / Mem0 21.1 / Cognee 20.6 / Zep 24.0 / GraphRAG 23.4 / RAPTOR 27.0",
+          "strength": "strong"
+        }
+      ],
+      "id": "memoryagentbench.c2",
+      "statement": "实测三族系统（Long-Context / RAG / Agentic Memory）后，不存在全维度全能的记忆系统： 总分最高为 Claude-3.7-Sonnet 49.6、GPT-4o 48.8、GPT-4.1-mini 46.9，最强 agentic-memory 是 MIRIX(GPT-4.1-mini) 37.7； 且多数商用记忆/RAG 系统总分低于裸 backbone GPT-4o-mini(42.2)——Mem0 21.1、Cognee 20.6、Zep 24.0、GraphRAG 23.4、RAPTOR 27.0。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能据此评判 AgeMem / supermemory / MemPalace——这三个系统不在受测清单内（逐字核实未出现），任何\"本篇评过它们\"的推断都是错的。",
+        "受测清单是\"相对有代表性的一部分\"（作者自承受预算限制），不是穷尽所有记忆 agent。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "受测系统名逐字核对 v2 HTML 结果表；AgeMem/supermemory/MemPalace 经专项核实确认不在表内（与 KG-2 实证一致）。",
+      "evidence": [
+        {
+          "anchor": "§4 Experiments / Table 2 rows",
+          "quote": "Mem0 / Cognee / Zep / GraphRAG / RAPTOR / MemoRAG / HippoRAG-v2 / MemGPT / MIRIX / Self-RAG / BM25 / Contriever",
+          "strength": "strong"
+        }
+      ],
+      "id": "memoryagentbench.c3",
+      "statement": "受测系统覆盖三族：Long-Context Agents(GPT-4o / GPT-4o-mini / GPT-4.1-mini / Gemini-2.0-Flash / Claude-3.7-Sonnet)、 RAG Agents(Simple=BM25；Embedding=Contriever/Text-Embed-3-Small/Large/Qwen3-Embedding-4B；Structure-Augmented=RAPTOR/GraphRAG/MemoRAG/HippoRAG-v2/Mem0/Cognee/Zep)、 Agentic Memory Agents(Self-RAG / MemGPT / MIRIX / MIRIX(4.1-mini))。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能完全排除 FactConsolidation 由 MQUAKE 反事实拼接带来的构念效度问题（作者用 o4-mini 短上下文可解作部分缓解证据，但非完全证伪拼接质疑）。",
+        "不能证明该崩塌对非反事实型冲突（自然出现的事实更新）同样严重。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "o4-mini 数字来自数据集验证表，作为\"非 bug\"论证的单点支撑证据，原文报告但样本窄。",
+      "evidence": [
+        {
+          "anchor": "§4 dataset validation (Table 4)",
+          "quote": "FactConsolidation-MH at 6K tokens = 80.0; at 32K tokens = 14.0",
+          "strength": "medium"
+        }
+      ],
+      "id": "memoryagentbench.c4",
+      "statement": "\"多跳选择性遗忘\"低分是真·长程推理范式短板而非数据集拼接 bug：更强推理模型 o4-mini 在 FactConsolidation 多跳 6K 能拿 80.0、 单跳 6K 达 100.0，但同任务在 32K 直接掉到 14.0，说明随上下文增长的多跳冲突消解能力崩塌是范式问题。\n",
+      "type": "fact"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "long-context 模型相对上升（它们本就擅长在可见全文里检索/通读）",
+        "RAG/agentic-memory 的\"边读边记\"优势被抹掉，因为不再需要在原文撤走后依赖自身记忆",
+        "失去\"记忆 vs long-context\"的本质区分(c1)——退化为 long-context 评测，正是本篇要纠正的旧范式"
+      ],
+      "q": "若把 MemoryAgentBench 的供给方式从\"增量逐块 + 收走原文\"改回\"一次性给出完整长上下文再提问\"，哪一族系统的相对排名最可能上升？为什么这会使该 benchmark 失去其核心主张？",
+      "tested_objects": [
+        "memoryagentbench.m1",
+        "memoryagentbench.c1"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "支持证据：o4-mini 6K 能到 80.0 但 32K 掉到 14.0，指向随长度崩塌的长程推理短板而非纯数据 bug(c4)",
+        "不能排除：FactConsolidation 由 MQUAKE 反事实对拼接的构念效度问题(a2)——合成冲突难度未必等于真实冲突",
+        "不能外推到非反事实型的自然事实更新场景"
+      ],
+      "q": "\"多跳选择性遗忘全体 ≤7%\" 这个结论，本 benchmark 能证明它是真·范式短板到什么程度？哪些反驳无法被它排除？",
+      "tested_objects": [
+        "memoryagentbench.c4",
+        "memoryagentbench.a2",
+        "memoryagentbench.f1"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "TTL(即时学新行为) + SF(覆盖过时/矛盾事实) 是衡量\"是否真在进化\"的两维",
+        "SF 对应站内 SUPERSEDE/ARCHIVE 操作与图谱 contradicts/supersedes 边",
+        "借\"四维 + 增量协议\"当回归测试尺，不复刻其合成数据集（避免构念效度问题）"
+      ],
+      "q": "想把这套 benchmark 迁移来体检 AI-Brief 自己的记忆系统(BriefMem)，四维里哪两维直接对应\"自进化\"，应如何借用而避免照抄？",
+      "tested_objects": [
+        "memoryagentbench.m2",
+        "memoryagentbench.m1"
+      ],
+      "type": "transfer"
+    },
+    {
+      "expected_points": [
+        "不直接成立——Mem0 的设计场景(长会话对话压缩)与本基准任务族(长文档/事件链/反事实)存在失配(f1)",
+        "仅默认 GPT-4o-mini 单 backbone，跨 backbone 稳定性未验证(c2 cannot_prove)",
+        "需在 Mem0 的目标场景(如 LoCoMo 式长对话)且控制 backbone 后才可比"
+      ],
+      "q": "本篇报告 Mem0 总分 21.1、低于裸 backbone GPT-4o-mini 42.2。据此推断\"Mem0 不如直接用 GPT-4o-mini\"是否成立？需要什么额外条件才能下这个判断？",
+      "tested_objects": [
+        "memoryagentbench.c2",
+        "memoryagentbench.f1"
+      ],
+      "type": "boundary"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "商用记忆系统总分低于裸 backbone，可能被外部读者过度解读为\"商用记忆系统无用\"，而非\"在本基准任务族上不占优\"。",
+      "id": "memoryagentbench.f1",
+      "statement": "benchmark 把\"场景失配的低分\"误读为\"记忆能力差\"。",
+      "triggered_when": "被测系统(如 Mem0/Zep)的设计场景是长会话对话压缩，却用长文档 QA/小说事件链/反事实编辑任务考它。"
+    },
+    {
+      "consequence": "同族被测可能被系统性高估，跨族排名失真。",
+      "id": "memoryagentbench.f2",
+      "statement": "LLM-judge 偏差污染开放题排名。",
+      "triggered_when": "LRU 摘要/DetectiveQA 用 GPT-4o 评分，被测含 GPT 同族模型。"
+    },
+    {
+      "consequence": "论文中的绝对分数与排名失去时效，需要重跑才有参考价值。",
+      "id": "memoryagentbench.f3",
+      "statement": "结论随产品版本漂移而过期。",
+      "triggered_when": "Mem0/MemGPT/MIRIX 等商用/开源 agent 发布新版本后未重测。"
+    }
+  ],
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§3.3 (chunks c1..cn + memorize instruction)",
+      "canonical_concept": "eval.lifecycle-dimensions",
+      "id": "memoryagentbench.m1",
+      "input": "一段长语料（重构自旧长上下文数据集或自建难题）+ 与之对应的问题集 q1..qm",
+      "name": "增量多轮记忆评测协议（incremental multi-turn evaluation）",
+      "non_replaceable": [
+        "增量逐块供给(取代一次性长上下文)",
+        "收走原文后才提问",
+        "四维正交划分"
+      ],
+      "operations": [
+        "将语料切成顺序块 c1,c2,...,cn",
+        "每块随附\"请记住其内容\"的指令，逐块喂给被测记忆系统（原文随后不可见）",
+        "读完后用 q1..qm 提问，系统只能依赖自己存下的记忆作答",
+        "按四维(AR/TTL/LRU/SF)各自的任务与指标打分；开放题(LRU 摘要/DetectiveQA)用 GPT-4o 作 LLM-judge"
+      ],
+      "optimization": "none",
+      "output": "被测系统在四维各任务上的得分（不给系统背书，只暴露维度短板）",
+      "problem": "mem.evaluation",
+      "replaceable": [
+        "具体 backbone 模型",
+        "embedding/检索后端",
+        "LLM-judge 模型",
+        "各维下的具体数据集"
+      ],
+      "reusable_pattern": "评测一个\"会记东西\"的系统时，把信息按时间顺序分块喂入并在原文撤走后才考核——把\"能否翻书\"和\"是否记住\"从根上分开。"
+    },
+    {
+      "anchor": "§1 Introduction (four competencies definitions)",
+      "canonical_concept": "eval.lifecycle-dimensions",
+      "id": "memoryagentbench.m2",
+      "input": "增量协议下被测系统的记忆行为",
+      "name": "四维正交能力划分(AR/TTL/LRU/SF)",
+      "non_replaceable": [
+        "四维彼此正交且各有认知科学依据",
+        "SF 维（旧版误记为冲突消解 CR，此处订正为 Selective Forgetting）"
+      ],
+      "operations": [
+        "AR 精确检索：单跳/多跳取回正确片段（单次查询可达即可）",
+        "TTL 测试时学习：部署中从示例学新行为/技能、不再训练",
+        "LRU 长程理解：整合 ≥100K token 跨度信息做全局理解",
+        "SF 选择性遗忘：遇矛盾证据时改写/覆盖/删除旧记忆"
+      ],
+      "optimization": "none",
+      "output": "沿四条正交轴的分维得分，用于证明\"无全能系统\"与定位共同短板",
+      "problem": "mem.lifecycle-management",
+      "replaceable": [
+        "每维下挂载的具体数据集（如 AR 可换 LongMemEval/EventQA）"
+      ],
+      "reusable_pattern": "把\"记忆好不好\"这个含糊判断拆成取回/学新/通读/忘旧四条互不替代的能力轴，再分别考。"
+    }
+  ],
+  "object_id": "paper/memoryagentbench",
+  "one_sentence_thesis": "主张现有\"记忆评测\"实为 long-context 评测（一次性灌全文）而非真记忆评测，靠\"增量逐块喂入 + 每块请记住 + 收走原文后提问\"的协议把二者分开、并沿四个正交能力维度(AR/TTL/LRU/SF)统一打分，在重构七个旧数据集 + 自建两个新数据集(EventQA/FactConsolidation)上实测 long-context / RAG / agentic-memory 三族系统，展示不存在全能记忆系统、且多跳选择性遗忘是全行业系统性盲区(所有方法 ≤7%)。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "能用（非红线，纯评测协议借用，无需训练/无 schema 变更）：把 AR/TTL/LRU/SF 四维 + 增量多轮协议作为 BriefMem 的回归测试设计尺。 落地动作：① 把记忆维护协议的\"学新不忘旧 / SUPERSEDE 覆盖过时条目\"显式对齐到 SF 维度； ② 把\"多跳选择性遗忘\"列为外脑记忆红线指标——新精读推翻旧判断时，图谱里被取代节点须被覆盖而非并存（呼应 no-old-new-coexistence）。 verify 路径=四维各取一个小自测集回归本站记忆召回/覆盖行为；借维度协议、不复刻合成数据集。\n",
+    "state": "apply"
+  },
+  "slug": "memoryagentbench",
+  "source": "arxiv:2507.05257v2 + github.com/HUST-AI-HYZ/MemoryAgentBench (MIT) + HF datasets/ai-hyz/MemoryAgentBench",
+  "status": "draft",
+  "title": "MemoryAgentBench: Evaluating Memory in LLM Agents via Incremental Multi-Turn Interactions",
+  "trigger_hooks": [
+    {
+      "related_object": "memoryagentbench.m2",
+      "risk": "把它当\"记忆引擎\"用——它只是尺子，不构建任何记忆，直接拿去当记忆系统会落空。",
+      "symptom": "我搭了个记忆/检索模块，但说不清它到底有没有让 agent 表现更好。",
+      "why_recall": "本篇把\"记忆有没有用\"拆成四条可单测的能力轴 + 增量协议，能把模糊体感变成可回归的测试集。"
+    },
+    {
+      "related_object": "memoryagentbench.m2",
+      "risk": "直接照搬 FactConsolidation 合成反事实对，可能引入构念效度问题；应借维度协议、不复刻其合成数据集。",
+      "symptom": "新信息推翻了旧结论，但系统还在用旧的答；不知道怎么衡量它会不会更新。",
+      "why_recall": "SF(选择性遗忘)维 + FactConsolidation 任务正是测\"新事实能否覆盖旧事实\"，且本篇指出这是全行业 ≤7% 的系统性盲区。"
+    },
+    {
+      "related_object": "memoryagentbench.m1",
+      "risk": "误以为\"改成分块喂\"就够了——还须收走原文后才提问，否则仍是 long-context 评测。",
+      "symptom": "我的评测把整篇长文塞进上下文再提问，怀疑测的不是记忆而是会不会翻书。",
+      "why_recall": "c1 的本质区分 + 增量逐块协议正是为分开\"long-context 翻书\"与\"真记住\"而设计。"
+    }
+  ]
+}

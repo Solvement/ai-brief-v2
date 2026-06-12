@@ -3903,10 +3903,13 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ════ Mind Palace 记忆球（3D）：画布让位 + 靛蓝分析面板（区别于检索区白卡；浅底 light 宪法） ════ */
 .globe-stage { position: relative; display: flex; gap: 0; height: 78vh; min-height: 560px; border-radius: 18px; overflow: hidden; border: 1px solid #d4d9e0; background: #f4f7fc; box-shadow: 0 1px 3px rgba(15,23,42,.05); }
-.globe-canvas { flex: 1 1 100%; transition: flex-basis .6s cubic-bezier(.22,.8,.3,1); min-width: 0; }
+/* overflow:hidden clips the WebGL canvas to its (focus-shrunk) box so its GPU compositing
+   layer can't spill right and cover the explanation panel — Kevin: 放大后解释文字看不见 (2026-06-12). */
+.globe-canvas { flex: 1 1 100%; transition: flex-basis .6s cubic-bezier(.22,.8,.3,1); min-width: 0; overflow: hidden; position: relative; }
 .globe-stage.focused .globe-canvas { flex: 1 1 56%; }
 .globe-panel {
   flex: 0 0 44%; max-width: 620px; overflow-y: auto; padding: 22px 24px;
+  position: relative; z-index: 2; /* sit above the canvas layer so explanation text is never covered */
   background: linear-gradient(165deg, #eef2ff, #f8faff 60%);
   border-left: 1px solid #c7d2fe; color: #1e293b;
   animation: globePanelIn .5s cubic-bezier(.22,.8,.3,1);

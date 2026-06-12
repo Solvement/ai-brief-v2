@@ -1,0 +1,511 @@
+{
+  "schema": "ros-graph-v1",
+  "generated_at": "2026-06-12T20:28:48.917Z",
+  "nodes": [
+    {
+      "id": "paper/agemem",
+      "slug": "agemem",
+      "kind": "paper",
+      "title": "AgeMem — Learning Unified Long-Term and Short-Term Memory Management for LLM Agents",
+      "thesis": "主张「记忆操作应是 agent 策略的一部分而非旁挂存储层」，方法是把六个记忆操作（LTM 的 Add/Update/Delete + STM 的 Retrieve/Summary/Filter）暴露为一等 tool-based policy action 并用三阶段课程 + step-wise GRPO 端到端强化学习训练， 在 ALFWorld/SciWorld/PDDL/BabyAI/HotpotQA 五个长程基准、Qwen2.5-7B 与 Qwen3-4B 两个 backbone 的受控评测上均分超过模块化记忆基线。\n",
+      "problems": [
+        "mem.lifecycle-management"
+      ],
+      "concepts": [
+        "mem.learned-policy-controller",
+        "train.terminal-credit-broadcast"
+      ],
+      "benchmarks": [],
+      "cluster": "mem",
+      "counts": {
+        "claims": 6,
+        "mechanisms": 3,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/kvarn",
+      "slug": "kvarn",
+      "kind": "paper",
+      "title": "KVarN — Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
+      "thesis": "主张「KV-Cache 量化的真实负载是自回归解码下的误差跨时间步累积、且罪魁是 token 幅度（scale）被压坏而非方向偏」， 方法是免校准地对每块 K/V 先做 Hadamard 旋转（治通道离群）再做双轴方差归一化（治 token 幅度极端值）后用 RTN 压到 2-bit， 在 Qwen3-4B / Llama-3.1-8B / Phi-4-14B 上、用对齐真实负载的 pseudo-decode 协议评测，于 MATH500/AIME24/HumanEval 等生成式 benchmark 在 2.3 bit/元素同档下取得新 SOTA（均为论文自报，无第三方复现）。\n",
+      "problems": [
+        "infra.kv-cache-compression",
+        "infra.quantization-eval-realism"
+      ],
+      "concepts": [
+        "quant.dual-axis-variance-normalization",
+        "quant.pseudo-decode-protocol"
+      ],
+      "benchmarks": [],
+      "cluster": "infra",
+      "counts": {
+        "claims": 6,
+        "mechanisms": 2,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/latentskill",
+      "slug": "latentskill",
+      "kind": "paper",
+      "title": "LatentSkill — From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
+      "thesis": "主张「可复用的 agent 技能不必每步以文本进 context，可被编译成权重」，方法是训练一个 hypernetwork（skill compiler）把技能文档 s 一次前向编成可插拔 LoRA 补丁 Δs=Gφ(s)、挂在冻结 backbone 上（θ⊕αΔs）， 在 ALFWorld 与 Search-QA 两类任务、Qwen3-8B 单一 backbone 的作者自报评测上，对同内容 in-context skill 基线提升成功率/EM 且大幅降 prefill token（仓库尚未开源，数字均自报）。\n",
+      "problems": [
+        "skill.knowledge-parameterization"
+      ],
+      "concepts": [
+        "skill.weight-space-skill",
+        "skill.hypernetwork-lora-compiler",
+        "skill.component-level-lora-arithmetic"
+      ],
+      "benchmarks": [],
+      "cluster": "skill",
+      "counts": {
+        "claims": 7,
+        "mechanisms": 3,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/longtracerl",
+      "slug": "longtracerl",
+      "kind": "paper",
+      "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+      "thesis": "主张长上下文 RL 的瓶颈一半在「干扰物不够像」、一半在「结果奖励管不到中间推理步」， 方法是用搜索 agent 真实轨迹里「读了却没引用」的文档造可分级的高混淆干扰（traj-tiered distractor）+ 用推理链每跳的黄金实体做实体级过程奖励（rubric reward），并以 positive-only 开关（过程分只发给最终答对者）防 reward hacking， 在 Qwen3-4B/8B/30B 三个推理 backbone、五个长上下文 benchmark 上自报平均分均居首（但绝对增益对 backbone 敏感：4B +5.7、8B 仅 +1.1）。\n",
+      "problems": [
+        "train.credit-assignment"
+      ],
+      "concepts": [
+        "train.entity-level-process-reward",
+        "train.outcome-gated-process-reward",
+        "data.trajectory-mined-hard-distractor"
+      ],
+      "benchmarks": [],
+      "cluster": "train",
+      "counts": {
+        "claims": 5,
+        "mechanisms": 2,
+        "trigger_hooks": 3,
+        "exam_questions": 3
+      }
+    },
+    {
+      "id": "paper/memoryagentbench",
+      "slug": "memoryagentbench",
+      "kind": "paper",
+      "title": "MemoryAgentBench: Evaluating Memory in LLM Agents via Incremental Multi-Turn Interactions",
+      "thesis": "主张现有\"记忆评测\"实为 long-context 评测（一次性灌全文）而非真记忆评测，靠\"增量逐块喂入 + 每块请记住 + 收走原文后提问\"的协议把二者分开、并沿四个正交能力维度(AR/TTL/LRU/SF)统一打分，在重构七个旧数据集 + 自建两个新数据集(EventQA/FactConsolidation)上实测 long-context / RAG / agentic-memory 三族系统，展示不存在全能记忆系统、且多跳选择性遗忘是全行业系统性盲区(所有方法 ≤7%)。\n",
+      "problems": [
+        "mem.evaluation",
+        "mem.lifecycle-management",
+        "mem.retrieval-precision",
+        "mem.staleness-conflict"
+      ],
+      "concepts": [
+        "eval.lifecycle-dimensions",
+        "eval.incremental-multi-turn-protocol",
+        "mem.external-vector-store",
+        "mem.fact-graph"
+      ],
+      "benchmarks": [
+        "bench.memoryagentbench"
+      ],
+      "cluster": "mem",
+      "counts": {
+        "claims": 4,
+        "mechanisms": 2,
+        "trigger_hooks": 3,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/scaling",
+      "slug": "scaling",
+      "kind": "paper",
+      "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
+      "thesis": "主张「PEFT/LoRA 不只是省钱的微调替代，而是长在共享强基座上的持久个人状态（local adaptive state）」， 方法是把问题拆成三根依赖轴——Scale Up（强先验给低秩更新杠杆）/ Scale Down（找低秩仍稳定的操作区间）/ Scale Out（让百万 adapter 可寻址·版本化·回滚·评测·聚合），并配 MinT 生命周期基础设施， 在作者体系内一组自有实验（rank sweep / OLoRA-tail / δ-Mem / LoRA-as-memory 容量律 / majority vote / MinT 工程指标）上展示该范式可行—— 但全篇为 position+synthesis paper，代码未披露、多变量未隔离、关键证据自报。\n",
+      "problems": [
+        "skill.knowledge-parameterization",
+        "train.credit-assignment",
+        "mem.lifecycle-management"
+      ],
+      "concepts": [
+        "skill.parametric-local-state",
+        "skill.lora-as-memory-capacity",
+        "skill.adapter-population-governance"
+      ],
+      "benchmarks": [],
+      "cluster": "skill",
+      "counts": {
+        "claims": 7,
+        "mechanisms": 3,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/tropd",
+      "slug": "tropd",
+      "kind": "paper",
+      "title": "Trust Region On-Policy Distillation",
+      "thesis": "主张 on-policy 蒸馏（OPD）的真问题不是「监督太少」而是「师生分布错位下少数 token 的稠密监督太强且不可信」—— 方法是借投机解码接受率 min(π_T/π_S,1) 逐 token 划信任区（可信 token 用省显存的 K1 reverse-KL、离群 token 改用教师 top-k forward-KL 温和回退）+ 老师前缀 cosine 退火的 off-policy guidance—— 在 DeepSeek-1.5B / Qwen3-SFT-1.7B 两组师生、单/多域推理基准上（作者自报、未本机复训）平均较 OPD 提升 +3~6 点，且消融证明「只在离群区用 FKL」（49.85）远胜「全局 FKL」（1.40）。\n",
+      "problems": [
+        "train.distillation-supervision-reliability"
+      ],
+      "concepts": [
+        "train.trust-region-supervision-gating"
+      ],
+      "benchmarks": [],
+      "cluster": "train",
+      "counts": {
+        "claims": 5,
+        "mechanisms": 3,
+        "trigger_hooks": 3,
+        "exam_questions": 3
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-0001",
+      "source": "paper/agemem",
+      "target": "paper/longtracerl",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/agemem",
+          "target_object": "paper/longtracerl",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: train.terminal-credit-broadcast is distinct_from/conflicts_with train.entity-level-process-reward; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0002",
+      "source": "paper/agemem",
+      "target": "paper/memoryagentbench",
+      "primary_type": "complements",
+      "confidence": "medium",
+      "count": 2,
+      "relations": [
+        {
+          "relation_type": "complements",
+          "source_object": "agemem.m1",
+          "target_object": "memoryagentbench.m2",
+          "confidence": "medium",
+          "derived_by": "llm_judgment",
+          "boundary": "互补不等于\"已被验证攻克\"：MAB 未实测 AgeMem（agemem.canonical.benchmarks 为空、c3 核实全文不含 MAB）， AgeMem 也未在 FactConsolidation 式多跳 SF 任务上报过分数。关系仅成立于\"诊断维度 ↔ 目标机制\"的设计层面； 一旦有人真把 AgeMem 放进 MAB 的 SF 维跑出结果，本边应升级为 validates 或被推翻。\n",
+          "reason": "双端锚点具体（agemem.m1 的 Delete/Update 动作 vs MAB.m2 的 SF 维 + c4 的 ≤7% 实测），机制面对位清晰； 但纯功能/设计层互补、无任何实测交集（MAB 未测 AgeMem），按纪律功能关系封顶 medium。\n"
+        },
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/agemem",
+          "target_object": "paper/memoryagentbench",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to mem.lifecycle-management"
+        }
+      ]
+    },
+    {
+      "id": "e-0003",
+      "source": "paper/agemem",
+      "target": "paper/scaling",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/agemem",
+          "target_object": "paper/scaling",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to mem.lifecycle-management"
+        }
+      ]
+    },
+    {
+      "id": "e-0004",
+      "source": "paper/agemem",
+      "target": "paper/tropd",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/agemem",
+          "target_object": "paper/tropd",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: train.terminal-credit-broadcast is distinct_from/conflicts_with train.trust-region-supervision-gating; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0005",
+      "source": "paper/latentskill",
+      "target": "paper/memoryagentbench",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/latentskill",
+          "target_object": "paper/memoryagentbench",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: skill.weight-space-skill is distinct_from/conflicts_with mem.external-vector-store; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0006",
+      "source": "paper/latentskill",
+      "target": "paper/scaling",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/latentskill",
+          "target_object": "paper/scaling",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to skill.knowledge-parameterization"
+        }
+      ]
+    },
+    {
+      "id": "e-0007",
+      "source": "paper/longtracerl",
+      "target": "paper/scaling",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/longtracerl",
+          "target_object": "paper/scaling",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to train.credit-assignment"
+        }
+      ]
+    },
+    {
+      "id": "e-0008",
+      "source": "paper/longtracerl",
+      "target": "paper/tropd",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/longtracerl",
+          "target_object": "paper/tropd",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: train.outcome-gated-process-reward is distinct_from/conflicts_with train.trust-region-supervision-gating; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0009",
+      "source": "paper/memoryagentbench",
+      "target": "paper/scaling",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 2,
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/memoryagentbench",
+          "target_object": "paper/scaling",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to mem.lifecycle-management"
+        },
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/memoryagentbench",
+          "target_object": "paper/scaling",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: mem.external-vector-store is distinct_from/conflicts_with skill.parametric-local-state; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    }
+  ],
+  "propositions": [
+    {
+      "id": "prop.memory-rule-vs-learned",
+      "statement": "长期 agent 的记忆管理应从固定规则转向可学习策略",
+      "state": "leaning-support",
+      "cluster": "mem",
+      "possible_synthesis": "hybrid controller——规则层管安全边界与可解释性，学习层管动态优化；先落 typed memory action 接口（不训练也能用，未来可挂学习层）",
+      "support": [
+        {
+          "claim_id": "agemem.c1",
+          "owner": "agemem",
+          "owner_kind": "paper",
+          "excerpt": "把 LTM+STM 管理折叠进 agent 自身策略（并用 RL 训练）在长程任务上胜过模块化的「记忆增强」基线： Qwen2.5-7B 均分 41.96% vs 最强基线 Mem0 37.14%；Qwen3-4B 均分 54.31% vs"
+        },
+        {
+          "claim_id": "agemem.c2",
+          "owner": "agemem",
+          "owner_kind": "paper",
+          "excerpt": "真正承重的是 RL 训练阶段而非统一记忆接口本身：去掉 RL 的 AgeMem-noRL 均分仅 33.43%（Qwen2.5）/ 45.59%（Qwen3）， 加上 RL 才到 41.96% / 54.31%，即 RL 贡献 +8.53 "
+        },
+        {
+          "claim_id": "agemem.c4",
+          "owner": "agemem",
+          "owner_kind": "paper",
+          "excerpt": "增益不是「给旧基线补齐同样的短期管理/RL 模块」就能追上的——v2 在附录给 LangMem/A-Mem/Mem0 增强后比较，AgeMem 仍领先， 作者据此论证「统一策略 ≠ 模块叠加」。"
+        }
+      ],
+      "oppose": [
+        {
+          "claim_id": "rohitg00-agentmemory.c4",
+          "owner": "rohitg00-agentmemory",
+          "owner_kind": "project",
+          "excerpt": "[自报·未独立复现] LongMemEval-S（500 题，本地 all-MiniLM-L6-v2 384 维 embedding，无 API key，无 LLM in loop） BM25+Vector R@5 95.2% / R@10"
+        }
+      ]
+    },
+    {
+      "id": "prop.verbatim-vs-extraction",
+      "statement": "记忆应逐字本地保留原始记录，而非云端抽取压缩",
+      "state": "open",
+      "cluster": "mem",
+      "possible_synthesis": "分层混合——逐字层保真可追溯 + 有损索引层导航（mempalace 实际架构）+ 版本链 supersede 管理事实演化（supermemory.c2 的数据契约可借）",
+      "support": [
+        {
+          "claim_id": "mempalace.c4",
+          "owner": "mempalace",
+          "owner_kind": "project",
+          "excerpt": "[实读] 逐字保真只在 drawer（内容）层成立；索引层（AAAK / closets）是显式有损的结构化摘要， 不可还原原文，仅作指针指向 verbatim drawers。"
+        },
+        {
+          "claim_id": "mempalace.c1",
+          "owner": "mempalace",
+          "owner_kind": "project",
+          "excerpt": "[自报] MemPalace 在 LongMemEval（500 题）上纯语义检索（无启发式、无 LLM）达 R@5 96.6%， 全程无需 API key / 云 / 任何 LLM。"
+        }
+      ],
+      "oppose": [
+        {
+          "claim_id": "supermemory.c1",
+          "owner": "supermemory",
+          "owner_kind": "project",
+          "excerpt": "记忆是「随时间追踪用户事实」的有状态层，区别于「检索文档块、对所有人返回同样结果」的无状态 RAG； 系统理解「I just moved to SF」supersede「I live in NYC」。"
+        },
+        {
+          "claim_id": "memoryagentbench.c1",
+          "owner": "memoryagentbench",
+          "owner_kind": "paper",
+          "excerpt": "记忆与长上下文存在本质区别：记忆是对过去信息的压缩与蒸馏表示（选择性抽取要点、删冗余、并融入新推断）， 而非逐字保存全部历史；因此把整段上下文一次性给出的旧数据集不适用于评测记忆 agent。"
+        }
+      ]
+    },
+    {
+      "id": "prop.parametric-vs-external-memory",
+      "statement": "agent 的个人状态/技能应存进模型参数（PEFT/LoRA），而非外部记忆库",
+      "state": "open",
+      "cluster": "skill",
+      "possible_synthesis": "分型混合——技能/行为进参数（weight-space skill），事实/记录留外部检索（verbatim/fact-graph），以知识类型路由介质",
+      "support": [
+        {
+          "claim_id": "latentskill.c1",
+          "owner": "latentskill",
+          "owner_kind": "paper",
+          "excerpt": "把技能从 in-context 文本编译成 in-weight LoRA，在 ALFWorld 对同内容 in-context skill 基线提升成功率且大幅省 prefill token： seen 74.3 vs 52.9（+21.4"
+        },
+        {
+          "claim_id": "scaling.c2",
+          "owner": "scaling",
+          "owner_kind": "paper",
+          "excerpt": "Scale Up：在固定可训练预算下，「强 base + 小 LoRA」比「弱 base + full RL」更有杠杆—— motivating table 中 DS-Distill-Qwen-32B LoRA r=8（0.07B trai"
+        }
+      ],
+      "oppose": [
+        {
+          "claim_id": "scaling.c5",
+          "owner": "scaling",
+          "owner_kind": "paper",
+          "excerpt": "Scale Out 的 LoRA-as-memory 容量律：用 DishNameBenchmark（263 runs）测「memory tokens / trainable parameter」—— 低于约 1e-3 时 accuracy"
+        },
+        {
+          "claim_id": "mempalace.c1",
+          "owner": "mempalace",
+          "owner_kind": "project",
+          "excerpt": "[自报] MemPalace 在 LongMemEval（500 题）上纯语义检索（无启发式、无 LLM）达 R@5 96.6%， 全程无需 API key / 云 / 任何 LLM。"
+        }
+      ]
+    },
+    {
+      "id": "prop.retrieval-metrics-insufficient",
+      "statement": "记忆系统的价值不能用检索命中率衡量，必须用生命周期能力与端到端任务收益衡量",
+      "state": "leaning-support",
+      "cluster": "mem",
+      "possible_synthesis": "检索命中率=必要非充分——例行回归用 R@k（便宜），季度体检叠加生命周期维度（SF/TTL/LRU）与端到端任务样本",
+      "support": [
+        {
+          "claim_id": "memoryagentbench.c1",
+          "owner": "memoryagentbench",
+          "owner_kind": "paper",
+          "excerpt": "记忆与长上下文存在本质区别：记忆是对过去信息的压缩与蒸馏表示（选择性抽取要点、删冗余、并融入新推断）， 而非逐字保存全部历史；因此把整段上下文一次性给出的旧数据集不适用于评测记忆 agent。"
+        },
+        {
+          "claim_id": "memoryagentbench.c2",
+          "owner": "memoryagentbench",
+          "owner_kind": "paper",
+          "excerpt": "实测三族系统（Long-Context / RAG / Agentic Memory）后，不存在全维度全能的记忆系统： 总分最高为 Claude-3.7-Sonnet 49.6、GPT-4o 48.8、GPT-4.1-mini 46.9，最"
+        },
+        {
+          "claim_id": "memoryagentbench.c4",
+          "owner": "memoryagentbench",
+          "owner_kind": "paper",
+          "excerpt": "\"多跳选择性遗忘\"低分是真·长程推理范式短板而非数据集拼接 bug：更强推理模型 o4-mini 在 FactConsolidation 多跳 6K 能拿 80.0、 单跳 6K 达 100.0，但同任务在 32K 直接掉到 14.0，说明"
+        }
+      ],
+      "oppose": [
+        {
+          "claim_id": "mempalace.a3",
+          "owner": "mempalace",
+          "owner_kind": "project",
+          "excerpt": "检索命中率（R@k）是衡量记忆系统价值的有效近似——README 头条用 retrieval recall，而非端到端任务正确率。"
+        },
+        {
+          "claim_id": "rohitg00-agentmemory.c4",
+          "owner": "rohitg00-agentmemory",
+          "owner_kind": "project",
+          "excerpt": "[自报·未独立复现] LongMemEval-S（500 题，本地 all-MiniLM-L6-v2 384 维 embedding，无 API key，无 LLM in loop） BM25+Vector R@5 95.2% / R@10"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,311 @@
+{
+  "assumptions": [
+    {
+      "anchor": "",
+      "conflicts_hint": "与「老师本身有噪声/不可靠」的场景天然张力——老师不可信时 min(π_T/π_S,1) 失真，整个分区基础动摇。",
+      "id": "tropd.a1",
+      "kind": "implicit",
+      "statement": "信任尺子 π_T/π_S 有意义的前提是老师本身可信、且师生 tokenizer/能力可比——隐含假设老师概率分布是可靠的监督参照。\n"
+    },
+    {
+      "anchor": "Limitations 逐字 'This work focuses primarily on OPD-based post-training ... Future work should investigate how additional stages, such as pre-training and mid-training, can further enhance small reasoning models'",
+      "conflicts_hint": "与「SRM 真实上限由 pre/mid-training 主导」的假设互斥——作者自承性能上限可能受限。",
+      "id": "tropd.a2",
+      "kind": "explicit",
+      "statement": "只做 OPD post-training（DeepSeek-Qwen2.5-1.5B / Qwen3-SFT-1.7B）即可代表方法价值——隐含假设 pre-/mid-training 不改变结论。\n"
+    },
+    {
+      "anchor": "§4.2 outlier FKL 解释（paper.mdx [!warn] 标注此说法按常规 KL 直觉不显然，复现应以作者代码为准）",
+      "conflicts_hint": "与「该辅助项可能在某些分布下反而干扰主目标」互斥——代码未发布，无法独立验证数值行为。",
+      "id": "tropd.a3",
+      "kind": "explicit",
+      "statement": "outlier FKL 在学生 top-k 概率和趋近 0 时会自然被抑制、不干扰 trust region——原文如此表述但按常规 KL 直觉不显然。\n"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "train.trust-region-supervision-gating"
+    ],
+    "problems": [
+      "train.distillation-supervision-reliability"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明在真实部署/应用中也有效——作者 Limitations 自承缺 practical deployment 与 application studies。",
+        "不能证明结果可复现——仓库 HEAD b4bee6f 未发布训练/评测代码与模型，数字仅可读不可复跑。",
+        "不能把领先归因为「超过老师」——老师 Avg. 58.48（单域）/ 73.43（多域）远高于学生，目标是稳定逼近老师而非超越。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 1/3/4 数字逐字可核，arXiv HTML v2 已核 Table 1 三关键行（Full FKL 1.40 / FKL Outlier 49.00 / TrOPD 49.85）。",
+      "evidence": [
+        {
+          "anchor": "Table 1（数学域 OPD 方法对比，老师 Skywork-OR1-Math-7B）",
+          "quote": "TrOPD Avg. 49.85; FKL Outlier 49.00; Clip Outlier 47.86; Mask Outlier 47.72; OPD(RKL) 46.79",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 3（DeepSeek-1.5B 学生，单域数学）",
+          "quote": "TrOPD Avg. 40.63; OPD 37.11; REOPOLD 38.79; Teacher 58.48",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 4（Qwen3-SFT-1.7B 多域，老师 Qwen3-Nemotron-4B）",
+          "quote": "TrOPD Avg. 51.73; OPD 48.29",
+          "strength": "strong"
+        }
+      ],
+      "id": "tropd.c1",
+      "statement": "在统一训练设定下，TrOPD 在数学域 OPD 基准上均分胜过所有对比方法：TrOPD 49.85 > FKL Outlier 49.00 > Clip Outlier 47.86 / Mask Outlier 47.72 > vanilla OPD(RKL) 46.79；端到端上 DeepSeek-1.5B 学生单域 TrOPD 40.63 vs OPD 37.11 vs REOPOLD 38.79， Qwen3-SFT-1.7B 多域 TrOPD 51.73 vs OPD 48.29。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 1.40 不是某个可调超参/实现细节导致的失败配置——代码未发布，全局 FKL 的具体训练设置无法独立审。",
+        "不能区分 49.00→49.85 的 +0.85 增量里 off-policy guidance 与随机噪声各占多少——原文未报方差/种子。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Full FKL 1.40 与 FKL Outlier 49.00 已在 arXiv HTML v2 逐字核实。",
+      "evidence": [
+        {
+          "anchor": "Table 1 / Table 5（消融，Full FKL vs FKL Outlier）",
+          "quote": "Full FKL Avg. 1.40 (AIME24 0.00 / AIME25 0.00 / AMC23 4.21); FKL Outlier Avg. 49.00; TrOPD Avg. 49.85",
+          "strength": "strong"
+        }
+      ],
+      "id": "tropd.c2",
+      "statement": "真正承重的不是「forward KL 本身神奇」，而是「只把 forward KL 放到不可靠的离群区」：全局 top-k FKL 几乎训不动（Avg. 仅 1.40）， 只在 outlier 区用 FKL 即到 49.00，再加 off-policy guidance 到 49.85。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明该发散在所有 OPD 实现中都实际致命——这是估计器的解析性质，实际训练崩塌程度仍依赖裁剪/学习率等工程处理。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——公式与「policy-gradient outliers」表述已在 arXiv HTML v2 逐字核实（属数学事实，非作者主观主张）。",
+      "evidence": [
+        {
+          "anchor": "§3.2 OPD for Reasoning Models（policy-gradient outlier）",
+          "quote": "∇𝒥 = (1/π_S(x)) log(π_T(x)/π_S(x)) → −∞；student-generated trajectories that receive extremely low confidence from the teacher induce significant policy-gradient outliers",
+          "strength": "strong"
+        }
+      ],
+      "id": "tropd.c3",
+      "statement": "K1 reverse-KL 估计器在师生分布错位时会产生发散的 policy-gradient outlier：当老师给学生某 token 的概率趋近 0， 其梯度形如 (1/π_S(x))·log(π_T(x)/π_S(x)) → -∞，少数离群 token 即可主导训练。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能证明该接受率是划信任区的最优准则——只论证它「自适应、省阈值」，未与最优阈值搜索对比。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——公式与投机解码动机句已在 arXiv HTML v2 逐字核实。",
+      "evidence": [
+        {
+          "anchor": "§4.2 Adaptive Trust Region（式 6）",
+          "quote": "P_trust(x)=min(π_T(x)/π_S(x),1); This design is motivated by speculative decoding, where ... P_accept(x) ∝ min(π_T(x)/π_S(x),1)",
+          "strength": "strong"
+        }
+      ],
+      "id": "tropd.c4",
+      "statement": "信任度量 P_trust(x)=min(π_T(x)/π_S(x),1) 直接借自投机解码的接受概率（P_accept ∝ min(π_T/π_S,1)）， 从而省去固定阈值 τ，由师生概率比自适应决定「老师是否接受这个 token」。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能证明叠加增益（40.63→41.67，+1.04）在统计上显著——无方差/种子，单组实验。",
+        "不能证明在其他师生/域上叠加性仍成立——仅此一组报告。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "由流程推断——数字来自本地深读资产抄录 Table 6，WebFetch 未单独复核该表；故 strength=medium、confidence=medium。",
+      "evidence": [
+        {
+          "anchor": "Table 6（与 AOPD 组合，5 项均值）",
+          "quote": "OPD 37.11; AOPD 39.79; TrOPD 40.63; TrOPD + AOPD 41.67",
+          "strength": "medium"
+        }
+      ],
+      "id": "tropd.c5",
+      "statement": "TrOPD 与并发工作 AOPD（asymmetric on-policy distillation）正交可叠加：五项均值 OPD 37.11 < AOPD 39.79 < TrOPD 40.63 < TrOPD+AOPD 41.67。\n",
+      "type": "author_claim"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "结果几乎训不动：Full FKL Avg. 仅 1.40（AIME24/25 均 0.00），远低于 FKL Outlier 49.00 / TrOPD 49.85（c2, f3）",
+        "说明承重的不是 FKL 本身，而是「按 token 可信度分区、只在离群区用 FKL」这一门控结构（m1/m2）",
+        "可信区仍需 reverse-KL；全局 FKL 丢掉了 mode-seeking 的高效监督"
+      ],
+      "q": "若对学生生成的全部 token（不分信任区/离群区）统一用 teacher top-k forward-KL，结果会怎样？这说明 TrOPD 的承重设计是什么？",
+      "tested_objects": [
+        "tropd.c2",
+        "tropd.m1",
+        "tropd.f3"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "老师本身不可靠时：尺子把不可信监督误判为可信（a1, f1）",
+        "师生 tokenizer/能力差异大、π_T/π_S 不可比时：比值失去「老师是否接受」的语义",
+        "原文未充分展开此失败模式，trust region 的有效性以「老师可信」为隐含前提"
+      ],
+      "q": "TrOPD 的信任区尺子是 min(π_T/π_S,1)。在什么条件下这把尺子会失效，导致分区门控反而有害？",
+      "tested_objects": [
+        "tropd.a1",
+        "tropd.f1",
+        "tropd.c4"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "能搬（设计心法）：把 critic/老师给的逐步分数分区——高信任步骤进训练样本/正常采纳，低信任步骤只给温和建议或示范，而非统一加权或一刀切（m1/m2 的 reusable_pattern）",
+        "能搬：冷启动用强模型示范、再有界退火撤掉（m3 心法），对应深读「先给范式样例再让模型自走」",
+        "搬不动：具体 min(π_T/π_S,1) 概率比尺子（本站无两个可比 policy 的逐 token 概率）、K1/forward-KL 梯度（无可训练 policy / RL 框架 / 付费 key）"
+      ],
+      "q": "把「强监督先过可靠度门再进回路」这条范式迁移到本站无可训练 model-client 的深读冷审/self-evo critic 打分，哪部分能搬、哪部分搬不动？",
+      "tested_objects": [
+        "tropd.m1",
+        "tropd.m2",
+        "tropd.m3"
+      ],
+      "type": "transfer"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "trust region 误把不可信监督划入可信区（或反之），分区门控失效，原文未充分展开此失败模式。",
+      "id": "tropd.f1",
+      "statement": "信任尺子失真。",
+      "triggered_when": "老师本身不可靠，或师生 tokenizer/能力差异大导致 π_T/π_S 不可比。"
+    },
+    {
+      "consequence": "离群区里仍有用的老师信号被一并裁掉，均分低于 FKL Outlier（47.72/47.86 vs 49.00）。",
+      "id": "tropd.f2",
+      "statement": "离群区监督被完全丢弃（mask/clip 路线）。",
+      "triggered_when": "用 Mask Outlier / Clip Outlier 一刀切处理离群 token。"
+    },
+    {
+      "consequence": "几乎训不动（Avg. 1.40），证明 FKL 只在离群区才有效。",
+      "id": "tropd.f3",
+      "statement": "全局误用 forward-KL。",
+      "triggered_when": "不分区、对全部 token 用 top-k forward-KL（Full FKL）。"
+    },
+    {
+      "consequence": "效果可能退化——原文给了默认值但无跨任务敏感性系统表。",
+      "id": "tropd.f4",
+      "statement": "超参跨任务漂移。",
+      "triggered_when": "把 k=64 / β=0.001 / cosine 退火日程直接搬到新师生或新域。"
+    }
+  ],
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§4.2 Adaptive Trust Region + Outlier Estimation，式 6/7，Table 2",
+      "canonical_concept": "train.trust-region-supervision-gating",
+      "id": "tropd.m1",
+      "input": "学生自生成轨迹 SoG 的每个 token x ~ π_S，及该 token 处的师生概率 π_T(x)、π_S(x)。\n",
+      "name": "逐 token 信任区门控（adaptive trust region gating）",
+      "non_replaceable": [
+        "「按 token 可信度分区、不同区用不同监督」这一结构（拿掉就退回统一 OPD，离群梯度复发散）",
+        "离群区不用 reverse-KL（继续用就是 c3 的 -∞ 发散根因）"
+      ],
+      "operations": [
+        "对每个学生 token 计算 P_trust(x)=min(π_T(x)/π_S(x),1)（借自投机解码接受率）",
+        "按 P_trust 采样掩码 M_x ~ Bernoulli(P_trust(x))：进信任区 or 落离群区",
+        "trust region：用 K1 reverse-KL 估计器学习，目标 -KL(π_S‖π_T)、估计器 log(π_T(x)/π_S(x))、显存 O(n)",
+        "outlier：弃用会发散的 reverse-KL，改用教师 top-k forward-KL，估计器 Σ_v π_T(v)log(π_S(v)/π_T(v))、显存 O(nk)（k=64）"
+      ],
+      "optimization": "无独立训练信号；本机制是「监督方式的选择器」，下游 reverse-KL / forward-KL 目标各自提供梯度。\n",
+      "output": "逐 token 的二元掩码 M_x ~ Bernoulli(P_trust(x))：trust region（可信）或 outlier（离群），决定该 token 用哪条监督目标。\n",
+      "problem": "train.distillation-supervision-reliability",
+      "replaceable": [
+        "信任度量函数（min(π_T/π_S,1) 可替换为其它接受率/阈值，作者论证它省阈值但未证最优）",
+        "离群区的温和监督形式（top-k FKL 可替换为其它正面示范，但消融显示 FKL 最高）",
+        "top-k 的 k 值（默认 64）"
+      ],
+      "reusable_pattern": "强监督进训练回路前先过「逐步可靠度门」——可信步骤正常学、不可信步骤降级为温和监督，而非统一加权或一刀切裁剪。"
+    },
+    {
+      "anchor": "§4.2 Outlier Masking/Estimation，式 7，Table 1/5，Fig.3/4",
+      "canonical_concept": "train.trust-region-supervision-gating",
+      "id": "tropd.m2",
+      "input": "落在离群区的学生 token（M_x=0），及教师在该位置的 top-k 词表分布。",
+      "name": "离群区 top-k forward-KL 温和回退（outlier estimation）",
+      "non_replaceable": [
+        "「保留而非丢弃离群区监督」这一选择（mask/clip 是丢弃派，消融里均低于 FKL Outlier）"
+      ],
+      "operations": [
+        "不用 reverse-KL（会 -∞），改算教师 top-k 上的 forward KL：Σ_v π_T(v) log(π_S(v)/π_T(v))（仅 top-k=64 个词，显存 O(nk)）",
+        "对比基线：Mask Outlier（屏蔽离群 token）、Clip Outlier（裁剪梯度）——二者比 vanilla 稳但丢掉离群区可用信号"
+      ],
+      "optimization": "forward-KL（mode-covering），作为离群区的替代监督目标。",
+      "output": "一个不发散的正面监督梯度——把学生推向教师 top-k 最可能写的词，而非围着学生刚写的坏 token 惩罚。",
+      "problem": "train.distillation-supervision-reliability",
+      "replaceable": [
+        "top-k 截断的 k（默认 64）"
+      ],
+      "reusable_pattern": "当某条强监督信号本身不可信时，不要简单屏蔽/裁剪（会连带丢有用信息），而是降级成一个更温和、更稳的替代信号。"
+    },
+    {
+      "anchor": "§4.3 Off-Policy Trust-Region Guidance，式 8/9",
+      "canonical_concept": "train.trust-region-supervision-gating",
+      "id": "tropd.m3",
+      "input": "训练 prompt；难题上学生自己写不出高质量开头（low-quality SoG）。",
+      "name": "off-policy guidance（老师前缀 + cosine 退火冷启动）",
+      "non_replaceable": [
+        "前缀长度最终退火到 0（不退火=残留 off-policy，回到 exposure bias）"
+      ],
+      "operations": [
+        "老师先写前缀 x[:l]，学生从 x[l:] 续写；前缀段用 forward KL 模仿，系数 β=0.001",
+        "最大前缀长度初始 = 最大训练序列长，随训练用 cosine schedule 退火到 0",
+        "退火到 0 后完全 on-policy，避免训练-推理分布残留 exposure bias"
+      ],
+      "optimization": "β·forward-KL（β=0.001），仅作冷启动引导项。",
+      "output": "训练初期由老师前缀引导、后期完全回到学生自身分布的混合轨迹。",
+      "problem": "train.distillation-supervision-reliability",
+      "replaceable": [
+        "退火日程（cosine 可换其它单调退火）",
+        "β 系数（默认 0.001）"
+      ],
+      "reusable_pattern": "起步阶段给「脚手架/示范」，但用有界退火日程逐步撤掉，最终让系统回到自身真实分布——避免长期依赖外部引导。"
+    }
+  ],
+  "object_id": "paper/tropd",
+  "one_sentence_thesis": "主张 on-policy 蒸馏（OPD）的真问题不是「监督太少」而是「师生分布错位下少数 token 的稠密监督太强且不可信」—— 方法是借投机解码接受率 min(π_T/π_S,1) 逐 token 划信任区（可信 token 用省显存的 K1 reverse-KL、离群 token 改用教师 top-k forward-KL 温和回退）+ 老师前缀 cosine 退火的 off-policy guidance—— 在 DeepSeek-1.5B / Qwen3-SFT-1.7B 两组师生、单/多域推理基准上（作者自报、未本机复训）平均较 OPD 提升 +3~6 点，且消融证明「只在离群区用 FKL」（49.85）远胜「全局 FKL」（1.40）。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "本篇是蒸馏训练方法论，记忆维度基本不相关；核心机制（reverse-KL / forward-KL 梯度、概率比尺子）依赖可训练 model-client， 本站无 RL 回路、无两个可比 policy 的逐 token 概率，无法直接落地训练栈——排 self-evo-queue 周审。 但其 reusable_pattern「强监督进回路前先过逐步可靠度门 + 温和回退 + 有界退火冷启动」是方法论原语，可对齐本站非训练流程： 深读作者→冷审→补差、self-evo critic 给步骤打分时，不应默认强模型每一步分数同样可信——可借「分区可靠度门」把高信任步骤正常采纳、低信任步骤只给温和建议。 整体判 queue：训练机制排周审，可靠度门的设计心法部分可立即对齐冷审/补差流程。\n",
+    "state": "queue"
+  },
+  "slug": "tropd",
+  "source": "arxiv:2606.01249v2 + github.com/Xingrun-Xing2/TrOPD（HEAD b4bee6f，仅 README/LICENSE/imgs，训练/评测代码与模型未发布）",
+  "status": "draft",
+  "title": "Trust Region On-Policy Distillation",
+  "trigger_hooks": [
+    {
+      "related_object": "tropd.m1",
+      "risk": "直接搬「用概率比 min(π_T/π_S,1) 当尺子」需要老师本身可信且可比；老师不可靠时这把尺子也会骗你（f1）。",
+      "symptom": "一个强模型/老师在给每一步打分或示范，但我默认「它每一步都同样可信」，结果少数离谱的步骤把整体带偏。",
+      "why_recall": "本篇核心判断=逐步监督不是天然可靠的，要先判「这一步信不信得过」再决定怎么用——分区门控（m1）正对此。"
+    },
+    {
+      "related_object": "tropd.m2",
+      "risk": "温和回退也不是免费的——全局误用 forward-KL（不分区）会几乎训不动（f3），关键是「只在不可信区」用。",
+      "symptom": "我发现某条监督/反馈信号不可信，第一反应是直接屏蔽或裁剪掉它。",
+      "why_recall": "本篇证明一刀切丢弃（mask/clip）会连带丢掉里面仍有用的信息，温和回退（top-k FKL）比丢弃保留更多可用监督（m2）。"
+    },
+    {
+      "related_object": "tropd.m3",
+      "risk": "退火日程是超参，不退火干净会残留 exposure bias；β/日程跨任务敏感（f4）。",
+      "symptom": "系统/学生起步阶段质量太差，自己产出的样本不值得学，但又怕长期依赖外部示范养成拐杖。",
+      "why_recall": "off-policy guidance（m3）用老师前缀冷启动、再 cosine 退火到 0，给「先扶上马再撤脚手架」的有界退火范式。"
+    }
+  ]
+}

@@ -279,6 +279,8 @@ for (const file of facetFiles) {
 }
 
 for (const { facet, file, where } of parsedFacets) {
+  // 星图只含文章（Kevin 2026-06-12）：项目已移出记忆球，项目 facet 不再对星图校验（项目精读仍在项目页）。
+  if (facet.kind === "project") continue;
   if (!hasText(facet.node_id)) fail(where, "node_id must be a non-empty string");
   else if (!resolvesFacetNode(facet)) fail(where, `node_id does not resolve in graph nodes: ${facet.node_id}`);
 
@@ -314,7 +316,8 @@ for (const { facet, file, where } of parsedFacets) {
         if (KILLED_EDGE_TYPES.has(edge.type)) fail(edgePath, `${edge.type} is killed in KG-2 schema v2`);
         else if (!EDGE_TYPES.has(edge.type)) fail(edgePath, `type must be one of ${[...EDGE_TYPES].join("|")}`);
         if (!hasText(edge.to)) fail(edgePath, "to must be a non-empty slug");
-        else if (!slugSet.has(edge.to) && !resolvesFacetNode(facetBySlug.get(edge.to) || {})) {
+        else if (!slugSet.has(edge.to) && !resolvesFacetNode(facetBySlug.get(edge.to) || {}) && facetBySlug.get(edge.to)?.kind !== "project") {
+          // 目标是项目 facet 时不算失败：项目已移出星图（Kevin 2026-06-12）。
           fail(edgePath, `to slug does not resolve in graph nodes: ${edge.to}`);
         }
         if (facet.schema === "v2" && !isLegacyGrandfatheredEdge(file, edge)) {

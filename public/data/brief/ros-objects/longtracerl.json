@@ -1,0 +1,288 @@
+{
+  "assumptions": [
+    {
+      "anchor": "§6 Limitations 逐字「single KILT Wikipedia knowledge source ... may limit the diversity of reasoning patterns」",
+      "conflicts_hint": "与「跨域/开放领域泛化有效」类主张天然张力——单源知识图谱上习得的推理模式未必迁移。",
+      "id": "longtracerl.a1",
+      "kind": "explicit",
+      "statement": "训练问题全部源自 KILT Wikipedia 单一知识源——隐含假设其推理模式足以泛化到其它领域（金融/法律/代码）。"
+    },
+    {
+      "anchor": "§6 Limitations 逐字「distractor quality depends on the capability of the search agent used to collect trajectories」",
+      "conflicts_hint": "与「数据难度是稳定可控的设计变量」张力——难度其实绑定在 agent 能力上，换 agent 即漂移。",
+      "id": "longtracerl.a2",
+      "kind": "explicit",
+      "statement": "干扰物质量可由采集轨迹的那个搜索 agent 可靠产生——隐含假设换强/弱 agent 不会显著改变难度分布。"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "与「需要逐跳推理逻辑的直接验证」假设互斥；作者自己也承认召回≠推理正确（c5），故才需 positive-only。",
+      "id": "longtracerl.a3",
+      "kind": "implicit",
+      "statement": "黄金实体召回率是「推理链中间步是否扎实」的有效代理——隐含假设提到对的实体≈走对了那一跳。"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "train.entity-level-process-reward",
+      "train.outcome-gated-process-reward",
+      "data.trajectory-mined-hard-distractor"
+    ],
+    "problems": [
+      "train.credit-assignment"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明增益对规模/backbone 均匀有效——8B 仅 +1.1 远小于 4B 的 +5.7，方法收益对 backbone 敏感（原文 Table 1 自承差异）。",
+        "不能证明在 Wikipedia 以外知识源训练仍同等有效——训练集全部源自 KILT Wikipedia 单源（见 a1）。",
+        "不能把「平均分居首」当独立复现结论——全部分数为论文自报口径，本对象未复现（confidence_reason 同此）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 1 数字逐字可核；惟为论文自报口径（abstract 与术语经 arXiv HTML 核对），故标自报。",
+      "evidence": [
+        {
+          "anchor": "Table 1 (§4.2 main results)",
+          "quote": "Qwen3-4B-Thinking 53.3 → 59.0; LongRLVR 56.5; DeepSeek-R1-0528-Qwen3-8B 42.7 → 43.8; Qwen3-30B-A3B-Thinking 60.5 → 63.7",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Abstract",
+          "quote": "rubric reward that leverages gold entities along each reasoning chain as fine-grained, entity-level process supervision ... a positive-only strategy applied to correct responses",
+          "strength": "medium"
+        }
+      ],
+      "id": "longtracerl.c1",
+      "statement": "在三个推理 backbone、五个长上下文 benchmark 上，LongTraceRL 自报平均分均居首： Qwen3-4B-Thinking 53.3→59.0（+5.7 over base，+2.5 over 最强基线 LongRLVR 56.5）、 DeepSeek-R1-0528-Qwen3-8B 42.7→43.8（+1.1）、Qwen3-30B-A3B-Thinking 60.5→63.7（+3.2）。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能把全部增益归因到 rubric——data 与 reward 两个变量在主结果里耦合，本消融只隔离 rubric 有无、未交叉隔离数据与奖励各自贡献的全部组合。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 1 的 -GRPO 行逐字可核，差值由两数相减得出。",
+      "evidence": [
+        {
+          "anchor": "Table 1 (LongTraceRL vs LongTraceRL-GRPO, §4.2)",
+          "quote": "LongTraceRL-GRPO (same data, no rubric reward) on Qwen3-4B: 53.7 vs LongTraceRL 59.0",
+          "strength": "strong"
+        }
+      ],
+      "id": "longtracerl.c2",
+      "statement": "承重的是 rubric 过程奖励而非仅靠数据：在相同 traj-tiered 数据上去掉 rubric 奖励（LongTraceRL-GRPO，只剩结果奖励）， Qwen3-4B 平均从 59.0 掉到 53.7，增益几乎全部消失。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明「含黄金实体比例」是混淆度的充分度量——它是混淆度的一个可观测代理，相关≠机制因果，原文只展示排名一致未做因果干预。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 3/4 数字逐字可核；「难度→分数」的因果解读属 interpretation，已在 cannot_prove 标注。",
+      "evidence": [
+        {
+          "anchor": "Table 3/4 + §4.3.2",
+          "quote": "traj-tiered 59.0 > search 56.7 > random 55.7; gold-entity ratio 50.03% / 42.16% / 15.00% / 1.35%; Tier-1 63.23%",
+          "strength": "strong"
+        }
+      ],
+      "id": "longtracerl.c3",
+      "statement": "干扰物难度（以「干扰文档含至少一个黄金实体的比例」量化）与下游分数严格同序： traj-tiered 59.0 > traj-random > search 56.7 > random 55.7，对应含黄金实体比例 50.03% > 42.16% > 15.00% > 1.35%； 其中 Tier-1（读了没引）单独高达 63.23%，随机抽干扰仅 1.35%。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 positive-only 是唯一防 reward hacking 手段——只对比「有/无」，未对比其它防作弊设计（如阈值/clip）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——Table 5 与 §4.3.3 逐字可核。",
+      "evidence": [
+        {
+          "anchor": "Table 5 + §4.3.3 / Fig.4",
+          "quote": "remove positive-only: 59.0 → 57.1; AA-LCR -4.8; MRCR -5.3; around step 120 rollouts hit 32K limit, positive-only pulls policy back to shorter responses",
+          "strength": "strong"
+        }
+      ],
+      "id": "longtracerl.c4",
+      "statement": "positive-only 门（过程分只在最终答对 r_oc>0 时才发放）是必要防作弊开关：去掉它（对错都给过程分） Qwen3-4B 平均从 59.0 掉到 57.1，AA-LCR 掉 4.8、MRCR 掉 5.3；并附带自我拉回过长回答的调节作用。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能由召回率推出推理链逻辑正确——召回高仅说明实体被提及，不保证推理路径正确（作者自承，正是 positive-only 存在的理由）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文明确——§3.2 与 Eq.1–2 逐字可核；该自我限定是作者主张。",
+      "evidence": [
+        {
+          "anchor": "§3.2 + Eq.1–2",
+          "quote": "rubric reward = recall of gold entities; normalized by dividing by the group maximum within GRPO group",
+          "strength": "strong"
+        }
+      ],
+      "id": "longtracerl.c5",
+      "statement": "rubric 奖励度量的是黄金实体召回率（回答命中黄金实体 / 全部黄金实体，再在 GRPO 组内除以最大值归一到 [0,1]）， 作者明确它度量「该提的实体提没提」而非「推理逻辑对不对」，因此本质需 positive-only 兜底。\n",
+      "type": "author_claim"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "平均从 59.0 掉到 53.7（LongTraceRL-GRPO），增益几乎全没（c2）",
+        "说明承重的是 rubric 过程奖励，不只是难负例数据",
+        "但 data 与 reward 在主结果里耦合，本消融未交叉隔离全部组合 → 不能完全归因到 rubric 单一变量（c2 cannot_prove）"
+      ],
+      "q": "若在相同的 traj-tiered 数据上去掉 rubric 过程奖励、只留结果奖励，Qwen3-4B 的平均分会怎样？这说明增益主要来自数据还是奖励？",
+      "tested_objects": [
+        "longtracerl.c2",
+        "longtracerl.m2"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "reward hacking：错回答靠堆检索到的实体名拿过程分（f2），因 rubric 本质是召回率不是推理正确（c5）",
+        "实测平均 59.0→57.1，AA-LCR -4.8、MRCR -5.3（c4）——长上下文检索密集任务上堆实体最易钻空子",
+        "positive-only 让过程分只在答对的回答间分高下，是必要兜底（c4, m2 non_replaceable）"
+      ],
+      "q": "rubric 奖励度量的是黄金实体召回率。如果去掉 positive-only 门、对错回答都发过程分，最可能出现什么失败模式？为什么 4B 上 AA-LCR/MRCR 掉得最多？",
+      "tested_objects": [
+        "longtracerl.c4",
+        "longtracerl.c5",
+        "longtracerl.f2"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "能搬（m1 范式）：难负例从自家 agent 真实轨迹副产物里捞（NO_EDGE 候选/冷审 borderline/选稿淘汰项）当判边器对抗测试集，难度可量化",
+        "能搬（m2 范式）：positive-only 心法——过程分（rubric/结构检查分）只对结果过门的产出发放，防深读/facet 堆关键词刷过程分",
+        "搬不动：GRPO/RL 训练回路、32×H800 训练（本站无可训练 policy / 算力）——借设计不抄栈"
+      ],
+      "q": "把本篇两条工程心法迁移到一个无 RL 训练栈的纯工程系统（如本站知识库的判边/冷审质量门），哪部分能搬、哪部分搬不动？",
+      "tested_objects": [
+        "longtracerl.m1",
+        "longtracerl.m2"
+      ],
+      "type": "transfer"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "学到的辨别/推理模式不再领先，增益缩水甚至负优化（原文未在新知识源训练验证，a1）。",
+      "id": "longtracerl.f1",
+      "statement": "跨域/跨知识源泛化失效。",
+      "triggered_when": "部署到非 Wikipedia 结构的知识源或推理模式很不同的领域。"
+    },
+    {
+      "consequence": "错回答也能靠列举检索到的实体拿高分，稀释「真正解题」梯度（c4 实测平均掉 2 分级、AA-LCR/MRCR 掉 4–5）。",
+      "id": "longtracerl.f2",
+      "statement": "reward hacking——靠堆实体名刷过程分。",
+      "triggered_when": "脱离 positive-only 单用 rubric 过程分（对错都发分）。"
+    },
+    {
+      "consequence": "Tier-1/Tier-2 的混淆度分布改变，「难度可控设计变量」的可比性失效（a2）。",
+      "id": "longtracerl.f3",
+      "statement": "干扰难度随采集 agent 漂移。",
+      "triggered_when": "更换造数据所用的搜索 agent（更强或更弱）。"
+    },
+    {
+      "consequence": "实际增益可能远小于 4B 上的 +5.7（8B 仅 +1.1），过度承诺（c1）。",
+      "id": "longtracerl.f4",
+      "statement": "增益对 backbone 不均匀，被误当普适方法。",
+      "triggered_when": "套到与论文不同规模/族的 backbone。"
+    }
+  ],
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§3.1.1–3.1.4, Fig.2",
+      "canonical_concept": "data.trajectory-mined-hard-distractor",
+      "id": "longtracerl.m1",
+      "input": "KILT 版 Wikipedia 超链接图 + 一个能 search/open/cite 的搜索 agent + 目标上下文长度 L=128K。\n",
+      "name": "traj-tiered 高混淆干扰数据工厂（agent 真实轨迹副产物造难负例）",
+      "non_replaceable": [
+        "「难负例从 agent 真实搜索行为的副产物（读了没引/没点开）里捞」这一来源（拿掉就退回随机/embedding 抽取，混淆度不可分级）",
+        "只保留答对轨迹这一过滤（保证轨迹是真有目标的搜索行为）"
+      ],
+      "operations": [
+        "KG 随机游走：从种子实体在超链接图走 k=8 跳（每步 LLM 从 ≤5 未访问候选选最相关，周期性 mad walk 增多样性）得多跳实体路径（§3.1.1）",
+        "强模型（如 GPT-5.2）据路径合成一道「必须逐跳推理、不能关键词匹配抄近路」的八跳问题 + 吐出每跳黄金实体（§3.1.1）",
+        "搜索 agent 真去答题，每题采 K=5 独立轨迹，只留答对的、全错丢弃（§3.1.2）",
+        "分级抽干扰：Tier-1（高混淆）= agent「读了却没引用」的文档；Tier-2（低混淆）= 出现在搜索结果但 agent 没点开的（§3.1.3）",
+        "traj-tiered 装配：从黄金段起先塞 Tier-1，不足 L 再补 Tier-2，全部 shuffle 防位置捷径（§3.1.4）"
+      ],
+      "optimization": "none（数据合成管线，不含训练信号；难度可由「含黄金实体比例」量化，c3）",
+      "output": "一条 128K 长上下文八跳 QA：黄金证据 + 按混淆度分级、打乱后装配的干扰文档，附每跳黄金实体标注。\n",
+      "problem": "train.credit-assignment",
+      "replaceable": [
+        "出题用的强模型（GPT-5.2 可换）",
+        "搜索 agent 的具体实现（但其能力强弱会改变干扰分布，见 a2）",
+        "目标长度 L 与 Tier 数（当前两档）"
+      ],
+      "reusable_pattern": "难负例不该随机造也不靠 embedding 相似，而从一个真实处理流程的副产物里捞「一度被认为值得但最终没采纳」的样本——混淆度可量化、可分级。"
+    },
+    {
+      "anchor": "§3.2, Eq.1–3, §4.3.3",
+      "canonical_concept": "train.outcome-gated-process-reward",
+      "id": "longtracerl.m2",
+      "input": "一组 G 个回答（GRPO group），每个回答的最终短答案 + 命中的黄金实体集合 + 该题全部黄金实体。\n",
+      "name": "实体级 rubric 过程奖励 + positive-only 门控组合",
+      "non_replaceable": [
+        "positive-only 门（拿掉则错回答也靠堆实体名拿过程分，助长 reward hacking，c4）",
+        "过程分以「每跳黄金实体召回」为信号（这是把过程监督做到实体级的承重点，c5）"
+      ],
+      "operations": [
+        "结果奖励 r_oc∈{0,1}：LLM judge 判最终短答案对不对（§3.2）",
+        "rubric 原始分 r̂_rb = 回答命中黄金实体 / 全部黄金实体（实体召回率）（Eq.1）",
+        "组内归一：r_rb = r̂_rb / (组内 max r̂_rb)，归到 [0,1]，跨题可比（Eq.2）",
+        "positive-only 组合：r = (1−α)·r_oc + α·r_rb 仅当 r_oc>0；否则 r=0（Eq.3，默认 α=0.3）",
+        "GRPO 据组内相对优势更新策略"
+      ],
+      "optimization": "GRPO（group size G=8），过程分只在答对回答之间分高下——奖励答对且中间扎实者、压低蒙对者",
+      "output": "每个回答的标量奖励 r：只在最终答对时为 (1−α)·r_oc + α·r_rb，答错一律 0。\n",
+      "problem": "train.credit-assignment",
+      "replaceable": [
+        "底层 RL 算法（GRPO 可换）",
+        "α 权重（消融示 0.3 最优，0.1 太弱、0.5 反伤，c4 相关 Table 2）",
+        "结果奖励的判定器（LLM judge 可换 exact match）"
+      ],
+      "reusable_pattern": "过程分（rubric/结构检查分）只发给已通过结果门的产出——把「过程质量」奖励锚定在「先做对」之上，防止靠堆要素刷过程分。"
+    }
+  ],
+  "object_id": "paper/longtracerl",
+  "one_sentence_thesis": "主张长上下文 RL 的瓶颈一半在「干扰物不够像」、一半在「结果奖励管不到中间推理步」， 方法是用搜索 agent 真实轨迹里「读了却没引用」的文档造可分级的高混淆干扰（traj-tiered distractor）+ 用推理链每跳的黄金实体做实体级过程奖励（rubric reward），并以 positive-only 开关（过程分只发给最终答对者）防 reward hacking， 在 Qwen3-4B/8B/30B 三个推理 backbone、五个长上下文 benchmark 上自报平均分均居首（但绝对增益对 backbone 敏感：4B +5.7、8B 仅 +1.1）。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "能用（两条工程心法，非红线；RL 栈本站不复现）——facet transfer 已点透，两条直接落本站： ① 难负例从真实处理轨迹副产物里捞，不随机造（m1 reusable_pattern）：本站判边 NO_EDGE 候选、冷审 borderline 稿、选稿淘汰项， 正是自家 agent「读了却没采纳」的高混淆样本——拿它们建判边器/质量门的对抗测试集，比随机抽负例难得多、难度可量化（呼应 RULES#18「先把 benchmark 做强」）； ② positive-only 心法（m2 reusable_pattern）：过程分（rubric 评分、结构检查分）只对结果过门的产出发放， 防深读/facet 被「堆关键词、堆实体名」刷过程分——正是本站冷审 rubric 该有的防作弊门，与 TrOPD「监督信号先过可靠度门」互补（那条管该不该信老师，这条管过程分该不该发）。 GRPO 训练栈本站无可训练 model-client/算力 → 不抄栈、借设计，故判 apply（方法论层），非系统级落地。\n",
+    "state": "apply"
+  },
+  "slug": "longtracerl",
+  "source": "arxiv:2605.31584v1 (2026-05-29, Tsinghua THU-KEG; Nianyi Lin / Jiajie Zhang / Lei Hou / Juanzi Li) + github.com/THU-KEG/LongTraceRL (4B/8B/30B 模型已开源)",
+  "status": "draft",
+  "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
+  "trigger_hooks": [
+    {
+      "related_object": "longtracerl.m1",
+      "risk": "难负例的难度绑定在采集 agent 的能力上（a2）；换采集源难度分布会漂移，别当成绝对稳定的基准。",
+      "symptom": "想验一个判别器/质量门是否真靠谱，手头却只有随机抽的负例——一眼能筛掉，测不出在「高度相似、似是而非」的样本上的辨别力。",
+      "why_recall": "本篇示范从一个真实处理流程的副产物（agent「读了却没引用」的文档）里捞高混淆难负例，且用「含黄金要素比例」把难度量化分级，比随机抽难得多。"
+    },
+    {
+      "related_object": "longtracerl.m2",
+      "risk": "它依赖一个可靠的「结果门」判定；若结果判定本身有噪声（如 LLM judge 误判），门控会把噪声放大到过程分发放上。",
+      "symptom": "给「过程/中间步质量」打分后，发现产出开始靠堆关键词、堆要素来刷高分，而最终结果并没真的变好。",
+      "why_recall": "positive-only 门——过程分只发给已通过结果门（最终答对）的产出，错的一律 0 分，让过程分只在「做对的产出之间」分高下，专治这种 reward hacking。"
+    },
+    {
+      "related_object": "longtracerl.c3",
+      "risk": "「含黄金要素比例」只是混淆度的一个代理，相关不等于因果；别把单一比例当难度的充分定义。",
+      "symptom": "一套训练/评测数据「到底难不难」全靠拍脑袋，没法把难度当成可调、可比较的设计变量。",
+      "why_recall": "本篇用「干扰含黄金实体比例」把数据难度从玄学变成可测量，且实测难度排名与下游分排名一致（c3）——给「难度即设计变量」一个落地模板。"
+    }
+  ]
+}

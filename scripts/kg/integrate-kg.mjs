@@ -186,6 +186,9 @@ for (const facet of facets) {
     console.warn(`[integrate-kg] WARN facet node unresolved: ${facet._file || facet.slug || facet.node_id}`);
     continue;
   }
+  // 论文 facet 认领的节点重标为 paper：agemem/memoryagentbench 等经项目路径入库的论文，节点 family 原是 project，
+  // 否则会被下面「星图只含文章」过滤误删。kind:paper 是唯一真相。
+  if (facet.kind === "paper") { node.family = "paper"; node.kind = "paper"; }
   if (facet.facets) node.facets = facet.facets;
   if (facet.self_evo_use) node.self_evo_use = facet.self_evo_use;
   if (Array.isArray(facet.core_concepts) && facet.core_concepts.length) node.core_concepts = facet.core_concepts;
@@ -430,14 +433,21 @@ for (const e of graph.edges) {
 graph.edges = [...keptRefs, ...bestByPair.values()];
 graph.edges = normalizeGraphRelations(graph.edges);
 
+// ── 星图只含文章（Kevin 2026-06-12）：记忆球移除项目节点 + 触及它们的边。
+//    项目精读仍在 brief-wiki / 项目页，只是不进记忆球；判据=节点被标了 project（family/kind/type）。 ──
+const isProjectNode = (n) => n.family === "project" || n.kind === "project" || n.type === "project";
+const projectIds = new Set(graph.nodes.filter(isProjectNode).map((n) => n.id));
+graph.nodes = graph.nodes.filter((n) => !projectIds.has(n.id));
+graph.edges = graph.edges.filter((e) => ![e.from, e.to, e.source, e.target].some((id) => id && projectIds.has(id)));
+
 const references = graph.edges.filter((e) => e.type === "references").length;
 const associativeEdges = graph.edges.filter((e) => e.type !== "references" && !(e.type === "same_track" && e.weak)).length;
 const edgeByType = {}; // recompute from scratch — base builder's count is stale after we add edges
 for (const e of graph.edges) edgeByType[e.type] = (edgeByType[e.type] || 0) + 1;
-graph.summary = { ...(graph.summary || {}), nodes: nodes.length, edges: graph.edges.length,
+graph.summary = { ...(graph.summary || {}), nodes: graph.nodes.length, edges: graph.edges.length,
   references, associativeEdges, crossDocEdges: graph.edges.filter((e) => e.cross_doc).length,
-  edgeByType, ghosts: nodes.filter((n) => n.ghost).length, assessed: nodes.filter((n) => n.self_evo_use).length,
-  facetedNodes: nodes.filter((n) => n.facets).length };
+  edgeByType, ghosts: graph.nodes.filter((n) => n.ghost).length, assessed: graph.nodes.filter((n) => n.self_evo_use).length,
+  facetedNodes: graph.nodes.filter((n) => n.facets).length, projectsRemoved: projectIds.size };
 await writeFile(GRAPH, `${JSON.stringify(graph, null, 2)}\n`, "utf8");
 console.log(`[integrate-kg] assessments:${merged} | facets:${facetedNodes} | ghosts +${ghostsAdded}/merged ${ghostsMerged} | curated:${edgesAdded} | facet-edges:${facetEdgesAdded} | relation-engine:${relationEngineEdgesAdded} | relation-llm:${relationEngineLlmEdgesAdded} | cross-doc:${crossDoc}`);
-console.log(`[integrate-kg] nodes ${nodes.length} | edges ${graph.edges.length} (references ${references} plumbing + ASSOCIATIVE ${associativeEdges}, weak same_track excluded) | ghosts ${graph.summary.ghosts} | assessed ${graph.summary.assessed} | faceted ${graph.summary.facetedNodes}`);
+console.log(`[integrate-kg] nodes ${graph.nodes.length} (projects removed ${projectIds.size}) | edges ${graph.edges.length} (references ${references} plumbing + ASSOCIATIVE ${associativeEdges}, weak same_track excluded) | ghosts ${graph.summary.ghosts} | assessed ${graph.summary.assessed} | faceted ${graph.summary.facetedNodes}`);
