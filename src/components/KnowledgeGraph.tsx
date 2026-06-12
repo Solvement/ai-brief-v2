@@ -285,6 +285,9 @@ export function KnowledgeGraph() {
   const [err, setErr] = useState<string | null>(null);
   const [mode, setMode] = useState<"graph" | "gaps">("graph");
   const [selected, setSelected] = useState<string | null>(null);
+  // MiroFish 点击探索（Obsidian local graph）：选中节点 → 只画它和 typed 邻居的局部网络
+  const [localMode, setLocalMode] = useState(false);
+  const [selEdge, setSelEdge] = useState<GEdge | null>(null);
   const [hover, setHover] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [, setTick] = useState(0);
@@ -324,16 +327,27 @@ export function KnowledgeGraph() {
 
   // visible subset by enabled kinds (perf: drop dense low-signal types by default)
   const { nodes, edges } = useMemo(() => {
+    // 点击探索（local graph）：只画选中节点 + typed 邻居 + 邻居间的边——无视过滤器（探索关系本身就是目的）
+    if (localMode && selected) {
+      const ids = new Set<string>([selected]);
+      for (const e of allEdges) {
+        if (e.source === selected) ids.add(e.target);
+        if (e.target === selected) ids.add(e.source);
+      }
+      const pool = allNodes.filter((n) => ids.has(n.id));
+      const ring = allEdges.filter((e) => ids.has(e.source) && ids.has(e.target));
+      return { nodes: pool, edges: ring };
+    }
     // memoryOnly: 只留有 facet/judgment 的真记忆节点 + 与它们相连的对端 → 干净星座，不是管线毛球
     let pool = allNodes.filter((n) => enabledKinds[n.kind]);
     if (memoryOnly) {
-      // 只留真·记忆节点：有 facet/判断的，或外搜 ghost。不做邻居扩张（那会把管线子节点拖进来）。
+      // 只留真·内化节点：有 facet/判断的，或外搜 ghost。不做邻居扩张（那会把管线子节点拖进来）。
       pool = pool.filter((n) => n.facets || n.selfEvoUse || n.designIdea || n.ghost);
     }
     const visIds = new Set(pool.map((n) => n.id));
     const ve = allEdges.filter((e) => visIds.has(e.source) && visIds.has(e.target));
     return { nodes: pool, edges: ve };
-  }, [allNodes, allEdges, enabledKinds, memoryOnly]);
+  }, [allNodes, allEdges, enabledKinds, memoryOnly, localMode, selected]);
 
   const clusters = useMemo(() => computeClusters(allNodes, allEdges), [allNodes, allEdges]);
 
@@ -468,10 +482,12 @@ export function KnowledgeGraph() {
     });
   const resetView = () => setView({ scale: 1, tx: 0, ty: 0 });
 
+  const downPosRef = useRef<{ x: number; y: number } | null>(null);
   const onPointerDownNode = (id: string) => (e: React.PointerEvent) => {
     e.stopPropagation();
     (e.target as Element).setPointerCapture?.(e.pointerId);
     dragRef.current = id;
+    downPosRef.current = { x: e.clientX, y: e.clientY };
     const n = simRef.current.find((m) => m.id === id);
     if (n) n.pinned = true;
     alphaRef.current = Math.max(alphaRef.current, 0.4);
@@ -513,15 +529,14 @@ export function KnowledgeGraph() {
   const byId = useMemo(() => new Map(simNodes.map((n) => [n.id, n])), [simNodes]);
   const allById = useMemo(() => new Map(allNodes.map((n) => [n.id, n])), [allNodes]);
 
+  // 搜索 = 独立结果列表（不和脑图重叠，Kevin 约束）：点结果 → 进入该节点的局部探索
   const q = query.trim().toLowerCase();
-  const matchSet = useMemo(() => {
-    if (!q) return null;
-    const s = new Set<string>();
-    for (const n of simNodes) {
-      if (n.title.toLowerCase().includes(q) || n.tags.some((t) => t.toLowerCase().includes(q))) s.add(n.id);
-    }
-    return s;
-  }, [q, simNodes]);
+  const searchResults = useMemo(() => {
+    if (!q) return [] as GNode[];
+    return allNodes
+      .filter((n) => n.title.toLowerCase().includes(q) || n.tags.some((t) => t.toLowerCase().includes(q)))
+      .slice(0, 12);
+  }, [q, allNodes]);
 
   const active = hover || selected;
   const neighborSet = useMemo(() => {
@@ -557,17 +572,20 @@ export function KnowledgeGraph() {
   const labelDetail = view.scale >= 1.3;
 
   const focusNode = useCallback((id: string) => {
+    // 进入该节点的局部探索（local graph 重新布局，居中轻微放大）
     setSelected(id);
-    const n = simRef.current.find((m) => m.id === id);
-    if (n) {
-      setView({ scale: 1.6, tx: W / 2 - n.x * 1.6, ty: H / 2 - n.y * 1.6 });
-      alphaRef.current = Math.max(alphaRef.current, 0.3);
-    } else {
-      // node filtered out of current view — enable its kind so it appears
-      const gn = allById.get(id);
-      if (gn) setEnabledKinds((k) => ({ ...k, [gn.kind]: true }));
-    }
-  }, [allById]);
+    setLocalMode(true);
+    setSelEdge(null);
+    setView({ scale: 1.15, tx: (W * (1 - 1.15)) / 2, ty: (H * (1 - 1.15)) / 2 });
+    alphaRef.current = 1;
+  }, []);
+
+  const exitLocal = useCallback(() => {
+    setLocalMode(false);
+    setSelected(null);
+    setSelEdge(null);
+    setView({ scale: 1, tx: 0, ty: 0 });
+  }, []);
 
   return (
     <main className="page kg-page">
@@ -577,7 +595,8 @@ export function KnowledgeGraph() {
           <h1>记忆宫殿 · Mind Palace</h1>
           <p>
             深读过的<b style={{ color: KIND_META.paper.color }}>论文</b>与<b style={{ color: KIND_META.project.color }}>项目</b>被<b>内化</b>成结构化记忆节点（用 X 方法解决 Y 问题、展现 Z 结果 + 创新/缺点），
-            <b>已核验的语义边</b>（取长补短/可合并/相反）连成推理网络。点节点看内化拆解 + 「能否用于研究/自进化」。
+            <b>已核验的语义边</b>（取长补短/可合并/相反）连成推理网络。
+            <b>点节点 → 进入局部探索</b>（只画它与 typed 邻居的关系网）；<b>点边 → 看「怎么利用」</b>。
             <b>幽灵节点</b>=已知但还没深读的紧邻。
           </p>
         </div>
@@ -599,12 +618,37 @@ export function KnowledgeGraph() {
       {raw && mode === "graph" && (
         <>
           <div className="kg-controls">
-            <input
-              className="kg-search"
-              placeholder="搜节点 / 标签…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                className="kg-search"
+                placeholder="搜节点 / 标签…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              {/* 搜索结果独立列表（不和脑图重叠）：点结果进入局部探索 */}
+              {searchResults.length > 0 && (
+                <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 30, minWidth: 320, maxWidth: 420,
+                  background: "#fff", border: "1px solid #cbd5e1", borderRadius: 12, boxShadow: "0 8px 28px rgba(15,23,42,.14)", overflow: "hidden" }}>
+                  {searchResults.map((n) => (
+                    <button key={n.id} onClick={() => { focusNode(n.id); setQuery(""); }}
+                      style={{ display: "flex", gap: 8, alignItems: "center", width: "100%", textAlign: "left",
+                        padding: "8px 12px", border: "none", borderBottom: "1px solid #f1f5f9", background: "#fff", cursor: "pointer", fontSize: 13 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: "50%", flex: "0 0 auto",
+                        background: n.ghost ? "#fff" : KIND_META[n.kind].color, border: n.ghost ? "1.5px dashed #94a3b8" : "none" }} />
+                      <span style={{ color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.title}</span>
+                      <span style={{ marginLeft: "auto", fontSize: 11, color: "#94a3b8", flex: "0 0 auto" }}>{n.deg} 条关联</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {localMode && selected && (
+              <button onClick={exitLocal}
+                style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap",
+                  border: "1px solid #ea580c", background: "#fff7ed", color: "#c2410c", fontWeight: 700 }}>
+                ← 返回全图（正在局部探索）
+              </button>
+            )}
             <div className="kg-kindtoggles">
               {(["paper", "project", "concept", "claim", "ghost"] as NodeKind[]).map((k) => {
                 const meta = KIND_META[k];
@@ -626,11 +670,11 @@ export function KnowledgeGraph() {
             </div>
             <button
               onClick={() => setMemoryOnly((v) => !v)}
-              title="只显示有内化 facet 的真记忆节点，过滤掉管线子节点"
+              title="只显示已深读内化（有 facet 判断）的节点，过滤管线子节点——按内化状态筛，不是按「记忆」主题筛"
               style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap",
                 border: `1px solid ${memoryOnly ? "#2563eb" : "#cbd5e1"}`, background: memoryOnly ? "#2563eb" : "#fff", color: memoryOnly ? "#fff" : "#475569" }}
             >
-              {memoryOnly ? "● 只看记忆" : "○ 看全部节点"}
+              {memoryOnly ? "● 只看已内化" : "○ 看全部节点"}
             </button>
             <div className="kg-zoom">
               <button className="kg-toggle" onClick={() => zoomBy(1 / 1.25)} aria-label="缩小">−</button>
@@ -653,7 +697,7 @@ export function KnowledgeGraph() {
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
               onPointerLeave={onPointerUp}
-              onClick={() => setSelected(null)}
+              onClick={() => { setSelEdge(null); if (localMode) exitLocal(); else setSelected(null); }}
             >
               <defs>
                 {Object.entries(EDGE_STYLE).map(([t, st]) =>
@@ -665,7 +709,7 @@ export function KnowledgeGraph() {
                 )}
               </defs>
               <g transform={tf}>
-                {/* edges */}
+                {/* edges（双线：可见线 + 透明加宽点击区 → 点边看「怎么利用」） */}
                 <g>
                   {edges.map((e, i) => {
                     const a = byId.get(e.source);
@@ -673,19 +717,23 @@ export function KnowledgeGraph() {
                     if (!a || !b) return null;
                     const st = edgeStyle(e.type);
                     const dim = neighborSet && !(neighborSet.has(e.source) && neighborSet.has(e.target));
+                    const isSel = selEdge === e;
                     return (
-                      <line
-                        key={i}
-                        x1={a.x}
-                        y1={a.y}
-                        x2={b.x}
-                        y2={b.y}
-                        stroke={st.color}
-                        strokeWidth={st.width}
-                        strokeDasharray={st.dash}
-                        markerEnd={st.directed ? `url(#kg-arrow-${e.type})` : undefined}
-                        opacity={dim ? 0.06 : 0.8}
-                      />
+                      <g key={i}>
+                        <line
+                          x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                          stroke={st.color}
+                          strokeWidth={isSel ? st.width + 1.4 : st.width}
+                          strokeDasharray={st.dash}
+                          markerEnd={st.directed ? `url(#kg-arrow-${e.type})` : undefined}
+                          opacity={dim ? 0.06 : isSel ? 1 : 0.8}
+                        />
+                        <line
+                          x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                          stroke="transparent" strokeWidth={14} style={{ cursor: "pointer" }}
+                          onClick={(ev) => { ev.stopPropagation(); setSelEdge(e); }}
+                        />
+                      </g>
                     );
                   })}
                 </g>
@@ -693,12 +741,11 @@ export function KnowledgeGraph() {
                 <g>
                   {simNodes.map((n) => {
                     const meta = KIND_META[n.kind];
-                    const dim =
-                      (neighborSet && !neighborSet.has(n.id)) ||
-                      (matchSet && !matchSet.has(n.id));
+                    const dim = !localMode && neighborSet && !neighborSet.has(n.id);
                     const r = meta.r + Math.min(6, n.deg * 0.5);
                     const isCore = n.kind === "paper" || n.kind === "project";
-                    const showLabel = active === n.id || hover === n.id || (matchSet?.has(n.id) ?? false) || (isCore && (labelDetail || n.deg >= 2));
+                    // 局部探索时全部显示标签（节点少，正是看关系的时候）
+                    const showLabel = localMode || active === n.id || hover === n.id || (isCore && (labelDetail || n.deg >= 2));
                     return (
                       <g
                         key={n.id}
@@ -710,7 +757,10 @@ export function KnowledgeGraph() {
                         onPointerLeave={() => setHover(null)}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelected(n.id);
+                          // 拖拽不触发探索：位移超过 5px 视为拖拽
+                          const dp = downPosRef.current;
+                          if (dp && Math.hypot(e.clientX - dp.x, e.clientY - dp.y) > 5) return;
+                          focusNode(n.id);
                         }}
                       >
                         {n.ghost ? (
@@ -751,9 +801,11 @@ export function KnowledgeGraph() {
               ))}
             </div>
 
-            {selectedNode && (
-              <NodeDetail node={selectedNode} edges={selectedEdges} onPick={focusNode} onClose={() => setSelected(null)} />
-            )}
+            {selEdge ? (
+              <EdgeDetail edge={selEdge} byId={allById} onPick={focusNode} onClose={() => setSelEdge(null)} />
+            ) : selectedNode ? (
+              <NodeDetail node={selectedNode} edges={selectedEdges} onPick={focusNode} onClose={() => { setSelected(null); setLocalMode(false); }} />
+            ) : null}
           </div>
         </>
       )}
@@ -929,6 +981,55 @@ function NodeDetail({
             );
           })}
         </div>
+      )}
+    </aside>
+  );
+}
+
+// ── edge detail panel（点边 → 这条关系是什么 + 怎么利用） ──────────────
+function EdgeDetail({
+  edge,
+  byId,
+  onPick,
+  onClose,
+}: {
+  edge: GEdge;
+  byId: Map<string, GNode>;
+  onPick: (id: string) => void;
+  onClose: () => void;
+}) {
+  const st = edgeStyle(edge.type);
+  const a = byId.get(edge.source);
+  const b = byId.get(edge.target);
+  return (
+    <aside className="kg-panel">
+      <button className="kg-panel-close" onClick={onClose}>×</button>
+      <div className="kg-panel-kind" style={{ color: st.color === "#fbcfe8" || st.color === "#a7f3d0" || st.color === "#93c5fd" ? "#475569" : st.color }}>
+        关系 · {st.label}{edge.confidence ? ` · 置信 ${edge.confidence}` : ""}
+      </div>
+      <h3 style={{ fontSize: 15, lineHeight: 1.5 }}>
+        <button onClick={() => a && onPick(a.id)} style={{ all: "unset", cursor: "pointer", color: "#2563eb", fontWeight: 700 }}>
+          {a ? shortTitle(a.title, 28) : edge.source}
+        </button>
+        <span style={{ margin: "0 8px", color: "#94a3b8" }}>{st.directed ? "→" : "↔"}</span>
+        <button onClick={() => b && onPick(b.id)} style={{ all: "unset", cursor: "pointer", color: "#7c3aed", fontWeight: 700 }}>
+          {b ? shortTitle(b.title, 28) : edge.target}
+        </button>
+      </h3>
+      {edge.use && (
+        <div className="kg-judge kg-judge-evo">
+          <div className="kg-judge-h">怎么利用（这条关系给你的动作）</div>
+          <p>{edge.use}</p>
+        </div>
+      )}
+      {edge.evidence && (
+        <div className="kg-judge">
+          <div className="kg-judge-h">证据（逐字出自内化散文）</div>
+          <p style={{ fontSize: 13, lineHeight: 1.6, color: "#334155" }}>{edge.evidence}</p>
+        </div>
+      )}
+      {!edge.use && !edge.evidence && (
+        <p className="kg-judge-empty">（这条边还没带「怎么利用」标注——关系引擎重挖后会补上。）</p>
       )}
     </aside>
   );

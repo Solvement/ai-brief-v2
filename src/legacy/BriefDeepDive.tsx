@@ -5,6 +5,7 @@ import { loadBriefEntity } from "../lib/data";
 import { LightSpineDeepDive } from "../components/LightSpineDeepDive";
 import type { LightSpine } from "../components/LightSpineDeepDive";
 import { TierTemplateDeepDive } from "../components/TierTemplateDeepDive";
+import type { FacetRecord } from "../components/ProjectFacetSpine";
 import type { ProjectTierTemplate } from "../types";
 
 /** Minimal shapes for the BriefMem JSON mirror (public/data/brief/*.json). */
@@ -41,6 +42,7 @@ interface EvidenceRow {
 export function BriefDeepDive({ slug }: { slug?: string }) {
   const [deepDives, setDeepDives] = useState<BriefItem[] | null>(null);
   const [content, setContent] = useState<BriefItem[] | null>(null);
+  const [facetsMap, setFacetsMap] = useState<Record<string, FacetRecord>>({});
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,6 +52,13 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
         setContent(c.items);
       })
       .catch((e) => setError(String(e?.message ?? e)));
+  }, []);
+  // Mind Palace facet（统一契约：深析项目标配）
+  useEffect(() => {
+    fetch("/data/brief/facets.json", { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => setFacetsMap(j?.facets ?? {}))
+      .catch(() => setFacetsMap({}));
   }, []);
 
   if (error) return <Shell><p className="brief-error">加载失败：{error}</p></Shell>;
@@ -73,22 +82,32 @@ export function BriefDeepDive({ slug }: { slug?: string }) {
     );
   }
 
-  // NEWEST shape: project-radar tier paradigm (2026-06-03) → tier_template page.
+  // Mind Palace facet 匹配：authoring.repo "owner/name" → facets.json 键序列
+  const repoPath: string = dive.meta?.authoring?.repo || "";
+  const [fOwner, fName] = repoPath.split("/");
+  const facetKeys = [
+    fOwner && fName ? `${fOwner}-${fName}` : "",
+    fName || "",
+    (dive.meta?.content ?? dive.slug ?? "").replace(/-deep-dive$/, ""),
+  ].map((s) => s.toLowerCase()).filter(Boolean);
+  const facet = facetKeys.map((k) => facetsMap[k]).find(Boolean) ?? null;
+
+  // 正统格式（Kevin 2026-06-11 定）：project-light-spine（RuView 式）优先。
+  const lightSpine: LightSpine | undefined = dive.meta?.light_spine;
+  if (lightSpine && lightSpine.schema_version) {
+    return (
+      <Shell mode="lightspine">
+        <LightSpineDeepDive item={dive} spine={lightSpine} facet={facet} />
+      </Shell>
+    );
+  }
+
+  // 过渡 fallback：tier_template（内容重生成完成后退役）。
   const tierTpl: ProjectTierTemplate | undefined = dive.meta?.tier_template;
   if (tierTpl && (typeof tierTpl.tier === "number" || tierTpl.one_sentence_positioning)) {
     return (
       <Shell mode="tier">
         <TierTemplateDeepDive item={dive} tpl={tierTpl} />
-      </Shell>
-    );
-  }
-
-  // NEW shape: project-light-spine/v1 → premium light-spine reading page.
-  const lightSpine: LightSpine | undefined = dive.meta?.light_spine;
-  if (lightSpine && lightSpine.schema_version) {
-    return (
-      <Shell mode="lightspine">
-        <LightSpineDeepDive item={dive} spine={lightSpine} />
       </Shell>
     );
   }

@@ -90,10 +90,14 @@ function DeepCard({ d }: { d: DeepRead }) {
 function dateKey(s?: string): string {
   return (s || "").split("T")[0] || "";
 }
+function localDateKey(d: Date): string {
+  // 本地时区的 YYYY-MM-DD——不能用 toISOString()（UTC：纽约晚上会把今天算成明天，当日内容被标"昨天"）
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 function tabLabel(key: string): string {
   if (key === "foundational") return "奠基论文";
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+  const today = localDateKey(new Date());
+  const yesterday = localDateKey(new Date(Date.now() - 86400000));
   if (key === today) return "今天";
   if (key === yesterday) return "昨天";
   const m = /^\d{4}-(\d{2})-(\d{2})$/.exec(key);

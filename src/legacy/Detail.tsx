@@ -5,9 +5,23 @@ import { loadTrending } from "../lib/data";
 import { Markdown } from "../components/Markdown";
 import { ProjectFacetSpine, type FacetRecord } from "../components/ProjectFacetSpine";
 
+/* ============================================================
+   /repo/[owner]/[name] — 统一项目页契约（Kevin 2026-06-11）
+   每个项目页固定结构：Hero → Mind Palace 内化（有则显示）→ 分析正文。
+   - 有深读：判断先行的单滚动阅读页（RuView/Spine 风格），Tab 分叉淘汰。
+   - 无深读：诚实速读块——判断口径唯一（recommended_action / 深度门），
+     不再出现「文案说值得深扒、面板说不建议投入」的自相矛盾。
+   ============================================================ */
+
 interface Props { owner: string; name: string }
 
 const BOARD_LABEL: Record<TrendingWindow, string> = { daily: "今日榜", weekly: "本周榜", monthly: "本月榜" };
+
+/** 与 RepoCard 同一张映射：判断口径全站唯一 */
+const ACTION_LABEL: Record<string, string> = {
+  ignore: "忽略", monitor: "观望", try: "可一试", analyze: "值得分析",
+  deep_dive: "值得深扒", clone_and_run: "克隆来跑", extract: "提炼复用",
+};
 
 function findRepo(data: TrendingData, owner: string, name: string): { repo: AnalyzedRepo; window: TrendingWindow } | null {
   const full = `${owner}/${name}`.toLowerCase();
@@ -46,36 +60,32 @@ function compactText(text: string, max = 180): string {
   if (sentence.length <= max) return sentence;
   return `${clean.slice(0, Math.max(0, max - 1)).trim()}…`;
 }
-function repoAudience(repo: AnalyzedRepo): string {
-  if (repo.tags.length > 0) return `你正在学习 ${repo.tags.slice(0, 3).join(" / ")} 相关项目`;
-  if (repo.language) return `你想用 ${repo.language} 读一个真实开源项目`;
-  return "你想判断这个项目是否值得继续研究";
-}
-function repoAction(repo: AnalyzedRepo): string {
-  if (repo.deep) return "先看 Overview 的新手路径，再按 Try it 做一次最小验证。";
-  if (repo.worthDeepDive >= 60) return "先读轻量摘要，确认是否和你的学习目标相关。";
-  return "了解趋势即可，暂时不建议投入大量时间。";
+
+/** 判断口径的唯一来源：管线 recommended_action 优先，否则按实际深度/门控推导。 */
+function verdictOf(repo: AnalyzedRepo): { label: string; reason: string } {
+  if (repo.recommended_action && ACTION_LABEL[repo.recommended_action]) {
+    return { label: ACTION_LABEL[repo.recommended_action], reason: "" };
+  }
+  if (repo.deep) return { label: "值得深扒", reason: "已通过深度门控并完成深读。" };
+  if (repo.worthDeepDive >= 60) {
+    return { label: "值得分析", reason: `价值分 ${repo.worthDeepDive}/100 已过深读线，深读生成中。` };
+  }
+  return { label: "了解趋势即可", reason: `价值分 ${repo.worthDeepDive}/100，未到深读线（60）。` };
 }
 
-type TabKey = "overview" | "concepts" | "howItWorks" | "novelty" | "ecosystem" | "limitations" | "tryIt";
+/** 是不是还没被重生成的旧模板机器话（「得分 57，信号是 project_type:...」）——渲染端兜底不展示垃圾 */
+function isTemplateJunk(light: string): boolean {
+  return /信号是\s*project_type|signal_score\s*[:：]/.test(light || "");
+}
+
 type ProjectDeepDive = NonNullable<AnalyzedRepo["deep"]>;
 type WorkflowStep = { title: string; body: string };
-const TAB_DEFS: { key: TabKey; label: string }[] = [
-  { key: "overview", label: "导读" },
-  { key: "concepts", label: "术语" },
-  { key: "howItWorks", label: "流程" },
-  { key: "novelty", label: "差异" },
-  { key: "ecosystem", label: "生态" },
-  { key: "limitations", label: "短板" },
-  { key: "tryIt", label: "上手" },
-];
 
 export function Detail({ owner, name }: Props) {
   const [data, setData] = useState<TrendingData | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [tab, setTab] = useState<TabKey>("overview");
-
   const [facetsMap, setFacetsMap] = useState<Record<string, FacetRecord> | null>(null);
+  const [backHref, setBackHref] = useState("/projects");
 
   useEffect(() => { loadTrending().then(setData).catch((e) => setErr(e?.message || String(e))); }, []);
   useEffect(() => {
@@ -84,6 +94,12 @@ export function Detail({ owner, name }: Props) {
       .then((j) => setFacetsMap(j?.facets ?? {}))
       .catch(() => setFacetsMap({}));
   }, []);
+  // 返回到来源榜（?win=monthly），不重置今日榜
+  useEffect(() => {
+    const w = new URLSearchParams(location.search).get("win");
+    if (w === "daily" || w === "weekly" || w === "monthly") setBackHref(`/projects?win=${w}`);
+  }, []);
+
   const found = useMemo(() => (data ? findRepo(data, owner, name) : null), [data, owner, name]);
   const facet = useMemo(() => {
     if (!facetsMap) return null;
@@ -93,160 +109,140 @@ export function Detail({ owner, name }: Props) {
     return null;
   }, [facetsMap, owner, name]);
 
-  if (err) return (<><Header /><div className="detail"><div className="notice error">加载数据失败：{err}</div></div></>);
-  if (!data) return (<><Header /><div className="detail"><div className="loading">正在加载…</div></div></>);
+  if (err) return (<div className="detail"><div className="notice error">加载数据失败：{err}</div></div>);
+  if (!data) return (<div className="detail"><div className="loading">正在加载…</div></div>);
   if (!found) {
     return (
-      <>
-        <Header />
-        <div className="detail">
-          <div className="breadcrumb"><a href="/projects">← 返回项目榜单</a></div>
-          <div className="notice">没找到 <b>{owner}/{name}</b>。可能不在当前的日 / 周 / 月榜上。</div>
-        </div>
-      </>
+      <div className="detail">
+        <div className="breadcrumb"><a href={backHref}>← 返回项目榜单</a></div>
+        <div className="notice">没找到 <b>{owner}/{name}</b>。可能不在当前的日 / 周 / 月榜上。</div>
+      </div>
     );
   }
 
   const { repo, window: win } = found;
   const deep = repo.deep;
+  const boardHref = `/projects?win=${win}`;
 
   return (
-    <>
-      <Header />
-      <div className="detail">
-        <div className="breadcrumb">
-          <a href="/projects">Projects</a><span className="sep">/</span>
-          <a href="/projects">{BOARD_LABEL[win]}</a><span className="sep">/</span>
-          <span>{repo.fullName}</span>
-        </div>
-
-        {facet && <ProjectFacetSpine facet={facet} />}
-
-        {!deep ? (
-          <>
-            <Hero repo={repo} win={win} deep={null} />
-            <LiteProjectDetail repo={repo} />
-          </>
-        ) : (
-          <div className="detail-grid">
-            <div className="main-col">
-              <Hero repo={repo} win={win} deep={deep} />
-
-              <div className="tabs">
-                {TAB_DEFS.map((t) => (
-                  <button key={t.key} className={`tab${tab === t.key ? " active" : ""}`} onClick={() => setTab(t.key)}>
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-
-              {tab === "overview" && (
-                <>
-                  <ProjectReaderBrief repo={repo} onSelectTab={setTab} />
-                  <ProjectVerificationPanel repo={repo} />
-                </>
-              )}
-
-              {tab === "concepts" && (
-                <section className="section">
-                  <h3>项目特有术语</h3>
-                  {deep.keyConcepts.length === 0 ? (
-                    <div className="body">README 里没有特别需要拆解的项目专有术语。</div>
-                  ) : (
-                    <div className="concept-list">
-                      {deep.keyConcepts.map((c, i) => (
-                        <div className="concept" key={i}>
-                          <div className="concept-term"><span className="concept-num">{i + 1}</span>{c.term}</div>
-                          <div className="concept-explain prose"><Markdown text={c.explain} /></div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              )}
-
-              {tab === "howItWorks" && (
-                <section className="section">
-                  <h3>架构与流程</h3>
-                  <ProjectWorkflowSketch repo={repo} />
-                  <div className="body prose"><Markdown text={deep.howItWorks} /></div>
-                </section>
-              )}
-              {tab === "novelty" && (
-                <section className="section">
-                  <h3>跟同类工作的差异</h3>
-                  <div className="body prose"><Markdown text={deep.novelty} /></div>
-                </section>
-              )}
-              {tab === "ecosystem" && (
-                <section className="section">
-                  <h3>在生态里的位置</h3>
-                  <div className="body prose"><Markdown text={deep.ecosystem} /></div>
-                </section>
-              )}
-              {tab === "limitations" && (
-                <section className="section">
-                  <h3>已知短板</h3>
-                  <LimitationView lim={deep.limitations} />
-                </section>
-              )}
-              {tab === "tryIt" && (
-                <section className="section">
-                  <h3>最短上手路径</h3>
-                  <TryItView steps={deep.tryIt} />
-                </section>
-              )}
-            </div>
-
-            <aside className="aside-col">
-              <ScoreCard score={deep.score} worthDeepDive={repo.worthDeepDive} />
-              <QuickSummary text={deep.atGlance} />
-              <SourceCard repo={repo} />
-              <NextSteps repo={repo} />
-            </aside>
-          </div>
-        )}
+    <div className="detail">
+      <div className="breadcrumb">
+        <a href={backHref}>Projects</a><span className="sep">/</span>
+        <a href={boardHref}>{BOARD_LABEL[win]}</a><span className="sep">/</span>
+        <span>{repo.fullName}</span>
       </div>
-    </>
+
+      <Hero repo={repo} win={win} deep={deep ?? null} />
+
+      {facet && <ProjectFacetSpine facet={facet} />}
+
+      {deep ? <DeepReading repo={repo} deep={deep} /> : <RadarLite repo={repo} hasFacet={!!facet} />}
+    </div>
   );
 }
 
-function Header() {
-  return null;
-}
+/* ───────────── 无深读：诚实速读（判断口径唯一，无矛盾） ───────────── */
 
-function LiteProjectDetail({ repo }: { repo: AnalyzedRepo }) {
+function RadarLite({ repo, hasFacet }: { repo: AnalyzedRepo; hasFacet: boolean }) {
+  const v = verdictOf(repo);
+  const showLight = repo.light && !isTemplateJunk(repo.light);
   return (
     <div className="lite-project-grid">
       <section className="section">
-        <h3>Quick read · 轻量判断</h3>
-        <div className="body prose"><Markdown text={repo.light} /></div>
+        <h3>雷达速读</h3>
+        {showLight ? (
+          <div className="body prose"><Markdown text={repo.light} /></div>
+        ) : (
+          <div className="body">
+            {repo.tldr && <p>{repo.tldr}</p>}
+            <p style={{ color: "var(--ink-3)" }}>这个项目还没有人话速读{hasFacet ? "（上方 Mind Palace 内化是已有的深度判断）" : ""}，下方判断来自确定性深度门控。</p>
+          </div>
+        )}
       </section>
       <aside className="aside">
-        <h4 className="aside-title"><span className="ico">?</span>为什么没有 Deep Dive</h4>
+        <h4 className="aside-title"><span className="ico">⚖</span>判断</h4>
         <div className="project-decision-stack">
+          <div><span>建议动作</span><b>{v.label}</b></div>
+          {v.reason && <div><span>为什么</span><b>{v.reason}</b></div>}
           <div><span>价值分</span><b>{repo.worthDeepDive}/100</b></div>
-          <div><span>适合你如果</span><b>{repoAudience(repo)}</b></div>
-          <div><span>建议动作</span><b>{repoAction(repo)}</b></div>
         </div>
         <div className="aside-note">
-          这里不展示命令行重跑说明。对学习者来说，先判断它是否和你的目标相关；如果相关，再去 GitHub README 看官方安装方式。
+          判断口径全站唯一：卡片、本页、文案出自同一个门控决定。要安装/运行，去 GitHub README 看官方方式。
         </div>
       </aside>
     </div>
   );
 }
 
-function ProjectReaderBrief({ repo, onSelectTab }: { repo: AnalyzedRepo; onSelectTab: (tab: TabKey) => void }) {
-  const deep = repo.deep;
-  if (!deep) return null;
+/* ───────────── 有深读：判断先行的单滚动阅读页（Tab 淘汰） ───────────── */
+
+function DeepReading({ repo, deep }: { repo: AnalyzedRepo; deep: ProjectDeepDive }) {
+  return (
+    <div className="detail-grid">
+      <div className="main-col">
+        <ReaderBrief repo={repo} deep={deep} />
+
+        <section className="section" id="sec-flow">
+          <h3>架构与流程</h3>
+          <WorkflowSketch deep={deep} />
+          <div className="body prose"><Markdown text={deep.howItWorks} /></div>
+        </section>
+
+        {deep.keyConcepts.length > 1 && (
+          <section className="section" id="sec-concepts">
+            <h3>项目特有术语</h3>
+            <div className="concept-list">
+              {deep.keyConcepts.slice(1).map((c, i) => (
+                <div className="concept" key={i}>
+                  <div className="concept-term"><span className="concept-num">{i + 2}</span>{c.term}</div>
+                  <div className="concept-explain prose"><Markdown text={c.explain} /></div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="section" id="sec-novelty">
+          <h3>跟同类工作的差异</h3>
+          <div className="body prose"><Markdown text={deep.novelty} /></div>
+        </section>
+
+        <section className="section" id="sec-ecosystem">
+          <h3>在生态里的位置</h3>
+          <div className="body prose"><Markdown text={deep.ecosystem} /></div>
+        </section>
+
+        <section className="section" id="sec-limitations">
+          <h3>已知短板</h3>
+          <LimitationView lim={deep.limitations} />
+        </section>
+
+        <section className="section" id="sec-tryit">
+          <h3>最短上手路径</h3>
+          <TryItView steps={deep.tryIt} />
+        </section>
+
+        <VerificationPanel repo={repo} deep={deep} />
+      </div>
+
+      <aside className="aside-col">
+        <ScoreCard score={deep.score} worthDeepDive={repo.worthDeepDive} />
+        <QuickSummary text={deep.atGlance} />
+        <SourceCard repo={repo} />
+      </aside>
+    </div>
+  );
+}
+
+function ReaderBrief({ repo, deep }: { repo: AnalyzedRepo; deep: ProjectDeepDive }) {
   const firstConcept = deep.keyConcepts[0];
   const reasons = deep.whyItMatters.slice(0, 3);
+  const showLight = repo.light && !isTemplateJunk(repo.light);
   return (
     <section className="dd-lead">
       <div className="dd-kicker">先给判断</div>
       <h2 className="dd-verdict">{firstSentence(deep.atGlance)}</h2>
-      <p className="dd-verdict-sub">{compactText(repo.light, 190)}</p>
+      {showLight && <p className="dd-verdict-sub">{compactText(repo.light, 190)}</p>}
 
       <div className="dd-insight">
         <div className="dd-insight-tag">核心洞见</div>
@@ -275,12 +271,12 @@ function ProjectReaderBrief({ repo, onSelectTab }: { repo: AnalyzedRepo; onSelec
       )}
 
       <div className="dd-threads">
-        <div className="dd-threads-lab">想再深挖（点开展开，不打扰主线）：</div>
+        <div className="dd-threads-lab">往下读（同一页，按需跳）：</div>
         <div className="dd-chips">
-          <button type="button" className="dd-chip" onClick={() => onSelectTab("howItWorks")}>＋ 完整流程</button>
-          <button type="button" className="dd-chip" onClick={() => onSelectTab("concepts")}>＋ 全部术语</button>
-          <button type="button" className="dd-chip" onClick={() => onSelectTab("novelty")}>＋ 跟同类的差异</button>
-          <button type="button" className="dd-chip" onClick={() => onSelectTab("tryIt")}>＋ 上手步骤</button>
+          <a className="dd-chip" href="#sec-flow">↓ 完整流程</a>
+          {deep.keyConcepts.length > 1 && <a className="dd-chip" href="#sec-concepts">↓ 全部术语</a>}
+          <a className="dd-chip" href="#sec-novelty">↓ 跟同类的差异</a>
+          <a className="dd-chip" href="#sec-tryit">↓ 上手步骤</a>
         </div>
       </div>
     </section>
@@ -309,7 +305,7 @@ function markdownSections(text: string): WorkflowStep[] {
   return sections.filter((section) => plainText(section.body));
 }
 
-function projectWorkflowSteps(deep: ProjectDeepDive): WorkflowStep[] {
+function workflowSteps(deep: ProjectDeepDive): WorkflowStep[] {
   const sectionSteps = markdownSections(deep.howItWorks)
     .slice(0, 4)
     .map((section) => ({
@@ -332,34 +328,10 @@ function projectWorkflowSteps(deep: ProjectDeepDive): WorkflowStep[] {
   ];
 }
 
-function projectMechanism(deep: ProjectDeepDive): string {
-  const steps = projectWorkflowSteps(deep);
-  const names = steps.map((step) => step.title).slice(0, 3).join(" -> ");
-  if (names) return `${names}。${steps[0]?.body || ""}`;
-  return compactText(deep.howItWorks, 150);
-}
-
-function projectTransfer(repo: AnalyzedRepo, deep: ProjectDeepDive): string {
-  const tags = repo.tags.slice(0, 3).join(" / ");
-  const novelty = compactText(deep.novelty, 150);
-  return tags ? `${tags} 方向可复用。${novelty}` : novelty;
-}
-
-function ProjectWorkflowSketch({ repo, onSelectTab, compact = false }: { repo: AnalyzedRepo; onSelectTab?: (tab: TabKey) => void; compact?: boolean }) {
-  const deep = repo.deep;
-  if (!deep) return null;
-  const steps = projectWorkflowSteps(deep);
+function WorkflowSketch({ deep }: { deep: ProjectDeepDive }) {
+  const steps = workflowSteps(deep);
   return (
-    <div className={`workflow-sketch-section${compact ? " compact" : ""}`}>
-      <div className="workflow-sketch-head">
-        <div>
-          <div className="section-kicker">Workflow</div>
-          <h3>只把真正的流程画出来</h3>
-        </div>
-        {compact && onSelectTab && (
-          <button className="text-link-button" type="button" onClick={() => onSelectTab("howItWorks")}>展开流程说明</button>
-        )}
-      </div>
+    <div className="workflow-sketch-section">
       <div className="workflow-sketch" aria-label="项目工作流">
         {steps.map((step, index) => (
           <article key={`${step.title}-${index}`}>
@@ -373,9 +345,7 @@ function ProjectWorkflowSketch({ repo, onSelectTab, compact = false }: { repo: A
   );
 }
 
-function ProjectVerificationPanel({ repo }: { repo: AnalyzedRepo }) {
-  const deep = repo.deep;
-  if (!deep) return null;
+function VerificationPanel({ repo, deep }: { repo: AnalyzedRepo; deep: ProjectDeepDive }) {
   const firstTry = firstTryStep(deep.tryIt);
   return (
     <section className="section project-verification-panel">
@@ -581,19 +551,6 @@ function SourceCard({ repo }: { repo: AnalyzedRepo }) {
           <a className="open" href={it.url} target="_blank" rel="noreferrer">{it.label}</a>
         </div>
       ))}
-    </div>
-  );
-}
-
-function NextSteps({ repo }: { repo: AnalyzedRepo }) {
-  return (
-    <div className="aside">
-      <h4 className="aside-title"><span className="ico">→</span>Next steps</h4>
-      <div className="next-step">读 Try it tab，按提示跑 5 分钟 quickstart</div>
-      <div className="next-step">把 Key Concepts 里的术语和你已知的 AI 概念做映射</div>
-      <div className="next-step">看 Ecosystem 知道它跟你已知项目的关系</div>
-      <div className="next-step">如果工程评分 ≥ 18，clone 下来本地跑 demo</div>
-      {repo.language && <div className="next-step">在你自己的 {repo.language} 项目里试它的核心抽象</div>}
     </div>
   );
 }

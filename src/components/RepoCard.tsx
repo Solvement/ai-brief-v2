@@ -67,9 +67,9 @@ function cardSummary(repo: AnalyzedRepo): string {
   return (repo.light || repo.description || "").trim();
 }
 
-interface Props { repo: AnalyzedRepo; featured?: boolean }
+interface Props { repo: AnalyzedRepo; featured?: boolean; fromWin?: "daily" | "weekly" | "monthly" }
 
-export function RepoCard({ repo }: Props) {
+export function RepoCard({ repo, fromWin }: Props) {
   const depth = depthOf(repo);
   const slug = slugOf(repo);
   const score = typeof repo.ranking_score === "number" ? repo.ranking_score : repo.worthDeepDive;
@@ -153,9 +153,11 @@ export function RepoCard({ repo }: Props) {
   // Card always links to an ANALYSIS page: brief-wiki if generated, else the universal
   // per-repo Detail (/repo/owner/name). The original repo is a SEPARATE footer link.
   const repoName = repo.name || (repo.fullName || "").split("/").slice(1).join("/");
+  // 携带来源榜（?win=monthly），详情页"返回"回到离开的榜而不是重置今日榜
+  const winQS = fromWin ? `?win=${fromWin}` : "";
   const analysisHref = hasBrief
-    ? `/brief/${encodeURIComponent(slug)}`
-    : `/repo/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repoName)}`;
+    ? `/brief/${encodeURIComponent(slug)}${winQS}`
+    : `/repo/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repoName)}${winQS}`;
 
   return (
     <div className={cls}>

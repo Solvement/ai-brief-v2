@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Markdown } from "./Markdown";
+import { ProjectFacetSpine, type FacetRecord } from "./ProjectFacetSpine";
 
 /* ============================================================
    Light-spine deep-dive reading page (project-light-spine/v1)
@@ -95,7 +96,18 @@ function sectionHasContent(sec?: SectionBody & { bullets?: string[]; items?: unk
   );
 }
 
-export function LightSpineDeepDive({ item, spine }: { item: DiveItem; spine: LightSpine }) {
+/** 返回链接带上来源榜（?win=monthly）：月榜点进来的返回月榜，不重置今日榜 */
+function useBackToProjects(): string {
+  const [href, setHref] = useState("/projects");
+  useEffect(() => {
+    const w = new URLSearchParams(location.search).get("win");
+    if (w === "daily" || w === "weekly" || w === "monthly") setHref(`/projects?win=${w}`);
+  }, []);
+  return href;
+}
+
+export function LightSpineDeepDive({ item, spine, facet }: { item: DiveItem; spine: LightSpine; facet?: FacetRecord | null }) {
+  const backHref = useBackToProjects();
   const m = item.meta ?? {};
   const repo: string | undefined = m.authoring?.repo;
   const projectType: string | undefined = m.project_type;
@@ -119,7 +131,7 @@ export function LightSpineDeepDive({ item, spine }: { item: DiveItem; spine: Lig
 
   return (
     <article className="dd">
-      <a className="dd-back" href="/projects">← 项目雷达</a>
+      <a className="dd-back" href={backHref}>← 项目雷达</a>
 
       {/* ── Header card ── */}
       <header className="dd-header">
@@ -151,6 +163,9 @@ export function LightSpineDeepDive({ item, spine }: { item: DiveItem; spine: Lig
           </details>
         )}
       </header>
+
+      {/* Mind Palace 深度内化（统一契约：每个深析项目标配，Kevin 2026-06-11） */}
+      {facet && <ProjectFacetSpine facet={facet} />}
 
       {/* ── 2-column body: main content + sticky verdict rail ── */}
       <div className="dd-body">

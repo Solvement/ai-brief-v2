@@ -21,7 +21,7 @@ function depthOf(repo: { final_depth?: string; deep?: unknown }): string {
   return repo.final_depth || (repo.deep ? "deep" : "list_only");
 }
 
-function RadarGrid({ board }: { board: Board }) {
+function RadarGrid({ board, win }: { board: Board; win: TrendingWindow }) {
   const repos = board.repos;
   if (repos.length === 0) return <div className="empty">这个榜没抓到数据</div>;
   const deepCount = repos.filter((r) => depthOf(r) === "deep").length;
@@ -29,7 +29,7 @@ function RadarGrid({ board }: { board: Board }) {
   return (
     <>
       <div className="radar-grid">
-        {repos.map((r, i) => <RepoCard key={r.fullName} repo={r} featured={i === 0} />)}
+        {repos.map((r, i) => <RepoCard key={r.fullName} repo={r} featured={i === 0} fromWin={win} />)}
       </div>
       <div className="radar-footstats">
         已收录 <b>{repos.length}</b> 个项目 · 深扒 <b>{deepCount}</b> · 分析 <b>{analysisCount}</b>
@@ -51,6 +51,18 @@ export function Projects() {
   useEffect(() => {
     loadTrending().then(setData).catch((e) => setErr(e?.message || String(e)));
   }, []);
+
+  // 从 URL 恢复来源榜（?win=monthly）：详情页返回/浏览器后退时回到离开的榜，而不是重置今日榜
+  useEffect(() => {
+    const w = new URLSearchParams(location.search).get("win");
+    if (w === "daily" || w === "weekly" || w === "monthly") setWin(w);
+  }, []);
+  const switchWin = (w: TrendingWindow) => {
+    setWin(w);
+    const url = new URL(location.href);
+    url.searchParams.set("win", w);
+    history.replaceState(null, "", url.toString());
+  };
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -101,7 +113,7 @@ export function Projects() {
               <button
                 key={w}
                 className={`radar-chip${win === w ? " active" : ""}`}
-                onClick={() => setWin(w)}
+                onClick={() => switchWin(w)}
               >
                 {TITLES[w]}
                 {data && <span className="radar-chip-count">{data[w].repos.length}</span>}
@@ -123,7 +135,7 @@ export function Projects() {
 
         {!data && !err && <div className="loading">正在加载榜单…</div>}
 
-        {data && <RadarGrid board={data[win]} />}
+        {data && <RadarGrid board={data[win]} win={win} />}
       </main>
 
       {ingest !== "idle" && (
