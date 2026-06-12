@@ -271,24 +271,36 @@ export function MindPalaceGlobe() {
           .linkOpacity(0.55)
           .linkDirectionalParticles((o: object) => { const l = o as { type?: string }; return l.type === "improves_on" || l.type === "builds_on" ? 2 : 0; })
           .linkDirectionalParticleWidth(1.6)
-          .onNodeClick((o: object) => {
-            const n = o as GNode;
-            const comp = componentOf(n.id, dataRef.current!.edges);
-            setFocus(comp);
-            setFocusRoot(n.id);
-            // 相机动画推近：沿该点方向退到 1.9 倍半径，画布同时让位（CSS）→"移到一边放大"
-            const d = Math.hypot(n.fx || 1, n.fy || 1, n.fz || 1) || 1;
-            const k = 1.9;
-            fg.cameraPosition({ x: ((n.fx || 0) / d) * d * k, y: ((n.fy || 0) / d) * d * k, z: ((n.fz || 0) / d) * d * k }, { x: n.fx || 0, y: n.fy || 0, z: n.fz || 0 }, 900);
-            setTimeout(() => fg.refresh(), 50);
-          })
+          .onNodeClick((o: object) => focusOn(o as GNode))
           .onBackgroundClick(() => {
             setFocus(null); setFocusRoot(null);
             fg.cameraPosition({ x: 0, y: 0, z: 760 }, { x: 0, y: 0, z: 0 }, 900);
             setTimeout(() => fg.refresh(), 50);
           });
+        // 聚焦逻辑（点击 / ?focus= 深链 / 测试钩子共用）：相机沿该点方向推近，画布让位（CSS）→"移到一边放大"
+        function focusOn(n: GNode) {
+          const comp = componentOf(n.id, dataRef.current!.edges);
+          setFocus(comp);
+          setFocusRoot(n.id);
+          const d = Math.hypot(n.fx || 1, n.fy || 1, n.fz || 1) || 1;
+          const k = 1.9;
+          fg.cameraPosition({ x: ((n.fx || 0) / d) * d * k, y: ((n.fy || 0) / d) * d * k, z: ((n.fz || 0) / d) * d * k }, { x: n.fx || 0, y: n.fy || 0, z: n.fz || 0 }, 900);
+          setTimeout(() => fg.refresh(), 50);
+        }
         fg.cameraPosition({ x: 0, y: 0, z: 760 });
         fgRef.current = fg as object;
+
+        // ?focus=<id> 深链：检索区/项目页可直达某条记忆的球聚焦（也作自动化验证钩子）
+        const focusParam = new URLSearchParams(location.search).get("focus");
+        if (focusParam) {
+          const target = nodes.find((x) => x.id === focusParam || x.title === focusParam);
+          if (target) setTimeout(() => focusOn(target), 400);
+        }
+        (window as unknown as { __mpFocus?: (id: string) => boolean }).__mpFocus = (id: string) => {
+          const target = nodes.find((x) => x.id === id || x.title.includes(id));
+          if (target) { focusOn(target); return true; }
+          return false;
+        };
 
         const onResize = () => fg.width(el.clientWidth).height(el.clientHeight);
         window.addEventListener("resize", onResize);
