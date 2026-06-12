@@ -29,3 +29,5 @@
 
 19. **closeout 必须引用验证证据（CMU 第 8 章验收清单）。** task-board 的 `交付结论：` 不许只写"做完了"——要带 verify/冷审/commit/门 等可追溯证据，否则只是完成幻觉。空/待办用 `交付结论：—` 或 `待…` 显式标注。`npm run ops:harness`（已接进 `validate`）机器检查此条 + workflow.yaml stage 完整性 + 跨文件引用不悬空 = 可判定 Rule 下沉成脚本（CMU「能判定就不要停在自然语言 Rule」）。
 20. **责任靠前后报告对比，不靠叙述（CMU 六轮补稳 #5）。** 大改动前 `npm run ops:baseline`（存 validate 套件基线），改完 `npm run ops:baseline:diff` 自证哪些 validator 是本次新引入失败的——"这不是我引入的"必须用 diff 证明，不能口头。
+
+21. **记忆要 compound，不要只长大（Boris/Fable 镜子，2026-06-12）。** session 收尾**必更** `task-board.md` 接力指针（上一跑 / 下一跑，write-before-walk-away）；动手前**先查失败登记**别重试踩过的坑；一条教训按 5 阶（Fail→Investigate→Verify→Distill→Consult）往上走，**确认的失败模式写回相关 paradigm/prompt 的「已知失败模式」段**（程序记忆、跨任务存活），不只写 task-board（项目记忆、随任务死）。详见 [docs/method/research-loop.md](./docs/method/research-loop.md) §记忆怎么 compound。
