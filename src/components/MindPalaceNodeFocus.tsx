@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  normalize, componentOf, sphereLayout, shortTitle,
+  normalize, componentOf, sphereLayout, shortTitle, findSynthesis,
   EDGE_LABEL, EDGE_COLOR,
-  type GNode, type GEdge, type RawGraph,
+  type GNode, type RawGraph, type SynthesisDoc,
 } from "./MindPalaceGlobe";
 
 // ════════════════════════════════════════════════════════════════════
@@ -15,6 +15,7 @@ import {
 
 export function MindPalaceNodeFocus({ nodeId }: { nodeId: string }) {
   const [raw, setRaw] = useState<RawGraph | null>(null);
+  const [synth, setSynth] = useState<SynthesisDoc | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const mountRef = useRef<HTMLDivElement | null>(null);
 
@@ -24,6 +25,10 @@ export function MindPalaceNodeFocus({ nodeId }: { nodeId: string }) {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
       .then((d) => alive && setRaw(d))
       .catch((e) => alive && setErr(e?.message || String(e)));
+    fetch("/data/brief/cluster-synthesis.json", { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => alive && setSynth(d))
+      .catch(() => alive && setSynth(null));
     return () => { alive = false; };
   }, []);
 
@@ -107,6 +112,12 @@ export function MindPalaceNodeFocus({ nodeId }: { nodeId: string }) {
           {isCluster ? (
             <>
               <h2 className="nf-h2">这串记忆的密切联系</h2>
+              {(() => { const s = findSynthesis(synth, comp); return s ? (
+                <div className="globe-synth">
+                  <div className="globe-synth-h">群体视角 · 这一簇合起来告诉我们什么</div>
+                  <p>{s.synthesis}</p>
+                </div>
+              ) : null; })()}
               <div className="globe-members" style={{ marginBottom: 14 }}>
                 {compNodes.map((n) => (
                   <a key={n.id} className={`globe-member light ${n.id === root.id ? "root" : ""} ${n.ghost ? "ghost" : ""}`}

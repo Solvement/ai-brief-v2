@@ -41,6 +41,16 @@ export interface GEdge {
   source: string; target: string; type: string;
   evidence?: string; use?: string; confidence?: string;
 }
+// 簇综述（群体分析，docs/paradigms/mind-palace-content.md）：这一簇合起来告诉我们什么
+export interface ClusterSynthesis { title?: string; synthesis: string; member_ids?: string[]; updated?: string }
+export type SynthesisDoc = Record<string, ClusterSynthesis>;
+export function findSynthesis(doc: SynthesisDoc | null, memberIds: Set<string>): ClusterSynthesis | null {
+  if (!doc) return null;
+  for (const v of Object.values(doc)) {
+    if (v?.member_ids?.some((m) => memberIds.has(m))) return v;
+  }
+  return null;
+}
 
 export const EDGE_LABEL: Record<string, string> = {
   improves_on: "取长补短/优化", composes_with: "可合并/前后关联", contradicts: "思路相反",
@@ -202,6 +212,7 @@ function computeClusters(nodes: GNode[], edges: GEdge[]): Cluster[] {
 // ════════════════════════════════════════════════════════════════════
 export function MindPalaceGlobe() {
   const [raw, setRaw] = useState<RawGraph | null>(null);
+  const [synth, setSynth] = useState<SynthesisDoc | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [mode, setMode] = useState<"globe" | "gaps">("globe");
   const [focus, setFocus] = useState<Set<string> | null>(null); // 选中的连通分量（或单点）
@@ -221,6 +232,10 @@ export function MindPalaceGlobe() {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status))))
       .then((d) => alive && setRaw(d))
       .catch((e) => alive && setErr(e?.message || String(e)));
+    fetch("/data/brief/cluster-synthesis.json", { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => alive && setSynth(d))
+      .catch(() => alive && setSynth(null));
     return () => { alive = false; };
   }, []);
 
@@ -376,6 +391,12 @@ export function MindPalaceGlobe() {
                 <>
                   <div className="globe-panel-kicker">关系分析 · 这一串记忆为什么连在一起</div>
                   <h2 className="globe-panel-title">{focusNodes.length} 条记忆的密切联系</h2>
+                  {(() => { const s = findSynthesis(synth, focus!); return s ? (
+                    <div className="globe-synth">
+                      <div className="globe-synth-h">群体视角 · 这一簇合起来告诉我们什么</div>
+                      <p>{s.synthesis}</p>
+                    </div>
+                  ) : null; })()}
                   <div className="globe-members">
                     {focusNodes.map((n) => (
                       <span key={n.id} className={`globe-member ${n.id === focusRoot ? "root" : ""} ${n.ghost ? "ghost" : ""}`}>

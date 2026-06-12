@@ -13,6 +13,13 @@
 3. **nesquena/hermes-webui** —— 配套关系显式写出；火点、与其他 WebUI 区别、可替换性。
 硬纪律：优势/实现为主（risk+unknowns ≤15%）；全中文正文（三铁律：不堆砌/不夹生/正文无指令代码）；claims 带自报/已核实；结构复杂配 Mermaid。
 
+**每篇另加（`docs/paradigms/mind-palace-content.md` 三要件，Kevin 2026-06-12）：**
+- `group_position` 段：放进同 track 谱系（项目+论文混排）看——站哪个位置/相对取舍（牺牲什么换什么）/补谱系哪块空/演进先后。单独看与放群体里看的理解差异要写出来。
+- `self_evo_verdict`：能否用到我们自己系统？三态 apply（直接应用+verify+汇报）/queue（红线进周审队列）/no（一句为什么）——禁便利贴。
+
+## A2 — 簇综述样板 ×1（群体分析格式证明）
+对 agent-memory 簇（AgeMem/MemoryAgentBench/supermemory/agentmemory/mempalace 等所在的最大连通分量）产一份**簇综述**：这一簇合起来告诉我们什么——这类问题的解法谱系长什么样、主流路线分歧在哪、什么已收敛什么还开放。中文、≤600 字、有谱系结构（不是逐项罗列）。写入 `public/data/brief/cluster-synthesis.json`（{"<track 或分量根 id>": {"title","synthesis","member_ids","updated"}}）。
+
 ## B — 关系引擎补"显式引用"候选规则（修 Hermes↔Hermes-WebUI 漏连事故）
 - 候选生成加规则：A 项目的 README/描述/facet 里**点名** B（仓库名/产品名匹配，归一化大小写与连字符）→ 必须成为候选对（绕过向量重叠门）。
 - 用新规则重跑候选→判边→重建图。预期至少补上 hermes-agent↔hermes-webui（depends_on/composes_with 类）；其它显式引用对一并入候选。
