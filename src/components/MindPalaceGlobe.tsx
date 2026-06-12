@@ -25,9 +25,9 @@ interface RawEdge {
   layer?: string; hidden?: boolean;
   [k: string]: unknown;
 }
-interface RawGraph { nodes?: RawNode[]; edges?: RawEdge[] }
+export interface RawGraph { nodes?: RawNode[]; edges?: RawEdge[] }
 
-interface GNode {
+export interface GNode {
   id: string; title: string; kind: "paper" | "project" | "ghost" | "other";
   track: string; tags: string[]; ghost: boolean;
   facets?: Record<string, string>; selfEvoUse?: string;
@@ -37,31 +37,32 @@ interface GNode {
   fx?: number; fy?: number; fz?: number;
   x?: number; y?: number; z?: number;
 }
-interface GEdge {
+export interface GEdge {
   source: string; target: string; type: string;
   evidence?: string; use?: string; confidence?: string;
 }
 
-const EDGE_LABEL: Record<string, string> = {
+export const EDGE_LABEL: Record<string, string> = {
   improves_on: "取长补短/优化", composes_with: "可合并/前后关联", contradicts: "思路相反",
   builds_on: "演进自", implements: "实现", shares_method: "共享方法",
   shares_concept: "共享概念", same_track: "同赛道", same_use_case: "同用例",
   complements: "互补", references: "引用", related: "关联",
 };
-const EDGE_COLOR: Record<string, string> = {
+export const EDGE_COLOR: Record<string, string> = {
   improves_on: "#f87171", composes_with: "#22d3ee", contradicts: "#fbbf24",
   builds_on: "#fb923c", implements: "#a78bfa", shares_method: "#34d399",
   shares_concept: "#c4b5fd", complements: "#67e8f9", related: "#94a3b8",
 };
-const TRACK_COLORS = ["#2563eb", "#7c3aed", "#0891b2", "#16a34a", "#d97706", "#dc2626", "#db2777", "#4f46e5", "#0d9488", "#9333ea"];
+// 浅底高对比色板（light theme 宪法；色相拉开 + 高饱和，浅底上彼此可分）
+const TRACK_COLORS = ["#1d4ed8", "#7c3aed", "#0e7490", "#15803d", "#b45309", "#b91c1c", "#be185d", "#4338ca", "#0f766e", "#86198f"];
 
-function shortTitle(t: string, max = 30): string {
+export function shortTitle(t: string, max = 30): string {
   const head = t.replace(/\s*[—:：].*$/, "").trim() || t;
   return head.length > max ? head.slice(0, max - 1) + "…" : head;
 }
 
 // ── normalize ──
-function normalize(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
+export function normalize(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
   const PAPER = new Set(["paper", "content", "deep-dive", "article"]);
   const PROJ = new Set(["project", "repo"]);
   const rawNodes = raw.nodes || [];
@@ -98,7 +99,8 @@ function normalize(raw: RawGraph): { nodes: GNode[]; edges: GEdge[] } {
 }
 
 // ── 球壳分区布局：track 簇 = 球面"大洲"，成员绕簇心切平面散开后投回球壳 ──
-function sphereLayout(nodes: GNode[], R = 320) {
+// R 调大 + spread 调大（Kevin：球粘在一起不好点击）
+export function sphereLayout(nodes: GNode[], R = 430) {
   const tracks = [...new Set(nodes.map((n) => n.track))];
   // fibonacci sphere 给每个 track 一个簇心方向
   const centers = new Map<string, [number, number, number]>();
@@ -119,7 +121,7 @@ function sphereLayout(nodes: GNode[], R = 320) {
     const up: [number, number, number] = Math.abs(c[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
     const tx = norm3(cross3(up, c));
     const ty = cross3(c, tx);
-    const spread = Math.min(0.55, 0.18 + members.length * 0.02);
+    const spread = Math.min(0.8, 0.3 + members.length * 0.03);
     members.forEach((m, i) => {
       const r = spread * Math.sqrt((i + 0.5) / members.length);
       const a = i * 2.39996; // golden angle
@@ -143,7 +145,7 @@ function norm3(v: number[]): [number, number, number] {
 }
 
 // ── 连通分量（typed 边） ──
-function componentOf(id: string, edges: GEdge[]): Set<string> {
+export function componentOf(id: string, edges: GEdge[]): Set<string> {
   const adj = new Map<string, string[]>();
   for (const e of edges) {
     if (!adj.has(e.source)) adj.set(e.source, []);
@@ -242,30 +244,31 @@ export function MindPalaceGlobe() {
 
         const fg = new ForceGraph3D(el)
           .width(el.clientWidth).height(el.clientHeight)
-          .backgroundColor("#0b1020") // 深空底——记忆球的"生物模型展示"感，与白底检索区强对比
+          .backgroundColor("#f4f7fc") // 浅底（light theme 宪法；Kevin：不理解为什么黑底）
           .graphData({ nodes: nodes as object[], links: edges.map((e) => ({ ...e })) as object[] })
           .cooldownTicks(0) // 固定坐标布局，不跑力学
           .enableNodeDrag(false)
           .showNavInfo(false)
           .nodeId("id")
-          .nodeLabel((o: object) => { const n = o as GNode; return `<div style="font:12px sans-serif;color:#e2e8f0;background:rgba(11,16,32,.85);padding:4px 8px;border-radius:6px;max-width:280px">${n.title}${n.ghost ? " · 幽灵（未深读）" : ""}</div>`; })
+          .nodeRelSize(5)
+          .nodeLabel((o: object) => { const n = o as GNode; return `<div style="font:12.5px sans-serif;color:#0f172a;background:rgba(255,255,255,.96);border:1px solid #cbd5e1;padding:5px 9px;border-radius:7px;max-width:300px;box-shadow:0 4px 14px rgba(15,23,42,.12)">${n.title}${n.ghost ? " · 幽灵（未深读）" : ""}</div>`; })
           .nodeVal((o: object) => { const n = o as GNode; return n.ghost ? 1.5 : 2.5 + Math.min(6, n.deg * 1.2); })
           .nodeColor((o: object) => {
             const n = o as GNode;
             const f = focusRef.current;
-            const base = n.ghost ? "#475569" : trackColor(n.track);
+            const base = n.ghost ? "#94a3b8" : trackColor(n.track);
             if (!f) return base;
-            return f.has(n.id) ? base : "rgba(70,80,100,0.12)";
+            return f.has(n.id) ? base : "rgba(148,163,184,0.18)";
           })
           .nodeOpacity(0.95)
           .linkColor((o: object) => {
             const l = o as { type?: string; source?: GNode | string; target?: GNode | string };
             const f = focusRef.current;
-            const c = EDGE_COLOR[l.type || "related"] || "#94a3b8";
+            const c = EDGE_COLOR[l.type || "related"] || "#64748b";
             if (!f) return c;
             const s = typeof l.source === "object" ? l.source?.id : l.source;
             const t = typeof l.target === "object" ? l.target?.id : l.target;
-            return s && t && f.has(s) && f.has(t) ? c : "rgba(70,80,100,0.06)";
+            return s && t && f.has(s) && f.has(t) ? c : "rgba(148,163,184,0.08)";
           })
           .linkWidth((o: object) => { const l = o as { type?: string }; return l.type === "improves_on" || l.type === "composes_with" ? 1.6 : 0.8; })
           .linkOpacity(0.55)
@@ -273,9 +276,8 @@ export function MindPalaceGlobe() {
           .linkDirectionalParticleWidth(1.6)
           .onNodeClick((o: object) => focusOn(o as GNode))
           .onBackgroundClick(() => {
-            setFocus(null); setFocusRoot(null);
-            fg.cameraPosition({ x: 0, y: 0, z: 760 }, { x: 0, y: 0, z: 0 }, 900);
-            setTimeout(() => fg.refresh(), 50);
+            // 聚焦中误点空白不再清空（球挤时误点频发导致"解释会消失"）——退出只走「返回全球」按钮
+            if (focusRef.current) return;
           });
         // 聚焦逻辑（点击 / ?focus= 深链 / 测试钩子共用）：相机沿该点方向推近，画布让位（CSS）→"移到一边放大"
         function focusOn(n: GNode) {
@@ -287,7 +289,7 @@ export function MindPalaceGlobe() {
           fg.cameraPosition({ x: ((n.fx || 0) / d) * d * k, y: ((n.fy || 0) / d) * d * k, z: ((n.fz || 0) / d) * d * k }, { x: n.fx || 0, y: n.fy || 0, z: n.fz || 0 }, 900);
           setTimeout(() => fg.refresh(), 50);
         }
-        fg.cameraPosition({ x: 0, y: 0, z: 760 });
+        fg.cameraPosition({ x: 0, y: 0, z: 980 });
         fgRef.current = fg as object;
 
         // ?focus=<id> 深链：检索区/项目页可直达某条记忆的球聚焦（也作自动化验证钩子）
@@ -363,7 +365,12 @@ export function MindPalaceGlobe() {
           <div className="globe-canvas" ref={mountRef} />
           {focus && (
             <aside className="globe-panel">
-              <button className="globe-panel-close" onClick={() => { setFocus(null); setFocusRoot(null); (fgRef.current as { cameraPosition?: (a: object, b: object, c: number) => void } | null)?.cameraPosition?.({ x: 0, y: 0, z: 760 }, { x: 0, y: 0, z: 0 }, 900); }}>× 返回全球</button>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 14 }}>
+                <button className="globe-panel-close" style={{ marginBottom: 0 }} onClick={() => { setFocus(null); setFocusRoot(null); (fgRef.current as { cameraPosition?: (a: object, b: object, c: number) => void } | null)?.cameraPosition?.({ x: 0, y: 0, z: 980 }, { x: 0, y: 0, z: 0 }, 900); }}>× 返回全球</button>
+                {focusRoot && (
+                  <a className="globe-fullpage" href={`/mind-palace/node/${encodeURIComponent(focusRoot)}`}>⤢ 全屏打开这条记忆</a>
+                )}
+              </div>
 
               {isCluster ? (
                 <>
