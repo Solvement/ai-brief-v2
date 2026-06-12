@@ -1,3 +1,8 @@
+# ♻️ 已收编（2026-06-12 KG-4）→ 正典见 [research-object-store.md](./research-object-store.md) §3
+
+> 八组动词表**继续有效**，但作用层从论文级降到**对象级**（A.mechanism ↔ B.benchmark），
+> 且关系优先由正典 join 结构推导、LLM 只判残差。新关系一律写 relation object（含 boundary/validation_experiment），不再写论文级单边。
+
 # 关系类型学（Mind Palace typed edges, 2026-06-11 从语料实挖）
 
 > Kevin 2026-06-11："关系种类很多，需要理清楚——实际沉淀会发现。" 本表**不是先验枚举**，是从现有 facet/discovery 散文里**实挖**出来的（每条都有语料出处），并按 **"怎么利用"(动作)** 归组——这是外脑和图书馆的区别：边不只说"相关"，要说**该拿它做什么**。

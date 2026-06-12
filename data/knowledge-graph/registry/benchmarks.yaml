@@ -1,0 +1,6 @@
+# ROS L2 · 评测注册表（schema: ros-v1）
+- id: bench.memoryagentbench
+  name: MemoryAgentBench
+  evaluates: [mem.lifecycle-management, mem.retrieval-precision, mem.staleness-conflict]
+  metrics: []        # 试点蒸馏时由 memoryagentbench 对象回填
+  limitations: []    # 测不出什么——join boundary 用

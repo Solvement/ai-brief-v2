@@ -1,0 +1,31 @@
+# ROS L2 · 问题注册表（schema: ros-v1）
+# ID 规范 {namespace}.{kebab-name}；新增词条须经主控审核（子 agent 走 proposed_problems）
+- id: mem
+  name: 长期 agent 记忆
+  parent: null
+  description: agent 跨会话/跨任务保留、组织、调用过去信息的总问题域。
+
+- id: mem.lifecycle-management
+  name: 记忆生命周期管理
+  parent: mem
+  description: 何时写入/更新/删除/检索/压缩/遗忘——记忆操作的决策问题，而非存储容量问题。
+
+- id: mem.retrieval-precision
+  name: 记忆检索相关性
+  parent: mem
+  description: 检索到的记忆与当前任务匹配；包含查询改写、混合检索、排序。
+
+- id: mem.staleness-conflict
+  name: 过期记忆与冲突事实
+  parent: mem
+  description: 旧结论污染新决策、同一事实多版本冲突时的更新/废弃/信任排序。
+
+- id: mem.fidelity-vs-abstraction
+  name: 保真与抽象的权衡
+  parent: mem
+  description: 逐字保留原始记录（可追溯、噪声大）vs 压缩/抽取（省、可推理、有损失）。
+
+- id: mem.evaluation
+  name: 记忆系统有效性评测
+  parent: mem
+  description: 如何证明一个 memory 系统真的有用——区分检索命中率提升与端到端任务收益。

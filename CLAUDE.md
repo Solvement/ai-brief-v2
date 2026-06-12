@@ -109,6 +109,12 @@ Dynamic workflows use **Claude's subagents (this Claude Code subscription)**. He
 - **项目→AutoSci（C）**：项目排名规则改为**月榜前 10（按 star）默认 deep-dive**；项目原语**按 project_type 选择性抽取**——skill / 教学类不抽或少抽，架构型（如 finance agent）抽底层架构。
 - **eval/goal**：`scripts/eval-redesign.mjs` 是三栏改造的机器 DONE 定义，目标=全绿。
 
+## 知识记忆架构 = Research Object Store（KG-4，2026-06-12 Kevin 拍板重构）
+精读/知识图谱的**记忆本体**从「论文级 facet + 论文级边」重构为对象库，正典 [docs/paradigms/research-object-store.md](./docs/paradigms/research-object-store.md)（唯一口径；mind-palace-content.md 已 superseded，relation-taxonomy.md 动词表收编到对象级）：
+- **六层**：L0 原文锚点 → L1 对象层（claims/mechanisms/assumptions/failure_modes/trigger_hooks/exam_questions）→ L2 正典注册层（problem/concept/benchmark/proposition）→ L3 关系层（**结构 join 推导为主、LLM 残差为辅、NO_EDGE 默认**）→ L4 视图=投影 → L5 考题盲测验收 → L6 迁移钩子。
+- **纪律**：论文不是推理单位，claim/mechanism 才是；图不是数据本体；私有术语必须挂正典 ID（防本体蔓延）；wide schema + sparse objects（按论文类型稀疏填写，禁摊满模板）；每个字段必须有消费方，盲测裁决去留；事实分型 fact/author_claim/interpretation/inference 永不混淆。
+- **数据**：`data/knowledge-graph/objects/`（对象）+ `registry/`（正典）+ `relations/`（关系）。旧 `facets/` 降级为草稿输入，全量回填后退役（🔴 删除时 Kevin 确认）。
+
 ## Harness 治理（2026-06-09 Kevin 定，结构化调度全套）
 本项目=长期每日更新知识库+自进化+研究 agent，按 CMU+腾讯《Harness 工程化》落**完整结构化调度**。Claude 与 Codex 同等。
 - **底线**：[RULES.md](./RULES.md) §工作流红线（#11–18）——>100 行先写 plan、不自审、只三种停、可运行交付、子 agent 四件套。

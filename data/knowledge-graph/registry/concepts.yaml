@@ -1,0 +1,57 @@
+# ROS L2 · 概念注册表（schema: ros-v1）
+# 同名异义的解药："memory" 一词的每种实体各占一条。私有术语禁止直接进图。
+- id: mem.learned-policy-controller
+  name: 可学习的记忆操作策略
+  type: mechanism-family
+  description: 把记忆操作（写入/更新/删除/检索等）建模为可训练的策略动作，由反馈信号优化。
+  aliases: [learned memory policy, agentic memory operations, 记忆即策略动作]
+  distinct_from: [mem.fixed-rule-hooks]
+  conflicts_with: []
+
+- id: mem.fixed-rule-hooks
+  name: 固定规则记忆钩子
+  type: mechanism-family
+  description: 通过写死的 hook/规则流程控制记忆写入与检索；可控、可解释、易调试，适应性弱。
+  aliases: [fixed memory hooks, rule-based memory management]
+  distinct_from: [mem.learned-policy-controller]
+  conflicts_with: []
+
+- id: mem.external-vector-store
+  name: 外部向量库记忆
+  type: data-structure
+  description: 嵌入+向量检索的外部存储；记忆=被动存取的检索索引。
+  aliases: [vector memory, RAG memory]
+  distinct_from: [mem.local-verbatim-log, mem.fact-graph]
+  conflicts_with: []
+
+- id: mem.local-verbatim-log
+  name: 本地逐字记录
+  type: data-structure
+  description: 本地保存原始交互/文本记录，不做摘要压缩，保真可追溯。
+  aliases: [verbatim memory, local raw log]
+  distinct_from: [mem.fact-graph, mem.external-vector-store]
+  conflicts_with: []
+
+- id: mem.fact-graph
+  name: 事实图谱记忆
+  type: data-structure
+  description: 抽取实体/事实/关系形成结构化图谱，支持冲突检测与跨文档合并；有抽取损失。
+  aliases: [fact graph, structured memory graph]
+  distinct_from: [mem.local-verbatim-log]
+  conflicts_with: []
+
+- id: train.terminal-credit-broadcast
+  name: 终局信用广播训练
+  type: training-scheme
+  description: 把终局奖励/优势广播回轨迹中每一步，给拿不到即时监督的早期决策延迟信用（如 step-wise GRPO）。
+  aliases: [step-wise GRPO, terminal advantage broadcast]
+  distinct_from: []
+  conflicts_with: []
+
+- id: eval.lifecycle-dimensions
+  name: 记忆生命周期评测维度
+  type: eval-dimension
+  description: 超出检索命中率的评测轴——更新/遗忘/冲突消解/长期任务收益。
+  aliases: [memory lifecycle eval]
+  distinct_from: []
+  conflicts_with: []
