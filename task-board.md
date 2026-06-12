@@ -14,7 +14,15 @@
 
 ## 进行中
 
+### KG-4 · Research Object Store 记忆本体重构（plan `docs/plans/KG-4-research-object-store.md`，Kevin 2026-06-12 拍板）
+- **大方向**：以高质量为唯一标准**重构记忆本体、保留基础设施**——「论文级 facet + 论文级边」→ 六层对象库（L0 锚点→L1 claims/mechanisms/assumptions/failure_modes/trigger_hooks/exam_questions→L2 正典注册层→L3 结构推导关系→L4 视图=投影→L5 考题盲测→L6 迁移钩子）。依据=GPT 分析 1/2/3 + Claude 架构共识。**本条目取代 KG-2/KG-3 的范式口径**（其基础设施成果保留）。
+- **小方向**：正典 `docs/paradigms/research-object-store.md` ✅；旧正典 superseded/收编 ✅；registry 4 表种子 ✅（commit 24397b1）；memory 簇 5 篇试点蒸馏（5×opus 并行）+ codex 三脚本（validate-objects/derive-relations/exam-blindtest）跑批中。
+- **阶段**：试点执行中（蒸馏+后端并行）。
+- **阻塞**：无。
+- **交付结论**：—
+
 ### PROJECTS-REMINE-2026-06-11 · 项目内容统一重生成 + 关系引擎再深挖（plan `docs/plans/2026-06-11-projects-remine.md`）
+- **⚠范式注记（2026-06-12）**：本任务的 facet/关系产物按旧口径生成；KG-4 重构后 facets 降级为草稿输入、论文级边待对象级重推导。基础设施成果（管线/validator/bench）继续有效。
 - **大方向**：项目深读、light 文案、Mind Palace facet 和 typed relation graph 收敛成同一套可检索知识基底；删旧重、补 spine/facet、关系边从厚证据里挖。
 - **小方向**：清理 ownerless 旧 deep-dive 重复项；`trending.light` 去模板化且与实际深度决策一致；`worthDeepDive >= 60` 全部有 `briefSlug`；项目/论文 facets 覆盖扩大；relation candidate 默认放宽到 topK=10/max=300；孤立 faceted node 落 `track` label。
 - **阶段**：✅ Codex 实现完成 + 数据侧门禁通过，待独立冷审。
@@ -22,6 +30,7 @@
 - **交付结论**：报告 `logs/remine-summary.md`；进度 `logs/remine-progress.md`。`public/data/brief/deep-dives.json` 59 条且 `meta.light_spine` 缺口 0；`trending.json` 90 条 light 去模板化，高分缺 `briefSlug` 为 0；公开 facets 93（paper 37 / project 56），embeddings 93；graph typed primary edges 33（mechanical-in-primary=0），track label 基数 8。验证：`npm run validate` 通过（仅既有 articles warning）；`node scripts/eval-relation-engine.mjs` 通过；`node scripts/kg/bench-retrieval.mjs hybrid` recall@3=8/8、precision=14/15；`node scripts/kg/recall-eval.mjs` recall@3=1.000。红线复核：`src/`、`app/` 无 diff，未运行 Next build。
 
 ### KG-3-RELATION-ENGINE · Mind Palace typed 关系引擎 Loop B+C（plan `docs/plans/2026-06-11-mind-palace-relation-engine.md`）
+- **⚠范式注记（2026-06-12 KG-4）**：论文级 typed 边口径已被对象级关系（结构推导优先）取代；引擎/eval 基础设施保留，边数据待 KG-4 重推导后退役。
 - **大方向**：Mind Palace 主图从 references/same_track 毛球切到 typed relation reasoning；机械边保留为 secondary plumbing，不再占主边层。
 - **小方向**：新增 `scripts/kg/relation-engine.mjs` 确定性 CI 路径（facet 明示证据 + lexical/shared-core candidate top-K，不调模型）；`same_use_case` 并入 `complements`；typed 边补 `use`；`build-brief-graph` / `integrate-kg` 统一 normalize。
 - **阶段**：✅ Codex 实现完成，待独立冷审。
@@ -166,6 +175,7 @@
 - **交付结论**：已按全文/源码复核并落盘 `paper.mdx` / `career.mdx` / `metadata.json` / `data/autosci/primitives/2605.29307.yaml`；修正 HF 动态 upvote 表述、career 自报标注、AutoSci core_concepts 受控词表命名；已进入文章索引，待 push/部署生产可见。
 
 ### KG-2 · 知识关联层全语料化 + 自进化反哺 + 综合栏（plan `docs/plans/KG-2-association-layer.md`）
+- **⚠范式注记（2026-06-12 KG-4）**：schema v2（facet 级）已被 ros-v1 对象库取代；两层命名制/NO_EDGE/证据门等纪律被 KG-4 正典继承。剩余切片（gap-map 反哺/综合栏）改在对象库上实现。
 - **大方向**：北极星 L1/L3——关联层覆盖全语料且**被机器真用**（gap-map 反哺选稿=自进化；跨记忆综合产 derived 节点=auto-research 种子）。Kevin 2026-06-09 loop 7 格确认（回填部分+增量、paper↔project 词表+核心概念门、竞赛+批判 agent、综合=单独栏、增量入图长在 PIPE-1、授权批判性改现有结构/范式）。
 - **与 AM 的关系**：吸收 AM Wave 2-4 的「沉淀管线」决策——增量入图=PIPE-1 LangGraph 节点（不塞 boot .mjs），落地前用幂等回填脚本；判边候选召回用 AM Wave 1 竞赛胜出的 **hybrid(BM25+向量+RRF)**，非纯向量。原 🔴「动上游管线」由此解除（不动现 boot 管线）。
 - **阶段**：✅ Phase 0 完成（codex+Claude 两路对抗审独立收敛：solution_path→可空 discovery_trace+source_span 硬门 / same_problem KILL / core_concepts 升对象数组 role 化使核心概念门机器可判 / 判边默认 NO_EDGE+双端 evidence+negative rationale / eval 重标基线防假绿 / Phase B 指标去 self_evo_use 循环论证。schema v2 定稿 plan §3.1；范式增量已落 papers.md#14「解法是怎么找到的(选读)」+ projects.md Tier3 core_concepts+claim_ledger）。→ 🔄 pilot 切片 2 跑中（TrOPD/MetaGPT/survey 三论文 facet v2 + 项目侧 core_concepts 升级 + codex validator v2，并行）。

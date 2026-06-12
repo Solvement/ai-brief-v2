@@ -36,7 +36,9 @@ one_sentence_thesis: ""          # 主张了什么、靠什么方法、在什么
 canonical:                       # 必须挂接 L2 注册表 ID；挂不上→proposed_*（见 §2）
   problems: [mem.lifecycle-management]
   concepts: [mem.learned-policy-controller]
-  benchmarks: [bench.memoryagentbench]
+  benchmarks: []                 # ⚠语义=实测关系（结果表/自测证据，含自报）；"功能上可被评测"不挂这里，
+                                 #   由 problem ∈ benchmark.evaluates join 推导（can_be_evaluated_by, candidate）。
+                                 #   裁定依据：判边口径（功能关系允许但 confidence 诚实分开）+ 类目级配对禁令。
   proposed_problems: []          # 新词条候选，主控审核后转正
   proposed_concepts: []
 

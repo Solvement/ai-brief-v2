@@ -1,0 +1,240 @@
+schema: ros-v1
+object_id: project/mempalace
+slug: mempalace
+kind: project
+title: MemPalace — 本地优先、逐字存储、零 API 的高召回记忆系统
+source: "github.com/MemPalace/mempalace (Python, MIT, v3.4.0)"
+one_sentence_thesis: >
+  主张「agent 记忆不必靠 LLM 抽取压缩事实」，靠的方法是把对话/项目内容逐字（verbatim）切块存为
+  drawers + 本地嵌入 + BM25/向量混合检索 + wings/rooms 元数据范围过滤 + 可选 LLM 重排，
+  在自报的 LongMemEval（500 题）retrieval recall 上展示 R@5 96.6%（raw 模式，无 LLM、零 API）。
+
+canonical:
+  problems:
+    - mem.fidelity-vs-abstraction
+    - mem.retrieval-precision
+  concepts:
+    - mem.local-verbatim-log
+    - mem.external-vector-store
+    - mem.scoped-retrieval-index
+  benchmarks:
+    - bench.longmemeval   # 实测=自报 LongMemEval 500 题（c1）；MemoryAgentBench 未实测本项目，不挂（canonical.benchmarks=实测关系）
+  proposed_problems: []
+  proposed_concepts: []   # mem.scoped-retrieval-index 已审核转正进 registry/concepts.yaml，type=mechanism-family（2026-06-12 主控收口）
+
+claims:
+  - id: mempalace.c1
+    statement: >
+      [自报] MemPalace 在 LongMemEval（500 题）上纯语义检索（无启发式、无 LLM）达 R@5 96.6%，
+      全程无需 API key / 云 / 任何 LLM。
+    type: author_claim
+    evidence:
+      - anchor: "README.md §Benchmarks 表「Raw (semantic search, no heuristics, no LLM)」"
+        quote: "Raw (semantic search, no heuristics, no LLM) | 96.6% | None"
+        strength: medium
+      - anchor: "README.md §Benchmarks"
+        quote: "The raw 96.6% requires no API key, no cloud, and no LLM at any stage."
+        strength: medium
+    cannot_prove:
+      - 不能推出 MemPalace 是「最佳开源记忆系统」——README 自己声明刻意不与 Mem0/Supermemory/Zep 等做并列对比（"We deliberately do not include a side-by-side comparison"）。
+      - 不能推出端到端任务收益——这是 retrieval recall（检索命中），不是问答正确率或长期任务完成率。
+      - 不能推出对其它数据集泛化——hybrid v4 的 held-out 数字（98.4%）才是 README 自承的「honest generalisable figure」，raw 96.6% 未声明 held-out 切分。
+    confidence: medium
+    confidence_reason: README 明确给出数字与口径，但为开发者自报、无第三方独立复现，故 medium 而非 high。
+
+  - id: mempalace.c2
+    statement: >
+      [自报] 数据默认不离开本机：所有抽取/分块/嵌入/LLM 辅助 refine 默认在本地运行，
+      外部 provider（Anthropic/OpenAI/Google）仅 BYOK 可选、从不默认、从不静默启用。
+    type: author_claim
+    evidence:
+      - anchor: "CLAUDE.md §Design Principles「Local-first, zero external API by default」"
+        quote: "The system never sends user content to a service the user has not explicitly configured."
+        strength: medium
+    cannot_prove:
+      - 不能推出「物理上无法外传」对所有后端成立——README §Storage backends 明示 qdrant/pgvector 后端在指向非本地服务时会发送并存储逐字 drawer 文本（"MemPalace will send and store verbatim drawer text and metadata there"）。"本地零 API" 只对默认 Chroma/sqlite_exact 路径成立。
+    confidence: medium
+    confidence_reason: 设计原则文档明确，且与源码默认后端一致；但「零 API」是默认路径属性，非全后端不变量，故标 medium。
+
+  - id: mempalace.c3
+    statement: >
+      [实读] 检索的实际默认路径是混合检索（BM25 关键词 + 向量语义），而非纯语义：
+      CLI 与 MCP 的 search() 都对候选调用 _hybrid_rank（向量权重 0.6 + BM25 权重 0.4）。
+    type: fact
+    evidence:
+      - anchor: "mempalace/searcher.py:1-10 模块 docstring"
+        quote: "Hybrid search: BM25 keyword matching + vector semantic similarity."
+        strength: strong
+      - anchor: "mempalace/searcher.py:183-225 _hybrid_rank"
+        quote: "def _hybrid_rank(results, query, vector_weight: float = 0.6, bm25_weight: float = 0.4, ...)"
+        strength: strong
+      - anchor: "mempalace/searcher.py:398-406 search()"
+        quote: "The MCP tool path already hybridizes BM25 with vector sim via `_hybrid_rank`; do the same here so CLI results match what agents ... hits = _hybrid_rank(hits, query, metric=metric)"
+        strength: strong
+    cannot_prove:
+      - 不能推出「混合检索就是 96.6% 那一档」——README 把 96.6% 标为 raw（pure semantic, no heuristics）模式；混合/重排是另外两档（98.4% / ≥99%）。实读的默认 search 路径与 raw benchmark 口径不是同一条。
+    confidence: high
+    confidence_reason: 源码逐字可证，_hybrid_rank 在 search() 内被无条件调用，权重为字面默认值。
+
+  - id: mempalace.c4
+    statement: >
+      [实读] 逐字保真只在 drawer（内容）层成立；索引层（AAAK / closets）是显式有损的结构化摘要，
+      不可还原原文，仅作指针指向 verbatim drawers。
+    type: fact
+    evidence:
+      - anchor: "mempalace/dialect.py:6-15 模块 docstring"
+        quote: "A lossy summarization format ... AAAK is NOT lossless compression. The original text cannot be reconstructed from AAAK output. It is a structured summary layer (closets) that points to the original verbatim content (drawers)."
+        strength: strong
+      - anchor: "mempalace/miner.py:1-8 模块 docstring"
+        quote: "Stores verbatim chunks as drawers. No summaries. Ever."
+        strength: strong
+    cannot_prove:
+      - 不能推出「MemPalace 完全不做抽象」——它在索引层确实做有损符号摘要（AAAK：抽实体/主题/情绪/标志位），只是把摘要降级为检索信号、把保真责任压在 drawer 层。所以「逐字 vs 抽取」是分层而非二选一。
+    confidence: high
+    confidence_reason: dialect.py 与 miner.py docstring 逐字自证分层语义。
+
+  - id: mempalace.c5
+    statement: >
+      [实读] 存储后端在 v3.4.0 已可插拔且有多个真实实现：默认 ChromaDB，另含 sqlite_exact（本地精确向量）、
+      qdrant（REST）、pgvector（Postgres），契约定义在 backends/base.py 的 BaseBackend/BaseCollection ABC。
+    type: fact
+    evidence:
+      - anchor: "mempalace/backends/ 目录"
+        quote: "base.py / chroma.py / sqlite_exact.py / qdrant.py / pgvector.py / registry.py"
+        strength: strong
+      - anchor: "mempalace/backends/base.py:553-595 class BaseBackend(ABC)"
+        quote: "Long-lived factory serving many palaces (RFC 001 §2). ... @abstractmethod def get_collection(...)"
+        strength: strong
+      - anchor: "README.md §Storage backends"
+        quote: "ChromaDB is the default. ... MemPalace also ships `sqlite_exact` ... and two opt-in external service backends — `qdrant` (REST) and `pgvector` (Postgres)."
+        strength: strong
+    cannot_prove:
+      - 不能推出「换后端零成本」——base.py 含 embedder identity / dimension / namespace isolation / maintenance 等一致性契约（RFC 001），换后端需通过 conformance 套件，接口位有重量。
+    confidence: high
+    confidence_reason: 目录与 ABC 源码逐字可证；此项实读结论与 facet 草稿「默认强绑 ChromaDB、无官方备选后端」相反（草稿基于旧版 v3.3.5，已过期）。
+
+mechanisms:
+  - id: mempalace.m1
+    name: 逐字分块存储 + wings/rooms/drawers 范围化索引
+    canonical_concept: mem.local-verbatim-log
+    problem: mem.fidelity-vs-abstraction
+    input: 对话转录（~/.claude/projects）或项目文件
+    output: 带 wing/room 元数据的 verbatim drawer 集合（向量化入后端 collection）
+    operations:
+      - mine 读取源文件/转录，按 READABLE_EXTENSIONS 过滤、跳过锁文件与 mempalace.yaml
+      - 切块：DEFAULT_CHUNK_SIZE=800 / OVERLAP=100 / MIN=50（config.py），逐字不摘要，由 ids.make_drawer_id_from_chunk 生成稳定 drawer id（幂等去重靠 file_already_mined）
+      - 实体自动检测（entity_detector.detect_entities）把人/项目识别为 wing；按内容路由到 room；wing/room 写入 drawer 的 ChromaDB metadata（非独立数据结构）
+      - 同步构建 AAAK closets（build_closet_lines / upsert_closet_lines）作为有损索引指针层
+      - 检索时 build_where_filter(wing, room) 把 metadata 过滤下推到后端，实现「先定范围再搜」
+    optimization: none
+    replaceable:
+      - 嵌入模型（minilm 默认 / embeddinggemma 可选，均 384-dim）
+      - 存储后端（chroma / sqlite_exact / qdrant / pgvector，base.py ABC）
+      - chunk_size / overlap（config 可调）
+    non_replaceable:
+      - 逐字 drawer 层（拿掉就违反 verbatim 唯一卖点）
+      - wing/room 作为 metadata 维度的范围过滤
+    reusable_pattern: 把「实体/主题/原始内容」分成三层 metadata 维度，使检索可按结构范围收窄，而非在扁平向量库里全量召回。
+    anchor: "mempalace/miner.py + mempalace/searcher.py:228-236 build_where_filter + mempalace/config.py:219-221"
+
+  - id: mempalace.m2
+    name: 三级检索流水线（混合检索 → 候选并集 → 可选 LLM 重排）
+    canonical_concept: mem.external-vector-store
+    problem: mem.retrieval-precision
+    input: 自然语言查询 + 可选 wing/room scope
+    output: 排序后的 verbatim drawer 命中（默认 n_results=5）
+    operations:
+      - 向量检索取候选；closet 命中作为「ranking 信号、绝非 gate」叠加（弱 closet 只能帮不能藏 drawer）
+      - _hybrid_rank：向量相似度（distance→similarity，cosine/l2/ip 各自单调映射）与 Okapi-BM25（候选内 IDF、min-max 归一）凸组合，默认 0.6/0.4
+      - 候选并集策略：把 BM25-only 候选（distance=None，按 BM25 单独计分）并入重排池，捞回向量索引没召回的文档
+      - 邻居扩展 _expand_with_neighbors：对命中 drawer 取同源文件 ±radius 相邻 chunk，避免 chunk 边界截断语义
+      - 可选 LLM rerank（top-20 候选用 reader 模型择优，模型无关，README 称用 Haiku/Sonnet/minimax 复现过）
+    optimization: none（检索时排序，无训练信号；rerank 用现成 LLM 推理，非学习策略）
+    replaceable:
+      - rerank LLM（任意 capable model，含本地 Ollama）
+      - vector_weight / bm25_weight 权重
+    non_replaceable:
+      - drawer 向量检索 floor（_first_or_empty 保证空集不崩；drawer 查询永远先跑）
+    reusable_pattern: 「向量 floor + BM25 信号 + 可选 LLM 重排」的渐进增强检索——便宜层永远兜底，贵层（LLM）只在需要时叠加，且可降级回纯向量。
+    anchor: "mempalace/searcher.py:183-225 _hybrid_rank, :353-406 search, :253-300 _expand_with_neighbors, README.md §Benchmarks (rerank)"
+
+assumptions:
+  - id: mempalace.a1
+    statement: 逐字保真比抽象/压缩更重要——「Memory is identity」「100% recall 是设计要求」，宁可噪声大也不丢原文。
+    kind: explicit
+    anchor: "CLAUDE.md §The Mission「100% recall is the design requirement ... Anything less means forgetting」"
+    conflicts_hint: 与「记忆应抽取压缩成事实图谱以便推理/冲突消解」（mem.fact-graph 路线，如 supermemory）天然张力。
+
+  - id: mempalace.a2
+    statement: 本地存储与本地嵌入的成本（~300MB 模型、磁盘、单机算力）可接受，且数据主权价值高于云端规模弹性。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「云托管 + 托管嵌入以换规模/多端同步」的假设互斥。
+
+  - id: mempalace.a3
+    statement: 检索命中率（R@k）是衡量记忆系统价值的有效近似——README 头条用 retrieval recall，而非端到端任务正确率。
+    kind: implicit
+    anchor: "README.md §Benchmarks（全部指标为 recall，R@5/R@10/avg recall）"
+    conflicts_hint: 与「检索命中率不足以衡量记忆系统价值，须用生命周期能力与端到端收益」（prop.retrieval-metrics-insufficient）张力。
+
+failure_modes:
+  - id: mempalace.f1
+    statement: 检索噪声随逐字记录规模增长——不抽取、不去冗余语义，扁平 drawer 越多，候选越嘈杂，依赖 wing/room scope 与 BM25/rerank 兜底。
+    triggered_when: 单 palace drawer 量大且查询泛、未限定 wing/room scope 时
+    consequence: top-k 被近义/重复 chunk 挤占；README 自承不做端到端对比，召回高不等于读到的就对
+  - id: mempalace.f2
+    statement: 「零 API / 本地」不是全后端不变量——选 qdrant/pgvector 且指向非本地服务时，逐字 drawer 文本会被发往该服务。
+    triggered_when: 用户设置 MEMPALACE_QDRANT_URL / MEMPALACE_PGVECTOR_DSN 指向远端
+    consequence: 数据主权承诺在该后端下失效（README 标为显式 opt-in，写本地 marker 防误连）
+  - id: mempalace.f3
+    statement: 自动保存钩子与会话保真强绑特定 agent 生态（Claude Code / Codex / Cursor），且 Claude Code 会话 30 天不接钩子即过期。
+    triggered_when: 未接 auto-save hook 或用非支持的 agent
+    consequence: 「记忆即身份」承诺被钩子覆盖面限制，跨工具保真不均
+
+trigger_hooks:
+  - symptom: 需要精确追溯「当初到底说了什么/写了什么」，不接受摘要或释义带来的信息损失
+    why_recall: MemPalace 的 verbatim drawer 层正是为不可逆追溯设计，索引层有损但内容层逐字
+    related_object: mempalace.m1
+    risk: 误以为「逐字 = 全栈零损失」——索引层（AAAK）仍是有损摘要，且大规模下检索噪声会上升
+  - symptom: 想要一个完全本地、不调用任何云/API 的记忆/检索层，数据不能离开本机
+    why_recall: 默认 Chroma/sqlite_exact 路径全本地、本地嵌入、无 telemetry
+    related_object: mempalace.c2
+    risk: 把「本地」当全后端属性——选远端 qdrant/pgvector 后端会发送逐字文本（f2）
+  - symptom: 检索在扁平大语料库里召回太杂，想按「人/项目/主题」先收窄范围再搜
+    why_recall: wings/rooms 作为 metadata 维度把范围过滤下推到后端，是一等检索手段
+    related_object: mempalace.m1
+    risk: 把 wing/room 当独立存储结构——它只是 ChromaDB metadata 字段，能力来自 where-filter
+
+exam_questions:
+  - q: 若把 MemPalace 的默认 search() 换成「纯语义、关掉 BM25」，对 README 的 96.6% 数字有何影响？为什么不能直接用默认 search 复现该数字？
+    type: counterfactual
+    expected_points:
+      - 96.6% 是 raw 模式（no heuristics, no LLM）专测口径，默认 search 走 _hybrid_rank（0.6/0.4）是另一条路径
+      - 关掉 BM25 反而更接近 raw 口径，但 raw benchmark 与生产 search 的候选/scope 设置仍可能不同
+      - 检索数字与口径强绑，不能跨模式套用
+    tested_objects: [mempalace.c1, mempalace.c3]
+  - q: MemPalace 与抽取派（事实图谱记忆，如 supermemory）在「保真 vs 抽象」轴上对立。它真的完全不做抽象吗？边界在哪？
+    type: boundary
+    expected_points:
+      - drawer（内容）层逐字、index（AAAK/closets）层有损摘要——是分层而非二选一
+      - 它把抽象降级为「检索信号」、把保真责任压在内容层，仍不做事实抽取/冲突消解/演化
+      - 所以定位是「保真底座」，不是「不做任何抽象」
+    tested_objects: [mempalace.c4, mempalace.a1]
+  - q: 把 MemPalace 的 wings/rooms/drawers 三层索引迁到一个多项目知识库（如 AI-Brief 的 BriefMem），哪些是承重组件、哪些是接口位、最大迁移风险是什么？
+    type: transfer
+    expected_points:
+      - 承重：逐字内容层 + wing/room 作为范围过滤维度
+      - 接口位：嵌入模型、存储后端（base.py ABC）、chunk 参数、rerank LLM
+      - 风险：wing/room 只是 metadata 不是独立结构，迁移时需复刻 where-filter 下推；规模增长的检索噪声（f1）
+    tested_objects: [mempalace.m1, mempalace.c5]
+
+self_evo_verdict:
+  state: queue
+  reason: >
+    设计思路对口、但落地是后端结构性改动（排周审，非直接 apply）。MemPalace 的「逐字不摘要」对 AI-Brief 的 L0 语料对口——
+    自进化要回溯原始事实时压缩条目不可逆，逐字底座更可信（与本站精读 paper.mdx + 全文存档同向）。
+    可借：① wings/rooms/drawers 三层范围化索引迁到 BriefMem 组织多项目记忆；② 「向量 floor + BM25 + 可选 LLM 重排」渐进增强检索流水线；③ base.py 可插拔后端 ABC。
+    但这些是换检索栈/加命名空间层的结构性选择，不属「可直接 apply 且 verify 全绿」的非红线小改 → 进 self-evo-queue，与抽取派（supermemory）对照后定本站「存逐字还是抽事实」路线。
+    不硬套：当前 KG typed 边 + 精读全文存档已覆盖「可回溯逐字底座 + 结构化检索」，MemPalace 是优化候选非必加。
+
+status: draft

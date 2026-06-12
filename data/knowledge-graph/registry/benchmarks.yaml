@@ -1,6 +1,36 @@
 # ROS L2 · 评测注册表（schema: ros-v1）
+# 语义裁定（2026-06-12 主控）：对象的 canonical.benchmarks = 实测关系（结果表/自测证据，含自报）；
+# "功能上可被评测"不挂这里，由 problem ∈ benchmark.evaluates 的 join 推导（can_be_evaluated_by, candidate）。
+- id: bench.longmemeval
+  name: LongMemEval（S/500 题检索基准）
+  evaluates: [mem.retrieval-precision]
+  metrics:
+    - "retrieval Recall@k (R@5/R@10) + MRR over 500 questions"
+  limitations:
+    - "只测检索命中，不测写入/更新/遗忘等生命周期维度，也不测端到端任务收益"
+    - "mempalace(96.6% raw)与 agentmemory(95.2%)均为各自自报口径（候选集/scope 设置不一），跨系统数字不可直比"
+  tested_systems:
+    self_reported: [mempalace, rohitg00-agentmemory]
+
 - id: bench.memoryagentbench
   name: MemoryAgentBench
-  evaluates: [mem.lifecycle-management, mem.retrieval-precision, mem.staleness-conflict]
-  metrics: []        # 试点蒸馏时由 memoryagentbench 对象回填
-  limitations: []    # 测不出什么——join boundary 用
+  evaluates: [mem.evaluation, mem.lifecycle-management, mem.retrieval-precision, mem.staleness-conflict]
+  metrics:
+    - "AR: exact-snippet retrieval accuracy (SH/MH-DocQA, LongMemEval(S*), EventQA)"
+    - "TTL: classification accuracy + recommendation Recall@5"
+    - "LRU: ∞-Bench-Sum F1 (GPT-4o judge) + DetectiveQA accuracy"
+    - "SF: FactConsolidation single-hop / multi-hop accuracy (MQUAKE counterfactual pairs, 6K/32K/64K/262K)"
+    - "overall: aggregated four-competency score (default backbone GPT-4o-mini)"
+  limitations:
+    - "只测构造任务（长文档/事件链/反事实编辑），不测真实长会话记忆生命周期——商用记忆系统场景失配"
+    - "SF 维数据为 MQUAKE 反事实拼接，构念效度存疑（多跳 ≤7% 真短板 vs 合成 artifact 不完全可分）"
+    - "开放题用 GPT-4o 作 LLM-judge，存在评判偏差（同族高估风险）"
+    - "默认单 backbone(GPT-4o-mini)，跨 backbone 排名稳定性未验证"
+    - "主要英文，跨语言/领域泛化未讨论"
+    - "受测系统不穷尽（明确不含 AgeMem/supermemory/MemPalace）；结论随产品版本漂移过期"
+  tested_systems:   # evaluates 边的唯一证据源（v2 结果表逐字核实）
+    long_context: [GPT-4o, GPT-4o-mini, GPT-4.1-mini, Gemini-2.0-Flash, Claude-3.7-Sonnet]
+    simple_rag: [BM25]
+    embedding_rag: [Contriever, Text-Embed-3-Small, Text-Embed-3-Large, Qwen3-Embedding-4B]
+    structure_augmented_rag: [RAPTOR, GraphRAG, MemoRAG, HippoRAG-v2, Mem0, Cognee, Zep]
+    agentic_memory: [Self-RAG, MemGPT, MIRIX, "MIRIX(4.1-mini)"]

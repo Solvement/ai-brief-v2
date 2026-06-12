@@ -1,0 +1,17 @@
+- source: paper/agemem
+  target: paper/memoryagentbench
+  shared_problems:
+    - mem.lifecycle-management
+- source: paper/memoryagentbench
+  target: project/rohitg00-agentmemory
+  shared_problems:
+    - mem.lifecycle-management
+    - mem.retrieval-precision
+- source: project/mempalace
+  target: project/rohitg00-agentmemory
+  shared_problems:
+    - mem.retrieval-precision
+- source: project/rohitg00-agentmemory
+  target: project/supermemory
+  shared_problems:
+    - mem.retrieval-precision

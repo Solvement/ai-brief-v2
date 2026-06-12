@@ -1,0 +1,216 @@
+schema: ros-v1
+object_id: project/rohitg00-agentmemory
+slug: rohitg00-agentmemory
+kind: project
+title: agentmemory — hook 自动采集 + 三路混合检索的本地 agent 记忆服务器
+source: "github.com/rohitg00/agentmemory (TypeScript, Apache-2.0, v0.9.27)"
+one_sentence_thesis: >
+  主张：编程 agent 的跨会话记忆应靠**写死的生命周期 hook 自动采集**（而非手动 add() 或 full agent runtime），
+  方法：把 hook 事件统一成「观察」写入本地 KV/索引，召回走 BM25+向量+实体图三路 RRF 融合并可优雅降级；
+  在什么设置下展示：在自报的 LongMemEval-S（500 题、本地 all-MiniLM-L6-v2 embedding、无 LLM in loop）检索基准上 R@5 95.2%，以及一个 240 观察/30 会话的内部编码语料上 demo。
+
+canonical:
+  problems: [mem.lifecycle-management, mem.retrieval-precision]
+  concepts: [mem.fixed-rule-hooks]
+  benchmarks: [bench.longmemeval]   # 实测=自报 LongMemEval-S（c4）；MemoryAgentBench 受测清单实证不含本项目，不挂（主控裁定 canonical.benchmarks=实测关系）
+  proposed_problems: []
+  proposed_concepts: []   # 两条提案（hook 采集管道/降级混合检索）主控审核驳回：主干已被 mem.fixed-rule-hooks + mem.retrieval-precision 覆盖，单列=本体蔓延（详 .agent/kg4/rohitg00-agentmemory-registry-proposals.md）
+
+claims:
+  - id: rohitg00-agentmemory.c1
+    statement: >
+      记忆写入靠固定的 agent 生命周期 hook 自动采集，而非人手动调用 add()：mem::observe 接收 HookPayload
+      （sessionId/hookType/timestamp/project/cwd），脱敏去重后写入本地 KV 与检索流。这是「固定规则记忆钩子」一方的核心机制主张。
+    type: fact
+    evidence:
+      - anchor: "src/functions/observe.ts:43"
+        quote: 'sdk.registerFunction("mem::observe",'
+        strength: strong
+      - anchor: "src/functions/observe.ts:89-95"
+        quote: "const raw: RawObservation = { id: obsId, sessionId: payload.sessionId, ... hookType: payload.hookType, raw: sanitizedRaw }"
+        strength: strong
+    cannot_prove:
+      - 不能推出自动采集在质量上优于手动 add()——repo 未做 auto-hook vs manual-add 的对照实验。
+      - 不能推出 hook 规则对未见过的 agent 客户端/事件类型仍稳定——hook 名是按已知客户端写死的。
+    confidence: high
+    confidence_reason: 直接读源码，函数注册与 payload 处理在 observe.ts 逐行可见。
+  - id: rohitg00-agentmemory.c2
+    statement: >
+      召回走三路混合检索：BM25(权重0.4)+向量(0.6)+实体图(0.3)，用 RRF（倒数排名融合，常数 K=60）合并，
+      并按 session 多样化（每会话≤3 条）。这是固定规则一方的检索侧主张——权重与常数全由人写死，非学习得到。
+    type: fact
+    evidence:
+      - anchor: "src/state/hybrid-search.ts:20"
+        quote: "const RRF_K = 60;"
+        strength: strong
+      - anchor: "src/state/hybrid-search.ts:30-33"
+        quote: "private bm25Weight = 0.4, private vectorWeight = 0.6, private graphWeight = 0.3,"
+        strength: strong
+      - anchor: "src/state/hybrid-search.ts:253"
+        quote: "maxPerSession = 3"
+        strength: strong
+    cannot_prove:
+      - 不能推出这组人定权重(0.4/0.6/0.3)是最优——repo 未给权重搜索/消融证明该配置最优。
+      - 不能推出三路优于两路：内部 QUALITY.md 自家数据上 triple-stream(BM25+Vector+Graph) R@10 58.0% 反而不高于 dual-stream(BM25+Vector) 58.6%。
+    confidence: high
+    confidence_reason: RRF 常数、三路权重、多样化上限均在 hybrid-search.ts 源码常量中逐字可见。
+  - id: rohitg00-agentmemory.c3
+    statement: >
+      检索可优雅降级：无 embedding provider 或向量索引为空时，向量腿/图腿权重归零并对剩余腿重归一化，退到 BM25(+Graph)
+      而非整体失忆——这是固定规则一方相对学习式的「可控/可解释/不依赖训练或外部 API」优势主张的代码落地。
+    type: fact
+    evidence:
+      - anchor: "src/state/hybrid-search.ts:91-98"
+        quote: "if (this.vector && this.embeddingProvider && this.vector.size > 0) { ... } catch { // fall through to BM25-only }"
+        strength: strong
+      - anchor: "src/state/hybrid-search.ts:197-206"
+        quote: "let effectiveVectorW = hasVector ? this.vectorWeight : 0; ... if (totalW > 0) { effectiveBm25W /= totalW; ... }"
+        strength: strong
+    cannot_prove:
+      - 不能推出降级后的检索质量「够用」于动态长期任务——自报 BM25-only R@5 86.2% 仅在 LongMemEval-S 单一检索基准上，非端到端任务收益。
+    confidence: high
+    confidence_reason: 降级分支与权重重归一化在 tripleStreamSearch 内逐行可见。
+  - id: rohitg00-agentmemory.c4
+    statement: >
+      [自报·未独立复现] LongMemEval-S（500 题，本地 all-MiniLM-L6-v2 384 维 embedding，无 API key，无 LLM in loop）
+      BM25+Vector R@5 95.2% / R@10 98.6% / MRR 88.2%；BM25-only 降级到 R@5 86.2%。作者明确标注只有 95.2% 是自测可复现、其余对比数为他方自报。
+    type: author_claim
+    evidence:
+      - anchor: "benchmark/LONGMEMEVAL.md:17"
+        quote: "agentmemory BM25+Vector | 95.2% | 98.6% | 99.4% | 87.9% | 88.2%"
+        strength: medium
+      - anchor: "benchmark/COMPARISON.md:22"
+        quote: "only agentmemory's 95.2% is our own measured result ... Every other number here is the vendor's published claim ... that we have not independently reproduced"
+        strength: medium
+    cannot_prove:
+      - 不能推出这等于端到端任务收益：LongMemEval-S 只测检索召回（R@K/MRR），无 LLM in loop、无更新/遗忘/冲突维度。
+      - 不能推出泛化到 coding-agent 真实分布：本数仅在公开多会话聊天语料上，本次未独立复现（未跑 npm run eval）。
+    confidence: medium
+    confidence_reason: 数字在 repo benchmark 文档中逐字可查，但属作者自报、未在本次蒸馏中实跑复现。
+
+mechanisms:
+  - id: rohitg00-agentmemory.m1
+    name: Hook-to-observation 采集管道
+    canonical_concept: mem.fixed-rule-hooks
+    problem: mem.lifecycle-management
+    input: HookPayload (sessionId, hookType ∈ {post_tool_use, prompt_submit, stop, session_end, ...}, timestamp, project, cwd, data)
+    output: RawObservation 写入本地 KV(KV.observations) + 检索流(STREAM) + BM25/向量索引；返回 {observationId}
+    operations:
+      - 校验 payload 必填字段(sessionId/hookType/timestamp)，缺失即拒
+      - dedup：按 (sessionId, toolName, tool_input) 计算 hash，命中则标 deduplicated 跳过
+      - 脱敏：JSON.stringify→stripPrivateData→parse
+      - 按 hookType 抽字段(toolName/toolInput/toolOutput/userPrompt)，并提取内嵌图片
+      - withKeyedLock(obs:sessionId) 串行写入；继承/标记 agentId(scope)
+      - 默认零-LLM 合成压缩(buildSyntheticCompression)写回并入 BM25+向量索引(可降级)
+    optimization: "none（规则写死，无任何训练/反馈优化信号）"
+    replaceable: [embedding provider（gemini/openai/voyage/cohere/openrouter/local 任一或缺）, 压缩策略（合成 vs LLM 压缩，AGENTMEMORY_AUTO_COMPRESS）]
+    non_replaceable: [hook→统一观察的规约层, 本地 KV 写入, dedup+脱敏]
+    reusable_pattern: 把任意 agent 生命周期事件统一规约成一条可审计、可脱敏去重、可检索的「观察」，使记忆采集与上层客户端解耦。
+    anchor: "src/functions/observe.ts:37-339"
+  - id: rohitg00-agentmemory.m2
+    name: 三路 RRF 混合检索 + 优雅降级
+    canonical_concept: mem.fixed-rule-hooks
+    problem: mem.retrieval-precision
+    input: query 字符串 + limit；可选 entityHints/QueryExpansion
+    output: HybridSearchResult[]（带 bm25/vector/graph/combined 分数，按 session 多样化≤3）
+    operations:
+      - BM25 检索 top limit*2
+      - 若有 embeddingProvider 且向量索引非空：embed(query)→向量检索；否则跳过(降级)
+      - 抽取实体→实体图检索 + 从 top 向量结果做图扩展(best-effort)
+      - 对三路各算名次，combinedScore = Σ effectiveWeight · 1/(RRF_K + rank)，RRF_K=60
+      - 缺失腿权重置0并对总权重重归一化(totalW)
+      - diversifyBySession(maxPerSession=3)→enrich→可选 rerank(RERANK_ENABLED)
+    optimization: "none（权重 0.4/0.6/0.3 与 K=60 为人定常量，无学习）"
+    replaceable: [向量腿（无 provider 时整腿可缺）, 图腿, reranker（默认关）]
+    non_replaceable: [BM25 腿, RRF 融合, 缺腿重归一化的降级逻辑]
+    reusable_pattern: 多检索腿用 RRF 融合且任一腿可缺失时权重归零重归一化——保证「某条检索通道挂了仍可用」而非整体失效。
+    anchor: "src/state/hybrid-search.ts:22-240"
+
+assumptions:
+  - id: rohitg00-agentmemory.a1
+    statement: 记忆操作（何时写/去重/检索/排序）可由一套**写死的规则与权重**覆盖，无需按任务自适应或从反馈学习。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「记忆操作应是可学习的策略动作（mem.learned-policy-controller）」天然对立——AgeMem 一方否定此假设。
+  - id: rohitg00-agentmemory.a2
+    statement: agent 客户端集合与其 hook 事件命名是已知且稳定的（connect 按 claude-code/codex/cursor 等具体客户端写适配）。
+    kind: explicit
+    anchor: "src/cli/connect/index.ts:103-106"
+    conflicts_hint: 新出现的 agent 客户端 / 改名的 hook 事件会落在规则覆盖之外。
+  - id: rohitg00-agentmemory.a3
+    statement: 检索价值可用检索召回指标（R@K/MRR）近似衡量；R@5 95.2% 被当作系统有效性的主证据。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「检索命中率不足以衡量记忆系统价值，须看生命周期能力与端到端任务收益（prop.retrieval-metrics-insufficient）」对立。
+
+failure_modes:
+  - id: rohitg00-agentmemory.f1
+    statement: 文档与源码漂移——README 称 EMBEDDING_PROVIDER=local 是「默认」「无 key 也有 local embeddings」，但 detectEmbeddingProvider() 在未设任何 env 时返回 null，且 "local" 不在自动探测分支里（须显式 EMBEDDING_PROVIDER=local 或装某 API key）。
+    triggered_when: 用户照 README 期望开箱即用本地向量，但未显式设置 EMBEDDING_PROVIDER。
+    consequence: 向量腿静默缺席，系统降级为 BM25(+Graph)，自报的 95.2% 路径未被启用而用户不自知（实读：detectEmbeddingProvider 仅认 forced/GEMINI/OPENAI/VOYAGE/COHERE/OPENROUTER，无 local 默认）。
+  - id: rohitg00-agentmemory.f2
+    statement: 固定规则与任务分布失配——hook 名、检索权重(0.4/0.6/0.3)、多样化上限(3) 全写死，遇到 README 未覆盖的客户端或与默认权重不匹配的检索分布时无法自适应。
+    triggered_when: 任务/语料分布变化，或接入未被 connect 适配的 agent（Windows 原生下 connect 直接不支持，须 WSL2）。
+    consequence: 检索权重不再贴合、新客户端采集不到；系统不会从反馈调整自己（实读：weights 为构造器默认常量，无更新路径）。
+  - id: rohitg00-agentmemory.f3
+    statement: 自家内部语料上三路并不优于两路——QUALITY.md(v0.6.0, 240 观察/30 会话/20 query) triple-stream R@10 58.0% 低于 dual-stream 58.6%，Precision@5 也更低。
+    triggered_when: 加入图腿但实体信号噪声大 / 语料规模小。
+    consequence: 默认开启的图腿在小语料上可能拖累而非提升排序质量（以实读 benchmark 数据为据）。
+  - id: rohitg00-agentmemory.f4
+    statement: 配置面自相矛盾与硬依赖——.env.example 的 core7/all51 与源码 53/8 口径不一致（源码默认 all，core 为 8 个 ESSENTIAL_TOOLS）；强 pin iii-sdk@0.11.2、Node>=20。
+    triggered_when: 用户照文档预期工具数 / 升级 iii-sdk。
+    consequence: 实际 MCP 工具面与文档数字对不上；锁死的 iii-sdk 升级未适配（实读：tools-registry.ts 默认 "all"、ESSENTIAL_TOOLS 8 个；package.json iii-sdk "0.11.2"）。
+
+trigger_hooks:
+  - symptom: "我需要记忆系统的写入/检索行为是可解释、可审计、能逐条调试的，不想要一个会自己变的黑箱"
+    why_recall: agentmemory 是「固定规则记忆钩子」的完整工程范例——规则与权重全显式写死、每步可追溯，正是可控/可解释/易调试这一侧的参考。
+    related_object: rohitg00-agentmemory.m1
+    risk: 把「可解释」误当「质量更高」——它没证明固定规则在动态长期任务上够用；可控不等于有效。
+  - symptom: "我没有训练反馈/没有 embedding API 可用，但仍想要一个跨会话能持久检索的记忆地基"
+    why_recall: 它零训练、无 LLM in loop 也能跑(BM25-only 降级)，是「无学习信号也立即可用」的检索骨架。
+    related_object: rohitg00-agentmemory.m2
+    risk: 降级路径(BM25-only)的自报 86.2% 仅在单一检索基准，别据此假设它在你的真实任务分布上同样够用。
+  - symptom: "我要把任意 agent 生命周期事件统一成可检索、可脱敏的记录，且某条检索通道挂了也不能整体失忆"
+    why_recall: hook-to-observation 管道 + 缺腿重归一化降级是两个可直接抄的接口骨架。
+    related_object: rohitg00-agentmemory.m1
+    risk: 抄接口时连带抄进文档漂移(local 非真默认)与写死权重，未按自己语料校准就上线。
+
+exam_questions:
+  - q: 若把 agentmemory 接到一个 hook 事件命名与 connect 适配器不同的全新 agent 客户端，记忆采集会发生什么？为什么这暴露了固定规则路线的边界？
+    type: counterfactual
+    expected_points:
+      - connect 按具体客户端写死(index.ts 按 win32/已知客户端分支)，未适配客户端的事件不会被规约成观察
+      - 系统无自适应/学习路径，不会自己识别新事件(a1/a2 假设被打破)
+      - 对照：可学习记忆控制器(mem.learned-policy-controller)主张用反馈适应分布变化
+    tested_objects: [rohitg00-agentmemory.a2, rohitg00-agentmemory.f2]
+  - q: 一个用户未设任何 embedding 环境变量、照 README 期望「本地向量开箱即用」，实际检索走哪条路径？自报 95.2% 是否适用？
+    type: boundary
+    expected_points:
+      - detectEmbeddingProvider() 返回 null（"local" 不在自动探测分支，须显式 EMBEDDING_PROVIDER=local）
+      - 向量腿缺席→降级 BM25(+Graph)，权重重归一化
+      - 95.2% 是 BM25+Vector 路径数；该用户实际落在 BM25-only(自报 86.2%)，文档漂移使其不自知
+    tested_objects: [rohitg00-agentmemory.c3, rohitg00-agentmemory.f1]
+  - q: 把 agentmemory 的「hook-to-observation + RRF 降级混合检索」迁移到本站(AI-Brief)的 KG 记忆后端，哪些接口可直接复用、哪些假设需先在本站语料上重新校准？
+    type: transfer
+    expected_points:
+      - 可复用：hook→统一观察规约、RRF 融合+缺腿降级、agent scope fail-closed 隔离、core/all 分层工具面
+      - 需校准：0.4/0.6/0.3 权重与图腿是否提升(自家小语料上 triple≤dual)、是否需要本地向量(默认 local 非真默认)
+      - 边界：它不解决「懂/抽象/自进化」，迁移得到的是存取地基而非可学习记忆控制器
+    tested_objects: [rohitg00-agentmemory.m1, rohitg00-agentmemory.m2, rohitg00-agentmemory.f3]
+  - q: agentmemory 与 AgeMem 在「记忆操作应固定还是可学习」上构成 prop.memory-rule-vs-learned 张力，两边各自不能证明什么？
+    type: boundary
+    expected_points:
+      - agentmemory 没证明固定规则在动态长期任务上够用(只测了静态检索召回，无更新/遗忘维度)
+      - 它也没证明学习式一定更好——两边都不能越界推
+      - 可能综合：hybrid controller（固定采集地基 + 之上加可学习检索/操作策略）
+    tested_objects: [rohitg00-agentmemory.c1, rohitg00-agentmemory.a1, rohitg00-agentmemory.a3]
+
+self_evo_verdict:
+  state: queue
+  reason: >
+    接口可借但不直接 apply——最该借的是几个明确工程接口：① hook-to-observation 管道(m1)；② RRF 混合检索优雅降级(m2)；
+    ③ agent scope fail-closed 隔离；④ core/all 分层工具面(治工具太多模型错用)。本站 KG/记忆维护协议已部分对齐(显式 ADD/UPDATE/SUPERSEDE = 可审计观察的非自动版)。
+    但「自动 hook 采集 + 三路检索后端」对本站是后端结构性改动(涉及记忆后端 schema)，不属能直接 verify 全绿的非红线小改——进 self-evo-queue 周审，
+    与 AgeMem 的可训练记忆控制器路线一并评估「本站记忆控制器要不要上自动采集层」。不硬套：当前手工记账+typed 边已满足外脑需求，自动采集是优化候选非必加。
+
+status: draft

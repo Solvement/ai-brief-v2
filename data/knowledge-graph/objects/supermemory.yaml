@@ -1,0 +1,213 @@
+schema: ros-v1
+object_id: project/supermemory
+slug: supermemory
+kind: project
+title: supermemory — 单一 API 全包的有状态记忆引擎（memory ≠ RAG）
+source: "github.com/supermemoryai/supermemory (Bun/Turborepo monorepo, MIT)"
+one_sentence_thesis: >
+  supermemory 主张「有状态记忆（自动抽取事实、版本化覆盖矛盾、到点遗忘）」区别于「无状态 RAG 检索」，
+  靠一个 hosted 记忆引擎 + 单一 SDK/MCP API（add/profile/search、containerTag 多租户隔离）实现，
+  在 README 中以 LongMemEval/LoCoMo/ConvoMem #1 自报展示效果——但开源仓库只含 SDK/MCP/可视化与数据契约，
+  抽取/消解/遗忘的引擎本体在服务端、不在本仓库，故其效果在本仓库内无法源码核验。
+
+canonical:
+  problems: [mem.staleness-conflict, mem.retrieval-precision]
+  concepts: [mem.fact-graph, mem.external-vector-store]
+  benchmarks: []   # 引擎闭源、无任何实测/自报 benchmark 结果；MemoryAgentBench 受测清单不含本项目（canonical.benchmarks=实测关系，主控裁定）
+  proposed_problems: []
+  proposed_concepts: []
+
+claims:
+  - id: supermemory.c1
+    statement: >
+      记忆是「随时间追踪用户事实」的有状态层，区别于「检索文档块、对所有人返回同样结果」的无状态 RAG；
+      系统理解「I just moved to SF」supersede「I live in NYC」。
+    type: author_claim
+    evidence:
+      - anchor: "README.md §How memory works under the hood"
+        quote: "Memory is not RAG. RAG retrieves document chunks - stateless, same results for everyone. Memory extracts and tracks facts about users over time. It understands that \"I just moved to SF\" supersedes \"I live in NYC.\""
+        strength: medium
+    cannot_prove:
+      - 无法证明这套抽取/supersede 逻辑在本仓库内运行——本仓库只有 SDK/MCP/可视化客户端，抽取与消解引擎在服务端 api.supermemory.ai，不可源码核验其准确率。
+      - 无法证明该范式区分带来端到端任务收益（README 给基准排名但无复现代码/数据）。
+    confidence: high
+    confidence_reason: README §How memory works under the hood 原文逐字明确，作为「作者宣称」事实清楚；置信度针对「README 这样宣称」为 high，针对「机制如此运行」为不可核验。
+
+  - id: supermemory.c2
+    statement: >
+      记忆按版本链组织：每条 memory entry 携带 version / parentMemoryId / rootMemoryId / isLatest /
+      isForgotten / forgetAfter / forgetReason 字段，且后端给出 updates/extends/derives 三种 relation 与
+      updatesMemoryId / nextVersionId 指针——这是「新事实覆盖旧事实、到点遗忘」在数据契约层的真实落地。
+    type: fact
+    evidence:
+      - anchor: "packages/memory-graph/src/api-types.ts:MemoryEntry (L3-29)"
+        quote: "isForgotten?: boolean; forgetAfter?: string | null; forgetReason?: string | null; version?: number; parentMemoryId?: string | null; rootMemoryId?: string | null; isLatest?: boolean"
+        strength: strong
+      - anchor: "packages/memory-graph/src/api-types.ts:MemoryRelation (L1) + L19-22"
+        quote: "export type MemoryRelation = \"updates\" | \"extends\" | \"derives\" ... relation?: MemoryRelation | null; updatesMemoryId?: string | null; nextVersionId?: string | null"
+        strength: strong
+      - anchor: "packages/memory-graph/src/canvas/version-chain.ts:VersionChainIndex.getChain (L39-105)"
+        quote: "Walk backward to root ... Walk forward from the selected node to find descendants. Version chains are linear (each memory has one parent)"
+        strength: strong
+    cannot_prove:
+      - 这些字段证明数据契约支持版本化/遗忘，但不证明「冲突消解决策正确」——决定哪条 supersede 哪条、何时设 forgetAfter 的逻辑在服务端引擎，本仓库不可见。
+      - 不能证明 version chain 在矛盾之外还能正确处理「同一事实多版本」之外的复杂情形（getChain 注释自承分叉时只取第一分支）。
+    confidence: high
+    confidence_reason: 三处源码（类型契约 + 版本链重建算法）逐字可见，是仓库内实读的事实；故标 fact 而非 author_claim。
+
+  - id: supermemory.c3
+    statement: >
+      记忆引擎为 hosted 服务：SDK/MCP 客户端默认指向 https://api.supermemory.ai，并显式处理
+      402「Memory limit reached. Upgrade at supermemory.ai」——表明核心处理在付费托管后端，开源仓库不含引擎本体。
+    type: fact
+    evidence:
+      - anchor: "apps/mcp/src/client.ts:SupermemoryClient.constructor (L110-122)"
+        quote: "constructor( bearerToken: string, containerTag?: string, apiUrl = \"https://api.supermemory.ai\", )"
+        strength: strong
+      - anchor: "apps/mcp/src/client.ts:handleError (L387-389)"
+        quote: "case 402: throw new Error(\"Memory limit reached. Upgrade at supermemory.ai\")"
+        strength: strong
+    cannot_prove:
+      - 不能证明「完全无法自托管」——README §Supermemory local 现已宣称单二进制本地运行（见 c4），但本仓库不含该 server 二进制源码，故只能证明「本仓库的客户端默认打到托管 API」。
+    confidence: high
+    confidence_reason: 客户端构造与错误码逐字可见；仓库内确无抽取/消解引擎源码（grep extractFact/contradiction/resolveConflict 仅命中客户端类型与可视化），故 hosted 为实读事实。
+
+  - id: supermemory.c4
+    statement: >
+      README 宣称可本地自托管：单二进制、零配置、`curl ... | bash` 安装，可接 Ollama 完全离线运行，
+      API 与平台一致（仅改 baseURL 到 http://localhost:6767），数据落在 ./.supermemory 目录。
+    type: author_claim
+    evidence:
+      - anchor: "README.md §Supermemory local - run it yourself"
+        quote: "State-of-the-art memory, on your machine. One binary. Zero config. ... Fully offline if you want - point it at Ollama (gpt-oss:20b works great) and nothing leaves your machine. ... baseURL: \"http://localhost:6767\""
+        strength: medium
+    cannot_prove:
+      - 无法在本仓库核验：self-host server 二进制/引擎源码不在此 monorepo（仓库只含 SDK、MCP、可视化、tools wrapper、validation）；自托管能力与「offline Ollama」均为 README 宣称，未源码确认。
+    confidence: medium
+    confidence_reason: README §Supermemory local 原文明确，故「README 宣称自托管」为高置信；但该宣称推翻不了「引擎不开源」——这一条更新了旧 facet「无自托管说明」的判断，须标为宣称而非事实。
+
+mechanisms:
+  - id: supermemory.m1
+    name: 事实版本链记忆（抽取→版本化覆盖→到点遗忘）
+    canonical_concept: mem.fact-graph
+    problem: mem.staleness-conflict
+    input: 对话/文档/URL/连接器内容（经 client.add 提交），按 containerTag 归属租户/项目。
+    output: 带版本与遗忘元数据的 memory entry 链（version/parentMemoryId/rootMemoryId/isLatest/isForgotten/forgetAfter）。
+    operations:
+      - "client.add(content, containerTag) 把内容入队（client.ts:createMemory 返回 status: queued）→ 服务端抽取原子事实"
+      - "新事实与旧事实冲突时，服务端生成新 entry 指向 parentMemoryId、置旧 entry isLatest=false（relation=updates / updatesMemoryId / nextVersionId）"
+      - "临时事实设 forgetAfter 时间戳与 forgetReason；到点置 isForgotten=true"
+      - "客户端 VersionChainIndex.getChain 从任一节点 backward 走到 root、forward 走到 latest，重建线性版本链供展示"
+    optimization: "none（仓库内无训练/优化信号；抽取与消解策略在服务端，未开源，无法判定是否含学习成分）"
+    replaceable:
+      - "底层 LLM（README §Supermemory local 称 Bring any model：OpenAI/Anthropic/Gemini/Groq/Ollama）"
+      - "存储后端（CLAUDE.md 提 Cloudflare Hyperdrive/KV/Workflows；为推测层，非本包实证）"
+    non_replaceable:
+      - "version-chain 数据契约（parentMemoryId/isLatest/forgetAfter）——拿掉就退化成无状态存储，不再是『有状态记忆』"
+      - "服务端抽取+消解引擎——决定何者 supersede 何者、何时遗忘，是范式承重件"
+    reusable_pattern: 把「会变的事实」建成带 parent 指针的版本链 + 遗忘元数据，让「新事实覆盖旧、临时事实到点失效」成为可查询的一等数据，而非靠检索时临场判断。
+    anchor: "packages/memory-graph/src/api-types.ts + packages/memory-graph/src/canvas/version-chain.ts + apps/mcp/src/client.ts:createMemory"
+
+  - id: supermemory.m2
+    name: 单一 API 表面（hybrid search + 静/动画像 + containerTag 隔离）
+    canonical_concept: mem.external-vector-store
+    problem: mem.retrieval-precision
+    input: 查询字符串 q + containerTag（可选 searchMode / threshold / limit）。
+    output: 记忆与文档混合的排序结果（memory vs chunk 区分保留）；profile 返回 static[] + dynamic[] 两类事实。
+    operations:
+      - "client.search.memories({q, containerTag, searchMode: \"hybrid\"}) 同查个人记忆与知识库文档（client.ts:search L223-228）"
+      - "结果归一化时保留 memory vs chunk 区分（client.ts L232-246：有 chunk 无 memory 时标 chunk，否则标 memory）"
+      - "client.profile({containerTag, q}) 一次返回 profile.static（长期偏好/身份）+ profile.dynamic（近期活动）（client.ts:getProfile L259-299）"
+      - "containerTag 作为多租户/多项目命名空间贯穿所有调用（构造函数默认 sm_project_default）"
+    optimization: "none"
+    replaceable:
+      - "searchMode（hybrid / memories）可切换"
+      - "embedding/相似度阈值 threshold 由调用方可调"
+    non_replaceable:
+      - "containerTag 隔离——是多租户正确性的承重件，去掉则记忆跨用户串味"
+      - "hybrid 同查（RAG+Memory 合一）——是 c1 范式区分在查询面的兑现"
+    reusable_pattern: 用一个租户标签（containerTag）做命名空间、用一次调用同时取「会演化的画像」与「可检索的事实」，把记忆栈的配置（向量库/嵌入/分块）藏在 API 之后。
+    anchor: "apps/mcp/src/client.ts:search (L216-256) + getProfile (L258-299) + constructor containerTag (L121)"
+
+assumptions:
+  - id: supermemory.a1
+    statement: 把核心记忆处理放在云端托管后端是可接受的——开发者愿意用「不碰向量库/嵌入/分块」换走数据驻留与可观测性。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「记忆须本地逐字、数据主权优先」的假设天然互斥（mem.local-verbatim-log 路线）。
+  - id: supermemory.a2
+    statement: 服务端 LLM 事实抽取的质量足够高，抽出的「原子事实」可信到能直接覆盖旧记忆、并据此自动遗忘。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「保真不可逆、宁存原文不抽取」的假设互斥（mem.fidelity-vs-abstraction）。
+  - id: supermemory.a3
+    statement: 版本链是线性的——每条记忆至多一个 parent；分叉/多源合并不是常态。
+    kind: explicit
+    anchor: "packages/memory-graph/src/canvas/version-chain.ts:getChain 注释 (L60-62) 『Version chains are linear (each memory has one parent) ... only the first branch ... is included』"
+    conflicts_hint: 与「同一事实可由多个独立来源并发更新、需图状合并」的场景冲突。
+
+failure_modes:
+  - id: supermemory.f1
+    statement: LLM 抽取错误或把推断当事实写入，错误事实进入版本链后被当作「latest 真相」并据以遗忘旧事实。
+    triggered_when: 输入含歧义/反讽/假设性陈述，或抽取模型幻觉。
+    consequence: 错误事实污染画像与检索，且因旧事实被 supersede 而难回溯（遗忘是降权/删除，见 README §Automatic forgetting）。
+  - id: supermemory.f2
+    statement: 自动遗忘/矛盾消解误判，把仍然有效的信息当过期或矛盾删除（forgetAfter 设错或 supersede 错对象）。
+    triggered_when: 临时性判断错误（误把长期事实当临时事实），或两条本不矛盾的事实被判为冲突。
+    consequence: 丢失重要记忆，且消解决策在服务端不可审计（本仓库看不到判定逻辑）。
+  - id: supermemory.f3
+    statement: 云依赖与厂商锁定——引擎与数据在 hosted 后端，达额度即 402 阻断，离线/内网受限，迁出成本高。
+    triggered_when: 账户超额（402）、断网、或合规要求数据不出内网。
+    consequence: 服务不可用或无法采用；README 宣称的 self-host 在本仓库无源码佐证，不能据此假定可离线兜底。
+  - id: supermemory.f4
+    statement: 多模态抽取（PDF/图像 OCR/视频转写/代码 AST 分块）准确率无数据，错误抽取沉淀为永久记忆。
+    triggered_when: 上传复杂文档，抽取层出错。
+    consequence: 噪声进入「单一记忆结构」，README 自称「Noise never becomes permanent memory」无法核验。
+
+trigger_hooks:
+  - symptom: 需要跨多次对话/会话长期跟踪同一对象的事实，并在信息变化时让旧版本自动失效。
+    why_recall: supermemory 的 version-chain 数据契约（parentMemoryId/isLatest/forgetAfter）是「事实随时间被覆盖/遗忘」的成熟落地范式。
+    related_object: supermemory.m1
+    risk: 误把它的「服务端自动消解」当作可信黑箱直接采纳——消解决策不可审计，错删难回溯。
+  - symptom: 需要按用户/项目隔离记忆，同时一次调用既拿「会演化的画像」又拿「可检索的事实」。
+    why_recall: containerTag 命名空间 + profile(static/dynamic) + hybrid search 是「记忆栈打包成单一 API」的参照设计。
+    related_object: supermemory.m2
+    risk: 照搬其「全栈托管 API」形态会一并继承云依赖与数据主权问题，与本站可审计/数据驻留方向冲突。
+  - symptom: 看到某记忆/RAG 方案自报在 LongMemEval/LoCoMo 等基准 #1，要判断该分数可信度。
+    why_recall: supermemory README 给出 #1 但仓库内无复现代码/数据/配置；需用独立增量协议（如 MemoryAgentBench 四维）核验自报 SOTA。
+    related_object: supermemory.c1
+    risk: 把「自报 #1」当「已核实 SOTA」直接引用。
+
+exam_questions:
+  - q: 若把 supermemory 的服务端抽取引擎换成一个只逐字存原文、从不抽取「原子事实」的存储层，c1 的「memory ≠ RAG」范式区分还成立吗？为什么？
+    type: counterfactual
+    expected_points:
+      - 不成立——「区别于 RAG」恰恰来自「抽取并 supersede 事实」，逐字存储退化为另一种文档检索。
+      - 版本链字段（parentMemoryId/isLatest）失去意义，因为没有被覆盖的「事实」对象。
+      - 这恰好是 mem.local-verbatim-log 路线（如逐字存储派），两者权衡相反。
+    tested_objects: [supermemory.c1, supermemory.m1]
+  - q: version-chain 注释声明「链是线性的、分叉只取第一分支」。在什么输入下这个假设会导致记忆错误，后果是什么？
+    type: boundary
+    expected_points:
+      - 当同一事实被多个独立来源并发更新（多源合并）时，线性假设丢弃其余分支。
+      - getChain 只重建第一分支，展示与回溯会遗漏真实的多版本历史。
+      - 对应假设 a3 与失败模式 f2（误消解）。
+    tested_objects: [supermemory.a3, supermemory.m1, supermemory.f2]
+  - q: 把 supermemory 的 containerTag 隔离机制迁移到一个「按 track/项目组织记忆」的外脑系统，能直接复用什么，必须重建什么？
+    type: transfer
+    expected_points:
+      - 可复用：containerTag 作为命名空间隔离记忆/画像的设计模式（m2 reusable_pattern）。
+      - 必须重建：服务端抽取/消解/遗忘引擎（不开源、不可控），以及离开 hosted API 的存储与检索实现。
+      - 须评估数据主权：照搬托管形态会继承 f3 云依赖风险。
+    tested_objects: [supermemory.m2, supermemory.f3]
+
+self_evo_verdict:
+  state: "no"
+  reason: >
+    核心记忆引擎（抽取/消解/遗忘）是 hosted 黑箱、不在开源仓库（c3 实读为据），既不可改也不可测，无法作本站可掌控、可审计的自进化记忆底座，
+    与「语料=人与 agent 共享记忆、数据主权可回溯」方向冲突——这是诚实的「收敛/no」结论，非遗漏。
+    保留两条不依赖其实现的设计参考（已入 transfer/trigger_hooks）：① 事实版本链 + 遗忘元数据（m1）作为「会演化的判断」如何被覆盖/失效的数据模型参照；
+    ② containerTag 命名空间 + static/dynamic 画像 + hybrid 同查（m2）作为记忆栈 API 形态参照。
+    注：README §Supermemory local 现宣称单二进制自托管/离线 Ollama（c4），这放宽了旧 facet「无自托管」的判断，但 self-host server 源码不在本仓库、不可核验，故仍不改 no。
+
+status: draft

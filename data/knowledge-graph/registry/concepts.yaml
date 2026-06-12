@@ -55,3 +55,19 @@
   aliases: [memory lifecycle eval]
   distinct_from: []
   conflicts_with: []
+
+- id: eval.incremental-multi-turn-protocol
+  name: 增量多轮记忆评测协议
+  type: eval-dimension
+  description: 评测时把长输入按多轮增量喂给记忆系统（而非一次性全量），逼出真实的写入/更新时序行为——是"供给方式"协议，独立于评什么轴。（2026-06-12 由 memoryagentbench 蒸馏转正）
+  aliases: [incremental multi-turn feeding, chunked memory injection protocol]
+  distinct_from: [eval.lifecycle-dimensions]
+  conflicts_with: []
+
+- id: mem.scoped-retrieval-index
+  name: 范围化检索索引
+  type: mechanism-family
+  description: 把实体/项目/主题等作为结构化元数据维度，检索先按范围收窄再搜，而非在扁平向量库全量召回。（2026-06-12 由 mempalace 蒸馏转正）
+  aliases: [scoped retrieval, wings/rooms/drawers, namespace-scoped memory]
+  distinct_from: [mem.external-vector-store]
+  conflicts_with: []

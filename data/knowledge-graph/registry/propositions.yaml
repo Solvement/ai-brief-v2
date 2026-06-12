@@ -1,28 +1,52 @@
 # ROS L2 · 命题/张力注册表（schema: ros-v1）——科研思想的载体，宁缺毋滥
-# support/oppose 挂 claim ID（不挂论文）；试点蒸馏完成后由主控回填
+# support/oppose 挂 claim/assumption 对象 ID；2026-06-12 试点蒸馏后回填（证据全部来自对象库，可逐条溯锚）
 - id: prop.memory-rule-vs-learned
   statement: 长期 agent 的记忆管理应从固定规则转向可学习策略
-  support: []
-  oppose: []
-  assumptions: []
-  open_questions: []
-  possible_synthesis: ""
-  state: open
+  support:
+    - agemem.c1   # 统一策略+RL 在两 backbone 五基准均分胜最强基线（Mem0/A-Mem）
+    - agemem.c2   # 消融证承重的是 RL 训练（+8.53/+8.72pp），不是接口
+    - agemem.c4   # 给旧基线补模块仍追不上——「统一策略 ≠ 模块叠加」
+  oppose:
+    - rohitg00-agentmemory.c4   # 固定规则三路 RRF 零训练自报 LongMemEval-S R@5 95.2%——规则式在检索维可与之竞争
+  assumptions:
+    - 学习侧：任务反馈可用于训练（agemem 全部训练轨迹来自 HotpotQA 单源，跨域泛化未证 → agemem.a1）
+    - 学习侧：终局优势广播的信用噪声可被训练平均掉（agemem.a3）
+    - 规则侧：任务分布稳定、规则覆盖集合不漂移（rohitg00-agentmemory assumptions）
+  open_questions:
+    - 两边证据不同台——AgeMem 测五基准、agentmemory 自测 LongMemEval，无共同 benchmark 直比
+    - 低反馈/高安全场景下学习式是否仍稳定，原文未证
+  possible_synthesis: hybrid controller——规则层管安全边界与可解释性，学习层管动态优化；先落 typed memory action 接口（不训练也能用，未来可挂学习层）
+  state: leaning-support
 
 - id: prop.verbatim-vs-extraction
   statement: 记忆应逐字本地保留原始记录，而非云端抽取压缩
-  support: []
-  oppose: []
-  assumptions: []
-  open_questions: []
-  possible_synthesis: ""
+  support:
+    - mempalace.c4   # 逐字保真在 drawer 层实读成立（设计哲学 Memory is identity）
+    - mempalace.c1   # 自报 LongMemEval R@5 96.6% 全程无 LLM——逐字+本地不牺牲检索
+  oppose:
+    - supermemory.c1        # 记忆=随时间追踪事实的有状态层，supersede 旧事实（抽取派范式宣言）
+    - memoryagentbench.c1   # 记忆的定义=压缩蒸馏表示而非逐字保全（benchmark 设计立场）
+  assumptions:
+    - 逐字侧：保真>抽象、本地成本可接受（mempalace.a1/a2）
+    - 抽取侧：LLM 抽取质量足够高、可信到能覆盖旧记忆并自动遗忘（supermemory.a2——其 f1 失败模式正打在这条上）
+  open_questions:
+    - 无共同 benchmark 直比（mempalace 自测 LongMemEval raw 口径 vs supermemory 引擎闭源无法测）
+    - mempalace 实读显示其索引层（AAAK）本身就是有损摘要——纯逐字立场在工程上不存在
+  possible_synthesis: 分层混合——逐字层保真可追溯 + 有损索引层导航（mempalace 实际架构）+ 版本链 supersede 管理事实演化（supermemory.c2 的数据契约可借）
   state: open
 
 - id: prop.retrieval-metrics-insufficient
   statement: 记忆系统的价值不能用检索命中率衡量，必须用生命周期能力与端到端任务收益衡量
-  support: []
-  oppose: []
-  assumptions: []
-  open_questions: []
-  possible_synthesis: ""
-  state: open
+  support:
+    - memoryagentbench.c1   # 一次性全量喂的旧数据集不适用于评测记忆 agent
+    - memoryagentbench.c2   # 四维实测无全能系统——检索强 ≠ 其他维强
+    - memoryagentbench.c4   # 多跳选择性遗忘随上下文增长崩塌（32K 掉到 14.0）——检索命中率看不见这个
+  oppose:
+    - mempalace.a3            # README 头条以 R@k 当价值近似（逐字派的隐含立场）
+    - rohitg00-agentmemory.c4 # 同样以 LongMemEval R@k 自证价值
+  assumptions:
+    - 支持侧：构造任务（反事实拼接/事件链）测得的短板能代表真实场景（memoryagentbench.a2——其构念效度自身存疑）
+  open_questions:
+    - 生命周期维度的测量本身依赖 LLM-judge（memoryagentbench.a3），裁判可信度未独立验证
+  possible_synthesis: 检索命中率=必要非充分——例行回归用 R@k（便宜），季度体检叠加生命周期维度（SF/TTL/LRU）与端到端任务样本
+  state: leaning-support
