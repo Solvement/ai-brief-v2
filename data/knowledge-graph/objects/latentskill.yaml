@@ -8,6 +8,28 @@ one_sentence_thesis: >
   主张「可复用的 agent 技能不必每步以文本进 context，可被编译成权重」，方法是训练一个 hypernetwork（skill compiler）把技能文档 s 一次前向编成可插拔 LoRA 补丁 Δs=Gφ(s)、挂在冻结 backbone 上（θ⊕αΔs），
   在 ALFWorld 与 Search-QA 两类任务、Qwen3-8B 单一 backbone 的作者自报评测上，对同内容 in-context skill 基线提升成功率/EM 且大幅降 prefill token（仓库尚未开源，数字均自报）。
 
+# ── 人读层（KG-5 受众分离）
+human:
+  headline: 把 agent 反复用到的技能从"每步贴进 prompt 的文本"改成"一次编译进权重的可插拔补丁"，省 token 还更抗 prompt 攻击。
+  plain_summary: >
+    做 agent 系统时，常把同一份技能说明/操作规则每一步都塞进上下文，越塞越贵。这篇训练了一个"技能编译器"，把技能文档一次性编成一小块可挂载的 LoRA 补丁挂到冻结的模型上，技能原文就不用再进 prompt 了。
+    作者自报在两类任务上成功率更高、每步 prefill token 砍掉约六成，而且因为技能不在明文里，prompt 级劫持攻击更难直接命中。值得记住的不是这套训练，而是几个设计直觉：能力强度可以是连续旋钮、拼模块要先拆共享部分、什么知识值得固化 vs 留作即查。
+  use_type: design_inspiration
+  use_type_reason: 落地核心（编译进 LoRA）需要自有可训练模型+大算力，纯工程系统搬不动；能拿走的是几条抽象设计直觉。
+  how_to_use: >
+    无可训练模型时搬不了编译本身，但能借两条设计直觉：① 给某个能力/插件配"强度"参数时按连续旋钮调（有最佳区间，过强会崩），别当有/无开关；
+    ② 拼多个可复用单元（如多个 prompt 范式）时先拆出共享部分再合并，别整块叠加把共享内容放大两遍。另外一个判断框架：高频复用的知识值得"固化/结构化"，一次性的留作即查。
+  can_borrow:
+    - 能力/插件强度按连续旋钮调，有最佳区间、过强会压坏原本能力（作者观察到倒 U 曲线）
+    - 拼多个可复用单元先拆共享组件再合并，整块直接叠加会重复放大共享部分导致更差
+    - "把知识分成'值得固化的高频复用'和'留作即查的一次性'两类来分别对待"
+    - 把敏感逻辑藏进不可读的形态确实更难被直接劫持，但要清醒：看不见≠安全
+  cannot_borrow:
+    - 编译进 LoRA 这套训练本身——需要自有可训练 backbone、hypernetwork、大算力，纯工程系统落不了地
+    - 不要推广成"任意模块可随便相加"——论文只在一对互补技能上验证，且组件对齐是人工的
+    - 不要把"明文不在 prompt"当安全保证——补丁自身仍可能被投毒或被恶意装载接口攻击，且更难审计
+  maturity: 全部数字为作者自报，官方仓库代码/数据/模型尚未开源；评测域窄（两类任务、单一 Qwen3-8B）；落地门槛=需自有可训练模型与大算力（作者自报约 8×H100、17 万份文档）。
+
 # ── 正典挂接（R4）。proposals 见 .agent/kg4/latentskill-registry-proposals.md
 # concepts 为本篇 propose 的新词条（技能参数化概念族，registry 现仅有 problem 无对应 concept）；canonical.concepts 暂留空，转正后回填，先入 proposed_concepts。
 canonical:

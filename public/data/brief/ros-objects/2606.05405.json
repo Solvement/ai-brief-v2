@@ -1,0 +1,390 @@
+{
+  "assumptions": [
+    {
+      "anchor": "§2.1 Verifiability + §3.3 (rejected at QC and re-engineered)",
+      "conflicts_hint": "与\"复杂 agent 任务必须用 agent/LLM 当判官\"路线（Agent-as-a-Judge 一系）正面张力；也与\"评测应覆盖主观/品味型工作\"的诉求互斥——可验证性门会系统性过滤掉这类工作流。",
+      "id": "2606.05405.a1",
+      "kind": "explicit",
+      "statement": "可验证性（admit deterministic checking or an unambiguous rubric tied to observable artifacts）可以作为任务准入的硬门槛，判不了的工作流就不该进核心 benchmark。"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "与\"评测样本应无选择偏差\"假设冲突——好规格化、产物清晰、可验收的项目更容易被提交和通过 QC（facet 自承 deterministic_task_selection_bias），难以量化这层筛选丢了什么。",
+      "id": "2606.05405.a2",
+      "kind": "implicit",
+      "statement": "专家自选提交的已完成项目，经五要素规格化后，仍能代表该职业真实工作流的分布。"
+    },
+    {
+      "anchor": "§2.3 Public/private release strategy（威胁与对策明示；对策充分性为隐含假设）",
+      "conflicts_hint": "与\"deterministic grader 可被反向工程\"的风险冲突——公开题的 evaluate() 逻辑随仓库公开，确定性判分比 LLM 判更可针对性投机；rotation 的运维成本与节奏未验证。",
+      "id": "2606.05405.a3",
+      "kind": "implicit",
+      "statement": "hidden reference + 私有题池 + 滚动轮换足以长期防住答案泄露与针对性过拟合。"
+    },
+    {
+      "anchor": "§2.2 (we ground the ALE taxonomy in SOC 2018 and O*NET)",
+      "conflicts_hint": "职业分类为人类劳动市场统计设计——子领域等权计数不等于经济权重；与\"用 GDP 占比/工资额加权\"的替代坐标系（GDPval 路线）形成方法张力。",
+      "id": "2606.05405.a4",
+      "kind": "explicit",
+      "statement": "按 SOC 2018 / O*NET 职业分类聚类（排除非数字化 sector）得到的 13 簇/55 子领域，是 AI agent 经济能力评测的合理覆盖坐标系。"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "eval.deterministic-first-verification",
+      "eval.gate-and-score",
+      "eval.task-agent-env-decoupling",
+      "eval.failure-attribution-taxonomy",
+      "eval.expert-sourced-task-qc"
+    ],
+    "problems": [
+      "eval.agent-capability",
+      "agent.harness-engineering"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明评测缺位是经济落差的主因——部署阻力还有合规、组织流程、成本、责任归属等，论文未做因果分析，只给立场论证。",
+        "不能证明 ALE 饱和就等于经济转化——作者自己用的是弱化措辞（\"progress on the benchmark may begin to register as real economic transformation\"，§1 结尾），这是愿景不是被验证的命题。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文 Abstract 与 §1 逐字明确陈述，为全篇设计动机；但其性质是立场主张（author_claim），非实验结论。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "We argue that this gap is largely an evaluation problem: widely used benchmarks lack sustained performance measurement on real and economically valuable workflows.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§1 Introduction",
+          "quote": "benchmark victories have accumulated faster than measurable transformation in core industries",
+          "strength": "medium"
+        }
+      ],
+      "id": "2606.05405.c1",
+      "statement": "benchmark 胜利没有转化为经济上有意义的部署，这个落差主要是评测问题： 广泛使用的 benchmark 缺少对真实、经济上有价值工作流（economically valuable workflows）的持续测量； 若能建成并最终饱和这类评测，才标志 AI 真正能执行专业工作流。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明私有任务池（1,017 题）真实存在且达到所述质量——仓库实读只确认 ale_run 框架、公开任务与 reference harness（深读源码核实），私有池外部不可复现。",
+        "不能证明\"55 子领域覆盖\"等于职业劳动全覆盖——它是 non-physical、software-mediated 工作的覆盖（论文明示排除非数字化 sector）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "数字逐字核对本地 TeX（data/counts.tex 宏 + Conclusion + §2.3 + Fig.4）；但源内存在小口径不一致须引用时注意： 专家人数 Abstract 写 250+、§5 Related Work 写 300+；Last-Exam 档 counts.tex 宏=36、Table 1 表头=35。\n",
+      "evidence": [
+        {
+          "anchor": "Conclusion §6",
+          "quote": "a benchmark of 960 expert-authored task workflows (1,490 task instances) across 55 digital industries, sourced from work experts have already shipped, anchored in the SOC/O*NET taxonomy",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§2.3 Public/private release strategy",
+          "quote": "releasing only 150 of the 1,490 task instances (~10%) publicly, with the remainder held in a private pool",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§3.3 Evaluation Modes",
+          "quote": "a task workflow whose only proposed scoring path is ''ask a model whether the result looks correct'' is rejected at QC and re-engineered to expose a checkable artifact",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.05405.c2",
+      "statement": "ALE 的构成（作者自报口径）：960 个专家撰写的 task workflow、1,490 个 task instance， 覆盖 13 个行业簇下 55 个子领域，taxonomy 锚定 SOC 2018 / O*NET（排除核心工作非数字化的 sector）； 题源是 250+ 行业专家已完成的真实项目，经五道门（expert sourcing → portal 提交五要素 → first-pass review → 工程实现+dry-run → 专家委员会终审）准入；可验证性（verifiability）是准入门槛—— 只能靠\"问模型对不对\"评分的任务在 QC 被拒收；仅 150 个实例（约 10%）公开，1,017 私有、323 待 QC，私有池滚动轮换防污染。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能据此评判清单外系统（如 OpenHands 之外的开源 harness、未列 backbone）——任何 evaluates 边只能挂到本清单出现的系统名。",
+        "清单内配对不完整（如 Claude Code 未配 GPT 系、Grok CLI 只配 Grok 4.3），跨 harness 比较只在有共同 backbone 的行成立。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "行名逐字核对本地 TeX 结果表。注意一处源内不一致：模型横评 Table 1 实有 13 行， 但 Appendix D.4 写 \"OpenClaw, 12 models\"，且 D.4 图口径数字（GPT-5.5 23.3%/Grok 4.3 5.3%）与 Table 1（22.8/4.4）不一致，疑似不同批次导出。\n",
+      "evidence": [
+        {
+          "anchor": "Table 1 (tables/main_results.tex) 行名",
+          "quote": "Codex / ALE-Claw / Cursor / Droid / Claude Code / Grok CLI / OpenClaw / ForgeCode / Hermes / Terminus / OpenHands; GPT-5.5 / GPT-5.4 / Claude Opus 4.7 / Claude Opus 4.6 / Claude Sonnet 4.6 / Gemini 3.1 Pro / DeepSeek V4 Pro / GLM 5.1 / Kimi K2.6 / Qwen3.6 Plus / MIMO v2.5 / MiniMax M2.7 / Grok 4.3",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4 ALE-Claw 段",
+          "quote": "ALE-Claw is a simplified implementation derived from OpenClaw and scoped to isolated benchmark runs.",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.05405.c3",
+      "statement": "受测系统清单（Table 1 逐字，自报结果）—— (a) 主流 harness×backbone 配置 12 个：Codex(GPT-5.5)、ALE-Claw(GPT-5.5)、Cursor(GPT-5.5)、Cursor(Opus 4.7)、 Droid(GPT-5.5)、ALE-Claw(Opus 4.7)、Claude Code(Sonnet 4.6)、Claude Code(Opus 4.7)、Droid(Opus 4.7)、 ALE-Claw(GPT-5.4)、Codex(GPT-5.4)、Grok CLI(Grok 4.3)； (b) 固定 OpenClaw+GUI-as-Tool 的模型横评 13 行：GPT-5.5、GPT-5.4、Claude Opus 4.7、Gemini 3.1 Pro、Claude Opus 4.6、 DeepSeek V4 Pro†、GLM 5.1†、Claude Sonnet 4.6、Kimi K2.6、Qwen3.6 Plus、MIMO v2.5、MiniMax M2.7†、Grok 4.3 （†=经 GUI-as-SubAgent 外挂视觉子 agent）； (c) 固定 GPT-5.5 的 harness 横评：Codex、ALE-Claw、OpenClaw、Cursor、Droid；固定 Opus 4.7：Cursor、ALE-Claw、Claude Code； (d) ALE-CLI（Linux-only 子集）：Codex(GPT-5.5)*、Claude Code(Sonnet 4.6)*（GCUA 参照）+ CLI agent 四个： ForgeCode(Sonnet 4.6)、Hermes(Sonnet 4.6)、Terminus(Sonnet 4.6)、OpenHands(Sonnet 4.6)。 其中 ALE-Claw 是作者自实现的 in-tree reference harness（OpenClaw 简化版），不是被独立评测的第三方产品。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能把 2.6% 当整体通过率引用——它是最难档（35 题）口径；Near-Term 档顶配 pass 已达 42.4%。",
+        "不能证明排名/数字跨重跑稳定——多数配置为单次 run，仅部分配置有三次重复的标准差；且全部为 ALE 团队自测，无第三方复现。",
+        "不能从低 pass 率直接推出行业自动化率/岗位替代结论——任务池先被可验证性门筛过，且 full pass 与部分完成（mean score）是两个量纲。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "数字逐字核对 Abstract+Table 1+§4 正文；§4 正文 ALE-CLI 口径（103 题宏、25.2%）与 Table 1 下面板（106 题、26.4%）存在已知小差异， 引用须带具体口径（正文比较段 vs 表格）。\n",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "across mainstream harness and backbone configurations, the average full pass rate is 2.6%",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 1",
+          "quote": "Codex (GPT-5.5) ... Overall Pass Rate 26.2",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4 ALE-CLI 段",
+          "quote": "the strongest configuration that achieves 82% on Terminal-Bench, reaches only a 25.2% overall pass rate on ALE-CLI",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.05405.c4",
+      "statement": "核心结果（全部自报）：最难档远未饱和——Last-Exam tier 上跨主流 harness/backbone 配置平均 full pass rate 2.6%； 最强配置 Codex+GPT-5.5 整体 pass 26.2%（Near-Term 42.4% / Full-Spectrum 20.0% / Last-Exam 8.6%）， Claude Code（Opus 4.7 与 Sonnet 4.6）在 Last-Exam 均 0.0%；同一 Codex+GPT-5.5 在 Terminal-Bench 拿 82%， 在 ALE-CLI（Linux-only 子集）只有 25.2% overall pass——说明 ALE 任务实质性更难、更长程。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能证明归因分布客观——失败分类由两段 LLM 流水线自动产生（Codex 读 run 工件出 analysis card → GPT-4o temperature 0 归类），论文未报告人工抽检一致率。",
+        "不能外推到所有 agent——失败分布只统计 Claude Code+Opus 4.7 一个配置的失败 run。",
+        "「模型≈3×harness」只在已工程化 harness 间成立（3–5 个成熟 harness vs 12–13 个模型，分母不对称）；不能推出 harness 不重要，更不能覆盖工程很差的 harness。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "百分比数字逐字核对 §4 与 Appendix D.3/D.4；降为 medium 因归因协议本身是 LLM 自动分类（未报人工验证）， 且 D.4 图口径与 Table 1 数字有小幅出入（如 Opus 4.7 harness 区间 14.7–20.0 vs 表 14.1–21.5）。\n",
+      "evidence": [
+        {
+          "anchor": "§4.2 Failure taxonomy",
+          "quote": "Understanding and Approach failures together account for roughly three quarters of cases, indicating that the dominant bottleneck is domain knowledge rather than execution capability.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Appendix D.3 Distribution",
+          "quote": "Nearly half (47%) of classifiable failures stem from Approach errors: wrong strategy (30%) or premature abandonment (17%).",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4.2 Additional analysis / Appendix D.4",
+          "quote": "the choice of foundation model accounts for roughly 3x the spread of the choice of agent harness among well-engineered systems",
+          "strength": "medium"
+        }
+      ],
+      "id": "2606.05405.c5",
+      "statement": "瓶颈归因（作者结论）：失败主因是模型的领域知识与方法选择，不是执行器或 harness 工程—— ① Claude Code+Opus 4.7 失败分类中 Understanding+Approach 合计约四分之三 （Approach 47%：wrong strategy 30%+premature abandonment 17%；Understanding 31%：domain knowledge gap 25%+hallucination 6%； Execution 22%；timeout/资源类被排除在该分布外）； ② 固定 OpenClaw 换 backbone 的 overall pass spread 为 18.0pp，约为固定 backbone 换 harness（5.3–6.0pp）的 3 倍； ③ 佐证现象：34% 公开任务指定图形软件为主工具，但多数配置 GUI 调用占比仍小，agent 倾向用 Bash/CLI 代替 GUI。\n",
+      "type": "author_claim"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "评测从\"考交付能力\"退化为\"考找答案/反向工程能力\"——exact/hash 与数值表格类直接失效（照抄 reference 即满分）",
+        "行为世界状态与几何距离类同样可由对照逆推逼近",
+        "被推翻的是 hidden reference 评分期才注入的承重设计（four-directory 契约中 reference/ hidden from the agent and used only for scoring）",
+        "这正是 facet/原文强调 \"reference 只在评分阶段出现，否则 benchmark 退化\" 的原因"
+      ],
+      "q": "若把 ALE 的 reference/ 改为任务开始就注入 VM（agent 可见），benchmark 会发生什么质变？哪些 comparison form 受影响最大、哪个设计原则被推翻？",
+      "tested_objects": [
+        "2606.05405.m1",
+        "2606.05405.a3"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "不能——2.6% 是最难档（35 题）口径，顶配整体 26.2%、Near-Term 档 42.4%，引用必须带档位",
+        "任务池先过可验证性准入门（a1/f3），样本偏向可自动验收的工作，不代表全部经济工作",
+        "数字全自报、多数单次 run、无第三方复现（c4 cannot_prove）",
+        "full pass 与部分完成是两个量纲——mean score 显示大量部分进展，\"通不过\"≠\"无经济价值\""
+      ],
+      "q": "\"Last-Exam 档平均 full pass 2.6%\" 能支撑\"当前 agent 干不了经济上有价值的工作\"吗？哪些反驳是本 benchmark 排除不了的？",
+      "tested_objects": [
+        "2606.05405.c4",
+        "2606.05405.f1",
+        "2606.05405.f3"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "硬门=结构可判项（文件存在/JSON-YAML-MDX 可解析/脚注可回溯/validator 绿）失败即不发布，过门后才谈内容质量分——与本站\"全绿才 deploy\"同构",
+        "冷审 major_gaps 标 Understanding/Approach/Execution/Infrastructure，决定补领域知识 vs 改范式 vs 修工具 vs 调环境（infra 故障≠编辑判决）",
+        "保留 public smoke（日常回归小集）+ private holdout（防模型/agent 升级时过拟合）",
+        "不照搬：私有题池的专家委员会运维（成本不成立）；LLM 两段归因流水线必须加人工抽检（其可靠性原文未验证）"
+      ],
+      "q": "把 ALE 的 gate-and-score + 四类失败归因迁移到 AI-Brief 自己的深读冷审质量门，应该怎么落地、哪些环节不该照搬？",
+      "tested_objects": [
+        "2606.05405.m1",
+        "2606.05405.c5",
+        "2606.05405.m2"
+      ],
+      "type": "transfer"
+    },
+    {
+      "expected_points": [
+        "不成立——原文限定 \"among well-engineered systems\"；harness sweep 只含 3–5 个成熟 harness，模型 sweep 含 12–13 个模型，分母不对称",
+        "harness 间差异（GUI 桥成熟度/上下文管理/retry 策略）与模型差异在配置里混杂，不能全归因给基座",
+        "数据口径上 Appendix D.4 图与 Table 1 有小幅出入（23.3 vs 22.8 等），spread 数字本身有导出批次噪声",
+        "正确读法：在 harness 已工程化的前提下，边际收益更多来自基座模型的领域知识与推理（与 c5 失败归因一致）"
+      ],
+      "q": "「模型选择 ≈ 3× harness 选择」这一结论的成立边界在哪？如果加入一个工程很差的 harness，结论还成立吗？",
+      "tested_objects": [
+        "2606.05405.c5",
+        "2606.05405.c3"
+      ],
+      "type": "boundary"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "对当前 agent 能力的系统性低估；或反向地把 benchmark 饱和误读为岗位可替代。",
+      "id": "2606.05405.f1",
+      "statement": "档位口径被丢失，\"2.6%\"被当成整体通过率或行业自动化率预测引用。",
+      "triggered_when": "媒体/决策者引用 headline 数字时不带 tier 口径（2.6%=Last-Exam 档平均 full pass；顶配整体 26.2%、Near-Term 档 42.4%）。"
+    },
+    {
+      "consequence": "公开榜分数与私有池真实能力脱钩，living benchmark 退化为已被过拟合的静态题库。",
+      "id": "2606.05405.f2",
+      "statement": "确定性 grader 被反向工程刷分。",
+      "triggered_when": "公开题长期不轮换、evaluate() 逻辑随仓库公开，参赛方针对 gate 条件与 reference 格式做任务特化优化。"
+    },
+    {
+      "consequence": "在 ALE 上饱和不代表能做该行业全部工作；以 ALE 引导研发会偏向可自动验收的工作类型。",
+      "id": "2606.05405.f3",
+      "statement": "可验证性偏置让 benchmark 系统性缺失主观判断型专业工作。",
+      "triggered_when": "把 ALE 的\"55/55 子领域全覆盖\"读成\"职业劳动全覆盖\"——高品味/沟通/政治判断类工作流在准入阶段就被拒收或弱化。"
+    },
+    {
+      "consequence": "把运行方差和导出口径差读成真实能力差，得出不可复现的结论。",
+      "id": "2606.05405.f4",
+      "statement": "自报+以单次 run 为主的榜单被当稳定排名消费。",
+      "triggered_when": "比较 Table 1 相邻名次（差 1–2pp）而该配置无重复 run 标准差；或跨口径混用（正文 vs 表格、宏 vs 表头的 35/36、103/106、4.3%/2.9% 超时率）。"
+    }
+  ],
+  "human": {
+    "can_borrow": [
+      "标准答案全程对系统隐藏、只在判分时拿出来比对——否则评测会退化成\"找答案 / 抄参照\"。",
+      "判分先过硬门（结构性可判项失败即 0），过门后才谈内容质量分；这跟\"全绿才发布\"是一回事。",
+      "凡是能用确定性脚本判的就别用大模型当判官；实在要判官也只用很窄的、要引证据的是/否小问题，再由代码汇总。",
+      "公开一小撮题做日常回归 + 留一大批私有题防针对性过拟合，并定期轮换，比\"换一套新题\"更可持续。"
+    ],
+    "cannot_borrow": [
+      "别把\"最难档 2.6%\"当成整体通过率或\"AI 替代不了岗位\"的证据——它是最难那一档的口径，顶配整体已到 26%。",
+      "真正靠品味/沟通/主观判断的工作，硬塞进确定性判分门会\"测得了的\"挤掉\"该测的\"。",
+      "那套两段式大模型自动失败归因没做人工抽检，照单全收会放大分类偏差，迁移时要加人工核对。"
+    ],
+    "headline": "把行业专家真实交付过的项目做成 1490 道\"能自动判分\"的活体 benchmark，专测 AI agent 干不干得了有经济价值的真实工作。",
+    "how_to_use": "给自己的系统设计验收门时，把每个任务做成\"真实输入 / 唯一可写的产物目录 / 对系统隐藏的标准答案 / 一段自动判分脚本\"四件套； 判分先过一个二值硬门（文件能不能解析、有没有违反硬约束），不过门直接判 0，过了再算连续质量分。失败时按\"没看懂 / 方法选错 / 执行崩了 / 环境问题\"四类归因，决定该补知识、改策略、修工具还是调环境。\n",
+    "maturity": "全部数字为作者团队自测、多为单次运行、无第三方复现；私有题池约一千道外部不可验证。门槛低（评测协议本身不需自有可训练模型），但私有题池的专家委员会运维成本极高，小团队难照搬。",
+    "plain_summary": "这篇 Agents' Last Exam（ALE）的核心论点是：agent 在各种 benchmark 上拿高分，却没换来真实经济产出——作者认为这主要是\"测错了\"， 现有评测没在持续地测真实、有价值的工作流。他们找了 250 多位行业专家，把他们已经交付过的真实项目（覆盖 55 个数字化子领域） 工程化成可自动跑、自动判分的任务，藏起标准答案、只发原料让 agent 干。结果连最强配置整体也只过 26%，最难那一档平均只过 2.6%（作者自报）。 想做 agent 系统、又苦于\"demo 跑得通但说不准能不能稳定交付真活\"的人，值得想起这套把验收做成可执行契约的思路。\n",
+    "use_type": "directly_usable",
+    "use_type_reason": "它给的是一套可直接照搬的评测协议（隐藏参照 + 硬门一票否决 + 确定性优先判分 + 四类失败归因），不是只能远观的抽象原则。"
+  },
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§3.1 Pipeline Architecture (Fig.6) + §3.3 Evaluation Modes",
+      "canonical_concept": "eval.task-agent-env-decoupling",
+      "id": "2606.05405.m1",
+      "input": "一个入库 task instance（main.py 封装五要素：描述/输入资产/目标软件/reference 资产/评测标准）+ 任一符合 action 接口的 agent（harness+backbone）",
+      "name": "三组件解耦的 hidden-reference 评测协议（task-spec / agent / environment + deterministic-first gate-and-score 判卷）",
+      "non_replaceable": [
+        "三组件接口解耦（换 agent 不改题、换题不改 agent）",
+        "reference 对 agent 隐藏且评分期才注入",
+        "gate-and-score 的 0 分强制",
+        "deterministic-first 准入纪律（只能 LLM 总判的任务不收）"
+      ],
+      "operations": [
+        "load()：声明任务与算力需求",
+        "start()：把远程 VM 置为确定性起始态，四目录契约——input/ 只读、software/ 预装专业软件、output/ 是 agent 唯一应写目标、reference/ 对 agent 全程隐藏仅评分用",
+        "agent 在动作环路（截图/shell/键鼠/文件编辑/API）下自由工作至终止，单 run 上限 5 小时",
+        "evaluate()：读 output/ 对照 hidden reference 评分。比较形式按任务选自小调色板：exact/hash、带容差的数值/表格字段、几何面距/点云距、视觉外观（vision-LLM judge）、固定输入轨迹下的行为世界状态、free-text rubric",
+        "组合方式以 gate-and-score 为最常见：二值前置门（如无 toolpath 碰撞、文件可解析）失败强制总分为 0，通过后才算连续质量分",
+        "deterministic-first 纪律：凡存在确定性替代就不用 LLM-as-judge；确需模型判的少数任务（视频/游戏截图/渲染场景）用窄的、证据锚定的 yes/no probe，由代码聚合成分"
+      ],
+      "optimization": "none",
+      "output": "[0,1] 任务分 + full pass 判定 + 可审计 run 工件（trajectory/logs/eval result/run metadata）",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "agent harness 与 backbone（任何符合 action 接口者）",
+        "VM 载体（cloud VM/本地容器）",
+        "每任务的 comparison form 选择",
+        "LLM/VLM probe 模型",
+        "GUI 接法（GUI-as-Tool vs GUI-as-SubAgent）"
+      ],
+      "reusable_pattern": "把\"会不会干活\"做成可执行验收契约——真实输入/唯一可写产物区/隐藏参照/evaluate() 四件套；硬门一票否决之后才谈连续质量分。"
+    },
+    {
+      "anchor": "§2.3 Task Construction Pipeline (Fig.3/Fig.4) + §2.3 Public/private release strategy",
+      "canonical_concept": "eval.expert-sourced-task-qc",
+      "id": "2606.05405.m2",
+      "input": "行业专家过去已完成（耗时数天/数周）的真实项目",
+      "name": "五道门专家任务构建流水线 + public/private 滚动题池",
+      "non_replaceable": [
+        "题源=专家已完成的真实项目（非编题）",
+        "可验证性作为准入门槛（判不了就拒）",
+        "多道独立评审（生成者≠审核者）",
+        "私有 holdout 的存在"
+      ],
+      "operations": [
+        "Expert sourcing：经行业从业者顾问委员会按 taxonomy 招募领域专家，保证覆盖",
+        "Task submission：web portal 提交，AI 辅助把提案补齐五要素（自然语言描述/输入文件/目标软件/期望交付物/评测规格）",
+        "First-pass review：会议式评审决定（major/minor revision、borderline accept、accept、strong accept），修订回环到专家",
+        "Task implementation：实现为 runnable 资产+容器+评测代码，工程师 dry-run，发现缺口自动路由回专家",
+        "Final QC：专家委员会终审——核 reference 正确性、评分边界校准（既不窄到不可能也不松到放水）、上下文充分性",
+        "发布策略：仅 150/1,490（~10%）公开，其余私有；rolling evaluation——私有题定期轮换进公开集、退役公开题被替换，维持不受污染的评测面"
+      ],
+      "optimization": "none",
+      "output": "工程化的可复跑 benchmark instance（runnable 资产+软件容器+codified 评测逻辑），入公开池（~10%）或私有池",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "专家招募渠道",
+        "portal 工具链",
+        "评审词表",
+        "公开/私有比例与轮换周期"
+      ],
+      "reusable_pattern": "评测语料从\"真实已交付工作\"反向工程而来，且每道题先过\"能否被自动验收\"的门；公开小集做日常回归、私有大池保长期可测性。"
+    }
+  ],
+  "object_id": "paper/2606.05405",
+  "one_sentence_thesis": "主张 benchmark 高分没换来经济产出的落差主要是评测问题（现有 benchmark 不持续测真实经济价值工作流）， 方法是把行业专家已完成的真实项目经五道 QC 门工程化为 task-spec/agent/environment 三组件解耦、 hidden reference + deterministic-first gate-and-score 自动判卷的 1,490 实例 benchmark（55 子领域/13 行业簇，仅 150 公开）， 并在主流 harness×backbone 配置自测中展示最难档（Last-Exam tier）平均 full pass rate 仅 2.6%、 最强配置 Codex+GPT-5.5 整体 26.2%——失败主因归到领域知识/方法选择而非执行器。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "能用且是本站质量门设计的直接同构（评测方法论，非红线）： ① gate-and-score（硬门失败即 0，过门再算质量分）= 本站\"build/lint/视觉 diff 全绿才谈内容质量\"，已对齐，可把口径写得更显式； ② deterministic-first（有确定性替代就不用 LLM-as-judge；判不了先重新工程化暴露可查工件）= 本站\"结构检查代码免费、generator≠critic\"的升级版， 深读/选稿评测应优先确定性检查（脚注可回溯/数字可对账/YAML 可解析），LLM 判官只留给确定性够不到的内容质量； ③ 冷审失败归因升级为四类标签（Understanding/Approach/Execution/Infrastructure），决定补领域知识/改范式/修工具/调环境——直接呼应\"infra 故障≠编辑判决\"教训； ④ public smoke + private holdout 防过拟合 = 本站 L1 回归集应有的\"日常回归小集 + 防刷私有集\"（Mini-ALE：把深读/冷审/KG 蒸馏任务写成 input/output/reference/evaluate 四目录契约）。 verify 路径=先在一个栏目的质量门落四类归因标签与确定性检查清单，跑一轮冷审对比归因分布是否可操作。\n",
+    "state": "apply"
+  },
+  "slug": "2606.05405",
+  "source": "arxiv:2606.05405v1 (NeurIPS 2026 preprint, 本地 TeX 全文 .agent/research/2606.05405/source/) + github.com/rdi-berkeley/agents-last-exam (HEAD 8583037, 实读) + agents-last-exam.org",
+  "status": "draft",
+  "title": "Agents' Last Exam",
+  "trigger_hooks": [
+    {
+      "related_object": "2606.05405.m1",
+      "risk": "把本质上确定性够不到的质量维度（文风/品味/取舍）硬塞进确定性门，会把\"测对了什么\"换成\"测得了什么\"。",
+      "symptom": "我的 agent 在 demo 里能跑通，但说不准它能不能稳定交付真实工作——每次验收都靠人看一眼。",
+      "why_recall": "ALE 把验收做成可执行契约（input/唯一可写 output/隐藏 reference/evaluate() 四件套 + gate-and-score 硬门一票否决），是\"把模糊业务流程变成可运行验收门\"的参照实现。"
+    },
+    {
+      "related_object": "2606.05405.c5",
+      "risk": "归因由 LLM 流水线自动产生且只验证过单配置——照单全收不做人工抽检会放大分类偏差（呼应本站\"infra 故障≠编辑判决\"教训）。",
+      "symptom": "agent 任务失败了，不知道该补领域知识、改规划策略、修工具还是调环境。",
+      "why_recall": "四类失败归因（Understanding/Approach/Execution/Infrastructure）+ 两段式轨迹分析流水线给出可操作的归因协议，且其发现（约 3/4 失败在领域知识/方法层）能校正\"先修工具\"的直觉。"
+    },
+    {
+      "related_object": "2606.05405.m2",
+      "risk": "私有池的征题、QC、轮换运维成本极高（ALE 靠 250+ 专家委员会）；小团队照搬容易把 rotation 做成一次性摆设。",
+      "symptom": "内部 benchmark 上线半年后分数全绿，但实际体验没变好——怀疑被针对性过拟合了。",
+      "why_recall": "public smoke set（~10% 公开做日常回归）+ private holdout + rolling rotation 是防污染的结构解，比\"换一套新题\"可持续。"
+    },
+    {
+      "related_object": "2606.05405.m1",
+      "risk": "该纪律隐含\"任务可被改造出 checkable artifact\"的假设（a1）——对真正主观的评测对象强行 deterministic 会测错对象。",
+      "symptom": "评测到底该写死检查脚本还是上 LLM-as-judge，团队争执不下。",
+      "why_recall": "ALE 的裁决规则可直接借用——deterministic-first：凡有确定性替代就不用 LLM 判；判不了的任务先重新工程化暴露可查工件，实在要判官也只用窄的证据锚定 yes/no probe 由代码聚合。"
+    }
+  ]
+}

@@ -4,10 +4,15 @@ import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 
 const ROOT = process.cwd();
-const OBJECT_ID_RE = /^[a-z0-9][a-z0-9-]*\.(c|m|a|f)\d+$/;
+// slug 段允许点号：arxiv-id slug 形如 2606.05405，对象 ID = 2606.05405.c1（KG-4 波次2，2026-06-12）。
+// slug 前缀的精确匹配由下方 id.startsWith(`${slug}.`) 守，这里只校验「以字母数字开头 + 末尾是 {c|m|a|f}{n} 后缀」。
+const OBJECT_ID_RE = /^[a-z0-9][a-z0-9.-]*\.(c|m|a|f)\d+$/;
 const CLAIM_TYPES = new Set(["fact", "author_claim", "interpretation", "inference"]);
 const EXAM_TYPES = new Set(["counterfactual", "boundary", "transfer"]);
 const SELF_EVO_STATES = new Set(["apply", "queue", "no"]);
+const USE_TYPES = new Set(["directly_usable", "design_inspiration", "background_reference"]);
+// 默认前端只渲染 human 块；这些 AI-内部记号若漏进人话层=受众分离破功，硬门拦截（KG-5）。
+const HUMAN_LEAK_RE = /\b(paper\/|project\/|derived_by|canonical|conflicts_assumption|distinct_from|\.c\d|\.m\d|\.a\d|\.f\d)\b/;
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
@@ -184,6 +189,29 @@ function validateSelfEvo(object, errors) {
   }
 }
 
+// KG-5 受众分离：默认前端只渲染 human 块——必须存在、非空、use_type 合法、不泄露 AI-内部记号。
+// 仅 kind=paper 强制：项目对象已移出星图（Kevin 2026-06-12），不作卡片渲染，只在命题证据审计层出现，免 human 门。
+function validateHuman(object, errors) {
+  if (object.kind === "project") return;
+  const human = object.human;
+  if (!human || typeof human !== "object") {
+    errors.push("human block is required (KG-5 受众分离：默认前端只渲染 human 块)");
+    return;
+  }
+  if (!nonEmptyString(human.headline)) errors.push("human.headline is empty");
+  if (!nonEmptyString(human.plain_summary)) errors.push("human.plain_summary is empty");
+  if (!nonEmptyString(human.how_to_use)) errors.push("human.how_to_use is empty");
+  if (!USE_TYPES.has(human.use_type)) {
+    errors.push("human.use_type must be one of directly_usable, design_inspiration, background_reference");
+  }
+  if (!hasItems(human.can_borrow)) errors.push("human.can_borrow must contain at least 1 item");
+  // 泄露扫描：把所有人话文本拼起来，命中 AI-内部记号即判失败。
+  const blob = [human.headline, human.plain_summary, human.how_to_use, human.use_type_reason, human.maturity,
+    ...asArray(human.can_borrow), ...asArray(human.cannot_borrow)].filter(nonEmptyString).join(" \n ");
+  const leak = blob.match(HUMAN_LEAK_RE);
+  if (leak) errors.push(`human block leaks AI-internal token "${leak[0]}" (受众分离：内部记号只进审计层，不进人话层)`);
+}
+
 function validateObject(object, { file, registry, globalIds }) {
   const errors = [];
   const warnings = [];
@@ -193,6 +221,7 @@ function validateObject(object, { file, registry, globalIds }) {
   if (!nonEmptyString(object.one_sentence_thesis)) errors.push("one_sentence_thesis is empty");
 
   validateCanonical(object, registry, errors);
+  validateHuman(object, errors);
   validateClaims(object, globalIds, errors);
   validateMechanisms(object, registry, globalIds, errors);
   validateAssumptionsAndFailures(object, globalIds, errors, warnings);

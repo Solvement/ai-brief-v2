@@ -33,6 +33,23 @@ title: ""
 source: "arxiv:2601.01885v2 + github.com/y1y5/AgeMem"
 one_sentence_thesis: ""          # 主张了什么、靠什么方法、在什么设置下证明/展示了什么（三段缺一不可）
 
+# ── 人读层（KG-5 受众分离）：对象其余字段全是 AI 的认知记账（审计/详情层），唯独 human 块给人看。
+#    纪律：从本对象已冷审的 claims/mechanisms/self_evo_verdict 重述成人话，禁引入对象里没有的事实；
+#    禁出现 object ID / canonical ID / derived_by / confidence / 内部术语（那些进审计层不进默认视图）。
+human:
+  headline: ""                   # 一句人话：这篇到底干了件什么事（不堆术语，必要英文名可留）
+  plain_summary: ""              # 2-4 句人话：在讲什么、为什么值得想起（说给"想做 agent 系统的人"听）
+  use_type: directly_usable | design_inspiration | background_reference   # 项目无关的粗判（见下）
+  use_type_reason: ""            # 一句：为什么归这个 type
+  how_to_use: ""                 # 项目无关：能落到哪、最小可借的形态
+  can_borrow: []                 # 能借什么（人话 2-4 条）
+  cannot_borrow: []              # 不能照搬什么（人话 1-3 条）
+  maturity: ""                   # 成熟度一句（自报 vs 实测、门槛如"需自有可训练模型"）
+# use_type 三档（项目无关、论文内在属性；query-specific 的"对你这个项目直接可用吗"留给云端问答助手）：
+#   directly_usable      = 评测设计/schema/benchmark 任务/协议这类可直接拿来用的（多为 benchmark/方法协议论文）
+#   design_inspiration   = 提供抽象/原则但需改造或缺介质（如需自有训练模型）才能落地
+#   background_reference = 理解路线用，当前不建议直接采用
+
 canonical:                       # 必须挂接 L2 注册表 ID；挂不上→proposed_*（见 §2）
   problems: [mem.lifecycle-management]
   concepts: [mem.learned-policy-controller]
@@ -102,15 +119,18 @@ status: draft | gold
 ```
 
 字段→消费方对照（裁决去留的依据）：
-| 字段 | 消费方 |
-|---|---|
-| claims.evidence/cannot_prove | 命题正反证据、冷审逐字核、盲测边界题 |
-| mechanisms | 比较/组合查询、流程图渲染、迁移 |
-| assumptions | conflicts join、边界题 |
-| failure_modes | mitigates join、风险提示 |
-| trigger_hooks | 问题召回（外脑第一查询） |
-| exam_questions | L5 验收闭环 |
-| canonical.* | 全部 L3 join |
+| 字段 | 消费方 | 受众 |
+|---|---|---|
+| **human.\*** | **检索区/星图默认视图（人读）** | **人（默认）** |
+| claims.evidence/cannot_prove | 命题正反证据、冷审逐字核、盲测边界题 | AI / 审计层（展开） |
+| mechanisms | 比较/组合查询、流程图渲染、迁移 | AI / 详情层（展开） |
+| assumptions | conflicts join、边界题 | AI / 详情层（展开） |
+| failure_modes | mitigates join、风险提示 | AI / 详情层（展开） |
+| trigger_hooks | 问题召回（外脑第一查询） | AI / 详情层（展开） |
+| exam_questions | L5 验收闭环 | AI / 审计层（展开） |
+| canonical.* | 全部 L3 join | AI / 审计层（展开） |
+
+**受众分离铁律（KG-5，2026-06-12 Kevin 拍板）**：对象库本身是 **AI-only 认知语料**——除 `human` 块外所有字段都是「AI 为理解而存的记账」（claim 分型/逐字锚点/cannot_prove/置信/object ID/derived_by），**默认前端一律不裸露**，只在「详情/审计/开发者」展开层出现。默认视图只渲染 `human` 块 + 命题人话框 + 关系人话 gloss。错误示范=把 `paper/agemem → paper/longtracerl`、`conflicts_assumption: ... is distinct_from ...`、`Candidate only; ...` 这类调试文字直接铺给用户。同站对论文做的 `paper.mdx`(人读) vs `autosci primitives`(AI-only) 受众分离，在 KG 层就是 `human` 块 vs 其余字段。**未来「输入任意问题→拆解→召回→综合判断」的问题导向问答=云端问答助手（独立轨，非静态站）**。
 
 ## 2. L2 正典注册层（`data/knowledge-graph/registry/`）
 

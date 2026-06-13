@@ -34,3 +34,96 @@
     embedding_rag: [Contriever, Text-Embed-3-Small, Text-Embed-3-Large, Qwen3-Embedding-4B]
     structure_augmented_rag: [RAPTOR, GraphRAG, MemoRAG, HippoRAG-v2, Mem0, Cognee, Zep]
     agentic_memory: [Self-RAG, MemGPT, MIRIX, "MIRIX(4.1-mini)"]
+
+# ════════ KG-4 波次2 · eval 簇 benchmark（2026-06-12 主控收口，4 条；socrates 经论证不注册=社交调解域外）════════
+- id: bench.2606.05405
+  name: Agents' Last Exam（ALE，真实经济工作流 agent benchmark）
+  aliases: [agents-last-exam, ALE, ALE-CLI]
+  evaluates: [eval.agent-capability, agent.harness-engineering]   # 主控裁定去掉根域 agent（过宽会污染 can_be_evaluated_by join）
+  metrics:
+    - "per-task score ∈ [0,1] via evaluate()（hidden reference + gate-and-score：二值门失败强制 0，过门后算连续质量分）"
+    - "full pass rate + mean score，按三档分报：Near-Term(59) / Full-Spectrum(55) / Last-Exam(35，宏写 36)"
+    - "Overall Pass Rate（三档全体任务 full-pass 率）"
+    - "成本三联：total API cost ($) / wall-clock (h) / token 用量（单 run 上限 5 小时）"
+    - "ALE-CLI 子集（Linux-only，正文宏 103 / 表格口径 106 题）供 CLI-only agent 对比"
+  limitations:
+    - "结果全部 ALE 团队自报自测；多数配置单次 run（仅部分有三次重复标准差），无第三方复现"
+    - "私有题池（1,017 题）外部不可复现——仓库只公开 ale_run 框架+150 公开任务+reference harness"
+    - "可验证性准入门系统性过滤主观/品味/沟通型工作流——覆盖的是 non-physical、software-mediated 工作，饱和≠职业劳动全覆盖"
+    - "确定性 grader 可被反向工程刷分；公开题依赖滚动轮换保鲜，运维成本高且充分性未验证"
+    - "失败归因为 LLM 两段流水线自动产生，未报人工抽检一致率，且只统计 Claude Code+Opus 4.7 单配置"
+    - "源内数字口径不一致：Last-Exam 35(表)/36(宏)；ALE-CLI 103(正文)/106(表)；timeout 4.3%(§4)/2.9%(App D.2)；专家 250+(Abstract)/300+(§5)；App D.4 图与 Table 1 有小幅出入。引用须带具体出处口径"
+    - "模型 vs harness '3×' 结论只在 well-engineered harness 间成立（3–5 harness vs 12–13 模型，分母不对称）"
+  tested_systems:   # Table 1 行名逐字核实；evaluates 边的唯一证据源
+    harness_backbone_configs: ["Codex(GPT-5.5)", "ALE-Claw(GPT-5.5)", "Cursor(GPT-5.5)", "Cursor(Opus 4.7)", "Droid(GPT-5.5)", "ALE-Claw(Opus 4.7)", "Claude Code(Sonnet 4.6)", "Claude Code(Opus 4.7)", "Droid(Opus 4.7)", "ALE-Claw(GPT-5.4)", "Codex(GPT-5.4)", "Grok CLI(Grok 4.3)"]
+    model_sweep_fixed_openclaw: [GPT-5.5, GPT-5.4, Claude-Opus-4.7, Gemini-3.1-Pro, Claude-Opus-4.6, "DeepSeek-V4-Pro†", "GLM-5.1†", Claude-Sonnet-4.6, Kimi-K2.6, Qwen3.6-Plus, MIMO-v2.5, "MiniMax-M2.7†", Grok-4.3]   # †=GUI-as-SubAgent；表实有 13 行，App D.4 自述 12
+    harness_sweep_fixed_gpt55: [Codex, ALE-Claw, OpenClaw, Cursor, Droid]
+    harness_sweep_fixed_opus47: [Cursor, ALE-Claw, Claude-Code]
+    ale_cli_subset: ["Codex(GPT-5.5)*", "Claude Code(Sonnet 4.6)*", "ForgeCode(Sonnet 4.6)", "Hermes(Sonnet 4.6)", "Terminus(Sonnet 4.6)", "OpenHands(Sonnet 4.6)"]   # *=GCUA 参照行；ALE-Claw=作者自实现 reference harness，非第三方产品
+
+- id: bench.2606.07297
+  name: SWE-Explore（仓库探索行级评测）
+  aliases: [swe-explore-bench, SWE-Explore]
+  evaluates: [code.repo-understanding]   # 不挂 eval.agent-capability：那是本篇 addresses 的元问题，非它评的维度
+  metrics:
+    - "coverage: line-level Precision/Recall/F1 + HitFile + HitRegion（对 R_core 打分）"
+    - "ranking: nDCG@B（行预算截断，增益=区域覆盖核心行数）+ FUH（首个有用命中）"
+    - "efficiency: Context Efficiency（预测行落在核心+可选 GT 比例；与下游修复 Pearson r=0.950 最高）+ Noise Rate"
+    - "one-time downstream validation: restricted-context resolve rate（explorer 选区=固定 Mini-SWE-Agent patcher 唯一可见上下文，n=150；不进常规评测循环）"
+  limitations:
+    - "solved-issue 偏置：只收 ≥2 条强模型成功修复轨迹的 issue，未解难题不在内——探索难度被系统性低估"
+    - "共识 GT 保守：交集偏多数成功路径，走替代证据路径的 explorer 被错杀低分（作者自承 empirical approximation）"
+    - "全部自报、无第三方复测；主表 agentic explorer 全部 GPT-5.4 单基座驱动，跨基座仅 Table 5 部分消融"
+    - "K=5 与行预算固定，排名超参敏感（作者自列 may not generalize across repository/issue types）"
+    - "空上下文基线在 canonical 仓库上被 patcher 记忆抬高，绝对值需谨慎"
+    - "下游验证 patcher 口径原文不一致（§4.2 写 GPT-5.4+Gemini-3-Pro，Table 3 caption 标 GPT-5.4）；且该协议不测补丁合成/验证能力"
+  tested_systems:   # v1 Table 6 分组逐字核实；全部自报。明确不含 Cursor（仅官方仓库 wrapper，论文正文/表均无）
+    baselines: [Oracle, Random]
+    sparse_retrievers: [BM25, TF-IDF, Potion]   # Potion 正文称轻量稠密 RAG，照录原表分组
+    general_agentic_explorers: [OpenHands, Mini-SWE-Agent, AweAgent, Claude Code, Codex]
+    academic_localizers: [AutoCodeRover, LocAgent, OrcaLoca, CoSIL]
+
+- id: bench.2606.07591
+  name: ResearchClawBench（RCBench，端到端自主科研评测）
+  aliases: [researchclawbench, RCBench]
+  evaluates: [eval.agent-capability, eval.open-ended-output-scoring]
+  metrics:
+    - "rubric weighted score 0-100 per task（judge=GPT-5.1 逐项判分后加权；50=target-paper-level 复现线，>50=discovery 区间）"
+    - "per-item 双模式分档：Mode A objective / Mode B subjective，每项含 technical keywords 核对"
+    - "4 supplemental dimensions: Comprehensiveness / Depth / Instruction Following / Professionalism（与 rubric 分弱相关，自报）"
+    - "资源效率：mean task cost / runtime vs score 的 Pareto frontier"
+    - "错误归因：280 runs 六类错误分布（Experiment Design Mismatch / Evidence Mismatch / Scientific Core Missing / Goal Misalignment / Reliability-Reporting Failure / Execution Failure）"
+  limitations:
+    - "dry-lab only——只评基于已有数据/代码/文献的研究，湿实验不可评（作者自承）"
+    - "只评终产物（最终报告+图）不评过程步骤——不适合直接当过程诊断或 RL 奖励（作者自承）"
+    - ">50 的 discovery 区间测量效度未证（作者自承）；repo README 口径（70+=surpass）还与论文（>50=discovery）不一致"
+    - "单 judge（GPT-5.1）、全部自报、无人工复评比例——同族被测有高估风险"
+    - "数据污染未控——目标论文可能已入被测模型预训练语料，'再发现'可能含'回忆'成分"
+    - "规模小：40 任务/10 域，单域仅 4 题；错误归因协议（标注者/一致性）未披露"
+    - "受测系统版本绑定，结论随版本漂移；The AI Scientist / AI Co-Scientist / AI-Researcher / InternAgent-1.5 未受测"
+  tested_systems:   # §4.1 + Table 5 逐字核实；全部自报
+    autonomous_agents: ["Claude Code (Claude-Opus-4.6)", "Codex CLI (GPT-5.4)", "OpenClaw (GPT-5.4)", "ResearchClaw (GPT-5.4)", "EvoScientist (GPT-5.4)", "ARIS Codex (Codex/GPT-5.4)", "Nanobot (GPT-5.4)"]
+    harness_llms: [Claude-Opus-4.7, Claude-Opus-4.6, Qwen3.7-Max, GLM-5.1, Qwen3.6-Plus, Kimi-K2.6, Gemini-3.5-Flash, DeepSeek-V4-Pro, GPT-5.5, MiMo-V2.5, MiMo-V2-Pro, GPT-5.4, Qwen3.5-397B-A17B, Kimi-K2.5, Grok-4.1, Gemini-3.1-Pro, Grok-4.3]
+    judge: [GPT-5.1]
+
+- id: bench.2606.05622
+  name: AdaPlanBench（隐藏双约束渐进披露的自适应规划基准）
+  aliases: [AdaPlanBench]
+  evaluates: [agent.planning-adaptivity]   # 不挂 eval.agent-capability：那是论文 addresses 的问题，非 benchmark 测受测系统的维度
+  metrics:
+    - "Acc (%): 终态方案满足全部 world+user 约束 且 rubric 全维 3-judge 平均 ≥ γ=4（任务成功层）"
+    - "VPR (%): 终态方案满足全部约束、非 early-stop/max-turn 终止（合规层；与 Acc 强制分离是承重设计）"
+    - "Avg Turns; AWRV/AURV: 每题重复违反【已披露】world/user 约束次数（只按披露历史计）"
+    - "ATWC/ATUC: 每轮触发的新 world/user 约束数（试探强度；作者注明 higher is not always better）"
+    - "rubric 8 维 1–5 分: feasibility / physical plausibility / logical step ordering / effectiveness / concreteness / safety / consequence awareness / autonomy"
+  limitations:
+    - "裁判同族偏置：constraint judge 与构造 checker 均为 GPT-5.4，最强受测恰为 GPT-5 系；有小样本人工校准（89.76% exact match）但无跨家族裁判交叉验证"
+    - "纯文本规划：perception/navigation/低层控制被有意抽掉，physical plausibility 由文本 judge 评分而非真实执行验证"
+    - "单域：仅 household tasks（307 题，源自 MacGyver 重写）；旅行/办公/软件运维/具身场景外推未证"
+    - "无 human baseline：67.75% 离人类/协议上限多远未知"
+    - "协议靠违规换披露（perverse elicitation）：ATWC/ATUC 测的是评测内探索，不是产品优化目标"
+    - "用户偏好简化为静态属性禁忌，真实偏好可协商、上下文依赖"
+    - "约束档案为 LLM 管线产物，checker 校准仅 30 实例（FN 2.31%/FP 3.72%），残余噪声可能污染题级归因"
+  tested_systems:   # Table 3（E_mid 主结果表）逐字核实；均为作者自测。构造期 planner/checker/judge 是管线组件不在此列
+    proprietary: [GPT-5, GPT-5-Mini, GPT-5-Nano, Gemini-3.1-Pro, Gemini-3-Flash, DeepSeek-v4-Flash]
+    open_weight: [Qwen3-8B, Qwen3-14B, Qwen3-32B, Llama-3.3-70B-Instruct]

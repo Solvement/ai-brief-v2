@@ -11,8 +11,10 @@ import { RosObjectPanel, useRosObject } from "./RosObjectPanel";
 //  - 球壳分区布局/聚焦让位机制沿用 v2（Kevin 已验收的交互），旧 facet 投影退役。
 // ════════════════════════════════════════════════════════════════════
 
+export interface RosNodeHuman { headline?: string; plain_summary?: string; use_type?: string; how_to_use?: string }
 export interface RosGraphNode {
   id: string; slug: string; kind: string; title: string; thesis?: string;
+  human?: RosNodeHuman | null;
   problems?: string[]; concepts?: string[]; benchmarks?: string[];
   cluster?: string; counts?: Record<string, number>;
   fx?: number; fy?: number; fz?: number; x?: number; y?: number; z?: number;
@@ -25,11 +27,16 @@ export interface RosRelation {
 export interface RosGraphEdge {
   id?: string; source: string; target: string;
   primary_type: string; confidence?: string; count?: number;
-  relations?: RosRelation[];
+  gloss?: string; relations?: RosRelation[];
 }
 export interface RosPropEvidence { claim_id: string; owner: string; owner_kind?: string; excerpt?: string }
+export interface RosPropHuman {
+  current_judgment?: string; why?: string[]; strongest_for?: string;
+  strongest_against?: string; third_way?: string; for_you?: string;
+}
 export interface RosProposition {
   id: string; statement: string; state?: string; cluster?: string;
+  human?: RosPropHuman | null;
   possible_synthesis?: string; support?: RosPropEvidence[]; oppose?: RosPropEvidence[];
 }
 export interface RosGraph { schema?: string; nodes?: RosGraphNode[]; edges?: RosGraphEdge[]; propositions?: RosProposition[] }
@@ -134,93 +141,129 @@ function edgeBaseColor(e: RosGraphEdge): string {
   return EDGE_COLOR[e.primary_type] || "#64748b";
 }
 
-// ── 关系卡（边的对象级展开） ──
+// ── 关系卡（KG-5 分层）：默认=人话 gloss 一句；展开「查证」才露对象级 reason/boundary/对象 ID（审计层） ──
 export function RelationCards({ edges, byId }: { edges: RosGraphEdge[]; byId: Map<string, RosGraphNode> }) {
   const [open, setOpen] = useState<string | null>(null);
   const judged = edges.filter((e) => e.primary_type !== "shares_problem");
   const base = edges.filter((e) => e.primary_type === "shares_problem");
+  const show = [...judged, ...base];
   return (
     <div className="globe-edges">
-      {judged.map((e, i) => {
+      {show.map((e, i) => {
         const a = byId.get(e.source); const b = byId.get(e.target);
         const key = e.id || `${e.source}|${e.target}|${i}`;
         const expanded = open === key;
         const rels = e.relations || [];
+        const gloss = e.gloss || `${a ? shortTitle(a.title, 18) : e.source} 与 ${b ? shortTitle(b.title, 18) : e.target} 相关。`;
         return (
           <div key={key} className="globe-edge-card">
-            <div className="globe-edge-head">
-              <span className="globe-edge-type" style={{ color: EDGE_COLOR[e.primary_type] || "#94a3b8" }}>{EDGE_LABEL[e.primary_type] || e.primary_type}</span>
-              <span className="globe-edge-pair">{a ? shortTitle(a.title, 18) : e.source} ↔ {b ? shortTitle(b.title, 18) : e.target}</span>
-              {e.confidence && <span className="globe-edge-conf">置信 {e.confidence}</span>}
-              {rels.length > 1 && (
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 8, marginTop: 5, flex: "0 0 auto", background: EDGE_COLOR[e.primary_type] || "#94a3b8" }} />
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontSize: 13, color: "#1e293b", lineHeight: 1.55 }}>{gloss}</p>
                 <button onClick={() => setOpen(expanded ? null : key)}
-                  style={{ marginLeft: "auto", fontSize: 11, color: "#2563eb", background: "none", border: "none", cursor: "pointer" }}>
-                  {expanded ? "收起" : `${rels.length} 条对象级关系 ▸`}
+                  style={{ marginTop: 3, fontSize: 11, color: "#2563eb", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
+                  {expanded ? "收起查证" : "查证 ▸"}
                 </button>
-              )}
-            </div>
-            {(expanded ? rels : rels.slice(0, 1)).map((r, j) => (
-              <div key={j} style={{ marginTop: 6, fontSize: 12.5, color: "#475569", borderLeft: "2px solid #e2e8f0", paddingLeft: 9 }}>
-                <p style={{ margin: 0 }}>
-                  <b style={{ color: "#334155" }}>{r.source_object}</b> → <b style={{ color: "#334155" }}>{r.target_object}</b>
-                  <span style={{ color: "#94a3b8" }}>（{EDGE_LABEL[r.relation_type] || r.relation_type}{r.derived_by === "structural_join" ? " · 结构推导" : r.derived_by === "llm_judgment" ? " · 判定" : ""}）</span>
-                </p>
-                {r.reason && <p style={{ margin: "2px 0 0" }}>{r.reason}</p>}
-                {r.boundary && <p style={{ margin: "2px 0 0", color: "#9a3412" }}>边界：{r.boundary}</p>}
               </div>
-            ))}
+            </div>
+            {expanded && (
+              <div style={{ marginTop: 6, paddingTop: 6, borderTop: "1px dashed #e2e8f0" }}>
+                <p style={{ margin: "0 0 4px", fontSize: 11, color: "#94a3b8" }}>
+                  {EDGE_LABEL[e.primary_type] || e.primary_type}{e.confidence ? ` · 置信 ${e.confidence}` : ""} · {rels.length} 条对象级关系
+                </p>
+                {rels.map((r, j) => (
+                  <div key={j} style={{ marginTop: 5, fontSize: 12, color: "#475569", borderLeft: "2px solid #e2e8f0", paddingLeft: 9 }}>
+                    <p style={{ margin: 0, fontFamily: "monospace", fontSize: 11, color: "#64748b" }}>
+                      {r.source_object} → {r.target_object}
+                      <span>（{EDGE_LABEL[r.relation_type] || r.relation_type}{r.derived_by === "structural_join" ? " · 结构推导" : r.derived_by === "llm_judgment" ? " · 判定" : ""}）</span>
+                    </p>
+                    {r.reason && <p style={{ margin: "2px 0 0" }}>{r.reason}</p>}
+                    {r.boundary && <p style={{ margin: "2px 0 0", color: "#9a3412" }}>边界：{r.boundary}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
-      {base.length > 0 && (
-        <p className="globe-empty" style={{ marginTop: 8 }}>另有 {base.length} 条「同问题底座」关联（结构推导，不构成判断）。</p>
-      )}
-      {judged.length === 0 && base.length === 0 && <p className="globe-empty">（这串记忆之间暂无已判定关系。）</p>}
+      {show.length === 0 && <p className="globe-empty">（这串记忆之间暂无已判定关系。）</p>}
     </div>
   );
 }
 
-// ── 命题板（群体分析层：科研张力的正反证据） ──
+// ── 命题板（KG-5 分层）：默认=人话框（结论/为什么/最强正反/第三条路/对我有什么用）；
+//    原始 claim 证据 excerpt（含 owner ID）收进「展开证据」审计层。 ──
+function PropositionCard({ p }: { p: RosProposition }) {
+  const [showEv, setShowEv] = useState(false);
+  const st = STATE_LABEL[p.state || "open"] || STATE_LABEL.open;
+  const h = p.human;
+  return (
+    <div style={{ border: "1px solid #e0e7ff", background: "#fafbff", borderRadius: 12, padding: "12px 14px" }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: st.color, background: st.bg, padding: "1px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{st.label}</span>
+        <b style={{ fontSize: 13.5, color: "#0f172a" }}>{p.statement}</b>
+      </div>
+
+      {h ? (
+        <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.6, color: "#1e293b" }}>
+          {h.current_judgment && <p style={{ margin: "0 0 6px" }}><b>当前判断：</b>{h.current_judgment}</p>}
+          {(h.why?.length || 0) > 0 && (
+            <>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "#475569", marginBottom: 3 }}>为什么</div>
+              <ul style={{ margin: "0 0 8px", paddingLeft: 18, fontSize: 12.5, color: "#334155" }}>
+                {h.why!.map((w, i) => <li key={i} style={{ marginBottom: 3 }}>{w}</li>)}
+              </ul>
+            </>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {h.strongest_for && <p style={{ margin: 0, fontSize: 12.5, color: "#475569" }}><b style={{ color: "#15803d" }}>最强正方：</b>{h.strongest_for}</p>}
+            {h.strongest_against && <p style={{ margin: 0, fontSize: 12.5, color: "#475569" }}><b style={{ color: "#b91c1c" }}>最强反方：</b>{h.strongest_against}</p>}
+          </div>
+          {h.third_way && <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "#0e7490", background: "#ecfeff", borderRadius: 8, padding: "7px 10px" }}><b>可能的第三条路：</b>{h.third_way}</p>}
+          {h.for_you && <p style={{ margin: "7px 0 0", fontSize: 12.5, color: "#1e40af", background: "#f5f9ff", borderRadius: 8, padding: "7px 10px" }}><b>对你有什么用：</b>{h.for_you}</p>}
+        </div>
+      ) : (
+        p.possible_synthesis && <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "#0e7490" }}><b>可能的第三条路：</b>{p.possible_synthesis}</p>
+      )}
+
+      <button onClick={() => setShowEv(!showEv)}
+        style={{ marginTop: 9, fontSize: 11, color: "#2563eb", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
+        {showEv ? "收起证据" : "展开证据数字 ▸"}
+      </button>
+      {showEv && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 8, paddingTop: 8, borderTop: "1px dashed #e2e8f0" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#15803d", marginBottom: 4 }}>正方证据</div>
+            {(p.support || []).map((s) => (
+              <p key={s.claim_id} style={{ margin: "0 0 4px", fontSize: 12, color: "#475569" }}>
+                <b>{s.owner}</b>{s.owner_kind === "project" && <span style={{ color: "#94a3b8" }}>（项目证据）</span>}：{s.excerpt}
+              </p>
+            ))}
+            {!(p.support || []).length && <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>（暂无）</p>}
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#b91c1c", marginBottom: 4 }}>反方证据</div>
+            {(p.oppose || []).map((s) => (
+              <p key={s.claim_id} style={{ margin: "0 0 4px", fontSize: 12, color: "#475569" }}>
+                <b>{s.owner}</b>{s.owner_kind === "project" && <span style={{ color: "#94a3b8" }}>（项目证据）</span>}：{s.excerpt}
+              </p>
+            ))}
+            {!(p.oppose || []).length && <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>（暂无）</p>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PropositionCards({ props: propositions }: { props: RosProposition[] }) {
   if (!propositions.length) return null;
   return (
     <div style={{ marginBottom: 14 }}>
       <div className="globe-synth-h" style={{ marginBottom: 8 }}>群体视角 · 这一簇在争什么命题</div>
       <div style={{ display: "grid", gap: 10 }}>
-        {propositions.map((p) => {
-          const st = STATE_LABEL[p.state || "open"] || STATE_LABEL.open;
-          return (
-            <div key={p.id} style={{ border: "1px solid #e0e7ff", background: "#fafbff", borderRadius: 12, padding: "12px 14px" }}>
-              <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: st.color, background: st.bg, padding: "1px 8px", borderRadius: 20, whiteSpace: "nowrap" }}>{st.label}</span>
-                <b style={{ fontSize: 13.5, color: "#0f172a" }}>{p.statement}</b>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 8 }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#15803d", marginBottom: 4 }}>正方证据</div>
-                  {(p.support || []).map((s) => (
-                    <p key={s.claim_id} style={{ margin: "0 0 4px", fontSize: 12, color: "#475569" }}>
-                      <b>{s.owner}</b>{s.owner_kind === "project" && <span style={{ color: "#94a3b8" }}>（项目证据）</span>}：{s.excerpt}
-                    </p>
-                  ))}
-                  {!(p.support || []).length && <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>（暂无）</p>}
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#b91c1c", marginBottom: 4 }}>反方证据</div>
-                  {(p.oppose || []).map((s) => (
-                    <p key={s.claim_id} style={{ margin: "0 0 4px", fontSize: 12, color: "#475569" }}>
-                      <b>{s.owner}</b>{s.owner_kind === "project" && <span style={{ color: "#94a3b8" }}>（项目证据）</span>}：{s.excerpt}
-                    </p>
-                  ))}
-                  {!(p.oppose || []).length && <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>（暂无）</p>}
-                </div>
-              </div>
-              {p.possible_synthesis && (
-                <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "#0e7490" }}><b>可能的第三条路：</b>{p.possible_synthesis}</p>
-              )}
-            </div>
-          );
-        })}
+        {propositions.map((p) => <PropositionCard key={p.id} p={p} />)}
       </div>
     </div>
   );
@@ -402,8 +445,8 @@ export function MindPalaceGlobe() {
           <div className="eyebrow">Mind Palace · AI 记忆球</div>
           <h1>星图 · 记忆球</h1>
           <p>
-            这是<b>AI 的自我记忆库</b>——只含<b>深读过的文章</b>。每篇被拆成主张/机制/假设/失败模式等可推理对象，
-            按<b>问题域分区</b>固定在球壳上；连线=<b>带证据与边界的对象级关系</b>（淡虚线=同问题底座，彩线=已判定关系，线越粗置信越高）。
+            这是<b>AI 的自我记忆库</b>——只含<b>深读过的文章</b>，按<b>问题域分区</b>固定在球壳上。
+            点开一篇先看人话定位 + 怎么用；连线=<b>一句话说清它们为什么相关</b>（淡虚线=同问题底座，彩线=已判定关系，线越粗越确定，点开看证据）。
             <b>拖动旋转 · 滚轮缩放 · 点一个点</b> → 球让位、面板展开。
           </p>
         </div>

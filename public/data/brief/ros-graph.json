@@ -1,13 +1,141 @@
 {
   "schema": "ros-graph-v1",
-  "generated_at": "2026-06-12T20:28:48.917Z",
+  "generated_at": "2026-06-13T03:21:41.264Z",
   "nodes": [
+    {
+      "id": "paper/2606.05405",
+      "slug": "2606.05405",
+      "kind": "paper",
+      "title": "Agents' Last Exam",
+      "thesis": "主张 benchmark 高分没换来经济产出的落差主要是评测问题（现有 benchmark 不持续测真实经济价值工作流）， 方法是把行业专家已完成的真实项目经五道 QC 门工程化为 task-spec/agent/environment 三组件解耦、 hidden reference + deterministic-first gate-and-score 自动判卷的 1,490 实例 benchmark（55 子领域/13 行业簇，仅 150 公开）， 并在主流 harness×backbone 配置自测中展示最难档（Last-Exam tier）平均 full pass rate 仅 2.6%、 最强配置 Codex+GPT-5.5 整体 26.2%——失败主因归到领域知识/方法选择而非执行器。\n",
+      "human": {
+        "headline": "把行业专家真实交付过的项目做成 1490 道\"能自动判分\"的活体 benchmark，专测 AI agent 干不干得了有经济价值的真实工作。",
+        "plain_summary": "这篇 Agents' Last Exam（ALE）的核心论点是：agent 在各种 benchmark 上拿高分，却没换来真实经济产出——作者认为这主要是\"测错了\"， 现有评测没在持续地测真实、有价值的工作流。他们找了 250 多位行业专家，把他们已经交付过的真实项目（覆盖 55 个数字化子领域） 工程化成可自动跑、自动判分的任务，藏起标准答案、只发原料让 agent 干。结果连最强配置整体也只过 26%，最难那一档平均只过 2.6%（作者自报）。 想做 agent 系统、又苦于\"demo 跑得通但说不准能不能稳定交付真活\"的人，值得想起这套把验收做成可执行契约的思路。\n",
+        "use_type": "directly_usable",
+        "how_to_use": "给自己的系统设计验收门时，把每个任务做成\"真实输入 / 唯一可写的产物目录 / 对系统隐藏的标准答案 / 一段自动判分脚本\"四件套； 判分先过一个二值硬门（文件能不能解析、有没有违反硬约束），不过门直接判 0，过了再算连续质量分。失败时按\"没看懂 / 方法选错 / 执行崩了 / 环境问题\"四类归因，决定该补知识、改策略、修工具还是调环境。\n"
+      },
+      "problems": [
+        "eval.agent-capability",
+        "agent.harness-engineering"
+      ],
+      "concepts": [
+        "eval.deterministic-first-verification",
+        "eval.gate-and-score",
+        "eval.task-agent-env-decoupling",
+        "eval.failure-attribution-taxonomy",
+        "eval.expert-sourced-task-qc"
+      ],
+      "benchmarks": [],
+      "cluster": "eval",
+      "counts": {
+        "claims": 5,
+        "mechanisms": 2,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/2606.05622",
+      "slug": "2606.05622",
+      "kind": "paper",
+      "title": "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model Agents under World and User Constraints",
+      "thesis": "主张现有基准缺少\"世界+用户双约束在交互中渐进披露(progressive disclosure)\"下的自适应重规划评测， 靠\"从多 planner 候选解法反向挖隐藏约束的可扩展构造管线 + 违反才披露(world 优先)的多轮交互协议 + VPR(合规)/Acc(合规且过 rubric 质量门)双层指标\"，在 307 个家务任务 × 10 个主流 LLM 上实测： 最强 GPT-5 也只有 67.75% accuracy，VPR>90% 的模型 Acc<45%（合规≠任务成功）， 显式贴回已披露约束只救合规(VPR+5–15%)救不了任务成功(Acc<3%)。\n",
+      "human": {
+        "headline": "一个评 agent「边做边适应」的家务规划基准——约束藏起来、撞墙才告诉你，看 agent 改不改得过来。",
+        "plain_summary": "现在评 agent 规划大多开局把所有限制一次说清，但真实里需求方/世界的限制是边做边冒出来的。 这篇造了个基准：把世界限制和用户偏好都藏成隐藏档案，agent 每提交一版方案、违反了才披露一条，逼它一轮轮重规划。 最值得记住的一点：它把「合不合规」和「真办成事」拆成两层指标分开报——结果发现有的模型合规率超 90%、任务成功率却不到 45%。 做 agent 系统、尤其想给自己 agent 设计评测的人，这套「合规≠有用」的分层报告思路很值得借。\n",
+        "use_type": "directly_usable",
+        "how_to_use": "落到任何「需求逐步披露、要看 agent 适应能力」的评测或返工流程上。最小可借形态：把验收拆成两层报告—— 一层只看「有没有违反规则」（合规），一层看「产出到底有没有用」（质量门），两层分开报、不让前者冒充后者； 多轮返工时显式保护已经改好的地方，别只盯最新一条反馈。\n"
+      },
+      "problems": [
+        "agent.planning-adaptivity",
+        "eval.agent-capability"
+      ],
+      "concepts": [
+        "eval.violation-triggered-disclosure",
+        "eval.compliance-quality-two-tier",
+        "eval.solution-mined-constraints"
+      ],
+      "benchmarks": [],
+      "cluster": "agent",
+      "counts": {
+        "claims": 8,
+        "mechanisms": 3,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/2606.07297",
+      "slug": "2606.07297",
+      "kind": "paper",
+      "title": "SWE-Explore: Benchmarking How Coding Agents Explore Repositories",
+      "thesis": "主张端到端 pass/fail 基准（SWE-bench 类）遮蔽了\"仓库探索（repository exploration）\"这一关键子能力， 方法是把探索形式化为固定行预算下 K=5 排序区域清单任务、用 ≥2 条独立成功修复轨迹的 read 动作行级交集 （+LLM 精炼+人工审）造 ground truth、沿覆盖×排序×效率三维打分并用受限上下文修复协议反验指标， 在 848 实例/10 语言/203 仓库上实测 14 个 explorer，展示 agentic 探索一档高于经典检索、 文件级定位已强而行级 recall 是真瓶颈、缺上下文比冗余更致命（全部自报）。\n",
+      "human": {
+        "headline": "一个专测「编码 agent 在仓库里翻资料找对地方」这一步的基准——把「找代码」从「改代码」里单拎出来评。",
+        "plain_summary": "现在评编码 agent 大多只看最终 bug 修没修好（通过/不通过），中间「会不会在大仓库里翻到该读的代码」这步被整体遮住了。 这篇把「探索」单独拎出来评：给 agent 一个 issue 和仓库，让它在固定行数预算内交一份排好序的「相关代码区域清单」， 再从覆盖、排序、效率三个角度打分。最值得记住的发现：agent 翻到对文件已经很强了，但真正读全关键行（行级召回）很差； 而且「漏掉关键证据」比「塞了一堆没用的」更致命——所以喂上下文要先保召回、再谈精简。做 agent 检索/记忆系统的人都能用上。\n",
+        "use_type": "directly_usable",
+        "how_to_use": "落到任何「先找资料再干活」的 agent（找相关代码、找相关记忆、检索召回）的评测上。最小可借形态： 录几条成功任务的轨迹、抽出其中「读/查」动作、取多条轨迹的交集当标准答案；让被评系统交一份排序候选清单， 按覆盖/排序/效率打分；喂上下文的策略定为「宁全勿漏，先保召回再压紧凑」。\n"
+      },
+      "problems": [
+        "code.repo-understanding",
+        "eval.agent-capability"
+      ],
+      "concepts": [
+        "eval.trajectory-consensus-ground-truth",
+        "eval.capability-isolation",
+        "eval.metric-downstream-validation"
+      ],
+      "benchmarks": [],
+      "cluster": "code",
+      "counts": {
+        "claims": 6,
+        "mechanisms": 3,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
+      "id": "paper/2606.07591",
+      "slug": "2606.07591",
+      "kind": "paper",
+      "title": "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research",
+      "thesis": "主张「coding agent 能自主做科研」的宣称缺乏可检验的评测、且实测远未达标—— 方法是把 40 道源自真实已发表论文的任务（10 个自然科学学科）做成端到端评测：每题给问题/文献/原始数据、 把目标论文 p* 对系统隐藏（hidden target），用专家拆解的加权可验证 rubric（含 technical keywords）逐项判分， 钉 50 分=复现线（re-discovery）、>50=发现（discovery），并配极简 ReAct 壳 ResearchHarness 让 17 个裸 LLM 与 7 个自主科研 agent 同台—— 在单 judge GPT-5.1 下实测（全部自报）最强 agent Claude Code 仅 21.5、最强裸 LLM Claude-Opus-4.7 仅 20.7， 且 280 次 agent 运行的失败集中于实验协议/证据/科学内核错配，而非工具执行。\n",
+      "human": {
+        "headline": "用 40 篇真实已发表论文当\"藏起来的标准答案\"，专测 coding agent 能不能从原始数据出发自主做出一项端到端科研。",
+        "plain_summary": "这篇 ResearchClawBench（RCBench）针对\"coding agent 能自主做科研\"的宣传，造了一套能检验它的评测：每题给问题、文献和原始数据， 把对应那篇真实论文藏起来当金样，再用专家按金样拆出的加权检查单（每项带要核对的关键词）给 agent 的最终报告逐项打分， 50 分钉为\"复现原论文\"线、超过 50 才算有新发现。实测下来最强 agent（Claude Code）和最强裸模型都只有 20 分出头（作者自报）， 而且失败几乎都集中在\"实验协议、证据、科学内核对不对\"，不是工具跑不动。想给一个产出开放式报告/文本的系统设计评测的人，会想起这套打分法。\n",
+        "use_type": "directly_usable",
+        "how_to_use": "评一个产出开放式报告/文本、没法用精确匹配的系统时：先拿一份人类已经做好的金样，把它藏起来、只发原料让系统重做； 再把金样拆成 5 到 7 个带权重的可核对子项，每项写清判据和要核对的关键词，让判官（大模型）逐项打分而不是打整体印象分，金样钉在刻度中点、上方留出超越空间。判分时明令\"看实质不看排版\"。\n"
+      },
+      "problems": [
+        "eval.agent-capability",
+        "eval.open-ended-output-scoring"
+      ],
+      "concepts": [
+        "eval.hidden-target-rediscovery",
+        "eval.weighted-verifiable-rubric",
+        "agent.minimal-harness-baseline"
+      ],
+      "benchmarks": [],
+      "cluster": "eval",
+      "counts": {
+        "claims": 6,
+        "mechanisms": 3,
+        "trigger_hooks": 3,
+        "exam_questions": 4
+      }
+    },
     {
       "id": "paper/agemem",
       "slug": "agemem",
       "kind": "paper",
       "title": "AgeMem — Learning Unified Long-Term and Short-Term Memory Management for LLM Agents",
       "thesis": "主张「记忆操作应是 agent 策略的一部分而非旁挂存储层」，方法是把六个记忆操作（LTM 的 Add/Update/Delete + STM 的 Retrieve/Summary/Filter）暴露为一等 tool-based policy action 并用三阶段课程 + step-wise GRPO 端到端强化学习训练， 在 ALFWorld/SciWorld/PDDL/BabyAI/HotpotQA 五个长程基准、Qwen2.5-7B 与 Qwen3-4B 两个 backbone 的受控评测上均分超过模块化记忆基线。\n",
+      "human": {
+        "headline": "把『什么时候存/取/改/删记忆』交给 agent 自己用强化学习学，而不是写死成外挂的记忆模块。",
+        "plain_summary": "多数 agent 的记忆是个旁挂的存储层，靠固定规则决定何时保存、何时检索。这篇反过来：把六个记忆操作 （长期记忆的增/改/删 + 短期上下文的取回/压缩/过滤）做成 agent 能自己调用的动作，再用强化学习端到端训练它何时用哪个。 在五个长程任务的受控评测上，分数超过了 Mem0、A-Mem 这类模块化记忆基线。值得记住的点：它把「记忆管理」从工程配置问题 变成了可学习的策略问题，而且消融显示真正提分的是 RL 训练而非那个统一接口本身。\n",
+        "use_type": "design_inspiration",
+        "how_to_use": "最小可借的形态是接口层：把系统里「何时写/取/改/删记忆」的控制决策从写死的 if-else 抽成一组带类型的动作 （Add/Update/Delete/Retrieve/Summary/Filter），先让这些决策显式、可观测、可替换；强化学习那一层等到有可训练模型再说。\n"
+      },
       "problems": [
         "mem.lifecycle-management"
       ],
@@ -30,6 +158,12 @@
       "kind": "paper",
       "title": "KVarN — Variance-Normalized KV-Cache Quantization Mitigates Error Accumulation in Reasoning Tasks",
       "thesis": "主张「KV-Cache 量化的真实负载是自回归解码下的误差跨时间步累积、且罪魁是 token 幅度（scale）被压坏而非方向偏」， 方法是免校准地对每块 K/V 先做 Hadamard 旋转（治通道离群）再做双轴方差归一化（治 token 幅度极端值）后用 RTN 压到 2-bit， 在 Qwen3-4B / Llama-3.1-8B / Phi-4-14B 上、用对齐真实负载的 pseudo-decode 协议评测，于 MATH500/AIME24/HumanEval 等生成式 benchmark 在 2.3 bit/元素同档下取得新 SOTA（均为论文自报，无第三方复现）。\n",
+      "human": {
+        "headline": "把模型推理时的 KV-Cache 压到 2-bit 还几乎不掉分，关键是发现真正坏事的是 token 的『幅度』被压歪、而非方向偏。",
+        "plain_summary": "大模型生成长文本时要缓存中间状态（KV-Cache），很占显存，于是有人把它量化压缩。这篇指出一个被忽略的点： 现有方法在『一次性喂全文』的场景下评测，但真实生成是一个 token 一个 token 往下滚，量化误差会跨步累积， 而累积的元凶是 token 整体幅度被压坏。它的解法是先用 Hadamard 旋转治通道方向上的离群、再沿两个轴做方差归一化治幅度离群， 最后压到 2-bit，且全程免校准。值得记住的不只是这个量化算子，更是两条方法论：评测要对齐真实工作流的累积负载、 以及优化时盯少数极端离群点比盯平均误差更值钱。\n",
+        "use_type": "design_inspiration",
+        "how_to_use": "对不跑推理栈的人，最小可借的是两条方法论：① 设计评测时复现真实工作流里误差/状态如何跨步累积，而不是用静态单次场景一次性度量； ② 优化质量时先救少数最严重的离群点，而非平均地降低整体误差。对跑推理栈的人，量化管线本身可参考。\n"
+      },
       "problems": [
         "infra.kv-cache-compression",
         "infra.quantization-eval-realism"
@@ -53,6 +187,12 @@
       "kind": "paper",
       "title": "LatentSkill — From In-Context Textual Skills to In-Weight Latent Skills for LLM Agents",
       "thesis": "主张「可复用的 agent 技能不必每步以文本进 context，可被编译成权重」，方法是训练一个 hypernetwork（skill compiler）把技能文档 s 一次前向编成可插拔 LoRA 补丁 Δs=Gφ(s)、挂在冻结 backbone 上（θ⊕αΔs）， 在 ALFWorld 与 Search-QA 两类任务、Qwen3-8B 单一 backbone 的作者自报评测上，对同内容 in-context skill 基线提升成功率/EM 且大幅降 prefill token（仓库尚未开源，数字均自报）。\n",
+      "human": {
+        "headline": "把 agent 反复用到的技能从\"每步贴进 prompt 的文本\"改成\"一次编译进权重的可插拔补丁\"，省 token 还更抗 prompt 攻击。",
+        "plain_summary": "做 agent 系统时，常把同一份技能说明/操作规则每一步都塞进上下文，越塞越贵。这篇训练了一个\"技能编译器\"，把技能文档一次性编成一小块可挂载的 LoRA 补丁挂到冻结的模型上，技能原文就不用再进 prompt 了。 作者自报在两类任务上成功率更高、每步 prefill token 砍掉约六成，而且因为技能不在明文里，prompt 级劫持攻击更难直接命中。值得记住的不是这套训练，而是几个设计直觉：能力强度可以是连续旋钮、拼模块要先拆共享部分、什么知识值得固化 vs 留作即查。\n",
+        "use_type": "design_inspiration",
+        "how_to_use": "无可训练模型时搬不了编译本身，但能借两条设计直觉：① 给某个能力/插件配\"强度\"参数时按连续旋钮调（有最佳区间，过强会崩），别当有/无开关； ② 拼多个可复用单元（如多个 prompt 范式）时先拆出共享部分再合并，别整块叠加把共享内容放大两遍。另外一个判断框架：高频复用的知识值得\"固化/结构化\"，一次性的留作即查。\n"
+      },
       "problems": [
         "skill.knowledge-parameterization"
       ],
@@ -76,6 +216,12 @@
       "kind": "paper",
       "title": "LongTraceRL: Learning Long-Context Reasoning from Search Agent Trajectories with Rubric Rewards",
       "thesis": "主张长上下文 RL 的瓶颈一半在「干扰物不够像」、一半在「结果奖励管不到中间推理步」， 方法是用搜索 agent 真实轨迹里「读了却没引用」的文档造可分级的高混淆干扰（traj-tiered distractor）+ 用推理链每跳的黄金实体做实体级过程奖励（rubric reward），并以 positive-only 开关（过程分只发给最终答对者）防 reward hacking， 在 Qwen3-4B/8B/30B 三个推理 backbone、五个长上下文 benchmark 上自报平均分均居首（但绝对增益对 backbone 敏感：4B +5.7、8B 仅 +1.1）。\n",
+      "human": {
+        "headline": "训练长上下文推理时，从 agent 的真实搜索轨迹里捞\"读了却没引用\"的文档当高难度干扰，再给推理每一跳的关键实体打过程分（且只发给最终答对的）。",
+        "plain_summary": "这篇治两个训练痛点：干扰物不够像（一眼能筛掉就测不出真本事）、只看最终结果管不到中间推理步。解法是把 agent 真去搜索时\"看过但没采纳\"的文档拿来当难干扰（天然似是而非、还能按混淆度分级），再按每跳该提到的关键实体给过程分。 最关键的一招叫 positive-only：过程分只发给最终答对的产出，答错的一律零分——否则模型会靠堆关键词刷过程分。对做质量门/评测的人，这两条范式不用 RL 也能借：难负例从自家流程的\"淘汰项\"里捞，过程分只奖励\"先做对\"的产出。\n",
+        "use_type": "design_inspiration",
+        "how_to_use": "无 RL 训练栈时搬不了训练回路，但两条心法可直接落到任何评测/质量门：① 要测一个判别器/质量门是否真靠谱，别用随机负例（一眼筛掉），从自家流程的\"淘汰项/borderline 项\"里捞高混淆难例，并用某个可量化比例给难度分级； ② 给\"过程/中间步质量\"打分时，过程分只发给最终结果已过门的产出，错的一律零分——专治产出靠堆关键词刷过程分。\n"
+      },
       "problems": [
         "train.credit-assignment"
       ],
@@ -99,6 +245,12 @@
       "kind": "paper",
       "title": "MemoryAgentBench: Evaluating Memory in LLM Agents via Incremental Multi-Turn Interactions",
       "thesis": "主张现有\"记忆评测\"实为 long-context 评测（一次性灌全文）而非真记忆评测，靠\"增量逐块喂入 + 每块请记住 + 收走原文后提问\"的协议把二者分开、并沿四个正交能力维度(AR/TTL/LRU/SF)统一打分，在重构七个旧数据集 + 自建两个新数据集(EventQA/FactConsolidation)上实测 long-context / RAG / agentic-memory 三族系统，展示不存在全能记忆系统、且多跳选择性遗忘是全行业系统性盲区(所有方法 ≤7%)。\n",
+      "human": {
+        "headline": "一把专门量『agent 是不是真记住了』的尺子：信息一块块喂进去、把原文收走再提问，逼系统靠自己的记忆答。",
+        "plain_summary": "作者发现现在很多所谓的「记忆评测」其实是在考长上下文——把整篇文章一次性塞进去再提问，测的是会不会翻书而不是记不记得住。 这篇把两者分开：信息按顺序一块块喂、每块都要求记住、读完把原文撤走再考，并沿四条互不替代的能力轴打分 （精确检索 / 边用边学新东西 / 通读超长内容 / 遇到矛盾时覆盖旧记忆）。实测下来没有任何系统四维全能， 而且「多跳的选择性遗忘」全行业准确率都不到 7%，是个系统性盲区。想做 agent 记忆系统的人值得拿它当回归测试的尺子。\n",
+        "use_type": "directly_usable",
+        "how_to_use": "给自己的记忆 / 检索模块当回归测试：照它的『增量逐块喂入 + 收走原文再提问』协议组织测试集， 沿四维（精确检索 / 即时学新 / 长程通读 / 选择性遗忘）分别考核，把「记忆到底有没有变好」从模糊体感变成可回归的分数。\n"
+      },
       "problems": [
         "mem.evaluation",
         "mem.lifecycle-management",
@@ -128,6 +280,12 @@
       "kind": "paper",
       "title": "On the Scaling of PEFT: Towards Million Personal Models of Trillion Parameters",
       "thesis": "主张「PEFT/LoRA 不只是省钱的微调替代，而是长在共享强基座上的持久个人状态（local adaptive state）」， 方法是把问题拆成三根依赖轴——Scale Up（强先验给低秩更新杠杆）/ Scale Down（找低秩仍稳定的操作区间）/ Scale Out（让百万 adapter 可寻址·版本化·回滚·评测·聚合），并配 MinT 生命周期基础设施， 在作者体系内一组自有实验（rank sweep / OLoRA-tail / δ-Mem / LoRA-as-memory 容量律 / majority vote / MinT 工程指标）上展示该范式可行—— 但全篇为 position+synthesis paper，代码未披露、多变量未隔离、关键证据自报。\n",
+      "human": {
+        "headline": "提出把 LoRA/PEFT 当成\"长在共享大模型上的持久个人状态\"，再配一套\"百万个小补丁怎么治理\"的方法论。",
+        "plain_summary": "做 agent 系统、想让它记住用户偏好/习惯/技能时，这篇给了一个架构观点：不要给每个用户复制一份大模型，而是少数强基座 + 海量轻量 adapter，每个 adapter 存这个人反复积累的行为后果。 它最值得记住的是两条判断：① 写入前要分层——一次性事实（日历、文档）留外部存储，只有反复稳定的行为改进才值得固化（因为它实测发现把太多事实硬塞进 adapter 会直接崩）；② 每次状态更新要当成带来源、可评测、可回滚的版本来管，而不是就地覆盖。这两条对任何记忆系统都通用，不限于训练。\n",
+        "use_type": "design_inspiration",
+        "how_to_use": "无可训练模型时搬不了 adapter 训练，但记忆/状态系统能直接借两条：① 写入门——任何记忆系统在写入前先判\"这是一次性事实还是可复用的行为习惯\"，事实留外部、习惯才下沉为稳定策略； ② 治理纪律——每次写入当成带来源（provenance）、可回滚的版本，而不是就地覆盖追不回。再加一条 population 思维：靠多个判断聚合（冷审/投票）而非单体不断自改。\n"
+      },
       "problems": [
         "skill.knowledge-parameterization",
         "train.credit-assignment",
@@ -148,11 +306,48 @@
       }
     },
     {
+      "id": "paper/socrates",
+      "slug": "socrates",
+      "kind": "paper",
+      "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
+      "thesis": "主张开放式多轮 LLM 调解（mediation）评测不可靠的根源在场景覆盖窄、变化轴单一、per-turn 全议题打分累积 off-topic 噪声， 方法是 agentic 场景策展（8 域真实冲突种子）+ 无调解员难题筛选门（3 次重放全僵局才入选）+ 5 根社会认知轴单轴扰动（15 条件） + 议题局部化 LLM evaluator + 反事实 Consensus Gain 三指标，在 40 难场景 × 15 条件 × 8 个 mediator 共 4,800 runs 的全 LLM 仿真上展示 evaluator 专家一致性 r=0.823（per-turn 基线 2 倍以上）且最强 mediator 仅关闭约 1/3 无调解共识缺口 （结果均为论文自报，代码/数据未发布不可复现）。\n",
+      "human": {
+        "headline": "一套让\"多轮开放式对话调解\"评测变可靠的方法论——靠藏起无调解基线、按议题局部打分、一次只动一根扰动轴，治\"评出来的差距其实是评测设计的毛病\"。",
+        "plain_summary": "这篇 SoCRATES 针对的是\"让 LLM 当调解员、再用 LLM 给它打分\"这类开放式多轮评测为什么不可靠：场景太少、变化轴单一、每回合对每个议题都打分会把无关噪声累积进结果。 它的几个做法可以脱离调解领域看：判分时每个维度只在与它真正相关的对话回合上更新、其余时刻保持上次分数； 先跑\"没有调解员\"的反事实基线、且只收三次重放都僵局的难场景，再按剩余改进空间算增益；扰动一次只动一根轴，好看出\"哪根轴把模型弄坏了\"。 想给自己的内容质量门或多维评测设计判分协议、又苦于\"大模型打分忽高忽低、各维分数一起动\"的人，值得想起这套结构性隔离噪声的思路。\n",
+        "use_type": "directly_usable",
+        "how_to_use": "设计开放式/多维度评测的判分协议时：①让每个维度的分数只在跟它真正相关的证据片段上更新，其余片段沿用上次分数，别顺手把整条对话每段都对每个维度打一遍； ②任何\"加了某个干预后好了多少\"的主张，先跑没有这个干预的基线，把基线本来就能过的样本剔出增益统计，增益按剩余改进空间归一化；③把可能让模型崩的因素拆成独立的轴，一次只改一根，读分轴 profile 而不是只看平均分。\n"
+      },
+      "problems": [
+        "eval.agent-capability",
+        "eval.llm-judge-reliability"
+      ],
+      "concepts": [
+        "eval.topic-localized-judging",
+        "eval.counterfactual-no-intervention-baseline",
+        "eval.single-axis-perturbation-profile",
+        "eval.agentic-scenario-curation"
+      ],
+      "benchmarks": [],
+      "cluster": "eval",
+      "counts": {
+        "claims": 7,
+        "mechanisms": 4,
+        "trigger_hooks": 4,
+        "exam_questions": 4
+      }
+    },
+    {
       "id": "paper/tropd",
       "slug": "tropd",
       "kind": "paper",
       "title": "Trust Region On-Policy Distillation",
       "thesis": "主张 on-policy 蒸馏（OPD）的真问题不是「监督太少」而是「师生分布错位下少数 token 的稠密监督太强且不可信」—— 方法是借投机解码接受率 min(π_T/π_S,1) 逐 token 划信任区（可信 token 用省显存的 K1 reverse-KL、离群 token 改用教师 top-k forward-KL 温和回退）+ 老师前缀 cosine 退火的 off-policy guidance—— 在 DeepSeek-1.5B / Qwen3-SFT-1.7B 两组师生、单/多域推理基准上（作者自报、未本机复训）平均较 OPD 提升 +3~6 点，且消融证明「只在离群区用 FKL」（49.85）远胜「全局 FKL」（1.40）。\n",
+      "human": {
+        "headline": "一个大模型在逐 token 教小模型时，先判断\"这一步的监督信不信得过\"，可信的正常学、不可信的降级成温和监督，而不是一刀切。",
+        "plain_summary": "这是一篇模型蒸馏（大模型教小模型）的方法论。它的核心判断很通用：老师给的逐步监督不是天然都可靠的，师生分布错位时少数离谱步骤会把整个训练带偏。 它的应对是给每一步划\"信任区\"——可信步骤照常学，不可信步骤改用更温和的监督而不是直接屏蔽（因为屏蔽会连带丢掉里面仍有用的信息）；起步阶段还用老师示范冷启动，再逐步撤掉脚手架回到自身分布。对做评分/审核流程的人，\"强监督先过可靠度门、温和回退、有界退火\"这套思路即使不训练也能借。\n",
+        "use_type": "background_reference",
+        "how_to_use": "无可训练模型时搬不了概率比尺子和 KL 梯度，但有一条设计心法可对齐评分/审核流程：当一个强模型/critic 给出逐步分数时，别默认每一步同样可信—— 把高信任步骤正常采纳，低信任步骤只给温和建议或示范，而不是统一加权或一刀切丢弃；起步阶段可用强模型示范，再逐步撤掉别养成长期拐杖。\n"
+      },
       "problems": [
         "train.distillation-supervision-reliability"
       ],
@@ -172,11 +367,359 @@
   "edges": [
     {
       "id": "e-0001",
+      "source": "paper/2606.05405",
+      "target": "paper/2606.05622",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 2,
+      "gloss": "Agents' Last Exam 与 AdaPlanBench：同在「agent 能力评测」上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.05405",
+          "target_object": "paper/2606.05622",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        },
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.05405",
+          "target_object": "paper/2606.05622",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.expert-sourced-task-qc is distinct_from/conflicts_with eval.solution-mined-constraints; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0002",
+      "source": "paper/2606.05405",
+      "target": "paper/2606.07297",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "Agents' Last Exam 与 SWE-Explore：都在解同一个问题——agent 能力评测。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.05405",
+          "target_object": "paper/2606.07297",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        }
+      ]
+    },
+    {
+      "id": "e-0003",
+      "source": "paper/2606.05405",
+      "target": "paper/2606.07591",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "Agents' Last Exam 与 ResearchClawBench：都在解同一个问题——agent 能力评测。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.05405",
+          "target_object": "paper/2606.07591",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        }
+      ]
+    },
+    {
+      "id": "e-0004",
+      "source": "paper/2606.05405",
+      "target": "paper/memoryagentbench",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "Agents' Last Exam 与 MemoryAgentBench：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.05405",
+          "target_object": "paper/memoryagentbench",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.task-agent-env-decoupling is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0005",
+      "source": "paper/2606.05405",
+      "target": "paper/socrates",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 2,
+      "gloss": "Agents' Last Exam 与 SoCRATES：同在「agent 能力评测」上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.05405",
+          "target_object": "paper/socrates",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        },
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.05405",
+          "target_object": "paper/socrates",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.expert-sourced-task-qc is distinct_from/conflicts_with eval.agentic-scenario-curation; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0006",
+      "source": "paper/2606.05622",
+      "target": "paper/2606.07297",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "AdaPlanBench 与 SWE-Explore：都在解同一个问题——agent 能力评测。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.05622",
+          "target_object": "paper/2606.07297",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        }
+      ]
+    },
+    {
+      "id": "e-0007",
+      "source": "paper/2606.05622",
+      "target": "paper/2606.07591",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "AdaPlanBench 与 ResearchClawBench：都在解同一个问题——agent 能力评测。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.05622",
+          "target_object": "paper/2606.07591",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        }
+      ]
+    },
+    {
+      "id": "e-0008",
+      "source": "paper/2606.05622",
+      "target": "paper/longtracerl",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "AdaPlanBench 与 LongTraceRL：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.05622",
+          "target_object": "paper/longtracerl",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.solution-mined-constraints is distinct_from/conflicts_with data.trajectory-mined-hard-distractor; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0009",
+      "source": "paper/2606.05622",
+      "target": "paper/memoryagentbench",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "AdaPlanBench 与 MemoryAgentBench：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.05622",
+          "target_object": "paper/memoryagentbench",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.violation-triggered-disclosure is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0010",
+      "source": "paper/2606.05622",
+      "target": "paper/socrates",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 2,
+      "gloss": "AdaPlanBench 与 SoCRATES：同在「agent 能力评测」上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.05622",
+          "target_object": "paper/socrates",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        },
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.05622",
+          "target_object": "paper/socrates",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.solution-mined-constraints is distinct_from/conflicts_with eval.agentic-scenario-curation; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0011",
+      "source": "paper/2606.07297",
+      "target": "paper/2606.07591",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "SWE-Explore 与 ResearchClawBench：都在解同一个问题——agent 能力评测。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.07297",
+          "target_object": "paper/2606.07591",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        }
+      ]
+    },
+    {
+      "id": "e-0012",
+      "source": "paper/2606.07297",
+      "target": "paper/longtracerl",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "SWE-Explore 与 LongTraceRL：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.07297",
+          "target_object": "paper/longtracerl",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.trajectory-consensus-ground-truth is distinct_from/conflicts_with data.trajectory-mined-hard-distractor; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0013",
+      "source": "paper/2606.07297",
+      "target": "paper/memoryagentbench",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "SWE-Explore 与 MemoryAgentBench：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.07297",
+          "target_object": "paper/memoryagentbench",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.capability-isolation is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0014",
+      "source": "paper/2606.07297",
+      "target": "paper/socrates",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "SWE-Explore 与 SoCRATES：都在解同一个问题——agent 能力评测。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.07297",
+          "target_object": "paper/socrates",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        }
+      ]
+    },
+    {
+      "id": "e-0015",
+      "source": "paper/2606.07591",
+      "target": "paper/memoryagentbench",
+      "primary_type": "tension_with",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "ResearchClawBench 与 MemoryAgentBench：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
+      "relations": [
+        {
+          "relation_type": "tension_with",
+          "source_object": "paper/2606.07591",
+          "target_object": "paper/memoryagentbench",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "Candidate only; concept-level conflict plus hints must be checked against source anchors.",
+          "reason": "conflicts_assumption: eval.hidden-target-rediscovery is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+        }
+      ]
+    },
+    {
+      "id": "e-0016",
+      "source": "paper/2606.07591",
+      "target": "paper/socrates",
+      "primary_type": "shares_problem",
+      "confidence": "medium",
+      "count": 1,
+      "gloss": "ResearchClawBench 与 SoCRATES：都在解同一个问题——agent 能力评测。",
+      "relations": [
+        {
+          "relation_type": "shares_problem",
+          "source_object": "paper/2606.07591",
+          "target_object": "paper/socrates",
+          "confidence": "medium",
+          "derived_by": "structural_join",
+          "boundary": "",
+          "reason": "shares_problem: both objects attach to eval.agent-capability"
+        }
+      ]
+    },
+    {
+      "id": "e-0017",
       "source": "paper/agemem",
       "target": "paper/longtracerl",
       "primary_type": "tension_with",
       "confidence": "medium",
       "count": 1,
+      "gloss": "AgeMem 与 LongTraceRL：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
       "relations": [
         {
           "relation_type": "tension_with",
@@ -190,12 +733,13 @@
       ]
     },
     {
-      "id": "e-0002",
+      "id": "e-0018",
       "source": "paper/agemem",
       "target": "paper/memoryagentbench",
       "primary_type": "complements",
       "confidence": "medium",
       "count": 2,
+      "gloss": "AgeMem 与 MemoryAgentBench 互补，可组合使用。",
       "relations": [
         {
           "relation_type": "complements",
@@ -218,12 +762,13 @@
       ]
     },
     {
-      "id": "e-0003",
+      "id": "e-0019",
       "source": "paper/agemem",
       "target": "paper/scaling",
       "primary_type": "shares_problem",
       "confidence": "medium",
       "count": 1,
+      "gloss": "AgeMem 与 On the Scaling of PEFT：都在解同一个问题——记忆生命周期管理。",
       "relations": [
         {
           "relation_type": "shares_problem",
@@ -237,12 +782,13 @@
       ]
     },
     {
-      "id": "e-0004",
+      "id": "e-0020",
       "source": "paper/agemem",
       "target": "paper/tropd",
       "primary_type": "tension_with",
       "confidence": "medium",
       "count": 1,
+      "gloss": "AgeMem 与 Trust Region On-Policy Distillation：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
       "relations": [
         {
           "relation_type": "tension_with",
@@ -256,12 +802,13 @@
       ]
     },
     {
-      "id": "e-0005",
+      "id": "e-0021",
       "source": "paper/latentskill",
       "target": "paper/memoryagentbench",
       "primary_type": "tension_with",
       "confidence": "medium",
       "count": 1,
+      "gloss": "LatentSkill 与 MemoryAgentBench：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
       "relations": [
         {
           "relation_type": "tension_with",
@@ -275,12 +822,13 @@
       ]
     },
     {
-      "id": "e-0006",
+      "id": "e-0022",
       "source": "paper/latentskill",
       "target": "paper/scaling",
       "primary_type": "shares_problem",
       "confidence": "medium",
       "count": 1,
+      "gloss": "LatentSkill 与 On the Scaling of PEFT：都在解同一个问题——知识/技能参数化。",
       "relations": [
         {
           "relation_type": "shares_problem",
@@ -294,12 +842,13 @@
       ]
     },
     {
-      "id": "e-0007",
+      "id": "e-0023",
       "source": "paper/longtracerl",
       "target": "paper/scaling",
       "primary_type": "shares_problem",
       "confidence": "medium",
       "count": 1,
+      "gloss": "LongTraceRL 与 On the Scaling of PEFT：都在解同一个问题——长轨迹信用分配。",
       "relations": [
         {
           "relation_type": "shares_problem",
@@ -313,12 +862,13 @@
       ]
     },
     {
-      "id": "e-0008",
+      "id": "e-0024",
       "source": "paper/longtracerl",
       "target": "paper/tropd",
       "primary_type": "tension_with",
       "confidence": "medium",
       "count": 1,
+      "gloss": "LongTraceRL 与 Trust Region On-Policy Distillation：在关键假设上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
       "relations": [
         {
           "relation_type": "tension_with",
@@ -332,12 +882,13 @@
       ]
     },
     {
-      "id": "e-0009",
+      "id": "e-0025",
       "source": "paper/memoryagentbench",
       "target": "paper/scaling",
       "primary_type": "tension_with",
       "confidence": "medium",
       "count": 2,
+      "gloss": "MemoryAgentBench 与 On the Scaling of PEFT：同在「记忆生命周期管理」上路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。",
       "relations": [
         {
           "relation_type": "shares_problem",
@@ -366,6 +917,18 @@
       "statement": "长期 agent 的记忆管理应从固定规则转向可学习策略",
       "state": "leaning-support",
       "cluster": "mem",
+      "human": {
+        "current_judgment": "证据偏向「该走可学习策略」，但还不是定论。",
+        "why": [
+          "AgeMem 把记忆操作折进 agent 自身策略并用强化学习训练，在两个模型、五个长程任务上的均分都超过最强的模块化记忆基线。",
+          "去掉强化学习这一阶段后性能明显回落（作者自报降约 8–9 个百分点），说明真正承重的是「学习」而不是接口本身。",
+          "但固定规则路线在纯检索维度仍能打：一个零训练的三路融合系统自报检索命中率 95%+，且规则式有可控、低成本、可解释的天然优势。"
+        ],
+        "strongest_for": "AgeMem——学习式记忆策略在五个长程任务上均分胜过最强模块化基线，消融还证明收益来自训练而非接口。",
+        "strongest_against": "一个零训练的固定规则检索系统自报 LongMemEval-S 命中率 95.2%，说明检索这一维规则式仍可竞争。",
+        "third_way": "混合控制器——规则层守安全边界与可解释性，学习层管动态优化；先把「何时存/改/删」做成可调用的 typed 动作（不训练也能用，未来再挂学习层）。",
+        "for_you": "想做长期记忆 agent，别一上来就上强化学习——先把记忆操作做成显式可调用的动作，留好以后接学习层的接口。"
+      },
       "possible_synthesis": "hybrid controller——规则层管安全边界与可解释性，学习层管动态优化；先落 typed memory action 接口（不训练也能用，未来可挂学习层）",
       "support": [
         {
@@ -401,6 +964,18 @@
       "statement": "记忆应逐字本地保留原始记录，而非云端抽取压缩",
       "state": "open",
       "cluster": "mem",
+      "human": {
+        "current_judgment": "尚无定论；更可能是分层混合，而不是二选一。",
+        "why": [
+          "逐字本地派：MemPalace 坚持原始记录逐字保留，自报不靠大模型也能拿到 96%+ 的检索命中。",
+          "抽取压缩派：supermemory / MemoryAgentBench 认为记忆本质是「随时间追踪、压缩蒸馏的事实」，旧事实该被新事实覆盖。",
+          "但实读 MemPalace 自己的索引层其实也是有损摘要——「纯逐字」立场在工程上并不真的存在。"
+        ],
+        "strongest_for": "MemPalace——逐字 + 本地、全程不调大模型，自报检索命中率 96.6%，证明保真不必牺牲检索。",
+        "strongest_against": "supermemory / MemoryAgentBench——把记忆定义为可压缩蒸馏、可覆盖旧事实的有状态层，而非逐字仓库。",
+        "third_way": "分层——逐字层保真可追溯 + 有损索引层负责导航 + 版本链管理事实演化（这正是 MemPalace 的实际架构）。",
+        "for_you": "存会议/对话记忆时，原始记录逐字留底（可追溯），上面再叠一个可更新的索引/摘要层做检索和事实演化，别只存其中一种。"
+      },
       "possible_synthesis": "分层混合——逐字层保真可追溯 + 有损索引层导航（mempalace 实际架构）+ 版本链 supersede 管理事实演化（supermemory.c2 的数据契约可借）",
       "support": [
         {
@@ -436,6 +1011,18 @@
       "statement": "agent 的个人状态/技能应存进模型参数（PEFT/LoRA），而非外部记忆库",
       "state": "open",
       "cluster": "skill",
+      "human": {
+        "current_judgment": "尚无定论；更合理的方向是按知识类型分型混合，而非一刀切。",
+        "why": [
+          "参数派：LatentSkill 把高频技能编译进 LoRA 权重，自报任务表现升、token 开销大降。",
+          "但同一条路线的内部反证：PEFT 容量律显示把「事实」硬塞进低秩参数会容量崩塌。",
+          "外部派：纯外部逐字 + 本地嵌入就能自报 96%+ 的检索命中，根本不必动参数。"
+        ],
+        "strongest_for": "LatentSkill——把高频流程技能从「每次塞进上下文」改成编译进权重，自报降 token、提特定任务表现。",
+        "strongest_against": "PEFT 容量律——事实性内容塞进参数有容量上限会崩塌；外部记忆在事实检索上更低成本、更可追溯。",
+        "third_way": "分型——技能/行为这类过程性知识可进参数，事实/记录这类陈述性知识留外部检索，用知识类型决定存哪。",
+        "for_you": "别把会议事实塞进权重；高频「处理流程」（如怎么提取行动项）可先做成模块化 skill、未来再考虑参数化，事实始终留外部。"
+      },
       "possible_synthesis": "分型混合——技能/行为进参数（weight-space skill），事实/记录留外部检索（verbatim/fact-graph），以知识类型路由介质",
       "support": [
         {
@@ -471,6 +1058,7 @@
       "statement": "记忆系统的价值不能用检索命中率衡量，必须用生命周期能力与端到端任务收益衡量",
       "state": "leaning-support",
       "cluster": "mem",
+      "human": null,
       "possible_synthesis": "检索命中率=必要非充分——例行回归用 R@k（便宜），季度体检叠加生命周期维度（SF/TTL/LRU）与端到端任务样本",
       "support": [
         {

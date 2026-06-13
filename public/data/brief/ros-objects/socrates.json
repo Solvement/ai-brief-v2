@@ -1,0 +1,483 @@
+{
+  "assumptions": [
+    {
+      "anchor": "",
+      "conflicts_hint": "与「agent 评测须含真实用户/真实后果」类假设互斥；论文 Limitations 自承 satisfaction/trust/emotional repair 等真人维度未验证——persona fidelity 87.2% 只验证了「LLM 演得像设定的 persona」，不是「像真人」。",
+      "id": "socrates.a1",
+      "kind": "implicit",
+      "statement": "全 LLM 仿真闭环（disputants、mediator、evaluator 三方全是 LLM）测得的调解能力差异，能代理真实人类纠纷场景中的调解行为差异。"
+    },
+    {
+      "anchor": "§4 / Appendix F.2（two expert annotators, 1,844 snippets, alpha=0.86；督导为有谈判/外交训练的 researcher）",
+      "conflicts_hint": "若「专家」定义提高为职业 mediator，r=0.823 的对齐天花板可能移动——与「LLM judge 对齐人类=对齐哪类人类」的评测假设张力。",
+      "id": "socrates.a2",
+      "kind": "explicit",
+      "statement": "评估器对齐验证的 ground truth = 两位受监督 rubric 的 graduate annotators（非职业调解员），其判断足以代表「专家」。"
+    },
+    {
+      "anchor": "Limitations: \"mediation quality also involves party satisfaction ... procedural fairness, trust restoration, and emotional repair ... We leave these extensions as future work.\"",
+      "conflicts_hint": "与「调解质量本质多维」的立场张力——一个会压着弱势方快速「达成共识」的 mediator 在本尺上得高分。",
+      "id": "socrates.a3",
+      "kind": "explicit",
+      "statement": "consensus（共识）是调解质量的主要可测结果；party satisfaction、procedural fairness、trust restoration、emotional repair 可以暂时排除在指标外。"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "与「轴间存在交互效应」（如情绪 × 文化 × 多方同时在场）互斥——benchmark 设计上从不叠加轴，交互项天然测不到。",
+      "id": "socrates.a4",
+      "kind": "implicit",
+      "statement": "单轴扰动足以表征真实冲突的复杂度——分轴 profile 的并集近似多轴同时变化时的行为。"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "eval.topic-localized-judging",
+      "eval.counterfactual-no-intervention-baseline",
+      "eval.single-axis-perturbation-profile",
+      "eval.agentic-scenario-curation"
+    ],
+    "problems": [
+      "eval.agent-capability",
+      "eval.llm-judge-reliability"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明这三条是 LLM judge 不可靠的全部根源——本篇只对「off-topic 噪声」一条给了量化消融（per-turn vs localized 的专家相关性差距），覆盖与变化轴两条是论证性主张。",
+        "不能证明 per-turn 协议在所有评测领域都失效——证据只来自调解域的 ProMediate 对照。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "Abstract 逐字陈述（WebFetch 核对），为全篇设计出发点；但属作者对领域现状的诊断，非实验事实。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "Existing testbeds rely on a few expert-authored domains, vary mainly strategic posture, and score every turn against every topic, introducing off-topic noise.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§1 Introduction",
+          "quote": "scenario coverage does not scale, as real disputes carry privacy and legal sensitivity",
+          "strength": "medium"
+        }
+      ],
+      "id": "socrates.c1",
+      "statement": "现有 LLM mediator 评测有三个结构性缺陷：①场景靠少量专家手写域、覆盖不可扩展（真实纠纷有隐私/法律敏感性）； ②变化轴单一，主要只改战略姿态（strategic posture）；③per-turn 评分协议每回合对每个议题都打分， 把 off-topic 噪声累积进结果——评出的差距反映评测设计缺陷而非调解能力。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 0.823 的对齐对所有冲突类型/语言成立——标注样本来自本篇自有英语轨迹分布，且标注者为受监督 rubric 的 graduate annotators 而非职业调解员（见 a2）。",
+        "不能证明 topic-localized judge 在时间敏感指标上同样可靠——Timeliness 换 backbone 后排名 Spearman rho 仅 0.406（见 c6/f1）。",
+        "代码/数据未发布，相关性数字无法独立复算。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "Abstract 与 Table 2 数字经 arxiv HTML 逐字核对、且有 backbone 替换的内部鲁棒性检查；置信扣分项=自报不可复现。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "The evaluator reaches 0.82 alignment with human experts, more than doubling a per-turn baseline.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4 Table 2",
+          "quote": "SoCRATES trajectory-level r=0.823 / outcome-level r=0.801; ProMediate 0.372/0.432; Non-expert 0.331/0.527",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4 / Appendix F.2",
+          "quote": "two expert annotators rate 1,844 snippets from 144 mediator trajectories",
+          "strength": "medium"
+        },
+        {
+          "anchor": "Appendix F.2 Backbone Robustness",
+          "quote": "SoCRATES 0.785/0.721 vs ProMediate 0.423/0.394 (Qwen3-235B evaluator backbone)",
+          "strength": "medium"
+        }
+      ],
+      "id": "socrates.c2",
+      "statement": "议题局部化 evaluator 与人类专家的一致性达 trajectory-level Pearson r=0.823 / outcome-level r=0.801， 是 per-turn 基线（ProMediate 0.372/0.432）的 2 倍以上，也远高于 non-expert 基线（0.331/0.527）； 把 evaluator backbone 从 DeepSeek-V3.2 换成 Qwen3-235B 后仍保持 0.785/0.721（ProMediate 同条件 0.423/0.394）。 ground truth 来自两位标注者对 144 条 mediator 轨迹的 1,844 个片段标注，标注者间一致性 alpha=0.86。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明「LLM 调解能力差」在真人场景成立——disputants/mediator/evaluator 全是 LLM，仿真闭环（a1）。",
+        "不能证明 34.4 是模型能力上限——mediator 只用统一 prompt 协议，未做 mediation 专门微调或复杂 scaffolding。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "Abstract 结论句 + Table 3 数字逐字核对；自报、不可复现，但内部多次重跑排名稳定（c6）支撑读数。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "even the strongest mediator closes only about a third of the unmediated consensus gap under diverse and realistic testbeds",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§5 Table 3",
+          "quote": "GPT-5.4-mini Consensus Gain 34.4; All-mediator avg. 25.9",
+          "strength": "strong"
+        }
+      ],
+      "id": "socrates.c3",
+      "statement": "8 个前沿 LLM mediator（每个 40 场景 × 15 条件 = 600 runs，共 4,800 mediated runs + 配对无调解基线）中， 最强的 GPT-5.4-mini Consensus Gain 也只有 34.4——即只关闭约三分之一的无调解共识缺口（全 mediator 平均 25.9）。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明因果方向（频繁插话导致低增益 vs 弱模型既乱插话又调解差）——这是观察相关，无干预实验。",
+        "不能直接外推到其他 agent 域的「干预频率 vs 增益」关系——量化反例只在调解仿真里成立。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "附录两句结论 + Table 3 数字逐字核对；错位模式在两个模型上一致出现。",
+      "evidence": [
+        {
+          "anchor": "Appendix H.1 Intervention Analysis",
+          "quote": "Solar-Pro-3 and Qwen3-30B intervene roughly twice as often as the top mediators and begin speaking much earlier in the conversation.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Appendix H.1",
+          "quote": "This over-eager speaking inflates intervention timeliness without translating into intervention effectiveness or consensus gain, suggesting that early and frequent intervention does not substitute for substantive contribution to social conflict resolution.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§5 Table 3",
+          "quote": "Solar-Pro-3 Timeliness 84.6 / Consensus Gain 19.9; Qwen3-30B Timeliness 84.6 / Consensus Gain 15.7",
+          "strength": "strong"
+        }
+      ],
+      "id": "socrates.c4",
+      "statement": "Timeliness 与 Consensus Gain 系统性错位：Timeliness 最高的 Solar-Pro-3 和 Qwen3-30B（均 84.6） Consensus Gain 反而垫底（19.9 / 15.7），二者插话频率约为头部 mediator 的两倍（32.3% / 31.1%）且开口更早—— 频繁早插话抬高「及时性」读数，但不转化为推动共识的有效性（勤快 ≠ 有效）。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明域差来自「域本身难度」而非场景策展在各域的难度门校准差异——hard-task gate 的难度是相对同一 party simulator 的（f3）。",
+        "每域只 5 个场景，域级结论的样本量小。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文结论句 + 域表数字逐字核对；但域级样本窄（5 场景/域）故解释强度有限。",
+      "evidence": [
+        {
+          "anchor": "§5.1",
+          "quote": "A benchmark restricted to transactional conflict overstates mediation ability, making it essential to evaluate how mediators adapt across diverse conflict domains.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§5 Table 3 (domain-wise)",
+          "quote": "all-mediator avg. Consensus Gain: Transactional 41.3 / Intra-organizational 16.6; GPT-5.4-mini 55.6/23.6; Qwen3-30B -7.9/48.6",
+          "strength": "strong"
+        }
+      ],
+      "id": "socrates.c5",
+      "statement": "调解难度强烈依赖冲突域：全 mediator 平均 Consensus Gain 从 Transactional 41.3 跌到 Intra-organizational 16.6（约 2.5×）， 且单模型域排序会翻转（GPT-5.4-mini Transactional 55.6 / Healthcare 23.6，Qwen3-30B Transactional -7.9 / Healthcare 48.6）—— 只测 transactional 域的 benchmark 会高估调解能力。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明跨「party simulator backbone」的稳定性同样好——多次重跑与 backbone 检查均以 DeepSeek-V3.2 party simulator 为底座。",
+        "不能证明 Timeliness 的不稳定只来自相关回合定位——也可能含 drop-event 检测阈值（tau=0.1）的敏感性。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "数字经逐字核对且作者诚实自报了弱项（rho=0.406），但稳定性检查范围有限（仅 general condition、仅换 evaluator）。",
+      "evidence": [
+        {
+          "anchor": "Appendix H.2 Benchmark Stability",
+          "quote": "the three runs yield a Kendall's W of 0.929, indicating strong agreement on the relative ordering of the eight mediators.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Appendix H.2",
+          "quote": "Six of the eight mediators stay within a half-range of ±3 points across runs.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Appendix H.2 (evaluator backbone swap)",
+          "quote": "Spearman rho: Timeliness 0.406 / Effectiveness 0.862 / Consensus Gain 0.786",
+          "strength": "medium"
+        }
+      ],
+      "id": "socrates.c6",
+      "statement": "benchmark 读数的稳定性分指标不均匀：重复 3 次 general-condition runs 后 8 个 mediator 的排名 Kendall's W = 0.929、 6/8 个 mediator 跨 run half-range ≤ ±3 分；但换 evaluator backbone 后排名稳定性 Effectiveness Spearman rho=0.862、 Consensus Gain 0.786，Timeliness 仅 0.406——「相关回合定位」这步对及时性读数影响大，Timeliness 是三指标中最脆的。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能据此推断作者不会发布或结果有问题——只是当前不可复现的状态记录。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "本轮（2026-06-12）WebFetch 项目页直接核实，属本站自验事实而非论文自报。",
+      "evidence": [
+        {
+          "anchor": "project page https://disl-lab.github.io/SoCRATES/",
+          "quote": "Code (GitHub) ... Coming soon! / SoCRATES (HuggingFace) ... Coming soon!",
+          "strength": "strong"
+        }
+      ],
+      "id": "socrates.c7",
+      "statement": "截至 2026-06-12，SoCRATES 的代码（GitHub）与数据集（HuggingFace）在项目页均标注 \"Coming soon!\"， 论文全部实验结果可读不可复跑——任何依赖其实现细节的主张都不可验证。\n",
+      "type": "fact"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "「本来就会和解」的场景进入评测集，S_unmed 升高，缺口 (1 - S_unmed) 变小",
+        "归一化分母趋近 0 使读数不稳定/爆炸，且 mediator 在自解场景上躺赢假增益",
+        "几乎不干预、只在容易场景跟着走的 mediator 被高估——反事实基线失去「缺口真实存在」的前提",
+        "这正是 c1 批判的旧评测缺陷之一（无反事实参照）的回归"
+      ],
+      "q": "如果去掉难题筛选门（不再要求 3 次无调解重放全部僵局），其余设计不变，Consensus Gain 这个指标会发生什么？哪类 mediator 会被系统性高估？",
+      "tested_objects": [
+        "socrates.m2",
+        "socrates.c3"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "支持：远超 per-turn（0.372）与 non-expert（0.331），且换 backbone 仍 0.785——协议本身贡献大于某个模型的巧合",
+        "排除不了：ground truth 是 graduate annotators 非职业调解员（a2），「对齐专家」的专家定义有限",
+        "排除不了：标注分布=本篇自有英语轨迹，跨语言/跨冲突类型未测；Timeliness 维仍 backbone 脆弱（c6/f1）",
+        "排除不了：代码/数据未发布（c7），相关性数字本身无法独立复算"
+      ],
+      "q": "evaluator 与专家相关 r=0.823 能把「topic-localized judge 可靠」证明到什么程度？哪些反驳是它排除不了的？",
+      "tested_objects": [
+        "socrates.c2",
+        "socrates.a2",
+        "socrates.c6",
+        "socrates.c7"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "反事实基线：任何「加了 agent/改了流程 +X%」的主张先跑无干预基线，基线本来能过的样本剔出增益统计（m2 reusable_pattern）",
+        "单轴扰动：按上下文长度/领域/信息密度等独立轴分别变化测分析模块，读分轴 profile 而非平均分（m3）",
+        "局部化评分：冷审各维度（事实准确/推理质量/文风）只在相关段落上独立更新，不顺手串联打分（m1）——per-turn vs localized 差 2 倍的根因",
+        "不该搬：LLM 调解仿真本体（领域无关、代码未发布）；以及记住难度门相对基线配置（f3）、活跃度指标单独引用不可靠（f1）"
+      ],
+      "q": "把 SoCRATES 的三件套（反事实基线门/单轴扰动 profile/局部化评分）迁移到一个内容质量冷审门（如 AI-Brief 的深读审计），各自怎么落地、哪些部分明确不该搬？",
+      "tested_objects": [
+        "socrates.m1",
+        "socrates.m2",
+        "socrates.m3",
+        "socrates.f3"
+      ],
+      "type": "transfer"
+    },
+    {
+      "expected_points": [
+        "不成立——全 LLM 仿真闭环（a1/f4），真人策略/信任/法律风险未进入验证路径",
+        "consensus-only 目标（a3）：压着弱势方快速达成共识也得高分，satisfaction/fairness 未测",
+        "域排序会翻转（c5）：GPT-5.4-mini Healthcare 仅 23.6、低于 Qwen3-30B 的 48.6——「第一」是跨域平均，不是处处第一",
+        "需补：真人受试/真实后果的对照实验、目标部署域的分域读数、多语场景、以及代码发布后的独立复现"
+      ],
+      "q": "根据 leaderboard，GPT-5.4-mini Consensus Gain 34.4 排第一。据此推断「GPT-5.4-mini 是当前最适合部署做真实纠纷调解的模型」是否成立？需要补什么证据才有资格下这个判断？",
+      "tested_objects": [
+        "socrates.c3",
+        "socrates.c5",
+        "socrates.a1",
+        "socrates.a3",
+        "socrates.f4"
+      ],
+      "type": "boundary"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "排名 Spearman rho 仅 0.406（Effectiveness 0.862 / Consensus Gain 0.786）——基于 Timeliness 的结论换把尺就翻，三指标中只有它不该单独引用。",
+      "id": "socrates.f1",
+      "statement": "Timeliness 读数对 judge 的「相关回合定位」高度敏感，跨 evaluator backbone 不可移植。",
+      "triggered_when": "换 evaluator backbone，或把 Timeliness 当主排名指标比较 mediator。"
+    },
+    {
+      "consequence": "同族偏好或相关误差可能系统性抬高/压低某些 mediator 读数，无法被现有检查完全排除。",
+      "id": "socrates.f2",
+      "statement": "同一模型（DeepSeek-V3.2）身兼 party simulator 与主 evaluator，测量回路存在耦合。",
+      "triggered_when": "鲁棒性检查只换了 evaluator backbone（Qwen3-235B），未对 simulator × evaluator 全组合重跑；且 DeepSeek-V3.2 同时还是被测 mediator 之一。"
+    },
+    {
+      "consequence": "「3 次全僵局」的场景集合随 simulator 漂移，反事实缺口（1 - S_unmed）大小改变，Consensus Gain 跨配置不可直比。",
+      "id": "socrates.f3",
+      "statement": "难题门的「难」是相对特定基线仿真配置的，不是场景的内在属性。",
+      "triggered_when": "换 party simulator backbone、改僵局判据，或把 40 个 hard scenarios 迁去别的仿真配置复用。"
+    },
+    {
+      "consequence": "真实人的策略变化、信任、法律风险、情绪创伤未进入任何验证路径（a1）；英语单语 + Hofstede profile 注入的文化轴也不覆盖多语调解——外推无依据。",
+      "id": "socrates.f4",
+      "statement": "仿真 leaderboard 被外部读者当成真人调解能力证据。",
+      "triggered_when": "用 Consensus Gain 数字为「LLM 可以调解真实纠纷」的产品/部署决策背书。"
+    }
+  ],
+  "human": {
+    "can_borrow": [
+      "评分的每个维度只在与它真正相关的证据单元上更新、其余时刻保持原值，从结构上把无关噪声隔离掉，而不是靠提示词嘱咐判官\"别被无关内容影响\"。",
+      "任何\"加了 X 之后 +N%\"的主张，先跑无 X 的基线，把基线本来就能成的样本剔掉，增益按剩余空间归一化——否则可能是任务本来就会到那里。",
+      "能力测试别只报平均分——把可能触发退化的因素拆成独立轴、一次只动一根，让\"哪根轴弄坏了模型\"能直接读出来。",
+      "把\"勤快\"和\"有效\"拆成两个独立指标分开测：本篇里插话最频繁、响应最快的两个模型，推动共识的增益反而垫底。"
+    ],
+    "cannot_borrow": [
+      "不能搬 LLM 调解仿真这个领域本体——它领域无关性差，且代码/数据至今未发布。",
+      "难度门里的\"难\"是相对某套基线仿真配置的，不是场景内在属性；换了底座模型或环境，旧的增益数字不可直接比。",
+      "像\"及时性/干预频率\"这类活跃度指标跨判官最不稳，不能单独引用，必须和结果增益指标分开报告。"
+    ],
+    "headline": "一套让\"多轮开放式对话调解\"评测变可靠的方法论——靠藏起无调解基线、按议题局部打分、一次只动一根扰动轴，治\"评出来的差距其实是评测设计的毛病\"。",
+    "how_to_use": "设计开放式/多维度评测的判分协议时：①让每个维度的分数只在跟它真正相关的证据片段上更新，其余片段沿用上次分数，别顺手把整条对话每段都对每个维度打一遍； ②任何\"加了某个干预后好了多少\"的主张，先跑没有这个干预的基线，把基线本来就能过的样本剔出增益统计，增益按剩余改进空间归一化；③把可能让模型崩的因素拆成独立的轴，一次只改一根，读分轴 profile 而不是只看平均分。\n",
+    "maturity": "全部结果为作者自报，且代码与数据集（GitHub/HuggingFace）截至 2026-06-12 仍标注 Coming soon，论文可读但不可复跑。方法论本身门槛低、不需自有可训练模型，但其有效性数字目前无法独立复现。",
+    "plain_summary": "这篇 SoCRATES 针对的是\"让 LLM 当调解员、再用 LLM 给它打分\"这类开放式多轮评测为什么不可靠：场景太少、变化轴单一、每回合对每个议题都打分会把无关噪声累积进结果。 它的几个做法可以脱离调解领域看：判分时每个维度只在与它真正相关的对话回合上更新、其余时刻保持上次分数； 先跑\"没有调解员\"的反事实基线、且只收三次重放都僵局的难场景，再按剩余改进空间算增益；扰动一次只动一根轴，好看出\"哪根轴把模型弄坏了\"。 想给自己的内容质量门或多维评测设计判分协议、又苦于\"大模型打分忽高忽低、各维分数一起动\"的人，值得想起这套结构性隔离噪声的思路。\n",
+    "use_type": "directly_usable",
+    "use_type_reason": "它给的三件套（局部化打分协议 / 反事实基线门 / 单轴扰动 profile）是可直接迁到任意多维多轮评测的打分协议，跟调解领域本身解耦；只有领域本体（LLM 调解仿真）不可搬。"
+  },
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§3.4.2: \"For each topic ... the judge reads the dialogue once and locates the turns where [the topic] is actively in play, those at which it is discussed or a party shifts position ... turns that do not touch [the topic] inherit the prior score.\"",
+      "canonical_concept": "eval.topic-localized-judging",
+      "id": "socrates.m1",
+      "input": "完整多轮调解对话 + 该场景的争议议题列表（每议题独立评）",
+      "name": "议题局部化评估器（topic-localized evaluator）",
+      "non_replaceable": [
+        "先定位相关回合再打分（relevance localization）",
+        "不相关回合 carry forward 不更新",
+        "每议题独立评分轨迹"
+      ],
+      "operations": [
+        "对每个议题，judge 通读一遍完整对话",
+        "定位该议题「真正在场」的回合——被实质讨论或某方立场变化的回合",
+        "只在定位到的回合打 agreement score（1-5）并记录各方当前 stance",
+        "未触及该议题的回合直接继承上一次分数（score carry forward），不重打",
+        "judge backbone = DeepSeek-V3.2，temperature=0；返回 relevant_turns / agreement_score / party_stances"
+      ],
+      "optimization": "none",
+      "output": "每议题的共识轨迹（逐相关回合 1-5 分 → remap [0,1]，跨议题平均为 Consensus Score）+ 各方立场记录",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "judge backbone（已验证换 Qwen3-235B 后 r=0.785/0.721）",
+        "评分量表（1-5）",
+        "应用领域（调解→任意多维多轮评测）"
+      ],
+      "reusable_pattern": "评分的每个维度只在与其真正相关的证据单元上更新，其余时刻保持上次状态——把 off-topic 噪声从评分轨迹里结构性隔离，而非靠 prompt 嘱咐 judge「别被无关内容影响」。"
+    },
+    {
+      "anchor": "§3.2: \"We run this simulation three times per candidate without a mediator and retain the scenario only when all three replays end in impasse.\" + §3.4.1: \"Normalizing by the remaining gap 1-S^unmed makes scenarios with different initial states comparable.\"",
+      "canonical_concept": "eval.counterfactual-no-intervention-baseline",
+      "id": "socrates.m2",
+      "input": "agentic 策展产出的候选场景（来自 m4）；评测期=每个 mediated run 的配对无调解 run",
+      "name": "难题筛选门 + 反事实 Consensus Gain（hard-task gate + counterfactual baseline）",
+      "non_replaceable": [
+        "无干预反事实基线（没有它增益无从定义）",
+        "难题门（没有它假增益涌入）",
+        "按剩余缺口归一化（没有它跨场景不可比）"
+      ],
+      "operations": [
+        "策展期：每个候选场景无 mediator 跑 3 次（DeepSeek-V3.2 party agents）",
+        "只有 3 次重放全部陷入僵局（impasse）才入选——保证缺口真实存在，剔除「本来就会和解」的场景",
+        "评测期：每个 mediated run 配一个 matched 无调解 run 作反事实基线",
+        "Consensus Gain = (S_med - S_unmed) / (1 - S_unmed) × 100：按剩余缺口（headroom）归一化，使不同初始状态的场景可比；S_unmed=1 时报 raw change"
+      ],
+      "optimization": "none",
+      "output": "40 个 hard scenarios（8 域 × 5）+ 每 run 的 Consensus Gain（关闭剩余缺口的百分比，可为负）",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "重放次数（3）",
+        "僵局判据",
+        "party simulator backbone",
+        "归一化指标的具体形式"
+      ],
+      "reusable_pattern": "给「加了 X 之后好了多少」的任何评测先跑无 X 基线：基线本来就能成的任务剔除（难度门），增益按剩余改进空间归一化——否则 +X% 可能是任务本来就会到那里。"
+    },
+    {
+      "anchor": "§3.3 + Appendix D Table (15 conditions per scenario: General 1 / Strategic 3 / Party 1 / History 1 / Emotion 3 / Culture 6)",
+      "canonical_concept": "eval.single-axis-perturbation-profile",
+      "id": "socrates.m3",
+      "input": "一个 general-condition hard scenario",
+      "name": "社会认知轴单轴扰动（single-axis socio-cognitive probing）",
+      "non_replaceable": [
+        "单轴独立扰动（不叠加）",
+        "与 general 基线条件配对对照"
+      ],
+      "operations": [
+        "沿 5 根轴（strategic posture / party composition / history length / emotional reactivity / cultural identity）逐一构造变体",
+        "每个条件只改一根轴，从不叠加——保证退化可归因到单轴",
+        "8 个 mediator 在全部 40 × 15 = 600 个 scenario-condition pair 上各跑一次",
+        "按轴聚合读 profile：本篇发现所有 mediator 至少在一轴收缩，Competing 姿态造成 18.9-64.1 的 Consensus Gain drop"
+      ],
+      "optimization": "none",
+      "output": "15 个条件（general 1 + 战略姿态 3 + 参与方构成 1 + 历史长度 1 + 情绪反应 3 + 文化身份 6）+ 每 mediator 的分轴能力 profile",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "轴的选择与数量",
+        "每轴变体数",
+        "应用领域"
+      ],
+      "reusable_pattern": "能力测试不要只报平均分——把可能触发退化的因素拆成独立轴、一次只动一根，让「哪根轴弄坏了模型」可直接读出，而非事后猜测。"
+    },
+    {
+      "anchor": "§3.2 + Appendix C: \"all identifying names, dollar figures, and dates are replaced with fictional substitutes.\"",
+      "canonical_concept": "eval.agentic-scenario-curation",
+      "id": "socrates.m4",
+      "input": "8 个真实冲突域（transactional/healthcare/environmental/B2B/public-policy/international/legal/intra-organizational）的公开纠纷素材",
+      "name": "agentic 场景策展流水线（agentic scenario curation）",
+      "non_replaceable": [
+        "真实冲突种子（区别于纯 LLM 虚构场景）",
+        "结构化 recast（背景/议题/偏好权重，使可仿真可评分）"
+      ],
+      "operations": [
+        "Searcher agent（o4-mini-deep-research backbone）在各域检索公开真实纠纷作种子",
+        "Scenario Writer（GPT-5.4 backbone）把报告式素材改写成结构化场景",
+        "匿名化：所有可识别名称、金额、日期替换为虚构值，保留冲突结构关系",
+        "循环至每域积累 5 个过难题门的场景（共 40）"
+      ],
+      "optimization": "none",
+      "output": "结构化可仿真候选场景（背景/参与方/争议议题/各方偏好权重），经 m2 难题门后沉淀为 benchmark",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "searcher/writer backbone",
+        "域清单",
+        "每域配额"
+      ],
+      "reusable_pattern": "评测任务的覆盖瓶颈不靠专家手写解决，靠「检索真实种子 → 模型改写成结构化任务 → 确定性过滤门」的流水线规模化——同时用匿名化把隐私/法律敏感性挡在外面。"
+    }
+  ],
+  "object_id": "paper/socrates",
+  "one_sentence_thesis": "主张开放式多轮 LLM 调解（mediation）评测不可靠的根源在场景覆盖窄、变化轴单一、per-turn 全议题打分累积 off-topic 噪声， 方法是 agentic 场景策展（8 域真实冲突种子）+ 无调解员难题筛选门（3 次重放全僵局才入选）+ 5 根社会认知轴单轴扰动（15 条件） + 议题局部化 LLM evaluator + 反事实 Consensus Gain 三指标，在 40 难场景 × 15 条件 × 8 个 mediator 共 4,800 runs 的全 LLM 仿真上展示 evaluator 专家一致性 r=0.823（per-turn 基线 2 倍以上）且最强 mediator 仅关闭约 1/3 无调解共识缺口 （结果均为论文自报，代码/数据未发布不可复现）。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "能用（评测工程方法论层，非红线；系统本体不接入——LLM 调解仿真领域无关且代码/数据未发布 c7）。 本站冷审门/质量门已实质借鉴其中原则（generator≠critic 的独立冷审 + 维度独立打分的 rubric 方向与 m1 同源），如实记账： 已对齐=局部化/维度隔离打分的精神；尚未落地的两条增量动作—— ① 反事实基线门（m2）：本站任何「有 agent vs 无 agent」改进主张（选稿器自进化、判边引擎）先跑无干预基线、剔除基线本来能过的样本再算增益； ② 单轴扰动 profile（m3）：评测分析模块按上下文长度/domain/信息密度独立变轴出分轴 profile，替代单一平均分。 附带红线提醒（f1 教训）：本站若引入「响应及时性/干预频率」类过程指标，必须与结果增益指标分开报告且不得单独引用。\n",
+    "state": "apply"
+  },
+  "slug": "socrates",
+  "source": "arxiv:2606.05563v1 + content/papers/2606.05563-socrates-mediation-eval/paper.mdx + project page https://disl-lab.github.io/SoCRATES/（GitHub Code 与 HF 数据均 Coming soon，2026-06-12 WebFetch 复核）",
+  "status": "draft",
+  "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
+  "trigger_hooks": [
+    {
+      "related_object": "socrates.m1",
+      "risk": "局部化依赖 judge 的「相关性定位」这一新步骤——对时间敏感的指标（如 Timeliness 类）这步本身是噪声源（f1），别把局部化当万能修复。",
+      "symptom": "LLM 评分疑似系统性偏高，或者各维度分数总是一起动——评不出维度间/样本间的真实差异。",
+      "why_recall": "议题局部化评分把每个维度的分数只锚在与其真正相关的证据单元上更新、其余 carry forward——per-turn 全维打分到局部化的专家相关性差距是 0.37→0.82（2 倍以上），说明很多「judge 不准」其实是评分协议把无关噪声累积进去了。"
+    },
+    {
+      "related_object": "socrates.m2",
+      "risk": "难度门是相对基线配置的（f3）——换了底座模型或环境后「难题」集合会漂移，旧的增益数字不可直比。",
+      "symptom": "加了 agent/新干预之后指标 +X%，但说不准没有它是不是本来也会涨到那里。",
+      "why_recall": "反事实无干预基线 + 难题门——先确认任务在无干预下真的失败（多次重放全失败才入选评测集），增益按剩余缺口归一化；否则「本来就会和解」的场景会贡献假增益。"
+    },
+    {
+      "related_object": "socrates.m3",
+      "risk": "真实场景多轴同时变化，单轴 profile 测不到交互效应（a4）；profile 好 ≠ 组合条件下稳。",
+      "symptom": "综合平均分看不出模型坏在哪，换个场景/领域/客户突然崩，事后才发现。",
+      "why_recall": "单轴扰动 profile——把可能触发退化的因素拆成独立轴、每次只动一根，本篇借此发现所有 mediator 至少一轴收缩、且域排序会翻转（Qwen3-30B Transactional -7.9 但 Healthcare 48.6）；平均分把这些全抹平。"
+    },
+    {
+      "related_object": "socrates.c4",
+      "risk": "这是观察相关非因果（c4 cannot_prove）；且活跃度类指标本身跨 judge 最不稳（c6），不要反向用「减少干预」当万能药方。",
+      "symptom": "某个 agent 干预特别频繁、响应特别快，看着勤快，但最终产出没有变好。",
+      "why_recall": "Timeliness vs Consensus Gain 错位是「勤快 ≠ 有效」的量化反例——插话频率 2 倍的两个模型增益垫底；把「活跃度指标」和「结果增益指标」拆开独立测，别让前者冒充后者。"
+    }
+  ]
+}

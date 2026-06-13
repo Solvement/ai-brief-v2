@@ -94,7 +94,8 @@
   type: mechanism-family
   description: 从 agent 自身轨迹分层挖掘难度严格递增的干扰项/负例，替代随机负例的数据工厂。（longtracerl）
   aliases: [traj-tiered distractors, trajectory-mined negatives]
-  distinct_from: []
+  # KG-4 波次2 回补：与 07297（成功轨迹交集造评测金标）/05622（候选解法反挖评测约束）同属"生成物当材料"族但介质与消费方不同。
+  distinct_from: [eval.trajectory-consensus-ground-truth, eval.solution-mined-constraints]
   conflicts_with: []
 
 - id: train.trust-region-supervision-gating
@@ -167,4 +168,156 @@
   description: 大规模 adapter 群体的生命周期治理（写入策略/修订/退役），与 mem.lifecycle-management 同问题不同介质。（scaling）
   aliases: [MinT governance, adapter lifecycle]
   distinct_from: [mem.fixed-rule-hooks]
+  conflicts_with: []
+
+# ════════ KG-4 波次2 · eval 簇概念（2026-06-12 主控收口，18 条）════════
+# 来源逐条标注；跨篇撞车已核（无 ID 冲突）；三组"任务构造"族用 distinct_from 互链不合并。
+
+# ── Agents' Last Exam (2606.05405) ──
+- id: eval.deterministic-first-verification
+  name: 确定性优先验证
+  type: eval-dimension
+  description: 评测判分纪律：凡存在确定性替代（代码/数值/结构/行为轨迹比对）就不用 LLM-as-judge；只能靠"问模型对不对"评分的任务拒收并重新工程化暴露 checkable artifact；确需模型判的少数任务用窄证据锚定 yes/no probe 由代码聚合。（2606.05405）
+  aliases: [deterministic-first, 回避 LLM-as-judge]
+  distinct_from: [eval.gate-and-score]
+  conflicts_with: []
+
+- id: eval.gate-and-score
+  name: 门控+打分（gate-and-score）
+  type: mechanism-family
+  description: 评分组合模式：二值前置门（可解析/无碰撞/必需字段齐）失败强制总分 0、不给局部努力分；过门后才算连续质量分（几何距离/数值容差/字段匹配）。（2606.05405；本站质量门"全绿才 deploy"同构）
+  aliases: [gate and score, 硬门一票否决]
+  distinct_from: [eval.deterministic-first-verification]
+  conflicts_with: []
+
+- id: eval.task-agent-env-decoupling
+  name: 评测三组件解耦（task-spec / agent / environment）
+  type: mechanism-family
+  description: 把 benchmark instance 拆为可执行任务规格（load/start/evaluate 生命周期）、agent（harness+backbone，只见任务描述与元数据）、环境（VM 契约，reference 对 agent 隐藏、评分期才注入）三个接口件——换 agent 不改题、换题不改 agent。（2606.05405）
+  aliases: [hidden-reference protocol, uncoupling of three components]
+  distinct_from: [eval.incremental-multi-turn-protocol]
+  conflicts_with: []
+
+- id: eval.failure-attribution-taxonomy
+  name: 失败根因四类归因
+  type: eval-dimension
+  description: pass/fail 之后的失败分型协议：Understanding（领域知识缺口/编造）、Approach（策略错/提前放弃）、Execution（实现 bug/输出格式）、Infrastructure（GUI-浏览器故障/超时资源）——决定补领域知识、改规划、修工具还是调环境。（2606.05405；消费方=本站冷审 major_gaps 标签）
+  aliases: [failure root-cause taxonomy, 四类失败归因]
+  distinct_from: []
+  conflicts_with: []
+
+- id: eval.expert-sourced-task-qc
+  name: 专家真实项目入题+多道门 QC
+  type: mechanism-family
+  description: 评测语料从领域专家已完成的真实项目反向工程而来（非编题/非众包），经 expert sourcing → 五要素规格化 → 会议式一审 → 工程实现+dry-run → 专家委员会终审五道门准入，可验证性是硬门槛；配 public smoke + private holdout 滚动轮换。（2606.05405）
+  aliases: [expert-sourced workflow tasks, 五道门任务构建]
+  distinct_from: [eval.agentic-scenario-curation, eval.solution-mined-constraints]
+  conflicts_with: []
+
+# ── SWE-Explore (2606.07297) ──
+- id: eval.trajectory-consensus-ground-truth
+  name: 轨迹共识标准答案
+  type: mechanism-family
+  description: 从多条（≥2）独立成功轨迹中取目标能力相关动作的交集当评测 gold（可加 LLM 精炼+人工审），用成功行为的共识替代昂贵且边界不一的人工标注。（2606.07297）
+  aliases: [trajectory-grounded ground truth, 成功轨迹交集造靶]
+  distinct_from: [data.trajectory-mined-hard-distractor]
+  conflicts_with: []
+
+- id: eval.capability-isolation
+  name: 子能力隔离评测
+  type: eval-dimension
+  description: 把端到端二值任务拆开、单拎一个子能力形式化为独立可测任务（固定输出接口+专属指标），暴露被整体成败遮蔽的真实瓶颈。（2606.07297）
+  aliases: [capability isolation, 单拎子能力评测靶]
+  distinct_from: [eval.incremental-multi-turn-protocol]
+  conflicts_with: []
+
+- id: eval.metric-downstream-validation
+  name: 指标下游反验
+  type: eval-dimension
+  description: 用受控下游协议量每个上游代理指标与下游真实收益的相关性，据此裁决该信/主报哪个指标——把指标选择从拍脑袋变成实测。（2606.07297；消费方=本站 L5 盲测裁决字段去留 / recall-bench 选主指标）
+  aliases: [metric validation via downstream correlation, 上游指标下游校验]
+  distinct_from: []
+  conflicts_with: []
+
+# ── ResearchClawBench (2606.07591) ──
+- id: eval.hidden-target-rediscovery
+  name: 隐藏目标再发现评测
+  type: eval-dimension
+  description: 把任务锚定在一份人类已完成的金样（如已发表论文）上，评测时对系统隐藏金样、只给原料（问题/文献/原始数据），按金样拆解的检查单验收"再发现"程度。（2606.07591；消费方=KG L5 盲测、冷审金样隐藏）
+  aliases: [hidden target paper, re-discovery evaluation, 白板测试量化版]
+  distinct_from: [eval.incremental-multi-turn-protocol]
+  conflicts_with: []
+
+- id: eval.weighted-verifiable-rubric
+  name: 加权可验证 rubric 判分
+  type: eval-dimension
+  description: 把开放式产出拆成围绕关键产物的加权子项（每项=具体判据+judge 须核对的 technical keywords+权重），按 Objective/Subjective 双模式分档逐项打分后加权；金样钉在刻度中点（50=与金样相当）、上方留超越区间。（2606.07591；消费方=冷审门升级）
+  aliases: [expert-curated weighted rubric, checklist judging, 50=复现线刻度]
+  distinct_from: []
+  conflicts_with: []
+
+- id: agent.minimal-harness-baseline
+  name: 极简壳基线
+  type: eval-dimension
+  description: 横向比较底模 agent 能力时给所有模型统一的最小工具壳（ReAct + 统一工具面 + 自动 compaction），把"模型能力"与"脚手架红利"分开测；与 agent.harness-engineering 问题域下的生产级 harness 相反（那是把编排做强，本条是评测时刻意做小）。（2606.07591；与 2606.05405 harness-vs-model sweep 同精神。当前消费方稀薄，盲测待裁）
+  aliases: [ResearchHarness, minimal scaffold baseline, 脚手架红利分离]
+  distinct_from: []
+  conflicts_with: []
+
+# ── SoCRATES (2606.05563 / socrates) ──
+- id: eval.topic-localized-judging
+  name: 议题局部化评分
+  type: mechanism-family
+  description: LLM judge 对每个评分维度先定位"真正相关的证据单元"（回合/段落），只在相关单元更新该维分数、其余 carry forward——把 off-topic 噪声从评分轨迹结构性隔离。（socrates；expert correlation 0.372→0.823）
+  aliases: [topic-localized evaluator, relevance-gated scoring, 局部化评分]
+  distinct_from: []
+  conflicts_with: []
+
+- id: eval.counterfactual-no-intervention-baseline
+  name: 反事实无干预基线（含难题门）
+  type: eval-dimension
+  description: 评"加了 X 好了多少"前先跑配对的无 X 基线：①难题门=基线多次重放都失败的任务才入选（剔除假增益）；②增益按剩余空间归一 gain=(S_with−S_without)/(1−S_without)。难度门的"难"相对基线配置而非任务内在属性，换底座会漂移。（socrates；消费方=本站"有 agent vs 无 agent"改进主张验收门）
+  aliases: [hard-task gate, counterfactual baseline gate, consensus-gain normalization]
+  distinct_from: []
+  conflicts_with: []
+
+- id: eval.single-axis-perturbation-profile
+  name: 单轴扰动能力侧写
+  type: eval-dimension
+  description: 把可能触发能力退化的因素拆成多条独立轴，每个测试条件只扰动一根轴、从不叠加，把单一平均分展开成分轴 profile——"哪根轴弄坏了模型"可直接读出。代价=测不到轴间交互。（socrates）
+  aliases: [single-axis probing, axis-wise capability profile, 分轴压力测试]
+  distinct_from: []
+  conflicts_with: []
+
+- id: eval.agentic-scenario-curation
+  name: agentic 场景策展
+  type: mechanism-family
+  description: 评测任务覆盖不靠专家手写：search agent 取真实公开素材种子 → writer 模型改写成结构化可仿真任务（匿名化保留冲突结构）→ 确定性过滤门筛选入库。（socrates；四条提案中最弱，与 expert-sourced-task-qc / solution-mined-constraints 同为任务构造族，盲测待裁）
+  aliases: [agentic task construction, scenario curation pipeline, 场景出题工厂]
+  distinct_from: [eval.counterfactual-no-intervention-baseline, eval.expert-sourced-task-qc, eval.solution-mined-constraints]
+  conflicts_with: []
+
+# ── AdaPlanBench (2606.05622) ──
+- id: eval.violation-triggered-disclosure
+  name: 违反触发的渐进披露评测协议
+  type: eval-dimension
+  description: 评测时把任务约束藏成隐藏档案，agent 提交违反哪条才披露哪条（可带优先级）；裁判用完整档案全知判分、披露故意不完备，两者之差产生可诊断信号（忘旧/修新坏旧/打转）。测"边做边适应"而非一次读懂长规则。（2606.05622）
+  aliases: [progressive disclosure protocol, hidden-constraint interactive eval, 违反才披露]
+  distinct_from: [eval.incremental-multi-turn-protocol]
+  conflicts_with: []
+
+- id: eval.compliance-quality-two-tier
+  name: 合规/质量双层指标分离
+  type: eval-dimension
+  description: 把"不再违反约束"（合规层 VPR）与"真办成事"（质量层 Acc=合规且过 rubric）强制分开报告——单报合规会把"听话但没用"评成高分。实证两层可大幅背离（VPR>90% 而 Acc<45%）。（2606.05622；消费方=本站质量门）
+  aliases: [VPR vs Acc split, compliance≠success, lint 绿≠内容有效]
+  distinct_from: []
+  conflicts_with: []
+
+- id: eval.solution-mined-constraints
+  name: 解法反挖式约束构造
+  type: mechanism-family
+  description: 造隐藏约束不靠人工写禁忌，而让多个 planner 先生成候选解法，再把解法依赖的资源/属性反向变成约束（资源不可用=world 约束、属性禁忌=user 约束），轮间回灌使密度可控分档；保留参考解保证可解性。（2606.05622）
+  aliases: [plan-mined constraints, adversarial constraint mining]
+  distinct_from: [data.trajectory-mined-hard-distractor, eval.expert-sourced-task-qc, eval.agentic-scenario-curation]
   conflicts_with: []

@@ -1,0 +1,439 @@
+{
+  "assumptions": [
+    {
+      "anchor": "§3.3 + limitations（作者自承 GT 是 empirical approximation，不证明替代证据路径无法支撑有效解）",
+      "conflicts_hint": "与\"探索路径多样性\"天然张力——若存在与共识路径不相交的有效证据路径，则高分=走主流路径，低分≠探索失败（f2 即此假设破裂的形态）。",
+      "id": "2606.07297.a1",
+      "kind": "explicit",
+      "statement": "多条成功轨迹 read 区域的行级交集（经 LLM 精炼+人工审）能近似\"修复该 issue 的核心必要上下文\"。"
+    },
+    {
+      "anchor": "limitations（作者自列：benchmark covers only instances solved by ≥2 strong LLMs; does not represent unsolved issues）",
+      "conflicts_hint": "与\"评测应覆盖能力边界\"冲突——未解 issue 的探索难度可能系统性更高，本基准对其静默（f1）。",
+      "id": "2606.07297.a2",
+      "kind": "explicit",
+      "statement": "在\"已被 ≥2 个强模型解出\"的 issue 子集上测得的探索画像，能代表 coding agent 的仓库探索能力。"
+    },
+    {
+      "anchor": "limitations（作者自列：fixed K=5 region budget may not generalize across different repository or issue types）",
+      "conflicts_hint": "与\"排名须超参稳健\"冲突——换 K/B 后名次可能洗牌（f4）。",
+      "id": "2606.07297.a3",
+      "kind": "explicit",
+      "statement": "固定 K=5 区域数与行预算设定下得到的 explorer 排名，可跨仓库/issue 类型泛化。"
+    },
+    {
+      "anchor": "",
+      "conflicts_hint": "若 patcher 对噪声容忍度不同（更弱基座可能更怕冗余），\"缺>冗余\"与\"CtxEff 最相关\"两条结论都可能漂移——与 c6 的处方绑定同一隐含前提。",
+      "id": "2606.07297.a4",
+      "kind": "implicit",
+      "statement": "单一 patcher 配置（Mini-SWE-Agent + GPT-5.4 系）测得的\"指标↔修复率\"相关性是 patcher 无关的。"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "eval.trajectory-consensus-ground-truth",
+      "eval.capability-isolation",
+      "eval.metric-downstream-validation"
+    ],
+    "problems": [
+      "code.repo-understanding",
+      "eval.agent-capability"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明探索是被二值化遮蔽的诸子能力里最重要的一个——补丁合成/验证等环节同样被遮蔽，本篇只拆出探索一环。",
+        "不能证明\"排序区域清单\"是探索能力的唯一合理形式化——交互式探索的中间行为（查询改写、回溯）被压成静态输出，该形式化丢掉的信息本篇未量化。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文 abstract 逐字明确陈述，为全篇设计出发点（WebFetch arXiv v1 核对）。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "they usually treat coding tasks as a holistic, binary prediction problem (e.g., resolved or unresolved), neglecting fine-grained agent capabilities such as repository understanding, context retrieval, code localization, and bug diagnosis",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Abstract",
+          "quote": "a benchmark that isolates the evaluation of repository exploration ... asks an explorer to return a ranked list of relevant code regions under a fixed line budget",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.07297.c1",
+      "statement": "SWE-bench 类仓库级基准把编码任务当整体二值预测（resolved/unresolved），遮蔽了仓库理解、上下文检索、 代码定位、bug 诊断等细粒度能力；SWE-Explore 把其中\"仓库探索\"单拎出来隔离评测——给 (issue, 仓库)， explorer 在固定行预算下交一份排序的相关代码区域清单。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 R_core 是\"必要且充分\"的修复上下文——作者自承它是经验近似（empirical approximation），不排除存在与共识路径不相交、但同样能支撑有效解的替代证据。",
+        "不能证明该 issue 分布代表未被强模型解出的难题——\"≥2 条成功轨迹\"这道滤天然只留已解 issue（见 a2/f1）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "原文 §3.2/§3.3 逐字核对（arXiv v1 HTML），数字与本地深读、官方仓库 bench_build.py 实读一致。",
+      "evidence": [
+        {
+          "anchor": "§3.2",
+          "quote": "we retain 848 instances spanning 10 programming languages and 203 open-source repositories ... built on three public repository-level data sources: SWE-bench Verified, SWE-bench-Pro, and SWE-bench Multilingual",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§3.3",
+          "quote": "at least two successful issue-resolution trajectories from strong LLMs such as GPT-5.4, Gemini-3-Pro, Sonnet-4.6, GLM-5.1, and Kimi-K2.6 ... we collect all read actions that resolve to an explicit file-interval pair ... a conservative intersection candidate Rint ... an LLM-based refinement step promotes a small subset of optional reads when they are load-bearing ... the authors then manually audit the resulting regions",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§3.2 (dataset statistics)",
+          "quote": "each instance carries on average 4.3 ground-truth files, 4.7 regions, and 1,578 visible lines",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.07297.c2",
+      "statement": "基准构成：848 实例、10 种编程语言、203 个开源仓库，源自 SWE-bench Verified / SWE-bench-Pro / SWE-bench Multilingual， 仅保留观察到 ≥2 条成功修复轨迹的 issue（轨迹来自 GPT-5.4、Gemini-3-Pro、Sonnet-4.6、GLM-5.1、Kimi-K2.6 等强模型）； ground truth = 各轨迹 read 动作（编辑器 view 工具调用、cat/head/tail/sed -n 命令行读、grep -n 行命中）抽成文件-区间对， 行级取交集 R_int 为保守核心候选，LLM 精炼提升少量承重（load-bearing）的可选读，最后作者人工审得 R_core； 平均每实例 4.3 个 ground-truth 文件、4.7 个区域、1,578 可见行。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能据此评判清单外的 explorer（如 Cursor——官方仓库 eval_runner 含其 wrapper，但论文正文与主表均未出现，专项核实确认；任何\"本篇评过 Cursor\"的说法都是错的）。",
+        "不能证明排名跨基座稳定——主表单一 GPT-5.4 基座，跨基座仅 Table 5 部分消融。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "受测系统名与分组逐字核对 arXiv v1 HTML Table 6/§4.1；Cursor 不在论文中经专项 WebFetch 核实；惟 Potion 在表内归组 Sparse Retrievers 与正文\"稠密检索\"描述有出入，照录不替作者调和。",
+      "evidence": [
+        {
+          "anchor": "§4.1 / Table 6 rows",
+          "quote": "Oracle / Random / BM25 / TF-IDF / Potion / OpenHands / Mini-SWE-Agent / AweAgent / Claude Code / Codex / AutoCodeRover / LocAgent / OrcaLoca / CoSIL",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4.1",
+          "quote": "All agentic explorers are driven by GPT-5.4 as the underlying model.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4.1",
+          "quote": "As a lightweight dense retriever we use a RAG pipeline instantiated with Potion.",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.07297.c3",
+      "statement": "受测系统按主表（Table 6）分四组共 14 个：Baselines（Oracle、Random）；Sparse Retrievers（BM25、TF-IDF、Potion—— 正文称 Potion 实为轻量稠密检索器经 RAG 管线实例化）；General-Purpose Agentic Explorers（OpenHands、Mini-SWE-Agent、 AweAgent、Claude Code、Codex）；Academic Localizers（AutoCodeRover、LocAgent、OrcaLoca、CoSIL）。 主表全部 agentic explorer 由 GPT-5.4 作底层模型驱动。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "全部为作者自报、无第三方复测；本对象只实读了官方仓库评测脚手架（bench_build.py/eval.py/bench_metrics.py 存在），未复跑分数。",
+        "不能由 CoSIL（专用 localizer）的高 recall 推出\"把图搜索机制装进通用 agent harness 同样涨行级 recall\"——机制迁移未测。",
+        "不能由\"探索画像相似\"推出五个通用 agent 修复能力相似——比的是探索质量工作点，不是修复。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "关键句与 CoSIL 数字逐字核对 arXiv v1 HTML；HitFile/Rec ℓ 区间为 Table 6 多行的归纳范围（区间经核对成立，逐格表值未逐一复核）；自报口径已在 cannot_prove 标明。",
+      "evidence": [
+        {
+          "anchor": "§4.3",
+          "quote": "Agentic exploration is a clear step above non-agentic retrieval.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4.3 / Table 6",
+          "quote": "Despite strong file-level hit rates and ranking scores, most non-oracle explorers still have low F1, and the limiting term is usually line-level recall rather than precision.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4.3 / Table 6",
+          "quote": "CoSIL is the main exception: it achieves by far the highest non-oracle Rec and F1 (Rec 0.788, F1 0.602)",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4.3",
+          "quote": "General coding agents behave surprisingly similarly",
+          "strength": "medium"
+        }
+      ],
+      "id": "2606.07297.c4",
+      "statement": "核心实测画像（自报）：agentic 探索一档高于非 agentic 检索（BM25/TF-IDF/Potion 多数指标接近 Random）； 通用 coding agent 文件级已强（HitFile 约 0.64–0.68、高早期排序分）但行级 recall（Rec ℓ）仅约 0.14–0.19， 限制项是行级 recall 而非 precision；五个通用 agent 探索画像惊人相似（harness 复杂度各异却落在同一工作点）； CoSIL 是主要例外——以迭代代码图搜索拿到非 oracle 最高的 Rec ℓ 0.788 / F1 0.602。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "patcher 口径原文自相不一致：§4.2 写 \"backed by GPT-5.4 and Gemini-3-Pro\"，Table 3 caption 标 GPT-5.4 with Mini-SWE-Agent——本对象照录差异，不替作者补全（沿本地深读的处理）。",
+        "不能证明相关性结论在其它 patcher/harness/任务下保持——单 patcher 配置、作者自承该协议是一次性方法学校验，不测绝对补丁生成能力，不进常规评测循环。",
+        "相关性≠因果——r=0.950 不能证明\"提升 CtxEff 必然提升修复率\"。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "全部数字逐字核对 arXiv v1 HTML Table 3/4；patcher 口径不一致已作为原文事实照录于 cannot_prove。",
+      "evidence": [
+        {
+          "anchor": "§4.2",
+          "quote": "Each explorer provides its K=5 ranked regions; the resulting context is then given to a fixed Mini-SWE-Agent patcher backed by GPT-5.4 and Gemini-3-Pro",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 3 (restricted-context resolve rate)",
+          "quote": "Oracle 59.7 / CoSIL 59.3 / Codex 50.3 / Mini-SWE-Agent 50.0 / Claude Code 48.0 / TF-IDF 26.0 / BM25 12.7 / Random 4.7",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Table 4 (§4.2 metric correlation)",
+          "quote": "Context Efficiency has the highest Pearson correlation (r=0.950) ... Rec@100 is the strongest rank-correlated signal (ρ=0.845) ... nDCG@500 Pearson r=+0.921, Spearman ρ=+0.460",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.07297.c5",
+      "statement": "指标下游反验（自报，n=150 子集）：受限上下文协议下各 explorer 选区作为固定 Mini-SWE-Agent patcher 的唯一可见上下文， 修复率 Oracle 59.7% / CoSIL 59.3% / Codex 50.3% / Mini-SWE-Agent 50.0% / Claude Code 48.0%， 经典检索 TF-IDF 26.0% / BM25 12.7% / Random 4.7%——上游探索质量确实换来下游修复； 上游指标与修复率的相关性：Context Efficiency Pearson r=0.950 最高、Rec@100 Spearman ρ=0.845 最强秩相关、 nDCG@500 Pearson 0.921 但 Spearman 仅 0.460（分大档次准、给相近 explorer 排序弱），故作者主张报一组混合指标。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能推广到任意规模的冗余——sweep 只用\"等预算的随机非核心区域\"填充，未覆盖极端超长上下文的稀释/分心效应。",
+        "不能把 α=0 附近的绝对值当真——两条曲线 α=0→25 均出现下陷，作者猜测是 canonical 仓库上 patcher 的记忆效应抬高了空上下文基线，并提醒谨慎解读（见 f3）。",
+        "不能证明该结论对非 SWE-bench 类任务、非代码域、或对噪声更敏感的弱基座 patcher 成立。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "结论句与 sweep 设定逐字核对 arXiv v1 HTML §4.4；为作者基于自家受控消融的处方式主张，故标 author_claim 而非 fact。",
+      "evidence": [
+        {
+          "anchor": "§4.4",
+          "quote": "Missing context is the dominant failure mode.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4.4",
+          "quote": "missing core evidence matters more than moderate precision loss, so recall-oriented improvements are more valuable than small filtering gains",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.07297.c6",
+      "statement": "缺上下文是主导失败模式：把 Oracle 上下文系统性降解（只露 α∈{0,25,50,75,100}% 核心区域，或用随机非核心区域填回 等量预算），修复率在 α=50→75 之间出现阈值式跳变；核心证据过阈值后，冗余无关代码的额外伤害极小， 而缺核心证据严重拖垮修复——故\"recall 导向的改进比小幅过滤收益更值钱\"。\n",
+      "type": "author_claim"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "GT 从平均 4.3 文件/1,578 行收窄到补丁触及的少数文件（深读核对约 1.4 文件）——评测对象从\"修复前要读够的证据上下文\"变成\"修改点定位\"，是更窄的能力",
+        "探索≠定位是本篇的立场根基（c1）：读宽证据的高 recall 型 explorer（如 CoSIL 式图搜索）相对优势缩小，精准点定位型占便宜",
+        "这会把\"翻到对文件但没读全承重行\"这一真实瓶颈重新藏回去——正是本篇要暴露的东西"
+      ],
+      "q": "若把 ground truth 从\"成功轨迹 read 过的行的交集\"换成\"最终补丁实际修改的行\"，这个 benchmark 度量的能力会怎么变？哪类 explorer 的排名最受冲击？",
+      "tested_objects": [
+        "2606.07297.m2",
+        "2606.07297.c1"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "支持面：同表内非 oracle 最高且远超通用 agent（0.14–0.19），下游受限上下文修复率 59.3% 几乎贴住 Oracle 59.7%（上下游互证）",
+        "排除不了：全部自报无第三方复测；CoSIL 是专用 localizer，机制搬进通用 agent harness 是否保收益未测（c4 cannot_prove）",
+        "排除不了：主表单基座 GPT-5.4 + 固定 K=5（a3/f4），换设定名次可能洗牌；共识 GT 口径也可能恰好偏向宽读式探索（a1）"
+      ],
+      "q": "\"CoSIL Rec ℓ 0.788 证明迭代代码图搜索是行级 recall 的突破口\"——这个推断能撑多远？哪些反驳排除不了？",
+      "tested_objects": [
+        "2606.07297.c4",
+        "2606.07297.a3",
+        "2606.07297.f4"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "照配方：录多条成功任务轨迹→抽 read/检索动作→行级（代码）或条目级（记忆）交集当 gold→被评者交 K 条排序候选→Precision/Recall/HitFile/nDCG@B/CtxEff 打分；喂料策略落\"召回优先于过滤\"（c6）",
+        "不能照抄①：本站\"成功\"判定不如 SWE-bench harness 客观——须先定义可判定的成功信号（如判边被冷审通过），否则共识无锚",
+        "不能照抄②：本站轨迹量级小，\"≥2 条成功轨迹\"过滤可能把样本筛空；LLM 精炼的主观性须留人工审兜底（m2 non_replaceable 的共识根基不可省）"
+      ],
+      "q": "要评 AI-Brief 自己的子 agent\"找相关代码/找相关记忆\"的质量，照本篇配方该怎么搭？哪些环节不能照抄？",
+      "tested_objects": [
+        "2606.07297.m2",
+        "2606.07297.m1",
+        "2606.07297.c6"
+      ],
+      "type": "transfer"
+    },
+    {
+      "expected_points": [
+        "成立前提：消费侧模型对噪声容忍度高（本篇 patcher 为 GPT-5.4 系强模型，a4 隐含），且冗余只到\"等预算\"规模",
+        "可能失效：极端超长上下文的稀释/分心效应 sweep 未覆盖；弱基座对噪声更敏感；token 成本约束下冗余有真实代价",
+        "α=0→25 记忆效应（f3）提醒空基线不可信；该准则是高覆盖区的边际判断（recall 改进 > 小幅过滤收益），不是\"无限堆料\"的许可"
+      ],
+      "q": "\"缺上下文比冗余更致命，所以喂上下文宁全勿漏\"——这条准则在什么条件下会失效或反转？",
+      "tested_objects": [
+        "2606.07297.c6",
+        "2606.07297.a4",
+        "2606.07297.f3"
+      ],
+      "type": "boundary"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "更难、没被强模型解出的 issue 不在基准里；在真实难题上行级 recall 瓶颈的位置和程度可能与本基准画像不同。",
+      "id": "2606.07297.f1",
+      "statement": "solved-issue 选择偏置让探索难度被系统性低估。",
+      "triggered_when": "把本基准分数外推为\"agent 探索任意真实（含未解）issue 的能力\"。"
+    },
+    {
+      "consequence": "行级 recall/F1 被打低、被误判为探索差——本基准低分≠没找到可用证据，只说明没走共识路径。",
+      "id": "2606.07297.f2",
+      "statement": "共识 GT 错杀非主流但有效的探索路径。",
+      "triggered_when": "explorer 走与多数成功轨迹不相交的替代证据路径（如从测试/调用方反推而非读实现）。"
+    },
+    {
+      "consequence": "patcher 的参数记忆冒充探索收益，\"缺上下文的真实代价\"在知名仓库上被低估；私有/新仓库上缺上下文可能伤得更重。",
+      "id": "2606.07297.f3",
+      "statement": "空上下文基线被 canonical 仓库记忆抬高。",
+      "triggered_when": "在 SWE-bench 类知名仓库上解读 α=0 附近的绝对修复率（曲线 α=0→25 下陷）。"
+    },
+    {
+      "consequence": "explorer 间相对名次可能洗牌；跨基座稳健性仅 Table 5 部分消融，引用时须带设定。",
+      "id": "2606.07297.f4",
+      "statement": "超参与基座敏感的排名被当稳健结论引用。",
+      "triggered_when": "换 K、行预算 B 或 agentic explorer 基座（主表全部 GPT-5.4 驱动）后直接沿用原表名次。"
+    }
+  ],
+  "human": {
+    "can_borrow": [
+      "「轨迹共识造标准答案」配方——标准答案没人能标清、雇人标又贵又不一致时，取多条独立成功轨迹里相关动作的交集当 gold，用成功行为的共识替代人工标注。",
+      "把「找资料」单拎成「固定预算下交一份排序清单」的任务来评，而不是只看最终任务成没成——否则「翻到对文件却没读全关键行」这种真瓶颈会被藏起来。",
+      "喂上下文的优先序：先保召回（别漏关键证据），再谈过滤精简——漏关键比塞冗余伤害大得多。",
+      "指标互相打架不知道信哪个时，造一个受控的下游协议，把每个上游指标对「真实下游收益」的相关性量出来，再决定主报哪个。"
+    ],
+    "cannot_borrow": [
+      "别把分数当「探索任意真实难题」的能力——基准只收「已被 ≥2 个强模型解出」的 issue，更难、没被解出的题不在内，探索难度被系统性低估。",
+      "别把「行级召回是瓶颈」当普适规律照搬——那是单一强基座、已解题子集上的自报画像，换基座/换任务族要重测。",
+      "「漏比冗余更致命」有前提（消费模型对噪声容忍度高、冗余只到等预算规模）；弱基座、或上下文极长被稀释时可能反转。"
+    ],
+    "headline": "一个专测「编码 agent 在仓库里翻资料找对地方」这一步的基准——把「找代码」从「改代码」里单拎出来评。",
+    "how_to_use": "落到任何「先找资料再干活」的 agent（找相关代码、找相关记忆、检索召回）的评测上。最小可借形态： 录几条成功任务的轨迹、抽出其中「读/查」动作、取多条轨迹的交集当标准答案；让被评系统交一份排序候选清单， 按覆盖/排序/效率打分；喂上下文的策略定为「宁全勿漏，先保召回再压紧凑」。\n",
+    "maturity": "全部为作者自报、本对象未复现（只实读了官方仓库的评测脚手架，未复跑分数）。 门槛低（评测方法+喂料策略借用，无需 schema 或训练改动），可直接借配方；但自家用时要先定义一个可判定的「成功」信号，否则共识无锚。\n",
+    "plain_summary": "现在评编码 agent 大多只看最终 bug 修没修好（通过/不通过），中间「会不会在大仓库里翻到该读的代码」这步被整体遮住了。 这篇把「探索」单独拎出来评：给 agent 一个 issue 和仓库，让它在固定行数预算内交一份排好序的「相关代码区域清单」， 再从覆盖、排序、效率三个角度打分。最值得记住的发现：agent 翻到对文件已经很强了，但真正读全关键行（行级召回）很差； 而且「漏掉关键证据」比「塞了一堆没用的」更致命——所以喂上下文要先保召回、再谈精简。做 agent 检索/记忆系统的人都能用上。\n",
+    "use_type": "directly_usable",
+    "use_type_reason": "它给出了一整套可直接照搭的评测配方（怎么造标准答案、怎么打分、怎么反验指标），想评自己 agent 的「找资料」能力能直接拿来用。"
+  },
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§3.1 (task formalization) + §3.4 (metrics)",
+      "canonical_concept": "eval.capability-isolation",
+      "id": "2606.07297.m1",
+      "input": "(issue q, 仓库快照 R)；explorer 可为稀疏/稠密检索或交互式 agent，不写补丁、不接触 ground truth。\n",
+      "name": "仓库探索独立评测靶（ranked line-level context selection task）",
+      "non_replaceable": [
+        "行级区域输出（文件级命中不构成本基准——行级才暴露真瓶颈）",
+        "排序+预算约束（无预算则堆料无代价）",
+        "与修复解耦（只交清单不写补丁，否则退回端到端黑箱）"
+      ],
+      "operations": [
+        "任务形式化 f:(q,R)↦P——把探索从端到端修复中剥出，输出静态排序清单而非补丁（§3.1）",
+        "行预算截断：评分只看累计行数 ≤B 的最长前缀 P≤B，惩罚啰嗦大区域吃光预算（§3.4）",
+        "覆盖维打分：行级 Precision/Recall/F1 + HitFile（GT 文件命中率）+ HitRegion（核心区域被 ≥1 预测区域覆盖比例）",
+        "排序维打分：nDCG@B（增益=区域覆盖的核心行数，按行预算而非 rank 截断）+ FUH（首个有用命中出现得多早）",
+        "效率维打分：Context Efficiency（预测行落在核心+可选 GT 内的比例）+ Noise Rate（与核心/可选都不沾的预测区域比例）"
+      ],
+      "optimization": "none",
+      "output": "K=5 排序区域清单 P=(r1,…,r5)，每区域 ri=(文件路径 pi, 起始行 si, 结束行 ei)，连同三维得分。\n",
+      "problem": "code.repo-understanding",
+      "replaceable": [
+        "explorer 实现（检索/agent 任意)",
+        "K 与行预算 B 的取值",
+        "驱动 agentic explorer 的基座模型"
+      ],
+      "reusable_pattern": "评\"先找资料再干活\"的系统时，把\"找资料\"单拎成固定预算下的排序选择任务，沿覆盖×排序×效率三维打分，而不是只看最终任务成败。"
+    },
+    {
+      "anchor": "§3.3 (Rint=⋂τ∈T R(τ) + LLM refinement + manual audit)",
+      "canonical_concept": "eval.trajectory-consensus-ground-truth",
+      "id": "2606.07297.m2",
+      "input": "每个 issue 的 ≥2 条独立成功修复轨迹（来自 GPT-5.4/Gemini-3-Pro/Sonnet-4.6/GLM-5.1/Kimi-K2.6 等强模型）。\n",
+      "name": "轨迹共识 ground truth 管线（trajectory-grounded GT）",
+      "non_replaceable": [
+        "≥2 条独立成功轨迹（共识信号的根——单轨迹无交集可言）",
+        "行级交集（保守性来源）",
+        "接地于真实成功行为而非人工标注（替代\"十个人画十种边界\"的标注）"
+      ],
+      "operations": [
+        "过滤：只保留观察到 ≥2 条成功修复轨迹的 issue（§3.3）",
+        "抽 read 动作：编辑器 view 工具调用、命令行读（cat/head/tail/sed -n）、grep -n 行命中 → 显式 (文件,起,止) 区间（§3.3；仓库 bench_build.py 实读一致）",
+        "行级按文件取交集 R_int=⋂τ∈T R(τ) 作保守核心候选（如 40–80 与 60–100 交得 60–80）",
+        "模型族特有可选读 R_opt=(⋃R(τ))∖R_int",
+        "LLM 精炼：仅当 optional 对该 issue 承重（load-bearing）时提升进核心（仓库 line_refine.py）",
+        "作者人工审：删无支撑区域，得最终 R_core"
+      ],
+      "optimization": "none",
+      "output": "行级核心区域集 R_core（主实验唯一打分靶）+ 可选读集 R_opt（计入 Context Efficiency 的分母侧）。\n",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "产生轨迹的模型族",
+        "read 动作抽取规则（可适配其它工具协议）",
+        "LLM 精炼所用模型"
+      ],
+      "reusable_pattern": "给\"边界没人能标清\"的能力造评测靶：取多条独立成功轨迹中该能力相关动作的交集当 gold——用成功行为的共识替代昂贵且不一致的人工标注。"
+    },
+    {
+      "anchor": "§4.2 + Table 3/4",
+      "canonical_concept": "eval.metric-downstream-validation",
+      "id": "2606.07297.m3",
+      "input": "各 explorer 的 K=5 选区 + 固定 patcher（Mini-SWE-Agent；§4.2 写 backed by GPT-5.4 and Gemini-3-Pro、 Table 3 caption 标 GPT-5.4——原文口径不一致照录）+ n=150 实例子集。\n",
+      "name": "受限上下文下游反验协议（metric validation via downstream repair）",
+      "non_replaceable": [
+        "受限可见性（不藏其余内容则 patcher 自己再探索，测不出 explorer 的贡献）",
+        "一次性校验定位（不进常规评测循环——新 explorer 只跑上游指标即可比分）"
+      ],
+      "operations": [
+        "受限可见性：仓库中 explorer 未选的内容全部隐藏，选区=patcher 唯一可见上下文（§4.2）",
+        "跑 SWE-bench harness 测各 explorer 选区下的修复率（Table 3）",
+        "对每个上游指标计算与修复率的 Pearson/Spearman 相关（Table 4）",
+        "据相关画像主张报一组混合指标：CtxEff 分大档次最准（r=0.950）、Rec@100 秩序最稳（ρ=0.845）、nDCG@500 Pearson 高 Spearman 弱"
+      ],
+      "optimization": "none",
+      "output": "每个上游探索指标与下游修复率的 Pearson/Spearman 相关表（Table 4）——裁决\"该信哪个指标\"。\n",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "patcher 及其基座",
+        "子集规模 n",
+        "下游任务 harness"
+      ],
+      "reusable_pattern": "自家 benchmark 指标互相打架时，造一个受控下游协议，把每个上游指标对下游真实收益的相关性量出来，再决定主报什么——把\"该信哪个指标\"从拍脑袋变成实测。"
+    }
+  ],
+  "object_id": "paper/2606.07297",
+  "one_sentence_thesis": "主张端到端 pass/fail 基准（SWE-bench 类）遮蔽了\"仓库探索（repository exploration）\"这一关键子能力， 方法是把探索形式化为固定行预算下 K=5 排序区域清单任务、用 ≥2 条独立成功修复轨迹的 read 动作行级交集 （+LLM 精炼+人工审）造 ground truth、沿覆盖×排序×效率三维打分并用受限上下文修复协议反验指标， 在 848 实例/10 语言/203 仓库上实测 14 个 explorer，展示 agentic 探索一档高于经典检索、 文件级定位已强而行级 recall 是真瓶颈、缺上下文比冗余更致命（全部自报）。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "能用（非红线，纯评测方法+喂料策略借用，无 schema/训练变更）： ① 轨迹共识造靶（m2）=给任意\"难标注\"能力造评测靶的通用配方——可评本站 codex/AutoSci 子 agent\"找相关代码/相关记忆\"质量： 从多次成功的判边/召回轨迹取动作交集当 gold，比人工标省且接地于成功行为； ② \"缺上下文比冗余致命、召回优先于过滤\"（c6）直接定本站给 sub-agent/codex 喂上下文的准则——宁全勿漏先保召回； ③ Context Efficiency（相关且紧凑）r=0.950 最贴下游（c5），给本站\"先召回相关、再压紧凑\"两步的优先序。 verify 路径=Mini 版（100–400 行）：录几条成功轨迹抽 read 动作取交集做迷你靶，让被评者交 K=5 排序候选， 算 Precision/Recall/HitFile/nDCG@B/CtxEff，再做缺/冗余消融看下游差；注意本站需先定义可判定的\"成功\"信号（见 transfer 考题）。\n",
+    "state": "apply"
+  },
+  "slug": "2606.07297",
+  "source": "arxiv:2606.07297v1 (2026-06-05, SJTU 等) + github.com/Qiushao-E/SWE-Explore-Bench (HEAD 3c12dc5 本地实读) + HF datasets/SWE-Explore-Bench/SWE-Explore-Bench",
+  "status": "draft",
+  "title": "SWE-Explore: Benchmarking How Coding Agents Explore Repositories",
+  "trigger_hooks": [
+    {
+      "related_object": "2606.07297.c4",
+      "risk": "把\"行级 recall 是瓶颈\"当普适规律——那是 GPT-5.4 驱动、solved-issue 子集上的自报画像，换基座/换任务族须重测。",
+      "symptom": "我的 agent/检索系统总能翻到对的文件，可产出还是缺关键依据——说不清差在找的层面还是用的层面。",
+      "why_recall": "本篇把\"找\"拆到行级并实测：文件级命中（HitFile 0.64–0.68）≠ 行级读全（Rec ℓ 仅 0.14–0.19），瓶颈在行级 recall——先量行级覆盖再怪生成。"
+    },
+    {
+      "related_object": "2606.07297.m2",
+      "risk": "交集天然保守且偏多数路径（错杀替代解法）；没有 ≥2 条成功轨迹的样本被整体丢弃，靶子继承 solved-issue 偏置。",
+      "symptom": "想评某个子能力，但'标准答案'没人能标清楚，雇人标又贵、边界还各画各的。",
+      "why_recall": "轨迹共识造靶配方——取多条独立成功轨迹中相关动作的行级/条目级交集当 gold，用成功行为的共识替代人工标注。"
+    },
+    {
+      "related_object": "2606.07297.m3",
+      "risk": "相关性绑定具体下游配置（patcher/任务/harness），换场景须重测；且相关≠因果，不能当优化目标无脑冲。",
+      "symptom": "评测报了一堆指标，彼此排名打架，不知道该信哪个、主报哪个。",
+      "why_recall": "受限下游反验协议——把每个上游指标对下游真实收益的相关性量出来再定主指标（本篇据此选 CtxEff/Rec@100 混合报告）。"
+    },
+    {
+      "related_object": "2606.07297.c6",
+      "risk": "结论出自\"等预算噪声填充\"的 sweep，不覆盖极端超长上下文稀释；空上下文基线还可能被记忆抬高（f3），弱基座下噪声代价可能更大。",
+      "symptom": "给模型喂上下文时纠结：多塞怕噪声淹了、少塞怕漏关键——先优化哪头？",
+      "why_recall": "缺上下文是主导失败模式：核心证据没过阈值前修复率压死，过阈值后冗余伤害很小——先保召回再谈紧凑过滤。"
+    }
+  ]
+}

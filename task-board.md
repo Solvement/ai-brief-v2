@@ -10,6 +10,7 @@
 
 - **上一跑 (2026-06-12)**：读 0xCodez Fable 5 自进化帖 + Boris「overnight sub-agents do deeper work」当镜子照自己；判定云端长时自治那半篇不采纳（与本地确定性 run model 冲突，RULES#17/PIPE-1），抽出五个真缺口落地——① 失败登记 ② 本接力指针 ③ 记忆 5 阶 compound 尺子 ④ verifier 机制说辞 ⑤ 失败模式写回 paradigm。本次改 `task-board / research-loop / quality-gate / RULES#21`。
 - **下一跑 → 该做什么**：用一次真实 session 收尾验证本指针确被更新（让 write-before-walk-away 成习惯）；新任务动手前先查下方失败登记。深读积压 3 篇（Mellum2 / TIDE / Humanoid-GPT）仍排今晚 boot 跑 `papers:deepread` + `papers:cold-audit`。
+- **本次补充 (2026-06-13)**：用 3 个子 agent 只读审了项目目标 / Projects 管线 / 清扫候选；结论是 Projects 不应压成「每日 3 个一句话」，而应「榜单 light 广覆盖 + deep 稀缺白板测试」。已只删 ignored 可再生缓存/旧日志（`.next`、`tsconfig.tsbuildinfo`、6/8 deep-dive 旧日志一部分、hook 测试目录），未碰 `public/data`、KG、`brief-wiki` 新内容和用户 docx；`npm run validate` 失败在既有未跟踪 ROS object id/schema，不属本次清扫引入。
 
 ## ⚠️ 失败登记 (failed attempts — 动手前先查，别重试踩过的坑)
 
@@ -39,9 +40,16 @@
 ### KG-4 · Research Object Store 记忆本体重构（plan `docs/plans/KG-4-research-object-store.md`，Kevin 2026-06-12 拍板）
 - **大方向**：以高质量为唯一标准**重构记忆本体、保留基础设施**——「论文级 facet + 论文级边」→ 六层对象库（L0 锚点→L1 claims/mechanisms/assumptions/failure_modes/trigger_hooks/exam_questions→L2 正典注册层→L3 结构推导关系→L4 视图=投影→L5 考题盲测→L6 迁移钩子）。依据=GPT 分析 1/2/3 + Claude 架构共识。**本条目取代 KG-2/KG-3 的范式口径**（其基础设施成果保留）。
 - **小方向**：正典 `docs/paradigms/research-object-store.md` ✅；旧正典 superseded/收编 ✅；registry 4 表种子+收口 ✅；memory 簇 5 篇试点蒸馏 ✅（5×opus 并行）；codex 三脚本 ✅；关系两层（结构推导+残差判定）✅；命题 3 个正反证据回填 ✅；盲测+冷审 ✅。
-- **阶段**：✅ 试点全链完成（commit 24397b1 → b2e3c30 → 3818223，feat 分支）。下一切片=前端投影切换+旧投影退役、存量回填。
-- **阻塞**：无（部署未做：本轮纯数据/脚本层，且全站 verify 有他人会话未提交 facet 改动的既有红，见下）。
+- **阶段**：✅ 试点全链完成（24397b1→b2e3c30→3818223）→ ✅ 波次1 五篇+前端v3（62721d4）→ ✅ **周期1 已上线生产**（9c2bb82+39bad3a，main 快进，2026-06-12 晚）：ros-graph.json(7 文章/9 聚合边/4 命题)+逐篇对象层 JSON 投影、检索区/记忆球/node-focus 三视图 /browse 实测、验收门全绿（lint 0 err/test 311 pass/build/validate 链含 ros 投影门）。⚠途中 Claude 撞 5h 配额（6:30pm NY 重置）杀了 W2 五 agent+codex 投影派发；恢复后发现 codex 投影脚本其实已写完（build/validate-ros-projection.mjs+tests+package.json 接线），直接跑通。relation-engine 旧测试断言(<=80)是 REMINE 提 300 上限时漏改的过期断言，已修。
+- **W2 五篇已收口入库**（2026-06-12）：2606.05405/2606.07297/2606.07591/socrates/2606.05622 五篇 eval 簇对象化完成；registry 收口=2 problem（eval.open-ended-output-scoring/eval.llm-judge-reliability）+18 concept+4 benchmark 转正（socrates 经论证不注册 bench）；validator 修 ID regex（slug 含点号）；derive 44→91 边幂等；recall@3=1.0。12 文章对象在库。
+- **剩**：残差 14 对 LLM 判定（codex 离线 file-judge，绕配额，非阻塞）；W3-W7 ≈21 篇；wave-2 五篇独立冷审（事实级，排队）；旧 facets 退役删除=🔴 Kevin 确认。
 - **交付结论**：① 5/5 对象过 `npm run kg:ros:validate`（0 err 0 warn；claims 带逐字锚+cannot_prove，trigger_hooks/考题/self_evo_verdict 齐）。② 关系=28 derived（13 功能 medium/2 实测 evaluates/4 聚合 tension/8 底座/1 对比）+ 4 judged 边 + 4 NO_EDGE 判例，`kg:ros:derive:check` 幂等绿；修了推导引擎两缺陷（assumption 笛卡尔积 36→4、功能关系 high→medium 按判边口径）。③ 独立冷审双 PASS：agemem(arxiv HTML 10 锚逐字)+mempalace(本地 clone 12 锚逐字)数字零误，1 个出处标注瑕疵已修。④ 盲测（agemem，A=只给定位 vs B=给对象库，sonnet 双盲作答+opus 评卷）：B 胜 3/4 题，证据可追溯轴 A 全程 0 分 B 满分，Q2 实证对象库**纠正了 A 自信的机制误解**（GRPO 终局广播被 A 误解为逐步打分）；裁决=无字段需删，缺口在题目覆盖（c4/c6 零消费，下轮补题）。⑤ ROS 测试 7/7 绿；`ops:baseline:diff` 唯一新红=validate-mind-palace，已用 `git show --name-only` 证明来自他人会话未提交的旧 facet 改动（M memoryagentbench.yaml/?? role-agent.yaml），KG-4 三个 commit 零涉 facets。证据文件：`.agent/kg4/{cold-audit-report,blindtest-verdict}.md`、`.agent/codex-kg4-backend-report.md`（本地）。
+
+### KG-5 · 表达分层 + 受众分离人读层（plan `docs/plans/KG-5-expression-layering.md`，Kevin 2026-06-12 拍板）
+- **大方向**：GPT 分析4 + Kevin 诊断——后端对象库方向对，错在**前台表达层**：默认把 AI 内部认知记账（claim 分型/逐字锚点/cannot_prove/object ID/derived_by/boundary）直接铺给用户。Kevin 决策：① 先做静态分层+人话层（可立即上线），问题导向问答助手作下一独立轨（云端）；② 人话用「扩对象加 `human` 块，Claude 重蒸馏写」=真受众分离（同论文 paper.mdx vs autosci 的受众分离在 KG 层落地）。
+- **小方向**：正典加 `human` 块 schema + 受众分离铁律 ✅；12 文章对象各写 human 块（4×opus 并行，从已冷审对象重述、禁引新事实）✅；4 命题写人话框（当前判断/为什么/最强正反/第三条路/对你有什么用）✅；25 边写人话 gloss（投影模板化、无调试串）✅；validator 加 human 硬门 + AI-内部记号泄露扫描 ✅；投影透传 human/gloss/命题人话 ✅；前端三件套重写（RosObjectPanel 人话默认+「拆开看」「查证·审计」两折叠层 / PropositionCards 人话框默认+展开证据数字 / RelationCards gloss 默认+查证展开 / Browse 卡片 use_type chip+headline）✅。
+- **阶段**：✅ 全链完成，验收门全绿（validator 15/15 含 human 门+泄露扫描、投影门 PASS、test 311、build、tsc 0、lint 0 err）；/browse 实测三视图默认零调试词泄露、use_type chip（6 直接可用/5 设计启发/1 背景参考）。**待**：独立人话冷审（忠实性，进行中）→ 通过即部署。
+- **不在本轮（下一轨）**：云端问题导向问答助手（输入任意问题→拆解→召回→综合判断+怎么用+下一步验证）；query-specific sharp use-tag 属此轨。
 
 ### PROJECTS-REMINE-2026-06-11 · 项目内容统一重生成 + 关系引擎再深挖（plan `docs/plans/2026-06-11-projects-remine.md`）
 - **⚠范式注记（2026-06-12）**：本任务的 facet/关系产物按旧口径生成；KG-4 重构后 facets 降级为草稿输入、论文级边待对象级重推导。基础设施成果（管线/validator/bench）继续有效。

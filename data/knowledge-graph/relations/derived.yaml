@@ -1,6 +1,366 @@
 - id: r-0001
   source:
     type: mechanism
+    id: 2606.05405.m1
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.1 Pipeline Architecture (Fig.6) + §3.3 Evaluation Modes
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0002
+  source:
+    type: mechanism
+    id: 2606.05405.m1
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.1 Pipeline Architecture (Fig.6) + §3.3 Evaluation Modes
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0003
+  source:
+    type: mechanism
+    id: 2606.05405.m2
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §2.3 Task Construction Pipeline (Fig.3/Fig.4) + §2.3 Public/private release strategy
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0004
+  source:
+    type: mechanism
+    id: 2606.05405.m2
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §2.3 Task Construction Pipeline (Fig.3/Fig.4) + §2.3 Public/private release strategy
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0005
+  source:
+    type: mechanism
+    id: 2606.05622.m1
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: "§3.1 Data Construction + Appendix: Model Choice / Table 2"
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0006
+  source:
+    type: mechanism
+    id: 2606.05622.m1
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: "§3.1 Data Construction + Appendix: Model Choice / Table 2"
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0007
+  source:
+    type: mechanism
+    id: 2606.05622.m2
+  target:
+    type: benchmark
+    id: bench.2606.05622
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: "§3.2 Agent–User–World Interaction + Appendix: Runtime Interaction Details（V̂_t 分段定义）+ repo env/run_config.yaml"
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem agent.planning-adaptivity is evaluated by bench.2606.05622 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0008
+  source:
+    type: mechanism
+    id: 2606.05622.m3
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: "§4 Metrics + Appendix: Metric Details（γ=4、N=307）"
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0009
+  source:
+    type: mechanism
+    id: 2606.05622.m3
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: "§4 Metrics + Appendix: Metric Details（γ=4、N=307）"
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0010
+  source:
+    type: mechanism
+    id: 2606.07297.m1
+  target:
+    type: benchmark
+    id: bench.2606.07297
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.1 (task formalization) + §3.4 (metrics)
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem code.repo-understanding is evaluated by bench.2606.07297 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0011
+  source:
+    type: mechanism
+    id: 2606.07297.m2
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.3 (Rint=⋂τ∈T R(τ) + LLM refinement + manual audit)
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0012
+  source:
+    type: mechanism
+    id: 2606.07297.m2
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.3 (Rint=⋂τ∈T R(τ) + LLM refinement + manual audit)
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0013
+  source:
+    type: mechanism
+    id: 2606.07297.m3
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §4.2 + Table 3/4
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0014
+  source:
+    type: mechanism
+    id: 2606.07297.m3
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §4.2 + Table 3/4
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0015
+  source:
+    type: mechanism
+    id: 2606.07591.m1
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.1–3.2（τ 定义+专家流水线）+ repo tasks/Astronomy_000/{task_info.json, target_study/checklist.json}
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0016
+  source:
+    type: mechanism
+    id: 2606.07591.m1
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.1–3.2（τ 定义+专家流水线）+ repo tasks/Astronomy_000/{task_info.json, target_study/checklist.json}
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0017
+  source:
+    type: mechanism
+    id: 2606.07591.m2
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.4 + repo evaluation/score.py（RUBRIC prompt：Mode A/B 分档表、'50 means as good as the actual published paper'、image 首图=ground-truth）
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0018
+  source:
+    type: mechanism
+    id: 2606.07591.m2
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.4 + repo evaluation/score.py（RUBRIC prompt：Mode A/B 分档表、'50 means as good as the actual published paper'、image 首图=ground-truth）
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0019
+  source:
+    type: mechanism
+    id: 2606.07591.m3
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.3 + Table 4（tool surface）+ 'the default compaction trigger is 128k tokens'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0020
+  source:
+    type: mechanism
+    id: 2606.07591.m3
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: §3.3 + Table 4（tool surface）+ 'the default compaction trigger is 128k tokens'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0021
+  source:
+    type: mechanism
     id: agemem.m1
   target:
     type: benchmark
@@ -16,7 +376,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.lifecycle-management is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0002
+- id: r-0022
   source:
     type: mechanism
     id: agemem.m2
@@ -34,7 +394,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.lifecycle-management is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0003
+- id: r-0023
   source:
     type: mechanism
     id: agemem.m3
@@ -52,7 +412,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.lifecycle-management is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0004
+- id: r-0024
   source:
     type: mechanism
     id: memoryagentbench.m1
@@ -70,7 +430,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.evaluation is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0005
+- id: r-0025
   source:
     type: mechanism
     id: memoryagentbench.m2
@@ -88,7 +448,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.lifecycle-management is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0006
+- id: r-0026
   source:
     type: mechanism
     id: mempalace.m2
@@ -106,7 +466,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.longmemeval (functional join, not an actual test run)"
   status: candidate
-- id: r-0007
+- id: r-0027
   source:
     type: mechanism
     id: mempalace.m2
@@ -124,7 +484,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0008
+- id: r-0028
   source:
     type: mechanism
     id: rohitg00-agentmemory.m1
@@ -142,7 +502,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.lifecycle-management is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0009
+- id: r-0029
   source:
     type: mechanism
     id: rohitg00-agentmemory.m2
@@ -160,7 +520,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.longmemeval (functional join, not an actual test run)"
   status: candidate
-- id: r-0010
+- id: r-0030
   source:
     type: mechanism
     id: rohitg00-agentmemory.m2
@@ -178,7 +538,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0011
+- id: r-0031
   source:
     type: mechanism
     id: scaling.m3
@@ -196,7 +556,151 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.lifecycle-management is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0012
+- id: r-0032
+  source:
+    type: mechanism
+    id: socrates.m1
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: '§3.4.2: "For each topic ... the judge reads the dialogue once and locates the turns where [the topic] is actively in play, those at which it is discussed or a party shifts position ... turns that do not touch [the topic] inherit the prior score."'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0033
+  source:
+    type: mechanism
+    id: socrates.m1
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: '§3.4.2: "For each topic ... the judge reads the dialogue once and locates the turns where [the topic] is actively in play, those at which it is discussed or a party shifts position ... turns that do not touch [the topic] inherit the prior score."'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0034
+  source:
+    type: mechanism
+    id: socrates.m2
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: '§3.2: "We run this simulation three times per candidate without a mediator and retain the scenario only when all three replays end in impasse." + §3.4.1: "Normalizing by the remaining gap 1-S^unmed makes scenarios with different initial states comparable."'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0035
+  source:
+    type: mechanism
+    id: socrates.m2
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: '§3.2: "We run this simulation three times per candidate without a mediator and retain the scenario only when all three replays end in impasse." + §3.4.1: "Normalizing by the remaining gap 1-S^unmed makes scenarios with different initial states comparable."'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0036
+  source:
+    type: mechanism
+    id: socrates.m3
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: "§3.3 + Appendix D Table (15 conditions per scenario: General 1 / Strategic 3 / Party 1 / History 1 / Emotion 3 / Culture 6)"
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0037
+  source:
+    type: mechanism
+    id: socrates.m3
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: "§3.3 + Appendix D Table (15 conditions per scenario: General 1 / Strategic 3 / Party 1 / History 1 / Emotion 3 / Culture 6)"
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0038
+  source:
+    type: mechanism
+    id: socrates.m4
+  target:
+    type: benchmark
+    id: bench.2606.05405
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: '§3.2 + Appendix C: "all identifying names, dollar figures, and dates are replaced with fictional substitutes."'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.05405 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0039
+  source:
+    type: mechanism
+    id: socrates.m4
+  target:
+    type: benchmark
+    id: bench.2606.07591
+  relation_type: can_be_evaluated_by
+  derived_by: structural_join
+  evidence_anchors:
+    source: '§3.2 + Appendix C: "all identifying names, dollar figures, and dates are replaced with fictional substitutes."'
+    target: registry.benchmarks.evaluates
+  boundary: Functional relation only — the benchmark has not actually tested this mechanism; upgrade requires a result-table/self-run record (canonical.benchmarks → evaluates).
+  validation_experiment: Run the benchmark against this mechanism's declared problem setting.
+  confidence:
+    value: medium
+    reason: "can_be_evaluated_by: mechanism.problem eval.agent-capability is evaluated by bench.2606.07591 (functional join, not an actual test run)"
+  status: candidate
+- id: r-0040
   source:
     type: mechanism
     id: supermemory.m1
@@ -214,7 +718,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.staleness-conflict is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0013
+- id: r-0041
   source:
     type: mechanism
     id: supermemory.m2
@@ -232,7 +736,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.longmemeval (functional join, not an actual test run)"
   status: candidate
-- id: r-0014
+- id: r-0042
   source:
     type: mechanism
     id: supermemory.m2
@@ -250,7 +754,7 @@
     value: medium
     reason: "can_be_evaluated_by: mechanism.problem mem.retrieval-precision is evaluated by bench.memoryagentbench (functional join, not an actual test run)"
   status: candidate
-- id: r-0015
+- id: r-0043
   source:
     type: mechanism
     id: mempalace.m2
@@ -268,7 +772,7 @@
     value: medium
     reason: "same_concept_family: both mechanisms attach to mem.external-vector-store"
   status: candidate
-- id: r-0016
+- id: r-0044
   source:
     type: benchmark
     id: bench.longmemeval
@@ -286,7 +790,7 @@
     value: medium
     reason: "evaluates: object declares an actual test record on bench.longmemeval (canonical.benchmarks = tested relation by ruling 2026-06-12)"
   status: candidate
-- id: r-0017
+- id: r-0045
   source:
     type: benchmark
     id: bench.longmemeval
@@ -304,7 +808,187 @@
     value: medium
     reason: "evaluates: object declares an actual test record on bench.longmemeval (canonical.benchmarks = tested relation by ruling 2026-06-12)"
   status: candidate
-- id: r-0018
+- id: r-0046
+  source:
+    type: object
+    id: paper/2606.05405
+  target:
+    type: object
+    id: paper/2606.05622
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0047
+  source:
+    type: object
+    id: paper/2606.05405
+  target:
+    type: object
+    id: paper/2606.07297
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0048
+  source:
+    type: object
+    id: paper/2606.05405
+  target:
+    type: object
+    id: paper/2606.07591
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0049
+  source:
+    type: object
+    id: paper/2606.05405
+  target:
+    type: object
+    id: paper/socrates
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0050
+  source:
+    type: object
+    id: paper/2606.05622
+  target:
+    type: object
+    id: paper/2606.07297
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0051
+  source:
+    type: object
+    id: paper/2606.05622
+  target:
+    type: object
+    id: paper/2606.07591
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0052
+  source:
+    type: object
+    id: paper/2606.05622
+  target:
+    type: object
+    id: paper/socrates
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0053
+  source:
+    type: object
+    id: paper/2606.07297
+  target:
+    type: object
+    id: paper/2606.07591
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0054
+  source:
+    type: object
+    id: paper/2606.07297
+  target:
+    type: object
+    id: paper/socrates
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0055
+  source:
+    type: object
+    id: paper/2606.07591
+  target:
+    type: object
+    id: paper/socrates
+  relation_type: shares_problem
+  derived_by: structural_join
+  evidence_anchors:
+    source: canonical.problems
+    target: canonical.problems
+  boundary: ""
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "shares_problem: both objects attach to eval.agent-capability"
+  status: candidate
+- id: r-0056
   source:
     type: object
     id: paper/agemem
@@ -322,7 +1006,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management"
   status: candidate
-- id: r-0019
+- id: r-0057
   source:
     type: object
     id: paper/agemem
@@ -340,7 +1024,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management"
   status: candidate
-- id: r-0020
+- id: r-0058
   source:
     type: object
     id: paper/agemem
@@ -358,7 +1042,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management"
   status: candidate
-- id: r-0021
+- id: r-0059
   source:
     type: object
     id: paper/latentskill
@@ -376,7 +1060,7 @@
     value: medium
     reason: "shares_problem: both objects attach to skill.knowledge-parameterization"
   status: candidate
-- id: r-0022
+- id: r-0060
   source:
     type: object
     id: paper/longtracerl
@@ -394,7 +1078,7 @@
     value: medium
     reason: "shares_problem: both objects attach to train.credit-assignment"
   status: candidate
-- id: r-0023
+- id: r-0061
   source:
     type: object
     id: paper/memoryagentbench
@@ -412,7 +1096,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management"
   status: candidate
-- id: r-0024
+- id: r-0062
   source:
     type: object
     id: paper/memoryagentbench
@@ -430,7 +1114,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0025
+- id: r-0063
   source:
     type: object
     id: paper/memoryagentbench
@@ -448,7 +1132,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management, mem.retrieval-precision"
   status: candidate
-- id: r-0026
+- id: r-0064
   source:
     type: object
     id: paper/memoryagentbench
@@ -466,7 +1150,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision, mem.staleness-conflict"
   status: candidate
-- id: r-0027
+- id: r-0065
   source:
     type: object
     id: project/mempalace
@@ -484,7 +1168,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0028
+- id: r-0066
   source:
     type: object
     id: project/mempalace
@@ -502,7 +1186,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0029
+- id: r-0067
   source:
     type: object
     id: project/rohitg00-agentmemory
@@ -520,7 +1204,7 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.lifecycle-management"
   status: candidate
-- id: r-0030
+- id: r-0068
   source:
     type: object
     id: project/rohitg00-agentmemory
@@ -538,7 +1222,169 @@
     value: medium
     reason: "shares_problem: both objects attach to mem.retrieval-precision"
   status: candidate
-- id: r-0031
+- id: r-0069
+  source:
+    type: object
+    id: paper/2606.05405
+  target:
+    type: object
+    id: paper/2606.05622
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.05405.a1, 2606.05405.a2, 2606.05405.a3, 2606.05405.a4
+    target: 2606.05622.a1, 2606.05622.a2, 2606.05622.a3, 2606.05622.a4
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.expert-sourced-task-qc is distinct_from/conflicts_with eval.solution-mined-constraints; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0070
+  source:
+    type: object
+    id: paper/2606.05405
+  target:
+    type: object
+    id: paper/memoryagentbench
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.05405.a1, 2606.05405.a2, 2606.05405.a3, 2606.05405.a4
+    target: memoryagentbench.a1, memoryagentbench.a2, memoryagentbench.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.task-agent-env-decoupling is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0071
+  source:
+    type: object
+    id: paper/2606.05405
+  target:
+    type: object
+    id: paper/socrates
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.05405.a1, 2606.05405.a2, 2606.05405.a3, 2606.05405.a4
+    target: socrates.a1, socrates.a2, socrates.a3, socrates.a4
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.expert-sourced-task-qc is distinct_from/conflicts_with eval.agentic-scenario-curation; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0072
+  source:
+    type: object
+    id: paper/2606.05622
+  target:
+    type: object
+    id: paper/longtracerl
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.05622.a1, 2606.05622.a2, 2606.05622.a3, 2606.05622.a4
+    target: longtracerl.a1, longtracerl.a2, longtracerl.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.solution-mined-constraints is distinct_from/conflicts_with data.trajectory-mined-hard-distractor; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0073
+  source:
+    type: object
+    id: paper/2606.05622
+  target:
+    type: object
+    id: paper/memoryagentbench
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.05622.a1, 2606.05622.a2, 2606.05622.a3, 2606.05622.a4
+    target: memoryagentbench.a1, memoryagentbench.a2, memoryagentbench.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.violation-triggered-disclosure is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0074
+  source:
+    type: object
+    id: paper/2606.05622
+  target:
+    type: object
+    id: paper/socrates
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.05622.a1, 2606.05622.a2, 2606.05622.a3, 2606.05622.a4
+    target: socrates.a1, socrates.a2, socrates.a3, socrates.a4
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.solution-mined-constraints is distinct_from/conflicts_with eval.agentic-scenario-curation; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0075
+  source:
+    type: object
+    id: paper/2606.07297
+  target:
+    type: object
+    id: paper/longtracerl
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.07297.a1, 2606.07297.a2, 2606.07297.a3, 2606.07297.a4
+    target: longtracerl.a1, longtracerl.a2, longtracerl.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.trajectory-consensus-ground-truth is distinct_from/conflicts_with data.trajectory-mined-hard-distractor; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0076
+  source:
+    type: object
+    id: paper/2606.07297
+  target:
+    type: object
+    id: paper/memoryagentbench
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.07297.a1, 2606.07297.a2, 2606.07297.a3, 2606.07297.a4
+    target: memoryagentbench.a1, memoryagentbench.a2, memoryagentbench.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.capability-isolation is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0077
+  source:
+    type: object
+    id: paper/2606.07591
+  target:
+    type: object
+    id: paper/memoryagentbench
+  relation_type: tension_with
+  derived_by: structural_join
+  evidence_anchors:
+    source: 2606.07591.a1, 2606.07591.a2, 2606.07591.a3, 2606.07591.a4
+    target: memoryagentbench.a1, memoryagentbench.a2, memoryagentbench.a3
+  boundary: Candidate only; concept-level conflict plus hints must be checked against source anchors.
+  validation_experiment: ""
+  confidence:
+    value: medium
+    reason: "conflicts_assumption: eval.hidden-target-rediscovery is distinct_from/conflicts_with eval.incremental-multi-turn-protocol; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
+  status: candidate
+- id: r-0078
   source:
     type: object
     id: paper/agemem
@@ -556,7 +1402,7 @@
     value: medium
     reason: "conflicts_assumption: train.terminal-credit-broadcast is distinct_from/conflicts_with train.entity-level-process-reward; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0032
+- id: r-0079
   source:
     type: object
     id: paper/agemem
@@ -574,7 +1420,7 @@
     value: medium
     reason: "conflicts_assumption: train.terminal-credit-broadcast is distinct_from/conflicts_with train.trust-region-supervision-gating; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0033
+- id: r-0080
   source:
     type: object
     id: paper/agemem
@@ -592,7 +1438,7 @@
     value: medium
     reason: "conflicts_assumption: mem.learned-policy-controller is distinct_from/conflicts_with mem.fixed-rule-hooks; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0034
+- id: r-0081
   source:
     type: object
     id: paper/latentskill
@@ -610,7 +1456,7 @@
     value: medium
     reason: "conflicts_assumption: skill.weight-space-skill is distinct_from/conflicts_with mem.external-vector-store; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0035
+- id: r-0082
   source:
     type: object
     id: paper/latentskill
@@ -628,7 +1474,7 @@
     value: medium
     reason: "conflicts_assumption: skill.weight-space-skill is distinct_from/conflicts_with mem.local-verbatim-log; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0036
+- id: r-0083
   source:
     type: object
     id: paper/latentskill
@@ -646,7 +1492,7 @@
     value: medium
     reason: "conflicts_assumption: skill.weight-space-skill is distinct_from/conflicts_with mem.external-vector-store; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0037
+- id: r-0084
   source:
     type: object
     id: paper/longtracerl
@@ -664,7 +1510,7 @@
     value: medium
     reason: "conflicts_assumption: train.outcome-gated-process-reward is distinct_from/conflicts_with train.trust-region-supervision-gating; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0038
+- id: r-0085
   source:
     type: object
     id: paper/memoryagentbench
@@ -682,7 +1528,7 @@
     value: medium
     reason: "conflicts_assumption: mem.external-vector-store is distinct_from/conflicts_with skill.parametric-local-state; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0039
+- id: r-0086
   source:
     type: object
     id: paper/memoryagentbench
@@ -700,7 +1546,7 @@
     value: medium
     reason: "conflicts_assumption: mem.external-vector-store is distinct_from/conflicts_with mem.local-verbatim-log; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0040
+- id: r-0087
   source:
     type: object
     id: paper/memoryagentbench
@@ -718,7 +1564,7 @@
     value: medium
     reason: "conflicts_assumption: mem.external-vector-store is distinct_from/conflicts_with mem.fact-graph; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0041
+- id: r-0088
   source:
     type: object
     id: paper/scaling
@@ -736,7 +1582,7 @@
     value: medium
     reason: "conflicts_assumption: skill.parametric-local-state is distinct_from/conflicts_with mem.external-vector-store; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0042
+- id: r-0089
   source:
     type: object
     id: project/mempalace
@@ -754,7 +1600,7 @@
     value: medium
     reason: "conflicts_assumption: mem.local-verbatim-log is distinct_from/conflicts_with skill.parametric-local-state; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0043
+- id: r-0090
   source:
     type: object
     id: project/mempalace
@@ -772,7 +1618,7 @@
     value: medium
     reason: "conflicts_assumption: mem.local-verbatim-log is distinct_from/conflicts_with mem.fact-graph; assumption carriers listed in evidence_anchors (aggregated, one edge per object pair)"
   status: candidate
-- id: r-0044
+- id: r-0091
   source:
     type: object
     id: project/rohitg00-agentmemory

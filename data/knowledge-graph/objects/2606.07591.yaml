@@ -1,0 +1,353 @@
+schema: ros-v1
+object_id: paper/2606.07591
+slug: "2606.07591"
+kind: paper
+title: "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research"
+source: "arxiv:2606.07591（本地 TeX source）+ github.com/InternScience/ResearchClawBench（MIT，本地 clone HEAD 27c7e34）+ HF datasets/InternScience/ResearchClawBench"
+one_sentence_thesis: >
+  主张「coding agent 能自主做科研」的宣称缺乏可检验的评测、且实测远未达标——
+  方法是把 40 道源自真实已发表论文的任务（10 个自然科学学科）做成端到端评测：每题给问题/文献/原始数据、
+  把目标论文 p* 对系统隐藏（hidden target），用专家拆解的加权可验证 rubric（含 technical keywords）逐项判分，
+  钉 50 分=复现线（re-discovery）、>50=发现（discovery），并配极简 ReAct 壳 ResearchHarness 让 17 个裸 LLM 与 7 个自主科研 agent 同台——
+  在单 judge GPT-5.1 下实测（全部自报）最强 agent Claude Code 仅 21.5、最强裸 LLM Claude-Opus-4.7 仅 20.7，
+  且 280 次 agent 运行的失败集中于实验协议/证据/科学内核错配，而非工具执行。
+
+human:
+  headline: 用 40 篇真实已发表论文当"藏起来的标准答案"，专测 coding agent 能不能从原始数据出发自主做出一项端到端科研。
+  plain_summary: >
+    这篇 ResearchClawBench（RCBench）针对"coding agent 能自主做科研"的宣传，造了一套能检验它的评测：每题给问题、文献和原始数据，
+    把对应那篇真实论文藏起来当金样，再用专家按金样拆出的加权检查单（每项带要核对的关键词）给 agent 的最终报告逐项打分，
+    50 分钉为"复现原论文"线、超过 50 才算有新发现。实测下来最强 agent（Claude Code）和最强裸模型都只有 20 分出头（作者自报），
+    而且失败几乎都集中在"实验协议、证据、科学内核对不对"，不是工具跑不动。想给一个产出开放式报告/文本的系统设计评测的人，会想起这套打分法。
+  use_type: directly_usable
+  use_type_reason: 它给的两套可直接照搬的协议（藏金样让系统从原料重做 + 把开放式产出拆成带权重带关键词的逐项 rubric 打分），正是"想给自己系统设计评测"的人能直接拿来用的。
+  how_to_use: >
+    评一个产出开放式报告/文本、没法用精确匹配的系统时：先拿一份人类已经做好的金样，把它藏起来、只发原料让系统重做；
+    再把金样拆成 5 到 7 个带权重的可核对子项，每项写清判据和要核对的关键词，让判官（大模型）逐项打分而不是打整体印象分，金样钉在刻度中点、上方留出超越空间。判分时明令"看实质不看排版"。
+  can_borrow:
+    - 把标准答案藏起来、只发原料让系统从头重做，是"它是真做出来了还是在背答案套模板"的可打分版白板测试。
+    - 开放式产出别让判官打整体印象分——拆成带权重、带核对关键词的子项逐项打，方差更小、更能区分好坏。
+    - 判分把客观项（定量结果）和主观项（机制论证）分开用不同分档表，并戒令"看实质不看文风"。
+    - 横向比多个底模时，给所有模型同一个最小工具壳，把"模型能力"和"脚手架红利"分开测。
+  cannot_borrow:
+    - 别把"最强才 21.5 分"读成"AI 完全不能做科研"——这是只评终产物、单一判官、特定 40 题、特定版本的口径。
+    - 科研域的具体 rubric 内容不能照抄，得按自己的领域重写子项。
+    - 只评最终报告、不评过程——过程走对大半最后崩掉的，跟全程敷衍的可能拿到相近分，别拿它当过程诊断或训练奖励。
+  maturity: 全部分数为作者自报、由单一判官按 rubric 打出、无人工复评比例报告，且按月迭代的模型版本会让绝对分数和排名很快过期。仓库为 MIT 开源（任务/判分脚本可得），门槛低、不需自有可训练模型；但只覆盖干实验室（dry-lab）任务。
+
+# ── 正典挂接（R4）。problem 挂 eval.agent-capability（registry 描述「任务构造、隐藏参照、确定性打分」正中本篇）。
+# concepts：现有 registry 全部为 mem/train/quant/skill 簇词条，无可挂 → 三条评测侧概念走 proposed_*，详见 .agent/kg4/2606.07591-registry-proposals.md。
+# benchmarks：canonical.benchmarks=「本篇被哪些 benchmark 实测」语义；本篇自身是 benchmark → 留空（任务指令亦明确留空）。
+#   本篇作为评测方的注册建议（bench.2606.07591）见 proposals 文件。
+canonical:
+  problems: [eval.agent-capability, eval.open-ended-output-scoring]   # eval.open-ended-output-scoring 2026-06-12 转正
+  concepts: [eval.hidden-target-rediscovery, eval.weighted-verifiable-rubric, agent.minimal-harness-baseline]   # 2026-06-12 主控收口转正
+  benchmarks: []   # 本篇即 benchmark；已注册 bench.2606.07591
+  proposed_problems: []
+  proposed_concepts: []
+
+# ════════════════════════════════════════════════════════════════
+# R1 忠实提取：claims + 逐字证据（anchor 指向原文 TeX / 本地仓库；arXiv abstract 已 WebFetch 复核）
+# ════════════════════════════════════════════════════════════════
+claims:
+  - id: 2606.07591.c1
+    statement: >
+      「coding agent 能自主做科研」的宣传缺乏有原则的检验方法：已有 benchmark（科学问答/交互式科学环境/论文复现）
+      各管一段，没有一个要求系统从原始实验数据出发、产出完整科研成果、并用可验证锚点（verifiable anchors）评判。
+    type: author_claim
+    evidence:
+      - anchor: "§1 Introduction"
+        quote: "yet there is no principled way to assess whether such claims hold up under scrutiny"
+        strength: strong
+      - anchor: "§1 Introduction"
+        quote: "However, none asks AI systems to start from raw experimental data, produce complete research outputs, and evaluate them with verifiable anchors."
+        strength: strong
+    cannot_prove:
+      - 不能证明 RCBench 自身已完全填补该空白——其 rubric 锚定已有目标论文，作者在 §6 自承「评真正新的科学结论需要比围绕已有论文构造的 rubric 更可靠的方法」。
+      - 不能证明相邻 benchmark（PaperBench/ScienceAgentBench/MLR-Bench 等）的组合不能近似覆盖同一能力面——对比表（benchmark-comparison）是作者自绘口径，✓/△/× 判定未经第三方核。
+    confidence: high
+    confidence_reason: 原文引言逐字明确，为全篇动机陈述。
+
+  - id: 2606.07591.c2
+    statement: >
+      24 个受测系统全部远低于 50 复现线：最强自主 agent Claude Code（backbone Claude-Opus-4.6）平均 21.5，
+      自主 agent 前沿均值（每题取最优）24.6；最强裸 LLM（经 ResearchHarness）Claude-Opus-4.7 平均 20.7，LLM 前沿均值 26.5。
+      且无系统通吃：Claude Code 40 题只赢 14 题，7 个 agent 两两任务级相关中位 0.79（区间 0.64–0.86），任务难度跨系统高度一致，
+      不同模型在不同学科各自领先（GLM-5.1 化学、GPT-5.4 生命科学、Qwen3.7-Max 物理等）。
+    type: fact
+    evidence:
+      - anchor: "Abstract"
+        quote: "the strongest autonomous agent, Claude Code, averages 21.5, and the strongest ResearchHarness LLM, Claude-Opus-4.7, averages 20.7, with an LLM frontier mean of only 26.5"
+        strength: strong
+      - anchor: "§1 Introduction"
+        quote: "even when taking the best autonomous-agent result for each task, the frontier mean is only 24.6"
+        strength: strong
+      - anchor: "§4.2 Main Results"
+        quote: "It wins only 14 out of 40 tasks at the task level and different agents show highly consistent task difficulty; among the 21 pairwise task-level correlations induced by the seven agents, the median is 0.79 and the range is 0.64--0.86"
+        strength: strong
+    cannot_prove:
+      - 不能证明这些分数=AI 科研能力的客观上限——分数由单 judge（GPT-5.1）按 rubric 打出，全部自报、无人工复评比例报告；judge 偏差与 rubric 构造都会移动绝对值。
+      - 不能跨版本外推——受测为特定版本配置（Claude Code 绑 Claude-Opus-4.6、多数 agent 绑 GPT-5.4），版本更新后绝对分数与排名过期。
+      - 不能证明「任务难度跨系统一致」=任务质量高——也可与「所有系统共享同类底模短板」相容。
+    confidence: high
+    confidence_reason: 数字逐字核对本地 TeX（Abstract/§1/§4.2/Table 5），并经 arXiv abstract WebFetch 复核一致。
+
+  - id: 2606.07591.c3
+    statement: >
+      受测清单：7 个自主科研 agent——Claude Code（Claude-Opus-4.6）、Codex CLI（GPT-5.4）、OpenClaw（GPT-5.4）、
+      ResearchClaw（GPT-5.4）、EvoScientist（GPT-5.4）、ARIS Codex（Codex/GPT-5.4）、Nanobot（GPT-5.4）；
+      17 个裸 LLM（经 ResearchHarness）——Claude-Opus-4.7、Claude-Opus-4.6、Qwen3.7-Max、GLM-5.1、Qwen3.6-Plus、
+      Kimi-K2.6、Gemini-3.5-Flash、DeepSeek-V4-Pro、GPT-5.5、MiMo-V2.5、MiMo-V2-Pro、GPT-5.4、Qwen3.5-397B-A17B、
+      Kimi-K2.5、Grok-4.1、Gemini-3.1-Pro、Grok-4.3。每次运行后由 GPT-5.1 按 rubric 给最终报告判分。
+    type: fact
+    evidence:
+      - anchor: "§4.1 Experimental Setup"
+        quote: "We evaluate seven agents: Claude Code, Codex CLI, ARIS Codex, OpenClaw, Nanobot, EvoScientist, and ResearchClaw"
+        strength: strong
+      - anchor: "§4.1 Experimental Setup"
+        quote: "After each run, GPT-5.1 scores the final report against the rubrics."
+        strength: strong
+      - anchor: "Table 5 主结果表（系统行逐字）"
+        quote: "Claude-Opus-4.7 / Claude-Opus-4.6 / Qwen3.7-Max / GLM-5.1 / Qwen3.6-Plus / Kimi-K2.6 / Gemini-3.5-Flash / DeepSeek-V4-Pro / GPT-5.5 / MiMo-V2.5 / MiMo-V2-Pro / GPT-5.4 / Qwen3.5-397B-A17B / Kimi-K2.5 / Grok-4.1 / Gemini-3.1-Pro / Grok-4.3"
+        strength: strong
+    cannot_prove:
+      - 不能用本篇数字评判未受测系统——The AI Scientist / AI Co-Scientist / AI-Researcher / InternAgent-1.5 只在 related work 被提及为「系统侧动机」，逐字核实不在结果表内。
+      - 不能区分「agent 框架贡献」与「backbone 贡献」——每个 agent 只绑一个 backbone 配置，无交叉控制实验（仅 Claude Code(Opus-4.6) 21.5 vs 裸 Opus-4.6 19.9 可作粗略对照）。
+    confidence: high
+    confidence_reason: 系统名逐字核对本地 TeX §4.1 与 Table 5 行；受测/未受测分界经 related_work.tex 专项核实。
+
+  - id: 2606.07591.c4
+    statement: >
+      对 7 个 agent × 40 任务全部 280 次运行做六类错误归因，失败集中在 Experiment Design Mismatch（协议/数据处理/基线/验证设定与目标论文不符）、
+      Evidence Mismatch（图/数字/结论与关键证据不符）、Scientific Core Missing（核心机制或发现缺失），
+      而非 Goal Misalignment / Reliability-Reporting Failure / Execution Failure——即瓶颈是科学严谨性，不是跑不出报告。
+    type: fact
+    evidence:
+      - anchor: "Abstract"
+        quote: "Error analysis shows that failures concentrate in experimental protocol mismatch, evidence mismatch, and missing scientific core."
+        strength: strong
+      - anchor: "§4.5 Error Analysis"
+        quote: "We analyze all 280 runs from the seven autonomous agents over 40 tasks and group fine-grained labels into six error types."
+        strength: strong
+      - anchor: "§4.6 Case Study (Physics 002, OpenClaw 27.45 全场该题最高)"
+        quote: "agent analysis often stops at the most direct observable trend while missing the finer verification steps and physical modeling required for target-paper-level re-discovery"
+        strength: medium
+    cannot_prove:
+      - 不能证明该错误分布同样适用于 17 个裸 LLM 的运行——错误分析只覆盖 7 个 agent 的 280 次运行。
+      - 归因协议未详述——fine-grained labels 由谁（人/LLM）标注、标注一致性如何，正文未报告，分布形状的可靠性无法独立审。
+      - 不能排除部分「协议不符」实为「不同但有效的科研路线」被 rubric 口径错杀（见 f1）。
+    confidence: high
+    confidence_reason: 错误三类集中表述在 Abstract 与 §4.5 双处逐字一致；280=7×40 数字自洽；但归因者身份原文未披露，已入 cannot_prove。
+
+  - id: 2606.07591.c5
+    statement: >
+      报告写得漂亮 ≠ 科学到位：4 个补充维度（Comprehensiveness/Depth/Instruction Following/Professionalism）里
+      系统的 Professionalism 常超 70（Claude Code 76.4），其余维度低得多（Claude Code Comp. 仅 44.6）；
+      且四维与 rubric 分仅弱相关——核心挑战是复刻 rubric 关键科学证据，不是产出排版精良的报告。
+    type: fact
+    evidence:
+      - anchor: "§4.3 Four Supplemental Dimensions"
+        quote: "Systems often exceed 70 on Professionalism, while the other dimensions are lower"
+        strength: strong
+      - anchor: "§4.3 Four Supplemental Dimensions"
+        quote: "The four dimensions also have weak correlations with rubric score."
+        strength: strong
+      - anchor: "Table 6（补充维度，Claude Code 行）"
+        quote: "Claude Code: Comp. 44.6 / Depth 58.0 / Instr. 49.0 / Prof. 76.4"
+        strength: strong
+    cannot_prove:
+      - 「弱相关」未给出相关系数与显著性检验——强度无法独立核。
+      - 补充维度同样出自 LLM judge——「专业性高分」本身可能含 judge 对表面文风的偏好，不是独立测量。
+    confidence: high
+    confidence_reason: 表述与数字逐字核对本地 TeX §4.3 与 Table 6；相关系数缺失已入 cannot_prove。
+
+  - id: 2606.07591.c6
+    statement: >
+      分数与资源投入（成本/耗时）仅弱正相关，且主要被「高分+高成本+长耗时」的 Claude Code 抬高；
+      成本维效率拐点是 Qwen3.7-Max、耗时维效率拐点是 OpenClaw。作者据此推断：当前任务尚不在现有模型的
+      稳定能力边界（stable capability boundary）之内——多花算力/时间不必然稳定变好。
+    type: author_claim
+    evidence:
+      - anchor: "§4.4 Runtime and Cost Analysis"
+        quote: "score appears to have only a weak positive relationship with resource investment, and this relationship is largely elevated by Claude Code"
+        strength: strong
+      - anchor: "§4.4 Runtime and Cost Analysis"
+        quote: "The efficient knee in the cost dimension is Qwen3.7-Max, while the efficient knee in the runtime dimension is OpenClaw."
+        strength: strong
+      - anchor: "§4.4 Runtime and Cost Analysis"
+        quote: "the current tasks may not yet lie within the stable capability boundary of existing models"
+        strength: medium
+    cannot_prove:
+      - 不能证明「能力边界之外」是唯一解释——同样的弱相关也与「评分只看终产物、对额外探索不给分」（f3 口径效应）相容。
+      - 「弱正相关」是 Pareto 图上的定性观察，无相关系数/统计检验。
+    confidence: high
+    confidence_reason: 三段引文逐字核对本地 TeX §4.4；「may not yet」原文自带弱模态词，故定型为 author_claim 而非 fact。
+
+# ════════════════════════════════════════════════════════════════
+# R2 机制重构（benchmark 论文稀疏侧写：评测协议=mechanism，共 3 条，能画流程图）
+# ════════════════════════════════════════════════════════════════
+mechanisms:
+  - id: 2606.07591.m1
+    name: 隐藏目标论文的任务构造流水线（hidden-target task construction）
+    canonical_concept: eval.hidden-target-rediscovery   # proposed
+    problem: eval.agent-capability
+    input: 高质量已发表论文（领域专家按「问题清晰 / 原始数据可得 / 有研究价值」筛选）
+    output: "标准化任务包 τ=(q, L, D, p*, A)：可执行任务描述、相关文献、原始数据、隐藏目标论文、围绕其关键产物的评测工件"
+    operations:
+      - 专家筛选目标论文（研究价值含科学/经济/生态/医疗等维度——保证「问题本身值得研究」）
+      - 抽出核心科学问题并改写成可执行任务描述 q
+      - 组织相关文献 L 与原始数据 D；目标论文 p* 不进系统可见面、只留在评测侧
+      - 围绕 p* 的关键科学产物构造加权 rubric（text|image 两型；每项=具体判据 + judge 须核对的 technical keywords + 权重；存 target_study/checklist.json）
+      - 打包标准化任务（task_info.json + data/ + related_work/ + target_study/）
+      - 多专家交叉核对、修问题、滤掉不合适样本
+    optimization: none（纯专家流程，无训练信号）
+    replaceable: [学科域与任务数（现 40×10）, 数据模态, rubric 条数与权重分布（如 Astronomy_000 为 0.20/0.30/0.50 三项）]
+    non_replaceable: [目标论文对被测系统隐藏（暴露即退化为 PaperBench 式论文复现）, rubric 锚定真实论文的具体科学产物而非泛泛维度, 专家出题+交叉核对（保科学意义，防 LLM 自造任务的效度问题）]
+    reusable_pattern: 要评「开放式产出做得对不对」，先找一份人类已做出的金样，把金样藏起来、只发原料，再用按金样拆解的加权检查单验收。
+    anchor: "§3.1–3.2（τ 定义+专家流水线）+ repo tasks/Astronomy_000/{task_info.json, target_study/checklist.json}"
+
+  - id: 2606.07591.m2
+    name: 加权可验证 rubric 双模式逐项判分（weighted-rubric judging）
+    canonical_concept: eval.weighted-verifiable-rubric   # proposed
+    problem: eval.agent-capability
+    input: "系统产出 y=(π, o, r)（实验代码与执行过程、中间结果/图/文件、最终研究报告）+ 该任务 checklist + 发给 agent 的任务说明"
+    output: 0–100 加权总分（50=复现线、>50=发现区间）+ 4 个补充维度分（全面性/深度/指令遵循/专业性）
+    operations:
+      - judge（论文实测=GPT-5.1；repo 强制显式 JUDGE_MODEL_NAME 环境变量、无默认回退）逐 rubric 项打分
+      - 每项先判定属 Mode A objective（定量指标/结果）还是 Mode B subjective（机制分析/论证），各有 0–100 十级分档表
+      - 对照该项判据与 technical keywords 核对报告实质内容（prompt 明令 substance over style、be highly skeptical of AI-generated content）
+      - image 型项：目标论文原图作为第一张 ground-truth 附图与 agent 产出图对比——刻度错/数据缺/趋势错即低分
+      - 按权重聚合各项分；50 锚定「与已发表论文相当（as good as the actual published paper）」，>50 进入 discovery 区间
+    optimization: none
+    replaceable: [judge 模型, 补充维度集合, 分档表粒度]
+    non_replaceable: [逐项加权判分（取代整体印象分——治 LLM-as-judge 偏置的结构手段）, 每项自带可核对 keywords（约束 judge 自由发挥）, 50 钉在「与真论文相当」的高标准（复刻与超越放进同一刻度）]
+    reusable_pattern: 开放式产出的 LLM 判分要稳，别让 judge 打整体印象分——拆成带权重、带核对关键词的子项，每项给清晰分档，金样钉在刻度中点、上方留超越空间，最后加权。
+    anchor: "§3.4 + repo evaluation/score.py（RUBRIC prompt：Mode A/B 分档表、'50 means as good as the actual published paper'、image 首图=ground-truth）"
+
+  - id: 2606.07591.m3
+    name: ResearchHarness 极简 ReAct 评测壳
+    canonical_concept: agent.minimal-harness-baseline   # proposed
+    problem: eval.agent-capability
+    input: 任意支持 OpenAI-compatible API + native tool calling 的裸 LLM + RCBench 任务包
+    output: 与完整自主 agent 同协议可比的端到端科研运行轨迹（代码/图/最终报告）
+    operations:
+      - 简洁 ReAct 式循环驱动工具调用
+      - "三类工具面——Web 检索：WebSearch/ScholarSearch（Serper API）、WebFetch（Jina Reader）；本地文件：Glob/Grep/Read/ReadPDF（MinerU 抽 PDF）/ReadImage/Write/Edit；本地执行：Bash 一次性命令 + TerminalStart/Write/Read/Interrupt/Kill 持久终端"
+      - 自动上下文压缩：消息历史逼近输入预算时摘要成 compact memory 续跑，默认 128k token 触发
+    optimization: none
+    replaceable: [搜索/抓取/PDF 抽取后端, compaction 阈值与摘要策略, 具体工具命名]
+    non_replaceable: [壳刻意做小（让评测逼近模型自身能力而非脚手架红利）, 跨 17 模型统一工具面（可比性的前提）]
+    reusable_pattern: 横向比较多个底模的 agent 能力时，给所有模型同一个最小统一工具壳，把「模型能力」与「脚手架红利」分开测。
+    anchor: "§3.3 + Table 4（tool surface）+ 'the default compaction trigger is 128k tokens'"
+
+# ════════════════════════════════════════════════════════════════
+# R3 批判轮：assumptions（显/隐）+ failure_modes（实验没证明什么）
+# ════════════════════════════════════════════════════════════════
+assumptions:
+  - id: 2606.07591.a1
+    statement: 围绕已有目标论文构造的 rubric 能充当开放式科研产出的「可验证锚点」；但其测量效度封顶在已知——作者自承评真正新的科学结论需要更可靠的方法。
+    kind: explicit
+    anchor: "§6 Limitations：'Evaluating truly new scientific conclusions requires more reliable evaluation methods than rubrics constructed around existing target papers.'"
+    conflicts_hint: 与自身「>50=发现区间」的刻度设计张力——刻度留了发现的空间，测量方法没跟上（f1 的根源）。
+
+  - id: 2606.07591.a2
+    statement: 单一 LLM judge（GPT-5.1）在「rubric 拆项 + technical keywords 核对 + 十级分档」约束下足够中立可比；论文自引 LLM-as-judge 偏置文献作动机，但未做 judge 一致性或换 judge 鲁棒性实验。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「judge 可信度须独立验证」的评测假设冲突——OpenAI 系 judge 评 OpenAI 系被测（GPT-5.4/5.5/Codex CLI）有同族偏好风险（与 memoryagentbench.a3 同型）。
+
+  - id: 2606.07591.a3
+    statement: 「目标论文对系统隐藏」在评测侧真正成立=被测模型未从预训练语料中见过/记住 p*；若 p* 已入语料，「再发现」退化为「回忆」。正文未讨论数据污染（contamination）控制。
+    kind: implicit
+    anchor: ""
+    conflicts_hint: 与「测研究能力而非记忆」的评测目的冲突。注意方向性——当前全员低分意味着即便有污染也未兑现成捷径，但该论证是方向性的、非证明。
+
+  - id: 2606.07591.a4
+    statement: 最终报告（终产物）足以代表整次科研运行的质量；过程级（细粒度研究步骤）评分被作者明确留作 limitation。
+    kind: explicit
+    anchor: "§6 Limitations：'current scoring mainly targets the final report rather than fine-grained research steps'"
+    conflicts_hint: 与过程信号路线（如 train.entity-level-process-reward 的逐跳过程分哲学）天然互补张力——终点评分便宜可扩展，过程评分才能做诊断与训练信号。
+
+failure_modes:
+  - id: 2606.07591.f1
+    statement: rubric 封顶效应——系统走出与目标论文不同但科学上有效的路线、或真超越时，逐项 rubric 仍按目标论文产物对表。
+    triggered_when: 被测产出偏离目标论文的方法学但成立，或真的越过复现线进入 discovery 区间。
+    consequence: 真发现可能被错杀计入「Experiment Design Mismatch」；>50 区间的读数效度未证（作者自承）。注意 repo README 口径与论文不一致——README 写「50 = match the paper, 70+ = surpass it」，论文写 >50 即 discovery。
+
+  - id: 2606.07591.f2
+    statement: 低分被外部读者脱离口径引用为「AI 完全不能做科研」。
+    triggered_when: 21.5/100 被引用时丢掉口径限定——dry-lab only、只评终产物、单 judge、特定 40 题、特定系统版本。
+    consequence: 把「离目标论文级证据链还远」误读成「无科研用途」——同一系统在子环节（数据处理/单步分析/文献综述）可能已可用；反向也成立：分数不低估不了 wet-lab 域的不可知。
+
+  - id: 2606.07591.f3
+    statement: 评终点不评过程——过程走对大半、最后一步崩掉的运行，与全程敷衍的运行可能拿相近分。
+    triggered_when: 把 RCBench 分数用作过程级诊断，或直接当 RL 训练奖励信号。
+    consequence: 分数对过程质量不敏感；当奖励用会鼓励「终报应试」（优化报告表面贴合 rubric 而非真做实验——judge prompt 的 skepticism 只缓解、不消除）。
+
+  - id: 2606.07591.f4
+    statement: 结论保鲜期短——受测 agent/模型按月迭代，绝对分数与排名随版本漂移过期。
+    triggered_when: 引用本篇排名比较 2026-06 之后发布的新版本系统。
+    consequence: 21.5/20.7/26.5 等数字失去时效，须重跑才有参考价值（与 memoryagentbench.f3 同型）。
+
+# ════════════════════════════════════════════════════════════════
+# R4 钩子与考题
+# ════════════════════════════════════════════════════════════════
+trigger_hooks:
+  - symptom: "我要评一个产出开放式文本/报告的系统，exact-match 用不了，让 LLM 整体打分又抖得厉害、分不出好坏。"
+    why_recall: 本篇的解法是把开放式产出拆成围绕关键产物的加权可验证子项 + technical keywords 核对 + Objective/Subjective 双模式分档——比整体打分更稳、更能区分（m2）。
+    related_object: 2606.07591.m2
+    risk: rubric 锚定已知答案——产出真正新颖时逐项 rubric 会错杀（f1）；需另设新颖性出口或人工兜底。
+
+  - symptom: "想知道我的系统是真理解/真做出来了，还是在背答案、套模板——需要一种「藏起标准答案、让它从原料重做」的测法。"
+    why_recall: hidden-target re-discovery 协议（m1）：隐藏金样、只给原料（问题/文献/数据），按金样拆解的加权检查单验收——「白板测试」的可打分量化版。
+    related_object: 2606.07591.m1
+    risk: 被测系统的训练语料若已含金样，测的是记忆不是能力（a3 污染未控）；金样选取须避开高曝光材料。
+
+  - symptom: "agent 交付的报告又快又漂亮，但行家一看内容就摇头——分不清瓶颈在工程执行还是在『内容对不对』。"
+    why_recall: 本篇实测（c4/c5）失败集中在协议/证据/科学内核错配而非执行，且专业性常 >70 但与实质分弱相关——先审证据链与协议正确性，别再优化排版与工具流。
+    related_object: 2606.07591.c4
+    risk: 该错误分布来自科研任务 + 7 个特定 agent 的 280 次运行，不必然迁移到你的任务域与系统。
+
+exam_questions:
+  - q: 若把 RCBench 的评分锚点从「50=复现线」改成「100=复刻原论文即满分」，benchmark 失去什么测量能力？这个改动会暴露它现有设计里哪条没解决的问题？
+    type: counterfactual
+    expected_points:
+      - 失去 discovery 区间——复刻与超越无法放进同一刻度，target optimization（奖励更强定量结果）与 diagnostic analysis（奖励更深解释）的「超越」无处计分
+      - 50 锚点的语义是「与已发表论文相当=高标准」，居中锚定才能让 judge 在两侧都有分档可用
+      - 但暴露的问题不变：>50 区间的测量效度本来就未证（a1/f1，rubric 封顶在已知）——刻度留了空间、方法没跟上
+    tested_objects: [2606.07591.m2, 2606.07591.a1, 2606.07591.f1]
+  - q: 「最强 agent 才 21.5 分」能推出「当前 AI 不能自主做科研」吗？哪些反驳本 benchmark 排除不了，哪些反驳反而被它的证据削弱？
+    type: boundary
+    expected_points:
+      - 不能直接推——口径限定：dry-lab only、只评终产物（f3）、单 judge GPT-5.1（a2）、rubric 锚定特定论文证据链（f1）、全部自报
+      - 排除不了：分数偏低部分来自评测口径而非能力（不同但有效的路线被错杀）
+      - 被削弱的反驳：「是工具/工程问题」——280 次运行错误集中在协议/证据/科学内核而非执行（c4）；「是脚手架问题」——裸 Opus-4.7+极简壳 20.7 与带完整脚手架的 Claude Code 21.5 几乎持平（c2/m3）
+      - 数据污染（a3）方向上只会推高分数，故低分不能归咎于污染
+    tested_objects: [2606.07591.c2, 2606.07591.c4, 2606.07591.f2, 2606.07591.a3]
+  - q: 把「隐藏目标 + 加权 rubric」迁移到 AI-Brief 自己的深读冷审门，应该借什么、改什么、防什么？
+    type: transfer
+    expected_points:
+      - 借协议：隐藏已发布 paper.mdx 金样 → 把每篇金样拆成 5–7 项加权可验证子项（含关键词）→ judge 对「新生成深读 vs 金样」逐项打分，50 锚「与金样相当」
+      - 借判据设计：Objective/Subjective 双模式分档 + substance over style 戒律，治冷审「整体 major_gaps」打分方差大的问题
+      - 改：科研域 rubric 内容不可照抄，须按深读范式（密度分区/锚点/事实分型）重写子项
+      - 防：f3 评终点教训——冷审仍须保留锚点逐字核（过程证据），不能只评成稿观感；f1 教训——新深读用不同但合理结构时勿按金样结构错杀
+    tested_objects: [2606.07591.m1, 2606.07591.m2, 2606.07591.f3]
+  - q: ResearchHarness 把壳刻意做小是为了什么测量目的？若让各家模型都用自带的完整 agent 脚手架来比，本篇哪条结论会先失效？
+    type: counterfactual
+    expected_points:
+      - 目的=分离「模型能力」与「脚手架红利」：统一最小工具面 + 统一 compaction，17 个底模才可比（m3）
+      - 失效的是归因结论：Claude Code(带脚手架) 21.5 vs 裸 Opus-4.7(极简壳) 20.7 几乎持平 → 「当前瓶颈在模型科研能力而非脚手架」——混用各家脚手架后该归因不再成立
+      - 同时跨模型排名也失真：分差会混入脚手架工程质量差异
+    tested_objects: [2606.07591.m3, 2606.07591.c2]
+
+self_evo_verdict:
+  state: apply
+  reason: >
+    能用，方法论层直接服务本站（非红线，纯评测协议借用）：
+    ① 加权可验证 rubric + 关键词核对 + 双模式分档（m2）可升级冷审门——把「整体 major_gaps」判分改成逐项加权判分，治方差与区分度；
+    ② hidden-target re-discovery（m1）是本站「白板测试」的量化版——隐藏金样、按金样拆 rubric 打分，把定性盲测变成可回归的分数（KG L5 盲测验收可直接借）；
+    ③ 远期：本篇是北极星 L3（AutoSci 自主科研）成熟时的现成评测尺，且其结论（瓶颈=科学严谨非工具执行）提示 L3 验收门应优先核证据链而非产出流畅度。
+    verify 路径=选 3 篇已深读论文，每篇拆 5–7 项加权 rubric（隐藏原 paper.mdx），对比「整体打分 vs 逐项打分」的方差与区分度，并对失败样本做六类错误归因，3–7 天可证。
+    防呆：借协议不照抄科研域 rubric；记住 f3（评终点不评过程）——冷审的锚点逐字核不可被 rubric 分取代。
+
+status: draft

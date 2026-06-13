@@ -9,6 +9,31 @@ one_sentence_thesis: >
   Retrieve/Summary/Filter）暴露为一等 tool-based policy action 并用三阶段课程 + step-wise GRPO 端到端强化学习训练，
   在 ALFWorld/SciWorld/PDDL/BabyAI/HotpotQA 五个长程基准、Qwen2.5-7B 与 Qwen3-4B 两个 backbone 的受控评测上均分超过模块化记忆基线。
 
+# ── 人读层（受众分离）：以下 human 块给人看；本块之外的字段是 AI 内部记账。
+human:
+  headline: "把『什么时候存/取/改/删记忆』交给 agent 自己用强化学习学，而不是写死成外挂的记忆模块。"
+  plain_summary: >
+    多数 agent 的记忆是个旁挂的存储层，靠固定规则决定何时保存、何时检索。这篇反过来：把六个记忆操作
+    （长期记忆的增/改/删 + 短期上下文的取回/压缩/过滤）做成 agent 能自己调用的动作，再用强化学习端到端训练它何时用哪个。
+    在五个长程任务的受控评测上，分数超过了 Mem0、A-Mem 这类模块化记忆基线。值得记住的点：它把「记忆管理」从工程配置问题
+    变成了可学习的策略问题，而且消融显示真正提分的是 RL 训练而非那个统一接口本身。
+  use_type: design_inspiration
+  use_type_reason: "核心增益来自 RL 训练，需要自有可训练模型才能复现；没有训练介质的纯工程系统只能借它的接口思路，不能直接拿来用。"
+  how_to_use: >
+    最小可借的形态是接口层：把系统里「何时写/取/改/删记忆」的控制决策从写死的 if-else 抽成一组带类型的动作
+    （Add/Update/Delete/Retrieve/Summary/Filter），先让这些决策显式、可观测、可替换；强化学习那一层等到有可训练模型再说。
+  can_borrow:
+    - "把记忆的控制决策建模成 agent 可调用的带类型动作（typed action），而不是埋在外部 hook 的固定规则里。"
+    - "显式区分长期记忆库和短期活跃上下文两个状态，分别治理。"
+    - "把一个复合能力拆成『先学记、再学抗干扰、最后学综合用』的递进课程来训练。"
+    - "想知道某个决策好不好却要等任务结束才知道时，用『终局结果回传给前面每一步』的思路给早期动作补反馈信号。"
+  cannot_borrow:
+    - "强化学习训练回路（step-wise GRPO）——没有可训练模型 / RL 框架的系统搬不动，多数工程系统先要的是接口而非 RL。"
+    - "把受控基准上的领先当成开放真实部署的承诺——作者自己也说评测相对受控、跨域没验证。"
+    - "终局优势均匀广播是粗粒度的，会把功劳平摊给无关步骤，别当成精确归因。"
+  maturity: >
+    全部为作者自报数字、受控基准上得出；核心机制需自有可训练模型 + RL 框架才能复现，门槛高。接口设计部分可立即借鉴、无门槛。
+
 # ── 正典挂接（R4）。MemoryAgentBench 经核实：原文全文不出现该名（既非受测基准、非 baseline、非 related work），故 benchmarks 留空。
 canonical:
   problems: [mem.lifecycle-management]

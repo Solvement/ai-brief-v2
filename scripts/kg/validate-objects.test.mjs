@@ -38,6 +38,16 @@ function goodObject(slug = "agemem") {
     title: "AgeMem",
     source: "fixture",
     one_sentence_thesis: "AgeMem learns a memory policy and evaluates it in a lifecycle setting.",
+    human: {
+      headline: "Let the agent learn when to store and forget, instead of hardcoding it.",
+      plain_summary: "Folds memory operations into the agent policy and trains them, beating modular baselines on long tasks.",
+      use_type: "design_inspiration",
+      use_type_reason: "The core gain needs a trainable model, so most systems can only borrow the interface idea.",
+      how_to_use: "Expose store/update/delete as callable actions first; add learning later.",
+      can_borrow: ["Model the control decision as a callable action."],
+      cannot_borrow: ["The training loop needs a trainable policy."],
+      maturity: "Self-reported on controlled benchmarks.",
+    },
     canonical: {
       problems: ["mem.lifecycle-management"],
       concepts: ["mem.learned-policy-controller"],

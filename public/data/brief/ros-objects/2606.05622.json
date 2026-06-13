@@ -1,0 +1,447 @@
+{
+  "assumptions": [
+    {
+      "anchor": "Appendix: Runtime Interaction Details——world constraints are typically more objective and directly verifiable / user constraints are typically softer and more preference-based",
+      "conflicts_hint": "若用户约束实为硬红线（安全/合规/过敏类禁忌），\"用户约束更可协商\"的前提失效，world-first 披露顺序与按它定义的试探指标都会偏。",
+      "id": "2606.05622.a1",
+      "kind": "explicit",
+      "statement": "世界约束比用户约束更客观、可直接验证（硬可行性条件），用户约束更软、更可协商——因此披露策略让世界约束永远优先。"
+    },
+    {
+      "anchor": "Appendix: Model Choice — Filter model and judge model validation",
+      "conflicts_hint": "与\"裁判须与被测家族独立\"的评测中立假设冲突——constraint judge=GPT-5.4 而最强受测=GPT-5 系，校准测的是与人一致率、未测同族偏袒。",
+      "id": "2606.05622.a2",
+      "kind": "explicit",
+      "statement": "经小样本人工校准（30 实例/30 轨迹/240 条轨迹）的 LLM 裁判体系（GPT-5.4 约束 judge + 三 rubric judge）足以充当全部主结果的 ground truth。"
+    },
+    {
+      "anchor": "Appendix: Significance discussion——we intentionally isolate the planning component / abstracting away from these factors allows us to focus on planning under incomplete task-relevant information",
+      "conflicts_hint": "与具身评测立场（物理合理性必须由真实执行验证）张力——本篇 physical plausibility 仍由文本 judge 打分，\"物理上行不行\"没有执行级证据。",
+      "id": "2606.05622.a3",
+      "kind": "explicit",
+      "statement": "把 perception/navigation/低层控制有意抽掉、只隔离文本层规划，仍能测到有意义且可归因的\"自适应规划\"能力。"
+    },
+    {
+      "anchor": "Appendix: user-attribute discussion——A user typically does not object to an object in isolation, but to attributes or implied modes of use such as being sharp, high-heat, noisy or messy",
+      "conflicts_hint": "与\"真实偏好可协商、上下文依赖、随交互演化\"的用户建模假设冲突——属性禁忌是静态硬化的偏好快照。",
+      "id": "2606.05622.a4",
+      "kind": "explicit",
+      "statement": "用户偏好可以充分操作化为\"工具/用法属性禁忌\"（高温/噪音/锋利/脏乱等）——用户反对的不是物体本身而是属性或隐含用法。"
+    }
+  ],
+  "canonical": {
+    "benchmarks": [],
+    "concepts": [
+      "eval.violation-triggered-disclosure",
+      "eval.compliance-quality-two-tier",
+      "eval.solution-mined-constraints"
+    ],
+    "problems": [
+      "agent.planning-adaptivity",
+      "eval.agent-capability"
+    ],
+    "proposed_concepts": [],
+    "proposed_problems": []
+  },
+  "claims": [
+    {
+      "cannot_prove": [
+        "不能证明此前不存在任何具备该组合的基准——比较基于作者自选的特征维度表(Table 1)；同期邻近工作（ADAPT 2604.14902 / SEQUOR 2605.06353 / APB 2606.04874，深读独立核到）覆盖相邻设置，\"underexplore\" 是定位声明非穷尽综述结论。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "摘要逐字（本地 LaTeX 源 + WebFetch arxiv abs 双核对）；定位句在 §3 原文明确。",
+      "evidence": [
+        {
+          "anchor": "Abstract",
+          "quote": "existing benchmarks still underexplore adaptive planning under such progressively revealed dual constraints",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§3 AdaPlanBench Construction ¶1",
+          "quote": "AdaPlanBench distinguishes itself from prior work by focusing on interactive planning under both user and world constraints",
+          "strength": "medium"
+        }
+      ],
+      "id": "2606.05622.c1",
+      "statement": "现有规划/agent 基准对\"世界与用户双约束在交互中渐进披露\"的自适应规划设置覆盖不足 （多为开局给全约束、或只测单侧约束、或动作空间封闭），AdaPlanBench 是为补此空白构造的动态交互基准。\n",
+      "type": "author_claim"
+    },
+    {
+      "cannot_prove": [
+        "不能证明 67.75% 离\"可用/人类水平\"多远——论文无 human baseline，协议下的可达上限未知。",
+        "绝对分数依赖 GPT-5.4 约束 judge + 三 rubric judge 体系；换裁判家族后的分数未测，且最强受测与 judge 同属 GPT 系（家族偏置风险）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "Table 3 数字与 §4 文字逐字核对本地 LaTeX 源；约束密度对照 Table 2（world 9.76/19.61/37.73，user 10.91/21.78/41.79）。",
+      "evidence": [
+        {
+          "anchor": "§4 Results ¶1 + Table 3 (E_mid 主结果表)",
+          "quote": "Even GPT-5, the best-performing model, reaches only 67.75% accuracy.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§4 Results ¶1",
+          "quote": "each query contains 0.295 repeated violations of disclosed world constraints and 0.503 repeated violations of disclosed user constraints",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Appendix Table 7 (95% Wald CI, 307 samples)",
+          "quote": "GPT-5 67.75 ± 5.23",
+          "strength": "medium"
+        }
+      ],
+      "id": "2606.05622.c2",
+      "statement": "在 E_mid（平均每题 19.61 条世界约束 + 21.78 条用户约束）下，10 个被测 LLM 中最强的 GPT-5 也只有 67.75% accuracy（95% Wald CI ±5.23），Gemini-3.1-Pro 约 35%、多数模型低于 45%、开源权重模型约 30% 或更低； 平均每题重复违反已披露世界约束 0.295 次、已披露用户约束 0.503 次，平均 17.91% 的题因连续两轮无新违规被 early stop。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能证明\"effectiveness/physical 低\"是模型规划能力缺陷而非 rubric judge 的口味——质量门本身由 LLM 裁判（文本评估）执行，无真实执行验证。",
+        "不能外推为\"VPR 类合规指标无用\"——VPR 与 AWRV/AURV 仍有效区分约束跟踪行为，只是不充分。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "两段数字均逐字核对 Table 3 与 Table 4（本地 LaTeX 源）。",
+      "evidence": [
+        {
+          "anchor": "§4 Results: High valid-plan rates do not necessarily translate into final task success",
+          "quote": "both Gemini-3.1-Pro and Gemini-3-Flash achieve relatively high VPRs, exceeding 90%, yet their accuracies remain below 45%.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§5 Table 4 (E_mid 四主维 rubric, Average 行)",
+          "quote": "Average 4.691 / 4.080 / 3.715 / 4.564 (Feasibility / Physical / Effectiveness / Safety)",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.05622.c3",
+      "statement": "高合规率不等于任务成功（VPR≠Acc）：Gemini-3.1-Pro VPR 91.21% 但 Acc 仅 34.53%、Gemini-3-Flash VPR 90.23% 但 Acc 43.32%， 且两者 AWRV/AURV 偏低（约束跟踪并不差）——约束全守住但方案过不了 rubric 质量门。 全模型平均 rubric 分上最弱的两维是 effectiveness 3.715 与 physical plausibility 4.080（feasibility 4.691 / safety 4.564）。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "相关非因果：不能证明\"提高试探强度→提高 accuracy\"——模型综合能力是显然混杂变量，且 n=10 的模型级横断相关。",
+        "不能证明高 ATWC/ATUC 在产品场景是好行为——该协议下\"试探\"=提交违规方案换取披露，产品里即反复让用户纠错。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "相关系数原文逐字；因果解释原文自标 \"One possible explanation\"，已在 statement 内显式分型。",
+      "evidence": [
+        {
+          "anchor": "§4 Results: Better final performance is associated with stronger proactive constraint exploration",
+          "quote": "accuracy is strongly correlated with both metrics, with correlation coefficients of 0.898 for ATWC and 0.919 for ATUC.",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.05622.c4",
+      "statement": "accuracy 与试探强度强相关：跨 10 模型，Acc 与 ATWC（每轮触发新世界约束数）相关系数 0.898、与 ATUC 0.919； Acc 最高的 GPT-5/GPT-5-Mini 同时是 ATWC/ATUC 最高的两个模型。作者解释（原文标注 one possible explanation，非验证结论）： 更强模型在阻断反馈后能产生更多样的修订方案，从而更快暴露隐藏约束。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "数字来自 4 个模型的子集（具体型号在 Figure 4，主文未列名），不能外推到全部 10 模型。",
+        "只测了\"贴回 prompt\"一种记忆形态——不能证明更结构化的干预（如把约束编译成可行动作空间）同样无效。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "干预数字原文逐字（§5 文字给出区间）；\"4 模型子集\"为原文明示。",
+      "evidence": [
+        {
+          "anchor": "§5 Instant constraint tracking module improves validity without recovering accuracy + Figure 4",
+          "quote": "yields only a marginal improvement in accuracy (less than 3% for 3 out of 4 models), while producing a more noticeable gain in VPR, typically on the order of 5%--15%",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.05622.c5",
+      "statement": "\"把全部已披露约束每轮显式贴回输入\"的干预实验：accuracy 只有边际提升（4 个被测模型中 3 个 <3%）， 但 VPR 提升明显（约 5%–15%）。作者据此判断：退化主因不是忘记约束（记忆问题）， 而是\"约束在手也设计不出有效方案\"（规划问题）——constraint tracking 只部分缓解。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "recency-bias 是作者假设性解释，未做机制级验证，也没有\"反馈+显式保护已满足约束\"的对照提示变体——不能证明破坏不可避免。",
+        "数字同样来自 4 模型子集 + 图读数区间，非全模型逐格表。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "数字与 recency 解释原文逐字；解释的 hypothesis 属性已在 statement 标注。",
+      "evidence": [
+        {
+          "anchor": "§5 Rubric-based feedback yields limited gains and destabilizes plans + Figure (refinement)",
+          "quote": "Accuracy improves only modestly, by around 10%, whereas VPR drops sharply, by roughly 40% for the two open-source models and 20% for the two proprietary models.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "§5 同段",
+          "quote": "models exhibit a recency-biased adaptation pattern",
+          "strength": "medium"
+        }
+      ],
+      "id": "2606.05622.c6",
+      "statement": "对失败题追加 rubric 维度反馈并允许 1–6 轮修订：accuracy 只提升约 10%，而 VPR 急跌—— 两个开源模型约降 40%、两个闭源模型约降 20%。作者解释（原文标注 one possible explanation）为 recency-biased adaptation：模型优先修复最新指出的弱点，破坏此前已满足的旧约束（修新坏旧）。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "不能区分\"用户约束本质更难\"与本基准的构造效应——用户约束条数更多（各档均高于世界约束）且为属性型宽表达；消融未做条数/表达宽度配平。",
+        "AURV>AWRV（0.503 vs 0.295）与此一致但同样不能定因。"
+      ],
+      "confidence": "medium",
+      "confidence_reason": "主文文字明确，但逐格数值只在图中（本轮未逐格读图），故降一档。",
+      "evidence": [
+        {
+          "anchor": "§5 User constraints contribute disproportionate difficulty + Figure (dual ablation)",
+          "quote": "User-Constraint Only is consistently harder than World-Constraint Only, while Both Constraints is the most demanding setting.",
+          "strength": "medium"
+        }
+      ],
+      "id": "2606.05622.c7",
+      "statement": "双侧消融（World-Constraint Only / User-Constraint Only / Both）显示：User-Only 一致难于 World-Only， Both 最难。作者解释：单条用户偏好（属性禁忌）往往排除一大片工具/动作/用法，对可行动作空间的限制面比单条世界约束更宽。\n",
+      "type": "fact"
+    },
+    {
+      "cannot_prove": [
+        "校准样本小（30 实例/30 轨迹/240 条轨迹各一次标注），且测的是\"与人一致/合理清晰\"，不是\"judge 与被测同家族时是否系统性偏袒\"——无跨家族裁判交叉验证。",
+        "不能证明 rubric 8 维全部同等可靠——人类一致性按维度不均（深读核：physical/effectiveness 两维一致率偏低）。"
+      ],
+      "confidence": "high",
+      "confidence_reason": "全部数字逐字核对 Appendix 原文段落（本地 LaTeX 源 line-level）。",
+      "evidence": [
+        {
+          "anchor": "Appendix: Model Choice — Filter model and judge model validation",
+          "quote": "It filters 42.18% of constraints on average, with a false negative rate of 2.31% and a false positive rate of 3.72%. ... The LLM judges achieve 89.76% exact match with human majority labels, and differ by at most one constraint in 161 out of 166 turns.",
+          "strength": "strong"
+        },
+        {
+          "anchor": "Appendix: Human Annotation (240 trajectories)",
+          "quote": "Across the 240 annotated trajectories, Q1 receives an average score of 4.45 and Q2 receives an average score of 4.66.",
+          "strength": "strong"
+        }
+      ],
+      "id": "2606.05622.c8",
+      "statement": "评测链路做了小样本人工校准：构造期 checker（GPT-5.4）在 30 个抽样实例上平均过滤 42.18% 候选约束， 对照 3 人多数票 false negative 2.31%/false positive 3.72%；运行期约束 judge 在 30 条轨迹/166 个 turn 级实例上 与人类多数票 89.76% exact match、161/166 个 turn 与人类差 ≤1 条约束；另由 8 位 PhD-level 标注者评 240 条轨迹， 反馈合理性(Q1)均分 4.45/5、约束清晰度(Q2) 4.66/5。\n",
+      "type": "fact"
+    }
+  ],
+  "exam_questions": [
+    {
+      "expected_points": [
+        "退化为\"一次性长规则阅读+约束跟随\"测试，不再测\"边做边适应\"（c1 的 gap 主张失效）",
+        "AWRV/AURV（重复违反已披露约束）、ATWC/ATUC（试探强度）、no-new-violation early stop 全部失去定义基础——它们都依赖披露历史",
+        "VPR/Acc 分离仍然保留（rubric 质量门独立于披露方式）——合规≠任务成功这条结论不依赖渐进披露"
+      ],
+      "q": "若把 AdaPlanBench 的全部约束开局写进题面（取消渐进披露），它还能测到什么、失去什么？哪些指标会失去意义？",
+      "tested_objects": [
+        "2606.05622.m2",
+        "2606.05622.m3",
+        "2606.05622.c1"
+      ],
+      "type": "counterfactual"
+    },
+    {
+      "expected_points": [
+        "不能——相关非因果，n=10 的模型级横断相关，模型综合能力是显然混杂变量",
+        "作者自己只给 \"one possible explanation\"（更强模型产生更多样修订），未做干预实验验证",
+        "目标错位：协议里试探=提交违规方案换披露；产品场景这等于反复让用户纠错（f2），高 ATWC/ATUC 不是优化目标"
+      ],
+      "q": "\"accuracy 与 ATWC/ATUC 相关 0.898/0.919\" 能推出\"让 agent 更激进地试探就能提高任务成功率\"吗？为什么？",
+      "tested_objects": [
+        "2606.05622.c4",
+        "2606.05622.f2"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "不能直接——无 human baseline，不知道该协议下人类/上限水平（67.75 的分母意义不明）",
+        "judge 同族偏置可能虚高 GPT-5（f1）；±5.23 的 CI；家务文本单域（f3）",
+        "需补：跨家族裁判交叉验证、人类基线、至少一个第二领域，才能谈\"离实用多远\""
+      ],
+      "q": "GPT-5 的 67.75% 能支持\"当前最强 agent 离实用自适应规划还差约三分之一\"这类说法吗？需要补什么才能下这种判断？",
+      "tested_objects": [
+        "2606.05622.c2",
+        "2606.05622.f1",
+        "2606.05622.f3"
+      ],
+      "type": "boundary"
+    },
+    {
+      "expected_points": [
+        "直接搬：判分全知/披露受限的解耦；双层报告（合规过门=VPR 层，内容有效=Acc 层）；重复违规计数；连续无新违规 early stop（封顶轮数的补充）",
+        "必须改：家务 rubric 换审稿 rubric；world-first 优先级换成\"红线类规则优先\"；user simulator 不必拟人化，直接结构化反馈即可；τ 需在自家任务上重标定",
+        "最大风险：裁判与生成者同族（站内生成与审稿可能同模型家族）重演 f1；以及 c5 的教训——光把全部已披露意见贴回返工 prompt 只救合规，必须配\"显式保护已过项\"（c6）"
+      ],
+      "q": "把该协议迁移到 AI-Brief 的冷审返工流程（约束=审稿规则，分批披露给生成者），哪些组件直接搬、哪些必须改、最大风险是什么？",
+      "tested_objects": [
+        "2606.05622.m2",
+        "2606.05622.m3",
+        "2606.05622.c5",
+        "2606.05622.c6"
+      ],
+      "type": "transfer"
+    }
+  ],
+  "failure_modes": [
+    {
+      "consequence": "GPT 系分数可能被系统性高估，\"GPT-5 遥遥领先\"的幅度不可全信；但 VPR≠Acc 等结构性结论受影响较小（同一裁判下的层间对比）。",
+      "id": "2606.05622.f1",
+      "statement": "裁判同族偏置污染跨家族排名。",
+      "triggered_when": "用 Table 3 直接比较 GPT 系与非 GPT 系模型能力——constraint judge 与 checker 均为 GPT-5.4，最高分恰是 GPT-5/GPT-5-Mini，且无跨家族裁判交叉验证。"
+    },
+    {
+      "consequence": "优化出在评测里高分、在真实用户面前反复犯错惹恼用户的 agent；论文自己也在 Table 3 注明 ATWC/ATUC \"higher is not always better\"。",
+      "id": "2606.05622.f2",
+      "statement": "把评测指标当产品目标（尤其 ATWC/ATUC）。",
+      "triggered_when": "读者把\"试探强度与 Acc 相关 0.9\"翻译成\"鼓励 agent 多试探\"并搬进产品——该协议下试探=靠提交违规方案换披露（perverse elicitation），产品里=反复让用户纠错。"
+    },
+    {
+      "consequence": "域窄（household only）+ 无 human baseline + 纯文本抽象，跨域结论与\"离实用多远\"的定量判断都缺依据。",
+      "id": "2606.05622.f3",
+      "statement": "把家务域纯文本结论外推为通用 agent 规划能力结论。",
+      "triggered_when": "引用\"最强模型只有 67.75%\"评价旅行/办公/软件运维/具身场景的 agent，或把文本 judge 评的 physical plausibility 当执行级物理验证。"
+    },
+    {
+      "consequence": "题级失败分析需先核约束质量；用户约束\"更难\"的结论也部分依赖构造方式（条数更多、属性表达更宽，见 c7 cannot_prove）。",
+      "id": "2606.05622.f4",
+      "statement": "约束档案本身是 LLM 管线产物，残余噪声/不自然约束污染难度归因。",
+      "triggered_when": "把某模型在个别题上的失败全归因于模型——checker 校准只抽了 30 实例（FN 2.31%/FP 3.72%），残余的模糊或不自然约束仍可能存在。"
+    }
+  ],
+  "human": {
+    "can_borrow": [
+      "把验收拆成「合规层」和「有用层」两套指标分开报——别让「全绿/没违规」冒充「真有用」。",
+      "多轮交互的评测里，把限制藏起来、违反了才披露一条，能测出 agent 会不会边做边适应，而不只是会不会一次读懂长规则。",
+      "「连续两轮没出现新违规就提前停」这个停机规则，能识别 agent 在原地打转、反复踩同一批已知雷。",
+      "返工提示里要显式保护「已经满足的部分」——否则模型会只顾修最新指出的问题、把之前改好的又改坏。"
+    ],
+    "cannot_borrow": [
+      "别把「藏约束、靠提交违规方案换披露」当产品交互模式照搬——那是评测手段，搬进产品等于让用户反复纠错惹人烦。",
+      "别把分数当跨领域结论——只在家务任务、纯文本（没有真实执行）上测的，也没有人类基线，说不清「离实用还差多远」。",
+      "别直接信「GPT-5 遥遥领先」的幅度——打分的裁判和最强受测模型同属一个家族，可能系统性偏高。"
+    ],
+    "headline": "一个评 agent「边做边适应」的家务规划基准——约束藏起来、撞墙才告诉你，看 agent 改不改得过来。",
+    "how_to_use": "落到任何「需求逐步披露、要看 agent 适应能力」的评测或返工流程上。最小可借形态：把验收拆成两层报告—— 一层只看「有没有违反规则」（合规），一层看「产出到底有没有用」（质量门），两层分开报、不让前者冒充后者； 多轮返工时显式保护已经改好的地方，别只盯最新一条反馈。\n",
+    "maturity": "全部为作者自报、本对象未复现；裁判体系只在小样本（约 30 条实例/轨迹）上对照过人工，且与最强受测模型同家族未做跨家族交叉验证。 门槛低（评测协议，无需自有可训练模型），可直接借设计思路。\n",
+    "plain_summary": "现在评 agent 规划大多开局把所有限制一次说清，但真实里需求方/世界的限制是边做边冒出来的。 这篇造了个基准：把世界限制和用户偏好都藏成隐藏档案，agent 每提交一版方案、违反了才披露一条，逼它一轮轮重规划。 最值得记住的一点：它把「合不合规」和「真办成事」拆成两层指标分开报——结果发现有的模型合规率超 90%、任务成功率却不到 45%。 做 agent 系统、尤其想给自己 agent 设计评测的人，这套「合规≠有用」的分层报告思路很值得借。\n",
+    "use_type": "directly_usable",
+    "use_type_reason": "它本身是一套评测协议（藏约束/违反才披露/双层指标），想给自己的多轮 agent 设计评测可直接照搭。"
+  },
+  "kind": "paper",
+  "mechanisms": [
+    {
+      "anchor": "§3.1 Data Construction + Appendix: Model Choice / Table 2",
+      "canonical_concept": "eval.solution-mined-constraints",
+      "id": "2606.05622.m1",
+      "input": "MacGyver 数据集原始题 → 重写（删除显式资源限制、保留目标与参考解）→ 二元过滤后的 307 个具体多步家务任务",
+      "name": "解法反挖式双约束构造管线（solution-mined dual-constraint construction）",
+      "non_replaceable": [
+        "约束从候选解法反向挖出（保证约束会被真实解法路径撞上而非随机禁忌）",
+        "参考解保留（保证任务可解）",
+        "轮间回灌累积（密度可控分档的来源）"
+      ],
+      "operations": [
+        "Step1 方案采样：J=3 个 planner（GPT-4.1 / DeepSeek-V3.2 / Qwen3.6-Flash）在各自已积累约束池下生成候选方案",
+        "Step2 约束抽取：从方案抽工具→不可用即世界约束（如 there is no iron at home）；再从工具/用法推断属性→用户属性禁忌即用户约束（如 concerned about tools that generate high heat）",
+        "Step3 合并规范化：M_merge 与旧约束池合并、规范化、去重，喂回下一轮引导新方案",
+        "终检：聚合各 planner 约束池后由 M_chk（GPT-5.4）删除模糊/无效约束，并过滤内部矛盾或联合穷尽的偏好组合（防把可行解空间清零）；保留参考解保证可解性"
+      ],
+      "optimization": "none",
+      "output": "每题一个隐藏双约束档案 E=(B_w, B_u)，按迭代轮数分 low/mid/high 三档密度（平均世界约束 9.76/19.61/37.73 条，用户约束 10.91/21.78/41.79 条）",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "planner 家族与数量",
+        "checker 模型",
+        "源数据集与领域（household→其他域）",
+        "轮数 R"
+      ],
+      "reusable_pattern": "想给任务造\"会被真实解法撞上\"的隐藏约束，先让多个模型生成解法、再把解法依赖的资源/属性反向变成约束——约束密度=迭代轮数，可解性=保留参考解并过滤矛盾组合。"
+    },
+    {
+      "anchor": "§3.2 Agent–User–World Interaction + Appendix: Runtime Interaction Details（V̂_t 分段定义）+ repo env/run_config.yaml",
+      "canonical_concept": "eval.violation-triggered-disclosure",
+      "id": "2606.05622.m2",
+      "input": "题目 q + 隐藏双约束档案 E；agent 每轮提交完整方案 p_t",
+      "name": "违反触发的渐进披露交互协议（violation-triggered progressive disclosure）",
+      "non_replaceable": [
+        "约束藏到违反才披露（否则退化为一次性长规则阅读测试）",
+        "判分(全量档案)与披露(单类受限)解耦（重复违规/试探强度等诊断指标的来源）",
+        "停滞 early stop"
+      ],
+      "operations": [
+        "判分全知：每轮用完整档案 E 检查 p_t，得违反的世界约束 V_t^w 与用户约束 V_t^u（judge=GPT-5.4）+ 三 rubric judge（GPT-4.1/DeepSeek-V3.2/Qwen3.6-Flash）打 8 维 1–5 分",
+        "披露受限（single-type revelation）：V̂_t = V_t^w 若非空；否则 V_t^u；否则空——世界约束永远优先于用户约束披露，未选中类型的违规暂扣到后续轮",
+        "user simulator 把选中违规改写成自然语言反馈；重复违反已披露约束时显式提醒'已经说过'",
+        "终止：方案满足全部约束（V^w=V^u=∅）/ 到 T=20 轮上限 / 连续 τ=2 轮无新违规则 early stop（判定原地打转）"
+      ],
+      "optimization": "none",
+      "output": "轨迹终态（valid plan / early stop / max-turn 失败）+ 每轮违规集与 rubric 分（供 m3 指标族计算）",
+      "problem": "agent.planning-adaptivity",
+      "replaceable": [
+        "judge 与 simulator 模型",
+        "领域",
+        {
+          "T 与 τ 取值（repo run_config.yaml": "max_turns 20 / no_new_violation_round_limit 2，与论文一致）"
+        },
+        "披露优先级规则"
+      ],
+      "reusable_pattern": "评\"边做边适应\"时，把判分与披露解耦——裁判全知、披露故意不完备，两者之差产生可诊断信号（忘旧约束/修新坏旧/原地打转/探索不足可分型）。"
+    },
+    {
+      "anchor": "§4 Metrics + Appendix: Metric Details（γ=4、N=307）",
+      "canonical_concept": "eval.compliance-quality-two-tier",
+      "id": "2606.05622.m3",
+      "input": "m2 产出的轨迹（每轮违规集、披露历史、rubric 分向量）",
+      "name": "VPR/Acc 双层指标 + 诊断指标族",
+      "non_replaceable": [
+        "Acc 与 VPR 分离（合规≠任务成功——本篇最承重的评测设计）",
+        "重复违规只对已披露历史计数"
+      ],
+      "operations": [
+        "VPR：终态方案满足全部世界/用户约束（不问质量）——合规层",
+        "Acc：在 VPR 基础上还须 rubric 全维 3-judge 平均分 ≥ γ=4（质量门；γ 做过 3.00–5.00 消融）——任务成功层",
+        "AWRV/AURV：每题重复违反【已披露】世界/用户约束的次数——只按披露历史计，区分'没学会'与'还没被告知'",
+        "ATWC/ATUC：每轮触发的新世界/用户约束数（题级触发量/轮数）——试探强度"
+      ],
+      "optimization": "none",
+      "output": "结果层 Acc/VPR/Avg Turns + 失败层 AWRV/AURV + 试探层 ATWC/ATUC",
+      "problem": "eval.agent-capability",
+      "replaceable": [
+        "rubric 维度集与 γ 阈值",
+        "judge 数量"
+      ],
+      "reusable_pattern": "合规门与质量门分开报——\"不再违规\"与\"真办成事\"是两层指标；只报合规会把\"听话但没用\"的系统评成高分（lint 绿 ≠ 内容有效）。"
+    }
+  ],
+  "object_id": "paper/2606.05622",
+  "one_sentence_thesis": "主张现有基准缺少\"世界+用户双约束在交互中渐进披露(progressive disclosure)\"下的自适应重规划评测， 靠\"从多 planner 候选解法反向挖隐藏约束的可扩展构造管线 + 违反才披露(world 优先)的多轮交互协议 + VPR(合规)/Acc(合规且过 rubric 质量门)双层指标\"，在 307 个家务任务 × 10 个主流 LLM 上实测： 最强 GPT-5 也只有 67.75% accuracy，VPR>90% 的模型 Acc<45%（合规≠任务成功）， 显式贴回已披露约束只救合规(VPR+5–15%)救不了任务成功(Acc<3%)。\n",
+  "schema": "ros-v1",
+  "self_evo_verdict": {
+    "reason": "能用且直击本站冷审返工的真实痛点（评测方法论借用，非红线）。两条落地： ① 双层报告制度化——build/lint/validate 全绿只是合规层(VPR)，深读内容有效是质量层(Acc)，质量门报告必须两层分开（c3：VPR>90% 仍可 Acc<45%）； ② 冷审返工 prompt 三件套——显式保护已过项（c6 recency-bias 修新坏旧）+ 贴回全部已披露意见（但知其只救合规，c5）+ 连续 2 轮无新违规 early stop（防原地打转，对封顶 3 轮的补充）。 verify 路径=在冷审返工流程上跑 A/B：A=贴回全部意见+保护已过项 vs B=只给最新失败反馈，比最终通过率/旧问题回归率/轮数（facet transfer 已给 Mini 版设计：给深读/判边/选稿任务藏约束、逐轮披露、tracker 记重复违规）。\n",
+    "state": "apply"
+  },
+  "slug": "2606.05622",
+  "source": "arxiv:2606.05622v1 (2026-06-04) + github.com/JiayuJeff/AdaPlanBench@ec191d9 + HF datasets/JiayuJeff/AdaPlanBench",
+  "status": "draft",
+  "title": "AdaPlanBench: Evaluating Adaptive Planning in Large Language Model Agents under World and User Constraints",
+  "trigger_hooks": [
+    {
+      "related_object": "2606.05622.m3",
+      "risk": "把质量门也交给与生成者同族的 LLM 裁判——裁判偏置会把质量层污染成另一个假绿灯（f1）。",
+      "symptom": "我的流水线/agent 过了所有 lint、校验、规则门（全绿），但产出内容还是没用——绿灯和有用对不上。",
+      "why_recall": "本篇把这件事做成了可测的结构：VPR（合规层）与 Acc（合规且过质量门）必须分开报，且实测两者大幅背离（VPR>90% 的模型 Acc<45%）。"
+    },
+    {
+      "related_object": "2606.05622.c6",
+      "risk": "误以为\"把全部历史反馈贴回 prompt\"就能根治——c5 显示显式贴回只救合规(VPR)、救不了任务成功(Acc)，保护已过项之外还得解决\"带着约束设计有效方案\"。",
+      "symptom": "多轮返工时，模型修好了我最新指出的问题，却把之前已经改好的地方又改坏了。",
+      "why_recall": "c6 给了这个现象的实测名字和量级——recency-biased adaptation：追加最新失败反馈使 Acc 仅+10% 而 VPR 暴跌 20–40%；返工提示必须显式保护已过项。"
+    },
+    {
+      "related_object": "2606.05622.m2",
+      "risk": "把协议直接当产品交互模式——协议里靠违规换信息是评测手段，产品里照搬等于让用户当裁判反复纠错（f2）。",
+      "symptom": "需求方/用户不会一次说清所有限制，agent 每撞一次墙才知道一条，越改越乱，没法量化它到底会不会适应。",
+      "why_recall": "m2 的协议是现成的测量结构：隐藏完整约束档案、违反才披露、裁判全知/披露受限解耦——能把\"会不会适应\"拆成忘旧约束/修新坏旧/原地打转/探索不足四种可分型失败。"
+    },
+    {
+      "related_object": "2606.05622.m2",
+      "risk": "τ 取太小会错杀\"正在慢慢逼近可行解\"的轨迹——本篇 τ=2 只在其家务域做过消融，迁移时需重标定。",
+      "symptom": "agent 在循环任务里原地打转，反复提交踩同一批已知雷的方案，烧轮次不收敛。",
+      "why_recall": "本篇的停机设计可直接借用：连续 τ=2 轮无【新】违规即判停滞 early stop（比纯轮数上限更早识别打转），并用\"重复违反已披露约束\"计数把打转变成可监控指标。"
+    }
+  ]
+}

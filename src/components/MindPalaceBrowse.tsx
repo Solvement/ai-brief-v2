@@ -11,6 +11,12 @@ import { CLUSTER_LABEL, type RosGraph, type RosGraphNode } from "./MindPalaceGlo
 interface EmbDoc { vectors: { slug: string; title: string; vec: number[] }[] }
 const cos = (a: number[], b: number[]) => { let d = 0; for (let i = 0; i < a.length; i++) d += a[i] * b[i]; return d; };
 
+const USE_TYPE_CHIP: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  directly_usable: { label: "直接可用", color: "#15803d", bg: "#f0fdf4", border: "#bbf7d0" },
+  design_inspiration: { label: "设计启发", color: "#b45309", bg: "#fffbeb", border: "#fde68a" },
+  background_reference: { label: "背景参考", color: "#64748b", bg: "#f8fafc", border: "#e2e8f0" },
+};
+
 export function MindPalaceBrowse() {
   const [graph, setGraph] = useState<RosGraph | null>(null);
   const [emb, setEmb] = useState<EmbDoc | null>(null);
@@ -43,7 +49,7 @@ export function MindPalaceBrowse() {
     const s = q.trim().toLowerCase();
     if (!s) return records;
     return records.filter((r) => {
-      const hay = [r.title, r.slug, r.thesis, ...(r.problems || []), ...(r.concepts || [])].join(" ").toLowerCase();
+      const hay = [r.title, r.slug, r.thesis, r.human?.headline, r.human?.plain_summary, r.human?.how_to_use, ...(r.problems || []), ...(r.concepts || [])].filter(Boolean).join(" ").toLowerCase();
       return hay.includes(s);
     });
   }, [records, q]);
@@ -68,8 +74,8 @@ export function MindPalaceBrowse() {
           <div className="eyebrow">Mind Palace</div>
           <h1>记忆宫殿 · Mind Palace</h1>
           <p>
-            深读过的<b>文章</b>被拆成可推理的结构化对象（主张+证据 · 机制 · 假设 · 失败模式 · 什么时候想起它）。
-            <b>搜一个主题或你遇到的问题 → 看对象层 + 语义相邻</b>。共 <b>{records.length}</b> 篇（按波次持续回填）。
+            深读过的<b>文章</b>，每篇先给一句人话定位 + 能不能直接用 + 怎么用、能借什么、不能照搬什么；
+            想拆开看主张/证据/机制再点开。<b>搜一个主题或你遇到的问题</b>，共 <b>{records.length}</b> 篇（按波次持续回填）。
           </p>
         </div>
       </div>
@@ -87,21 +93,21 @@ export function MindPalaceBrowse() {
           <div style={{ display: "grid", gap: 9 }}>
             {filtered.map((r) => {
               const on = sel === r.slug;
+              const ut = r.human?.use_type ? USE_TYPE_CHIP[r.human.use_type] : null;
+              const blurb = r.human?.headline || r.human?.plain_summary || r.thesis || "";
               return (
                 <button key={r.slug} onClick={() => setSel(r.slug)}
                   style={{ textAlign: "left", padding: "11px 13px", borderRadius: 11, cursor: "pointer",
                     border: `1px solid ${on ? "#2563eb" : "#e2e8f0"}`, background: on ? "#f5f8ff" : "#fff",
                     boxShadow: on ? "0 1px 8px rgba(37,99,235,.12)" : "none" }}>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 4, flexWrap: "wrap" }}>
+                    {ut && <span style={{ fontSize: 10, fontWeight: 700, color: ut.color, background: ut.bg, border: `1px solid ${ut.border}`, padding: "1px 7px", borderRadius: 20 }}>{ut.label}</span>}
                     <span style={{ fontSize: 10, fontWeight: 700, color: "#2563eb", background: "#eff6ff", padding: "1px 7px", borderRadius: 20 }}>
                       {CLUSTER_LABEL[r.cluster || ""] || r.cluster || "文章"}
                     </span>
-                    <span style={{ fontWeight: 700, fontSize: 13.5, color: "#0f172a" }}>{(r.title || r.slug).split(/[—:：]/)[0].trim()}</span>
+                    <span style={{ fontWeight: 700, fontSize: 13, color: "#0f172a" }}>{(r.title || r.slug).split(/[—:：]/)[0].trim()}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>{(r.thesis || "").slice(0, 90)}</div>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>
-                    {r.counts?.claims || 0} 主张 · {r.counts?.mechanisms || 0} 机制 · {r.counts?.trigger_hooks || 0} 触发钩子
-                  </div>
+                  <div style={{ fontSize: 12.5, color: "#475569", lineHeight: 1.55 }}>{blurb.slice(0, 110)}</div>
                 </button>
               );
             })}

@@ -105,3 +105,14 @@
   name: 量化评测的真实性
   parent: infra
   description: 量化方法的评测协议是否还原真实部署条件（如 decode 时量化误差累积），防评测虚高。（2026-06-12 kvarn 蒸馏转正）
+
+# ── KG-4 波次2 · eval 簇细分问题（2026-06-12 主控收口；均为 eval.agent-capability 子问题）──
+- id: eval.open-ended-output-scoring
+  name: 开放式产出判分
+  parent: eval.agent-capability
+  description: 开放式产出（科研报告/深读/综述）既不能 exact-match 也不能单测，整体 LLM 打分又有偏置与高方差——如何把它变成可验证、可比、可回归的分数。（2026-06-12 researchclawbench 蒸馏转正）
+
+- id: eval.llm-judge-reliability
+  name: LLM 裁判可信度
+  parent: eval.agent-capability
+  description: 用 LLM 当评分裁判时裁判读数本身是否可信——与人类专家一致性、跨 judge backbone 排名稳定性、评分协议对无关噪声的隔离。与 train.distillation-supervision-reliability（训练时监督信号该不该用）是不同问题域：本条是推理/评测时裁判读数，消费方=benchmark 设计与质量门。（2026-06-12 socrates 蒸馏转正）

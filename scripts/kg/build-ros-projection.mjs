@@ -112,6 +112,18 @@ function counts(object) {
   };
 }
 
+// 卡片/星图默认渲染用的人话摘要（受众分离：默认视图只读这块，不碰 AI-内部字段）。
+function humanCard(object) {
+  const h = object.human;
+  if (!h || typeof h !== "object") return null;
+  return {
+    headline: h.headline || "",
+    plain_summary: h.plain_summary || "",
+    use_type: h.use_type || "",
+    how_to_use: h.how_to_use || "",
+  };
+}
+
 function nodeFor(object) {
   const canonical = object.canonical || {};
   const problems = asArray(canonical.problems);
@@ -121,12 +133,43 @@ function nodeFor(object) {
     kind: object.kind,
     title: object.title || object.slug,
     thesis: object.one_sentence_thesis || "",
+    human: humanCard(object),
     problems,
     concepts: asArray(canonical.concepts),
     benchmarks: asArray(canonical.benchmarks),
     cluster: rootNamespace(problems[0]),
     counts: counts(object),
   };
+}
+
+function shortTitle(title) {
+  // 只在破折号/冒号断，不在 ASCII 连字符断（否则 "SWE-Explore" 会被切成 "SWE"）。
+  return String(title || "").split(/[—–:：]/)[0].trim() || String(title || "");
+}
+
+// 边的人话 gloss（受众分离）：按关系类型 + 两端标题 + 共享问题人名拼成自然语句，
+// 不出现 object ID / canonical ID / "conflicts_assumption:" 等调试串；具体分歧留审计层（relations[].reason）。
+function edgeGloss(primaryType, sourceNode, targetNode, problemName) {
+  const a = shortTitle(sourceNode?.title);
+  const b = shortTitle(targetNode?.title);
+  const shared = (sourceNode?.problems || []).find((p) => (targetNode?.problems || []).includes(p));
+  const sn = shared ? problemName(shared) : "";
+  switch (primaryType) {
+    case "shares_problem":
+      return `${a} 与 ${b}：都在解同一个问题${sn ? `——${sn}` : ""}。`;
+    case "tension_with":
+      return `${a} 与 ${b}：${sn ? `同在「${sn}」上` : "在关键假设上"}路线不同，是设计层张力（不是实验证明的冲突）；具体分歧点开看。`;
+    case "can_be_evaluated_by":
+      return `${a} 关心的能力，可以用 ${b} 这套评测来检验。`;
+    case "evaluates":
+      return `${b} 对 ${a} 做了实测。`;
+    case "compares_with":
+      return `${a} 与 ${b} 可横向对比。`;
+    case "complements":
+      return `${a} 与 ${b} 互补，可组合使用。`;
+    default:
+      return `${a} 与 ${b} 相关。`;
+  }
 }
 
 function indexObjects(objects) {
@@ -187,7 +230,7 @@ function edgeSortKey(item) {
   ].join("|");
 }
 
-function aggregateEdges(relations, ownerById) {
+function aggregateEdges(relations, ownerById, nodeById, problemName) {
   const groups = new Map();
   for (const relation of relations) {
     const sourceOwner = ownerById.get(relation.source?.id);
@@ -219,6 +262,7 @@ function aggregateEdges(relations, ownerById) {
         primary_type: primary,
         confidence,
         count: sorted.length,
+        gloss: edgeGloss(primary, nodeById.get(group.source), nodeById.get(group.target), problemName),
         relations: sorted.map(relationDetail),
       };
     });
@@ -244,12 +288,26 @@ function evidenceRef(id, recordById, ownerById) {
   };
 }
 
+function humanProp(proposition) {
+  const h = proposition.human;
+  if (!h || typeof h !== "object") return null;
+  return {
+    current_judgment: h.current_judgment || "",
+    why: asArray(h.why),
+    strongest_for: h.strongest_for || "",
+    strongest_against: h.strongest_against || "",
+    third_way: h.third_way || "",
+    for_you: h.for_you || "",
+  };
+}
+
 function propositionFor(proposition, indexes) {
   return {
     id: proposition.id,
     statement: proposition.statement || "",
     state: proposition.state || "open",
     cluster: propositionCluster(proposition, indexes.recordById, indexes.ownerById),
+    human: humanProp(proposition),
     possible_synthesis: proposition.possible_synthesis || "",
     support: asArray(proposition.support).map((id) => evidenceRef(id, indexes.recordById, indexes.ownerById)),
     oppose: asArray(proposition.oppose).map((id) => evidenceRef(id, indexes.recordById, indexes.ownerById)),
@@ -269,12 +327,17 @@ export async function buildRosProjection({ root = ROOT } = {}) {
     ...await loadRelationsFile(root, "judged.yaml"),
   ];
   const propositions = (await loadRegistryList(root, "propositions")).map((item) => propositionFor(item, indexes));
+  const problemList = await loadRegistryList(root, "problems");
+  const problemNames = new Map(problemList.map((p) => [p.id, p.name || p.id]));
+  const problemName = (id) => problemNames.get(id) || id;
   const paperObjects = objects.filter((object) => object.kind === "paper");
+  const nodes = paperObjects.map(nodeFor);
+  const nodeById = new Map(nodes.map((n) => [n.id, n]));
   const graph = {
     schema: "ros-graph-v1",
     generated_at: await generatedAt(root, inputFiles),
-    nodes: paperObjects.map(nodeFor),
-    edges: aggregateEdges(relations, indexes.ownerById),
+    nodes,
+    edges: aggregateEdges(relations, indexes.ownerById, nodeById, problemName),
     propositions,
   };
 

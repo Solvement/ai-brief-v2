@@ -17,6 +17,16 @@
     - 低反馈/高安全场景下学习式是否仍稳定，原文未证
   possible_synthesis: hybrid controller——规则层管安全边界与可解释性，学习层管动态优化；先落 typed memory action 接口（不训练也能用，未来可挂学习层）
   state: leaning-support
+  human:   # 人读层（KG-5）：星图默认渲染这块，不露 object ID
+    current_judgment: 证据偏向「该走可学习策略」，但还不是定论。
+    why:
+      - AgeMem 把记忆操作折进 agent 自身策略并用强化学习训练，在两个模型、五个长程任务上的均分都超过最强的模块化记忆基线。
+      - 去掉强化学习这一阶段后性能明显回落（作者自报降约 8–9 个百分点），说明真正承重的是「学习」而不是接口本身。
+      - 但固定规则路线在纯检索维度仍能打：一个零训练的三路融合系统自报检索命中率 95%+，且规则式有可控、低成本、可解释的天然优势。
+    strongest_for: AgeMem——学习式记忆策略在五个长程任务上均分胜过最强模块化基线，消融还证明收益来自训练而非接口。
+    strongest_against: 一个零训练的固定规则检索系统自报 LongMemEval-S 命中率 95.2%，说明检索这一维规则式仍可竞争。
+    third_way: 混合控制器——规则层守安全边界与可解释性，学习层管动态优化；先把「何时存/改/删」做成可调用的 typed 动作（不训练也能用，未来再挂学习层）。
+    for_you: 想做长期记忆 agent，别一上来就上强化学习——先把记忆操作做成显式可调用的动作，留好以后接学习层的接口。
 
 - id: prop.verbatim-vs-extraction
   statement: 记忆应逐字本地保留原始记录，而非云端抽取压缩
@@ -34,6 +44,16 @@
     - mempalace 实读显示其索引层（AAAK）本身就是有损摘要——纯逐字立场在工程上不存在
   possible_synthesis: 分层混合——逐字层保真可追溯 + 有损索引层导航（mempalace 实际架构）+ 版本链 supersede 管理事实演化（supermemory.c2 的数据契约可借）
   state: open
+  human:
+    current_judgment: 尚无定论；更可能是分层混合，而不是二选一。
+    why:
+      - 逐字本地派：MemPalace 坚持原始记录逐字保留，自报不靠大模型也能拿到 96%+ 的检索命中。
+      - 抽取压缩派：supermemory / MemoryAgentBench 认为记忆本质是「随时间追踪、压缩蒸馏的事实」，旧事实该被新事实覆盖。
+      - 但实读 MemPalace 自己的索引层其实也是有损摘要——「纯逐字」立场在工程上并不真的存在。
+    strongest_for: MemPalace——逐字 + 本地、全程不调大模型，自报检索命中率 96.6%，证明保真不必牺牲检索。
+    strongest_against: supermemory / MemoryAgentBench——把记忆定义为可压缩蒸馏、可覆盖旧事实的有状态层，而非逐字仓库。
+    third_way: 分层——逐字层保真可追溯 + 有损索引层负责导航 + 版本链管理事实演化（这正是 MemPalace 的实际架构）。
+    for_you: 存会议/对话记忆时，原始记录逐字留底（可追溯），上面再叠一个可更新的索引/摘要层做检索和事实演化，别只存其中一种。
 
 - id: prop.parametric-vs-external-memory
   statement: agent 的个人状态/技能应存进模型参数（PEFT/LoRA），而非外部记忆库
@@ -51,6 +71,16 @@
     - 无共同 benchmark：两路线各自自报，未同台
   possible_synthesis: 分型混合——技能/行为进参数（weight-space skill），事实/记录留外部检索（verbatim/fact-graph），以知识类型路由介质
   state: open
+  human:
+    current_judgment: 尚无定论；更合理的方向是按知识类型分型混合，而非一刀切。
+    why:
+      - 参数派：LatentSkill 把高频技能编译进 LoRA 权重，自报任务表现升、token 开销大降。
+      - 但同一条路线的内部反证：PEFT 容量律显示把「事实」硬塞进低秩参数会容量崩塌。
+      - 外部派：纯外部逐字 + 本地嵌入就能自报 96%+ 的检索命中，根本不必动参数。
+    strongest_for: LatentSkill——把高频流程技能从「每次塞进上下文」改成编译进权重，自报降 token、提特定任务表现。
+    strongest_against: PEFT 容量律——事实性内容塞进参数有容量上限会崩塌；外部记忆在事实检索上更低成本、更可追溯。
+    third_way: 分型——技能/行为这类过程性知识可进参数，事实/记录这类陈述性知识留外部检索，用知识类型决定存哪。
+    for_you: 别把会议事实塞进权重；高频「处理流程」（如怎么提取行动项）可先做成模块化 skill、未来再考虑参数化，事实始终留外部。
 
 - id: prop.retrieval-metrics-insufficient
   statement: 记忆系统的价值不能用检索命中率衡量，必须用生命周期能力与端到端任务收益衡量
