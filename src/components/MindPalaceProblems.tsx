@@ -4,9 +4,10 @@ import { RosObjectPanel, useRosObject } from "./RosObjectPanel";
 import { CLUSTER_LABEL, PropositionCards, type RosGraph, type RosGraphNode, type RosProposition } from "./MindPalaceGlobe";
 
 // ════════════════════════════════════════════════════════════════════
-//  Mind Palace 问题地图（KG-5.1 mock，借 Karpathy LLM Wiki 的 kind:comparison）
-//  以「问题家族」为骨架：撞到一个问题 → 先看这里已有哪些方法 + 目前的判断 +
-//  能不能直接拿，别重复造轮子。验证「按问题组织 > 按论文组织」这个方向。
+//  Mind Palace 问题地图（KG-5.1，借 Karpathy LLM Wiki 的 kind:comparison）
+//  宽屏 master-detail：左=问题家族导航；中=选中家族的对比裁决+方法网格；
+//  右=选中方法的对象层。撞到一个问题 → 看已有哪些方法+目前判断+能不能拿，
+//  别重复造轮子。不再一长条从上到下滚。
 // ════════════════════════════════════════════════════════════════════
 
 const USE_TYPE_CHIP: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -20,6 +21,7 @@ interface Family { cluster: string; papers: RosGraphNode[]; props: RosPropositio
 export function MindPalaceProblems() {
   const [graph, setGraph] = useState<RosGraph | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [selFamily, setSelFamily] = useState<string | null>(null);
   const [sel, setSel] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,11 +37,14 @@ export function MindPalaceProblems() {
     const ensure = (c: string) => { if (!map.has(c)) map.set(c, { cluster: c, papers: [], props: [] }); return map.get(c)!; };
     for (const p of papers) ensure(p.cluster || "未分区").papers.push(p);
     for (const pr of props) ensure(pr.cluster || "未分区").props.push(pr);
-    // 富对比的家族（命题多 → 论文多）排前面
     return [...map.values()].sort((a, b) => (b.props.length * 10 + b.papers.length) - (a.props.length * 10 + a.papers.length));
   }, [graph]);
 
+  // 默认选中最富对比的家族（派生，不在 effect 里 setState）
+  const activeFamily = selFamily || families[0]?.cluster || null;
+
   const allPapers = useMemo(() => (graph?.nodes || []).filter((n) => n.kind === "paper"), [graph]);
+  const fam = useMemo(() => families.find((f) => f.cluster === activeFamily) || null, [families, activeFamily]);
   const selNode = useMemo(() => allPapers.find((p) => p.slug === sel) || null, [allPapers, sel]);
   const { obj: selObj, loading: selLoading } = useRosObject(sel);
 
@@ -48,22 +53,26 @@ export function MindPalaceProblems() {
     const ut = p.human?.use_type ? USE_TYPE_CHIP[p.human.use_type] : null;
     return (
       <button key={p.slug} onClick={() => setSel(p.slug)}
-        style={{ textAlign: "left", padding: "11px 13px", borderRadius: 11, cursor: "pointer", width: "100%",
+        style={{ textAlign: "left", padding: "12px 14px", borderRadius: 12, cursor: "pointer", width: "100%", height: "100%",
           border: `1px solid ${on ? "#2563eb" : "#e2e8f0"}`, background: on ? "#f5f8ff" : "#fff",
           boxShadow: on ? "0 1px 8px rgba(37,99,235,.12)" : "none" }}>
-        <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 4, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 5, flexWrap: "wrap" }}>
           {ut && <span style={{ fontSize: 10, fontWeight: 700, color: ut.color, background: ut.bg, border: `1px solid ${ut.border}`, padding: "1px 7px", borderRadius: 20 }}>{ut.label}</span>}
-          <span style={{ fontWeight: 700, fontSize: 13, color: "#0f172a" }}>{(p.title || p.slug).split(/[—–:：]/)[0].trim()}</span>
+          <span style={{ fontWeight: 700, fontSize: 13.5, color: "#0f172a" }}>{(p.title || p.slug).split(/[—–:：]/)[0].trim()}</span>
         </div>
-        <div style={{ fontSize: 12.5, color: "#334155", lineHeight: 1.55 }}>{p.human?.headline || p.thesis?.slice(0, 110) || ""}</div>
+        <div style={{ fontSize: 12.5, color: "#334155", lineHeight: 1.55 }}>{p.human?.headline || p.thesis?.slice(0, 120) || ""}</div>
         {p.human?.how_to_use && (
-          <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.5, marginTop: 5, paddingTop: 5, borderTop: "1px dashed #eef2f7" }}>
+          <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.5, marginTop: 6, paddingTop: 6, borderTop: "1px dashed #eef2f7" }}>
             <b style={{ color: "#2563eb" }}>怎么用 · </b>{p.human.how_to_use}
           </div>
         )}
       </button>
     );
   };
+
+  const cols = sel
+    ? "minmax(180px, 210px) minmax(0, 1fr) minmax(340px, 400px)"
+    : "minmax(180px, 210px) minmax(0, 1fr)";
 
   return (
     <main className="page kg-page">
@@ -72,65 +81,72 @@ export function MindPalaceProblems() {
           <div className="eyebrow">Mind Palace · 问题地图</div>
           <h1>按问题找方法 · 别重复造轮子</h1>
           <p>
-            不按论文、不按图，<b>按你会撞到的问题家族</b>组织。撞到一个问题 → 先看这里：
-            <b>这个问题已经有哪些方法</b>、<b>目前的判断是什么</b>（最强正方 vs 反方 + 第三条路）、<b>能不能直接拿来用</b>——
-            而不是从零造轮子。共 <b>{allPapers.length}</b> 篇方法、<b>{(graph?.propositions || []).length}</b> 条跨篇判断。
+            按你会撞到的<b>问题家族</b>组织。选一个家族 → 看这个问题<b>已有哪些方法</b>、<b>目前的判断</b>
+            （最强正方 vs 反方 + 第三条路），点方法看<b>能不能直接拿</b>。
+            共 <b>{allPapers.length}</b> 篇方法、<b>{(graph?.propositions || []).length}</b> 条跨篇判断。
           </p>
         </div>
       </div>
 
       {err && <div className="notice error">记忆库加载失败：{err}</div>}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr minmax(300px, 380px)", gap: 22, alignItems: "start" }}>
-        {/* 左：问题家族 → 判断 + 方法 */}
-        <div style={{ display: "grid", gap: 26 }}>
-          {families.map((f) => (
-            <section key={f.cluster}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10, paddingBottom: 8, borderBottom: "2px solid #e2e8f0" }}>
-                <h2 style={{ margin: 0, fontSize: 18, color: "#0f172a" }}>{CLUSTER_LABEL[f.cluster] || f.cluster}</h2>
-                <span style={{ fontSize: 12, color: "#94a3b8" }}>{f.papers.length} 篇方法 · {f.props.length} 条判断</span>
-              </div>
+      <div style={{ display: "grid", gridTemplateColumns: cols, gap: 20, alignItems: "start" }}>
+        {/* 左：问题家族导航 */}
+        <nav style={{ position: "sticky", top: 12, display: "grid", gap: 6 }}>
+          {families.map((f) => {
+            const on = f.cluster === activeFamily;
+            return (
+              <button key={f.cluster} onClick={() => { setSelFamily(f.cluster); setSel(null); }}
+                style={{ textAlign: "left", padding: "9px 11px", borderRadius: 10, cursor: "pointer",
+                  border: `1px solid ${on ? "#2563eb" : "#e2e8f0"}`, background: on ? "#2563eb" : "#fff",
+                  color: on ? "#fff" : "#334155" }}>
+                <div style={{ fontWeight: 700, fontSize: 13.5 }}>{CLUSTER_LABEL[f.cluster] || f.cluster}</div>
+                <div style={{ fontSize: 11, opacity: on ? 0.85 : 0.6, marginTop: 1 }}>{f.papers.length} 方法 · {f.props.length} 判断</div>
+              </button>
+            );
+          })}
+        </nav>
 
-              {/* 目前的判断（comparison / 裁决）—— 命题人话对比卡 */}
-              {f.props.length > 0 ? (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "#b45309", marginBottom: 8 }}>目前的判断（同问题下多方法对比）</div>
-                  <PropositionCards props={f.props} />
+        {/* 中：选中家族的判断 + 方法网格 */}
+        <div style={{ minWidth: 0 }}>
+          {fam && (
+            <>
+              <h2 style={{ margin: "0 0 12px", fontSize: 19, color: "#0f172a" }}>{CLUSTER_LABEL[fam.cluster] || fam.cluster}</h2>
+
+              {fam.props.length > 0 ? (
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "#b45309", marginBottom: 9 }}>目前的判断（同问题下多方法对比）</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: 12, alignItems: "start" }}>
+                    {fam.props.map((p) => <PropositionCards key={p.id} props={[p]} />)}
+                  </div>
                 </div>
               ) : (
-                <div style={{ fontSize: 12.5, color: "#94a3b8", marginBottom: 12, fontStyle: "italic" }}>
+                <div style={{ fontSize: 12.5, color: "#94a3b8", marginBottom: 18, fontStyle: "italic" }}>
                   这个问题家族还没有跨篇判断（命题），下面是单篇方法——回填更多论文后会长出对比。
                 </div>
               )}
 
-              {/* 这个问题下的方法（论文卡） */}
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "#2563eb", marginBottom: 8 }}>这个问题下的方法</div>
-              <div style={{ display: "grid", gap: 9 }}>
-                {f.papers.map(paperCard)}
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "#2563eb", marginBottom: 9 }}>这个问题下的方法</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 11, alignItems: "stretch" }}>
+                {fam.papers.map(paperCard)}
               </div>
-            </section>
-          ))}
-        </div>
-
-        {/* 右：选中方法的对象层（拆开看 / 查证审计在面板里折叠） */}
-        <div style={{ position: "sticky", top: 12 }}>
-          {!sel && (
-            <div style={{ border: "1px dashed #cbd5e1", borderRadius: 14, padding: "40px 22px", textAlign: "center", color: "#94a3b8" }}>
-              点左边任一<b>方法</b> → 看它怎么用、能借什么、不能照搬什么；想深究再点「拆开看」。
-            </div>
-          )}
-          {sel && (
-            <>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
-                <h3 style={{ margin: 0, fontSize: 17, color: "#0f172a" }}>{selNode?.title || sel}</h3>
-                <a href={`/mind-palace/node/${encodeURIComponent(selNode?.id || `paper/${sel}`)}`} style={{ fontSize: 12, color: "#2563eb", whiteSpace: "nowrap" }}>⤢ 关系球</a>
-              </div>
-              {selLoading && <p className="kg-loading">加载对象层…</p>}
-              {selObj && <RosObjectPanel obj={selObj} />}
-              {!selLoading && !selObj && <div className="notice">对象层数据缺失（投影未含此篇）。</div>}
             </>
           )}
         </div>
+
+        {/* 右：选中方法的对象层 */}
+        {sel && (
+          <div style={{ position: "sticky", top: 12 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6 }}>
+              <h3 style={{ margin: 0, fontSize: 16, color: "#0f172a", flex: 1 }}>{selNode?.title || sel}</h3>
+              <button onClick={() => setSel(null)} style={{ fontSize: 12, color: "#94a3b8", background: "none", border: "none", cursor: "pointer" }}>✕ 收起</button>
+            </div>
+            <a href={`/mind-palace/node/${encodeURIComponent(selNode?.id || `paper/${sel}`)}`} style={{ fontSize: 12, color: "#2563eb" }}>⤢ 关系球</a>
+            {selLoading && <p className="kg-loading">加载对象层…</p>}
+            {selObj && <div style={{ marginTop: 8 }}><RosObjectPanel obj={selObj} /></div>}
+            {!selLoading && !selObj && <div className="notice">对象层数据缺失（投影未含此篇）。</div>}
+          </div>
+        )}
       </div>
     </main>
   );
