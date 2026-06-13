@@ -1,0 +1,162 @@
+schema: ros-synthesis-v1
+id: synth.mem.long-term-agent-memory
+question: "怎么搭一个长期记忆的 agent（存/取/改/删、保真、事实演化、怎么验证）？"
+cluster: mem
+sources: [agemem, mempalace, supermemory, memoryagentbench, rohitg00-agentmemory]
+status: draft   # 待独立对抗审 + Kevin PR 签字
+
+# ════════════════════════════════════════════════════════════════
+# 高光胶囊：每篇一个（X 解决 Y、到 Z 程度，M 改善，N 相关）
+# ════════════════════════════════════════════════════════════════
+capsules:
+  - source: agemem
+    X_method: 把六个记忆操作（LTM Add/Update/Delete + STM Retrieve/Summary/Filter）做成 agent 可调用的 typed action，再用三阶段课程 + step-wise GRPO 端到端强化学习训练「何时用哪个」。
+    Y_problem: mem.lifecycle-management（何时存/取/改/删）
+    Z_degree: "[自报·受控基准] 5 个长程基准、两 backbone 均分胜最强模块化基线（41.96 vs Mem0 37.14 / 54.31 vs A-Mem 45.74）；消融证承重的是 RL 训练（+8.5/+8.7pp）而非接口本身。跨域未证（训练课程仅 HotpotQA，作者自承评测 relatively controlled）。"
+    M_improve: 更细粒度可组合工具（作者列为 future work）；跨域课程；步级而非终局广播的信用分配。
+    N_related: ["[[rohitg00-agentmemory]] 规则式对立面", "[[memoryagentbench]] 评测尺", prop.memory-rule-vs-learned]
+    grounding: [agemem.c1, agemem.c2, agemem.m1, agemem.m2, agemem.a1]
+    fact_type: author_claim
+
+  - source: rohitg00-agentmemory
+    X_method: hook 自动采集生命周期事件统一成「观察」（脱敏去重写本地 KV）+ 三路 RRF 混合检索（BM25 0.4 / 向量 0.6 / 图 0.3，K=60）+ 缺腿权重归零重归一化的优雅降级。
+    Y_problem: mem.lifecycle-management + mem.retrieval-precision
+    Z_degree: "[自报·单一检索基准] LongMemEval-S R@5 95.2%（BM25+Vector，本地 MiniLM，无 LLM）；降级 BM25-only 86.2%。注意：自家小语料上三路 R@10 58.0% 反低于两路 58.6%（图腿小语料拖累）；文档漂移（local 非真默认）。"
+    M_improve: 三路权重/图腿须按自己语料校准（别照搬 0.4/0.6/0.3）；hook 适配新客户端无自适应。
+    N_related: ["[[agemem]] 学习式对立面", "[[mempalace]] 同走本地+混合检索", prop.memory-rule-vs-learned]
+    grounding: [rohitg00-agentmemory.c1, rohitg00-agentmemory.c2, rohitg00-agentmemory.c3, rohitg00-agentmemory.m1, rohitg00-agentmemory.m2, rohitg00-agentmemory.f1, rohitg00-agentmemory.f3]
+    fact_type: fact   # 机制为实读源码；R@5 为 author_claim
+
+  - source: mempalace
+    X_method: 逐字（verbatim）切块存为 drawers（本地嵌入，从不摘要）+ wings/rooms 元数据范围过滤 + 「向量 floor + BM25 + 可选 LLM 重排」渐进检索；保真责任压在内容层，索引层（AAAK）显式有损只作指针。
+    Y_problem: mem.fidelity-vs-abstraction + mem.retrieval-precision
+    Z_degree: "[自报] LongMemEval R@5 96.6%（raw 纯语义、无 LLM、零 API）。实读：默认 search 实为混合检索（非 raw 口径）；索引层有损——『纯逐字』工程上不存在，是分层。仅检索召回、非端到端。"
+    M_improve: 大规模检索噪声随逐字量增长，靠 wing/room scope + BM25 + rerank 兜底；缺事实演化/冲突消解层。
+    N_related: ["[[supermemory]] 保真 vs 抽取对立面", "[[memoryagentbench]] 抽取派立场", prop.verbatim-vs-extraction]
+    grounding: [mempalace.c1, mempalace.c3, mempalace.c4, mempalace.m1, mempalace.m2, mempalace.a1]
+    fact_type: fact   # 机制/分层为实读源码；R@5 为 author_claim
+
+  - source: supermemory
+    X_method: 事实抽取 + 版本链组织（每条 memory 带 version/parentMemoryId/rootMemoryId/isLatest/isForgotten/forgetAfter，relation∈updates/extends/derives）让「新事实覆盖旧、到点遗忘」成为可查询的一等数据；containerTag 多租户隔离 + hybrid 同查画像。
+    Y_problem: mem.staleness-conflict + mem.retrieval-precision
+    Z_degree: "[数据契约实读成立 / 引擎自报不可核验] 版本链字段与重建算法在开源仓库逐字可见；但抽取/消解/遗忘引擎是 hosted 黑箱、不在开源仓库——决定『何者 supersede 何者』的逻辑不可审计；自报基准 #1 无复现代码。"
+    M_improve: 消解决策不可审计→错误事实进版本链会污染且难回溯（f1/f2）；版本链假设线性（分叉只取第一支）。
+    N_related: ["[[mempalace]] 逐字派对立面", "[[memoryagentbench]] SF 维呼应", prop.verbatim-vs-extraction]
+    grounding: [supermemory.c1, supermemory.c2, supermemory.c3, supermemory.m1, supermemory.f1, supermemory.a3]
+    fact_type: fact   # 版本链数据契约为实读；抽取效果为不可核验 author_claim
+
+  - source: memoryagentbench
+    X_method: 「增量逐块喂入 + 每块请记住 + 收走原文再提问」协议，把「会翻书」和「真记住」从根上分开；沿四条正交能力轴打分——AR 精确检索 / TTL 即时学新 / LRU 长程通读 / SF 选择性遗忘。
+    Y_problem: mem.evaluation（怎么证明记忆系统真有用）
+    Z_degree: "[实测] 三族系统实测无全能者（最高 Claude-3.7 49.6）；多数商用记忆系统总分低于裸 backbone（含场景失配成分，f1）；关键：多跳选择性遗忘全行业 ≤7%，是系统性盲区。"
+    M_improve: 合成数据集（FactConsolidation 反事实拼接）有构念效度疑问——借维度协议、别复刻数据集；LLM-judge 偏差。
+    N_related: ["量所有记忆系统的尺子", "SF 维 = 衡量是否真在进化", prop.retrieval-metrics-insufficient]
+    grounding: [memoryagentbench.c1, memoryagentbench.c2, memoryagentbench.c4, memoryagentbench.m1, memoryagentbench.m2]
+    fact_type: fact
+
+# ════════════════════════════════════════════════════════════════
+# 共同之处 + 不同之处
+# ════════════════════════════════════════════════════════════════
+common:
+  - 都在解决「长期 agent 记忆」：跨会话保留、组织、调用过去信息。
+  - 都用某种检索（向量 / BM25 / 混合）作为取回手段。
+  - 4/5 都触及记忆生命周期（何时存/取/改/删/忘）。
+
+differences:
+  - axis: 记忆操作 = 固定规则 vs 可学习策略
+    poles: { rule: rohitg00-agentmemory（权重写死、可审计、零训练）, learned: agemem（typed action + RL 训练，消融证 RL 承重） }
+    proposition: prop.memory-rule-vs-learned
+  - axis: 内容 = 逐字保真 vs 抽取压缩事实
+    poles: { verbatim: mempalace（drawer 逐字、保真底座）, extraction: "supermemory + memoryagentbench 立场（记忆=压缩蒸馏的事实、可 supersede）" }
+    proposition: prop.verbatim-vs-extraction
+  - axis: 价值度量 = 检索 R@k vs 生命周期+端到端
+    poles: { retrieval: "mempalace / rohitg00（自报 R@k 当主证据）", lifecycle: memoryagentbench（R@k 必要非充分，须四维+端到端） }
+    proposition: prop.retrieval-metrics-insufficient
+  - axis: 部署 = 本地可审计 vs 云 hosted 黑箱
+    poles: { local: "mempalace / rohitg00（源码可读、数据驻留）", hosted: supermemory（引擎闭源、消解不可审计） }
+
+key_finding: >
+  MemoryAgentBench 提供裁判性发现——**不存在四维全能的记忆系统**，且**多跳选择性遗忘（SF）全行业 ≤7%**，是系统性盲区。
+  这说明：不该追求单一「最强记忆系统」，而该**按能力维度分层取长补短**，并把 SF（事实演化/覆盖旧记忆）当作最该补的短板与「是否真在进化」的关键尺。
+
+# ════════════════════════════════════════════════════════════════
+# 融合假设（新高光 / 取长补短）—— 这就是 Kevin 问"怎么搭"时给的好办法
+# ════════════════════════════════════════════════════════════════
+fusion_hypothesis:
+  statement: >
+    长期记忆 agent 不该在「规则 vs 学习」「逐字 vs 抽取」里二选一，而该搭成一个**分层、可审计、规则地基 + 可学习预留**的栈：
+    逐字底座保真可追溯，其上叠一个**可审计的**事实版本链管演化，控制决策做成 typed action（先规则可用、预留学习层），
+    检索走「向量 floor + BM25 + 可选重排」可降级，验收用四维尺并死盯 SF（选择性遗忘）这个全行业盲区。
+  layers:
+    - layer: L0 采集
+      take: hook-to-observation 自动采集 + 脱敏去重 + scope fail-closed 隔离
+      from: rohitg00-agentmemory.m1
+      why: 采集与上层 agent 解耦、可审计；零训练立即可用。
+    - layer: L1 保真底座
+      take: 逐字 drawer 本地存（从不摘要），原始事实不可逆留底
+      from: mempalace.m1
+      why: 自进化要回溯原始事实，压缩不可逆；逐字底座是可信地基（呼应本站 paper.mdx 全文存档）。
+    - layer: L2 检索
+      take: 向量 floor + BM25 + 图（可选）RRF 融合 + 缺腿降级；wing/room 范围过滤
+      from: [rohitg00-agentmemory.m2, mempalace.m2]
+      why: 便宜层永远兜底、贵层按需叠加；某腿挂了不整体失忆。
+    - layer: L3 事实演化层（可审计版）
+      take: 版本链数据契约（parentMemoryId/isLatest/forgetAfter）管「新覆盖旧、到点遗忘」
+      from: supermemory.m1
+      why: 逐字底座缺的正是事实演化；消解决策走 typed action 显式记账。**注意（对抗审 MA-1 修正）：可审计让错误 supersede 可回溯、且逐字底座让它可逆——这是相对 supermemory.f1 黑箱的真实改进，但「可审计 ≠ 消解决策正确」**，supersede/遗忘的判断本身仍是错误面（LLM-judge 偏差 agemem.f3、supermemory.a2），融合只是把风险挪到可回溯的位置、削弱它，并未消除。
+    - layer: L4 控制接口
+      take: 记忆操作做成 typed action（Add/Update/Delete/Retrieve/Summary/Filter）
+      from: agemem.m1
+      why: 把控制决策抽成 typed 接口、预留未来挂可学习层（agemem 的 noRL 本就是该接口的规则版，规则→RL 同接口升级、不重构）。**但（对抗审 MA-2 修正）规则版的『控制策略』未证可用**——agemem.c2 的 noRL 均分 33.43/45.59，**反低于现成 Mem0 37.14（Qwen2.5）**：纯规则填这个控制接口在 agemem 自己的基准上输给了开箱基线。所以本栈「立即可用」的是 L2 检索层（rohitg00 自报 R@5 95.2%，单基准、属检索能力非控制策略），不是 L4 的规则控制策略——那是最该先实测的弱缝。
+    - layer: L5 验收尺
+      take: 增量多轮协议 + 四维（AR/TTL/LRU/SF），死盯 SF
+      from: memoryagentbench.m1
+      why: 把「记忆有没有变好」变成可回归分数；SF 是全行业盲区，也是「是否真在进化」的关键维（对接本站 SUPERSEDE/no-old-new-coexistence）。
+  novelty: >
+    定位为**整合/策展型**新高光，不是新机制——把 mempalace 保真底座 + supermemory 演化契约（去黑箱）
+    + agemem typed 控制接口（规则起步、学习预留）+ rohitg00 零训练降级检索 + MAB 四维验收（死盯 SF）拼成一个分层栈，
+    把对立轴化解成同栈不同层而非选边。**诚实降级（对抗审）：rohitg00 自己的 exam_question 已勾勒过「hybrid controller = 固定地基 + 上层可学习」的雏形——本合成是把这个方向具体化成可落地的五层栈并标清每层边界，价值在工程可执行性与诚实边界，不在机制原创。**
+
+# ════════════════════════════════════════════════════════════════
+# 验证（我定的方式；Kevin 只看产出）
+# ════════════════════════════════════════════════════════════════
+verification:
+  provenance: "✓ 每层挂到具体 object/mechanism ID（见 layers[].from）；自报 vs 实测在 capsules[].Z_degree 已分清。"
+  composability:
+    - "逐字底座(mempalace) + 版本链(supermemory)：不冲突。mempalace 自己也有有损索引层(c4)，版本链作用在『判断/抽取的事实』上、指向逐字 drawer；两层互补——mempalace 缺演化、supermemory 缺可审计逐字底座。"
+    - "typed action(agemem) + 规则起步(rohitg00)：接口兼容（noRL 即 typed 接口的规则版，规则→RL 同接口升级）。**但兼容≠可用**：noRL 控制策略均分低于 Mem0（见 L4 修正）；接口可复用、规则控制策略本身待实测，是本栈最弱缝。"
+    - "MAB 四维(评测) 独立于实现，可直接叠加当回归尺。"
+    - "a1（保真不抽取）vs a2（抽取可覆盖）：分层**只解决了存储层**（mempalace.c4 自证它已在逐字之上跑有损索引，故设计自洽）——**但未解决检索默认**（对抗审）：一旦 isLatest=false，agent 默认先读演化后的抽象，正是 a1 警告的。设计补丁：检索默认须同时呈现逐字 drawer 指针、不可只返回 latest 抽象。"
+  adversarial_review:
+    state: done   # 独立冷 agent 已审，4 个阻塞修复已应用；详见 mem-long-term-agent-memory.review.md
+    verdict: "HOLDS WITH REQUIRED FIXES（修复已应用，待 Kevin PR 签字毕业出 draft）"
+    findings:
+      - "MA-1 抽取污染——PARTIALLY：逐字底座让坏 supersede 可逆（相对 supermemory.f1 黑箱是真改进），但『可审计 ≠ 决策正确』，风险被削弱非消除。已在 L3 why 修正。"
+      - "MA-2 规则起步是否够用——BREAKS 乐观框架（最弱缝）：agemem noRL 33.43/45.59 反低于 Mem0 37.14；『立即可用』实为检索层(rohitg00)非控制策略；『80%来自RL』表述不精确。已在 L4/composability/honest_boundaries 修正。"
+      - "MA-3 拼凑不可比局部最优——HOLDS：借机制非分数、R@k 全标自报、引 MAB 当唯一实测共同尺；残留=该栈尚未在 MAB 四维实跑，须保持『未证伪假设』框定。"
+      - "G-1 修复：rohitg00 capsule 文档漂移 caveat 补挂 f1（已加）。"
+      - "G-2 确认：四条 prop.* 均存在于 registry/propositions.yaml（memory-rule-vs-learned / verbatim-vs-extraction / retrieval-metrics-insufficient / parametric-vs-external-memory）。"
+      - "novelty——FAIR：整合型非新机制，rohitg00 exam_q 已勾勒 hybrid controller 雏形；措辞已据此降级。"
+  empirical_opportunity: "可在本站 BriefMem 小语料上跑 MAB 四维（尤其 SF）回归——属机会层，非阻塞；非 agent 类不强求。"
+  boundaries_cannot_borrow:
+    - "agemem 的 RL 训练回路（step-wise GRPO）：本站无可训练 model-client，先只上规则版 typed 接口。"
+    - "supermemory 的 hosted 消解引擎：黑箱不可审计，必须替换成 typed action 显式记账。"
+    - "MAB 的 FactConsolidation 合成数据集：构念效度疑问，借维度协议、别复刻。"
+    - "所有 R@k 均自报、口径不一、未独立复现——别当已核实 SOTA。"
+
+# ════════════════════════════════════════════════════════════════
+# 人读层：Kevin 问"怎么搭长期记忆 agent"时给的好办法
+# ════════════════════════════════════════════════════════════════
+answer:
+  headline: "别在『规则vs学习』『逐字vs抽取』里选边——搭成一个分层、可审计、规则起步可学习预留的栈，逐字底座保真 + 可审计演化层管事实更新 + typed 动作做控制接口 + 可降级混合检索 + 四维验收死盯『选择性遗忘』。"
+  do_first:
+    - "先把记忆控制决策（何时写/取/改/删）抽成一组 typed action（agemem 的接口）——这一步是为可审计和未来挂学习层铺路；但别假设『规则填一下就够好』（见边界），把它当可观测的接口骨架而非已验证的策略。"
+    - "底层逐字留原始记录别摘要（mempalace），上面叠一个轻量版本链管『新事实覆盖旧、到点遗忘』，覆盖/遗忘走 typed action 显式记账可回溯（取 supermemory 的契约、去它的黑箱）；检索默认要同时给逐字指针，别只返回覆盖后的最新抽象。"
+    - "检索用向量 floor + BM25，缺腿能降级（这层是真·立即可用，rohitg00 自报 R@5 95.2%）；先别上图腿（小语料上反而拖累）。"
+    - "用 MemoryAgentBench 四维当回归测试，尤其盯『选择性遗忘』——这是全行业 ≤7% 的盲区，也是判断你的记忆是不是真在进化的关键。"
+  later: "等你有可训练模型/算力，再把 typed action 接口上挂强化学习（agemem 路线）——接口不用重构。"
+  honest_boundaries: >
+    （对抗审后据实收紧）① 真·立即可用的只有检索层（rohitg00 自报 R@5 95.2%，单基准、属检索能力）；
+    ② **L4 规则控制策略未证可用**——agemem 去掉 RL 的 noRL 均分 33.43/45.59，反低于现成 Mem0 37.14，纯规则版在它自己基准上输给开箱基线，是本栈最该先实测的弱缝（RL 贡献约 +8.5/8.7pp，是『超基线增量』的大头但占绝对分约 20%，别说成八成）；
+    ③ 可审计让错误覆盖可回溯、逐字底座让它可逆，但**消解决策本身仍可能错**（LLM-judge 偏差），风险被削弱非消除；
+    ④ R@k 各家自报、口径不一、没同台；本架构是整合型融合假设，尚未在 MAB 四维上实跑——是『未证伪的好办法骨架』，不是定论。
