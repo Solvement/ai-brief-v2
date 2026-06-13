@@ -2,6 +2,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { MindPalaceBrowse } from "./MindPalaceBrowse";
+import { MindPalaceProblems } from "./MindPalaceProblems";
 
 // 记忆宫殿两区（Kevin 2026-06-11 深夜定）：
 // 「检索区」（默认）= 给 Kevin 学习/使用的蒸馏知识点；
@@ -12,8 +13,8 @@ const MindPalaceGlobe = dynamic(() => import("./MindPalaceGlobe").then((m) => m.
 });
 
 export function MindPalace() {
-  const [mode, setMode] = useState<"browse" | "globe">("browse");
-  const btn = (m: "browse" | "globe", label: string) => (
+  const [mode, setMode] = useState<"problems" | "browse" | "globe">("problems");
+  const btn = (m: "problems" | "browse" | "globe", label: string) => (
     <button
       onClick={() => setMode(m)}
       style={{
@@ -28,10 +29,11 @@ export function MindPalace() {
   return (
     <div style={{ position: "relative" }}>
       <div style={{ position: "absolute", top: 14, right: 18, zIndex: 20, display: "flex", gap: 8 }}>
-        {btn("browse", "检索区 · 给你")}
+        {btn("problems", "问题地图 · 别造轮子")}
+        {btn("browse", "按文章 · 检索")}
         {btn("globe", "记忆球 · AI")}
       </div>
-      {mode === "browse" ? <MindPalaceBrowse /> : <MindPalaceGlobe />}
+      {mode === "problems" ? <MindPalaceProblems /> : mode === "browse" ? <MindPalaceBrowse /> : <MindPalaceGlobe />}
     </div>
   );
 }
